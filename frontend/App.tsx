@@ -1,18 +1,22 @@
-import { StatusBar } from 'expo-status-bar';
-import {  Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import { Text, View, Dimensions, SafeAreaView } from "react-native";
 import "./global.css";
-import Navbar from './src/components/Navbar/Navbar';
+import BottomBar from "./src/components/Navbars/BottomBar";
+import TopBar from "./src/components/Navbars/TopBar";
 
 export default function App() {
   return (
-    <View className='flex-1 justify-center items-center bg-black '>
-      <View className='absolute bottom-0'>
-        <Navbar/>
+    <SafeAreaView className="flex-1 bg-black">
+      <View className="flex-1  items-center justify-center  bg-black ">
+        <View className=" absolute top-0  w-screen">
+          <TopBar />
+        </View>
+        <View className=" absolute bottom-0  w-screen">
+          <BottomBar />
+        </View>
+        <Text className="text-white text-xl ">It indeed works!</Text>
+        <StatusBar style={"light"} />
       </View>
-      <Text className='text-black text-xl '>It indeed works!</Text>
-      <StatusBar style="auto" />
-    </View>
+    </SafeAreaView>
   );
 }
-
-
