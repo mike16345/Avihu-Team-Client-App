@@ -3,8 +3,8 @@ import { View, Text } from "react-native";
 
 export const HomePage = () => {
   return (
-    <View>
-      <Text>HomePage</Text>
+    <View className="h-screen bg-black ">
+      <Text className="text-white">HomePage</Text>
     </View>
   );
 };
