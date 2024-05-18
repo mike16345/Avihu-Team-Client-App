@@ -1,5 +1,5 @@
-import { StatusBar } from 'expo-status-bar';
-import {  Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import { Text, View } from "react-native";
 import "./global.css";
 import LoginPage from './src/pages/LoginPage';
 
@@ -11,4 +11,3 @@ export default function App() {
     </View>
   );
 }
-
