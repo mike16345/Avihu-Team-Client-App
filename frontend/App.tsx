@@ -6,17 +6,15 @@ import TopBar from "./src/components/Navbars/TopBar";
 
 export default function App() {
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <View className="flex-1  items-center justify-center  bg-black ">
-        <View className=" absolute top-0  w-screen">
-          <TopBar />
-        </View>
-        <View className=" absolute bottom-0  w-screen">
-          <BottomBar />
-        </View>
-        <Text className="text-white text-xl ">It indeed works!</Text>
-        <StatusBar style={"light"} />
+    <View className="flex-1  items-center justify-center  bg-black ">
+      <View className=" absolute top-0  w-screen">
+        <TopBar />
       </View>
-    </SafeAreaView>
+      <View className=" absolute bottom-0  w-screen">
+        <BottomBar />
+      </View>
+      <Text className="text-white text-xl ">It indeed works!</Text>
+      <StatusBar style={"light"} />
+    </View>
   );
 }

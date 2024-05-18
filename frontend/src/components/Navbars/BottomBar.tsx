@@ -1,17 +1,12 @@
 import React from "react";
-import { View, Text, Button } from "react-native";
-import FontAwesomeIcon from "react-native-vector-icons/FontAwesome";
+import { View } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
-import { ButtonGroup } from "@rneui/themed";
 
 const BottomBar = () => {
   return (
-    <View
-      className="flex flex-row w-full justify-around  py-4 items-center
-    bg-gray-800 rounded-lg "
-    >
+    <View className=" flex-row w-full justify-around ios:pb-8 py-4 items-center bg-gray-800 rounded-lg ">
       <AntDesign
         onPress={() => {
           console.log("go home");
