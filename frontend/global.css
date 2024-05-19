@@ -2,6 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.inpt{
-    @apply bg-white p-2 border-2 my-5 w-48 text-lg rounded
+.inpt {
+    @apply bg-white p-2 border-2 my-5 w-72 text-lg rounded text-right
 }
