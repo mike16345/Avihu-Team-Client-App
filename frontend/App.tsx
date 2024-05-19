@@ -15,9 +15,9 @@ export default function App() {
         className="flex-1 h-screen  bg-black "
       >
         <MainTab />
-        <View className=" absolute top-0  w-screen">
+        {/* <View className=" absolute top-0  w-screen">
           <TopBar />
-        </View>
+        </View> */}
         {/* <View className=" absolute bottom-0  w-screen">
           <BottomBar />
         </View> */}
