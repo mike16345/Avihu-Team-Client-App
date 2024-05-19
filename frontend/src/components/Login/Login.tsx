@@ -1,5 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity, Keyboard } from 'react-native'
 import React, { useEffect, useState } from 'react'
+import { Input } from 'react-native-elements';
 
 export default function Login() {
 
@@ -21,13 +22,16 @@ export default function Login() {
                 errors[`email`] = `אנא הכניסו כתובת מייל תקינה`
             }
         }
-        if (hardcodedUser.email === inputtedCrendentials.email &&
-            hardcodedUser.password === inputtedCrendentials.password) {
-            console.log(`yay`);
-        } else {
-            console.log(`nay`);
-
+        if (errors.length==0) {
+            if (hardcodedUser.email === inputtedCrendentials.email &&
+                hardcodedUser.password === inputtedCrendentials.password) {
+                    console.log(`yay`);
+            } else {
+                console.log(`nay`);
+            }
         }
+        setFormErrors(errors);
+
     }
 
 
@@ -36,18 +40,23 @@ export default function Login() {
             <Text onPress={Keyboard.dismiss}>Login</Text>
 
             <View>
-                <TextInput
-                    placeholder='אימייל..'
-                    className='inpt '
-                    keybardType='email-address'
-                    onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, email: val })}
-                />
-                <TextInput
-                    placeholder='סיסמא..'
-                    className='inpt'
-                    secureTextEntry={true}
-                    onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, password: val })}
-                />
+                <View className='w-72'>
+                    <Input
+                        placeholder='אימייל..'
+                        className='inpt '
+                        errorMessage={formErrors[`email`]&& formErrors[`email`]}
+                        errorStyle={{textAlign:'right'}}
+                        onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, email: val })}
+                    />
+                </View>
+                <View className='w-72'>
+                    <Input
+                        placeholder='סיסמא..'
+                        className='inpt'
+                        secureTextEntry={true}
+                        onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, password: val })}
+                    />
+                </View>
 
                 <TouchableOpacity>
                     <Text className='pb-6 underline text-green-300 text-right'>הרשמה</Text>

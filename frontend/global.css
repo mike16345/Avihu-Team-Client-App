@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
-
 :root {
   --css-interop: true;
   --css-interop-verify-nativewind: true;
