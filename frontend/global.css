@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --css-interop: true;
+  --css-interop-verify-nativewind: true;
+}
+
+
 .inpt{
     @apply bg-white p-2 border-2 my-5 w-48 text-lg rounded
 }
