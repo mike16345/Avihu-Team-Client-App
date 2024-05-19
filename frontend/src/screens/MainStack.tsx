@@ -1,21 +1,22 @@
 import React from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { HomePage } from "./HomePage";
 import MyDietPlanPage from "./MyDietPlanPage";
 import MyWorkoutPlanPage from "./MyWorkoutPlanPage";
 import VideoGallery from "./VideoGallery";
+import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 
-const Stack = createNativeStackNavigator();
+const Tab = createMaterialBottomTabNavigator();
+
 // TODO: Change to bottomTab navigator
-const MainStack = () => {
+const MainTab = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Home" component={HomePage}></Stack.Screen>
-      <Stack.Screen name="MyDietPlanPage" component={MyDietPlanPage}></Stack.Screen>
-      <Stack.Screen name="MyWorkoutPlanPage" component={MyWorkoutPlanPage}></Stack.Screen>
-      <Stack.Screen name="VideoGallery" component={VideoGallery}></Stack.Screen>
-    </Stack.Navigator>
+    <Tab.Navigator>
+      <Tab.Screen name="Home" component={HomePage}></Tab.Screen>
+      <Tab.Screen name="MyDietPlanPage" component={MyDietPlanPage}></Tab.Screen>
+      <Tab.Screen name="MyWorkoutPlanPage" component={MyWorkoutPlanPage}></Tab.Screen>
+      <Tab.Screen name="VideoGallery" component={VideoGallery}></Tab.Screen>
+    </Tab.Navigator>
   );
 };
 
-export default MainStack;
+export default MainTab;
