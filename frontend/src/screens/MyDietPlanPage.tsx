@@ -3,8 +3,8 @@ import React from "react";
 
 const MyDietPlanPage = () => {
   return (
-    <View>
-      <Text>MyDietPlanPage</Text>
+    <View className="justify-center items-center bg-black flex-1">
+      <Text className="text-white">MyDietPlanPage</Text>
     </View>
   );
 };

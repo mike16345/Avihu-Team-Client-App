@@ -1,8 +1,5 @@
-import { View, Text } from "react-native";
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import BottomBar from "../components/Navbars/BottomBar";
-import TopBar from "../components/Navbars/TopBar";
 import { HomePage } from "./HomePage";
 import MyDietPlanPage from "./MyDietPlanPage";
 import MyWorkoutPlanPage from "./MyWorkoutPlanPage";

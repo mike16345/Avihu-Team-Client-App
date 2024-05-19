@@ -12,7 +12,7 @@ const BottomBar = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
-    <View className=" flex-row w-full justify-around ios:pb-8 py-4 items-center bg-gray-800 rounded-lg ">
+    <View className=" flex-row w-full justify-around ios:pb-8 py-4 items-center bg-gray-800 rounded-t-lg ">
       <AntDesign
         onPress={() => {
           navigation.navigate("Home");

@@ -3,8 +3,8 @@ import React from "react";
 
 const VideoGallery = () => {
   return (
-    <View>
-      <Text>VideoGallery</Text>
+    <View className="justify-center items-center">
+      <Text className="text-white">VideoGallery</Text>
     </View>
   );
 };
