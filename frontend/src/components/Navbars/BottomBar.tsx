@@ -8,8 +8,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 
 const BottomBar = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   return (
     <View className=" flex-row w-full justify-around ios:pb-8 py-4 items-center bg-gray-800 rounded-t-lg ">
@@ -24,7 +23,7 @@ const BottomBar = () => {
 
       <IonIcon
         onPress={() => {
-          navigation.navigate("MyWorkoutPlanPage");
+          navigation.navigate("MyWorkoutPlanPage", { id: "Hello World" });
         }}
         style={{ color: "white" }}
         name="body"

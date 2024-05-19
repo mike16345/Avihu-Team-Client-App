@@ -9,7 +9,7 @@ import MainStack from "./src/screens/MainStack";
 export default function App() {
   return (
     <NavigationContainer>
-      <View className="flex-1  bg-black ">
+      <View className="flex-1 h-screen  bg-black ">
         <MainStack />
         <View className=" absolute top-0  w-screen">
           <TopBar />
@@ -17,7 +17,7 @@ export default function App() {
         <View className=" absolute bottom-0  w-screen">
           <BottomBar />
         </View>
-        {/* <StatusBar style={"light"} /> */}
+        <StatusBar style={"light"} />
       </View>
     </NavigationContainer>
   );
