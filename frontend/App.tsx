@@ -6,7 +6,7 @@ import LoginPage from './src/pages/LoginPage';
 export default function App() {
   return (
     <View className='flex-1 justify-center items-center  '>
-      <LoginPage/>
+      <LoginPage />
       <StatusBar style="auto" />
     </View>
   );
