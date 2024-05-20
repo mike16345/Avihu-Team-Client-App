@@ -1,6 +1,7 @@
-import { View, Text, TextInput, TouchableOpacity, Keyboard } from 'react-native'
+import { View,  TouchableOpacity, Keyboard } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Input } from 'react-native-elements';
+import { Input, Text } from 'react-native-elements';
+
 
 export default function Login() {
 
@@ -29,9 +30,9 @@ export default function Login() {
         if (errors.length == 0) {
             if (hardcodedUser.email === inputtedCrendentials.email &&
                 hardcodedUser.password === inputtedCrendentials.password) {
-                console.log(`yay`);
+                setStatus(`התחברות בוצעה בהצלחה`)
             } else {
-                console.log(`nay`);
+                setStatus(`התחברות נכשלה!`)
 
             }
         }
@@ -41,10 +42,9 @@ export default function Login() {
 
 
     return (
-        <View>
-            <Text onPress={Keyboard.dismiss}>Login</Text>
-
+        <View className='flex-1  justify-center'>
             <View>
+                <Text onPress={()=> Keyboard.dismiss()} className='text-4xl text-center pb-8'>כניסה לחשבונך</Text>
                 <View className='w-72'>
                     <Input
                         placeholder='אימייל..'
@@ -66,14 +66,14 @@ export default function Login() {
                 </View>
 
                 <TouchableOpacity>
-                    <Text className='pb-6 underline text-green-300 text-right'>הרשמה</Text>
+                    <Text className='pb-6 underline text-right'>הרשמה</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={handleSubmit}>
-                    <Text className='bg-green-200 text-center py-2 '>התחברות</Text>
+                    <Text className='bg-green-200 text-center py-2'>התחברות</Text>
                 </TouchableOpacity>
 
-                <Text>{status}</Text>
+                <Text className='text-center pt-6'>{status}</Text>
             </View>
         </View>
     )
