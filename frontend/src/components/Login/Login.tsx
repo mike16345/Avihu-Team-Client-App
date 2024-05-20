@@ -16,18 +16,23 @@ export default function Login() {
     const handleSubmit = () => {
         Keyboard.dismiss()
         const errors: array = [];
-        if (inputtedCrendentials.email) {
-            const emailRegex = /^[\w\.-]+@[a-zA-Z\d\.-]+\.[a-zA-Z]{2,}$/;
-            if (!emailRegex.test(inputtedCrendentials.email)) {
-                errors[`email`] = `אנא הכניסו כתובת מייל תקינה`
-            }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(inputtedCrendentials.email) || !inputtedCrendentials.email) {
+            errors[`email`] = `אנא הכניסו כתובת מייל תקינה`
         }
-        if (errors.length==0) {
+
+        if (!inputtedCrendentials.password) {
+            errors[`password`] = `אנא הזינו סיסמא`
+        }
+
+        if (errors.length == 0) {
             if (hardcodedUser.email === inputtedCrendentials.email &&
                 hardcodedUser.password === inputtedCrendentials.password) {
-                    console.log(`yay`);
+                console.log(`yay`);
             } else {
                 console.log(`nay`);
+
             }
         }
         setFormErrors(errors);
@@ -44,15 +49,17 @@ export default function Login() {
                     <Input
                         placeholder='אימייל..'
                         className='inpt '
-                        errorMessage={formErrors[`email`]&& formErrors[`email`]}
-                        errorStyle={{textAlign:'right'}}
-                        onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, email: val })}
+                        errorMessage={formErrors[`email`]}
+                        errorStyle={{ textAlign: 'right' }}
+                        onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, email: val.toLocaleLowerCase().trim() })}
                     />
                 </View>
                 <View className='w-72'>
                     <Input
                         placeholder='סיסמא..'
                         className='inpt'
+                        errorMessage={formErrors[`password`]}
+                        errorStyle={{ textAlign: 'right' }}
                         secureTextEntry={true}
                         onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, password: val })}
                     />
