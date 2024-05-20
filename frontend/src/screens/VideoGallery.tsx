@@ -3,7 +3,7 @@ import React from "react";
 
 const VideoGallery = () => {
   return (
-    <View className="justify-center items-center">
+    <View className="flex-1 bg-black justify-center items-center">
       <Text className="text-white">VideoGallery</Text>
     </View>
   );

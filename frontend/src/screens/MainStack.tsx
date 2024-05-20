@@ -8,17 +8,18 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import IonIcon from "react-native-vector-icons/Ionicons";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
 import ProfileScreen from "./ProfileScreen";
-import { Platform } from "react-native";
-import { cssInterop, remapProps } from "nativewind";
+import { remapProps } from "nativewind";
 
 const Tab = createMaterialBottomTabNavigator();
+
 remapProps(Tab.Navigator, {
   barClass: "barStyle",
 });
+
 // TODO: Change to bottomTab navigator
 const MainTab = () => {
   return (
-    <Tab.Navigator initialRouteName="Home" barClass="bg-black android:pb-8" activeColor="#e91e63">
+    <Tab.Navigator initialRouteName="Home" activeColor="#e91e63">
       <Tab.Screen
         name="Home"
         component={HomePage}
@@ -44,6 +45,8 @@ const MainTab = () => {
         component={MyWorkoutPlanPage}
         options={{
           tabBarLabel: "Workout",
+          tabBarAccessibilityLabel: "Workout Tab",
+
           tabBarIcon: ({ color }: { color: string }) => (
             <IonIcon color={color} name="body" size={28} />
           ),
