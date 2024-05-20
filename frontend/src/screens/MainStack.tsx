@@ -19,15 +19,21 @@ remapProps(Tab.Navigator, {
 // TODO: Change to bottomTab navigator
 const MainTab = () => {
   return (
-    <Tab.Navigator initialRouteName="Home" activeColor="#e91e63">
+    <Tab.Navigator
+      barStyle={{ backgroundColor: "#1F2937" }}
+      initialRouteName="Home"
+      inactiveColor="white"
+      activeColor="#10B981"
+    >
       <Tab.Screen
         name="Home"
         component={HomePage}
         options={{
           tabBarLabel: "Home",
-          tabBarIcon: ({ color }: { color: string }) => (
-            <MaterialCommunityIcons name="home" color={color} size={28} />
-          ),
+          tabBarIcon: ({ color }: { color: string }) => {
+            console.log("color", color);
+            return <MaterialCommunityIcons name="home" color={color} size={28} />;
+          },
         }}
       />
       <Tab.Screen
