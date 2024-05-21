@@ -5,8 +5,7 @@ import Login from '../components/Login/Login'
 export default function LoginPage() {
     return (
         <View>
-        <Text>LoginPage</Text>
-        <Login/>
+            <Login/>
         </View>
     )
 }
