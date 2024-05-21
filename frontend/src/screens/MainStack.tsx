@@ -8,13 +8,8 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import IonIcon from "react-native-vector-icons/Ionicons";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
 import ProfileScreen from "./ProfileScreen";
-import { remapProps } from "nativewind";
 
 const Tab = createMaterialBottomTabNavigator();
-
-remapProps(Tab.Navigator, {
-  barClass: "barStyle",
-});
 
 // TODO: Change to bottomTab navigator
 const MainTab = () => {
@@ -47,7 +42,7 @@ const MainTab = () => {
         }}
       />
       <Tab.Screen
-        name="Workout"
+        name="MyWorkoutPlanPage"
         component={MyWorkoutPlanPage}
         options={{
           tabBarLabel: "Workout",
