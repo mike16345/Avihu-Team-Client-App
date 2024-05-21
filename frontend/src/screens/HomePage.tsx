@@ -18,7 +18,7 @@ export const HomePage = () => {
       ></ImageBackground>
       <View className="absolute pointer-events-none flex-1  h-screen w-screen bg-black opacity-40 z-40"></View>
       <View className="absolute top-1/2 items-center z-[100] justify-center gap-2">
-        <Text className="text-3xl   font-black text-white ">Avihu Busheri</Text>
+        <Text className="text-3xl font-black text-white ">Avihu Busheri</Text>
         <TouchableOpacity className="">
           <Text className="bg-emerald-300 p-3 rounded text-black font-bold ">Get Started</Text>
         </TouchableOpacity>
