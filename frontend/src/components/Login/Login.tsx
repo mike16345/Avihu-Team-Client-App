@@ -16,6 +16,7 @@ export default function Login() {
 
     const handleSubmit = () => {
         Keyboard.dismiss()
+
         const errors: array = [];
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -28,16 +29,16 @@ export default function Login() {
         }
 
         if (errors.length == 0) {
+
             if (hardcodedUser.email === inputtedCrendentials.email &&
                 hardcodedUser.password === inputtedCrendentials.password) {
                 setStatus(`התחברות בוצעה בהצלחה`)
             } else {
                 setStatus(`התחברות נכשלה!`)
-
             }
+
         }
         setFormErrors(errors);
-
     }
 
 
@@ -70,7 +71,7 @@ export default function Login() {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={handleSubmit}>
-                    <Text className='bg-green-200 text-center py-2'>התחברות</Text>
+                    <Text className='bg-emerald-300 text-center py-2'>התחברות</Text>
                 </TouchableOpacity>
 
                 <Text className='text-center pt-6'>{status}</Text>
