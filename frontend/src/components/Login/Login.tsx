@@ -1,6 +1,6 @@
-import { View, TouchableOpacity, Keyboard, ImageBackground } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { Image, Input, Text } from 'react-native-elements';
+import { View, TouchableOpacity, Keyboard, ImageBackground,Text, KeyboardAvoidingView } from 'react-native'
+import React, { useState } from 'react'
+import { Input } from 'react-native-elements';
 import avihuBg from './avihuBg.jpeg'
 
 export default function Login() {
@@ -11,8 +11,9 @@ export default function Login() {
     }
 
     const [inputtedCrendentials, setInputtedCredentials] = useState<{ email: string, password: string }>({ email: ``, password: `` });
-    const [status, setStatus] = useState<string>(``);
-    const [formErrors, setFormErrors] = useState<array>([])
+    const [status, setStatus] = useState<string>();
+    const [formErrors, setFormErrors] = useState<array>([]);
+    const [didSucceed, setDidSucceed] = useState<boolean>()
 
     const handleSubmit = () => {
         Keyboard.dismiss()
@@ -28,13 +29,15 @@ export default function Login() {
             errors[`password`] = `אנא הזינו סיסמא`
         }
 
-        if (errors.length == 0) {
+        if (!errors[`email`] && !errors[`password`]) {
 
             if (hardcodedUser.email === inputtedCrendentials.email &&
                 hardcodedUser.password === inputtedCrendentials.password) {
                 setStatus(`התחברות בוצעה בהצלחה`)
+                setDidSucceed(true)
             } else {
                 setStatus(`התחברות נכשלה!`)
+                setDidSucceed(false)
             }
 
         }
@@ -44,10 +47,10 @@ export default function Login() {
 
     return (
         <View className='flex-1 w-screen justify-center ' >
-            <ImageBackground source={avihuBg} className='w-full h-full flex-1 absolute z-0' />
+            <ImageBackground source={avihuBg} className='w-full h-full flex-2 absolute z-0' />
             <View className=' w-full h-full absolute top-0 left-0 bg-black opacity-55 z-10'></View>
-            <View className='w-full items-center z-30'>
-                <Text onPress={() => Keyboard.dismiss()} className='text-4xl text-center pb-8'>כניסה לחשבונך</Text>
+            <KeyboardAvoidingView behavior='padding' className='w-full items-center z-30'>
+                <Text  className='text-5xl text-center text-emerald-300 font-bold pb-8'>כניסה לחשבון</Text>
                 <View className=' w-80'>
                     <Input
                         placeholder='אימייל..'
@@ -69,15 +72,20 @@ export default function Login() {
                 </View>
 
                 <TouchableOpacity >
-                    <Text className='pb-6 underline text-right'>הרשמה</Text>
+                    <Text className='pb-6 w-72 underline text-right text-emerald-300'>הרשמה</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={handleSubmit}>
-                    <Text className='bg-emerald-300 text-center py-2'>התחברות</Text>
+                    <Text className='bg-emerald-300 text-center py-2 w-72 font-bold'>התחברות</Text>
                 </TouchableOpacity>
 
-                <Text className='text-center pt-6'>{status}</Text>
-            </View>
+                { didSucceed ? (
+                            <Text className='text-emerald-300 pt-8 text-lg'>{status}</Text>
+                        ) : (
+                            <Text className='text-red-700 pt-8 text-lg'>{status}</Text>
+                        )
+                    }
+            </KeyboardAvoidingView>
         </View>
     )
 }
