@@ -1,7 +1,7 @@
-import { View,  TouchableOpacity, Keyboard } from 'react-native'
+import { View, TouchableOpacity, Keyboard, ImageBackground } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Input, Text } from 'react-native-elements';
-
+import { Image, Input, Text } from 'react-native-elements';
+import avihuBg from './avihuBg.jpeg'
 
 export default function Login() {
 
@@ -43,10 +43,11 @@ export default function Login() {
 
 
     return (
-        <View className='flex-1  justify-center'>
-            <View>
-                <Text onPress={()=> Keyboard.dismiss()} className='text-4xl text-center pb-8'>כניסה לחשבונך</Text>
-                <View className='w-72'>
+        <View className='flex-1 w-screen justify-center ' >
+            <ImageBackground source={avihuBg} className='w-full h-full flex-1 absolute  ' />
+            <View className='w-full items-center bg-black'>
+                <Text onPress={() => Keyboard.dismiss()} className='text-4xl text-center pb-8'>כניסה לחשבונך</Text>
+                <View className=' w-80'>
                     <Input
                         placeholder='אימייל..'
                         className='inpt '
@@ -55,7 +56,7 @@ export default function Login() {
                         onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, email: val.toLocaleLowerCase().trim() })}
                     />
                 </View>
-                <View className='w-72'>
+                <View className='w-80'>
                     <Input
                         placeholder='סיסמא..'
                         className='inpt'
@@ -66,7 +67,7 @@ export default function Login() {
                     />
                 </View>
 
-                <TouchableOpacity>
+                <TouchableOpacity >
                     <Text className='pb-6 underline text-right'>הרשמה</Text>
                 </TouchableOpacity>
 
