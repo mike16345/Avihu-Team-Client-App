@@ -6,20 +6,23 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 import MainTab from "./src/screens/MainStack";
 import "react-native-gesture-handler";
 import "./global.css";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function App() {
   return (
     <NavigationContainer>
-      <SafeAreaProvider
-        initialMetrics={initialWindowMetrics}
-        className="flex-1 h-screen  bg-black "
-      >
-        <MainTab />
-        <View className=" absolute top-0  w-screen">
+      <GestureHandlerRootView className=" flex-1">
+        <SafeAreaProvider
+          initialMetrics={initialWindowMetrics}
+          className="flex-1 h-screen  bg-black "
+        >
+          <MainTab />
+          {/* <View className=" absolute top-0  w-screen">
           <TopBar />
-        </View>
-        <StatusBar style={"light"} />
-      </SafeAreaProvider>
+        </View> */}
+          <StatusBar style={"light"} />
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
     </NavigationContainer>
   );
 }

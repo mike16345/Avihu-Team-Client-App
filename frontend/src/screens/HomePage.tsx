@@ -18,7 +18,7 @@ export const HomePage: React.FC<HomePageProps> = ({ navigation }) => {
         source={avihuFlyTrap}
         style={{
           width: moderateScale(350, 2),
-          height: moderateScale(650, 2),
+          height: moderateScale(675, 2),
           paddingTop: StatusBar.currentHeight,
         }}
       ></ImageBackground>

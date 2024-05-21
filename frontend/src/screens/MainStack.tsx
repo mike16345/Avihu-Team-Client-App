@@ -5,13 +5,15 @@ import MyWorkoutPlanPage from "./MyWorkoutPlanPage";
 import VideoGallery from "./VideoGallery";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+
 import IonIcon from "react-native-vector-icons/Ionicons";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
 import ProfileScreen from "./ProfileScreen";
+import MyProgressScreen from "./MyProgressScreen";
 
 const Tab = createMaterialBottomTabNavigator();
 
-// TODO: Change to bottomTab navigator
 const MainTab = () => {
   return (
     <Tab.Navigator
@@ -49,7 +51,7 @@ const MainTab = () => {
           tabBarAccessibilityLabel: "Workout Tab",
 
           tabBarIcon: ({ color }: { color: string }) => (
-            <IonIcon color={color} name="body" size={28} />
+            <MaterialCommunityIcons color={color} name="weight-lifter" size={28} />
           ),
         }}
       />
@@ -64,15 +66,27 @@ const MainTab = () => {
         }}
       />
       <Tab.Screen
+        name="MyWeight"
+        component={MyProgressScreen}
+        options={{
+          tabBarLabel: "Weight ",
+
+          tabBarIcon: ({ color }: { color: string }) => (
+            <MaterialIcons name="monitor-weight" color={color} size={28} />
+          ),
+        }}
+      />
+      {/* <Tab.Screen
         name="Profile"
         component={ProfileScreen}
         options={{
           tabBarLabel: "Profile",
+
           tabBarIcon: ({ color }: { color: string }) => (
             <MaterialCommunityIcons name="account" color={color} size={28} />
           ),
         }}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };
