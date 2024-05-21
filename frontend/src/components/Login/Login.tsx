@@ -44,8 +44,9 @@ export default function Login() {
 
     return (
         <View className='flex-1 w-screen justify-center ' >
-            <ImageBackground source={avihuBg} className='w-full h-full flex-1 absolute  ' />
-            <View className='w-full items-center bg-black'>
+            <ImageBackground source={avihuBg} className='w-full h-full flex-1 absolute z-0' />
+            <View className=' w-full h-full absolute top-0 left-0 bg-black opacity-55 z-10'></View>
+            <View className='w-full items-center z-30'>
                 <Text onPress={() => Keyboard.dismiss()} className='text-4xl text-center pb-8'>כניסה לחשבונך</Text>
                 <View className=' w-80'>
                     <Input
