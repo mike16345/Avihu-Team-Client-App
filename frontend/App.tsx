@@ -1,18 +1,13 @@
 import { StatusBar } from "expo-status-bar";
 import { View } from "react-native";
-import BottomBar from "./src/components/Navigators/BottomBar";
 import TopBar from "./src/components/Navigators/TopBar";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import MainTab from "./src/screens/MainStack";
 import "react-native-gesture-handler";
 import "./global.css";
-import Sidebar from "./src/components/Navigators/Sidebar";
-import { useState } from "react";
 
 export default function App() {
-  const [isDrawerOpen, setisDrawerOpen] = useState(false);
-
   return (
     <NavigationContainer>
       <SafeAreaProvider

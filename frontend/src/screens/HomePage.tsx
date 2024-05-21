@@ -1,24 +1,28 @@
 import React from "react";
-import { View, Text, ImageBackground } from "react-native";
+import { View, Text, ImageBackground, Dimensions, StatusBar, TouchableOpacity } from "react-native";
 import avihuFlyTrap from "../../assets/avihuFlyTrap.jpeg";
+import { moderateScale } from "react-native-size-matters";
+import { Button } from "react-native-paper";
 
 export const HomePage = () => {
   return (
-    <View className="flex-1 ">
+    <View className="flex-1 items-center ">
       <ImageBackground
-        className=" w-auto  h-screen items-center justify-center"
+        className="  object-fill  items-center  justify-center z-0"
         source={avihuFlyTrap}
-        style={{}}
-      >
-        <Text
-          className="text-2xl font-bold shadow-lg  text-white text-center z-50"
-          style={{
-            elevation: 10,
-          }}
-        >
-          Avihu Busheri
-        </Text>
-      </ImageBackground>
+        style={{
+          width: moderateScale(300, 2),
+          height: moderateScale(600, 2),
+          paddingTop: StatusBar.currentHeight,
+        }}
+      ></ImageBackground>
+      <View className="absolute pointer-events-none flex-1  h-screen w-screen bg-black opacity-40 z-40"></View>
+      <View className="absolute top-1/2 items-center z-[100] justify-center gap-2">
+        <Text className="text-3xl   font-black text-white ">Avihu Busheri</Text>
+        <TouchableOpacity className="">
+          <Text className="bg-emerald-300 p-3 rounded text-black font-bold ">Get Started</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
