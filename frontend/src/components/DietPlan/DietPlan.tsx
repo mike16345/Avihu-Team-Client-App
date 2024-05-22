@@ -1,11 +1,9 @@
 import { View, Text } from 'react-native'
 import React, { useState } from 'react'
 import dietPlan from './dietPlan.json'
-import { ListItem } from '@rneui/themed';
-import chicken from '../../../assets/images/chicken-icon.svg'
-import bread from '../../../assets/images/bread-icon.svg'
-import vegetable from '../../../assets/images/vegetable-icon.svg'
+
 import { Image } from 'react-native-elements';
+import CollapsableItem from './CollapsableItem';
 
 export default function DietPlan() {
 
@@ -14,18 +12,7 @@ export default function DietPlan() {
 
     return (
         <View className='w-screen'>
-            <ListItem.Accordion
-                content={
-                    <>
-                        <ListItem.Title>ארוחה 1:</ListItem.Title>
-                    </>
-                }
-            >
-                <ListItem>
-
-                </ListItem>
-
-            </ListItem.Accordion>
+            <CollapsableItem meal={meal[1]} title='ארוחה ראשונה' />
         </View>
     )
 }
