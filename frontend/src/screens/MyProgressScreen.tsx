@@ -20,17 +20,22 @@ const MyProgressScreen = () => {
         height={350}
         yAxisSuffix="lb"
         yAxisInterval={1} // optional, defaults to 1
+        withHorizontalLines={true}
+        withDots={false}
+        withVerticalLines={false}
         chartConfig={{
           backgroundColor: "#1c1917",
           backgroundGradientFrom: "#1c1917",
           backgroundGradientTo: "#292524",
-          propsForLabels: { fontStyle: "italic", onPress: () => console.log("something") },
           decimalPlaces: 1, // optional, defaults to 2dp
+          propsForHorizontalLabels: { onPress: (e) => console.log("e", e) },
+          propsForLabels: { onPress: (e) => console.log("e", e.target) },
+
           color: (opacity = 1) => `#6ee7b7`,
           labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           propsForDots: {
             r: "5",
-            strokeWidth: "2",
+            strokeWidth: "1.5",
             stroke: "#FFF",
           },
         }}
