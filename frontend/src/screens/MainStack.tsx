@@ -4,13 +4,8 @@ import MyDietPlanPage from "./MyDietPlanPage";
 import MyWorkoutPlanPage from "./MyWorkoutPlanPage";
 import VideoGallery from "./VideoGallery";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-
-import IonIcon from "react-native-vector-icons/Ionicons";
-import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
-import ProfileScreen from "./ProfileScreen";
 import MyProgressScreen from "./MyProgressScreen";
+import NativeIcon from "../components/Icon/NativeIcon";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -28,8 +23,9 @@ const MainTab = () => {
         options={{
           tabBarLabel: "Home",
           tabBarIcon: ({ color }: { color: string }) => {
-            console.log("color", color);
-            return <MaterialCommunityIcons name="home" color={color} size={28} />;
+            return (
+              <NativeIcon library="MaterialCommunityIcons" name="home" color={color} size={28} />
+            );
           },
         }}
       />
@@ -39,7 +35,7 @@ const MainTab = () => {
         options={{
           tabBarLabel: "Videos",
           tabBarIcon: ({ color }: { color: string }) => (
-            <MaterialCommunityIcons name="video" color={color} size={28} />
+            <NativeIcon library="MaterialCommunityIcons" name="video" color={color} size={28} />
           ),
         }}
       />
@@ -51,7 +47,12 @@ const MainTab = () => {
           tabBarAccessibilityLabel: "Workout Tab",
 
           tabBarIcon: ({ color }: { color: string }) => (
-            <MaterialCommunityIcons color={color} name="weight-lifter" size={28} />
+            <NativeIcon
+              library="MaterialCommunityIcons"
+              color={color}
+              name="weight-lifter"
+              size={28}
+            />
           ),
         }}
       />
@@ -61,7 +62,7 @@ const MainTab = () => {
         options={{
           tabBarLabel: "Diet",
           tabBarIcon: ({ color }: { color: string }) => (
-            <FontAwesome6 color={color} name="bowl-food" size={28} />
+            <NativeIcon library="FontAwesome6" color={color} name="bowl-food" size={28} />
           ),
         }}
       />
@@ -72,21 +73,10 @@ const MainTab = () => {
           tabBarLabel: "Weight ",
 
           tabBarIcon: ({ color }: { color: string }) => (
-            <MaterialIcons name="monitor-weight" color={color} size={28} />
+            <NativeIcon library="MaterialIcons" name="monitor-weight" color={color} size={28} />
           ),
         }}
       />
-      {/* <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarLabel: "Profile",
-
-          tabBarIcon: ({ color }: { color: string }) => (
-            <MaterialCommunityIcons name="account" color={color} size={28} />
-          ),
-        }}
-      /> */}
     </Tab.Navigator>
   );
 };
