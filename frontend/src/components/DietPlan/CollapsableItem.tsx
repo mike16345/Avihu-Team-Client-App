@@ -1,9 +1,6 @@
 import { View, Text } from 'react-native'
 import React, { useState } from 'react'
 import { ListItem } from '@rneui/themed';
-import chicken from '../../../assets/images/chicken-icon.svg'
-import bread from '../../../assets/images/bread-icon.svg'
-import vegetable from '../../../assets/images/vegetable-icon.svg'
 import { Avatar, Image } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5'
 
@@ -12,7 +9,7 @@ export default function CollapsableItem({ meal, title }) {
     const [expanded, setExpanded] = useState(false);
 
     return (
-        <View className='w-full items-end'>
+        <View className='w-full items-start'>
             <ListItem.Accordion
                 content={
                     <>
@@ -21,20 +18,26 @@ export default function CollapsableItem({ meal, title }) {
                 }
                 isExpanded={expanded}
                 onPress={() => setExpanded(!expanded)}
-                className='bg-slate-400'
+                className='w-screen items-end'
             >
-                <View className='flex-row'>
-                    <ListItem className='flex-row'>
-                        <Icon name='drumstick-bite' />
-                        <Text>{`${meal.totalProtein}g`}</Text>
+                <View className='flex-row-reverse w-screen items-center justify-center border-2'>
+                    <ListItem >
+                        <View className='flex-row items-center border-2 w-[33vw] justify-center'>
+                            <Icon  name='drumstick-bite' />
+                            <Text className='text-lg pl-2' >{`${meal.totalProtein}g`}</Text>
+                        </View>
                     </ListItem>
                     <ListItem>
-                        <Icon name='bread-slice' />
-                        <Text>{`${meal.totalCarbs}g`}</Text>
+                        <View className='flex-row items-center border-2 w-[30vw] justify-center'>
+                            <Icon name='bread-slice' />
+                            <Text className='text-lg pl-2'>{`${meal.totalCarbs}g`}</Text>
+                        </View>
                     </ListItem>
                     <ListItem>
-                        <Icon name='carrot' />
-                        <Text>{`${meal.totalVeggies}`}</Text>
+                        <View className='flex-row items-center border-2 w-[33vw] justify-center'>
+                            <Icon name='carrot' />
+                            <Text className='text-lg pl-2'>{`${meal.totalVeggies}`}</Text>
+                        </View>
                     </ListItem>
                 </View>
 

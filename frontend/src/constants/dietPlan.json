@@ -3,24 +3,28 @@
     "meals": [
         {
             "id": "10",
+            "title":"ארוחה ראשונה",
             "totalProtein": "40",
             "totalCarbs": "160",
             "totalVeggies": "5"
         },
         {
             "id": "20",
+            "title":"ארוחה שניה",
             "totalProtein": "160",
             "totalCarbs": "80",
             "totalVeggies": "5"
         },
         {
             "id": "30",
+            "title":"ארוחה שלישית",
             "totalProtein": "80",
             "totalCarbs": "160",
             "totalVeggies": "5"
         },
         {
             "id": "40",
+            "title":"ארוחה רביעית",
             "totalProtein": "40",
             "totalCarbs": "80",
             "totalVeggies": "5"
