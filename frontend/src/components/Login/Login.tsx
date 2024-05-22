@@ -73,7 +73,7 @@ export default function Login() {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={handleSubmit}>
-                    <Text className='bg-emerald-300 text-center py-2'>התחברות</Text>
+                    <Text className='bg-emerald-300 text-center py-2 px-28'>התחברות</Text>
                 </TouchableOpacity>
 
                 <Text className='text-center pt-6'>{status}</Text>
