@@ -1,6 +1,4 @@
 import { StatusBar } from "expo-status-bar";
-import { View } from "react-native";
-import TopBar from "./src/components/Navigators/TopBar";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import MainTab from "./src/screens/MainStack";
@@ -17,9 +15,6 @@ export default function App() {
           className="flex-1 h-screen  bg-black "
         >
           <MainTab />
-          {/* <View className=" absolute top-0  w-screen">
-          <TopBar />
-        </View> */}
           <StatusBar style={"light"} />
         </SafeAreaProvider>
       </GestureHandlerRootView>
