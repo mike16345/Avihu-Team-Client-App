@@ -1,16 +1,16 @@
 import React from "react";
-import { HomePage } from "./HomePage";
-import MyDietPlanPage from "./MyDietPlanPage";
-import MyWorkoutPlanPage from "./MyWorkoutPlanPage";
-import VideoGallery from "./VideoGallery";
+import { HomePage } from "../screens/HomePage";
+import MyDietPlanPage from "../screens/MyDietPlanPage";
+import MyWorkoutPlanPage from "../screens/MyWorkoutPlanPage";
+import VideoGallery from "../screens/VideoGallery";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
-import MyProgressScreen from "./MyProgressScreen";
+import MyProgressScreen from "../screens/MyProgressScreen";
 import NativeIcon from "../components/Icon/NativeIcon";
 import { RootStackParamList } from "../types/navigatorTypes";
 
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
-const MainTab = () => {
+const BottomTabNavigator = () => {
   return (
     <Tab.Navigator
       barStyle={{ backgroundColor: "#1F2937" }}
@@ -69,7 +69,7 @@ const MainTab = () => {
         }}
       />
       <Tab.Screen
-        name="MyWeight"
+        name="MyProgressScreen"
         component={MyProgressScreen}
         options={{
           tabBarLabel: "Weight ",
@@ -83,4 +83,4 @@ const MainTab = () => {
   );
 };
 
-export default MainTab;
+export default BottomTabNavigator;
