@@ -4,4 +4,5 @@ export type RootStackParamList = {
   Settings: undefined;
   MyWorkoutPlanPage: undefined;
   MyDietPlanPage: undefined;
+  VideoGallery: undefined;
 };

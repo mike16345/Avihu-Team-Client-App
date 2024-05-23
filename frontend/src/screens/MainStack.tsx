@@ -8,15 +8,16 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import IonIcon from "react-native-vector-icons/Ionicons";
 import FontAwesome6 from "react-native-vector-icons/FontAwesome6";
 import ProfileScreen from "./ProfileScreen";
+import { RootStackParamList } from "../types/navigatorTypes";
 
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
 // TODO: Change to bottomTab navigator
 const MainTab = () => {
   return (
     <Tab.Navigator
       barStyle={{ backgroundColor: "#1F2937" }}
-      initialRouteName="Home"
+      initialRouteName="MyDietPlanPage"
       inactiveColor="white"
       activeColor="#10B981"
     >
@@ -26,13 +27,13 @@ const MainTab = () => {
         options={{
           tabBarLabel: "Home",
           tabBarIcon: ({ color }: { color: string }) => {
-            console.log("color", color);
             return <MaterialCommunityIcons name="home" color={color} size={28} />;
           },
         }}
       />
+
       <Tab.Screen
-        name="Video Gallery"
+        name="VideoGallery"
         component={VideoGallery}
         options={{
           tabBarLabel: "Videos",
@@ -54,7 +55,7 @@ const MainTab = () => {
         }}
       />
       <Tab.Screen
-        name="Diet"
+        name="MyDietPlanPage"
         component={MyDietPlanPage}
         options={{
           tabBarLabel: "Diet",
