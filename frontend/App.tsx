@@ -1,12 +1,25 @@
 import { StatusBar } from "expo-status-bar";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import TopBar from "./src/components/Navigators/TopBar";
+import { NavigationContainer } from "@react-navigation/native";
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
+import MainTab from "./src/screens/MainStack";
+import "react-native-gesture-handler";
 import "./global.css";
 
 export default function App() {
   return (
-    <View className="flex-1 justify-center items-center bg-green-500 ">
-      <Text className="text-black text-xl ">It actually works!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <SafeAreaProvider
+        initialMetrics={initialWindowMetrics}
+        className="flex-1 h-screen  bg-black "
+      >
+        <MainTab />
+        <View className=" absolute top-0  w-screen">
+          <TopBar />
+        </View>
+        <StatusBar style={"light"} />
+      </SafeAreaProvider>
+    </NavigationContainer>
   );
 }
