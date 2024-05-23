@@ -6,14 +6,15 @@ import VideoGallery from "./VideoGallery";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import MyProgressScreen from "./MyProgressScreen";
 import NativeIcon from "../components/Icon/NativeIcon";
+import { RootStackParamList } from "../types/navigatorTypes";
 
-const Tab = createMaterialBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
 const MainTab = () => {
   return (
     <Tab.Navigator
       barStyle={{ backgroundColor: "#1F2937" }}
-      initialRouteName="Home"
+      initialRouteName="MyDietPlanPage"
       inactiveColor="white"
       activeColor="#10B981"
     >
@@ -29,8 +30,9 @@ const MainTab = () => {
           },
         }}
       />
+
       <Tab.Screen
-        name="Video Gallery"
+        name="VideoGallery"
         component={VideoGallery}
         options={{
           tabBarLabel: "Videos",
@@ -57,7 +59,7 @@ const MainTab = () => {
         }}
       />
       <Tab.Screen
-        name="Diet"
+        name="MyDietPlanPage"
         component={MyDietPlanPage}
         options={{
           tabBarLabel: "Diet",
