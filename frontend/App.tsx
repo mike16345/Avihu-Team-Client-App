@@ -6,20 +6,23 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 import MainTab from "./src/screens/MainStack";
 import "react-native-gesture-handler";
 import "./global.css";
-import LoginPage from './src/pages/LoginPage';
+import Login from "./src/components/Login/Login";
+import { useState } from "react";
 
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
     <NavigationContainer>
       <SafeAreaProvider
         initialMetrics={initialWindowMetrics}
         className="flex-1 h-screen  bg-black "
       >
-        <MainTab />
-        <View className=" absolute top-0  w-screen">
+        {isLoggedIn && <MainTab />}
+        {/* <View className=" absolute top-0  w-screen">
           <TopBar />
-        </View>
-        <LoginPage />
+        </View> */}
+        {!isLoggedIn && <Login setIsLoggedIn={setIsLoggedIn} />}
         <StatusBar style={"light"} />
       </SafeAreaProvider>
     </NavigationContainer>
