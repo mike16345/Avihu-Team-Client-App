@@ -1,8 +1,18 @@
 import React, { useState } from "react";
-import { View, Button, Dimensions, StyleSheet, ScrollView, StatusBar, Text } from "react-native";
+import {
+  View,
+  Button,
+  Dimensions,
+  StyleSheet,
+  ScrollView,
+  StatusBar,
+  Text,
+  Platform,
+} from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { weighIns, weights } from "../constants/MyWeight";
 import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -30,10 +40,17 @@ const ChartWithDynamicColors = () => {
     transform: [{ translateX: tooltipX.value }, { translateY: tooltipY.value }],
   }));
 
+  console.log("Statuse bar height: ", StatusBar.currentHeight);
+
   const [tooltipValue, setTooltipValue] = useState<number | null>(null);
   const [currentRange, setCurrentRange] = useState<Ranges>("oneMonth");
 
   const chartLabels = externalDataSet[currentRange].labels;
+
+  const tapGesture = Gesture.Tap().onEnd((e) => {
+    tooltipX.value = e.absoluteX;
+    tooltipY.value = e.absoluteY;
+  });
 
   const handleRangeChange = (range: Ranges) => {
     try {
@@ -45,54 +62,58 @@ const ChartWithDynamicColors = () => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
-      <LineChart
-        data={{
-          labels: chartLabels,
-          datasets: [
-            {
-              data: weights,
-              strokeWidth: 2,
-            },
-          ],
-          legend: ["מעקב שקילה"],
-        }}
-        width={screenWidth}
-        height={220}
-        onDataPointClick={(data) => {
-          const { x, y, value, getColor } = data;
-          console.log("x", x);
-          console.log("y", y);
-          console.log("value", value);
-          tooltipX.value = x;
-          tooltipY.value = y;
+      <GestureDetector gesture={tapGesture}>
+        <Animated.View>
+          <LineChart
+            data={{
+              labels: chartLabels,
+              datasets: [
+                {
+                  data: weights,
+                  strokeWidth: 2,
+                },
+              ],
+              legend: ["מעקב שקילה"],
+            }}
+            width={screenWidth}
+            height={220}
+            onDataPointClick={(data) => {
+              const { x, y, value, getColor } = data;
+              console.log("x", x);
+              console.log("y", y);
+              console.log("value", value);
+              // tooltipX.value = x;
+              // tooltipY.value = y;
 
-          setTooltipValue(value);
-        }}
-        chartConfig={{
-          backgroundColor: "#18181b",
-          backgroundGradientFrom: "#18181b",
-          backgroundGradientTo: "#18181b",
-          decimalPlaces: 2,
-          color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(256, 256, 256, ${opacity})`,
-          style: {
-            borderRadius: 16,
-          },
+              setTooltipValue(value);
+            }}
+            chartConfig={{
+              backgroundColor: "#18181b",
+              backgroundGradientFrom: "#18181b",
+              backgroundGradientTo: "#18181b",
+              decimalPlaces: 2,
+              color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(256, 256, 256, ${opacity})`,
+              style: {
+                borderRadius: 16,
+              },
 
-          propsForDots: {
-            r: "6",
-            strokeWidth: "2",
-            stroke: "#fff", // White color for the dots
-          },
-        }}
-        bezier
-        style={{
-          marginVertical: 8,
-        }}
-      />
+              propsForDots: {
+                r: "6",
+                strokeWidth: "2",
+                stroke: "#fff", // White color for the dots
+              },
+            }}
+            bezier
+            style={{
+              marginVertical: 8,
+            }}
+          />
+        </Animated.View>
+      </GestureDetector>
       {tooltipValue !== null && (
         <Animated.View style={[styles.tooltip, tooltipStyle]}>
-          <Text className="text-white font-semibold">{tooltipValue}</Text>
+          <Text className="text-white  font-semibold">{tooltipValue}</Text>
         </Animated.View>
       )}
       <View style={styles.buttonContainer}>
@@ -109,7 +130,15 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: "black",
-    paddingTop: StatusBar.currentHeight,
+    paddingTop: StatusBar.currentHeight || 0,
+    ...Platform.select({
+      ios: {
+        paddingTop: 32,
+      },
+      android: {
+        // backgroundColor: "blue",
+      },
+    }),
   },
   buttonContainer: {
     flexDirection: "row",
@@ -119,7 +148,6 @@ const styles = StyleSheet.create({
   tooltip: {
     position: "absolute",
     backgroundColor: "rgba(0, 0, 0, 0.7)",
-    padding: 8,
     borderRadius: 4,
     zIndex: 100,
   },
