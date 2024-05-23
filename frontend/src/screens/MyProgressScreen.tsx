@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { View, Button, Dimensions, StyleSheet, ScrollView, StatusBar } from "react-native";
+import { View, Button, Dimensions, StyleSheet, ScrollView, StatusBar, Text } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { weighIns, weights } from "../constants/MyWeight";
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -21,10 +22,17 @@ const externalDataSet = {
 };
 
 type Ranges = "oneMonth" | "threeMonths" | "oneYear";
+
 const ChartWithDynamicColors = () => {
+  const tooltipX = useSharedValue(0);
+  const tooltipY = useSharedValue(0);
+  const tooltipStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: tooltipX.value }, { translateY: tooltipY.value }],
+  }));
+
+  const [tooltipValue, setTooltipValue] = useState<number | null>(null);
   const [currentRange, setCurrentRange] = useState<Ranges>("oneMonth");
 
-  const chartData = externalDataSet[currentRange].data;
   const chartLabels = externalDataSet[currentRange].labels;
 
   const handleRangeChange = (range: Ranges) => {
@@ -50,18 +58,28 @@ const ChartWithDynamicColors = () => {
         }}
         width={screenWidth}
         height={220}
+        onDataPointClick={(data) => {
+          const { x, y, value, getColor } = data;
+          console.log("x", x);
+          console.log("y", y);
+          console.log("value", value);
+          tooltipX.value = x;
+          tooltipY.value = y;
+
+          setTooltipValue(value);
+        }}
         chartConfig={{
           backgroundColor: "#18181b",
           backgroundGradientFrom: "#18181b",
           backgroundGradientTo: "#18181b",
           decimalPlaces: 2,
-          color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`, // text-emerald-300
+          color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`,
           labelColor: (opacity = 1) => `rgba(256, 256, 256, ${opacity})`,
           style: {
             borderRadius: 16,
           },
+
           propsForDots: {
-            onPress: (e) => {},
             r: "6",
             strokeWidth: "2",
             stroke: "#fff", // White color for the dots
@@ -72,6 +90,11 @@ const ChartWithDynamicColors = () => {
           marginVertical: 8,
         }}
       />
+      {tooltipValue !== null && (
+        <Animated.View style={[styles.tooltip, tooltipStyle]}>
+          <Text className="text-white font-semibold">{tooltipValue}</Text>
+        </Animated.View>
+      )}
       <View style={styles.buttonContainer}>
         <Button title="1M" onPress={() => handleRangeChange("oneMonth")} />
         <Button title="3M" onPress={() => handleRangeChange("threeMonths")} />
@@ -92,6 +115,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginTop: 16,
     gap: 12,
+  },
+  tooltip: {
+    position: "absolute",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    padding: 8,
+    borderRadius: 4,
+    zIndex: 100,
   },
 });
 
