@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
-import MainTab from "./src/screens/MainStack";
+import BottomTabNavigator from "./src/Navigators/BottomTabNavigator";
 import "react-native-gesture-handler";
 import "./global.css";
 import Login from "./src/components/Login/Login";
@@ -9,7 +9,7 @@ import { useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   return (
     <NavigationContainer>
@@ -18,8 +18,7 @@ export default function App() {
           initialMetrics={initialWindowMetrics}
           className="flex-1 h-screen  bg-black "
         >
-          <MainTab />
-          {isLoggedIn && <MainTab />}
+          {isLoggedIn && <BottomTabNavigator />}
           {!isLoggedIn && <Login setIsLoggedIn={setIsLoggedIn} />}
           <StatusBar style={"light"} />
         </SafeAreaProvider>
