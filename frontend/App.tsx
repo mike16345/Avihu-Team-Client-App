@@ -14,18 +14,20 @@ import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const { getItem } = useAsyncStorage("isLoggedIn");
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const { getItem, removeItem } = useAsyncStorage("isLoggedIn");
+
+  const checkLoginStatus = async () => {
+    const token = await getItem();
+    if (token) setIsLoggedIn(true);
+  };
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      const token = await getItem();
-      console.log(token);
-      if (token) {
-        setIsLoggedIn(true);
-      }
-    };
     checkLoginStatus();
+
+    return () => {
+      removeItem();
+    };
   }, []);
 
   return (

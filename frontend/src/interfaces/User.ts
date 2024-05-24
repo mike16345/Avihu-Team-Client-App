@@ -12,7 +12,8 @@ export interface IUser {
 
 // WeighIn interface
 export interface IWeighIn {
-  id: string;
-  dateOfWeighIn: Date;
+  id?: string;
+  date: Date;
   weight: number;
+  weightUnit: "lbs" | "kg";
 }
