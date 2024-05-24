@@ -7,7 +7,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigatorTypes";
 
 interface HomePageProps {
-  navigation: NativeStackNavigationProp<RootStackParamList, "Home">;
+  navigation?: NativeStackNavigationProp<RootStackParamList, "Home">;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ navigation }) => {
@@ -25,7 +25,7 @@ export const HomePage: React.FC<HomePageProps> = ({ navigation }) => {
       <View className="absolute  flex-1  h-screen w-screen bg-black opacity-40 z-40"></View>
       <View className="absolute top-1/2 items-center z-[100] justify-center gap-2">
         <Text className="text-3xl font-black text-white ">Avihu Busheri</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("MyWorkoutPlanPage")} className="">
+        <TouchableOpacity onPress={() => navigation!.navigate("MyWorkoutPlanPage")} className="">
           <Text className="bg-emerald-300 p-3 rounded text-black font-bold ">Get Started</Text>
         </TouchableOpacity>
       </View>

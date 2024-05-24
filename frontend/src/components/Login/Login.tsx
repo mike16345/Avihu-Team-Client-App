@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import { Input } from "react-native-elements";
 import avihuBg from "../../../assets/avihuFlyTrap.jpeg";
 import { testEmail } from "../../utils/utils";
+import NativeIcon from "../Icon/NativeIcon";
 
 interface IUserCredentials {
   email: string;
@@ -37,6 +38,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     password: ``,
   });
   const [status, setStatus] = useState<string>();
+  const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<ICredentialsErrors>({});
   const [didSucceed, setDidSucceed] = useState<boolean>();
 
@@ -70,17 +72,18 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
   };
 
   return (
-    <View className="flex-1 w-screen justify-center ">
+    <View className="flex-1 w-screen justify-center  ">
       <ImageBackground source={avihuBg} className="w-full h-full flex-2 absolute z-0" />
       <View className=" w-full h-full absolute top-0 left-0 bg-black opacity-55 z-10"></View>
-      <KeyboardAvoidingView behavior="padding" className="w-full items-center z-30">
+      <KeyboardAvoidingView behavior="padding" className="w-full gap-4 items-center z-30">
         <Text className="ios:text-5xl text-4xl text-center text-emerald-300 font-bold pb-8">
           כניסה לחשבון
         </Text>
-        <View className=" w-80">
+        <View className=" items-center justify-center w-80">
           <Input
             placeholder="Email..."
-            className="inpt "
+            inputContainerStyle={{ borderBottomWidth: 0 }}
+            className="inpt  "
             keyboardType={Platform.OS == "android" ? "email-address" : "default"}
             autoCorrect={false}
             autoComplete="email"
@@ -98,29 +101,37 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
         <View className="w-80">
           <Input
             placeholder="Password..."
-            className="inpt placeholder:text-right"
+            className="inpt "
+            inputContainerStyle={{ borderBottomWidth: 0 }}
             errorMessage={formErrors[`password`]}
             errorStyle={{ textAlign: "right" }}
-            secureTextEntry={true}
+            secureTextEntry={!showPassword}
             textContentType="oneTimeCode"
             onChangeText={(val) =>
               setInputtedCredentials({ ...inputtedCrendentials, password: val })
             }
           />
+          <NativeIcon
+            onPress={() => setShowPassword((show) => !show)}
+            library="MaterialCommunityIcons"
+            name={showPassword ? "eye-off-outline" : "eye-outline"}
+            color={"black"}
+            size={28}
+            style={{ position: "absolute", zIndex: 10, top: 10, right: 20 }}
+          />
         </View>
-
         <TouchableOpacity>
-          <Text className="pb-6 w-72 underline text-right text-emerald-300">הרשמה</Text>
+          <Text className="w-72 underline text-right text-emerald-300">הרשמה</Text>
         </TouchableOpacity>
-
         <TouchableOpacity onPress={handleSubmit}>
-          <Text className="bg-emerald-300 text-center py-2 w-72 font-bold">התחברות</Text>
+          <Text className="bg-emerald-300 text-center text-lg rounded-md py-2 w-72 font-bold">
+            התחברות
+          </Text>
         </TouchableOpacity>
-
         {didSucceed ? (
-          <Text className="text-emerald-300 pt-8 text-lg">{status}</Text>
+          <Text className="text-emerald-300 text-lg">{status}</Text>
         ) : (
-          <Text className="text-red-700 pt-8 text-lg">{status}</Text>
+          <Text className="text-red-700 text-lg">{status}</Text>
         )}
       </KeyboardAvoidingView>
     </View>

@@ -7,9 +7,10 @@ import "./global.css";
 import Login from "./src/components/Login/Login";
 import { useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { HomePage } from "./src/screens/HomePage";
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <NavigationContainer>
@@ -18,8 +19,9 @@ export default function App() {
           initialMetrics={initialWindowMetrics}
           className="flex-1 h-screen  bg-black "
         >
-          {isLoggedIn && <BottomTabNavigator />}
-          {!isLoggedIn && <Login setIsLoggedIn={setIsLoggedIn} />}
+          {isLoggedIn ? <BottomTabNavigator /> : <Login setIsLoggedIn={setIsLoggedIn} />}
+
+
           <StatusBar style={"light"} />
         </SafeAreaProvider>
       </GestureHandlerRootView>
