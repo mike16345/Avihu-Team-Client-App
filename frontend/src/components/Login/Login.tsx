@@ -12,6 +12,7 @@ import { Input } from "react-native-elements";
 import avihuBg from "../../../assets/avihuFlyTrap.jpeg";
 import { testEmail } from "../../utils/utils";
 import NativeIcon from "../Icon/NativeIcon";
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 interface IUserCredentials {
   email: string;
@@ -32,6 +33,8 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     email: `avihu123@gmail.com`,
     password: `qwerty123`,
   };
+
+  const { setItem } = useAsyncStorage("isLoggedIn");
 
   const [inputtedCrendentials, setInputtedCredentials] = useState<IUserCredentials>({
     email: ``,
@@ -64,6 +67,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     if (hardcodedUser.email === email && hardcodedUser.password === password) {
       setStatus(`התחברות בוצעה בהצלחה`);
       setDidSucceed(true);
+      setItem("true");
       setIsLoggedIn(true);
     } else {
       setStatus(`התחברות נכשלה!`);
