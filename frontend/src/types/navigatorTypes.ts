@@ -6,4 +6,5 @@ export type RootStackParamList = {
   MyDietPlanPage: undefined;
   VideoGallery: undefined;
   MyProgressScreen: undefined;
+  LoginScreen: undefined;
 };

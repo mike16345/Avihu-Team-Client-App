@@ -1,5 +1,4 @@
 import React from "react";
-import { HomePage } from "../screens/HomePage";
 import MyDietPlanPage from "../screens/MyDietPlanPage";
 import MyWorkoutPlanPage from "../screens/MyWorkoutPlanPage";
 import VideoGallery from "../screens/VideoGallery";
@@ -14,23 +13,10 @@ const BottomTabNavigator = () => {
   return (
     <Tab.Navigator
       barStyle={{ backgroundColor: "#1F2937" }}
-      initialRouteName="MyDietPlanPage"
+      initialRouteName="MyProgressScreen"
       inactiveColor="white"
       activeColor="#10B981"
     >
-      <Tab.Screen
-        name="Home"
-        component={HomePage}
-        options={{
-          tabBarLabel: "Home",
-          tabBarIcon: ({ color }: { color: string }) => {
-            return (
-              <NativeIcon library="MaterialCommunityIcons" name="home" color={color} size={28} />
-            );
-          },
-        }}
-      />
-
       <Tab.Screen
         name="VideoGallery"
         component={VideoGallery}

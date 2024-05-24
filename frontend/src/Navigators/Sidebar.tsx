@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { HomePage } from "../screens/HomePage";
+import { HomePage } from "../screens/GetStartedScreen";
 import TopBar from "./TopBar";
 const Drawer = createDrawerNavigator();
 
