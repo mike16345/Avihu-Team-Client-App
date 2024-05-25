@@ -83,7 +83,7 @@ class DateUtils {
         return this.extractMonthLabels(data);
       case "years":
         return this.extractYearLabels(data);
-      default:
+      default: 
         throw new Error("Invalid range. Use  'days','months', or 'years'.");
     }
   }
@@ -144,11 +144,10 @@ class DateUtils {
     return labels;
   }
   private static extractYearLabels<T>(data: ItemsInDateRangeParams<T>): string[] {
+    const currentYear = new Date().getFullYear();
     const { items, dateKey, n } = data;
-    let labels: string[] = [];
 
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
+    let labels: string[] = [];
 
     for (let month = 0; month < 12; month++) {
       const monthDate = new Date(currentYear, month, 1);
@@ -168,7 +167,7 @@ class DateUtils {
       return found;
     });
 
-    return labels;
+    return labels.length > 5 ? labels.map((label) => label.slice(0, 3)) : labels;
   }
 }
 
