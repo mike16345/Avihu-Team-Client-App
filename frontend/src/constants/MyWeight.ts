@@ -1,6 +1,6 @@
 import { IWeighIn } from "../interfaces/User";
 
-export const weighIns: IWeighIn[] = [
+export const myWeighIns: IWeighIn[] = [
   { date: new Date("2024-02-18"), weightUnit: "lbs", weight: 218.4 },
   { date: new Date("2024-02-19"), weightUnit: "lbs", weight: 215.2 },
   { date: new Date("2024-02-20"), weightUnit: "lbs", weight: 216.0 },
@@ -80,12 +80,11 @@ export const weighIns: IWeighIn[] = [
   { date: new Date("2024-05-19"), weightUnit: "lbs", weight: 199.4 },
   { date: new Date("2024-05-20"), weightUnit: "lbs", weight: 197.4 },
   { date: new Date("2024-05-21"), weightUnit: "lbs", weight: 196.4 },
+  { date: new Date("2024-06-21"), weightUnit: "lbs", weight: 195.4 },
+  { date: new Date("2024-07-21"), weightUnit: "lbs", weight: 194.4 },
+  { date: new Date("2024-08-21"), weightUnit: "lbs", weight: 193.9 },
+  { date: new Date("2024-09-21"), weightUnit: "lbs", weight: 193.4 },
+  { date: new Date("2024-10-21"), weightUnit: "lbs", weight: 192.4 },
+  { date: new Date("2024-11-21"), weightUnit: "lbs", weight: 191.4 },
+  { date: new Date("2024-12-21"), weightUnit: "lbs", weight: 190.4 },
 ];
-
-export const weights = [
-  218.4, 215.2, 216, 216, 214.4, 215.6, 212.8, 216, 214.8, 214.6, 214, 213.2, 212.6, 212, 211.6,
-  211, 211.2, 211.6, 210.8, 210.4, 209.6, 208.2, 208.2, 208.2, 210.8, 208.2, 206.6, 207, 209.8,
-];
-// 207.8, 209.4, 206.4, 204.8, 205.6, 206.8, 206.2, 205.4, 207, 201.2, 201.2, 201.2, 201.2, 204, 204,
-// 201.2, 200.8, 201.2, 199.6, 199.4, 200.8, 199.4, 199.4, 198.6, 197.8, 199, 199, 197.6, 197.4,
-// 197.6, 196.6, 197.4, 197.4, 197, 196.8, 195.6, 196.4,
