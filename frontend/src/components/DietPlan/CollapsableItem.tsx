@@ -5,7 +5,7 @@ import { Avatar, Image } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import { white } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 
-export default function CollapsableItem({ meal, title }) {
+export default function CollapsableItem({ meal, title, uiTypes, setter }) {
 
     const [expanded, setExpanded] = useState(false);
 
@@ -25,18 +25,18 @@ export default function CollapsableItem({ meal, title }) {
             >
                 <View className='flex-row-reverse w-screen items-center justify-center border-2'>
                     <ListItem containerStyle={{ backgroundColor: 'black' }}  >
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => setter(uiTypes.PROTEIN)}>
                             <View style={{ backgroundColor: 'black' }} className='flex-row items-center border-2 w-[33vw] justify-center'>
                                 <Icon name='drumstick-bite' color='rgb(110 231 183)' size={24} />
-                                <Text style={{ color: 'rgb(110 231 183)' }} className='text-lg pl-2' >{`${meal.totalProtein}g`}</Text>
+                                <Text style={{ color: 'rgb(110 231 183)' }} className='text-lg pl-2' >{` X ${meal.totalProtein}`}</Text>
                             </View>
                         </TouchableOpacity>
                     </ListItem>
                     <ListItem containerStyle={{ backgroundColor: 'black' }}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => setter(uiTypes.CARBS)}>
                             <View style={{ backgroundColor: 'black' }} className='flex-row items-center border-2 w-[30vw] justify-center'>
                                 <Icon name='bread-slice' color='rgb(110 231 183)' size={24} />
-                                <Text style={{ color: 'rgb(110 231 183)' }} className='text-lg pl-2'>{`${meal.totalCarbs}g`}</Text>
+                                <Text style={{ color: 'rgb(110 231 183)' }} className='text-lg pl-2'>{` X ${meal.totalCarbs}`}</Text>
                             </View>
                         </TouchableOpacity>
                     </ListItem>
@@ -44,7 +44,7 @@ export default function CollapsableItem({ meal, title }) {
                         <TouchableOpacity>
                             <View style={{ backgroundColor: 'black' }} className='flex-row items-center border-2 w-[33vw] justify-center'>
                                 <Icon name='carrot' color='rgb(110 231 183)' size={24} />
-                                <Text style={{ color: 'rgb(110 231 183)' }} className='text-lg pl-2'>{`${meal.totalVeggies}`}</Text>
+                                <Text style={{ color: 'rgb(110 231 183)' }} className='text-lg pl-2'>{` X ${meal.totalVeggies}`}</Text>
                             </View>
                         </TouchableOpacity>
                     </ListItem>
