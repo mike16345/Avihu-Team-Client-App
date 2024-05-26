@@ -4,8 +4,7 @@ import DietPlan from '../components/DietPlan/DietPlan'
 
 export default function MyDietPlanPage() {
     return (
-        <View>
-            <Text>MyDietPlanPage</Text>
+        <View className='flex-1'>
             <DietPlan />
         </View>
     )

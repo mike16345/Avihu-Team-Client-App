@@ -19,11 +19,12 @@ export default function App() {
         initialMetrics={initialWindowMetrics}
         className="flex-1 h-screen  bg-black "
       >
-        {isLoggedIn && <MainTab />}
+        {/* {isLoggedIn && <MainTab />} */}
         {/* <View className=" absolute top-0  w-screen">
           <TopBar />
         </View> */}
-        {!isLoggedIn && <Login setIsLoggedIn={setIsLoggedIn} />}
+        {/* {!isLoggedIn && <Login setIsLoggedIn={setIsLoggedIn} />} */}
+        <MyDietPlanPage />
         <StatusBar style={"light"} />
       </SafeAreaProvider>
     </NavigationContainer>
