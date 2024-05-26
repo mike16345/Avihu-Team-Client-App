@@ -1,3 +1,5 @@
+import { WeightUnit } from "../types/weightTypes";
+
 export interface IUser {
   id: string;
   name: string;
@@ -15,5 +17,5 @@ export interface IWeighIn {
   id?: string;
   date: Date;
   weight: number;
-  weightUnit: "lbs" | "kg";
+  weightUnit: WeightUnit;
 }

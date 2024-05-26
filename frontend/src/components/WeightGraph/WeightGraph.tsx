@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, StatusBar, useWindowDimensions, Platform } from "react-native";
+import { View, StyleSheet, useWindowDimensions } from "react-native";
 import React, { useState } from "react";
 import { LineChart } from "react-native-chart-kit";
 import { myWeighIns } from "../../constants/MyWeight";
@@ -6,9 +6,10 @@ import { IWeighIn } from "../../interfaces/User";
 import { ItemsInDateRangeParams, DateRanges } from "../../types/dateTypes";
 import DateUtils from "../../utils/dateUtils";
 import { Colors } from "../../constants/Colors";
-import Button from "../Button/Button";
 import WeightCard from "./WeightCard";
 import WeeklyScoreCard from "./WeeklyScoreCard";
+import AddWeight from "./AddWeight";
+import ChangeRangeBtns from "./ChangeRangeBtns";
 
 const rangeParams: ItemsInDateRangeParams<IWeighIn> = {
   items: myWeighIns,
@@ -48,13 +49,21 @@ export const WeightGraph = () => {
     setCurrentRange(range);
   };
 
+  const handleSaveNewWeighIn = (newWeighIn: IWeighIn) => {
+    const newWeighIns = [...weighIns, newWeighIn];
+    const weights = extractWeights(newWeighIns);
+
+    setWeighIns(newWeighIns);
+    setWeights(weights);
+  };
+
   function extractWeights(items: IWeighIn[]) {
     return items.map((item) => item.weight);
   }
 
   return (
     <View style={styles.container}>
-      <View>
+      <View style={styles.weightContainer}>
         <LineChart
           data={{
             labels: DateUtils.extractLabels({
@@ -106,31 +115,16 @@ export const WeightGraph = () => {
             borderRadius: 16,
           }}
         />
-        <View style={styles.buttonContainer}>
-          <Button style={styles.rangeButton} onPress={() => handleRangeChange("weeks")}>
-            <Text style={styles.rangeText}>1W</Text>
-          </Button>
-          <Button style={styles.rangeButton} onPress={() => handleRangeChange("months")}>
-            <Text style={styles.rangeText}>1M</Text>
-          </Button>
-          <Button style={styles.rangeButton} onPress={() => handleRangeChange("years")}>
-            <Text style={styles.rangeText}>1Y</Text>
-          </Button>
+        <ChangeRangeBtns onRangeChange={handleRangeChange} />
+        <View
+          style={{ height: 120 }}
+          className="flex-row items-center justify-between w-screen gap-4"
+        >
+          <WeightCard currentWeight={selectedWeight || weights[weights.length - 1]} />
+          <WeeklyScoreCard weights={weights} range={currentRange} />
         </View>
       </View>
-
-      <View
-        style={{ height: 120 }}
-        className="flex-row items-center justify-between w-screen gap-4"
-      >
-        <WeightCard currentWeight={selectedWeight || weights[weights.length - 1]} />
-        <WeeklyScoreCard weights={weights} range={currentRange} />
-      </View>
-      <View style={{ flex: 1 }}>
-        <Button style={styles.addWeightButton}>
-          <Text>הוסף משקל</Text>
-        </Button>
-      </View>
+      <AddWeight onSave={handleSaveNewWeighIn} />
     </View>
   );
 };
@@ -139,45 +133,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: "black",
+    justifyContent: "space-around",
+  },
+  weightContainer: {
+    flex: 1,
     gap: 12,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    marginTop: 16,
-    gap: 12,
-  },
-  selectedWeight: {
-    fontWeight: 600,
-    textAlign: "center",
-  },
-  rangeButton: {
-    backgroundColor: Colors.bgSecondry,
-    borderRadius: 4,
-    width: 100,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  rangeText: {
-    fontWeight: "600",
-    color: Colors.primary,
-  },
-  addWeightButton: {
-    width: "100%",
-    height: 50,
-    backgroundColor: Colors.primary,
-    padding: 12,
-    borderRadius: 4,
-    justifyContent: "center",
-    alignItems: "center",
   },
 });

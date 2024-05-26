@@ -9,7 +9,6 @@ const WeightCard: React.FC<WeightCardProps> = ({ currentWeight }) => {
   return (
     <View style={styles.card}>
       <Text className="text-white font-bold text-right ">משקל נוכחי</Text>
-
       <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 3 }}>
         <Text className="text-white text-2xl  font-bold">{currentWeight}</Text>
         <Text style={{ color: "white", fontSize: 12 }} className="text-white">

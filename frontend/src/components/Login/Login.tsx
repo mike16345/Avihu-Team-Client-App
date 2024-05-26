@@ -87,7 +87,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
           <Input
             placeholder="Email..."
             inputContainerStyle={{ borderBottomWidth: 0 }}
-            className="inpt  "
+            className="inpt w-72 "
             keyboardType={Platform.OS == "android" ? "email-address" : "default"}
             autoCorrect={false}
             autoComplete="email"
@@ -105,7 +105,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
         <View className="w-80">
           <Input
             placeholder="Password..."
-            className="inpt "
+            className="inpt w-72 "
             inputContainerStyle={{ borderBottomWidth: 0 }}
             errorMessage={formErrors[`password`]}
             errorStyle={{ textAlign: "right" }}
