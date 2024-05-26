@@ -1,83 +1,128 @@
-import { View, TouchableOpacity, Keyboard, ImageBackground } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { Image, Input, Text } from 'react-native-elements';
-import avihuBg from './avihuBg.jpeg'
+import {
+  View,
+  TouchableOpacity,
+  Keyboard,
+  ImageBackground,
+  Text,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import React, { useState } from "react";
+import { Input } from "react-native-elements";
+import avihuBg from "../../../assets/avihuFlyTrap.jpeg";
+import { testEmail } from "../../utils/utils";
 
-export default function Login() {
+interface IUserCredentials {
+  email: string;
+  password: string;
+}
 
-    const hardcodedUser = {
-        email: `avihu123@gmail.com`,
-        password: `qwerty123`
+interface ICredentialsErrors {
+  email?: string;
+  password?: string;
+}
+
+interface ILoginProps {
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function Login({ setIsLoggedIn }: ILoginProps) {
+  const hardcodedUser: IUserCredentials = {
+    email: `avihu123@gmail.com`,
+    password: `qwerty123`,
+  };
+
+  const [inputtedCrendentials, setInputtedCredentials] = useState<IUserCredentials>({
+    email: ``,
+    password: ``,
+  });
+  const [status, setStatus] = useState<string>();
+  const [formErrors, setFormErrors] = useState<ICredentialsErrors>({});
+  const [didSucceed, setDidSucceed] = useState<boolean>();
+
+  const handleSubmit = () => {
+    const { email, password } = inputtedCrendentials;
+    const errors: ICredentialsErrors = {};
+
+    Keyboard.dismiss();
+
+    if (!testEmail(email)) {
+      errors[`email`] = `אנא הכניסו כתובת מייל תקינה`;
     }
 
-    const [inputtedCrendentials, setInputtedCredentials] = useState<{ email: string, password: string }>({ email: ``, password: `` });
-    const [status, setStatus] = useState<string>(``);
-    const [formErrors, setFormErrors] = useState<array>([])
+    if (!password) {
+      errors[`password`] = `אנא הזינו סיסמא`;
+    }
 
-    const handleSubmit = () => {
-        Keyboard.dismiss()
+    if (errors[`email`] || errors[`password`]) {
+      setFormErrors(errors);
+      return;
+    }
 
-        const errors: array = [];
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (hardcodedUser.email === email && hardcodedUser.password === password) {
+      setStatus(`התחברות בוצעה בהצלחה`);
+      setDidSucceed(true);
+      setIsLoggedIn(true);
+    } else {
+      setStatus(`התחברות נכשלה!`);
+      setDidSucceed(false);
+    }
+  };
 
-        if (!emailRegex.test(inputtedCrendentials.email) || !inputtedCrendentials.email) {
-            errors[`email`] = `אנא הכניסו כתובת מייל תקינה`
-        }
-
-        if (!inputtedCrendentials.password) {
-            errors[`password`] = `אנא הזינו סיסמא`
-        }
-
-        if (errors.length == 0) {
-
-            if (hardcodedUser.email === inputtedCrendentials.email &&
-                hardcodedUser.password === inputtedCrendentials.password) {
-                setStatus(`התחברות בוצעה בהצלחה`)
-            } else {
-                setStatus(`התחברות נכשלה!`)
+  return (
+    <View className="flex-1 w-screen justify-center ">
+      <ImageBackground source={avihuBg} className="w-full h-full flex-2 absolute z-0" />
+      <View className=" w-full h-full absolute top-0 left-0 bg-black opacity-55 z-10"></View>
+      <KeyboardAvoidingView behavior="padding" className="w-full items-center z-30">
+        <Text className="ios:text-5xl text-4xl text-center text-emerald-300 font-bold pb-8">
+          כניסה לחשבון
+        </Text>
+        <View className=" w-80">
+          <Input
+            placeholder="Email..."
+            className="inpt "
+            keyboardType={Platform.OS == "android" ? "email-address" : "default"}
+            autoCorrect={false}
+            autoComplete="email"
+            errorMessage={formErrors[`email`]}
+            textContentType="oneTimeCode"
+            errorStyle={{ textAlign: "right" }}
+            onChangeText={(val) =>
+              setInputtedCredentials({
+                ...inputtedCrendentials,
+                email: val.toLocaleLowerCase().trim(),
+              })
             }
-
-        }
-        setFormErrors(errors);
-    }
-
-
-    return (
-        <View className='flex-1 w-screen justify-center ' >
-            <ImageBackground source={avihuBg} className='w-full h-full flex-1 absolute z-0' />
-            <View className=' w-full h-full absolute top-0 left-0 bg-black opacity-55 z-10'></View>
-            <View className='w-full items-center z-30'>
-                <Text onPress={() => Keyboard.dismiss()} className='text-4xl text-center pb-8'>כניסה לחשבונך</Text>
-                <View className=' w-80'>
-                    <Input
-                        placeholder='אימייל..'
-                        className='inpt '
-                        errorMessage={formErrors[`email`]}
-                        errorStyle={{ textAlign: 'right' }}
-                        onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, email: val.toLocaleLowerCase().trim() })}
-                    />
-                </View>
-                <View className='w-80'>
-                    <Input
-                        placeholder='סיסמא..'
-                        className='inpt'
-                        errorMessage={formErrors[`password`]}
-                        errorStyle={{ textAlign: 'right' }}
-                        secureTextEntry={true}
-                        onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, password: val })}
-                    />
-                </View>
-
-                <TouchableOpacity >
-                    <Text className='pb-6 underline text-right'>הרשמה</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={handleSubmit}>
-                    <Text className='bg-emerald-300 text-center py-2 px-28'>התחברות</Text>
-                </TouchableOpacity>
-
-                <Text className='text-center pt-6'>{status}</Text>
-            </View>
+          />
         </View>
-    )
+        <View className="w-80">
+          <Input
+            placeholder="Password..."
+            className="inpt placeholder:text-right"
+            errorMessage={formErrors[`password`]}
+            errorStyle={{ textAlign: "right" }}
+            secureTextEntry={true}
+            textContentType="oneTimeCode"
+            onChangeText={(val) =>
+              setInputtedCredentials({ ...inputtedCrendentials, password: val })
+            }
+          />
+        </View>
+
+        <TouchableOpacity>
+          <Text className="pb-6 w-72 underline text-right text-emerald-300">הרשמה</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleSubmit}>
+          <Text className="bg-emerald-300 text-center py-2 w-72 font-bold">התחברות</Text>
+        </TouchableOpacity>
+
+        {didSucceed ? (
+          <Text className="text-emerald-300 pt-8 text-lg">{status}</Text>
+        ) : (
+          <Text className="text-red-700 pt-8 text-lg">{status}</Text>
+        )}
+      </KeyboardAvoidingView>
+    </View>
+  );
 }
