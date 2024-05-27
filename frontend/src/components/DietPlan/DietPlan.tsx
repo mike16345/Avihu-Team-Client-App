@@ -1,4 +1,4 @@
-import { View, ImageBackground } from 'react-native'
+import { View, ImageBackground, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import dietPlan from '../../constants/dietPlan.json'
 import CollapsableItem from './CollapsableItem';
@@ -16,8 +16,6 @@ export default function DietPlan() {
     const [meals, setMeals] = useState(dietPlan.meals)
     const [uiView, setUiView] = useState(UI_TYPES.STANDARD)
 
-
-
     return (
         <ScrollView className="w-screen h-screen flex-1 bg-black ">
             <ImageBackground source={logoBlack} className="w-screen h-[40vh]" />
@@ -26,12 +24,12 @@ export default function DietPlan() {
                     key={meal.id}
                     meal={meal}
                     title={meal.title}
-                    setter={setUiView}
-                    uiTypes={UI_TYPES}
+                    setUiState={setUiView}
+                    uiStates={UI_TYPES}
                 />
             ))}
-            {uiView === UI_TYPES.CARBS && <CarbTable setter={setUiView} uiTypes={UI_TYPES} />}
-            {uiView === UI_TYPES.PROTEIN && <ProtienTable setter={setUiView} uiTypes={UI_TYPES} />}
+            {uiView === UI_TYPES.CARBS && <CarbTable setUiState={setUiView} uiStates={UI_TYPES} />}
+            {uiView === UI_TYPES.PROTEIN && <ProtienTable setUiState={setUiView} uiStates={UI_TYPES} />}
         </ScrollView>
     );
 }
