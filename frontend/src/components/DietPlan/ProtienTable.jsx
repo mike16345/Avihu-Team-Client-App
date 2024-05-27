@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity } from 'react-native'
 
 const ProtienTable = ({ setUiState, uiStates }) => {
     return (
-        <View className='w-screen  border-2 border-emerald-300 rounded absolute bg-black top-24 gap-4 '>
+        <View className='w-screen  border-2 border-emerald-300 rounded absolute bg-black top-12 gap-4 '>
             <View className='items-end'>
                 <TouchableOpacity onPress={() => setUiState(uiStates.STANDARD)}>
                     <Icon style={{ padding: 5 }} name='close-o' color='rgb(110 231 183)' size={32} />

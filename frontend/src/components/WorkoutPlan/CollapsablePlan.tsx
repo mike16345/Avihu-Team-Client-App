@@ -29,36 +29,50 @@ const CollapsablePlan: FC<CollapsableWorkoutPlanProps> = ({ title, item }) => {
       }
       isExpanded={isExpanded}
       onPress={() => setIsExpanded((isExpanded) => !isExpanded)}
-      className="w-screen items-end"
+      className="items-end"
       style={{ backgroundColor: "black" }}
       containerStyle={{ backgroundColor: "black" }}
     >
-      <View className="flex-row-reverse w-screen items-center justify-center border-2">
+      <View className="items-end">
         {item.map((workout, index) => {
           const { name, sets } = workout;
           const totalSets = sets.length;
 
           return (
-            <ListItem containerStyle={{ flexDirection: "row", backgroundColor: "black" }}>
-              <TouchableOpacity>
-                <NativeIcon
-                  library="MaterialCommunityIcons"
-                  name="arm-flex"
-                  color="rgb(110 231 183)"
-                  size={24}
-                />
-                <View
-                  style={{ backgroundColor: "black" }}
-                  className="flex-row items-center border-2 w-[33vw] justify-center"
+            <View className="flex-row items-center p-2">
+              <ListItem
+                containerStyle={{
+                  backgroundColor: "black",
+                  padding: 16,
+                }}
+              >
+                <TouchableOpacity
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
+                  }}
                 >
-                  {sets.map((set, index) => (
-                    <Text className="text-emerald-300">
-                      {set.minReps}-{index == totalSets - 1 ? `x${totalSets}` : ""}
-                    </Text>
-                  ))}
-                </View>
-              </TouchableOpacity>
-            </ListItem>
+                  <View style={{ flexDirection: "row", backgroundColor: "black" }}>
+                    {sets.map((set, index) => (
+                      <Text className="text-emerald-300">
+                        {set.minReps}-{index == totalSets - 1 ? `x${totalSets}` : ""}
+                      </Text>
+                    ))}
+                  </View>
+                  <NativeIcon
+                    library="MaterialCommunityIcons"
+                    name="arm-flex"
+                    color="rgb(110 231 183)"
+                    size={24}
+                  />
+                </TouchableOpacity>
+              </ListItem>
+              <Text className="underline" style={{ color: "white", fontWeight: 600 }}>
+                {name}:
+              </Text>
+            </View>
           );
         })}
       </View>
