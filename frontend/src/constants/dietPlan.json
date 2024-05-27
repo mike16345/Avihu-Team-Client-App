@@ -1,0 +1,34 @@
+{
+    "id": "1",
+    "meals": [
+        {
+            "id": "10",
+            "title": "ארוחה ראשונה",
+            "totalProtein": "1.5",
+            "totalCarbs": "2",
+            "totalVeggies": "5"
+        },
+        {
+            "id": "20",
+            "title": "ארוחה שניה",
+            "totalProtein": "2",
+            "totalCarbs": "1",
+            "totalVeggies": "5"
+        },
+        {
+            "id": "30",
+            "title": "ארוחה שלישית",
+            "totalProtein": "1",
+            "totalCarbs": "2",
+            "totalVeggies": "5"
+        },
+        {
+            "id": "40",
+            "title": "ארוחה רביעית",
+            "totalProtein": "1.5",
+            "totalCarbs": "1",
+            "totalVeggies": "5"
+        }
+    ],
+    "totalCalories": "1,000"
+}
