@@ -4,11 +4,12 @@ import { View, Text, TouchableOpacity } from 'react-native'
 
 const ProtienTable = ({ setter, uiTypes }) => {
     return (
-        <View className='w-screen  border-2 border-emerald-300 rounded absolute bg-black top-1/4'>
+        <View className='w-screen  border-2 border-emerald-300 rounded absolute bg-black top-24 '>
             <View className='items-end'>
                 <TouchableOpacity onPress={() => setter(uiTypes.STANDARD)}>
                     <Icon style={{ padding: 5 }} name='close-o' color='rgb(110 231 183)' size={32} />
                 </TouchableOpacity>
+                
             </View>
             <View className='items-center'>
                 <Text className='text-emerald-300 text-2xl py-4 font-bold underline'>מנות חלבון</Text>

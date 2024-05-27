@@ -19,14 +19,19 @@ export default function DietPlan() {
 
 
     return (
-        <View className='w-screen h-screen flex-1 bg-black '>
-            <ImageBackground source={logoBlack} className='w-screen h-[40vh]' />
-            {meals.map(meal => (
-                <CollapsableItem key={meal.id} meal={meal} title={meal.title} setter={setUiView} uiTypes={UI_TYPES} />
+        <ScrollView className="w-screen h-screen flex-1 bg-black ">
+            <ImageBackground source={logoBlack} className="w-screen h-[40vh]" />
+            {meals.map((meal) => (
+                <CollapsableItem
+                    key={meal.id}
+                    meal={meal}
+                    title={meal.title}
+                    setter={setUiView}
+                    uiTypes={UI_TYPES}
+                />
             ))}
             {uiView === UI_TYPES.CARBS && <CarbTable setter={setUiView} uiTypes={UI_TYPES} />}
             {uiView === UI_TYPES.PROTEIN && <ProtienTable setter={setUiView} uiTypes={UI_TYPES} />}
-
-        </View>
-    )
+        </ScrollView>
+    );
 }
