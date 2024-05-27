@@ -40,9 +40,7 @@ export default function App() {
         >
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             {isLoggedIn ? (
-              <>
-                <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
-              </>
+              <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
             ) : (
               <>
                 <Stack.Screen name="HomePage" component={GetStartedScreen} />

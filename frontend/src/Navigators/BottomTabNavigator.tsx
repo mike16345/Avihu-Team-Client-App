@@ -1,11 +1,11 @@
 import React from "react";
-import MyDietPlanPage from "../screens/MyDietPlanPage";
 import MyWorkoutPlanPage from "../screens/MyWorkoutPlanPage";
 import VideoGallery from "../screens/VideoGallery";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import MyProgressScreen from "../screens/MyProgressScreen";
 import NativeIcon from "../components/Icon/NativeIcon";
 import { RootStackParamList } from "../types/navigatorTypes";
+import MyDietPlanScreen from "../screens/MyDietPlanScreen";
 
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
@@ -46,7 +46,7 @@ const BottomTabNavigator = () => {
       />
       <Tab.Screen
         name="MyDietPlanPage"
-        component={MyDietPlanPage}
+        component={MyDietPlanScreen}
         options={{
           tabBarLabel: "Diet",
           tabBarIcon: ({ color }: { color: string }) => (
