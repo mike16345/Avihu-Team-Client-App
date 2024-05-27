@@ -1,9 +1,8 @@
-import { View, Text, ImageBackground, TouchableOpacity } from 'react-native'
+import { View, ImageBackground } from 'react-native'
 import React, { useState } from 'react'
 import dietPlan from '../../constants/dietPlan.json'
 import CollapsableItem from './CollapsableItem';
 import logoBlack from '../../../assets/images/avihu-logo-black.png'
-import Icon from 'react-native-vector-icons/EvilIcons'
 import CarbTable from './CarbTable';
 import ProtienTable from './ProtienTable';
 
@@ -14,7 +13,6 @@ export default function DietPlan() {
         PROTEIN: 'PROTEIN'
     }
 
-    const [expanded, setExpanded] = useState<boolean>(false)
     const [meals, setMeals] = useState(dietPlan.meals)
     const [uiView, setUiView] = useState(UI_TYPES.STANDARD)
 
