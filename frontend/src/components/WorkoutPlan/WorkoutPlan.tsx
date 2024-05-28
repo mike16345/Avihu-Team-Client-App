@@ -3,18 +3,17 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  Touchable,
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import { useState } from "react";
 import CollapsablePlan from "./CollapsablePlan";
-import { workoutPlans, workoutPlanToName, workoutTypeToName } from "../../constants/Workouts";
-import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
+import { workoutPlans, workoutPlanToName, workoutTypeToName } from "@/constants/Workouts";
+import logoBlack from "@assets/avihu/avihu-logo-black.png";
 import DropDownPicker from "react-native-dropdown-picker";
-import { WorkoutPlans } from "../../enums/WorkoutPlans";
-import { WorkoutType } from "../../enums/WorkoutTypes";
-import { IWorkout } from "../../interfaces/Workout";
+import { WorkoutPlans } from "@/enums/WorkoutPlans";
+import { WorkoutType } from "@/enums/WorkoutTypes";
+import { IWorkout } from "@/interfaces/Workout";
 
 const tips = [
   "כל תחילת אימון הליכה 5 דק לחמם את הגוף",

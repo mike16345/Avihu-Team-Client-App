@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GetStartedScreen } from "./src/screens/GetStartedScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+
 import "react-native-gesture-handler";
 import "./global.css";
 
