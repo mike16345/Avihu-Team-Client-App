@@ -34,11 +34,8 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <GestureHandlerRootView className="flex-1">
-        <SafeAreaProvider
-          initialMetrics={initialWindowMetrics}
-          className="flex-1 h-screen bg-black"
-        >
+      <GestureHandlerRootView>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             {isLoggedIn ? (
               <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
