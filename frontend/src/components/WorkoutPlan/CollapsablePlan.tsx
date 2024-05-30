@@ -39,7 +39,7 @@ const CollapsablePlan: FC<CollapsableWorkoutPlanProps> = ({ title, item }) => {
           const totalSets = sets.length;
 
           return (
-            <View className="flex-row items-center p-2">
+            <View key={index} className="flex-row items-center p-2">
               <ListItem
                 containerStyle={{
                   backgroundColor: "black",
@@ -81,5 +81,3 @@ const CollapsablePlan: FC<CollapsableWorkoutPlanProps> = ({ title, item }) => {
 };
 
 export default CollapsablePlan;
-
-const styles = StyleSheet.create({});

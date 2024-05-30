@@ -17,16 +17,6 @@ const BottomTabNavigator = () => {
       activeColor="#10B981"
     >
       <Tab.Screen
-        name="VideoGallery"
-        component={VideoGallery}
-        options={{
-          tabBarLabel: "Videos",
-          tabBarIcon: ({ color }: { color: string }) => (
-            <NativeIcon library="MaterialCommunityIcons" name="video" color={color} size={28} />
-          ),
-        }}
-      />
-      <Tab.Screen
         name="MyWorkoutPlanPage"
         component={MyWorkoutPlanPage}
         options={{

@@ -73,7 +73,7 @@ const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
           </Button>
         </View>
       </Dialog>
-      <View className="w-screen px-4 ">
+      <View className="w-screen px-2 ">
         <TouchableHighlight
           onPress={() => setOpenAddWeightModal((open) => !open)}
           style={styles.addWeightBtn}

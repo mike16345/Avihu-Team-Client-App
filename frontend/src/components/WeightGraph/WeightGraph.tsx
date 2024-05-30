@@ -133,7 +133,10 @@ export const WeightGraph = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexGrow: 1,
+    gap: 20,
     alignItems: "center",
+    justifyContent: "space-evenly",
   },
   weightContainer: {
     flex: 1,

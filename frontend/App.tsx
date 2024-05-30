@@ -1,7 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
-import BottomTabNavigator from "./src/Navigators/BottomTabNavigator";
+import BottomTabNavigator from "./src/navigators/BottomTabNavigator";
 import Login from "./src/components/Login/Login";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";

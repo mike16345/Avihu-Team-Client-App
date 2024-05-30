@@ -1,5 +1,4 @@
 import { View, Text } from "react-native";
-import React from "react";
 import { Avatar } from "@rneui/themed";
 import Entypo from "react-native-vector-icons/Entypo";
 

@@ -14,14 +14,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { WorkoutPlans } from "@/enums/WorkoutPlans";
 import { WorkoutType } from "@/enums/WorkoutTypes";
 import { IWorkout } from "@/interfaces/Workout";
-
-const tips = [
-  "כל תחילת אימון הליכה 5 דק לחמם את הגוף",
-  "אימון משקולות תמיד יהיה לפני האירובי",
-  "בתחילת האימון יש לבצע שני סטים של חימום בתרגיל הראשון",
-  "במידה ויש תרגיל שאתם לא מכירים אתם שולחים לי הודעה",
-  "מנוחה בין סט לסט 40-60 שניות",
-];
+import WorkoutTips from "./WorkoutTips";
 
 const WorkoutPlan = () => {
   const keys = Object.keys(workoutPlans);
@@ -33,25 +26,23 @@ const WorkoutPlan = () => {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState(itms);
   const [value, setValue] = useState(itms[0].value);
+  const [openTips, setOpenTips] = useState(false);
 
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<Record<WorkoutType, IWorkout[]>>(
     workoutPlans[Number(keys[0]) as WorkoutPlans]
   );
 
   return (
-    <View className="flex-1">
+    <View>
       <ImageBackground source={logoBlack} className="w-screen h-[30vh] items-center " />
       <View
         style={{
-          width: "90%",
+          width: "100%",
           padding: 12,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
+          gap: 20,
         }}
       >
         <DropDownPicker
-          style={{ width: "50%" }}
           rtl
           open={open}
           value={value}
@@ -66,7 +57,7 @@ const WorkoutPlan = () => {
             setCurrentWorkoutPlan(workoutPlans[key]);
           }}
         />
-        <TouchableOpacity onPress={() => console.log("open tips")}>
+        <TouchableOpacity onPress={() => setOpenTips(true)}>
           <Text className=" text-emerald-300 text-lg font-bold underline">דגשים</Text>
         </TouchableOpacity>
       </View>
@@ -84,6 +75,7 @@ const WorkoutPlan = () => {
           );
         })}
       </ScrollView>
+      <WorkoutTips openTips={openTips} setOpenTips={setOpenTips} />
     </View>
   );
 };
