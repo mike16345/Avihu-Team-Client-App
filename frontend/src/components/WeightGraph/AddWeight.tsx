@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TouchableHighlight, TextInput } from "react-native";
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 import Button from "../Button/Button";
 import { Colors } from "../../constants/Colors";
 import { ButtonGroup, Dialog } from "react-native-elements";
@@ -53,7 +53,7 @@ const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
                 onChangeText={(val) => handleInputWeight(val)}
                 className="inpt  h-10 w-24 ml-2"
                 keyboardType="number-pad"
-              ></TextInput>
+              />
             </View>
             <View className="flex-row-reverse items-center justify-between ">
               <Text className=" text-lg  font-bold text-white">סוג:</Text>

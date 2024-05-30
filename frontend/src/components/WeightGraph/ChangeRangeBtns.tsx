@@ -55,7 +55,7 @@ export default ChangeRangeBtns;
 
 const styles = StyleSheet.create({
   rangeButton: {
-    backgroundColor: Colors.bgSecondry,
+    backgroundColor: Colors.bgSecondary,
     color: Colors.primary,
     borderRadius: 4,
     justifyContent: "center",
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   },
   activeRangeBtn: {
     backgroundColor: Colors.primary,
-    color: Colors.bgSecondry,
+    color: Colors.bgSecondary,
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",

@@ -1,11 +1,8 @@
-//@ts-nocheck
-
-import { StyleSheet, View } from "react-native";
-import { Calendar, CalendarProvider, DateData } from "react-native-calendars";
+import { View } from "react-native";
+import { Calendar, CalendarProvider } from "react-native-calendars";
 import { darkTheme } from "./calendarTheme";
 import DayComponent from "./Day";
 import { useMemo, useState } from "react";
-import { MarkedDates } from "react-native-calendars/src/types";
 import DateUtils from "@/utils/dateUtils";
 
 const WeightCalendar = () => {
@@ -32,25 +29,24 @@ const WeightCalendar = () => {
           enableSwipeMonths
           onDayPress={(day) => {
             setSelected(day.dateString);
-            props.onDaySelect && props.onDaySelect(day);
           }}
           hideExtraDays
-          dayComponent={({ date, state, marking }) => {
-            console.log(`day (${date?.day})states :${state}`);
+          // dayComponent={({ date, state, marking }) => {
+          //   console.log(`day (${date?.day})states :${state}`);
 
-            return (
-              <DayComponent
-                date={date?.day || 0}
-                state={state || ""}
-                marking={marking?.customStyles || { weight: "88kg" }}
-                key={1}
-                onPress={() => {
-                  console.log("setting selected", date?.day);
-                  setSelected(date.dateString);
-                }}
-              />
-            );
-          }}
+          //   return (
+          //     <DayComponent
+          //       date={date?.day || 0}
+          //       state={state || ""}
+          //       marking={marking?.customStyles || { weight: "88kg" }}
+          //       key={1}
+          //       onPress={() => {
+          //         console.log("setting selected", date?.day);
+          //         setSelected(date.dateString);
+          //       }}
+          //     />
+          //   );
+          // }}
           style={{ borderRadius: 4 }}
           theme={darkTheme}
         />
@@ -60,5 +56,3 @@ const WeightCalendar = () => {
 };
 
 export default WeightCalendar;
-
-const styles = StyleSheet.create({});

@@ -1,4 +1,3 @@
-import React from "react";
 import MyWorkoutPlanPage from "../screens/MyWorkoutPlanPage";
 import VideoGallery from "../screens/VideoGallery";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
@@ -44,6 +43,7 @@ const BottomTabNavigator = () => {
           ),
         }}
       />
+
       <Tab.Screen
         name="MyDietPlanPage"
         component={MyDietPlanScreen}

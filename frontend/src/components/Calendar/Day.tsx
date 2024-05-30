@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/Colors";
-import React, { useState } from "react";
+import React from "react";
 import { Text, StyleSheet, TouchableOpacity } from "react-native";
 import { DayState } from "react-native-calendars/src/types";
 
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 5,
 
-    backgroundColor: Colors.bgSecondry,
+    backgroundColor: Colors.bgSecondary,
     borderRadius: 5,
   },
   selectedDayContainer: {

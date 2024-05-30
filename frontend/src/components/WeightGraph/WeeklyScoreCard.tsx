@@ -53,7 +53,6 @@ const styles = StyleSheet.create({
     padding: 20,
     height: "100%",
     backgroundColor: "#18181b",
-    direction: "rtl",
   },
   weeklyWeightStatus: {
     fontWeight: 600,

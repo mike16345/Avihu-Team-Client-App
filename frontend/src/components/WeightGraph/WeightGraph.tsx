@@ -1,5 +1,5 @@
 import { View, StyleSheet, useWindowDimensions } from "react-native";
-import React, { useState } from "react";
+import { useState } from "react";
 import { LineChart } from "react-native-chart-kit";
 import { myWeighIns } from "../../constants/MyWeight";
 import { IWeighIn } from "../../interfaces/User";
@@ -87,9 +87,9 @@ export const WeightGraph = () => {
             setSelectedWeight(value);
           }}
           chartConfig={{
-            backgroundColor: Colors.bgSecondry,
-            backgroundGradientFrom: Colors.bgSecondry,
-            backgroundGradientTo: Colors.bgSecondry,
+            backgroundColor: Colors.bgSecondary,
+            backgroundGradientFrom: Colors.bgSecondary,
+            backgroundGradientTo: Colors.bgSecondary,
 
             decimalPlaces: 2,
             color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`,
@@ -112,7 +112,8 @@ export const WeightGraph = () => {
           withInnerLines={false}
           withOuterLines={false}
           style={{
-            borderRadius: 16,
+            borderRadius: 12,
+            padding: 4,
           }}
         />
         <ChangeRangeBtns onRangeChange={handleRangeChange} />
@@ -133,7 +134,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "space-around",
   },
   weightContainer: {
     flex: 1,
