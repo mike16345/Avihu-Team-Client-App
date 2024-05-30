@@ -5,6 +5,7 @@ import MyProgressScreen from "../screens/MyProgressScreen";
 import NativeIcon from "../components/Icon/NativeIcon";
 import { RootStackParamList } from "../types/navigatorTypes";
 import MyDietPlanScreen from "../screens/MyDietPlanScreen";
+import WorkoutVideoPopup from "@/components/WorkoutPlan/WorkoutVideoPopup";
 
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
@@ -52,6 +53,17 @@ const BottomTabNavigator = () => {
 
           tabBarIcon: ({ color }: { color: string }) => (
             <NativeIcon library="MaterialIcons" name="monitor-weight" color={color} size={28} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="VideoGallery"
+        component={WorkoutVideoPopup}
+        options={{
+          tabBarLabel: "Weight ",
+
+          tabBarIcon: ({ color }: { color: string }) => (
+            <NativeIcon library="MaterialIcons" name="camera" color={color} size={28} />
           ),
         }}
       />
