@@ -2,7 +2,7 @@ import { Colors } from "@/constants/Colors";
 import { Theme } from "react-native-calendars/src/types";
 
 export const darkTheme: Theme = {
-  calendarBackground: Colors.bgSecondry,
+  calendarBackground: Colors.bgSecondary,
   textSectionTitleColor: Colors.primary,
   textSectionTitleDisabledColor: Colors.secondary,
   dayTextColor: Colors.light,
@@ -12,7 +12,7 @@ export const darkTheme: Theme = {
   arrowColor: Colors.primary,
   textDisabledColor: Colors.dark,
   textInactiveColor: Colors.secondary,
-  backgroundColor: Colors.bgSecondry,
+  backgroundColor: Colors.bgSecondary,
   dotColor: Colors.primary,
   selectedDotColor: Colors.primary,
   disabledArrowColor: Colors.secondary,
@@ -39,15 +39,15 @@ export const darkTheme: Theme = {
   stylesheet: {
     calendar: {
       main: {
-        backgroundColor: Colors.bgSecondry,
+        backgroundColor: Colors.bgSecondary,
       },
       header: {
-        backgroundColor: Colors.bgSecondry,
+        backgroundColor: Colors.bgSecondary,
       },
     },
     day: {
       basic: {
-        backgroundColor: Colors.bgSecondry,
+        backgroundColor: Colors.bgSecondary,
         color: Colors.light,
       },
       period: {
@@ -62,20 +62,20 @@ export const darkTheme: Theme = {
     },
     "calendar-list": {
       main: {
-        backgroundColor: Colors.bgSecondry,
+        backgroundColor: Colors.bgSecondary,
       },
     },
     agenda: {
       main: {
-        backgroundColor: Colors.bgSecondry,
+        backgroundColor: Colors.bgSecondary,
       },
       list: {
-        backgroundColor: Colors.bgSecondry,
+        backgroundColor: Colors.bgSecondary,
       },
     },
     expandable: {
       main: {
-        backgroundColor: Colors.bgSecondry,
+        backgroundColor: Colors.bgSecondary,
       },
     },
   },
