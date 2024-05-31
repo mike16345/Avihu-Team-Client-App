@@ -77,17 +77,6 @@ const BottomTabNavigator = () => {
             ),
           }}
         />
-        <Tab.Screen
-          name="VideoGallery"
-          component={WorkoutVideoPopup}
-          options={{
-            tabBarLabel: "Weight ",
-
-            tabBarIcon: ({ color }: { color: string }) => (
-              <NativeIcon library="MaterialIcons" name="camera" color={color} size={28} />
-            ),
-          }}
-        />
       </Tab.Navigator>
     </View>
   );

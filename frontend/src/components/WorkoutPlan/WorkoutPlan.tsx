@@ -25,8 +25,8 @@ const WorkoutPlan = () => {
   }));
 
   const [open, setOpen] = useState(false);
-  const [items, setItems] = useState(itms);
-  const [value, setValue] = useState(itms[0].value);
+  const [plans, setPlans] = useState(itms);
+  const [value, setValue] = useState(plans[0].value);
   const [openTips, setOpenTips] = useState(false);
   const scrollViewRef = useRef(null);
 
@@ -44,11 +44,11 @@ const WorkoutPlan = () => {
           rtl
           open={open}
           value={value}
-          items={items}
+          items={plans}
           theme="DARK"
           setOpen={setOpen}
           setValue={setValue}
-          setItems={setItems}
+          setItems={setPlans}
           onChangeValue={(val) => {
             if (!val) return;
             const key = Number(val) as WorkoutPlans;
