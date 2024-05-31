@@ -23,8 +23,21 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
 
   return (
     <View style={styles.workoutContainer}>
-      <Pressable onPress={() => setModalVisible(true)}>
-        <Image source={{ uri: thumbnail }} style={styles.thumbnail} />
+      <Pressable
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          // backgroundColor: Colors.secondary,
+        }}
+        onPress={() => setModalVisible(true)}
+      >
+        <Image
+          source={{ uri: thumbnail }}
+          borderRadius={2}
+          width={100}
+          height={50}
+          resizeMode="cover"
+        />
       </Pressable>
       <Divider width={0.5} color={Colors.dark} orientation="vertical" />
       <View style={styles.workoutDescriptionContainer}>
@@ -32,7 +45,11 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
         <View style={styles.workoutInfoContainer}>
           <Text style={styles.set}>סט: 1</Text>
           <Text style={styles.set}>חזרות: 15</Text>
-          <Button style={styles.recordWorkoutBtn} onPress={() => console.log("record set")}>
+          <Button
+            textProps={{ style: styles.recordBtnText }}
+            style={styles.recordWorkoutBtn}
+            onPress={() => console.log("record set")}
+          >
             <Text style={styles.recordBtnText}>הקלט</Text>
           </Button>
         </View>
@@ -51,9 +68,11 @@ export default Workout;
 
 const styles = StyleSheet.create({
   workoutContainer: {
+    display: "flex",
     flexDirection: "row-reverse",
     alignItems: "center",
     width: "100%",
+    height: 100,
     backgroundColor: Colors.bgSecondary,
     padding: 2,
     borderRadius: 10,
@@ -92,9 +111,9 @@ const styles = StyleSheet.create({
   },
   thumbnail: {
     flex: 1,
-    width: 90,
+    width: 95,
     height: 90,
-    resizeMode: "center",
+    resizeMode: "cover",
     marginLeft: 8,
   },
   modalView: {

@@ -44,7 +44,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "לחיצת חזה עם מוט",
         sets: [
           { minReps: 15, restTime: 40 },
@@ -53,10 +53,11 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
           { minReps: 8, restTime: 40 },
         ],
       },
+
       {
         id: "5",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "לחיצת חזה עם משקולות חופשי",
         sets: [
           { minReps: 15, restTime: 40 },
@@ -82,7 +83,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "הרחקת כתף בישיבה / עמידה",
         sets: [
           { minReps: 12, restTime: 40 },
@@ -94,7 +95,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "לחיצת כתפיים משקולות חופשי",
         sets: [
           { minReps: 10, restTime: 40 },
@@ -106,7 +107,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "כפיפת כתף עם משקולות חופשי יד יד",
         sets: [
           { minReps: 12, restTime: 40 },
@@ -118,7 +119,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "פשיטת מרפק בפולי עליון עם- חבל או מוט",
         sets: [
           { minReps: 12, restTime: 40 },
@@ -130,7 +131,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "פשיטה מרפק מאחורי הראש או בפולי עליון",
         sets: [
           { minReps: 12, maxReps: 15, restTime: 40 },
@@ -141,7 +142,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "פשיטת מרפק יד יד",
         sets: [
           { minReps: 15, restTime: 40 },
@@ -156,7 +157,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "1",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "Triceps",
         sets: [
           { minReps: 15, restTime: 40 },
@@ -170,7 +171,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "2",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "Biceps",
         sets: [
           { minReps: 15, restTime: 40 },
@@ -186,7 +187,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "לחיצת חזה עם מוט",
         sets: [
           { minReps: 15, restTime: 40 },
@@ -200,7 +201,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "הרחקת כתף",
         sets: [
           { minReps: 12, restTime: 40 },
@@ -214,7 +215,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "פשיטת מרפק בפולי עליון עם- חבל או מוט",
         sets: [
           { minReps: 12, maxReps: 15, restTime: 40 },
@@ -228,7 +229,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "פטישים בישיבה יד יד ",
         sets: [
           { minReps: 12, maxReps: 15, restTime: 40 },
@@ -242,7 +243,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "4",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "מתח בפולי עליון אחיזה רחבה",
         sets: [
           { minReps: 10, maxReps: 12, restTime: 40 },
@@ -256,7 +257,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "2",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "לחיצת רגלים במכונה יעודית",
         sets: [
           { minReps: 10, maxReps: 12, restTime: 40 },
@@ -268,7 +269,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "2",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "כפיפת ברכיים במכונה יעודית",
         sets: [
           { minReps: 12, restTime: 40 },
@@ -280,7 +281,7 @@ export const workoutPlans: Record<WorkoutPlans, Record<number, IWorkout[]>> = {
       {
         id: "2",
         tipFromTrainer: "",
-        linkToVideo: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        linkToVideo: "https://www.youtube.com/watch?v=tLva2G5TVdA",
         name: "הרמת עקבים בסמיט משין",
         sets: [
           { minReps: 12, maxReps: 15, restTime: 40 },
