@@ -86,6 +86,6 @@ export default BottomTabNavigator;
 
 const styles = StyleSheet.create({
   barStyle: {
-    backgroundColor: Colors.secondary,
+    backgroundColor: Colors.bgSecondary,
   },
 });

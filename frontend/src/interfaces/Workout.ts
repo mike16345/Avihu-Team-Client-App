@@ -50,3 +50,10 @@ export interface RecordedWorkout {
   time: number;
   note: string;
 }
+
+
+export interface IRecordedSet{
+  repsDone: number;
+  weight: number;
+  note: string;
+}

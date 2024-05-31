@@ -1,6 +1,6 @@
 import { Colors } from "@/constants/Colors";
 import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from "react";
-import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
+import { StyleSheet, View, Text, ActivityIndicator, useWindowDimensions } from "react-native";
 import { Dialog } from "react-native-elements";
 import YoutubePlayer, { YoutubeIframeRef } from "react-native-youtube-iframe";
 
@@ -17,6 +17,8 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({
   videoId,
   title,
 }) => {
+  const { width, height } = useWindowDimensions();
+
   const [isLoading, setIsLoading] = useState(true);
   const [canPlay, setCanPlay] = useState(false);
   const playerRef = useRef<YoutubeIframeRef | null>(null);
@@ -32,12 +34,13 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({
       setCanPlay(false);
     };
   }, []);
+
   return (
     <Dialog
       overlayStyle={{
         backgroundColor: Colors.secondary,
-        width: 400,
-        height: 350,
+        width: width - 25,
+        height: height / 2,
         alignItems: "center",
       }}
       isVisible={isVisible}
@@ -51,11 +54,12 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({
           play={canPlay}
           onReady={onReady}
           initialPlayerParams={{ loop: true }}
-          width={300}
+          width={width - 40}
           height={200}
           videoId={videoId}
         />
       </View>
+      <Text style={styles.tip}>דגשים: אל תשבור את הכתף</Text>
     </Dialog>
   );
 };
@@ -67,13 +71,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.secondary,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-evenly",
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
+    color: Colors.primary,
+    // alignSelf: "center",
+  },
+  tip: {
+    fontSize: 12,
+    fontWeight: "bold",
     textAlign: "right",
-    marginBottom: 20,
     color: Colors.primary,
   },
 });

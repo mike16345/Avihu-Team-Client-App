@@ -1,10 +1,11 @@
 import { Colors } from "@/constants/Colors";
 import { IWorkout } from "@/interfaces/Workout";
 import { FC, useState } from "react";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import Button from "../Button/Button";
 import { Divider } from "react-native-elements";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
+import RecordWorkout from "./RecordWorkout";
 
 interface WorkoutProps {
   workout: IWorkout;
@@ -17,28 +18,23 @@ const getYouTubeThumbnail = (id: string) => {
 };
 
 const Workout: FC<WorkoutProps> = ({ workout }) => {
-  const [modalVisible, setModalVisible] = useState(false);
   const videoId = extractVideoId(workout.linkToVideo!);
   const thumbnail = getYouTubeThumbnail(videoId);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [openRecordWorkout, setOpenRecordWorkout] = useState(false);
+
   return (
     <View style={styles.workoutContainer}>
-      <Pressable
+      <Button
         style={{
           alignItems: "center",
           justifyContent: "center",
-          // backgroundColor: Colors.secondary,
         }}
         onPress={() => setModalVisible(true)}
       >
-        <Image
-          source={{ uri: thumbnail }}
-          borderRadius={2}
-          width={100}
-          height={50}
-          resizeMode="cover"
-        />
-      </Pressable>
+        <Image source={{ uri: thumbnail }} borderRadius={2} style={styles.thumbnail} />
+      </Button>
       <Divider width={0.5} color={Colors.dark} orientation="vertical" />
       <View style={styles.workoutDescriptionContainer}>
         <Text style={styles.workoutTitle}>{workout.name}</Text>
@@ -48,12 +44,18 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
           <Button
             textProps={{ style: styles.recordBtnText }}
             style={styles.recordWorkoutBtn}
-            onPress={() => console.log("record set")}
+            onPress={() => setOpenRecordWorkout(true)}
           >
             הקלט
           </Button>
         </View>
       </View>
+      <RecordWorkout
+        workoutName={workout.name}
+        setNumber={1} // TODO: Check what set user is on and send that.
+        isOpen={openRecordWorkout}
+        setIsOpen={setOpenRecordWorkout}
+      />
       <WorkoutVideoPopup
         title={workout.name}
         isVisible={modalVisible}
@@ -110,7 +112,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   thumbnail: {
-    flex: 1,
     width: 95,
     height: 90,
     resizeMode: "cover",
