@@ -34,7 +34,7 @@ export default function DietPlan() {
             </View>
 
             {meals.map((meal) => (
-                <View className='p-4 rtl items-center'>
+                <View className='p-4 rtl items-center' key={meal.title}>
                     <Text className='text-emerald-300 underline font-bold text-lg p-2'>{meal.title}</Text>
                     <View className='flex-row'>
 
