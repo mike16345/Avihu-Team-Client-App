@@ -1,11 +1,22 @@
 import WeightCalendar from "@/components/Calendar/WeightCalendar";
 import { WeightGraph } from "@/components/WeightGraph/WeightGraph";
 import { Colors } from "@/constants/Colors";
+import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
+import { useRef } from "react";
 import { StyleSheet, ScrollView, StatusBar, Platform, View } from "react-native";
 
 const MyProgressScreen = () => {
+  const { handleScroll } = useHideTabBarOnScroll();
+
+  const scrollRef = useRef(null);
+
   return (
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
+    <ScrollView
+      ref={scrollRef}
+      onScroll={handleScroll}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.container}
+    >
       <View style={styles.calendarContainer}>
         <WeightCalendar />
       </View>

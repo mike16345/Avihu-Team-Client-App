@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
-import { IWeighIn } from "../../interfaces/User";
 import { Colors } from "../../constants/Colors";
 import { DateRanges } from "../../types/dateTypes";
 

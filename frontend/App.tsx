@@ -17,7 +17,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   const { getItem, removeItem } = useAsyncStorage("isLoggedIn");
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const checkLoginStatus = async () => {
     const token = await getItem();
