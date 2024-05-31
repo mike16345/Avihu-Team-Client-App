@@ -50,7 +50,7 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
             style={styles.recordWorkoutBtn}
             onPress={() => console.log("record set")}
           >
-            <Text style={styles.recordBtnText}>הקלט</Text>
+            הקלט
           </Button>
         </View>
       </View>
