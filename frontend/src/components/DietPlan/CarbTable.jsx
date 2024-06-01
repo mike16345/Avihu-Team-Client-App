@@ -5,7 +5,7 @@ import { View, Text, TouchableOpacity } from 'react-native'
 
 const CarbTable = ({ setUiState, uiStates }) => {
     return (
-        <View className='w-screen  border-2 border-emerald-300 rounded absolute bg-black top-24  gap-4'>
+        <View className='w-screen  border-2 border-emerald-300 rounded  bg-black  gap-4'>
             <View className='items-end'>
                 <TouchableOpacity onPress={() => setUiState(uiStates.STANDARD)}>
                     <Icon style={{ padding: 5 }} name='close-o' color='rgb(110 231 183)' size={32} />
@@ -50,7 +50,7 @@ const CarbTable = ({ setUiState, uiStates }) => {
                 <Text className='text-emerald-300 w-1/2 text-right px-10'>30 גרם שיבולת שועל</Text>
                 <Text className='text-emerald-300 w-1/2 text-right px-10'>30 גרם גרנולה</Text>
             </View>
-            <View className='flex-row-reverse justify-center '>
+            <View className='flex-row-reverse justify-center pb-4'>
                 <Text className='text-emerald-300 w-1/2 text-right px-10'>30 גרם קורנפלקס</Text>
                 <Text className='text-emerald-300 w-1/2 text-right px-10'>80 גרם אורז</Text>
             </View>
