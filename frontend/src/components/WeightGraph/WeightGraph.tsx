@@ -1,11 +1,11 @@
 import { View, StyleSheet, useWindowDimensions } from "react-native";
-import React, { useState } from "react";
+import { useState } from "react";
 import { LineChart } from "react-native-chart-kit";
-import { myWeighIns } from "../../constants/MyWeight";
-import { IWeighIn } from "../../interfaces/User";
-import { ItemsInDateRangeParams, DateRanges } from "../../types/dateTypes";
-import DateUtils from "../../utils/dateUtils";
-import { Colors } from "../../constants/Colors";
+import { myWeighIns } from "@/constants/MyWeight";
+import { IWeighIn } from "@/interfaces/User";
+import { ItemsInDateRangeParams, DateRanges } from "@/types/dateTypes";
+import DateUtils from "@/utils/dateUtils";
+import { Colors } from "@/constants/Colors";
 import WeightCard from "./WeightCard";
 import WeeklyScoreCard from "./WeeklyScoreCard";
 import AddWeight from "./AddWeight";
@@ -87,9 +87,9 @@ export const WeightGraph = () => {
             setSelectedWeight(value);
           }}
           chartConfig={{
-            backgroundColor: Colors.bgSecondry,
-            backgroundGradientFrom: Colors.bgSecondry,
-            backgroundGradientTo: Colors.bgSecondry,
+            backgroundColor: Colors.bgSecondary,
+            backgroundGradientFrom: Colors.bgSecondary,
+            backgroundGradientTo: Colors.bgSecondary,
 
             decimalPlaces: 2,
             color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`,
@@ -112,7 +112,8 @@ export const WeightGraph = () => {
           withInnerLines={false}
           withOuterLines={false}
           style={{
-            borderRadius: 16,
+            borderRadius: 12,
+            padding: 4,
           }}
         />
         <ChangeRangeBtns onRangeChange={handleRangeChange} />
@@ -132,8 +133,10 @@ export const WeightGraph = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexGrow: 1,
+    gap: 20,
     alignItems: "center",
-    justifyContent: "space-around",
+    justifyContent: "space-evenly",
   },
   weightContainer: {
     flex: 1,

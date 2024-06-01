@@ -9,9 +9,9 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Input } from "react-native-elements";
-import avihuBg from "../../../assets/avihuFlyTrap.jpeg";
-import { testEmail } from "../../utils/utils";
-import NativeIcon from "../Icon/NativeIcon";
+import avihuBg from "@assets/avihuFlyTrap.jpeg";
+import { testEmail } from "@/utils/utils";
+import NativeIcon from "@/components/Icon/NativeIcon";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 interface IUserCredentials {

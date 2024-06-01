@@ -1,30 +1,51 @@
-import React from "react";
-import { Dimensions, StyleSheet, ScrollView, StatusBar, Text, Platform } from "react-native";
-import { WeightGraph } from "../components/WeightGraph/WeightGraph";
-
-const screenWidth = Dimensions.get("window").width;
+import WeightCalendar from "@/components/Calendar/WeightCalendar";
+import { WeightGraph } from "@/components/WeightGraph/WeightGraph";
+import { Colors } from "@/constants/Colors";
+import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
+import { useRef } from "react";
+import { StyleSheet, ScrollView, StatusBar, Platform, View } from "react-native";
 
 const MyProgressScreen = () => {
+  const { handleScroll } = useHideTabBarOnScroll();
+
+  const scrollRef = useRef(null);
+
   return (
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
-      <WeightGraph />
+    <ScrollView
+      ref={scrollRef}
+      onScroll={handleScroll}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.container}
+    >
+      <View style={styles.calendarContainer}>
+        <WeightCalendar />
+      </View>
+      <View style={styles.graphContainer}>
+        <WeightGraph />
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: "center",
+    flexGrow: 1,
     backgroundColor: "black",
-    padding: 20,
-    gap: 4,
+    gap: 12,
     paddingTop: StatusBar.currentHeight || 0,
     ...Platform.select({
       ios: {
         paddingTop: 32,
       },
     }),
+  },
+  calendarContainer: {
+    flex: 1,
+    backgroundColor: Colors.bgSecondary,
+    borderRadius: 12,
+  },
+  graphContainer: {
+    flex: 2,
   },
 });
 

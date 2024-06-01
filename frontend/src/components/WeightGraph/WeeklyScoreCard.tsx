@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
-import { IWeighIn } from "../../interfaces/User";
 import { Colors } from "../../constants/Colors";
 import { DateRanges } from "../../types/dateTypes";
 
@@ -16,6 +15,7 @@ const rangeToName = (range: DateRanges) => {
       return "";
   }
 };
+
 interface WeeklyScoreCardProps {
   weights: number[];
   range: DateRanges;
@@ -53,7 +53,6 @@ const styles = StyleSheet.create({
     padding: 20,
     height: "100%",
     backgroundColor: "#18181b",
-    direction: "rtl",
   },
   weeklyWeightStatus: {
     fontWeight: 600,

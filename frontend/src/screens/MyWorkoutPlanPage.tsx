@@ -1,15 +1,12 @@
-import { View, Text } from "react-native";
-import React from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types/navigatorTypes";
-import { RouteProp } from "@react-navigation/native";
+import { View } from "react-native";
+import WorkoutPlan from "../components/WorkoutPlan/WorkoutPlan";
 
-const MyWorkoutPlanPage = () => {
+const MyWorkoutPlanScreen = () => {
   return (
     <View className="h-screen justify-center items-center bg-black">
-      <Text className="text-white">MyWorkoutPlanPage</Text>
+      <WorkoutPlan />
     </View>
   );
 };
 
-export default MyWorkoutPlanPage;
+export default MyWorkoutPlanScreen;

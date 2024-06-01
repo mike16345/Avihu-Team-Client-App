@@ -1,4 +1,4 @@
-import { WeightUnit } from "../types/weightTypes";
+import { WeightUnit } from "@/types/weightTypes";
 
 export interface IUser {
   id: string;

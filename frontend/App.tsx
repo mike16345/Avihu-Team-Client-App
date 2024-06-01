@@ -1,13 +1,14 @@
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
-import BottomTabNavigator from "./src/Navigators/BottomTabNavigator";
-import Login from "./src/components/Login/Login";
+import BottomTabNavigator from "@/navigators/BottomTabNavigator";
+import Login from "@/components/Login/Login";
 import { useEffect, useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { GetStartedScreen } from "./src/screens/GetStartedScreen";
+import { GetStartedScreen } from "@/screens/GetStartedScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+
 import "react-native-gesture-handler";
 import "./global.css";
 
@@ -33,11 +34,8 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <GestureHandlerRootView className="flex-1">
-        <SafeAreaProvider
-          initialMetrics={initialWindowMetrics}
-          className="flex-1 h-screen bg-black"
-        >
+      <GestureHandlerRootView>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             {isLoggedIn ? (
               <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />

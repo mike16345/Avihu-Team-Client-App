@@ -1,6 +1,12 @@
-import { Pressable, PressableProps } from "react-native";
-import React from "react";
+import { Pressable, PressableProps, TextProps, Text } from "react-native";
 
-export default function Button({ ...props }: PressableProps) {
-  return <Pressable {...props}>{props.children}</Pressable>;
+interface ButtonProps extends PressableProps {
+  textProps?: TextProps;
+}
+
+export default function Button({ textProps, ...props }: ButtonProps) {
+  const { children } = props;
+  const content = typeof children === "string" ? <Text {...textProps}>{children}</Text> : children;
+
+  return <Pressable {...props}>{content}</Pressable>;
 }

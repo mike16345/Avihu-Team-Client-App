@@ -1,6 +1,6 @@
 import React from "react";
-import { View, Text, ImageBackground, Dimensions, TouchableOpacity, Touchable } from "react-native";
-import avihuFlyTrap from "../../assets/avihuFlyTrap.jpeg";
+import { View, Text, ImageBackground, TouchableOpacity } from "react-native";
+import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
 import { moderateScale } from "react-native-size-matters";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../types/navigatorTypes";

@@ -2,9 +2,9 @@ import React from 'react'
 import Icon from 'react-native-vector-icons/EvilIcons'
 import { View, Text, TouchableOpacity } from 'react-native'
 
-const ProtienTable = ({ setUiState, uiStates }) => {
+const ProteinTable = ({ setUiState, uiStates }) => {
     return (
-        <View className='w-screen  border-2 border-emerald-300 rounded  bg-black  gap-4 '>
+        <View className='w-screen  border-2 border-emerald-300 rounded bg-black  gap-4 '>
             <View className='items-end'>
                 <TouchableOpacity onPress={() => setUiState(uiStates.STANDARD)}>
                     <Icon style={{ padding: 5 }} name='close-o' color='rgb(110 231 183)' size={32} />
@@ -53,4 +53,4 @@ const ProtienTable = ({ setUiState, uiStates }) => {
     )
 }
 
-export default ProtienTable
+export default ProteinTable

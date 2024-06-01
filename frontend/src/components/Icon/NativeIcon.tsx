@@ -1,4 +1,3 @@
-import React from "react";
 import AntDesignIcons from "react-native-vector-icons/AntDesign";
 import EntypoIcons from "react-native-vector-icons/Entypo";
 import EvilIconsIcons from "react-native-vector-icons/EvilIcons";

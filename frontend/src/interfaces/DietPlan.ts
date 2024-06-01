@@ -1,5 +1,5 @@
-import { Carbs } from "../enums/Carbs";
-import { Proteins } from "../enums/Proteins";
+import { Carbs } from "@/enums/Carbs";
+import { Proteins } from "@/enums/Proteins";
 
 export interface IDietPlan {
   id: string;

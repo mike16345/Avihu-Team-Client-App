@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View, TouchableHighlight, TextInput } from "react-native";
-import React, { FC, useState } from "react";
-import Button from "../Button/Button";
-import { Colors } from "../../constants/Colors";
+import { FC, useState } from "react";
+import Button from "@/components/Button/Button";
+import { Colors } from "@/constants/Colors";
 import { ButtonGroup, Dialog } from "react-native-elements";
-import { IWeighIn } from "../../interfaces/User";
-import type { WeightUnit } from "../../types/weightTypes";
+import { IWeighIn } from "@/interfaces/User";
+import type { WeightUnit } from "@/types/weightTypes";
 
 interface AddWeightProps {
   onSave: (newWeighIn: IWeighIn) => void;
@@ -53,7 +53,7 @@ const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
                 onChangeText={(val) => handleInputWeight(val)}
                 className="inpt  h-10 w-24 ml-2"
                 keyboardType="number-pad"
-              ></TextInput>
+              />
             </View>
             <View className="flex-row-reverse items-center justify-between ">
               <Text className=" text-lg  font-bold text-white">סוג:</Text>
@@ -73,7 +73,7 @@ const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
           </Button>
         </View>
       </Dialog>
-      <View className="w-screen px-4 ">
+      <View className="w-screen px-2 ">
         <TouchableHighlight
           onPress={() => setOpenAddWeightModal((open) => !open)}
           style={styles.addWeightBtn}
