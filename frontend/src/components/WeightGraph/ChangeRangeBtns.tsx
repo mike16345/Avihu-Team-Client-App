@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { FC, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { FC, useState } from "react";
 import { ButtonGroup } from "react-native-elements";
-import { Colors } from "../../constants/Colors";
-import { DateRanges } from "../../types/dateTypes";
+import { Colors } from "@/constants/Colors";
+import { DateRanges } from "@/types/dateTypes";
 
 const selectedRangeToRange = (selectedRange: string) => {
   switch (selectedRange) {
@@ -20,6 +20,7 @@ const selectedRangeToRange = (selectedRange: string) => {
 interface ChangeRangeProps {
   onRangeChange: (range: DateRanges) => void;
 }
+
 const ChangeRangeBtns: FC<ChangeRangeProps> = ({ onRangeChange }) => {
   const ranges = ["1W", "1M", "1Y"];
   const [selectedRangeIndex, setSelectedRangeIndex] = useState(0);

@@ -1,6 +1,6 @@
-import { WorkoutPlans } from "../enums/WorkoutPlans";
-import { WorkoutType } from "../enums/WorkoutTypes";
-import { IDetailedWorkoutPlan, IWorkout, IWorkoutPlan } from "../interfaces/Workout";
+import { WorkoutPlans } from "@/enums/WorkoutPlans";
+import { WorkoutType } from "@/enums/WorkoutTypes";
+import { IWorkout } from "@/interfaces/Workout";
 
 export const workoutPlanToName = (workoutPlan: WorkoutPlans | string) => {
   switch (Number(workoutPlan)) {

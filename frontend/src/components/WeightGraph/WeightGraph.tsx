@@ -1,11 +1,11 @@
 import { View, StyleSheet, useWindowDimensions } from "react-native";
 import { useState } from "react";
 import { LineChart } from "react-native-chart-kit";
-import { myWeighIns } from "../../constants/MyWeight";
-import { IWeighIn } from "../../interfaces/User";
-import { ItemsInDateRangeParams, DateRanges } from "../../types/dateTypes";
-import DateUtils from "../../utils/dateUtils";
-import { Colors } from "../../constants/Colors";
+import { myWeighIns } from "@/constants/MyWeight";
+import { IWeighIn } from "@/interfaces/User";
+import { ItemsInDateRangeParams, DateRanges } from "@/types/dateTypes";
+import DateUtils from "@/utils/dateUtils";
+import { Colors } from "@/constants/Colors";
 import WeightCard from "./WeightCard";
 import WeeklyScoreCard from "./WeeklyScoreCard";
 import AddWeight from "./AddWeight";

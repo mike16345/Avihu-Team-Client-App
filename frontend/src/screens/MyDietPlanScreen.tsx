@@ -1,6 +1,5 @@
 import { View } from "react-native";
-import React from "react";
-import DietPlan from "../components/DietPlan/DietPlan";
+import DietPlan from "@/components/DietPlan/DietPlan";
 
 const MyDietPlanScreen = () => {
   return (

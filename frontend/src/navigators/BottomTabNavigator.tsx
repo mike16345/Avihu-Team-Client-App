@@ -1,10 +1,9 @@
-import MyWorkoutPlanPage from "../screens/MyWorkoutPlanPage";
+import MyWorkoutPlanPage from "@/screens/MyWorkoutPlanPage";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
-import MyProgressScreen from "../screens/MyProgressScreen";
-import NativeIcon from "../components/Icon/NativeIcon";
-import { RootStackParamList } from "../types/navigatorTypes";
-import MyDietPlanScreen from "../screens/MyDietPlanScreen";
-import WorkoutVideoPopup from "@/components/WorkoutPlan/WorkoutVideoPopup";
+import MyProgressScreen from "@/screens/MyProgressScreen";
+import NativeIcon from "@/components/Icon/NativeIcon";
+import { RootStackParamList } from "@/types/navigatorTypes";
+import MyDietPlanScreen from "@/screens/MyDietPlanScreen";
 import useAnimateBottomBar from "@/hooks/useAnimatedBottomBar";
 import { StyleSheet, View } from "react-native";
 import { Colors } from "@/constants/Colors";

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Dialog, Divider } from "react-native-elements";
 import { Colors } from "@/constants/Colors";
-import OpacityButton from "../Button/OpacityButton";
+import OpacityButton from "@/components/Button/OpacityButton";
 
 interface RecordWorkoutProps {
   isOpen: boolean;

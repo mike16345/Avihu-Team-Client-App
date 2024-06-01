@@ -15,6 +15,7 @@ const rangeToName = (range: DateRanges) => {
       return "";
   }
 };
+
 interface WeeklyScoreCardProps {
   weights: number[];
   range: DateRanges;

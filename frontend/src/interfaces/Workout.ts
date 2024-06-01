@@ -1,4 +1,4 @@
-import { WorkoutType } from "../enums/WorkoutTypes";
+import { WorkoutType } from "@/enums/WorkoutTypes";
 
 export interface ISet {
   minReps: number;
@@ -51,8 +51,7 @@ export interface RecordedWorkout {
   note: string;
 }
 
-
-export interface IRecordedSet{
+export interface IRecordedSet {
   repsDone: number;
   weight: number;
   note: string;

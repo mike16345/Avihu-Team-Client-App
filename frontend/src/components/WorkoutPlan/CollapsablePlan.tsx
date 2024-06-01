@@ -1,8 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React, { FC, useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
+import { FC, useState } from "react";
 import { ListItem } from "@rneui/themed";
-import NativeIcon from "../Icon/NativeIcon";
-import { IWorkout } from "../../interfaces/Workout";
+import NativeIcon from "@/components/Icon/NativeIcon";
+import { IWorkout } from "@/interfaces/Workout";
 
 interface CollapsableWorkoutPlanProps {
   title: string;

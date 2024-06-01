@@ -1,8 +1,8 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
-import React, { Dispatch, FC, SetStateAction } from "react";
+import { Dispatch, FC, SetStateAction } from "react";
 import { Dialog } from "react-native-elements";
 import { Colors } from "@/constants/Colors";
-import NativeIcon from "../Icon/NativeIcon";
+import NativeIcon from "@/components/Icon/NativeIcon";
 
 interface WorkoutTipsProps {
   openTips: boolean;

@@ -2,7 +2,7 @@ import { Colors } from "@/constants/Colors";
 import { IWorkout } from "@/interfaces/Workout";
 import { FC, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
-import Button from "../Button/Button";
+import Button from "@/components/Button/Button";
 import { Divider } from "react-native-elements";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
 import RecordWorkout from "./RecordWorkout";

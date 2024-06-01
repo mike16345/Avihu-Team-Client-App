@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View, TouchableHighlight, TextInput } from "react-native";
 import { FC, useState } from "react";
-import Button from "../Button/Button";
-import { Colors } from "../../constants/Colors";
+import Button from "@/components/Button/Button";
+import { Colors } from "@/constants/Colors";
 import { ButtonGroup, Dialog } from "react-native-elements";
-import { IWeighIn } from "../../interfaces/User";
-import type { WeightUnit } from "../../types/weightTypes";
+import { IWeighIn } from "@/interfaces/User";
+import type { WeightUnit } from "@/types/weightTypes";
 
 interface AddWeightProps {
   onSave: (newWeighIn: IWeighIn) => void;
