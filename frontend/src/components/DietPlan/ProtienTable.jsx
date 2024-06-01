@@ -46,7 +46,7 @@ const ProtienTable = ({ setUiState, uiStates }) => {
                 <Text className='text-emerald-300 w-1/2 text-right px-10'>קופסת טונה</Text>
                 <Text className='text-emerald-300 w-1/2 text-right px-10'>סקופ אבקת חלבון</Text>
             </View>
-            <View className='flex-row justify-center  '>
+            <View className='flex-row justify-center  pb-4'>
                 <Text className='text-emerald-300 w-1/2 text-right px-10'>משקה חלבון פרו יטבתה (זירו)</Text>
             </View>
         </View>
