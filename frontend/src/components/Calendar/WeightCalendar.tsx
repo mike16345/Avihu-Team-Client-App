@@ -4,16 +4,23 @@ import { darkTheme } from "./calendarTheme";
 import DayComponent from "./Day";
 import { useMemo, useState } from "react";
 import DateUtils from "@/utils/dateUtils";
+import { Colors } from "@/constants/Colors";
+import { MarkedDates } from "react-native-calendars/src/types";
 
 const WeightCalendar = () => {
   const [selected, setSelected] = useState(DateUtils.getCurrentDate("YYYY-MM-DD"));
 
-  const marked = useMemo(() => {
+  const marked: MarkedDates = useMemo(() => {
     return {
       [selected]: {
         selected: true,
-        selectedColor: "#222222",
-        selectedTextColor: "yellow",
+        selectedColor: Colors.primary,
+        dotColor: Colors.warning,
+        marked: true,
+        periods: [{ startingDay: true, endingDay: false, color: Colors.danger }],
+
+        selectedTextColor: Colors.dark,
+        dots: [{ color: Colors.primaryDark, key: selected, selectedDotColor: Colors.primaryLight }],
       },
     };
   }, [selected]);
