@@ -58,7 +58,6 @@ const WeightCalendar = () => {
                 key={1}
                 onPress={() => {
                   if (!date) return;
-                  console.log("setting selected", date?.day);
                   setSelected(date.dateString);
                 }}
               />

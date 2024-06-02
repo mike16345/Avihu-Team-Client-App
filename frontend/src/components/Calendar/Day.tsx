@@ -12,10 +12,9 @@ interface DayComponentProps {
 }
 
 const DayComponent: React.FC<DayComponentProps> = ({ date, state, marking, onPress }) => {
-  const { weight, customStyles } = marking || {};
+  const { weight, selected } = marking || {};
 
-  console.log("marking", marking?.selected);
-  const selectedStyle = marking?.selected && styles.selectedDayContainer;
+  const selectedStyle = selected && styles.selectedDayContainer;
 
   return (
     <TouchableOpacity
@@ -23,7 +22,7 @@ const DayComponent: React.FC<DayComponentProps> = ({ date, state, marking, onPre
       style={[styles.dayContainer, state == "today" && styles.todayContainer]}
     >
       <Text style={[styles.dateText, selectedStyle]}>{date}</Text>
-      {weight && <Text style={[styles.valueText, customStyles?.text]}>{weight}</Text>}
+      {weight && <Text style={[styles.valueText]}>{weight}</Text>}
     </TouchableOpacity>
   );
 };
