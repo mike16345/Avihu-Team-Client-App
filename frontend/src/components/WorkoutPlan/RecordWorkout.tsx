@@ -20,6 +20,7 @@ interface RecordWorkoutProps {
 
 const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName, setNumber }) => {
   const { width, height } = useWindowDimensions();
+  // TODO: Make RecordedSet object instead
   const [weight, setWeight] = useState<string>("");
   const [reps, setReps] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
