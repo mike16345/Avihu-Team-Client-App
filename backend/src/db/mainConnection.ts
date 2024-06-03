@@ -2,8 +2,6 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import path from "path";
 
-console.log("path", path);
-
 const pathToEnv = path.resolve(__dirname, "..", "..", ".env.local");
 dotenv.config({ path: pathToEnv });
 
