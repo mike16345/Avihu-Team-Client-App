@@ -4,21 +4,21 @@ import { UserController } from "../controllers/userController";
 const router = express.Router();
 
 // Get all users
-router.get("/getItems", UserController.getUsers);
+router.get("/", UserController.getUsers);
 
 // Update user
-router.put("/edit", UserController.updateUser);
+router.put("/:id", UserController.updateUser);
 
-// Update users
-router.put("/edit/bulk", UserController.updateManyUsers);
+// Update users (bulk)
+router.put("/bulk", UserController.updateManyUsers);
 
-// Get user by id
-router.get("/getItem/:id", UserController.getUser);
+// Get user by ID
+router.get("/:id", UserController.getUser);
 
-//Delete user
-router.delete("/delete", UserController.deleteUser);
+// Delete user
+router.delete("/:id", UserController.deleteUser);
 
 // Get user by email
-router.get("/byEmail/getItem/:email", UserController.getUserByEmail);
+router.get("/email/:email", UserController.getUserByEmail);
 
 export default router;
