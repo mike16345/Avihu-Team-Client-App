@@ -86,4 +86,6 @@ export const myWeighIns: IWeighIn[] = [
   { date: new Date("2024-05-28"), weightUnit: "lbs", weight: 192.4 },
   { date: new Date("2024-05-29"), weightUnit: "lbs", weight: 191.4 },
   { date: new Date("2024-05-30"), weightUnit: "lbs", weight: 190.4 },
+  { date: new Date("2024-06-01"), weightUnit: "lbs", weight: 195.4 },
+  { date: new Date("2024-06-02"), weightUnit: "lbs", weight: 194.4 },
 ];

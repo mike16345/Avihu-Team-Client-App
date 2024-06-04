@@ -7,9 +7,9 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/images/avihu-logo-black.png",
+      "resizeMode": "fit",
+      "backgroundColor": "black"
     },
     "ios": {
       "supportsTablet": true

@@ -1,9 +1,10 @@
 import { View, ImageBackground, ScrollView, TouchableOpacity, Text } from "react-native";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import dietPlan from "../../constants/dietPlan.json";
 import logoBlack from "../../../assets/images/avihu-logo-black.png";
 import CarbTable from "./CarbTable";
 import ProteinTable from "./ProteinTable";
+import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
 
 export default function DietPlan() {
   const UI_TYPES = {
@@ -12,11 +13,18 @@ export default function DietPlan() {
     PROTEIN: "PROTEIN",
   };
 
+  const { handleScroll } = useHideTabBarOnScroll();
+
   const [meals, setMeals] = useState(dietPlan.meals);
   const [uiView, setUiView] = useState(UI_TYPES.STANDARD);
+  const scrollRef = useRef(null);
 
   return (
-    <ScrollView className="w-screen h-screen flex-1 bg-black  relative">
+    <ScrollView
+      ref={scrollRef}
+      onScroll={handleScroll}
+      className="w-screen h-screen flex-1 bg-black  relative"
+    >
       <ImageBackground source={logoBlack} className="w-screen h-[30vh]" />
 
       <View className="flex-row justify-center gap-9 pb-6">
