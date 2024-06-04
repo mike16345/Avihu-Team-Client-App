@@ -1,24 +1,24 @@
 import express from "express";
-import { UserController } from "../controllers/userController";
+import { userController } from "../controllers/userController";
 
 const router = express.Router();
 
 // Get all users
-router.get("/", UserController.getUsers);
+router.get("/", userController.getUsers);
 
 // Update user
-router.put("/:id", UserController.updateUser);
+router.put("/:id", userController.updateUser);
 
 // Update users (bulk)
-router.put("/bulk", UserController.updateManyUsers);
+router.put("/bulk", userController.updateManyUsers);
 
 // Get user by ID
-router.get("/:id", UserController.getUser);
+router.get("/:id", userController.getUser);
 
 // Delete user
-router.delete("/:id", UserController.deleteUser);
+router.delete("/:id", userController.deleteUser);
 
 // Get user by email
-router.get("/email/:email", UserController.getUserByEmail);
+router.get("/email/:email", userController.getUserByEmail);
 
 export default router;
