@@ -1,5 +1,5 @@
 import { View, StyleSheet, useWindowDimensions } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LineChart } from "react-native-chart-kit";
 import { myWeighIns } from "@/constants/MyWeight";
 import { IWeighIn } from "@/interfaces/User";
@@ -10,6 +10,8 @@ import WeightCard from "./WeightCard";
 import WeeklyScoreCard from "./WeeklyScoreCard";
 import AddWeight from "./AddWeight";
 import ChangeRangeBtns from "./ChangeRangeBtns";
+import { useWeighInApi } from "@/hooks/useWeighInApi";
+import { useUserStore } from "@/store/userStore";
 
 const rangeParams: ItemsInDateRangeParams<IWeighIn> = {
   items: myWeighIns,
@@ -20,6 +22,9 @@ const rangeParams: ItemsInDateRangeParams<IWeighIn> = {
 
 export const WeightGraph = () => {
   const { width } = useWindowDimensions();
+  const { getWeighInsByUserId, addWeighIn } = useWeighInApi();
+
+  const currentUser = useUserStore((state) => state.currentUser);
 
   const [selectedWeight, setSelectedWeight] = useState<number | null>(null);
   const [currentRange, setCurrentRange] = useState<DateRanges>("weeks");
@@ -53,13 +58,26 @@ export const WeightGraph = () => {
     const newWeighIns = [...weighIns, newWeighIn];
     const weights = extractWeights(newWeighIns);
 
+    addWeighIn("665f0b0b00b1a04e8f1c4478", newWeighIn);
     setWeighIns(newWeighIns);
     setWeights(weights);
+  };
+
+  const getUserWeightIns = async () => {
+    if (!currentUser) return;
+
+    await getWeighInsByUserId(currentUser.id)
+      .then((weighIns) => setWeighIns(weighIns))
+      .catch((err) => console.log(err));
   };
 
   function extractWeights(items: IWeighIn[]) {
     return items.map((item) => item.weight);
   }
+
+  useEffect(() => {
+    getUserWeightIns();
+  }, []);
 
   return (
     <View style={styles.container}>

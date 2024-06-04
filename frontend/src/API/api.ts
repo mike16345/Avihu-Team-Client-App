@@ -16,9 +16,10 @@ async function request<T>(
       params,
       headers,
     });
-    
+
     return response.data;
   } catch (error) {
+    console.log("error", error);
     throw error;
   }
 }

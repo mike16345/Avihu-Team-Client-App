@@ -26,6 +26,7 @@ const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
       weight: weight,
       weightUnit: weightType,
     };
+
     setOpenAddWeightModal(false);
     onSave(weighIn);
   };

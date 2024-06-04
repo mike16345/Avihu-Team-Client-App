@@ -2,8 +2,10 @@ import { Request, Response } from "express";
 import { WeighInSchemaValidation } from "../models/weighInModel";
 import { weighInServices } from "../services/weighInService";
 
-class userController {
+class WeighInsController {
   addWeighIn = async (req: Request, res: Response) => {
+    console.log("req id ", req.params);
+    console.log("req body", req.body);
     const id = req.params.id;
     const data = {
       userId: id,
@@ -28,4 +30,4 @@ class userController {
   };
 }
 
-export const UserController = new userController();
+export const weighInsController = new WeighInsController();
