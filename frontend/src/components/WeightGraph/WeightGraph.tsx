@@ -54,11 +54,14 @@ export const WeightGraph = () => {
     setCurrentRange(range);
   };
 
-  const handleSaveNewWeighIn = (newWeighIn: IWeighIn) => {
+  const handleSaveNewWeighIn = async (newWeighIn: IWeighIn) => {
     const newWeighIns = [...weighIns, newWeighIn];
     const weights = extractWeights(newWeighIns);
 
-    addWeighIn("665f0b0b00b1a04e8f1c4478", newWeighIn);
+    await addWeighIn("665f0b0b00b1a04e8f1c4478", newWeighIn)
+      .then((res) => console.log("res", res))
+      .catch((err) => console.log("err", err));
+
     setWeighIns(newWeighIns);
     setWeights(weights);
   };
@@ -66,9 +69,9 @@ export const WeightGraph = () => {
   const getUserWeightIns = async () => {
     if (!currentUser) return;
 
-    await getWeighInsByUserId(currentUser.id)
-      .then((weighIns) => setWeighIns(weighIns))
-      .catch((err) => console.log(err));
+    // await getWeighInsByUserId(currentUser.id)
+    //   .then((weighIns) => setWeighIns(weighIns))
+    //   .catch((err) => console.log(err));
   };
 
   function extractWeights(items: IWeighIn[]) {
