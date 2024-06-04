@@ -1,15 +1,13 @@
 import { Request, Response } from "express";
 import { WeighInSchemaValidation } from "../models/weighInModel";
 import { weighInServices } from "../services/weighInService";
+import { ObjectId } from "mongodb";
 
 class WeighInsController {
   addWeighIn = async (req: Request, res: Response) => {
-    console.log("req id ", req.params);
-    console.log("req body", req.body);
     const id = req.params.id;
     const data = {
       userId: id,
-      date: req.body.date || new Date(),
       weight: req.body.weight,
     };
 

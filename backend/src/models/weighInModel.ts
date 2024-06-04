@@ -8,13 +8,13 @@ const weighInSchema = new Schema<IWeighIn>({
 });
 
 const weighInsSchema = new Schema<IWeighIns>({
-  userId: { type: Schema.Types.ObjectId, ref: "users" },
+  userId: { type: String },
   weighIns: [weighInSchema],
 });
 
 export const WeighIns = model("weighIns", weighInSchema);
 
 export const WeighInSchemaValidation = Joi.object({
-  userId: { type: Schema.Types.ObjectId, ref: "users" },
+  userId: Joi.string().min(1).max(60),
   weight: Joi.number().min(1).max(600),
 });
