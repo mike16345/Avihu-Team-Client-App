@@ -1,4 +1,4 @@
-import axiosInstance from "./apiConfig";
+import axiosInstance from "@/config/apiConfig";
 import { Method } from "axios";
 
 async function request<T>(
@@ -19,7 +19,7 @@ async function request<T>(
 
     return response.data;
   } catch (error) {
-    console.log("error", error);
+    console.log("Error:", error);
     throw error;
   }
 }
