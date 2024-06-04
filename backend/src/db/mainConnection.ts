@@ -18,11 +18,12 @@ async function main() {
   const cluster = process.env.DB_CLUSTER;
   const DATABASE_SERVER = `mongodb+srv://${username}:${password}@${cluster}.syi4d9w.mongodb.net/`;
   const port = process.env.PORT;
-
+  const dbName = process.env.DB_NAME;
   console.log("database server:", DATABASE_SERVER);
 
   try {
-    await mongoose.connect(DATABASE_SERVER);
+    mongoose.set("strictQuery", false);
+    await mongoose.connect(DATABASE_SERVER, { dbName: dbName });
     console.log("mongo connected listening on port:", port);
   } catch (err) {
     throw err;

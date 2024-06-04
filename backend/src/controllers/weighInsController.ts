@@ -5,6 +5,9 @@ import { ObjectId } from "mongodb";
 
 class WeighInsController {
   addWeighIn = async (req: Request, res: Response) => {
+    console.log("id", req.params.id);
+    console.log("req", req.body);
+
     const id = req.params.id;
     const data = {
       userId: id,
@@ -14,6 +17,7 @@ class WeighInsController {
     const { error, value } = WeighInSchemaValidation.validate(data);
 
     if (error) {
+      console.log("error", error);
       return res.status(400).json({ message: error.message });
     }
 
