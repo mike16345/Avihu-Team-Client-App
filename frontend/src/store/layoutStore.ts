@@ -6,6 +6,6 @@ interface ILayoutStore {
 }
 
 export const useLayoutStore = create<ILayoutStore>((set) => ({
-  isNavbarOpen: false,
+  isNavbarOpen: true,
   setIsNavbarOpen: (isOpen: boolean) => set({ isNavbarOpen: isOpen }),
 }));
