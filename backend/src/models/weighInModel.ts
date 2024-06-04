@@ -12,7 +12,7 @@ const weighInsSchema = new Schema<IWeighIns>({
   weighIns: [weighInSchema],
 });
 
-export const WeighIns = model("weighIns", weighInSchema);
+export const WeighIns = model("weighIns", weighInsSchema);
 
 export const WeighInSchemaValidation = Joi.object({
   userId: Joi.string().min(1).max(60),

@@ -23,6 +23,7 @@ async function main() {
 
   try {
     mongoose.set("strictQuery", false);
+
     await mongoose.connect(DATABASE_SERVER, { dbName: dbName });
     console.log("mongo connected listening on port:", port);
   } catch (err) {
