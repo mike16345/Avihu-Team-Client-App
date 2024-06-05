@@ -46,24 +46,28 @@ export const WeightGraph = () => {
   };
 
   const handleRangeChange = (range: DateRanges) => {
-    const weighIns = DateUtils.getItemsInRange({ ...rangeParams, range: range });
+    const newWeighIns = DateUtils.getItemsInRange({
+      ...rangeParams,
+      items: weighIns,
+      range: range,
+    });
     const weights = extractWeights(weighIns);
 
     setWeights(weights);
-    setWeighIns(weighIns);
+    setWeighIns(newWeighIns);
     setCurrentRange(range);
   };
 
   const handleSaveNewWeighIn = async (newWeighIn: IWeighIn) => {
-    const newWeighIns = [...weighIns, newWeighIn];
-    const weights = extractWeights(newWeighIns);
-
     await addWeighIn("665f0b0b00b1a04e8f1c4478", newWeighIn)
-      .then((res) => console.log("res", res))
-      .catch((err) => console.log("err", err));
+      .then((res) => {
+        const updatedWeighIns = res.weighIns;
+        const weights = extractWeights(updatedWeighIns);
 
-    setWeighIns(newWeighIns);
-    setWeights(weights);
+        setWeighIns(updatedWeighIns);
+        setWeights(weights);
+      })
+      .catch((err) => console.log("err", err));
   };
 
   const getUserWeightIns = async () => {

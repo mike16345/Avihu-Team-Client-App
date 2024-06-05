@@ -66,11 +66,16 @@ class DateUtils {
     }
 
     return items.filter((item) => {
-      const itemDate = item[dateKey];
+      let itemDate = item[dateKey] as any;
 
       if (!(itemDate instanceof Date)) {
-        throw new Error(`'${String(dateKey)}' is not of type Date`);
+        itemDate = new Date(itemDate);
       }
+
+      if (isNaN(itemDate.getTime())) {
+        throw new Error(`'${String(dateKey)}' is not a valid date`);
+      }
+
       return itemDate >= pastDate && itemDate <= now;
     });
   }
@@ -83,7 +88,7 @@ class DateUtils {
         return this.extractMonthLabels(data);
       case "years":
         return this.extractYearLabels(data);
-      default: 
+      default:
         throw new Error("Invalid range. Use  'days','months', or 'years'.");
     }
   }
@@ -168,6 +173,10 @@ class DateUtils {
     });
 
     return labels.length > 5 ? labels.map((label) => label.slice(0, 3)) : labels;
+  }
+
+  static convertToDate(date: string): Date {
+    return new Date(date);
   }
 }
 
