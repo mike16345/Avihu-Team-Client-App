@@ -22,11 +22,13 @@ const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
 
   const handleSaveWeight = () => {
     const weighIn: IWeighIn = {
-      date: new Date(),
+      // date: new Date(),
       weight: weight,
-      weightUnit: weightType,
+      // weightUnit: weightType,
     };
+
     setOpenAddWeightModal(false);
+    console.log("weigh in", weighIn);
     onSave(weighIn);
   };
 

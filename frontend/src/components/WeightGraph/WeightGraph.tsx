@@ -1,5 +1,5 @@
 import { View, StyleSheet, useWindowDimensions } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LineChart } from "react-native-chart-kit";
 import { myWeighIns } from "@/constants/MyWeight";
 import { IWeighIn } from "@/interfaces/User";
@@ -10,6 +10,8 @@ import WeightCard from "./WeightCard";
 import WeeklyScoreCard from "./WeeklyScoreCard";
 import AddWeight from "./AddWeight";
 import ChangeRangeBtns from "./ChangeRangeBtns";
+import { useWeighInApi } from "@/hooks/useWeighInApi";
+import { useUserStore } from "@/store/userStore";
 
 const rangeParams: ItemsInDateRangeParams<IWeighIn> = {
   items: myWeighIns,
@@ -20,6 +22,9 @@ const rangeParams: ItemsInDateRangeParams<IWeighIn> = {
 
 export const WeightGraph = () => {
   const { width } = useWindowDimensions();
+  const { getWeighInsByUserId, addWeighIn } = useWeighInApi();
+
+  const currentUser = useUserStore((state) => state.currentUser);
 
   const [selectedWeight, setSelectedWeight] = useState<number | null>(null);
   const [currentRange, setCurrentRange] = useState<DateRanges>("weeks");
@@ -41,25 +46,45 @@ export const WeightGraph = () => {
   };
 
   const handleRangeChange = (range: DateRanges) => {
-    const weighIns = DateUtils.getItemsInRange({ ...rangeParams, range: range });
+    const newWeighIns = DateUtils.getItemsInRange({
+      ...rangeParams,
+      items: weighIns,
+      range: range,
+    });
     const weights = extractWeights(weighIns);
 
     setWeights(weights);
-    setWeighIns(weighIns);
+    setWeighIns(newWeighIns);
     setCurrentRange(range);
   };
 
-  const handleSaveNewWeighIn = (newWeighIn: IWeighIn) => {
-    const newWeighIns = [...weighIns, newWeighIn];
-    const weights = extractWeights(newWeighIns);
+  const handleSaveNewWeighIn = async (newWeighIn: IWeighIn) => {
+    await addWeighIn("665f0b0b00b1a04e8f1c4478", newWeighIn)
+      .then((res) => {
+        const updatedWeighIns = res.weighIns;
+        const weights = extractWeights(updatedWeighIns);
 
-    setWeighIns(newWeighIns);
-    setWeights(weights);
+        setWeighIns(updatedWeighIns);
+        setWeights(weights);
+      })
+      .catch((err) => console.log("err", err));
+  };
+
+  const getUserWeightIns = async () => {
+    if (!currentUser) return;
+
+    // await getWeighInsByUserId(currentUser.id)
+    //   .then((weighIns) => setWeighIns(weighIns))
+    //   .catch((err) => console.log(err));
   };
 
   function extractWeights(items: IWeighIn[]) {
     return items.map((item) => item.weight);
   }
+
+  useEffect(() => {
+    getUserWeightIns();
+  }, []);
 
   return (
     <View style={styles.container}>

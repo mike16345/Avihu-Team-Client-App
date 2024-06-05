@@ -32,4 +32,9 @@ yarn-error.*
 .env*.local
 
 # typescript
+
 *.tsbuildinfo
+
+
+# ip 
+**/ip.ts

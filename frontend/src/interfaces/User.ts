@@ -19,3 +19,9 @@ export interface IWeighIn {
   weight: number;
   weightUnit: WeightUnit;
 }
+
+export interface IWeighInResponse {
+  _id: string;
+  userId: string;
+  weighIns: IWeighIn[];
+}
