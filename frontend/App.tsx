@@ -11,7 +11,6 @@ import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 import "react-native-gesture-handler";
 import "./global.css";
-import { fetchData } from "@/API/api";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,15 +24,8 @@ export default function App() {
     if (token) setIsLoggedIn(true);
   };
 
-  const getUsers = async () => {
-    await fetchData("/users")
-      .then((res) => console.log("res", res))
-      .catch((err) => console.error(err));
-  };
-
   useEffect(() => {
     checkLoginStatus();
-    getUsers();
 
     return () => {
       removeItem();
