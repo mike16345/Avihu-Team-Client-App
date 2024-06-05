@@ -29,7 +29,6 @@ export async function fetchData<T>(endpoint: string, params?: any, headers?: any
 }
 
 export async function sendData<T>(endpoint: string, data: any, headers?: any): Promise<T> {
-  console.log("endpoint", axiosInstance.arguments);
   return request<T>("post", endpoint, data, undefined, headers);
 }
 
