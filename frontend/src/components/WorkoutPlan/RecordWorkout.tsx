@@ -20,6 +20,7 @@ interface RecordWorkoutProps {
 
 const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName, setNumber }) => {
   const { width, height } = useWindowDimensions();
+  
   // TODO: Make RecordedSet object instead
   const [weight, setWeight] = useState<string>("");
   const [reps, setReps] = useState<string>("");
@@ -100,12 +101,12 @@ const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName,
           </View>
 
           <View style={styles.notesContainer}>
-            <Text style={styles.inputLabel}>פטק:</Text>
+            <Text style={styles.inputLabel}>פתק:</Text>
             <TextInput
               className="inpt "
               style={[styles.multilineInput, { width: width - 80 }]}
-              keyboardType="ascii-capable"
               multiline
+              placeholderTextColor={"gray"}
               placeholder="איך עבר לך?"
               textAlignVertical="top"
               value={notes}
@@ -135,6 +136,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
+    textAlign: "right",
     color: Colors.primary,
     fontWeight: "bold",
     backgroundColor: Colors.bgSecondary,
@@ -151,8 +153,9 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   title: {
-    fontSize: 20,
+    fontSize: 17,
     padding: 8,
+    textAlign: "right",
     fontWeight: "bold",
     color: Colors.primary,
   },

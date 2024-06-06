@@ -81,13 +81,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   workoutTitle: {
+    textAlign: "right",
     color: Colors.primary,
     fontSize: 14,
     fontWeight: "600",
   },
   set: {
     color: Colors.light,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "600",
   },
   workoutDescriptionContainer: {

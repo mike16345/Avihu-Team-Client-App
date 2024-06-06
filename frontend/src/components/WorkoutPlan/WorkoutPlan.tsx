@@ -50,13 +50,18 @@ const WorkoutPlan = () => {
           setOpen={setOpen}
           setValue={setValue}
           setItems={setPlans}
+          labelStyle={{ textAlign: "right" }}
+          listItemLabelStyle={{ textAlign: "right" }}
           onChangeValue={(val) => {
             if (!val) return;
             const key = Number(val) as WorkoutPlans;
             setCurrentWorkoutPlan(workoutPlans[key]);
           }}
         />
-        <TouchableOpacity onPress={() => setOpenTips(true)}>
+        <TouchableOpacity
+          style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
+          onPress={() => setOpenTips(true)}
+        >
           <Text style={styles.tipsText}>דגשים</Text>
         </TouchableOpacity>
       </View>
@@ -90,17 +95,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   container: {
+    zIndex: 10,
     width: "100%",
+    alignItems: "flex-end",
     padding: 12,
     gap: 20,
   },
   tipsText: {
     color: Colors.primary,
+    textAlign: "right",
     fontSize: 18,
     fontWeight: "bold",
     textDecorationLine: "underline",
   },
   workoutContainer: {
+    zIndex: 1,
     padding: 4,
     gap: 12,
   },
