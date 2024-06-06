@@ -87,7 +87,7 @@ export const WeightGraph = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { width: width - 4 }]}>
       <View style={styles.weightContainer}>
         <LineChart
           data={{
@@ -106,7 +106,7 @@ export const WeightGraph = () => {
             legend: ["מעקב שקילה"],
           }}
           hidePointsAtIndex={hidePointsAtIndex()}
-          width={width}
+          width={width - 15}
           height={220}
           onDataPointClick={({ value }) => {
             setSelectedWeight(value);
@@ -142,10 +142,7 @@ export const WeightGraph = () => {
           }}
         />
         <ChangeRangeBtns onRangeChange={handleRangeChange} />
-        <View
-          style={{ height: 120 }}
-          className="flex-row items-center justify-between w-screen gap-4"
-        >
+        <View style={{ height: 120 }} className="flex-row items-center justify-between  gap-4">
           <WeightCard currentWeight={selectedWeight || weights[weights.length - 1]} />
           <WeeklyScoreCard weights={weights} range={currentRange} />
         </View>
@@ -157,14 +154,11 @@ export const WeightGraph = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    flexGrow: 1,
     gap: 20,
     alignItems: "center",
-    justifyContent: "space-evenly",
+    justifyContent: "center",
   },
   weightContainer: {
-    flex: 1,
     gap: 12,
   },
 });

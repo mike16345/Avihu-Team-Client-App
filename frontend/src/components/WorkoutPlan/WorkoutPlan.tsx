@@ -16,6 +16,7 @@ import { IWorkout } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
 import Workout from "./Workout";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
+import { Colors } from "@/constants/Colors";
 
 const WorkoutPlan = () => {
   const keys = Object.keys(workoutPlans);
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   tipsText: {
-    color: "emerald",
+    color: Colors.primary,
     fontSize: 18,
     fontWeight: "bold",
     textDecorationLine: "underline",

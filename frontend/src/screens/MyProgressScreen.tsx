@@ -32,15 +32,18 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: "black",
     gap: 12,
-    paddingTop: StatusBar.currentHeight || 0,
     ...Platform.select({
       ios: {
-        paddingTop: 32,
+        paddingTop: 40,
+      },
+      android: {
+        paddingTop: StatusBar.currentHeight || 0,
       },
     }),
   },
   calendarContainer: {
     flex: 1,
+    marginHorizontal: 12,
     backgroundColor: Colors.bgSecondary,
     borderRadius: 12,
   },

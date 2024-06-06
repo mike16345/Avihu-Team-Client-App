@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, useWindowDimensions } from "react-native";
 import { Calendar, CalendarProvider } from "react-native-calendars";
 import { darkTheme } from "./calendarTheme";
 import DayComponent from "./Day";
@@ -17,7 +17,10 @@ interface MarkedDays {
 }
 
 const WeightCalendar = () => {
+  const { width } = useWindowDimensions();
+
   const [selected, setSelected] = useState(DateUtils.getCurrentDate("YYYY-MM-DD"));
+
   const marked: MarkedDays = useMemo(() => {
     const marks: MarkedDays = {};
 
@@ -41,7 +44,7 @@ const WeightCalendar = () => {
   }, [selected]);
 
   return (
-    <View className="flex-1 ">
+    <View className="flex-1">
       <CalendarProvider date={selected}>
         <Calendar
           markedDates={marked}
@@ -64,7 +67,7 @@ const WeightCalendar = () => {
             );
           }}
           hideExtraDays
-          style={{ borderRadius: 4 }}
+          style={{ borderRadius: 12, padding: 4 }}
           theme={darkTheme}
         />
       </CalendarProvider>
