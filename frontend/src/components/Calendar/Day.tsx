@@ -14,14 +14,16 @@ interface DayComponentProps {
 const DayComponent: React.FC<DayComponentProps> = ({ date, state, marking, onPress }) => {
   const { weight, selected } = marking || {};
 
-  const selectedStyle = selected && styles.selectedDayContainer;
+  const selectedTwStyle = selected ? "  bg-primary rounded-2xl ios:overflow-hidden" : "";
 
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[styles.dayContainer, state == "today" && styles.todayContainer]}
     >
-      <Text style={[styles.dateText, selectedStyle]}>{date}</Text>
+      <Text className={`${selectedTwStyle}  `} style={[styles.dateText]}>
+        {date}
+      </Text>
       {weight && <Text style={[styles.valueText]}>{weight}</Text>}
     </TouchableOpacity>
   );
@@ -34,16 +36,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.bgSecondary,
     borderRadius: 5,
   },
-  selectedDayContainer: {
-    borderRadius: 12,
-    backgroundColor: Colors.bgPrimary,
-  },
+
   dateText: {
     color: Colors.light,
     paddingHorizontal: 10,
     paddingVertical: 3,
     fontWeight: "600",
-    fontSize: 16,
+    fontSize: 14,
   },
   disabledText: {
     color: Colors.dark,

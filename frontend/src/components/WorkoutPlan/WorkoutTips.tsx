@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, Platform, StyleSheet, Text, View } from "react-native";
 import { Dispatch, FC, SetStateAction } from "react";
 import { Dialog } from "react-native-elements";
 import { Colors } from "@/constants/Colors";
@@ -36,7 +36,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ openTips, setOpenTips }) => {
         <Text style={styles.title}>דגשים לאימון</Text>
       </View>
       <FlatList
-        renderItem={({ item, index, separators }) => (
+        renderItem={({ item, index }) => (
           <Text style={styles.tip}>
             {index + 1 + ". "}
             {item}
@@ -61,6 +61,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   tip: {
+    ...Platform.select({
+      ios: {
+        textAlign: "right",
+      },
+    }),
     color: Colors.light,
     paddingBottom: 10,
     fontWeight: "600",
