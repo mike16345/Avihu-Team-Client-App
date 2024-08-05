@@ -1,15 +1,9 @@
 import { WeightUnit } from "@/types/weightTypes";
 
 export interface IUser {
-  id: string;
+  _id: string;
   name: string;
   email: string;
-  password: string; // just for demo
-  dietPlan: string;
-  workoutPlan: string;
-  weighIns: string[];
-  workoutProgress: string[];
-  mealsProgress: string[];
 }
 
 // WeighIn interface

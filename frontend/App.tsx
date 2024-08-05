@@ -11,13 +11,17 @@ import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 import "react-native-gesture-handler";
 import "./global.css";
+import { useUserStore } from "@/store/userStore";
+import { useUserApi } from "@/hooks/useUserApi";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   const { getItem, removeItem } = useAsyncStorage("isLoggedIn");
+  const setCurrentUser = useUserStore((state) => state.setCurrentUser);
+  const { getUserById } = useUserApi();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const checkLoginStatus = async () => {
     const token = await getItem();
@@ -26,6 +30,7 @@ export default function App() {
 
   useEffect(() => {
     checkLoginStatus();
+    getUserById("665f0b0b00b1a04e8f1c4478").then((user) => setCurrentUser(user));
 
     return () => {
       removeItem();

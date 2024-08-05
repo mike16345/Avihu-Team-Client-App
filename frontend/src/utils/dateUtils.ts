@@ -48,6 +48,8 @@ class DateUtils {
 
   static getItemsInRange<T>(data: ItemsInDateRangeParams<T>): T[] {
     const { items, dateKey, n, range } = data;
+    if (!items.length) return [];
+
     const now = new Date();
     let pastDate: Date;
 
@@ -81,15 +83,19 @@ class DateUtils {
   }
 
   static extractLabels<T>(data: ItemsInDateRangeParams<T>) {
-    switch (data.range) {
-      case "weeks":
-        return this.extractDayLabels(data);
-      case "months":
-        return this.extractMonthLabels(data);
-      case "years":
-        return this.extractYearLabels(data);
-      default:
-        throw new Error("Invalid range. Use  'days','months', or 'years'.");
+    try {
+      switch (data.range) {
+        case "weeks":
+          return this.extractDayLabels(data);
+        case "months":
+          return this.extractMonthLabels(data);
+        case "years":
+          return this.extractYearLabels(data);
+        default:
+          throw new Error("Invalid range. Use  'days','months', or 'years'.");
+      }
+    } catch (err) {
+      console.error(err);
     }
   }
 

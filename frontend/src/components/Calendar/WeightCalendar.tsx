@@ -2,11 +2,11 @@ import { View, useWindowDimensions } from "react-native";
 import { Calendar, CalendarProvider } from "react-native-calendars";
 import { darkTheme } from "./calendarTheme";
 import DayComponent from "./Day";
-import { useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import DateUtils from "@/utils/dateUtils";
 import { Colors } from "@/constants/Colors";
-import { myWeighIns } from "@/constants/MyWeight";
 import { MarkingProps } from "react-native-calendars/src/calendar/day/marking";
+import { IWeighIn } from "@/interfaces/User";
 
 export interface ExtendedMarking extends MarkingProps {
   weight?: number;
@@ -16,15 +16,17 @@ interface MarkedDays {
   [key: string]: ExtendedMarking;
 }
 
-const WeightCalendar = () => {
-  const { width } = useWindowDimensions();
+interface WeightCalendarProps {
+  weighIns: IWeighIn[];
+}
 
+const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
   const [selected, setSelected] = useState(DateUtils.getCurrentDate("YYYY-MM-DD"));
 
   const marked: MarkedDays = useMemo(() => {
     const marks: MarkedDays = {};
 
-    myWeighIns.forEach((weighIn) => {
+    weighIns.forEach((weighIn) => {
       const dateString = weighIn.date.toISOString().split("T")[0];
 
       marks[dateString] = {

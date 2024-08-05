@@ -2,13 +2,35 @@ import WeightCalendar from "@/components/Calendar/WeightCalendar";
 import { WeightGraph } from "@/components/WeightGraph/WeightGraph";
 import { Colors } from "@/constants/Colors";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
-import { useRef } from "react";
+import { useUserApi } from "@/hooks/useUserApi";
+import { useWeighInApi } from "@/hooks/useWeighInApi";
+import { IWeighIn } from "@/interfaces/User";
+import { useUserStore } from "@/store/userStore";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, ScrollView, StatusBar, Platform, View } from "react-native";
 
 const MyProgressScreen = () => {
   const { handleScroll } = useHideTabBarOnScroll();
+  const { getWeighInsByUserId } = useWeighInApi();
+
+  const currentUser = useUserStore((state) => state.currentUser);
+  const [weighIns, setWeighIns] = useState<IWeighIn[]>([]);
+
+  const getUserWeightIns = async () => {
+    if (!currentUser) return;
+
+    getWeighInsByUserId(currentUser._id)
+      .then((weighIns) => {
+        setWeighIns(weighIns);
+      })
+      .catch((err) => console.log(err));
+  };
 
   const scrollRef = useRef(null);
+
+  useEffect(() => {
+    getUserWeightIns();
+  }, []);
 
   return (
     <ScrollView
@@ -18,10 +40,10 @@ const MyProgressScreen = () => {
       contentContainerStyle={styles.container}
     >
       <View style={styles.calendarContainer}>
-        <WeightCalendar />
+        <WeightCalendar weighIns={weighIns} />
       </View>
       <View style={styles.graphContainer}>
-        <WeightGraph />
+        <WeightGraph weighIns={weighIns} />
       </View>
     </ScrollView>
   );
