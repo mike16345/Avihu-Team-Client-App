@@ -1,4 +1,4 @@
-import { View, useWindowDimensions } from "react-native";
+import { View } from "react-native";
 import { Calendar, CalendarProvider } from "react-native-calendars";
 import { darkTheme } from "./calendarTheme";
 import DayComponent from "./Day";
@@ -27,7 +27,7 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
     const marks: MarkedDays = {};
 
     weighIns.forEach((weighIn) => {
-      const dateString = weighIn.date.toISOString().split("T")[0];
+      const dateString = new Date(weighIn.date).toISOString().split("T")[0];
 
       marks[dateString] = {
         selected: selected === dateString,

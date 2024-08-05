@@ -10,7 +10,6 @@ import WeeklyScoreCard from "./WeeklyScoreCard";
 import AddWeight from "./AddWeight";
 import ChangeRangeBtns from "./ChangeRangeBtns";
 import { useWeighInApi } from "@/hooks/useWeighInApi";
-import { myWeighIns } from "@/constants/MyWeight";
 
 const rangeParams: ItemsInDateRangeParams<IWeighIn> = {
   items: [],
@@ -30,13 +29,13 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
   const [selectedWeight, setSelectedWeight] = useState<number | null>(null);
   const [currentRange, setCurrentRange] = useState<DateRanges>("weeks");
   const [userWeighIns, setUserWeighIns] = useState<IWeighIn[]>([]);
-  const [weights, setWeights] = useState(extractWeights(weighIns));
+  const [weights, setWeights] = useState<number[]>([]);
 
   const hidePointsAtIndex = () => {
     if (weights.length < 100) return;
 
     const indices = weights
-      .map((w, index) => {
+      .map((_, index) => {
         if (index % 2 !== 0) {
           return index;
         }
@@ -52,7 +51,7 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
       items: weighIns,
       range: range,
     });
-    const weights = extractWeights(userWeighIns);
+    const weights = extractWeights(newWeighIns);
 
     setWeights(weights);
     setUserWeighIns(newWeighIns);
@@ -63,9 +62,10 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
     addWeighIn("665f0b0b00b1a04e8f1c4478", newWeighIn)
       .then((res) => {
         const updatedWeighIns = res.weighIns;
-        const weights = extractWeights(updatedWeighIns);
+        const newWeighIns = DateUtils.getItemsInRange({ ...rangeParams, items: updatedWeighIns });
+        const weights = extractWeights(newWeighIns);
 
-        setUserWeighIns(updatedWeighIns);
+        setUserWeighIns(newWeighIns);
         setWeights(weights);
       })
       .catch((err) => console.log("err", err));
@@ -78,13 +78,11 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
   useEffect(() => {
     try {
       const weighInsInRange = DateUtils.getItemsInRange({ ...rangeParams, items: weighIns });
-      console.log("test", weighInsInRange);
+      const weights = extractWeights(weighInsInRange);
 
       setUserWeighIns(weighInsInRange);
-      setWeights(extractWeights(weighInsInRange));
-    } catch (err) {
-      console.log("error fetching weigh ins: ", err);
-    }
+      setWeights(weights);
+    } catch (err) {}
   }, [weighIns]);
 
   return (
@@ -92,15 +90,14 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
       <View style={styles.weightContainer}>
         <LineChart
           data={{
-            labels:
-              DateUtils.extractLabels({
-                ...rangeParams,
-                items: weighIns,
-                range: currentRange,
-              }) || [],
+            labels: DateUtils.extractLabels({
+              ...rangeParams,
+              items: weighIns,
+              range: currentRange,
+            }),
             datasets: [
               {
-                data: weights,
+                data: weights.length > 0 ? weights : [0],
                 strokeWidth: 2,
               },
             ],

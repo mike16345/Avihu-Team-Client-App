@@ -2,7 +2,6 @@ import WeightCalendar from "@/components/Calendar/WeightCalendar";
 import { WeightGraph } from "@/components/WeightGraph/WeightGraph";
 import { Colors } from "@/constants/Colors";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
-import { useUserApi } from "@/hooks/useUserApi";
 import { useWeighInApi } from "@/hooks/useWeighInApi";
 import { IWeighIn } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
@@ -21,6 +20,7 @@ const MyProgressScreen = () => {
 
     getWeighInsByUserId(currentUser._id)
       .then((weighIns) => {
+        console.log("weigh ins", weighIns);
         setWeighIns(weighIns);
       })
       .catch((err) => console.log(err));

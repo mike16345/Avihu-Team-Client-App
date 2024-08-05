@@ -19,7 +19,7 @@ async function request<T>(
 
     return response.data;
   } catch (error) {
-    console.log("Error:", error);
+    console.error("Error:", JSON.stringify(error));
     throw error;
   }
 }

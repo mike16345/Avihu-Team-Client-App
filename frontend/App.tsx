@@ -21,7 +21,7 @@ export default function App() {
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
   const { getUserById } = useUserApi();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const checkLoginStatus = async () => {
     const token = await getItem();

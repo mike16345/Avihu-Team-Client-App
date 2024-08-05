@@ -96,6 +96,7 @@ class DateUtils {
       }
     } catch (err) {
       console.error(err);
+      return [];
     }
   }
 
