@@ -1,8 +1,9 @@
 import { StyleSheet, View } from "react-native";
 import { FC, useState } from "react";
-import { ButtonGroup } from "react-native-elements";
 import { Colors } from "@/constants/Colors";
 import { DateRanges } from "@/types/dateTypes";
+import { SegmentedButtons } from "react-native-paper";
+import { useAppTheme } from "@/themes/useAppTheme";
 
 const selectedRangeToRange = (selectedRange: string) => {
   switch (selectedRange) {
@@ -22,31 +23,26 @@ interface ChangeRangeProps {
 }
 
 const ChangeRangeBtns: FC<ChangeRangeProps> = ({ onRangeChange }) => {
+  const theme = useAppTheme();
   const ranges = ["1W", "1M", "1Y"];
   const [selectedRangeIndex, setSelectedRangeIndex] = useState(0);
 
   return (
     <View>
-      <ButtonGroup
-        buttons={ranges}
-        selectedIndex={selectedRangeIndex}
-        buttonContainerStyle={{ borderWidth: 0, paddingRight: 20 }}
-        onPress={(index) => {
+      <SegmentedButtons
+        value={ranges[selectedRangeIndex]}
+        onValueChange={(value) => {
+          const index = ranges.indexOf(value);
           setSelectedRangeIndex(index);
-          onRangeChange(selectedRangeToRange(ranges[index]));
+          onRangeChange(value == "1W" ? "weeks" : value == "1M" ? "months" : "years");
         }}
-        buttonStyle={styles.rangeButton}
-        selectedButtonStyle={styles.activeRangeBtn}
-        textStyle={{ color: Colors.primary }}
-        innerBorderStyle={{ width: 0 }}
-        containerStyle={{
-          width: "100%",
-          gap: 4,
-          height: 40,
-          borderWidth: 0,
-          borderRadius: 4,
-          backgroundColor: "transparent",
-        }}
+        buttons={ranges.map((range) => ({
+          value: range,
+          label: range,
+          checkedColor: theme.colors.primary,
+          uncheckedColor: theme.colors.onPrimary,
+        }))}
+        density="regular" // Adjust density as needed
       />
     </View>
   );

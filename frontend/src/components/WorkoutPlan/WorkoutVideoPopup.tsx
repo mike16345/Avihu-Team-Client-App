@@ -1,7 +1,7 @@
 import { Colors } from "@/constants/Colors";
 import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, ActivityIndicator, useWindowDimensions } from "react-native";
-import { Dialog } from "react-native-elements";
+import { Dialog } from "react-native-paper";
 import YoutubePlayer, { YoutubeIframeRef } from "react-native-youtube-iframe";
 
 interface WorkoutVideoPopupProps {
@@ -37,14 +37,15 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({
 
   return (
     <Dialog
-      overlayStyle={{
+      style={{
         backgroundColor: Colors.secondary,
         width: width - 25,
         height: height / 2,
         alignItems: "center",
       }}
-      isVisible={isVisible}
-      onBackdropPress={() => setIsVisible(false)}
+      visible={isVisible}
+      onDismiss={() => setIsVisible(false)}
+      dismissableBackButton
     >
       <View style={styles.container}>
         <Text style={styles.title}>{title}</Text>

@@ -8,6 +8,7 @@ import useAnimateBottomBar from "@/hooks/useAnimatedBottomBar";
 import { StyleSheet, View } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { useLayoutStore } from "@/store/layoutStore";
+import ResponsiveComponent from "./ResponsiveC";
 
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
@@ -68,6 +69,17 @@ const BottomTabNavigator = () => {
         <Tab.Screen
           name="MyProgressScreen"
           component={MyProgressScreen}
+          options={{
+            tabBarLabel: "Weight ",
+
+            tabBarIcon: ({ color }: { color: string }) => (
+              <NativeIcon library="MaterialIcons" name="monitor-weight" color={color} size={28} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Responsive"
+          component={ResponsiveComponent}
           options={{
             tabBarLabel: "Weight ",
 

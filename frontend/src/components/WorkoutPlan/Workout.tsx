@@ -3,9 +3,10 @@ import { IWorkout } from "@/interfaces/Workout";
 import { FC, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Button from "@/components/Button/Button";
-import { Divider } from "react-native-elements";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
 import RecordWorkout from "./RecordWorkout";
+import { useAppTheme } from "@/themes/useAppTheme";
+import Divider from "../ui/Divider";
 
 interface WorkoutProps {
   workout: IWorkout;
@@ -13,11 +14,13 @@ interface WorkoutProps {
 const extractVideoId = (url: string) => {
   return url.split("v=")[1].split("&")[0];
 };
+
 const getYouTubeThumbnail = (id: string) => {
   return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 };
 
 const Workout: FC<WorkoutProps> = ({ workout }) => {
+  const theme = useAppTheme();
   const videoId = extractVideoId(workout.linkToVideo!);
   const thumbnail = getYouTubeThumbnail(videoId);
 
@@ -35,7 +38,7 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
       >
         <Image source={{ uri: thumbnail }} borderRadius={2} style={styles.thumbnail} />
       </Button>
-      <Divider width={0.5} color={Colors.dark} orientation="vertical" />
+      <Divider orientation="vertical" />
       <View style={styles.workoutDescriptionContainer}>
         <Text style={styles.workoutTitle}>{workout.name}</Text>
         <View style={styles.workoutInfoContainer}>
@@ -99,6 +102,7 @@ const styles = StyleSheet.create({
   workoutInfoContainer: {
     flexDirection: "row-reverse",
     width: "100%",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
   },

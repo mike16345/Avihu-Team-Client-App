@@ -9,9 +9,16 @@ interface DayComponentProps {
   state: DayState;
   marking?: ExtendedMarking;
   onPress: () => void;
+  onLongPress: () => void;
 }
 
-const DayComponent: React.FC<DayComponentProps> = ({ date, state, marking, onPress }) => {
+const DayComponent: React.FC<DayComponentProps> = ({
+  date,
+  state,
+  marking,
+  onPress,
+  onLongPress,
+}) => {
   const { weight, selected } = marking || {};
 
   const selectedTwStyle = selected ? "  bg-primary rounded-2xl ios:overflow-hidden" : "";
@@ -19,6 +26,7 @@ const DayComponent: React.FC<DayComponentProps> = ({ date, state, marking, onPre
   return (
     <TouchableOpacity
       onPress={onPress}
+      onLongPress={onLongPress}
       style={[styles.dayContainer, state == "today" && styles.todayContainer]}
     >
       <Text className={`${selectedTwStyle}  `} style={[styles.dateText]}>
