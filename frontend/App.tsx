@@ -34,6 +34,7 @@ export default function App() {
   };
 
   useEffect(() => {
+    Appearance.setColorScheme("dark");
     checkLoginStatus();
     getUserById("665f0b0b00b1a04e8f1c4478").then((user) => setCurrentUser(user));
 
