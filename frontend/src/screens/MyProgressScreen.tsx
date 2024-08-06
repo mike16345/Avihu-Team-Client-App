@@ -20,7 +20,6 @@ const MyProgressScreen = () => {
 
     getWeighInsByUserId(currentUser._id)
       .then((weighIns) => {
-        console.log("weigh ins", weighIns);
         setWeighIns(weighIns);
       })
       .catch((err) => console.log(err));

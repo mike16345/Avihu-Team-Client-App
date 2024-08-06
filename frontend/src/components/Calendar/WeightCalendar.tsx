@@ -1,6 +1,5 @@
 import { TextInput, View, Text } from "react-native";
-import { Calendar, CalendarProvider } from "react-native-calendars";
-import { darkTheme } from "./calendarTheme";
+import { Calendar, CalendarProvider, DateData } from "react-native-calendars";
 import DayComponent from "./Day";
 import { FC, useMemo, useState } from "react";
 import DateUtils from "@/utils/dateUtils";
@@ -8,6 +7,7 @@ import { Colors } from "@/constants/Colors";
 import { MarkingProps } from "react-native-calendars/src/calendar/day/marking";
 import { IWeighIn } from "@/interfaces/User";
 import { Dialog, Button } from "react-native-paper";
+import useCalendarTheme from "@/themes/useCalendarTheme";
 
 export interface ExtendedMarking extends MarkingProps {
   weight?: number;
@@ -22,6 +22,8 @@ interface WeightCalendarProps {
 }
 
 const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
+  const calendarTheme = useCalendarTheme();
+
   const [selected, setSelected] = useState(DateUtils.getCurrentDate("YYYY-MM-DD"));
   const [isEditWeighOpen, setIsEditWeightOpen] = useState(false);
 
@@ -54,10 +56,10 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
           <Calendar
             markedDates={marked}
             enableSwipeMonths
-            onDayPress={(day) => {
+            onDayPress={(day: DateData) => {
               setSelected(day.dateString);
             }}
-            dayComponent={({ date, state, marking }) => {
+            dayComponent={({ date, state, marking }: DateData) => {
               return (
                 <DayComponent
                   date={date?.day || 0}
@@ -65,6 +67,8 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
                   marking={marking}
                   key={1}
                   onLongPress={() => {
+                    if (!date) return;
+                    setSelected(date.dateString);
                     setIsEditWeightOpen(true);
                   }}
                   onPress={() => {
@@ -76,7 +80,7 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
             }}
             hideExtraDays
             style={{ borderRadius: 12, padding: 4 }}
-            theme={darkTheme}
+            theme={calendarTheme}
           />
         </CalendarProvider>
       </View>

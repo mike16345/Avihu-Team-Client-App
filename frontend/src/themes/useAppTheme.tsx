@@ -142,5 +142,7 @@ export const useAppTheme = () => {
     };
   }, []);
 
-  return useTheme<typeof memoizedTheme>();
+  console.log("memoized theme", memoizedTheme.colors.background);
+
+  return useTheme<typeof memoizedTheme>(theme);
 };
