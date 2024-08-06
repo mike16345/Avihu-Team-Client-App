@@ -1,5 +1,5 @@
 import { deleteItem, fetchData, sendData, updateItem } from "@/API/api";
-import { ICompleteWorkoutPlan } from "@/interfaces/IWorkoutPlan";
+import { ICompleteWorkoutPlan } from "../interfaces/Workout";
 
 const WORKOUT_PLAN_ENDPOINT = "workoutPlans/";
 

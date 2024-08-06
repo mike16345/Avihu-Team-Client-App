@@ -30,7 +30,7 @@ export default function App() {
 
   useEffect(() => {
     checkLoginStatus();
-    getUserById("665f0b0b00b1a04e8f1c4478").then((user) => setCurrentUser(user));
+    getUserById("665f0b0b00b1a04e8f1c4478").then((user) => setCurrentUser(user)).catch(err=>console.log(`app.tsx`,err));
 
     return () => {
       removeItem();

@@ -6,41 +6,63 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { workoutPlans, workoutPlanToName } from "@/constants/Workouts";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
 import DropDownPicker from "react-native-dropdown-picker";
 import { WorkoutPlans } from "@/enums/WorkoutPlans";
 import { WorkoutType } from "@/enums/WorkoutTypes";
-import { IWorkout } from "@/interfaces/Workout";
+import { ICompleteWorkoutPlan, IWorkout } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
 import Workout from "./Workout";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
 import { Colors } from "@/constants/Colors";
+import { useWorkoutPlanApi } from "@/hooks/useWorkoutPlanApi";
+import { useUserStore } from "@/store/userStore";
 
 const WorkoutPlan = () => {
-  const keys = Object.keys(workoutPlans);
-  const itms = keys.map((item) => ({
-    label: workoutPlanToName(item),
-    value: item,
-  }));
+  
 
   const [open, setOpen] = useState(false);
-  const [plans, setPlans] = useState(itms);
-  const [value, setValue] = useState(plans[0].value);
+  const [plans, setPlans] = useState();
+  const [value, setValue] = useState();
   const [openTips, setOpenTips] = useState(false);
   const scrollViewRef = useRef(null);
+  const [workoutPlan,setWorkoutPlan]=useState<ICompleteWorkoutPlan>()
 
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<Record<WorkoutType, IWorkout[]>>(
-    workoutPlans[Number(keys[0]) as WorkoutPlans]
+  
   );
 
   const { handleScroll } = useHideTabBarOnScroll();
+  const{getWorkoutPlanByUserId}=useWorkoutPlanApi()
+  const {currentUser}=useUserStore()
+
+  useEffect(()=>{
+    getWorkoutPlanByUserId(`665f0b0b00b1a04e8f1c4478`)
+    .then(res=>{
+      setWorkoutPlan(res)})
+    .catch(err=>console.log(err))
+  },[])
+
+  useEffect(()=>{
+    if (workoutPlan) {
+      let planNames=[]
+      for (plan of workoutPlan.workoutPlans){
+        planNames.push(plan.planName)
+      }
+      setPlans(planNames)
+      setValue(planNames[0])
+      setCurrentWorkoutPlan(workoutPlan.workoutPlans[0])
+
+    }
+  },[workoutPlan])
 
   return (
     <ScrollView ref={scrollViewRef} onScroll={handleScroll} scrollEventThrottle={16}>
       <ImageBackground source={logoBlack} style={styles.headerImage} />
       <View style={styles.container}>
+        { value && plans && currentWorkoutPlan &&
         <DropDownPicker
           rtl
           open={open}
@@ -58,6 +80,7 @@ const WorkoutPlan = () => {
             setCurrentWorkoutPlan(workoutPlans[key]);
           }}
         />
+}
         <TouchableOpacity
           style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
           onPress={() => setOpenTips(true)}
@@ -67,7 +90,7 @@ const WorkoutPlan = () => {
       </View>
 
       <View>
-        {Object.keys(currentWorkoutPlan).map((item, i) => {
+        {currentWorkoutPlan && Object.keys(currentWorkoutPlan).map((item, i) => {
           const workoutType = Number(item) as WorkoutType;
           const workouts = currentWorkoutPlan[workoutType];
 
