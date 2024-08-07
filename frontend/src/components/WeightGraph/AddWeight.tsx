@@ -2,9 +2,11 @@ import { StyleSheet, Text, View, TouchableHighlight, TextInput } from "react-nat
 import { FC, useState } from "react";
 import Button from "@/components/Button/Button";
 import { Colors } from "@/constants/Colors";
-import { ButtonGroup, Dialog } from "react-native-elements";
 import { IWeighIn } from "@/interfaces/User";
-import type { WeightUnit } from "@/types/weightTypes";
+import { Portal } from "react-native-paper";
+import { useLayoutStyles } from "@/styles/useLayoutStyles";
+import useCommonStyles from "@/styles/useCommonStyles";
+import { CustomModal } from "../ui/Modal";
 
 interface AddWeightProps {
   onSave: (newWeighIn: IWeighIn) => void;
@@ -14,7 +16,8 @@ const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
   const [openAddWeightModal, setOpenAddWeightModal] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [weight, setWeight] = useState(0);
-  const [weightType, setWeightType] = useState<WeightUnit>("kgs");
+  const commonStyles = useCommonStyles();
+  const layoutStyles = useLayoutStyles();
 
   const handleInputWeight = (value: string) => {
     setWeight(Number(value));
@@ -33,40 +36,36 @@ const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
   };
 
   return (
-    <View>
-      <Dialog
-        animationType="slide"
-        overlayStyle={styles.centeredView}
-        transparent={true}
-        backdropStyle={{ backgroundColor: "rgba(0, 0 , 0, 0.5)" }}
-        onBackdropPress={() => setOpenAddWeightModal(false)}
-        isVisible={openAddWeightModal}
-        statusBarTranslucent
-        onRequestClose={() => {
-          setOpenAddWeightModal((open) => !open);
-        }}
+    <>
+      <View>
+        <View className="w-screen px-2 ">
+          <TouchableHighlight
+            onPress={() => {
+              console.log("opening");
+              setOpenAddWeightModal((open) => !open);
+            }}
+            style={styles.addWeightBtn}
+          >
+            <Text className="font-bold text-lg">הוסף משקל</Text>
+          </TouchableHighlight>
+        </View>
+      </View>
+      <CustomModal
+        dismissableBackButton
+        contentContainerStyle={[styles.modalView, commonStyles.paddingLarge]}
+        visible={openAddWeightModal}
+        onDismiss={() => setOpenAddWeightModal(false)}
       >
-        <Dialog.Title titleStyle={styles.title} title="הוסף משקל" />
-        <View style={styles.modalView}>
+        <Text> הוסף משקל</Text>
+        <View style={[layoutStyles.flex1]}>
           <View style={{ flex: 1, gap: 20, justifyContent: "center" }}>
             <View className="  flex-row-reverse items-center justify-between ">
               <Text className=" text-lg  font-bold text-white">משקל:</Text>
+
               <TextInput
                 onChangeText={(val) => handleInputWeight(val)}
                 className="inpt  h-10 w-24 ml-2"
                 keyboardType="number-pad"
-              />
-            </View>
-            <View className="flex-row-reverse items-center justify-between ">
-              <Text className=" text-lg  font-bold text-white">סוג:</Text>
-              <ButtonGroup
-                buttons={["Kg", "lb"]}
-                selectedIndex={selectedIndex}
-                onPress={(value) => {
-                  setSelectedIndex(value);
-                  setWeightType(value == 0 ? "kgs" : "lbs");
-                }}
-                containerStyle={{ width: 90, height: 30 }}
               />
             </View>
           </View>
@@ -74,16 +73,8 @@ const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
             <Text className="font-bold text-lg">שמור</Text>
           </Button>
         </View>
-      </Dialog>
-      <View className="w-screen px-2 ">
-        <TouchableHighlight
-          onPress={() => setOpenAddWeightModal((open) => !open)}
-          style={styles.addWeightBtn}
-        >
-          <Text className="font-bold text-lg">הוסף משקל</Text>
-        </TouchableHighlight>
-      </View>
-    </View>
+      </CustomModal>
+    </>
   );
 };
 
@@ -93,16 +84,16 @@ const styles = StyleSheet.create({
   centeredView: {
     backgroundColor: Colors.dark,
   },
+
+  title: {
+    color: Colors.light,
+  },
   modalView: {
     borderRadius: 20,
     gap: 12,
     width: "100%",
     height: 200,
   },
-  title: {
-    color: Colors.light,
-  },
-
   addWeightBtn: {
     width: "100%",
     height: 50,

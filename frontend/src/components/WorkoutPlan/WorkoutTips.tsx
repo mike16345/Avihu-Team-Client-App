@@ -1,8 +1,8 @@
 import { FlatList, Platform, StyleSheet, Text, View } from "react-native";
 import { Dispatch, FC, SetStateAction } from "react";
-import { Dialog } from "react-native-elements";
 import { Colors } from "@/constants/Colors";
 import NativeIcon from "@/components/Icon/NativeIcon";
+import { CustomModal } from "../ui/Modal";
 
 interface WorkoutTipsProps {
   openTips: boolean;
@@ -19,11 +19,11 @@ const tips = [
 
 const WorkoutTips: FC<WorkoutTipsProps> = ({ openTips, setOpenTips }) => {
   return (
-    <Dialog
-      animationType="slide"
-      overlayStyle={styles.centeredView}
-      isVisible={openTips}
-      onRequestClose={() => setOpenTips(false)}
+    <CustomModal
+      style={styles.centeredView}
+      visible={openTips}
+      onDismiss={() => setOpenTips(false)}
+      dismissableBackButton
     >
       <View className="flex-row justify-between items-center mb-4">
         <NativeIcon
@@ -44,7 +44,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ openTips, setOpenTips }) => {
         )}
         data={tips}
       />
-    </Dialog>
+    </CustomModal>
   );
 };
 

@@ -5,6 +5,7 @@ const PORT = process.env.EXPO_PUBLIC_SERVER_PORT;
 
 console.log("Ip address", IP_ADDRESS);
 console.log("Port", PORT);
+
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: `http://${IP_ADDRESS}:${PORT}`,
   timeout: 10000,

@@ -7,9 +7,10 @@ import {
   TextInput,
   KeyboardAvoidingView,
 } from "react-native";
-import { Dialog, Divider } from "react-native-elements";
 import { Colors } from "@/constants/Colors";
 import OpacityButton from "@/components/Button/OpacityButton";
+import Divider from "../ui/Divider";
+import { CustomModal } from "../ui/Modal";
 
 interface RecordWorkoutProps {
   isOpen: boolean;
@@ -20,7 +21,7 @@ interface RecordWorkoutProps {
 
 const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName, setNumber }) => {
   const { width, height } = useWindowDimensions();
-  
+
   // TODO: Make RecordedSet object instead
   const [weight, setWeight] = useState<string>("");
   const [reps, setReps] = useState<string>("");
@@ -56,23 +57,20 @@ const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName,
   };
 
   return (
-    <Dialog
-      animationType="slide"
-      overlayStyle={{
+    <CustomModal
+      contentContainerStyle={{
         backgroundColor: Colors.bgSecondary,
         borderWidth: 1.5,
         borderColor: Colors.primary,
-        width: width - 40,
-        height: height / 1.3,
         padding: 20,
         alignItems: "center",
       }}
-      isVisible={isOpen}
-      onBackdropPress={() => setIsOpen(false)}
-      onRequestClose={() => setIsOpen(false)}
+      visible={isOpen}
+      dismissableBackButton
+      onDismiss={() => setIsOpen(false)}
     >
-      <Dialog.Title titleStyle={styles.title} title={`${workoutName} סט ${setNumber}`} />
-      <Divider width={1.5} style={{ marginBottom: 20 }} />
+      <Text style={styles.title}>{`${workoutName} סט ${setNumber}`}</Text>
+      <Divider thickness={0.5} style={{ marginBottom: 20 }} />
       <View style={styles.container}>
         <KeyboardAvoidingView className="gap-8">
           <View className=" gap-2 h-16 px-2   justify-center">
@@ -122,7 +120,7 @@ const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName,
           שמור
         </OpacityButton>
       </View>
-    </Dialog>
+    </CustomModal>
   );
 };
 

@@ -3,16 +3,20 @@ import {
   TouchableOpacity,
   Keyboard,
   ImageBackground,
-  Text,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from "react-native";
 import React, { useState } from "react";
-import { Input } from "react-native-elements";
 import avihuBg from "@assets/avihuFlyTrap.jpeg";
 import { testEmail } from "@/utils/utils";
-import NativeIcon from "@/components/Icon/NativeIcon";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import { Button, Text, TextInput, useTheme } from "react-native-paper";
+import useTextStyles from "@/styles/useTextStyles";
+import { useAppTheme } from "@/themes/useAppTheme";
+import useFontSize from "@/styles/useFontSize";
+import { useLayoutStyles } from "@/styles/useLayoutStyles";
+import useCommonStyles from "@/styles/useCommonStyles";
 
 interface IUserCredentials {
   email: string;
@@ -29,6 +33,12 @@ interface ILoginProps {
 }
 
 export default function Login({ setIsLoggedIn }: ILoginProps) {
+  const theme = useAppTheme();
+  const textStyles = useTextStyles();
+  const fontSize = useFontSize();
+  const layoutStyles = useLayoutStyles();
+  const commonStyles = useCommonStyles();
+
   const hardcodedUser: IUserCredentials = {
     email: `avihu123@gmail.com`,
     password: `qwerty123`,
@@ -75,63 +85,70 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     }
   };
 
+  console.log("theme colors", theme.colors.onPrimary);
   return (
-    <View className="flex-1 w-screen justify-center  ">
+    <View style={[layoutStyles.fullSize, layoutStyles.center]}>
       <ImageBackground source={avihuBg} className="w-full h-full flex-2 absolute z-0" />
       <View className=" w-full h-full absolute top-0 left-0 bg-black opacity-55 z-10"></View>
-      <KeyboardAvoidingView behavior="padding" className="w-full gap-4 items-center z-30">
-        <Text className="ios:text-5xl text-4xl text-center text-emerald-300 font-bold pb-8">
+      <KeyboardAvoidingView behavior="padding" className=" items-center z-30">
+        <Text
+          style={[
+            textStyles.textPrimary,
+            textStyles.textBold,
+            commonStyles.paddingLarge,
+            fontSize.xxl,
+          ]}
+        >
           כניסה לחשבון
         </Text>
-        <View className=" items-center justify-center w-80">
-          <Input
-            placeholder="Email..."
-            inputContainerStyle={{ borderBottomWidth: 0 }}
-            className="inpt w-72 "
-            keyboardType={Platform.OS == "android" ? "email-address" : "default"}
-            autoCorrect={false}
-            autoComplete="email"
-            errorMessage={formErrors[`email`]}
-            textContentType="oneTimeCode"
-            errorStyle={{ textAlign: "right" }}
-            onChangeText={(val) =>
-              setInputtedCredentials({
-                ...inputtedCrendentials,
-                email: val.toLocaleLowerCase().trim(),
-              })
-            }
-          />
+        <View className=" w-80">
+          <View>
+            <TextInput
+              style={{ width: "100%" }}
+              placeholder="Email..."
+              keyboardType={Platform.OS == "android" ? "email-address" : "default"}
+              autoCorrect={false}
+              autoComplete="email"
+              textContentType="oneTimeCode"
+              onChangeText={(val) =>
+                setInputtedCredentials({
+                  ...inputtedCrendentials,
+                  email: val.toLocaleLowerCase().trim(),
+                })
+              }
+            />
+            <Text style={textStyles.textDanger}>{formErrors.email}</Text>
+          </View>
+          <View>
+            <TextInput
+              style={{ width: "100%" }}
+              placeholder="Password..."
+              secureTextEntry={!showPassword}
+              onChangeText={(val) =>
+                setInputtedCredentials({ ...inputtedCrendentials, password: val })
+              }
+              right={
+                <TextInput.Icon
+                  onPress={() => setShowPassword((show) => !show)}
+                  icon={showPassword ? "eye-off" : "eye"}
+                />
+              }
+            />
+            <Text style={textStyles.textDanger}>{formErrors.password}</Text>
+          </View>
+          <TouchableOpacity style={layoutStyles.fullWidth}>
+            <Text style={[textStyles.textRight, textStyles.textPrimary, textStyles.textUnderline]}>
+              הרשמה
+            </Text>
+          </TouchableOpacity>
         </View>
-        <View className="w-80">
-          <Input
-            placeholder="Password..."
-            className="inpt w-72 "
-            inputContainerStyle={{ borderBottomWidth: 0 }}
-            errorMessage={formErrors[`password`]}
-            errorStyle={{ textAlign: "right" }}
-            secureTextEntry={!showPassword}
-            textContentType="oneTimeCode"
-            onChangeText={(val) =>
-              setInputtedCredentials({ ...inputtedCrendentials, password: val })
-            }
-          />
-          <NativeIcon
-            onPress={() => setShowPassword((show) => !show)}
-            library="MaterialCommunityIcons"
-            name={showPassword ? "eye-off-outline" : "eye-outline"}
-            color={"black"}
-            size={28}
-            style={{ position: "absolute", zIndex: 10, top: 10, right: 20 }}
-          />
-        </View>
-        <TouchableOpacity>
-          <Text className="w-72 underline text-right text-emerald-300">הרשמה</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleSubmit}>
-          <Text className="bg-emerald-300 text-center text-lg rounded-md py-2 w-72 font-bold">
-            התחברות
-          </Text>
-        </TouchableOpacity>
+        <Button
+          style={{ backgroundColor: theme.colors.primary }}
+          mode="contained"
+          onPress={handleSubmit}
+        >
+          התחברות
+        </Button>
         {didSucceed ? (
           <Text className="text-emerald-300 text-lg">{status}</Text>
         ) : (
@@ -141,3 +158,10 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  registerBtn: {
+    textAlign: "right",
+    textDecorationLine: "underline",
+  },
+});
