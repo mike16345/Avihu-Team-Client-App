@@ -1,5 +1,5 @@
 import { Colors } from "@/constants/Colors";
-import { IWorkout } from "@/interfaces/Workout";
+import { IExercise, IWorkout } from "@/interfaces/Workout";
 import { FC, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Button from "@/components/Button/Button";
@@ -9,7 +9,7 @@ import { useAppTheme } from "@/themes/useAppTheme";
 import Divider from "../ui/Divider";
 
 interface WorkoutProps {
-  workout: IWorkout;
+  workout: IExercise;
 }
 const extractVideoId = (url: string) => {
   return url.split("v=")[1].split("&")[0];
@@ -26,6 +26,8 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [openRecordWorkout, setOpenRecordWorkout] = useState(false);
+  const [currentSet,setCurrentSet]=useState(workout.sets[0])
+  const [currentSetNumber,setCurrentSetNumber]=useState(workout.sets.indexOf(currentSet)+1)
 
   return (
     <View style={styles.workoutContainer}>
@@ -42,8 +44,15 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
       <View style={styles.workoutDescriptionContainer}>
         <Text style={styles.workoutTitle}>{workout.name}</Text>
         <View style={styles.workoutInfoContainer}>
-          <Text style={styles.set}>סט: 1</Text>
-          <Text style={styles.set}>חזרות: 15</Text>
+          <View style={styles.setsContainer}>
+            <Text style={styles.set}>סט:{currentSetNumber}</Text>
+            <View style={styles.RepsContainer}>
+              <Text style={styles.set}>חזרות:</Text>
+              <Text style={styles.set}>מינ:{currentSet.minReps}</Text>
+              <Text style={styles.set}>מקס:{currentSet.minReps}</Text>
+            </View>
+          </View>
+          
           <Button
             textProps={{ style: styles.recordBtnText }}
             style={styles.recordWorkoutBtn}
@@ -55,7 +64,7 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
       </View>
       <RecordWorkout
         workoutName={workout.name}
-        setNumber={1} // TODO: Check what set user is on and send that.
+        setNumber={currentSetNumber} 
         isOpen={openRecordWorkout}
         setIsOpen={setOpenRecordWorkout}
       />
@@ -73,6 +82,7 @@ export default Workout;
 
 const styles = StyleSheet.create({
   workoutContainer: {
+    direction:`ltr`,
     display: "flex",
     flexDirection: "row-reverse",
     alignItems: "center",
@@ -80,6 +90,7 @@ const styles = StyleSheet.create({
     height: 100,
     backgroundColor: Colors.bgSecondary,
     padding: 2,
+    margin:5,
     borderRadius: 10,
     justifyContent: "space-between",
   },
@@ -105,6 +116,16 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  setsContainer:{
+    flexDirection:"column",
+    alignItems:`flex-end`,
+    gap:5
+  },
+  RepsContainer:{
+    flexDirection:`row-reverse`,
+    justifyContent:`space-around`,
+    gap:8
   },
   recordWorkoutBtn: {
     backgroundColor: Colors.primary,

@@ -9,10 +9,10 @@ import {
 import { useState, useRef, useEffect } from "react";
 import { workoutPlans, workoutPlanToName } from "@/constants/Workouts";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
-import DropDownPicker from "react-native-dropdown-picker";
+import DropDownPicker, { ItemType, ValueType } from "react-native-dropdown-picker";
 import { WorkoutPlans } from "@/enums/WorkoutPlans";
 import { WorkoutType } from "@/enums/WorkoutTypes";
-import { ICompleteWorkoutPlan, IWorkout } from "@/interfaces/Workout";
+import { ICompleteWorkoutPlan, IMuscleGroupWorkouts, IWorkout, IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
 import Workout from "./Workout";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
@@ -24,15 +24,13 @@ const WorkoutPlan = () => {
   
 
   const [open, setOpen] = useState(false);
-  const [plans, setPlans] = useState();
-  const [value, setValue] = useState();
+  const [plans, setPlans] = useState<ItemType[]|null>(null);
+  const [value, setValue] = useState<ValueType>();
   const [openTips, setOpenTips] = useState(false);
   const scrollViewRef = useRef(null);
   const [workoutPlan,setWorkoutPlan]=useState<ICompleteWorkoutPlan>()
 
-  const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<Record<WorkoutType, IWorkout[]>>(
-  
-  );
+  const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan>();
 
   const { handleScroll } = useHideTabBarOnScroll();
   const{getWorkoutPlanByUserId}=useWorkoutPlanApi()
@@ -47,24 +45,26 @@ const WorkoutPlan = () => {
 
   useEffect(()=>{
     if (workoutPlan) {
-      let planNames=[]
-      for (plan of workoutPlan.workoutPlans){
-        planNames.push(plan.planName)
-      }
-      setPlans(planNames)
-      setValue(planNames[0])
+     const plans = workoutPlan.workoutPlans.map(workout => {
+      return { label: workout.planName, value: workout.planName };
+    });
+      setPlans(plans)
+      setValue(plans[0].label)
+      console.log(workoutPlan.workoutPlans[0]);
+      
       setCurrentWorkoutPlan(workoutPlan.workoutPlans[0])
 
     }
   },[workoutPlan])
 
+
   return (
-    <ScrollView ref={scrollViewRef} onScroll={handleScroll} scrollEventThrottle={16}>
+    <ScrollView style={styles.scrollView} ref={scrollViewRef} onScroll={handleScroll} scrollEventThrottle={16}>
       <ImageBackground source={logoBlack} style={styles.headerImage} />
       <View style={styles.container}>
         { value && plans && currentWorkoutPlan &&
         <DropDownPicker
-          rtl
+          ltr
           open={open}
           value={value}
           items={plans}
@@ -72,12 +72,12 @@ const WorkoutPlan = () => {
           setOpen={setOpen}
           setValue={setValue}
           setItems={setPlans}
-          labelStyle={{ textAlign: "right" }}
-          listItemLabelStyle={{ textAlign: "right" }}
+          labelStyle={{ textAlign: "left" }}
+          listItemLabelStyle={{ textAlign: "left" }}
           onChangeValue={(val) => {
             if (!val) return;
             const key = Number(val) as WorkoutPlans;
-            setCurrentWorkoutPlan(workoutPlans[key]);
+            setCurrentWorkoutPlan(plans[key]);
           }}
         />
 }
@@ -90,18 +90,18 @@ const WorkoutPlan = () => {
       </View>
 
       <View>
-        {currentWorkoutPlan && Object.keys(currentWorkoutPlan).map((item, i) => {
-          const workoutType = Number(item) as WorkoutType;
-          const workouts = currentWorkoutPlan[workoutType];
-
-          return (
-            <View key={i} style={styles.workoutContainer}>
-              {workouts.map((workout, index) => {
-                return <Workout workout={workout} key={index} />;
-              })}
+       
+            <View style={styles.workoutContainer}>
+              {currentWorkoutPlan && currentWorkoutPlan.muscleGroups.map((muscleGroup, index) => {
+                 
+                return <View>
+                 <Text>{muscleGroup.muscleGroup}</Text>
+                {muscleGroup.exercises.map(exercise=>(
+                  <Workout workout={exercise} key={index} />
+                ))}
+                </View>
+})}
             </View>
-          );
-        })}
       </View>
       <WorkoutTips openTips={openTips} setOpenTips={setOpenTips} />
     </ScrollView>
@@ -111,9 +111,13 @@ const WorkoutPlan = () => {
 export default WorkoutPlan;
 
 const styles = StyleSheet.create({
+  scrollView:{
+    width:`100%`,
+    direction:`rtl`,
+  },
   headerImage: {
     width: "100%",
-    height: 150,
+    height: 250,
     justifyContent: "center",
     alignItems: "center",
   },
