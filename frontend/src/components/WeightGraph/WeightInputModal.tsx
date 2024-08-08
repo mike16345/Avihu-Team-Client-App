@@ -2,7 +2,7 @@ import { useWindowDimensions, View } from "react-native";
 import React, { FC, useState } from "react";
 import { CustomModal } from "../ui/Modal";
 import { Button, TextInput, Text } from "react-native-paper";
-import useGlobalStyles from "@/styles/useGlobalStyles";
+import useStyles from "@/styles/useGlobalStyles";
 import { useThemeContext } from "@/themes/useAppTheme";
 
 interface WeightInputModalProps {
@@ -19,7 +19,7 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
   const { width } = useWindowDimensions();
   const { theme } = useThemeContext();
   const [weight, setWeight] = useState(0);
-  const globalStyles = useGlobalStyles();
+  const { text, fonts, colors, layout } = useStyles();
 
   const handleInputWeight = (value: string) => {
     setWeight(Number(value));
@@ -44,19 +44,13 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
       visible={openAddWeightModal}
       onDismiss={() => setOpenAddWeightModal(false)}
     >
-      <View style={globalStyles.container}>
-        <Text
-          style={[globalStyles.xl, globalStyles.textBold, { color: theme.colors.onSurfaceVariant }]}
-        >
-          הוסף משקל
-        </Text>
-        <View
-          style={[globalStyles.justifyContentBetween, globalStyles.fullWidth, globalStyles.flexRow]}
-        >
-          <Text style={[globalStyles.textBold]}>משקל:</Text>
+      <View style={layout.container}>
+        <Text style={[fonts.xl, text.textBold, colors.textOnSurfaceVariant]}>הוסף משקל</Text>
+        <View style={[layout.justifyBetween, layout.widthFull, layout.flexRow]}>
+          <Text style={[text.textBold]}>משקל:</Text>
           <TextInput onChangeText={(val) => handleInputWeight(val)} keyboardType="number-pad" />
           <Button mode="contained" onPress={handleClickSave}>
-            <Text style={[globalStyles.textBold, globalStyles.lg]}>שמור</Text>
+            <Text style={[text.textBold, fonts.lg]}>שמור</Text>
           </Button>
         </View>
       </View>

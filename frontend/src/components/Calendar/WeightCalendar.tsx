@@ -7,10 +7,8 @@ import { MarkingProps } from "react-native-calendars/src/calendar/day/marking";
 import { IWeighIn } from "@/interfaces/User";
 import { Button } from "react-native-paper";
 import useCalendarTheme from "@/themes/useCalendarTheme";
-import { useLayoutStyles } from "@/styles/useLayoutStyles";
 import { CustomModal } from "../ui/Modal";
-import { useThemeContext } from "@/themes/useAppTheme";
-import useCommonStyles from "@/styles/useCommonStyles";
+import useStyles from "@/styles/useGlobalStyles";
 
 export interface ExtendedMarking extends MarkingProps {
   weight?: number;
@@ -22,18 +20,16 @@ interface WeightCalendarProps {
 }
 
 const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
-  const { theme } = useThemeContext();
   const [selected, setSelected] = useState(DateUtils.getCurrentDate("YYYY-MM-DD"));
 
   const { calendar, marked } = useCalendarTheme(weighIns, selected);
-  const layoutStyles = useLayoutStyles();
-  const commonStyles = useCommonStyles();
+  const { layout, colors, spacing } = useStyles();
 
   const [isEditWeighOpen, setIsEditWeightOpen] = useState(false);
 
   return (
     <>
-      <View key={calendar.calendarBackground} style={layoutStyles.flex1}>
+      <View key={calendar.calendarBackground} style={layout.flex1}>
         <CalendarProvider date={selected}>
           <Calendar
             markedDates={marked}
@@ -70,13 +66,12 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
       <CustomModal
         contentContainerStyle={{ padding: 20 }}
         style={[
-          layoutStyles.alignItemsStart,
-          commonStyles.paddingLarge,
+          layout.itemsStart,
+          spacing.pdLg,
+          colors.backgroundSecondaryContainer,
           {
             position: "absolute",
-
             height: "50%",
-            backgroundColor: theme.colors.secondaryContainer,
           },
         ]}
         onDismiss={() => setIsEditWeightOpen(false)}

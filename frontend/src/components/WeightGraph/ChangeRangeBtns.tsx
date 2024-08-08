@@ -2,7 +2,8 @@ import { View } from "react-native";
 import { FC, useState } from "react";
 import { DateRanges } from "@/types/dateTypes";
 import { SegmentedButtons } from "react-native-paper";
-import { useThemeContext } from "@/themes/useAppTheme";
+import useColors from "@/styles/useColors";
+import { useSpacingStyles } from "@/styles/useSpacingStyles";
 
 const selectedRangeToRange = (selectedRange: string) => {
   switch (selectedRange) {
@@ -22,7 +23,8 @@ interface ChangeRangeProps {
 }
 
 const ChangeRangeBtns: FC<ChangeRangeProps> = ({ onRangeChange }) => {
-  const { theme } = useThemeContext();
+  const colors = useColors();
+  const spacing = useSpacingStyles();
   const ranges = ["1W", "1M", "1Y"];
 
   const [selectedRangeIndex, setSelectedRangeIndex] = useState(0);
@@ -33,16 +35,18 @@ const ChangeRangeBtns: FC<ChangeRangeProps> = ({ onRangeChange }) => {
         value={ranges[selectedRangeIndex]}
         onValueChange={(range) => {
           const index = ranges.indexOf(range);
+
           setSelectedRangeIndex(index);
           onRangeChange(selectedRangeToRange(range));
         }}
+        theme={{ roundness: 2 }}
+        style={spacing.mgHorizontalDefault}
         buttons={ranges.map((range) => ({
           value: range,
           label: range,
-          checkedColor: theme.colors.primary,
-          uncheckedColor: theme.colors.onBackground,
+          checkedColor: colors.textPrimary.color,
+          uncheckedColor: colors.textOnBackground.color,
         }))}
-        density="regular"
       />
     </View>
   );

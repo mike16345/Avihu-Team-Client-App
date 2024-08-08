@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useState } from "react";
-import { Colors } from "../../constants/Colors";
+import React from "react";
 import { DateRanges } from "../../types/dateTypes";
+import useStyles from "@/styles/useGlobalStyles";
+import WeightCard from "./WeightCard";
 
 const rangeToName = (range: DateRanges) => {
   switch (range) {
@@ -20,41 +20,24 @@ interface WeeklyScoreCardProps {
   weights: number[];
   range: DateRanges;
 }
+
 const WeeklyScoreCard: React.FC<WeeklyScoreCardProps> = ({ weights, range }) => {
   const firstWeighIn = weights[0];
   const lastWeighIn = weights[weights.length - 1];
   const weightLoss = Math.abs(lastWeighIn - firstWeighIn).toFixed(2);
 
-  const [isImproving, setIsImproving] = useState(lastWeighIn < firstWeighIn);
+  const { colors } = useStyles();
+  const isImproving = lastWeighIn < firstWeighIn;
+  const weightStyle = isImproving ? colors.textSuccess : colors.textDanger;
 
   return (
-    <View style={styles.card}>
-      <Text className="text-white font-bold text-right ">מגמה {rangeToName(range)} </Text>
-      <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 3 }}>
-        <Text
-          style={{ color: isImproving ? Colors.success : Colors.danger }}
-          className="text-white text-2xl  font-bold"
-        >
-          {weightLoss}
-        </Text>
-        <Text style={{ color: "white", fontSize: 12, opacity: 50 }}>ק"ג</Text>
-      </View>
-    </View>
+    <WeightCard
+      title={`מגמה ${rangeToName(range)}`}
+      value={weightLoss}
+      unit='ק"ג'
+      valueStyle={weightStyle}
+    />
   );
 };
 
 export default WeeklyScoreCard;
-
-const styles = StyleSheet.create({
-  card: {
-    flex: 1,
-    gap: 2,
-    borderRadius: 16,
-    padding: 20,
-    height: "100%",
-    backgroundColor: "#18181b",
-  },
-  weeklyWeightStatus: {
-    fontWeight: 600,
-  },
-});

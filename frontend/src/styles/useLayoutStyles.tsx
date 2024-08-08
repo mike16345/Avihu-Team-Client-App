@@ -16,9 +16,6 @@ export const useLayoutStyles = () => {
     column: {
       flexDirection: "column",
     },
-    spaceBetween: {
-      justifyContent: "space-between",
-    },
     spaceAround: {
       justifyContent: "space-around",
     },
@@ -31,13 +28,13 @@ export const useLayoutStyles = () => {
     noWrap: {
       flexWrap: "nowrap",
     },
-    fullWidth: {
+    widthFull: {
       width: "100%",
     },
-    fullHeight: {
+    heightFull: {
       height: "100%",
     },
-    fullSize: {
+    sizeFull: {
       width: "100%",
       height: "100%",
     },
@@ -47,22 +44,34 @@ export const useLayoutStyles = () => {
     flexRow: {
       flexDirection: "row",
     },
+    flexRowReverse: {
+      flexDirection: "row-reverse",
+    },
+    flexColumnReverse: {
+      flexDirection: "column-reverse",
+    },
     flexColumn: {
       flexDirection: "column",
     },
-    justifyContentCenter: {
+    justifyStart: {
+      justifyContent: "flex-start",
+    },
+    justifyEnd: {
+      justifyContent: "flex-end",
+    },
+    justifyCenter: {
       justifyContent: "center",
     },
-    justifyContentBetween: {
+    justifyBetween: {
       justifyContent: "space-between",
     },
-    alignItemsCenter: {
+    itemsCenter: {
       alignItems: "center",
     },
-    alignItemsStart: {
+    itemsStart: {
       alignItems: "flex-start",
     },
-    alignItemsEnd: {
+    itemsEnd: {
       alignItems: "flex-end",
     },
   });

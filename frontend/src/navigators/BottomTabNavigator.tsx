@@ -3,26 +3,23 @@ import { RootStackParamList } from "@/types/navigatorTypes";
 import useAnimateBottomBar from "@/hooks/useAnimatedBottomBar";
 import { View } from "react-native";
 import { useLayoutStore } from "@/store/layoutStore";
-import { useLayoutStyles } from "@/styles/useLayoutStyles";
-import { useThemeContext } from "@/themes/useAppTheme";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
+import useStyles from "@/styles/useGlobalStyles";
 
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
 const BottomTabNavigator = () => {
-  const { theme } = useThemeContext();
-
-  const layoutStyles = useLayoutStyles();
+  const { layout, colors } = useStyles();
 
   const animatedValue = useAnimateBottomBar();
   const { isNavbarOpen } = useLayoutStore();
 
   return (
-    <View style={[layoutStyles.flex1, { backgroundColor: theme.colors.background }]}>
+    <View style={[layout.flex1, colors.background]}>
       <Tab.Navigator
         barStyle={[
           {
-            backgroundColor: theme.colors.background,
+            ...colors.background,
             opacity: animatedValue,
             pointerEvents: isNavbarOpen ? "auto" : "none",
             transform: [
@@ -37,17 +34,17 @@ const BottomTabNavigator = () => {
         ]}
         initialRouteName="MyWorkoutPlanPage"
         activeIndicatorStyle={{
-          ...layoutStyles.center,
+          ...layout.center,
           width: 45,
           height: 40,
 
-          backgroundColor: theme.colors.onBackground,
+          backgroundColor: colors.textOnBackground.color,
 
           padding: 8,
           borderRadius: 99,
         }}
-        inactiveColor={theme.colors.onBackground}
-        activeColor={theme.colors.primary}
+        inactiveColor={colors.textOnBackground.color}
+        activeColor={colors.textPrimary.color}
       >
         {BottomScreenNavigatorTabs.map((tab) => {
           return (

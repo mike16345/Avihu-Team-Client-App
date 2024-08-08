@@ -2,14 +2,13 @@ import { StyleSheet, Text, View, TouchableHighlight, TextInput } from "react-nat
 import { FC, useState } from "react";
 import Button from "@/components/Button/Button";
 import { Colors } from "@/constants/Colors";
-import { IWeighIn } from "@/interfaces/User";
-import { Portal } from "react-native-paper";
+import { IWeighInPost } from "@/interfaces/User";
 import { useLayoutStyles } from "@/styles/useLayoutStyles";
 import useCommonStyles from "@/styles/useCommonStyles";
 import { CustomModal } from "../ui/Modal";
 
 interface AddWeightProps {
-  onSave: (newWeighIn: IWeighIn) => void;
+  onSave: (newWeighIn: IWeighInPost) => void;
 }
 
 const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
@@ -23,11 +22,9 @@ const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
     setWeight(Number(value));
   };
 
-  const handleSaveWeight = () => {
-    const weighIn: IWeighIn = {
-      // date: new Date(),
+  const handleSaveWeight = (weight: number) => {
+    const weighIn: IWeighInPost = {
       weight: weight,
-      // weightUnit: weightType,
     };
 
     setOpenAddWeightModal(false);
@@ -37,19 +34,7 @@ const AddWeightModal: FC<AddWeightProps> = ({ onSave }) => {
 
   return (
     <>
-      <View>
-        <View className="w-screen px-2 ">
-          <TouchableHighlight
-            onPress={() => {
-              console.log("opening");
-              setOpenAddWeightModal((open) => !open);
-            }}
-            style={styles.addWeightBtn}
-          >
-            <Text className="font-bold text-lg">הוסף משקל</Text>
-          </TouchableHighlight>
-        </View>
-      </View>
+      <View></View>
       <CustomModal
         dismissableBackButton
         contentContainerStyle={[styles.modalView, commonStyles.paddingLarge]}

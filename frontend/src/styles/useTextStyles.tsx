@@ -38,14 +38,8 @@ const useTextStyles = () => {
     textSecondary: {
       color: theme.colors.secondary,
     },
-    textSuccess: {
-      color: theme.colors.tertiary,
-    },
     textDanger: {
       color: theme.colors.error,
-    },
-    textWarning: {
-      color: theme.colors.warning,
     },
     textInfo: {
       color: theme.colors.info,

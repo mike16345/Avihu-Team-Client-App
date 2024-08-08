@@ -2,25 +2,23 @@ import { StyleSheet } from "react-native";
 
 const useCommonStyles = () => {
   const commonStyles = StyleSheet.create({
-    marginSmall: {
-      margin: 8,
+    roundedSm: {
+      borderRadius: 8,
     },
-    marginMedium: {
-      margin: 16,
+    rounded: {
+      borderRadius: 12,
     },
-    marginLarge: {
-      margin: 24,
+
+    roundedMd: {
+      borderRadius: 16,
     },
-    paddingSmall: {
-      padding: 8,
+    roundedLg: {
+      borderRadius: 20,
     },
-    paddingMedium: {
-      padding: 16,
+
+    roundedFull: {
+      borderRadius: 9999,
     },
-    paddingLarge: {
-      padding: 24,
-    },
-    
   });
 
   return commonStyles;

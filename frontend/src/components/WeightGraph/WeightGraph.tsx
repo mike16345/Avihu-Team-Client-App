@@ -1,24 +1,19 @@
-import { View, StyleSheet, useWindowDimensions } from "react-native";
+import { View, StyleSheet, useWindowDimensions, ScrollView } from "react-native";
 import { FC, useEffect, useState } from "react";
 import { LineChart } from "react-native-chart-kit";
 import { IWeighIn, IWeighInPost } from "@/interfaces/User";
 import { ItemsInDateRangeParams, DateRanges } from "@/types/dateTypes";
 import DateUtils from "@/utils/dateUtils";
-import WeightCard from "./WeightCard";
 import WeeklyScoreCard from "./WeeklyScoreCard";
 import ChangeRangeBtns from "./ChangeRangeBtns";
 import { useWeighInApi } from "@/hooks/useWeighInApi";
 import { useUserStore } from "@/store/userStore";
-import { useLayoutStyles } from "@/styles/useLayoutStyles";
 import useGraphTheme from "@/themes/useGraphTheme";
-import { useThemeContext } from "@/themes/useAppTheme";
 import WeightInputModal from "./WeightInputModal";
 import OpacityButton from "../Button/OpacityButton";
 import { Text } from "react-native-paper";
-import { Colors } from "@/constants/Colors";
-import useTextStyles from "@/styles/useTextStyles";
-import useFontSize from "@/styles/useFontSize";
-import useCommonStyles from "@/styles/useCommonStyles";
+import useStyles from "@/styles/useGlobalStyles";
+import CurrentWeightCard from "./CurrentWeightCard";
 
 const rangeParams: ItemsInDateRangeParams<IWeighIn> = {
   items: [],
@@ -32,11 +27,7 @@ interface WeightGraphProps {
 }
 
 export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
-  const { theme } = useThemeContext();
-  const layoutStyles = useLayoutStyles();
-  const textStyles = useTextStyles();
-  const fontSizes = useFontSize();
-  const commonStyles = useCommonStyles();
+  const { text, layout, fonts, colors, common, spacing } = useStyles();
 
   const { width } = useWindowDimensions();
   const { addWeighIn } = useWeighInApi();
@@ -106,8 +97,16 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
 
   return (
     <>
-      <View style={[styles.container, layoutStyles.center, { width: width - 4 }]}>
-        <View style={styles.weightContainer}>
+      <ScrollView
+        contentContainerStyle={[
+          layout.container,
+          layout.sizeFull,
+          layout.center,
+          spacing.gapLg,
+          { width: width - 4 },
+        ]}
+      >
+        <View style={spacing.gapLg}>
           <LineChart
             data={{
               labels: DateUtils.extractLabels({
@@ -119,13 +118,13 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
                 {
                   data: weights.length > 0 ? weights : [0],
                   strokeWidth: 2,
-                  color: (o: number) => theme.colors.primary,
+                  color: (o: number) => colors.textPrimary.color,
                 },
               ],
               legend: ["מעקב שקילה"],
             }}
             hidePointsAtIndex={hidePointsAtIndex()}
-            width={width - 22}
+            width={width - 20}
             height={220}
             onDataPointClick={({ value }) => {
               setSelectedWeight(value);
@@ -139,22 +138,30 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
             }}
           />
           <ChangeRangeBtns onRangeChange={handleRangeChange} />
-          <View style={{ height: 120 }} className="flex-row items-center justify-between  gap-4">
-            <WeightCard currentWeight={selectedWeight || weights[weights.length - 1]} />
+          <View
+            style={[spacing.gapLg, layout.flexRow, spacing.pdSm, { minHeight: 100, flexShrink: 0 }]}
+          >
+            <CurrentWeightCard currentWeight={selectedWeight || weights[weights.length - 1]} />
             <WeeklyScoreCard weights={weights} range={currentRange} />
           </View>
         </View>
-        <View style={[layoutStyles.fullWidth, commonStyles.paddingSmall]}>
+        <View style={layout.widthFull}>
           <OpacityButton
             onPress={() => {
               setOpenWeightModal((open) => !open);
             }}
-            style={styles.addWeightBtn}
+            style={[
+              spacing.pdDefault,
+              colors.backgroundPrimary,
+              layout.center,
+              common.roundedSm,
+              styles.addWeightBtn,
+            ]}
           >
-            <Text style={[textStyles.textBold, fontSizes.lg]}>הוסף משקל</Text>
+            <Text style={[text.textBold, colors.textOnPrimary, fonts.lg]}>הוסף משקל</Text>
           </OpacityButton>
         </View>
-      </View>
+      </ScrollView>
       <WeightInputModal
         openAddWeightModal={openWeightModal}
         setOpenAddWeightModal={setOpenWeightModal}
@@ -172,12 +179,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   addWeightBtn: {
-    width: "100%",
     height: 50,
-    backgroundColor: Colors.primary,
-    padding: 12,
-    borderRadius: 4,
-    justifyContent: "center",
-    alignItems: "center",
   },
 });

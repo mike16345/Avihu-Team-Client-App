@@ -5,18 +5,13 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
 } from "react-native";
 import React, { useState } from "react";
 import avihuBg from "@assets/avihuFlyTrap.jpeg";
 import { testEmail } from "@/utils/utils";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { Button, Text, TextInput } from "react-native-paper";
-import useTextStyles from "@/styles/useTextStyles";
-import useFontSize from "@/styles/useFontSize";
-import { useLayoutStyles } from "@/styles/useLayoutStyles";
-import useCommonStyles from "@/styles/useCommonStyles";
-import { useThemeContext } from "@/themes/useAppTheme";
+import useStyles from "@/styles/useGlobalStyles";
 
 interface IUserCredentials {
   email: string;
@@ -33,12 +28,7 @@ interface ILoginProps {
 }
 
 export default function Login({ setIsLoggedIn }: ILoginProps) {
-  const { theme } = useThemeContext();
-
-  const textStyles = useTextStyles();
-  const fontSize = useFontSize();
-  const layoutStyles = useLayoutStyles();
-  const commonStyles = useCommonStyles();
+  const { text, colors, fonts, layout, spacing } = useStyles();
 
   const hardcodedUser: IUserCredentials = {
     email: `avihu123@gmail.com`,
@@ -86,20 +76,12 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     }
   };
 
-  console.log("theme colors", theme.colors.onPrimary);
   return (
-    <View style={[layoutStyles.fullSize, layoutStyles.center]}>
+    <View style={[layout.sizeFull, layout.center]}>
       <ImageBackground source={avihuBg} className="w-full h-full flex-2 absolute z-0" />
       <View className=" w-full h-full absolute top-0 left-0 bg-black opacity-40 z-10"></View>
       <KeyboardAvoidingView behavior="padding" className=" items-center z-30">
-        <Text
-          style={[
-            textStyles.textPrimary,
-            textStyles.textBold,
-            commonStyles.paddingLarge,
-            fontSize.xxxl,
-          ]}
-        >
+        <Text style={[colors.textPrimary, text.textBold, spacing.pdLg, fonts.xxxl]}>
           כניסה לחשבון
         </Text>
         <View className=" w-80 gap-2 ">
@@ -118,7 +100,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
                 })
               }
             />
-            <Text style={[textStyles.textDanger, textStyles.textRight]}>{formErrors.email}</Text>
+            <Text style={[text.textDanger, text.textRight]}>{formErrors.email}</Text>
           </View>
           <View>
             <TextInput
@@ -135,12 +117,10 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
                 />
               }
             />
-            <Text style={[textStyles.textDanger, textStyles.textRight]}>{formErrors.password}</Text>
+            <Text style={[text.textDanger, text.textRight]}>{formErrors.password}</Text>
           </View>
           <TouchableOpacity>
-            <Text style={[textStyles.textRight, textStyles.textPrimary, textStyles.textUnderline]}>
-              הרשמה
-            </Text>
+            <Text style={[text.textRight, text.textPrimary, text.textUnderline]}>הרשמה</Text>
           </TouchableOpacity>
         </View>
         <Button mode="contained" onPress={handleSubmit}>
@@ -155,10 +135,3 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  registerBtn: {
-    textAlign: "right",
-    textDecorationLine: "underline",
-  },
-});
