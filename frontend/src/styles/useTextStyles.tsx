@@ -1,8 +1,8 @@
-import { useAppTheme } from "@/themes/useAppTheme";
+import { useThemeContext } from "@/themes/useAppTheme";
 import { StyleSheet } from "react-native";
 
 const useTextStyles = () => {
-  const theme = useAppTheme();
+  const { theme } = useThemeContext();
 
   const textStyles = StyleSheet.create({
     textRight: {

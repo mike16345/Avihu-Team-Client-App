@@ -5,10 +5,12 @@ import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
 import { useWeighInApi } from "@/hooks/useWeighInApi";
 import { IWeighIn } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
+import { useThemeContext } from "@/themes/useAppTheme";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, ScrollView, StatusBar, Platform, View } from "react-native";
 
 const MyProgressScreen = () => {
+  const { theme } = useThemeContext();
   const { handleScroll } = useHideTabBarOnScroll();
   const { getWeighInsByUserId } = useWeighInApi();
 
@@ -36,7 +38,7 @@ const MyProgressScreen = () => {
       ref={scrollRef}
       onScroll={handleScroll}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.container}
+      contentContainerStyle={{ ...styles.container, backgroundColor: theme.colors.background }}
     >
       <View style={styles.calendarContainer}>
         <WeightCalendar weighIns={weighIns} />
