@@ -1,27 +1,28 @@
-import MyWorkoutPlanPage from "@/screens/MyWorkoutPlanPage";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
-import MyProgressScreen from "@/screens/MyProgressScreen";
-import NativeIcon from "@/components/Icon/NativeIcon";
 import { RootStackParamList } from "@/types/navigatorTypes";
-import MyDietPlanScreen from "@/screens/MyDietPlanScreen";
 import useAnimateBottomBar from "@/hooks/useAnimatedBottomBar";
-import { StyleSheet, View } from "react-native";
-import { Colors } from "@/constants/Colors";
+import { View } from "react-native";
 import { useLayoutStore } from "@/store/layoutStore";
-import ResponsiveComponent from "./ResponsiveC";
+import { useLayoutStyles } from "@/styles/useLayoutStyles";
+import { useThemeContext } from "@/themes/useAppTheme";
+import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
 const BottomTabNavigator = () => {
+  const { theme } = useThemeContext();
+
+  const layoutStyles = useLayoutStyles();
+
   const animatedValue = useAnimateBottomBar();
   const { isNavbarOpen } = useLayoutStore();
 
   return (
-    <View className="flex-1 bg-black">
+    <View style={[layoutStyles.flex1, { backgroundColor: theme.colors.background }]}>
       <Tab.Navigator
         barStyle={[
-          styles.barStyle,
           {
+            backgroundColor: theme.colors.background,
             opacity: animatedValue,
             pointerEvents: isNavbarOpen ? "auto" : "none",
             transform: [
@@ -35,68 +36,32 @@ const BottomTabNavigator = () => {
           },
         ]}
         initialRouteName="MyWorkoutPlanPage"
-        inactiveColor={Colors.light}
-        activeColor="#10B981"
+        activeIndicatorStyle={{
+          ...layoutStyles.center,
+          width: 45,
+          height: 40,
+
+          backgroundColor: theme.colors.onBackground,
+
+          padding: 8,
+          borderRadius: 99,
+        }}
+        inactiveColor={theme.colors.onBackground}
+        activeColor={theme.colors.primary}
       >
-        <Tab.Screen
-          name="MyWorkoutPlanPage"
-          component={MyWorkoutPlanPage}
-          options={{
-            tabBarLabel: "Workout",
-            tabBarAccessibilityLabel: "Workout Tab",
-
-            tabBarIcon: ({ color }: { color: string }) => (
-              <NativeIcon
-                library="MaterialCommunityIcons"
-                color={color}
-                name="weight-lifter"
-                size={28}
-              />
-            ),
-          }}
-        />
-
-        <Tab.Screen
-          name="MyDietPlanPage"
-          component={MyDietPlanScreen}
-          options={{
-            tabBarLabel: "Diet",
-            tabBarIcon: ({ color }: { color: string }) => (
-              <NativeIcon library="FontAwesome6" color={color} name="bowl-food" size={28} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="MyProgressScreen"
-          component={MyProgressScreen}
-          options={{
-            tabBarLabel: "Weight ",
-
-            tabBarIcon: ({ color }: { color: string }) => (
-              <NativeIcon library="MaterialIcons" name="monitor-weight" color={color} size={28} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Responsive"
-          component={ResponsiveComponent}
-          options={{
-            tabBarLabel: "Weight ",
-
-            tabBarIcon: ({ color }: { color: string }) => (
-              <NativeIcon library="MaterialIcons" name="monitor-weight" color={color} size={28} />
-            ),
-          }}
-        />
+        {BottomScreenNavigatorTabs.map((tab) => {
+          return (
+            <Tab.Screen
+              key={tab.name}
+              name={tab.name}
+              component={tab.component}
+              options={{ ...tab.options }}
+            />
+          );
+        })}
       </Tab.Navigator>
     </View>
   );
 };
 
 export default BottomTabNavigator;
-
-const styles = StyleSheet.create({
-  barStyle: {
-    backgroundColor: Colors.bgSecondary,
-  },
-});

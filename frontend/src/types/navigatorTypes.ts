@@ -8,3 +8,19 @@ export type RootStackParamList = {
   MyProgressScreen: undefined;
   LoginScreen: undefined;
 };
+export type TabBarIcon = ({ color, focused }: TabBarIconProps) => React.ReactNode | React.ReactNode;
+export type TabBarIconProps = { color: string; focused: boolean };
+export type TabBarBadge = string | number | boolean | undefined;
+
+export interface NavigatorTabs {
+  name: keyof RootStackParamList;
+  component: () => React.ReactNode;
+  options: {
+    title?: string;
+    tabBarButtonTestID?: string;
+    tabBarLabel?: string;
+    tabBarBadge?: TabBarBadge;
+    tabBarAccessibilityLabel?: string;
+    tabBarIcon: TabBarIcon;
+  };
+}
