@@ -14,10 +14,7 @@ export interface IWorkout {
   sets: ISet[];
 }
 
-export interface IWorkoutPlan {
-  id: string;
-  workouts: string[];
-}
+
 
 export interface IDetailedWorkoutPlan extends IWorkoutPlan {
   [WorkoutType.CHEST]: IWorkoutPlan[];

@@ -25,7 +25,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ openTips, setOpenTips }) => {
       onDismiss={() => setOpenTips(false)}
       dismissableBackButton
     >
-      <View className="flex-row justify-between items-center mb-4">
+      <View style={styles.icon}>
         <NativeIcon
           onPress={() => setOpenTips(false)}
           library="MaterialCommunityIcons"
@@ -33,8 +33,8 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ openTips, setOpenTips }) => {
           size={22}
           color={"white"}
         />
-        <Text style={styles.title}>דגשים לאימון</Text>
       </View>
+        <Text style={styles.title}>דגשים לאימון</Text>
       <FlatList
         renderItem={({ item, index }) => (
           <Text style={styles.tip}>
@@ -52,13 +52,24 @@ export default WorkoutTips;
 
 const styles = StyleSheet.create({
   centeredView: {
-    backgroundColor: Colors.dark,
+    backgroundColor: Colors.darkLight,
+    height:'40%',
+    top:'20%',
+    padding:12,
+    borderRadius:'20px'
   },
-
+  icon:{
+    display:"flex",
+    alignItems:"flex-end",
+    paddingBottom:20,
+    paddingRight:10
+  },
   title: {
     color: Colors.primary,
     fontSize: 20,
     fontWeight: "600",
+    textAlign:"right",
+    paddingVertical:15
   },
   tip: {
     ...Platform.select({

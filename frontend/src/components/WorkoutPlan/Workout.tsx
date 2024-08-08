@@ -1,6 +1,6 @@
 import { Colors } from "@/constants/Colors";
 import { IExercise, IWorkout } from "@/interfaces/Workout";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Button from "@/components/Button/Button";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
@@ -29,6 +29,11 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
   const [currentSet,setCurrentSet]=useState(workout.sets[0])
   const [currentSetNumber,setCurrentSetNumber]=useState(workout.sets.indexOf(currentSet)+1)
 
+  useEffect(()=>{
+    setCurrentSet(workout.sets[0])
+    setCurrentSetNumber(1)
+  },[workout])
+
   return (
     <View style={styles.workoutContainer}>
       <Button
@@ -54,7 +59,7 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
           </View>
           
           <Button
-            textProps={{ style: styles.recordBtnText }}
+            textProps={{ style: styles.recordBtnText}}
             style={styles.recordWorkoutBtn}
             onPress={() => setOpenRecordWorkout(true)}
           >

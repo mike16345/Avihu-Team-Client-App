@@ -7,18 +7,16 @@ import {
   View,
 } from "react-native";
 import { useState, useRef, useEffect } from "react";
-import { workoutPlans, workoutPlanToName } from "@/constants/Workouts";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
 import DropDownPicker, { ItemType, ValueType } from "react-native-dropdown-picker";
-import { WorkoutPlans } from "@/enums/WorkoutPlans";
-import { WorkoutType } from "@/enums/WorkoutTypes";
-import { ICompleteWorkoutPlan, IMuscleGroupWorkouts, IWorkout, IWorkoutPlan } from "@/interfaces/Workout";
+import { ICompleteWorkoutPlan, IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
 import Workout from "./Workout";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
 import { Colors } from "@/constants/Colors";
 import { useWorkoutPlanApi } from "@/hooks/useWorkoutPlanApi";
 import { useUserStore } from "@/store/userStore";
+import useFontSize from "@/styles/useFontSize";
 
 const WorkoutPlan = () => {
   
@@ -33,15 +31,23 @@ const WorkoutPlan = () => {
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan>();
 
   const { handleScroll } = useHideTabBarOnScroll();
+  const { lg } = useFontSize();
   const{getWorkoutPlanByUserId}=useWorkoutPlanApi()
   const {currentUser}=useUserStore()
 
+  const selectNewWorkoutPlan=(planName:string)=>{
+    const selectedWorkoutPlan=workoutPlan?.workoutPlans.find(plan=> plan.planName===planName)
+    
+    setCurrentWorkoutPlan(selectedWorkoutPlan)
+    
+  }
+
   useEffect(()=>{
     getWorkoutPlanByUserId(`665f0b0b00b1a04e8f1c4478`)
-    .then(res=>{
-      setWorkoutPlan(res)})
+    .then(res=>setWorkoutPlan(res))
     .catch(err=>console.log(err))
   },[])
+
 
   useEffect(()=>{
     if (workoutPlan) {
@@ -50,7 +56,6 @@ const WorkoutPlan = () => {
     });
       setPlans(plans)
       setValue(plans[0].label)
-      console.log(workoutPlan.workoutPlans[0]);
       
       setCurrentWorkoutPlan(workoutPlan.workoutPlans[0])
 
@@ -62,7 +67,7 @@ const WorkoutPlan = () => {
     <ScrollView style={styles.scrollView} ref={scrollViewRef} onScroll={handleScroll} scrollEventThrottle={16}>
       <ImageBackground source={logoBlack} style={styles.headerImage} />
       <View style={styles.container}>
-        { value && plans && currentWorkoutPlan &&
+        { value && plans && 
         <DropDownPicker
           ltr
           open={open}
@@ -74,11 +79,7 @@ const WorkoutPlan = () => {
           setItems={setPlans}
           labelStyle={{ textAlign: "left" }}
           listItemLabelStyle={{ textAlign: "left" }}
-          onChangeValue={(val) => {
-            if (!val) return;
-            const key = Number(val) as WorkoutPlans;
-            setCurrentWorkoutPlan(plans[key]);
-          }}
+          onChangeValue={(val) => selectNewWorkoutPlan(val)}
         />
 }
         <TouchableOpacity
@@ -95,7 +96,7 @@ const WorkoutPlan = () => {
               {currentWorkoutPlan && currentWorkoutPlan.muscleGroups.map((muscleGroup, index) => {
                  
                 return <View>
-                 <Text>{muscleGroup.muscleGroup}</Text>
+                 <Text style={[styles.muscleGroupText,lg]}>{muscleGroup.muscleGroup}</Text>
                 {muscleGroup.exercises.map(exercise=>(
                   <Workout workout={exercise} key={index} />
                 ))}
@@ -140,4 +141,10 @@ const styles = StyleSheet.create({
     padding: 4,
     gap: 12,
   },
+  muscleGroupText:{
+    color:'white',
+    textAlign:"left",
+    fontWeight:'bold',
+    padding:10,
+  }
 });
