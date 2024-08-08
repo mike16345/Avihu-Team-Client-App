@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   muscleGroupText:{
-    color:'white',
+    color:Colors.light,
     textAlign:"left",
     fontWeight:'bold',
     padding:10,
