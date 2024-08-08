@@ -1,10 +1,15 @@
-import { View, ImageBackground, ScrollView, TouchableOpacity, Text } from "react-native";
-import { useRef, useState } from "react";
-import dietPlan from "../../constants/dietPlan.json";
+import { View, ImageBackground, ScrollView, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { useEffect, useRef, useState } from "react";
 import logoBlack from "../../../assets/images/avihu-logo-black.png";
 import CarbTable from "./CarbTable";
 import ProteinTable from "./ProteinTable";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
+import { useDietPlanApi } from "@/hooks/useDietPlanApi";
+import { useUserStore } from "@/store/userStore";
+import { IDietPlan } from "@/interfaces/DietPlan";
+import MealContainer from "./MealContainer";
+import { Colors } from "@/constants/Colors";
+import useFontSize from "@/styles/useFontSize";
 
 export default function DietPlan() {
   const UI_TYPES = {
@@ -14,10 +19,29 @@ export default function DietPlan() {
   };
 
   const { handleScroll } = useHideTabBarOnScroll();
+  const currentUser = useUserStore((state) => state.currentUser);
+  const {getDietPlanByUserId}=useDietPlanApi()
+  const {lg}=useFontSize()
 
-  const [meals, setMeals] = useState(dietPlan.meals);
+  const [dietPlan,setDietPlan]=useState<IDietPlan|null>(null)
+  const [meals, setMeals] = useState();
   const [uiView, setUiView] = useState(UI_TYPES.STANDARD);
   const scrollRef = useRef(null);
+
+  useEffect(()=>{
+    if (!currentUser) return 
+
+    getDietPlanByUserId(currentUser?._id)
+    .then(res=> setDietPlan(res))
+    .catch(err=>console.log(err))
+  },[])
+
+  useEffect(()=>{
+    if (dietPlan) {
+      console.log(dietPlan.meals[0].totalProtein);
+      
+    }
+  },[dietPlan])
 
   return (
     <ScrollView
@@ -39,26 +63,10 @@ export default function DietPlan() {
           </View>
         </TouchableOpacity>
       </View>
-      {meals.map((meal) => (
-        <View className="p-4 rtl items-center" key={meal.title}>
-          <Text className="text-emerald-300 underline font-bold text-lg p-2">{meal.title}</Text>
-          <View className="flex-row">
-            {typeof meal.optOne == `string` ? (
-              <Text className="text-white">{meal.optOne}</Text>
-            ) : (
-              <View className="flex-row-reverse w-[100vw] flex-wrap p-1 justify-center">
-                {meal.optOne.map((opt) => (
-                  <Text className="text-white px-1">{opt} /</Text>
-                ))}
-              </View>
-            )}
-          </View>
-          <Text className="text-emerald-300 font-bold">+</Text>
-          <View className="flex-row-reverse gap-2">
-            <Text className="text-white py-1">{meal.optTwo}</Text>
-            <Text className="text-emerald-300 font-bold py-1">+</Text>
-            <Text className="text-white py-1">{meal.optThree}</Text>
-          </View>
+      {dietPlan?.meals.map((meal,i) => (
+        <View key={i} style={styles.meal}>
+          <Text style={styles.mealTitle}>ארוחה {i+1}</Text>
+          <MealContainer  meal={meal}/>
         </View>
       ))}
 
@@ -68,4 +76,21 @@ export default function DietPlan() {
       </View>
     </ScrollView>
   );
+
 }
+
+ const styles=StyleSheet.create({
+    meal:{
+      backgroundColor:Colors.darkLight,
+      padding:10,
+      margin:7,
+      borderRadius:10
+    },
+    mealTitle:{
+      color:Colors.lightDark,
+      textAlign:"right",
+      fontWeight:"bold",
+      paddingRight:10,
+      paddingTop:5
+    }
+  })

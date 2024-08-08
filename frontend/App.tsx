@@ -25,6 +25,7 @@ export default function App() {
   const { getItem, removeItem } = useAsyncStorage("isLoggedIn");
   const { getUserById } = useUserApi();
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
+  const currentUser = useUserStore((state) => state.currentUser);
 
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
@@ -48,7 +49,7 @@ export default function App() {
         <PaperProvider theme={Appearance.getColorScheme() == "dark" ? DarkTheme : LightTheme}>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-              {isLoggedIn ? (
+              {isLoggedIn && currentUser ? (
                 <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
               ) : (
                 <>
