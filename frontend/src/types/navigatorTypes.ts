@@ -12,7 +12,7 @@ export type TabBarIcon = ({ color, focused }: TabBarIconProps) => React.ReactNod
 export type TabBarIconProps = { color: string; focused: boolean };
 export type TabBarBadge = string | number | boolean | undefined;
 
-export interface NavigatorTabs {
+export interface NavigatorTab {
   name: keyof RootStackParamList;
   component: () => React.ReactNode;
   options: {

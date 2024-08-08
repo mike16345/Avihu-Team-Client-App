@@ -38,3 +38,6 @@ yarn-error.*
 
 # ip 
 **/ip.ts
+
+# test 
+**/test.tsx
