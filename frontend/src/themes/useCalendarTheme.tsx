@@ -30,6 +30,7 @@ const useCalendarTheme = (weighIns: IWeighIn[] = [], selected: string = "") => {
             selectedDotColor: theme.colors.primaryContainer,
           },
         ],
+        weighInId: weighIn._id,
         weight: weighIn.weight,
       };
     });
@@ -38,7 +39,6 @@ const useCalendarTheme = (weighIns: IWeighIn[] = [], selected: string = "") => {
   }, [selected, weighIns, theme.colors]);
 
   const styles = useMemo(() => {
-    console.log("calculating", theme.colors.background);
     const calendar = {
       calendarBackground: theme.colors.secondaryContainer,
       textSectionTitleColor: theme.colors.primary,

@@ -7,6 +7,7 @@ export interface IUser {
 // WeighIn interface
 export interface IWeighInPost extends Omit<IWeighIn, "date"> {}
 export interface IWeighIn {
+  _id: string;
   date: Date;
   weight: number;
 }

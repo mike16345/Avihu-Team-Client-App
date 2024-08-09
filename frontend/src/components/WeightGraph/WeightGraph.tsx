@@ -41,6 +41,8 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
 
   const graphTheme = useGraphTheme(weights);
 
+  const currentWeight = selectedWeight || weights[weights.length - 1];
+
   const hidePointsAtIndex = () => {
     if (weights.length < 100) return;
 
@@ -68,6 +70,7 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
   };
 
   const handleSaveNewWeighIn = (newWeighIn: number) => {
+    setOpenWeightModal(false);
     if (!currentUser) return;
     const weighInPost: IWeighInPost = {
       weight: newWeighIn,
@@ -141,7 +144,7 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
           <View
             style={[spacing.gapLg, layout.flexRow, spacing.pdSm, { minHeight: 100, flexShrink: 0 }]}
           >
-            <CurrentWeightCard currentWeight={selectedWeight || weights[weights.length - 1]} />
+            <CurrentWeightCard currentWeight={currentWeight} />
             <WeeklyScoreCard weights={weights} range={currentRange} />
           </View>
         </View>
@@ -162,11 +165,14 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
           </OpacityButton>
         </View>
       </ScrollView>
-      <WeightInputModal
-        openAddWeightModal={openWeightModal}
-        setOpenAddWeightModal={setOpenWeightModal}
-        handleSaveWeight={(weight) => handleSaveNewWeighIn(weight)}
-      />
+
+      {openWeightModal && (
+        <WeightInputModal
+          handleDismiss={() => setOpenWeightModal(false)}
+          currentWeight={currentWeight}
+          handleSaveWeight={(weight) => handleSaveNewWeighIn(weight)}
+        />
+      )}
     </>
   );
 };

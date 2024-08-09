@@ -1,5 +1,6 @@
 import { fetchData, sendData, deleteItem, updateItem } from "@/API/api";
 import { IWeighIn, IWeighInPost, IWeighInResponse } from "@/interfaces/User";
+import { UpdateDocumentResponse } from "@/types/ApiTypes";
 
 const WEIGH_INS_ENDPOINT = "weighIns/weights/";
 
@@ -7,8 +8,8 @@ export const useWeighInApi = () => {
   const addWeighIn = (id: string, data: IWeighInPost) =>
     sendData<IWeighInResponse>(`${WEIGH_INS_ENDPOINT}${id}`, data);
 
-  const updateWeighIn = (id: string, data: IWeighIn) =>
-    updateItem<IWeighIn>(`${WEIGH_INS_ENDPOINT}${id}`, data);
+  const updateWeighInById = (id: string, data: IWeighInPost) =>
+    updateItem<UpdateDocumentResponse>(`${WEIGH_INS_ENDPOINT}${id}`, data);
 
   const deleteWeighIn = (id: string) => deleteItem<IWeighIn>(WEIGH_INS_ENDPOINT, id);
 
@@ -25,7 +26,7 @@ export const useWeighInApi = () => {
   return {
     addWeighIn,
     getWeighInsById,
-    updateWeighIn,
+    updateWeighInById,
     deleteWeighIn,
     deleteWeighInsByUserId,
     getWeighInsByUserId,

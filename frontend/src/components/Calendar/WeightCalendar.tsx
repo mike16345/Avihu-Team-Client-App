@@ -1,18 +1,20 @@
-import { TextInput, View, Text } from "react-native";
+import { View } from "react-native";
 import { Calendar, CalendarProvider, DateData } from "react-native-calendars";
 import DayComponent from "./Day";
 import { FC, useState } from "react";
 import DateUtils from "@/utils/dateUtils";
 import { MarkingProps } from "react-native-calendars/src/calendar/day/marking";
-import { IWeighIn } from "@/interfaces/User";
-import { Button } from "react-native-paper";
+import { IWeighIn, IWeighInPost } from "@/interfaces/User";
 import useCalendarTheme from "@/themes/useCalendarTheme";
-import { CustomModal } from "../ui/Modal";
 import useStyles from "@/styles/useGlobalStyles";
+import WeightInputModal from "../WeightGraph/WeightInputModal";
+import { useWeighInApi } from "@/hooks/useWeighInApi";
+import { useUserStore } from "@/store/userStore";
 
 export interface ExtendedMarking extends MarkingProps {
   weight?: number;
   customStyles?: any;
+  weighInId?: string;
 }
 
 interface WeightCalendarProps {
@@ -20,12 +22,52 @@ interface WeightCalendarProps {
 }
 
 const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
+  const { addWeighIn, updateWeighInById } = useWeighInApi();
+  const currentUser = useUserStore((state) => state.currentUser);
   const [selected, setSelected] = useState(DateUtils.getCurrentDate("YYYY-MM-DD"));
 
   const { calendar, marked } = useCalendarTheme(weighIns, selected);
-  const { layout, colors, spacing } = useStyles();
+  const { layout } = useStyles();
 
+  const [selectedWeighInId, setSelectedWeighInId] = useState<string | null>(null);
   const [isEditWeighOpen, setIsEditWeightOpen] = useState(false);
+
+  const handleSaveWeighIn = (updatedWeighIn: number) => {
+    const weighIn: Partial<IWeighInPost> = {
+      weight: updatedWeighIn,
+    };
+
+    setIsEditWeightOpen(false);
+
+    if (selectedWeighInId) {
+      updateWeighInById(selectedWeighInId, weighIn)
+        .then((res) => {
+          console.log("Res", res);
+
+          if (res.modifiedCount == 1) {
+            console.log("succeeded");
+          } else {
+            console.error("Failed to update weight");
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        })
+        .finally(() => {});
+
+      return;
+    }
+
+    if (!currentUser) return;
+
+    addWeighIn(currentUser._id, weighIn)
+      .then((res) => {
+        console.log("Res", res);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   return (
     <>
@@ -46,8 +88,11 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
                   marking={marking}
                   key={date?.day}
                   onLongPress={() => {
-                    if (!date) return;
+                    console.log("marking", marking);
+
+                    if (!marking) return;
                     setSelected(date.dateString);
+                    setSelectedWeighInId(marking.weighInId);
                     setIsEditWeightOpen(true);
                   }}
                   onPress={() => {
@@ -63,36 +108,13 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
           />
         </CalendarProvider>
       </View>
-      <CustomModal
-        contentContainerStyle={{ padding: 20 }}
-        style={[
-          layout.itemsStart,
-          spacing.pdLg,
-          colors.backgroundSecondaryContainer,
-          {
-            position: "absolute",
-            height: "50%",
-          },
-        ]}
-        onDismiss={() => setIsEditWeightOpen(false)}
-        visible={isEditWeighOpen}
-      >
-        <Text>Hi</Text>
-        <View style={{ flex: 1, gap: 20, justifyContent: "center" }}>
-          <View className="  flex-row-reverse items-center justify-between ">
-            <Text className=" text-lg  font-bold text-white">משקל:</Text>
-            <TextInput
-              onChangeText={(val) => console.log(val)}
-              className="inpt  h-10 w-24 ml-2"
-              keyboardType="number-pad"
-            />
-          </View>
-        </View>
-
-        <Button mode="contained" onPress={() => console.log("update weight")}>
-          <Text className="font-bold text-lg">שמור</Text>
-        </Button>
-      </CustomModal>
+      {isEditWeighOpen && (
+        <WeightInputModal
+          currentWeight={marked[selected]?.weight || 0}
+          handleSaveWeight={handleSaveWeighIn}
+          handleDismiss={() => setIsEditWeightOpen(false)}
+        />
+      )}
     </>
   );
 };
