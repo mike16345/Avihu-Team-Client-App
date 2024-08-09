@@ -1,54 +1,81 @@
 import { useWindowDimensions, View } from "react-native";
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 import { CustomModal } from "../ui/Modal";
-import { Button, TextInput, Text } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 import useStyles from "@/styles/useGlobalStyles";
 import { useThemeContext } from "@/themes/useAppTheme";
+import WeightWheelPicker from "./WeightWheelPicker";
 
 interface WeightInputModalProps {
-  openAddWeightModal: boolean;
-  setOpenAddWeightModal: React.Dispatch<React.SetStateAction<boolean>>;
+  currentWeight: number;
   handleSaveWeight: (weight: number) => void;
+  handleDismiss: () => void;
 }
 
 const WeightInputModal: FC<WeightInputModalProps> = ({
+  currentWeight,
   handleSaveWeight,
-  openAddWeightModal,
-  setOpenAddWeightModal,
+  handleDismiss,
 }) => {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const { theme } = useThemeContext();
-  const [weight, setWeight] = useState(0);
-  const { text, fonts, colors, layout } = useStyles();
+  const [weight, setWeight] = useState(currentWeight);
+  const { text, spacing, fonts, colors, layout, common } = useStyles();
 
-  const handleInputWeight = (value: string) => {
-    setWeight(Number(value));
+  console.log("current weight: " + Math.floor(weight));
+
+  const handleUpdateWeight = (value: number) => {
+    setWeight(value);
   };
 
   const handleClickSave = () => {
-    setOpenAddWeightModal(false);
     handleSaveWeight(weight);
   };
 
-  const modalBgColor = theme.colors.surface;
-
   return (
     <CustomModal
+      dismissable
       dismissableBackButton
       contentContainerStyle={{
         borderRadius: theme.roundness,
         marginHorizontal: "auto",
         width: width - 40,
-        backgroundColor: modalBgColor,
+        height: height / 1.5,
+        ...colors.backgroundSurface,
       }}
-      visible={openAddWeightModal}
-      onDismiss={() => setOpenAddWeightModal(false)}
+      visible={true}
+      onDismiss={handleDismiss}
     >
-      <View style={layout.container}>
-        <Text style={[fonts.xl, text.textBold, colors.textOnSurfaceVariant]}>הוסף משקל</Text>
-        <View style={[layout.justifyBetween, layout.widthFull, layout.flexRow]}>
-          <Text style={[text.textBold]}>משקל:</Text>
-          <TextInput onChangeText={(val) => handleInputWeight(val)} keyboardType="number-pad" />
+      <View style={[layout.container, spacing.gapXxl]}>
+        <View style={[layout.flexRow, layout.justifyBetween]}>
+          <Text
+            style={[
+              text.textBold,
+              fonts.xl,
+              spacing.pdHorizontalDefault,
+              common.rounded,
+              spacing.pdVerticalSm,
+              { borderWidth: 2 },
+            ]}
+          >
+            {weight}
+          </Text>
+          <Text style={[text.textRight, fonts.xl, text.textBold, colors.textOnSurfaceVariant]}>
+            הוסף משקל
+          </Text>
+        </View>
+        <View style={[layout.center, { maxHeight: height / 2.5 }]}>
+          <WeightWheelPicker
+            onValueChange={(weight) => handleUpdateWeight(weight)}
+            activeItemColor={colors.textOnSurface.color}
+            inactiveItemColor={colors.textOnSurfaceDisabled.color}
+            minWeight={40}
+            maxWeight={200}
+            stepSize={1}
+            height={height / 2}
+            itemHeight={40}
+            selectedWeight={weight}
+          />
           <Button mode="contained" onPress={handleClickSave}>
             <Text style={[text.textBold, fonts.lg]}>שמור</Text>
           </Button>
