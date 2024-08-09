@@ -1,21 +1,6 @@
+import { WheelPickerProps } from "@/types/wheelPickerTypes";
 import React, { useState, useRef, useEffect } from "react";
 import { View, StyleSheet, FlatList, TouchableOpacity, Text } from "react-native";
-
-type WheelPickerOption = {
-  value: any;
-  label?: string;
-};
-
-type WheelPickerProps = {
-  data: WheelPickerOption[];
-  selectedValue: any;
-  onValueChange: (value: any) => void;
-  height?: number;
-  itemHeight?: number;
-  activeItemColor: string;
-  inactiveItemColor: string;
-  label?: string;
-};
 
 const WheelPicker: React.FC<WheelPickerProps> = ({
   data,
@@ -28,17 +13,18 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   label,
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(
-    data.findIndex((item) => item.value === selectedValue)
+    data.findIndex((item) => String(item.value) == String(selectedValue))
   );
   const flatListRef = useRef<FlatList>(null);
 
   const handleItemPress = (index: number) => {
-    setSelectedIndex(index);
-    onValueChange(data[index].value);
     flatListRef.current?.scrollToOffset({
       offset: index * itemHeight,
       animated: true,
     });
+
+    setSelectedIndex(index);
+    onValueChange(data[index].value);
   };
 
   const handleScroll = (event: any) => {
@@ -46,21 +32,38 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     const index = Math.round(contentOffset.y / itemHeight);
 
     setSelectedIndex(index);
-    onValueChange(data[index].value);
   };
 
-  const handleScrollEnd = () => {
+  const handleScrollEnd = (event: any) => {
+    const { contentOffset } = event.nativeEvent;
+    const index = Math.round(contentOffset.y / itemHeight);
+
     flatListRef.current?.scrollToOffset({
-      offset: selectedIndex * itemHeight,
+      offset: index * itemHeight,
       animated: true,
     });
+
+    onValueChange(data[index].value);
+    setSelectedIndex(selectedIndex);
   };
+
+  useEffect(() => {
+    const selectedIndex = data.findIndex((item) => String(item.value) == String(selectedValue));
+    if (selectedIndex == -1) return;
+
+    flatListRef.current?.scrollToIndex({ index: selectedIndex });
+  }, []);
 
   return (
     <View style={[styles.container, { height }]}>
       <View style={styles.row}>
         <FlatList
           ref={flatListRef}
+          getItemLayout={(data, index) => ({
+            length: itemHeight,
+            offset: itemHeight * index,
+            index,
+          })}
           data={data}
           keyExtractor={(_, index) => index.toString()}
           renderItem={({ item, index }) => (
@@ -88,11 +91,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: (height - itemHeight) / 2 }}
         />
-        {label && (
-          <View style={styles.labelContainer}>
-            <Text style={[styles.labelText, { color: inactiveItemColor }]}>{label}</Text>
-          </View>
-        )}
+        {label && <Text style={[styles.labelText, { color: inactiveItemColor }]}>{label}</Text>}
       </View>
     </View>
   );
@@ -114,15 +113,15 @@ const styles = StyleSheet.create({
     // Add your selected item styles here
   },
   itemText: {
-    fontSize: 16,
+    fontSize: 24,
   },
   labelContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 4,
   },
   labelText: {
-    fontSize: 16,
+    fontSize: 18,
+    marginLeft: 8,
   },
 });
 
