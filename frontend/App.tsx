@@ -20,7 +20,7 @@ const { LightTheme } = adaptNavigationTheme({ reactNavigationLight: DefaultTheme
 
 export default function App() {
   const { getUserById } = useUserApi();
-  const setCurrentUser = useUserStore((state) => state.setCurrentUser);
+  const { currentUser, setCurrentUser } = useUserStore();
   const colorScheme = Appearance.getColorScheme();
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function App() {
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
             <NavigationContainer theme={LightTheme}>
-              <RootNavigator />
+              {currentUser && <RootNavigator />}
               <StatusBar
                 key={colorScheme}
                 translucent
