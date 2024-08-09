@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import WheelPicker from "../ui/WheelPicker";
+import SectionWheelPicker from "../ui/SectionWheelPicker";
+import { WheelPickerProps, WheelPickerOption } from "@/types/wheelPickerTypes";
 
 type WeightWheelPickerProps = {
   minWeight: number;
@@ -24,29 +25,86 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
   activeItemColor,
   inactiveItemColor,
 }) => {
-  const generateWeightOptions = () => {
-    const options: { value: number; label?: string }[] = [];
+  // Split selectedWeight into whole and decimal parts
+  const wholePart = Math.floor(selectedWeight);
+  const decimalPart = Math.round((selectedWeight - wholePart) * 100);
+
+  console.log("selected", selectedWeight);
+
+  console.log("wholePart", wholePart);
+  console.log("decimalPart", decimalPart);
+
+  const generateWholeWeightOptions = (): WheelPickerOption[] => {
+    const options: WheelPickerOption[] = [];
 
     for (let weight = minWeight; weight <= maxWeight; weight += stepSize) {
-      options.push({ value: weight, label: `kg` });
+      options.push({ value: weight, label: `${weight} kg` });
     }
 
     return options;
   };
 
-  const [weightOptions] = useState(generateWeightOptions());
-  const selectedIndex = weightOptions.findIndex((option) => option.value === selectedWeight);
+  const generateDecimalWeightOptions = (): WheelPickerOption[] => {
+    const options: WheelPickerOption[] = [];
+
+    for (let decimal = 0; decimal < 100; decimal++) {
+      options.push({
+        value: decimal < 10 ? `0${decimal}` : `${decimal}`,
+        label: `.${decimal < 10 ? `0${decimal}` : `${decimal}`}`,
+      });
+    }
+
+    return options;
+  };
+
+  const [wholeWeightOptions] = useState(generateWholeWeightOptions());
+  const [decimalWeightOptions] = useState(generateDecimalWeightOptions());
+
+  const handleValueChange = (values: any[], indices: number[]) => {
+    const wholeValue = values[0];
+    const decimalValue = Number(values[1]) / 100;
+    const updatedValue = wholeValue + decimalValue;
+
+    console.log(updatedValue);
+
+    onValueChange(wholeValue + decimalValue);
+  };
+
+  const wheelPickerPropsArray: WheelPickerProps[] = [
+    {
+      data: wholeWeightOptions,
+      selectedValue: wholePart,
+      onValueChange: (value) =>
+        handleValueChange(
+          [value, decimalPart],
+          [wholeWeightOptions.findIndex((option) => option.value === value), decimalPart]
+        ),
+      height,
+      itemHeight,
+      activeItemColor,
+      inactiveItemColor,
+    },
+    {
+      data: decimalWeightOptions,
+      selectedValue: decimalPart,
+      onValueChange: (value) =>
+        handleValueChange(
+          [wholePart, value],
+          [wholePart, decimalWeightOptions.findIndex((option) => option.value === value)]
+        ),
+      height,
+      itemHeight,
+      activeItemColor,
+      inactiveItemColor,
+      label: 'ק"ג',
+    },
+  ];
 
   return (
-    <WheelPicker
-      data={weightOptions}
-      selectedValue={selectedWeight}
-      onValueChange={onValueChange}
-      height={height}
-      itemHeight={itemHeight}
-      activeItemColor={activeItemColor}
-      inactiveItemColor={inactiveItemColor}
-      label="kg"
+    <SectionWheelPicker
+      data={wheelPickerPropsArray}
+      selectedValues={[wholePart, decimalPart]}
+      onValueChange={handleValueChange}
     />
   );
 };

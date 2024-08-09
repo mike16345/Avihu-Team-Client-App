@@ -1,53 +1,54 @@
-import React, { useState } from "react";
+import React from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import WheelPicker from "./WheelPicker";
-import useColors from "@/styles/useColors";
-import { SectionWheelPickerProps } from "@/types/wheelPickerTypes";
+import { WheelPickerProps } from "@/types/wheelPickerTypes";
+
+export type SectionWheelPickerProps = {
+  data: WheelPickerProps[];
+  selectedValues: any[];
+  onValueChange: (values: any[], indices: number[]) => void;
+};
 
 const SectionWheelPicker: React.FC<SectionWheelPickerProps> = ({
   data,
   selectedValues,
   onValueChange,
-  height = 200,
-  itemHeight = 40,
 }) => {
-  const [selectedIndices, setSelectedIndices] = useState(
-    selectedValues.map((value) => data.findIndex((section) => section.data.includes(value)))
-  );
-  const colors = useColors();
-
   const handleValueChange = (sectionIndex: number, value: any) => {
-    setSelectedIndices((prevIndices) => {
-      const updatedIndices = [...prevIndices];
-
-      updatedIndices[sectionIndex] = data[sectionIndex].data.indexOf(value);
-      onValueChange(
-        data.map((section, i) => section.data[updatedIndices[i]]),
-        updatedIndices
+    try {
+      const updatedValues = [...selectedValues];
+      const updatedIndices = updatedValues.map((v, i) =>
+        data[i].data.findIndex((item) => item.value === v)
       );
-      
-      return updatedIndices;
-    });
+
+      updatedValues[sectionIndex] = value;
+      updatedIndices[sectionIndex] = data[sectionIndex].data.findIndex(
+        (item) => item.value === value
+      );
+
+      onValueChange(updatedValues, updatedIndices);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
-    <View style={[styles.container, { height }, colors.backgroundSurface]}>
+    <View>
       <FlatList
         data={data}
         keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={[styles.section, colors.outline]}>
-            <WheelPicker
-              data={item.data}
-              selectedValue={item.data[selectedIndices[index]]}
-              onValueChange={(value) => handleValueChange(index, value)}
-              height={height}
-              itemHeight={itemHeight}
-              activeItemColor={colors.textOnBackground.color}
-              inactiveItemColor={colors.textOnSurfaceDisabled.color}
-            />
-          </View>
-        )}
+        contentContainerStyle={styles.container}
+        renderItem={({ item, index }) => {
+          return (
+            <View>
+              <WheelPicker
+                {...item}
+                selectedValue={selectedValues[index]}
+                onValueChange={(value) => handleValueChange(index, value)}
+              />
+            </View>
+          );
+        }}
         horizontal
         showsHorizontalScrollIndicator={false}
       />
@@ -57,12 +58,13 @@ const SectionWheelPicker: React.FC<SectionWheelPickerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    overflow: "hidden",
     flexDirection: "row",
+    gap: 20,
+    alignItems: "center",
   },
+
   section: {
     flex: 1,
-    borderRightWidth: 1,
   },
 });
 

@@ -1,24 +1,21 @@
+export type WheelPickerOption = {
+  value: any;
+  label?: string;
+};
+
 export type WheelPickerProps = {
   data: WheelPickerOption[];
   selectedValue: any;
   onValueChange: (value: any) => void;
   height?: number;
   itemHeight?: number;
-  activeItemStyle: StyleSheet;
-  inactiveItemColor: StyleSheet;
+  activeItemColor: string;
+  inactiveItemColor: string;
+  label?: string;
 };
 
 export type SectionWheelPickerProps = {
-  data: { data: WheelPickerOption[] }[];
+  data: WheelPickerProps[];
   selectedValues: any[];
   onValueChange: (values: any[], indices: number[]) => void;
-  height?: number;
-  itemHeight?: number;
-  activeItemColor: StyleSheet;
-  inactiveItemColor: StyleSheet;
-};
-
-export type WheelPickerOption = {
-  value: any;
-  label?: string;
 };
