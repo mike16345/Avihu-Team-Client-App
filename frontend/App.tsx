@@ -1,12 +1,21 @@
 import { StatusBar } from "expo-status-bar";
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import {
+  DarkTheme as NavigationDarkTheme,
+  DefaultTheme as NavigationDefaultTheme,
+  NavigationContainer,
+} from "@react-navigation/native";
+
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useUserStore } from "@/store/userStore";
 import { useUserApi } from "@/hooks/useUserApi";
 import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
-import { LightTheme as CustomLightTheme, DarkTheme, ThemeProvider } from "@/themes/useAppTheme";
+import {
+  LightTheme as CustomLightTheme,
+  DarkTheme as CustomDarkTheme,
+  ThemeProvider,
+} from "@/themes/useAppTheme";
 import { Appearance } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import "react-native-gesture-handler";
@@ -16,7 +25,10 @@ import "./global.css";
 // Enable RTL
 // I18nManager.forceRTL(true);
 
-const { LightTheme } = adaptNavigationTheme({ reactNavigationLight: DefaultTheme });
+const { LightTheme, DarkTheme } = adaptNavigationTheme({
+  reactNavigationLight: NavigationDefaultTheme,
+  reactNavigationDark: NavigationDarkTheme,
+});
 
 export default function App() {
   const { getUserById } = useUserApi();
@@ -33,11 +45,11 @@ export default function App() {
   }, []);
 
   return (
-    <PaperProvider theme={colorScheme == "dark" ? DarkTheme : CustomLightTheme}>
+    <PaperProvider theme={colorScheme == "dark" ? CustomDarkTheme : CustomLightTheme}>
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <NavigationContainer theme={LightTheme}>
+            <NavigationContainer theme={colorScheme == "dark" ? DarkTheme : LightTheme}>
               {currentUser && <RootNavigator />}
               <StatusBar
                 key={colorScheme}
