@@ -86,6 +86,7 @@ const useCalendarTheme = (weighIns: IWeighIn[] = [], selected: string = "") => {
       dayContainer: {
         alignItems: "center",
         paddingHorizontal: 2,
+        gap: 2,
       },
       selected: {
         borderRadius: 16,

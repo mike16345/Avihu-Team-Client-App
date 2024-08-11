@@ -68,9 +68,9 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
             activeItemColor={colors.textOnSurface.color}
             inactiveItemColor={colors.textOnSurfaceDisabled.color}
             minWeight={40}
-            maxWeight={200}
+            maxWeight={currentWeight + 100}
             stepSize={1}
-            height={height / 2}
+            height={height / 2.5}
             itemHeight={40}
             selectedWeight={weight}
           />

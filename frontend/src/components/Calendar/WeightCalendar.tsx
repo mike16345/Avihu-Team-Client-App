@@ -7,17 +7,13 @@ import { IWeighIn, IWeighInPost } from "@/interfaces/User";
 import useCalendarTheme from "@/themes/useCalendarTheme";
 import useStyles from "@/styles/useGlobalStyles";
 import WeightInputModal from "../WeightGraph/WeightInputModal";
-import { useWeighInApi } from "@/hooks/useWeighInApi";
-import { useUserStore } from "@/store/userStore";
 
 interface WeightCalendarProps {
   weighIns: IWeighIn[];
+  onSaveWeighIn: (weighIn: IWeighInPost, weighInId?: string | null, isNew?: boolean) => void;
 }
 
-const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
-  const { addWeighIn, updateWeighInById } = useWeighInApi();
-  const currentUser = useUserStore((state) => state.currentUser);
-
+const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns, onSaveWeighIn }) => {
   const { layout } = useStyles();
 
   const [selectedWeighInId, setSelectedWeighInId] = useState<string | null>(null);
@@ -27,6 +23,7 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
   const { calendar, marked } = useCalendarTheme(weighIns, selected);
 
   const handleSaveWeighIn = (updatedWeighIn: number) => {
+    const isNew = !selectedWeighInId;
     const weighIn: Partial<IWeighInPost> = {
       weight: updatedWeighIn,
       date: selected,
@@ -34,28 +31,7 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
 
     setIsEditWeightOpen(false);
     setSelectedWeighInId(null);
-
-    if (selectedWeighInId) {
-      updateWeighInById(selectedWeighInId, weighIn)
-        .then((res) => {
-          console.log("Res", res);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-
-      return;
-    }
-
-    if (!currentUser) return;
-
-    addWeighIn(currentUser._id, weighIn)
-      .then((res) => {
-        console.log("Res", res);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    onSaveWeighIn(weighIn, selectedWeighInId, isNew);
   };
 
   return (

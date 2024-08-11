@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet } from "react-native";
 import WheelPicker from "./WheelPicker";
 import { WheelPickerProps } from "@/types/wheelPickerTypes";
 
@@ -33,25 +33,16 @@ const SectionWheelPicker: React.FC<SectionWheelPickerProps> = ({
   };
 
   return (
-    <View>
-      <FlatList
-        data={data}
-        keyExtractor={(_, index) => index.toString()}
-        contentContainerStyle={styles.container}
-        renderItem={({ item, index }) => {
-          return (
-            <View>
-              <WheelPicker
-                {...item}
-                selectedValue={selectedValues[index]}
-                onValueChange={(value) => handleValueChange(index, value)}
-              />
-            </View>
-          );
-        }}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      />
+    <View style={styles.container}>
+      {data.map((item, index) => (
+        <View key={index}>
+          <WheelPicker
+            {...item}
+            selectedValue={selectedValues[index]}
+            onValueChange={(value) => handleValueChange(index, value)}
+          />
+        </View>
+      ))}
     </View>
   );
 };
@@ -59,12 +50,8 @@ const SectionWheelPicker: React.FC<SectionWheelPickerProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    gap: 20,
     alignItems: "center",
-  },
-
-  section: {
-    flex: 1,
+    gap: 20,
   },
 });
 

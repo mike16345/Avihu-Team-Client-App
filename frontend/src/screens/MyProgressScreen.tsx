@@ -1,13 +1,14 @@
 import WeightCalendar from "@/components/Calendar/WeightCalendar";
 import FABGroup from "@/components/ui/FABGroup";
 import { WeightGraph } from "@/components/WeightGraph/WeightGraph";
-import { Colors } from "@/constants/Colors";
-import { DEFAULT_MESSAGE_TO_TRAINER } from "@/constants/Constants";
+import WeightInputModal from "@/components/WeightGraph/WeightInputModal";
+import { DEFAULT_INITIAL_WEIGHT, DEFAULT_MESSAGE_TO_TRAINER } from "@/constants/Constants";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
 import { useWeighInApi } from "@/hooks/useWeighInApi";
-import { IWeighIn } from "@/interfaces/User";
+import { IWeighIn, IWeighInPost } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
 import { useThemeContext } from "@/themes/useAppTheme";
+import DateUtils from "@/utils/dateUtils";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, ScrollView, StatusBar, Platform, View, Linking } from "react-native";
 import { Portal } from "react-native-paper";
@@ -18,12 +19,42 @@ const MyProgressScreen = () => {
   const currentUser = useUserStore((state) => state.currentUser);
   const { theme } = useThemeContext();
   const { handleScroll } = useHideTabBarOnScroll();
-  const { getWeighInsByUserId } = useWeighInApi();
+  const { getWeighInsByUserId, updateWeighInById, addWeighIn } = useWeighInApi();
 
   const [weighIns, setWeighIns] = useState<IWeighIn[]>([]);
   const [isFabOpen, setIsFabOpen] = useState(false);
+  const [openWeightModal, setOpenWeightModal] = useState(false);
 
   const scrollRef = useRef(null);
+
+  const currentWeight = DateUtils.getLatestItem(weighIns, "date")?.weight || DEFAULT_INITIAL_WEIGHT;
+
+  const handleSaveWeighIn = (
+    weighIn: IWeighInPost,
+    weighInId?: string | null,
+    isNew: boolean = true
+  ) => {
+    setOpenWeightModal(false);
+
+    if (isNew && currentUser) {
+      return addWeighIn(currentUser._id, weighIn)
+        .then((res) => setWeighIns(res.weighIns))
+        .catch((err) => console.log("err", err));
+    }
+    if (!weighInId) return;
+
+    handleUpdateWeighIn(weighInId, weighIn);
+  };
+
+  const handleUpdateWeighIn = async (weighInId: string, weighIn: IWeighInPost) => {
+    try {
+      const updateResult = await updateWeighInById(weighInId, weighIn);
+
+      setWeighIns((prev) => prev.map((item) => (item._id === weighInId ? updateResult : item)));
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const getUserWeightIns = async () => {
     if (!currentUser) return;
@@ -48,7 +79,7 @@ const MyProgressScreen = () => {
         contentContainerStyle={{ ...styles.container, backgroundColor: theme.colors.background }}
       >
         <View style={styles.calendarContainer}>
-          <WeightCalendar weighIns={weighIns} />
+          <WeightCalendar weighIns={weighIns} onSaveWeighIn={handleSaveWeighIn} />
         </View>
         <View style={styles.graphContainer}>
           <WeightGraph weighIns={weighIns} />
@@ -64,7 +95,7 @@ const MyProgressScreen = () => {
           actions={[
             {
               icon: "plus",
-              onPress: () => console.log("pressed add weight"),
+              onPress: () => setOpenWeightModal(true),
               label: "Add Weight",
             },
             {
@@ -83,6 +114,13 @@ const MyProgressScreen = () => {
           ]}
         />
       </ScrollView>
+      {openWeightModal && (
+        <WeightInputModal
+          handleDismiss={() => setOpenWeightModal(false)}
+          currentWeight={currentWeight || 0}
+          handleSaveWeight={(weight) => handleSaveWeighIn({ weight })}
+        />
+      )}
     </Portal.Host>
   );
 };
@@ -90,8 +128,6 @@ const MyProgressScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "black",
-    gap: 12,
     ...Platform.select({
       ios: {
         paddingTop: 40,
@@ -103,9 +139,7 @@ const styles = StyleSheet.create({
   },
   calendarContainer: {
     flex: 1,
-    marginHorizontal: 12,
-    backgroundColor: Colors.bgSecondary,
-    borderRadius: 12,
+    marginHorizontal: 10,
   },
   graphContainer: {
     flex: 2,

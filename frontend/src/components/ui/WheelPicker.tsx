@@ -59,7 +59,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
       <View style={styles.row}>
         <FlatList
           ref={flatListRef}
-          getItemLayout={(data, index) => ({
+          getItemLayout={(_, index) => ({
             length: itemHeight,
             offset: itemHeight * index,
             index,
