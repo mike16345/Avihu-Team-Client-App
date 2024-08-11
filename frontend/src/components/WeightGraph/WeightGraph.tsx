@@ -41,7 +41,7 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
 
   const graphTheme = useGraphTheme(weights);
 
-  const currentWeight = selectedWeight || weights[weights.length - 1];
+  const currentWeight = selectedWeight || DateUtils.getLatestItem(weighIns, "date")?.weight;
 
   const hidePointsAtIndex = () => {
     if (weights.length < 100) return;
@@ -144,7 +144,7 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
           <View
             style={[spacing.gapLg, layout.flexRow, spacing.pdSm, { minHeight: 100, flexShrink: 0 }]}
           >
-            <CurrentWeightCard currentWeight={currentWeight} />
+            <CurrentWeightCard currentWeight={currentWeight || 0} />
             <WeeklyScoreCard weights={weights} range={currentRange} />
           </View>
         </View>
@@ -169,7 +169,7 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
       {openWeightModal && (
         <WeightInputModal
           handleDismiss={() => setOpenWeightModal(false)}
-          currentWeight={currentWeight}
+          currentWeight={currentWeight || 0}
           handleSaveWeight={(weight) => handleSaveNewWeighIn(weight)}
         />
       )}

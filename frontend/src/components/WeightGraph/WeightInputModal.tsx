@@ -22,8 +22,6 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
   const [weight, setWeight] = useState(currentWeight);
   const { text, spacing, fonts, colors, layout, common } = useStyles();
 
-  console.log("current weight: " + Math.floor(weight));
-
   const handleUpdateWeight = (value: number) => {
     setWeight(value);
   };
