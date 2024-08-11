@@ -21,7 +21,7 @@ const MealContainer:React.FC<MealContainerProps> = ({meal}) => {
             <Text style={styles.mealItemsText}>פחמימות: {totalCarbs.quantity}</Text>
         </View>
         <View style={styles.mealItems}>
-            <NativeIcon library='Ionicons' name='airplane-sharp' size={16} color={Colors.primary}/>
+            <NativeIcon library='Ionicons' name='airplane-sharp' size={16} color={Colors.primary}/> 
             <Text style={styles.mealItemsText}>שומנים: {totalFats.quantity}</Text>
         </View>
         <View style={styles.mealItems}>
