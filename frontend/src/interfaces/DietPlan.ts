@@ -19,6 +19,17 @@ export interface IMeal {
   totalFats?: IMealItem;
   totalVeggies?: IMealItem;
 }
+export interface IServingItem {
+  spoons: number;
+  grams: number;
+}
+
+export interface IMenuItem {
+  name: string;
+  dietaryType: string[];
+  foodGroup: string;
+  oneServing: IServingItem;
+}
 
 export interface IRecordedMeal {
   id: string;
