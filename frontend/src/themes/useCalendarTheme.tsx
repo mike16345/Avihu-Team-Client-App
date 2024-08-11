@@ -1,8 +1,14 @@
 import { useMemo } from "react";
 import { IWeighIn } from "@/interfaces/User";
-import { ExtendedMarking } from "@/components/Calendar/WeightCalendar";
 import { StyleSheet } from "react-native";
 import { useThemeContext } from "./useAppTheme";
+import { Theme } from "react-native-calendars/src/types";
+import { MarkingProps } from "react-native-calendars/src/calendar/day/marking";
+export interface ExtendedMarking extends MarkingProps {
+  weight?: number;
+  customStyles?: any;
+  weighInId?: string;
+}
 
 interface MarkedDays {
   [key: string]: ExtendedMarking;
@@ -39,13 +45,13 @@ const useCalendarTheme = (weighIns: IWeighIn[] = [], selected: string = "") => {
   }, [selected, weighIns, theme.colors]);
 
   const styles = useMemo(() => {
-    const calendar = {
+    const calendar: Theme = {
       calendarBackground: theme.colors.secondaryContainer,
-      textSectionTitleColor: theme.colors.primary,
+      textSectionTitleColor: theme.colors.onSecondaryContainer,
       textSectionTitleDisabledColor: theme.colors.secondary,
-      dayTextColor: theme.colors.onSurface,
-      selectedDayTextColor: theme.colors.onPrimary,
-      monthTextColor: theme.colors.primary,
+      dayTextColor: theme.colors.onSecondaryContainer,
+      selectedDayTextColor: theme.colors.onSecondaryContainer,
+      monthTextColor: theme.colors.onSecondaryContainer,
       selectedDayBackgroundColor: theme.colors.primary,
       arrowColor: theme.colors.primary,
       textDisabledColor: theme.colors.surfaceDisabled,
@@ -69,27 +75,24 @@ const useCalendarTheme = (weighIns: IWeighIn[] = [], selected: string = "") => {
       textDayHeaderFontSize: 16,
       todayButtonFontWeight: "600",
       todayButtonFontSize: 14,
-      todayButtonTextColor: theme.colors.primary,
+      todayButtonTextColor: theme.colors.onSecondaryContainer,
       todayButtonPosition: "center",
-      arrowHeight: 15,
+      arrowHeight: 25,
       arrowWidth: 15,
-      weekVerticalMargin: 5,
+      weekVerticalMargin: 8,
     };
 
     const dayStyles = StyleSheet.create({
       dayContainer: {
         alignItems: "center",
-        padding: 5,
+        paddingHorizontal: 2,
       },
       selected: {
-        borderRadius: 9999,
+        borderRadius: 16,
         backgroundColor: theme.colors.info,
         paddingHorizontal: 8,
-        paddingVertical: 0,
       },
       dateText: {
-        paddingHorizontal: 10,
-        paddingVertical: 3,
         fontWeight: "600",
         fontSize: 14,
         color: theme.colors.onBackground,
@@ -99,7 +102,7 @@ const useCalendarTheme = (weighIns: IWeighIn[] = [], selected: string = "") => {
       },
       valueText: {
         color: theme.colors.primary,
-        fontWeight: "400",
+        fontWeight: "900",
       },
       todayContainer: {
         borderBottomWidth: 2,
