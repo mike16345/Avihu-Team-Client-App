@@ -7,12 +7,17 @@ export interface IDietPlan {
   totalCalories: number;
 }
 
+interface IMealItem{
+  quantity:number,
+  unit:string
+}
+
 export interface IMeal {
   id: string;
-  totalProtein: number;
-  totalCarbs: number;
-  totalFats?: number;
-  totalVeggies?: number;
+  totalProtein: IMealItem;
+  totalCarbs: IMealItem;
+  totalFats?: IMealItem;
+  totalVeggies?: IMealItem;
 }
 
 export interface IRecordedMeal {

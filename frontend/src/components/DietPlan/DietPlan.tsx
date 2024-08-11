@@ -36,12 +36,6 @@ export default function DietPlan() {
     .catch(err=>console.log(err))
   },[])
 
-  useEffect(()=>{
-    if (dietPlan) {
-      console.log(dietPlan.meals[0].totalProtein);
-      
-    }
-  },[dietPlan])
 
   return (
     <ScrollView
@@ -84,7 +78,8 @@ export default function DietPlan() {
       backgroundColor:Colors.darkLight,
       padding:10,
       margin:7,
-      borderRadius:10
+      borderRadius:10,
+      display:`flex`,
     },
     mealTitle:{
       color:Colors.lightDark,
