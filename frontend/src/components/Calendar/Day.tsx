@@ -1,33 +1,23 @@
 import React from "react";
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, TouchableOpacityProps } from "react-native";
 import { DayState } from "react-native-calendars/src/types";
-import { ExtendedMarking } from "./WeightCalendar";
 import useFontSize from "@/styles/useFontSize";
-import useCalendarTheme from "@/themes/useCalendarTheme";
+import useCalendarTheme, { ExtendedMarking } from "@/themes/useCalendarTheme";
 
-interface DayComponentProps {
+interface DayComponentProps extends TouchableOpacityProps {
   date: number;
   state: DayState;
   marking?: ExtendedMarking;
-  onPress: () => void;
-  onLongPress: () => void;
 }
 
-const DayComponent: React.FC<DayComponentProps> = ({
-  date,
-  state,
-  marking,
-  onPress,
-  onLongPress,
-}) => {
+const DayComponent: React.FC<DayComponentProps> = ({ date, state, marking, ...props }) => {
   const dayStyles = useCalendarTheme().dayStyles;
   const fontSize = useFontSize();
   const { weight, selected } = marking || {};
 
   return (
     <TouchableOpacity
-      onPress={onPress}
-      onLongPress={onLongPress}
+      {...props}
       style={[dayStyles.dayContainer, state == "today" && dayStyles.todayContainer]}
     >
       <Text

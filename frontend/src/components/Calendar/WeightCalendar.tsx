@@ -3,19 +3,12 @@ import { Calendar, CalendarProvider, DateData } from "react-native-calendars";
 import DayComponent from "./Day";
 import { FC, useState } from "react";
 import DateUtils from "@/utils/dateUtils";
-import { MarkingProps } from "react-native-calendars/src/calendar/day/marking";
 import { IWeighIn, IWeighInPost } from "@/interfaces/User";
 import useCalendarTheme from "@/themes/useCalendarTheme";
 import useStyles from "@/styles/useGlobalStyles";
 import WeightInputModal from "../WeightGraph/WeightInputModal";
 import { useWeighInApi } from "@/hooks/useWeighInApi";
 import { useUserStore } from "@/store/userStore";
-
-export interface ExtendedMarking extends MarkingProps {
-  weight?: number;
-  customStyles?: any;
-  weighInId?: string;
-}
 
 interface WeightCalendarProps {
   weighIns: IWeighIn[];
@@ -24,36 +17,32 @@ interface WeightCalendarProps {
 const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
   const { addWeighIn, updateWeighInById } = useWeighInApi();
   const currentUser = useUserStore((state) => state.currentUser);
-  const [selected, setSelected] = useState(DateUtils.getCurrentDate("YYYY-MM-DD"));
 
-  const { calendar, marked } = useCalendarTheme(weighIns, selected);
   const { layout } = useStyles();
 
   const [selectedWeighInId, setSelectedWeighInId] = useState<string | null>(null);
   const [isEditWeighOpen, setIsEditWeightOpen] = useState(false);
+  const [selected, setSelected] = useState(DateUtils.getCurrentDate("YYYY-MM-DD"));
+
+  const { calendar, marked } = useCalendarTheme(weighIns, selected);
 
   const handleSaveWeighIn = (updatedWeighIn: number) => {
     const weighIn: Partial<IWeighInPost> = {
       weight: updatedWeighIn,
+      date: selected,
     };
 
     setIsEditWeightOpen(false);
+    setSelectedWeighInId(null);
 
     if (selectedWeighInId) {
       updateWeighInById(selectedWeighInId, weighIn)
         .then((res) => {
           console.log("Res", res);
-
-          if (res.modifiedCount == 1) {
-            console.log("succeeded");
-          } else {
-            console.error("Failed to update weight");
-          }
         })
         .catch((err) => {
           console.error(err);
-        })
-        .finally(() => {});
+        });
 
       return;
     }
@@ -87,13 +76,12 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns }) => {
                   state={state || ""}
                   marking={marking}
                   key={date?.day}
+                  delayLongPress={100}
                   onLongPress={() => {
-                    console.log("marking", marking);
-
-                    if (!marking) return;
                     setSelected(date.dateString);
-                    setSelectedWeighInId(marking.weighInId);
                     setIsEditWeightOpen(true);
+                    if (!marking) return;
+                    setSelectedWeighInId(marking.weighInId);
                   }}
                   onPress={() => {
                     if (!date) return;
