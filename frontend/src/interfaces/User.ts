@@ -5,10 +5,10 @@ export interface IUser {
 }
 
 // WeighIn interface
-export interface IWeighInPost extends Omit<IWeighIn, "date"> {}
+export interface IWeighInPost extends Partial<IWeighIn> {}
 export interface IWeighIn {
   _id: string;
-  date: Date;
+  date: string;
   weight: number;
 }
 
