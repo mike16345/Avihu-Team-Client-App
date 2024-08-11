@@ -17,7 +17,6 @@ const MenuItemModal:React.FC<MenuItemModalProps> = ({isOpen, foodGroup, dismiss}
     const {xl}=useFontSize();
     const {getMenuItems}=useMenuItemApi()
 
- const [visible, setVisible] = useState(false);
  const [items,setItems]=useState<IMenuItem[]>([])
 
  useEffect(()=>{

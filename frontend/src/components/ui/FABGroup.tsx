@@ -1,57 +1,15 @@
-import React, { useState } from 'react'
-import { StyleSheet } from 'react-native';
-import { FAB, Portal, PaperProvider } from 'react-native-paper';
+import { FC } from "react";
+import { FAB, Portal } from "react-native-paper";
+import { Props } from "react-native-paper/src/components/FAB/FabGroup";
 
-const FABGroup = () => {
-    const [open, setOpen] = useState(false);
+interface FABGroupProps extends Props {}
 
+const FABGroup: FC<FABGroupProps> = ({ ...props }) => {
   return (
-    <PaperProvider>
-        <Portal>
-            <FAB.Group
-                style={styles.FabContainer}
-                open={open}
-                visible={true}
-                icon={open?`arrow-collapse-down`:`arrow-collapse-up`}
-                label='תפריטים'
-                actions={[
-                    {   icon:`camera-control`,
-                        label:`חלבונים`, 
-                        onPress:()=>console.log(`חלבונים`)
-                    },
-                    {   icon:`baguette`,
-                        label:`פחמימות`, 
-                        onPress:()=>console.log(`פחמימות`)
-                    },
-                    {   icon:`camera-control`,
-                        label:`שומנים`, 
-                        onPress:()=>console.log(`שומנים`)
-                    },
-                    {   icon:`camera-control`,
-                        label:`ירקות`, 
-                        onPress:()=>console.log(`ירקות`)
-                    },
-                ]}
-                onStateChange={()=>setOpen(!open)}
-                onPress={()=>setOpen(!open)}
-            />
-            <FAB
-                style={styles.FabContainer}
-                icon="plus"
-                onPress={()=>console.log(`aa`)
-                }
-            />
-        </Portal>
-    </PaperProvider>
-  )
-}
+    <Portal>
+      <FAB.Group {...props} />
+    </Portal>
+  );
+};
 
-const styles=StyleSheet.create({
-    FabContainer: {
-        position: 'absolute',
-        right: 16,
-        bottom: 16,
-    },
-})
-
-export default FABGroup
+export default FABGroup;
