@@ -3,6 +3,7 @@ import { IMeal } from '@/interfaces/DietPlan'
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import NativeIcon from '../Icon/NativeIcon'
+import CustomInstructionsContainer from './CustomInstructionsContainer'
 
 interface MealContainerProps{
     meal:IMeal
@@ -12,12 +13,13 @@ const MealContainer:React.FC<MealContainerProps> = ({meal}) => {
     const { totalCarbs, totalProtein, totalFats, totalVeggies} =meal
   return (
     <View style={styles.mealItemsContainer}>
-            {totalProtein.customInstructions && totalProtein.customInstructions[0]  ? totalProtein.customInstructions?.map(item=>(
-                <View style={styles.mealItems}>
-                    <NativeIcon library='MaterialCommunityIcons' name='fish' size={16} color={Colors.primary}/>
-                    <Text style={styles.mealItemsText}>{item.item}: {item.quantity}</Text>
-                </View>
-            )) :
+            {totalProtein.customInstructions && totalProtein.customInstructions[0] ?
+                <CustomInstructionsContainer 
+                    customInstructions={totalProtein.customInstructions}
+                    icon='fish'
+                    foodGroup='חלבונים'
+                />
+             :
             totalProtein && totalProtein.quantity > 0 &&
                 <View style={styles.mealItems}>
                     <NativeIcon library='MaterialCommunityIcons' name='fish' size={16} color={Colors.primary}/>
@@ -25,12 +27,13 @@ const MealContainer:React.FC<MealContainerProps> = ({meal}) => {
                 </View>
             }
 
-            {totalCarbs.customInstructions && totalCarbs.customInstructions[0] ? totalCarbs.customInstructions?.map(item=>(
-                <View style={styles.mealItems}>
-                    <NativeIcon library='MaterialCommunityIcons' name='baguette' size={16} color={Colors.primary}/>
-                    <Text style={styles.mealItemsText}>{item.item}: {item.quantity}</Text>
-                </View>
-            )) :totalCarbs.quantity > 0 &&
+            {totalCarbs.customInstructions && totalCarbs.customInstructions[0] ? 
+               <CustomInstructionsContainer 
+                    customInstructions={totalCarbs.customInstructions}
+                    icon='baguette'
+                    foodGroup='פחמימות'
+                />
+           :totalCarbs.quantity > 0 &&
                 <View style={styles.mealItems}>
                     <NativeIcon library='MaterialCommunityIcons' name='baguette' size={16} color={Colors.primary}/>
                     <Text style={styles.mealItemsText}>פחמימות: {totalCarbs.quantity}</Text>

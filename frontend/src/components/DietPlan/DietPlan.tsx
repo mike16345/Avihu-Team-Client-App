@@ -64,7 +64,6 @@ export default function DietPlan() {
         open={isFabOpen}
         visible
         icon={isFabOpen?`close`:`food-outline`}
-        label="פריטים"
         actions={[
           {
               icon: 'fish',
