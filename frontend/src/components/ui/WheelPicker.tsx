@@ -78,7 +78,9 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
               <Text
                 style={[
                   styles.itemText,
-                  index === selectedIndex ? { color: "white" } : { color: inactiveItemColor },
+                  index === selectedIndex
+                    ? { color: activeItemColor }
+                    : { color: inactiveItemColor },
                 ]}
               >
                 {item.value}
