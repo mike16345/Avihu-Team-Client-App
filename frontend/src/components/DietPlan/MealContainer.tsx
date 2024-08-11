@@ -60,7 +60,7 @@ const styles=StyleSheet.create({
         justifyContent:'flex-start',
         flexWrap:`wrap`,
         gap:8,
-        width:'70%',
+        width:'80%',
         padding:10
     },
     mealCol:{
