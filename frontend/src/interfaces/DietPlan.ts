@@ -7,9 +7,15 @@ export interface IDietPlan {
   totalCalories: number;
 }
 
+export interface ICustomItemInstructions {
+  item: string;
+  quantity: number;
+}
+
 interface IMealItem{
   quantity:number,
   unit:string
+  customInstructions?: ICustomItemInstructions[];
 }
 
 export interface IMeal {

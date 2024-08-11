@@ -63,8 +63,8 @@ export default function DietPlan() {
         style={{bottom:100}}
         open={isFabOpen}
         visible
-        icon={isFabOpen?`menu-down`:`menu-up`}
-        label="קבוצות אוכל"
+        icon={isFabOpen?`close`:`food-outline`}
+        label="פריטים"
         actions={[
           {
               icon: 'fish',
