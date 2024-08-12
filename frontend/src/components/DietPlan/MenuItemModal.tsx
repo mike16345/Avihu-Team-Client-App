@@ -32,6 +32,7 @@ const MenuItemModal:React.FC<MenuItemModalProps> = ({isOpen, foodGroup, dismiss}
      <CustomModal
         visible={isOpen}
         dismissable
+        dismissableBackButton
         onDismiss={dismiss}
      >
         <ScrollView style={styles.modal}>
