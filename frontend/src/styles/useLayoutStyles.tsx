@@ -10,18 +10,6 @@ export const useLayoutStyles = () => {
       justifyContent: "center",
       alignItems: "center",
     },
-    row: {
-      flexDirection: "row",
-    },
-    column: {
-      flexDirection: "column",
-    },
-    spaceAround: {
-      justifyContent: "space-around",
-    },
-    spaceEvenly: {
-      justifyContent: "space-evenly",
-    },
     wrap: {
       flexWrap: "wrap",
     },
@@ -41,6 +29,9 @@ export const useLayoutStyles = () => {
     flex1: {
       flex: 1,
     },
+    flexGrow: {
+      flexGrow: 1,
+    },
     flexRow: {
       flexDirection: "row",
     },
@@ -58,6 +49,12 @@ export const useLayoutStyles = () => {
     },
     justifyEnd: {
       justifyContent: "flex-end",
+    },
+    justifyAround: {
+      justifyContent: "space-around",
+    },
+    justifyEvenly: {
+      justifyContent: "space-evenly",
     },
     justifyCenter: {
       justifyContent: "center",

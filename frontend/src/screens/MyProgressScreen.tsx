@@ -3,29 +3,26 @@ import FABGroup from "@/components/ui/FABGroup";
 import { WeightGraph } from "@/components/WeightGraph/WeightGraph";
 import WeightInputModal from "@/components/WeightGraph/WeightInputModal";
 import { DEFAULT_INITIAL_WEIGHT, DEFAULT_MESSAGE_TO_TRAINER } from "@/constants/Constants";
-import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
 import { useWeighInApi } from "@/hooks/useWeighInApi";
 import { IWeighIn, IWeighInPost } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
-import { useThemeContext } from "@/themes/useAppTheme";
+import useStyles from "@/styles/useGlobalStyles";
 import DateUtils from "@/utils/dateUtils";
-import { useEffect, useRef, useState } from "react";
-import { StyleSheet, ScrollView, StatusBar, Platform, View, Linking } from "react-native";
+import { useEffect, useState } from "react";
+import { StyleSheet, ScrollView, View, Linking } from "react-native";
 import { Portal } from "react-native-paper";
 
 const MyProgressScreen = () => {
   const TRAINER_PHONE_NUMBER = process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER;
 
   const currentUser = useUserStore((state) => state.currentUser);
-  const { theme } = useThemeContext();
-  const { handleScroll } = useHideTabBarOnScroll();
   const { getWeighInsByUserId, updateWeighInById, addWeighIn } = useWeighInApi();
+
+  const { colors, spacing, layout } = useStyles();
 
   const [weighIns, setWeighIns] = useState<IWeighIn[]>([]);
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [openWeightModal, setOpenWeightModal] = useState(false);
-
-  const scrollRef = useRef(null);
 
   const currentWeight = DateUtils.getLatestItem(weighIns, "date")?.weight || DEFAULT_INITIAL_WEIGHT;
 
@@ -73,10 +70,13 @@ const MyProgressScreen = () => {
   return (
     <Portal.Host>
       <ScrollView
-        ref={scrollRef}
-        onScroll={handleScroll}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ ...styles.container, backgroundColor: theme.colors.background }}
+        contentContainerStyle={[
+          layout.flexGrow,
+          colors.background,
+          spacing.pdBottomBar,
+          spacing.pdStatusBar,
+        ]}
       >
         <View style={styles.calendarContainer}>
           <WeightCalendar weighIns={weighIns} onSaveWeighIn={handleSaveWeighIn} />
@@ -126,20 +126,9 @@ const MyProgressScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    ...Platform.select({
-      ios: {
-        paddingTop: 40,
-      },
-      android: {
-        paddingTop: StatusBar.currentHeight || 0,
-      },
-    }),
-  },
   calendarContainer: {
     flex: 1,
-    marginHorizontal: 10,
+    marginHorizontal: 12,
   },
   graphContainer: {
     flex: 2,

@@ -40,7 +40,7 @@ const ChangeRangeBtns: FC<ChangeRangeProps> = ({ onRangeChange }) => {
           onRangeChange(selectedRangeToRange(range));
         }}
         theme={{ roundness: 2 }}
-        style={spacing.mgHorizontalDefault}
+        style={spacing.pdHorizontalSm}
         buttons={ranges.map((range) => ({
           value: range,
           label: range,

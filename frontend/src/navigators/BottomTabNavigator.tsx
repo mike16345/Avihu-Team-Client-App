@@ -1,35 +1,24 @@
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import { RootStackParamList } from "@/types/navigatorTypes";
-import useAnimateBottomBar from "@/hooks/useAnimatedBottomBar";
 import { View } from "react-native";
-import { useLayoutStore } from "@/store/layoutStore";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
+import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
 const BottomTabNavigator = () => {
   const { layout, colors } = useStyles();
 
-  const animatedValue = useAnimateBottomBar();
-  const { isNavbarOpen } = useLayoutStore();
-
   return (
     <View style={[layout.flex1, colors.background]}>
       <Tab.Navigator
         barStyle={[
           {
+            height: BOTTOM_BAR_HEIGHT,
             ...colors.background,
-            opacity: animatedValue,
-            pointerEvents: isNavbarOpen ? "auto" : "none",
-            transform: [
-              {
-                translateY: animatedValue.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [50, 0],
-                }),
-              },
-            ],
+            borderTopWidth: 0.199,
+            borderTopColor: colors.textOnSurfaceDisabled.color,
           },
         ]}
         initialRouteName="MyProgressScreen"
@@ -37,9 +26,7 @@ const BottomTabNavigator = () => {
           ...layout.center,
           width: 45,
           height: 40,
-
           backgroundColor: colors.textOnBackground.color,
-
           padding: 8,
           borderRadius: 99,
         }}

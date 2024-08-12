@@ -1,4 +1,6 @@
-import { StyleSheet } from "react-native";
+import { BOTTOM_BAR_HEIGHT, TOP_BAR_HEIGHT } from "@/constants/Constants";
+import { StatusBar } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 export const useSpacingStyles = () => {
   return StyleSheet.create({
@@ -138,6 +140,19 @@ export const useSpacingStyles = () => {
     },
     pdVerticalXxl: {
       paddingVertical: 48,
+    },
+    pdStatusBar: {
+      ...Platform.select({
+        ios: {
+          paddingTop: TOP_BAR_HEIGHT,
+        },
+        android: {
+          paddingTop: StatusBar.currentHeight || TOP_BAR_HEIGHT,
+        },
+      }),
+    },
+    pdBottomBar: {
+      paddingBottom: BOTTOM_BAR_HEIGHT,
     },
     // Gap
     gapXs: {
