@@ -16,7 +16,7 @@ const MyProgressScreen = () => {
   const TRAINER_PHONE_NUMBER = process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER;
 
   const currentUser = useUserStore((state) => state.currentUser);
-  const { getWeighInsByUserId, updateWeighInById, addWeighIn } = useWeighInApi();
+  const { getWeighInsByUserId, updateWeighInById, deleteWeighIn, addWeighIn } = useWeighInApi();
 
   const { colors, spacing, layout } = useStyles();
 
@@ -53,6 +53,19 @@ const MyProgressScreen = () => {
     }
   };
 
+  const handleDeleteWeighIn = async (weighInId: string | null) => {
+    if (!weighInId) return;
+
+    try {
+      const response = await deleteWeighIn(weighInId);
+
+      setWeighIns(response.weighIns);
+      setOpenWeightModal(false);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const getUserWeightIns = async () => {
     if (!currentUser) return;
 
@@ -79,7 +92,11 @@ const MyProgressScreen = () => {
         ]}
       >
         <View style={styles.calendarContainer}>
-          <WeightCalendar weighIns={weighIns} onSaveWeighIn={handleSaveWeighIn} />
+          <WeightCalendar
+            weighIns={weighIns}
+            onSaveWeighIn={handleSaveWeighIn}
+            onDeleteWeighIn={(weighInId) => handleDeleteWeighIn(weighInId)}
+          />
         </View>
         <View style={styles.graphContainer}>
           <WeightGraph weighIns={weighIns} />

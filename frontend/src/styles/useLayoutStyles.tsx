@@ -10,6 +10,15 @@ export const useLayoutStyles = () => {
       justifyContent: "center",
       alignItems: "center",
     },
+    direction: {
+      direction: "inherit",
+    },
+    rtl: {
+      direction: "rtl",
+    },
+    ltr: {
+      direction: "ltr",
+    },
     wrap: {
       flexWrap: "wrap",
     },

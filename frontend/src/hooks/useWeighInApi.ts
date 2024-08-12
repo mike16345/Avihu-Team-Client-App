@@ -10,7 +10,7 @@ export const useWeighInApi = () => {
   const updateWeighInById = (id: string, data: IWeighInPost) =>
     updateItem<IWeighIn>(`${WEIGH_INS_ENDPOINT}${id}`, data);
 
-  const deleteWeighIn = (id: string) => deleteItem<IWeighIn>(WEIGH_INS_ENDPOINT, id);
+  const deleteWeighIn = (id: string) => deleteItem<IWeighInResponse>(WEIGH_INS_ENDPOINT, id);
 
   const getWeighInsByUserId = (userID: string) =>
     fetchData<IWeighIn[]>(`${WEIGH_INS_ENDPOINT}user/${userID}`);
@@ -20,7 +20,8 @@ export const useWeighInApi = () => {
   const deleteWeighInsByUserId = (userID: string) =>
     deleteItem(WEIGH_INS_ENDPOINT + "user", userID);
 
-  const deleteWeighIns = (userID: string) => deleteItem(WEIGH_INS_ENDPOINT, userID);
+  const deleteWeighIns = (userID: string) =>
+    deleteItem<IWeighInResponse>(WEIGH_INS_ENDPOINT, userID);
 
   return {
     addWeighIn,
