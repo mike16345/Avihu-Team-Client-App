@@ -5,6 +5,7 @@ import NativeIcon from '../Icon/NativeIcon'
 import { MaterialCommunityIconsNames } from '@/types/iconTypes'
 import { Colors } from '@/constants/Colors'
 
+
 interface CustomInstructionsContainerProps{
     customInstructions:ICustomItemInstructions[]
     icon:MaterialCommunityIconsNames
@@ -18,14 +19,14 @@ const CustomInstructionsContainer:React.FC<CustomInstructionsContainerProps> = (
             <NativeIcon 
                 library='MaterialCommunityIcons' 
                 name={icon}
-                size={16} 
+                size={20} 
                 color={Colors.primary}
             />
             <Text style={styles.textColor}>{foodGroup}:</Text>
         </View>
         <View style={styles.itemsContainer}> 
             {customInstructions.map((item, i)=>(
-                <Text style={styles.textColor}>{item.item}: {item.quantity} {i+1 !==customInstructions.length ? `/`:``} </Text>
+                <Text style={styles.textColor}>{item.item}: {item.quantity}  {i+1 !==customInstructions.length ? `/`:``} </Text>
             ))}
         </View>
     </View>
@@ -36,6 +37,7 @@ const styles=StyleSheet.create({
     title:{
         display:`flex`,
         flexDirection:`row`,
+        alignItems:`center`,
         gap:2,
         paddingBottom:5
     },
@@ -48,7 +50,7 @@ const styles=StyleSheet.create({
         justifyContent:`center`,
         width:`100%`,
         padding:5,
-        gap:5
+        gap:5,
     }
 })
 

@@ -14,7 +14,7 @@ const MealContainer:React.FC<MealContainerProps> = ({meal}) => {
   return (
     <View style={styles.mealItemsContainer}>
             {totalProtein.customInstructions && totalProtein.customInstructions[0] ?
-                <CustomInstructionsContainer 
+                <CustomInstructionsContainer
                     customInstructions={totalProtein.customInstructions}
                     icon='fish'
                     foodGroup='חלבונים'
@@ -22,7 +22,7 @@ const MealContainer:React.FC<MealContainerProps> = ({meal}) => {
              :
             totalProtein && totalProtein.quantity > 0 &&
                 <View style={styles.mealItems}>
-                    <NativeIcon library='MaterialCommunityIcons' name='fish' size={16} color={Colors.primary}/>
+                    <NativeIcon library='MaterialCommunityIcons' name='fish' size={20} color={Colors.primary}/>
                     <Text style={styles.mealItemsText}>חלבונים: {totalProtein.quantity}</Text>
                 </View>
             }
@@ -35,19 +35,19 @@ const MealContainer:React.FC<MealContainerProps> = ({meal}) => {
                 />
            :totalCarbs.quantity > 0 &&
                 <View style={styles.mealItems}>
-                    <NativeIcon library='MaterialCommunityIcons' name='baguette' size={16} color={Colors.primary}/>
+                    <NativeIcon library='MaterialCommunityIcons' name='baguette' size={20} color={Colors.primary}/>
                     <Text style={styles.mealItemsText}>פחמימות: {totalCarbs.quantity}</Text>
                 </View>
             }
             {totalFats && totalFats.quantity > 0 &&
                 <View style={styles.mealItems}>
-                    <NativeIcon library='MaterialCommunityIcons' name='cheese' size={16} color={Colors.primary}/> 
+                    <NativeIcon library='MaterialCommunityIcons' name='cheese' size={20} color={Colors.primary}/> 
                     <Text style={styles.mealItemsText}>שומנים: {totalFats?.quantity}</Text>
                 </View>
             }
             {totalVeggies && totalVeggies?.quantity > 0 &&
                 <View style={styles.mealItems}>
-                    <NativeIcon library='MaterialCommunityIcons' name='leaf' size={16} color={Colors.primary}/>
+                    <NativeIcon library='MaterialCommunityIcons' name='leaf' size={20} color={Colors.primary}/>
                     <Text style={styles.mealItemsText}>ירקות: {totalVeggies?.quantity}</Text>
                 </View>
             }

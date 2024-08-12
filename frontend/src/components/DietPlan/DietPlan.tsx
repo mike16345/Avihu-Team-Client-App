@@ -13,8 +13,6 @@ import MenuItemModal from "./MenuItemModal";
 
 
 export default function DietPlan() {
-  
-
   const { handleScroll } = useHideTabBarOnScroll();
   const currentUser = useUserStore((state) => state.currentUser);
   const {getDietPlanByUserId}=useDietPlanApi()
