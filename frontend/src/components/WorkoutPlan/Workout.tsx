@@ -5,7 +5,6 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import Button from "@/components/Button/Button";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
 import RecordWorkout from "./RecordWorkout";
-import { useAppTheme } from "@/themes/useAppTheme";
 import Divider from "../ui/Divider";
 
 interface WorkoutProps {
@@ -20,7 +19,6 @@ const getYouTubeThumbnail = (id: string) => {
 };
 
 const Workout: FC<WorkoutProps> = ({ workout }) => {
-  const theme = useAppTheme();
   const videoId = extractVideoId(workout.linkToVideo!);
   const thumbnail = getYouTubeThumbnail(videoId);
 

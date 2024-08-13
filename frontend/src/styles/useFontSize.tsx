@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 
-const baseFontSize = 16;
+const baseFontSize = 12;
 
 const useFontSize = () => {
   const { fontScale } = useWindowDimensions();
@@ -13,10 +13,12 @@ const useFontSize = () => {
   const fontSizes = useMemo(
     () =>
       StyleSheet.create({
+        xs: { fontSize: scaleFontSize(baseFontSize * 0.25) },
+        sm: { fontSize: scaleFontSize(baseFontSize * 0.5) },
+        md: { fontSize: scaleFontSize(baseFontSize * 0.875) },
         default: { fontSize: scaleFontSize(baseFontSize) },
-        sm: { fontSize: scaleFontSize(baseFontSize * 0.875) },
         lg: { fontSize: scaleFontSize(baseFontSize * 1.25) },
-        xl: { fontSize: scaleFontSize(baseFontSize * 1.5) },
+        xl: { fontSize: scaleFontSize(baseFontSize * 1.75) },
         xxl: { fontSize: scaleFontSize(baseFontSize * 2) },
         xxxl: { fontSize: scaleFontSize(baseFontSize * 2.5) },
       }),

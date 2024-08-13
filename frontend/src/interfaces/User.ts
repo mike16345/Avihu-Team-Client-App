@@ -1,5 +1,3 @@
-import { WeightUnit } from "@/types/weightTypes";
-
 export interface IUser {
   _id: string;
   name: string;
@@ -7,11 +5,11 @@ export interface IUser {
 }
 
 // WeighIn interface
+export interface IWeighInPost extends Partial<IWeighIn> {}
 export interface IWeighIn {
-  id?: string;
-  date: Date;
+  _id: string;
+  date: string;
   weight: number;
-  weightUnit: WeightUnit;
 }
 
 export interface IWeighInResponse {
