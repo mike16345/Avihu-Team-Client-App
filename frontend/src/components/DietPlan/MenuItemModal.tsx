@@ -54,7 +54,7 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
         colors.borderPrimary,
         common.borderDefault,
         common.roundedMd,
-        {height:`75%`}
+        {height:`80%`}
       ]}>
         <View>
           <Text style={[

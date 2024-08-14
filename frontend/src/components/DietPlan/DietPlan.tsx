@@ -11,6 +11,7 @@ import FABGroup from "../ui/FABGroup";
 import MenuItemModal from "./MenuItemModal";
 import useStyles from "@/styles/useGlobalStyles";
 import { DarkTheme, useThemeContext } from "@/themes/useAppTheme";
+import { Portal } from "react-native-paper";
 
 export default function DietPlan() {
   const { handleScroll } = useHideTabBarOnScroll();
@@ -43,10 +44,10 @@ export default function DietPlan() {
   }, []);
 
   return (
+    <Portal.Host>
     <ScrollView
       ref={scrollRef}
       onScroll={handleScroll}
-      /* key={colors.background.backgroundColor} */
       style={[
         layout.flex1,
         colors.backgroundSecondary,
@@ -58,7 +59,7 @@ export default function DietPlan() {
       <ImageBackground source={logoBlack} className="w-screen h-[30vh]" />
 
       {dietPlan?.meals.map((meal, i) => (
-        <View key={colors.backgroundSecondaryContainer.backgroundColor+i} style={[
+        <View key={i} style={[
           layout.flexRowReverse,
           layout.itemsCenter,
           spacing.pdDefault,
@@ -96,6 +97,7 @@ export default function DietPlan() {
         isOpen={isModalOpen}
         dismiss={() => setIsModalOpen(false)}
       />
+      
       <FABGroup
         open={isFabOpen}
         visible
@@ -125,7 +127,9 @@ export default function DietPlan() {
           },
         ]}
       />
+      
     </ScrollView>
+    </Portal.Host>
   );
 }
 
