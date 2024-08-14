@@ -26,7 +26,7 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
         spacing.pdVerticalXs,
       ]}>
         {icon}
-        <Text style={colors.textInverseOnSurface}>{foodGroup}:</Text>
+        <Text style={colors.textOnSecondaryContainer}>{foodGroup}:</Text>
       </View>
       <View style={[
         layout.flexRow,
@@ -36,7 +36,7 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
         spacing.gapSm
       ]}>
         {customInstructions.map((item, i) => (
-          <Text key={i} style={colors.textInverseOnSurface}>
+          <Text key={i} style={colors.textOnSecondaryContainer}>
             {item.item}: {item.quantity} {i + 1 !== customInstructions.length ? `/` : ``}{" "}
           </Text>
         ))}

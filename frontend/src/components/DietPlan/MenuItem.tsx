@@ -1,68 +1,51 @@
-import { Colors } from "@/constants/Colors";
 import { IMenuItem } from "@/interfaces/DietPlan";
 import useFontSize from "@/styles/useFontSize";
-import useStyles from "@/styles/useGlobalStyles";
-import { useLayoutStyles } from "@/styles/useLayoutStyles";
+
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {  Text, View } from "react-native";
+
+
 
 interface MenuItemProps {
   menuItem: IMenuItem;
+  styles:any
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ menuItem }) => {
-  const { xsm } = useFontSize();
-  const {itemsCenter}=useLayoutStyles();
+const MenuItem: React.FC<MenuItemProps> = ({ menuItem, styles }) => {
+  const { md } = useFontSize();
+  const {colors,layout,spacing,text}=styles
+
 
   return (
-    <View style={styles.menuItemContainer}>
-      <View style={styles.divider}>
-        <Text style={styles.menuItemName}>{menuItem.name}</Text>
+    <View style={[
+      layout.itemsCenter,
+      spacing.pdXs,
+      spacing.gapXs
+    ]}>
+      <View style={[colors.borderPrimary, {borderBottomWidth:2}, layout.widthFull]}>
+        <Text style={[
+            colors.textOnSecondaryContainer,
+            text.textRight,
+            spacing.pdXs
+        ]}>{menuItem.name}</Text>
       </View>
-      <View style={styles.servingContainer}>
-        <Text style={[styles.servingItemText, xsm]}>גרם: {menuItem.oneServing.grams}</Text>
-        <View style={styles.servingDivider}></View>
-        <Text style={[styles.servingItemText, xsm]}>כפות: {menuItem.oneServing.spoons}</Text>
+      <View style={[
+        layout.flexRow,
+        layout.justifyBetween,
+        spacing.gapSm,
+        spacing.pdXs,
+      ]}>
+        <Text style={[colors.textOnSecondaryContainer, md]}>גרם: {menuItem.oneServing.grams}</Text>
+        <View style={[
+          colors.borderPrimary,
+        {borderLeftWidth: 1}
+        ]}></View>
+        <Text style={[colors.textOnSecondaryContainer, md]}>כפות: {menuItem.oneServing.spoons}</Text>
       </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  menuItemContainer: {
-    display: `flex`,
-    alignItems: `center`,
-    padding: 5,
-    gap: 2,
-  },
-  menuItemName: {
-    color: Colors.light,
-    textAlign: `right`,
-    padding: 2,
-  },
-  servingContainer: {
-    display: `flex`,
-    flexDirection: `row`,
-    justifyContent: `space-between`,
-    gap: 3,
-    padding: 5,
-  },
-  servingItemText: {
-    color: Colors.light,
-  },
-  borderLeft: {
-    borderLeftColor: Colors.light,
-    borderLeftWidth: 4,
-  },
-  divider: {
-    borderBottomColor: Colors.primary,
-    borderBottomWidth: 1,
-    width: `100%`,
-  },
-  servingDivider: {
-    width: 1,
-    backgroundColor: Colors.primary,
-  },
-});
+
 
 export default MenuItem;

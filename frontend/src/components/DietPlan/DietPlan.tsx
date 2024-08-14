@@ -10,7 +10,7 @@ import NativeIcon from "../Icon/NativeIcon";
 import FABGroup from "../ui/FABGroup";
 import MenuItemModal from "./MenuItemModal";
 import useStyles from "@/styles/useGlobalStyles";
-import { useThemeContext } from "@/themes/useAppTheme";
+import { DarkTheme, useThemeContext } from "@/themes/useAppTheme";
 
 export default function DietPlan() {
   const { handleScroll } = useHideTabBarOnScroll();
@@ -31,6 +31,9 @@ export default function DietPlan() {
     setSelectedFoodGroup(foodGroup);
   };
 
+  console.log(colors.background);
+  
+
   useEffect(() => {
     if (!currentUser) return;
 
@@ -43,42 +46,45 @@ export default function DietPlan() {
     <ScrollView
       ref={scrollRef}
       onScroll={handleScroll}
+      /* key={colors.background.backgroundColor} */
       style={[
         layout.flex1,
-        colors.background,
+        colors.backgroundSecondary,
         spacing.pdBottomBar,
-        spacing.pdStatusBar
+        spacing.pdStatusBar,
+        {backgroundColor:DarkTheme.colors.background}
       ]}
     >
       <ImageBackground source={logoBlack} className="w-screen h-[30vh]" />
 
       {dietPlan?.meals.map((meal, i) => (
-        <View key={i} style={[
+        <View key={colors.backgroundSecondaryContainer.backgroundColor+i} style={[
           layout.flexRowReverse,
           layout.itemsCenter,
           spacing.pdDefault,
           spacing.mgSm,
-          colors.backgroundSecondary,
+          colors.backgroundSecondaryContainer,
           common.rounded
-        ]}>
+        ]}
+        >
           <View style={[
             layout.itemsCenter,
             spacing.pdXs,
-            spacing.pdHorizontalXs,
             spacing.gapSm,
             common.borderLeftSm,
-            colors.borderInverseOnSurface,
+            colors.borderSecondary,
             {paddingLeft:10}
-          ]}>
+          ]} 
+          >
             <NativeIcon
               library="MaterialCommunityIcons"
               name="food-outline"
-              color={theme.colors.inverseOnSurface}
+              color={theme.colors.secondary}
               size={20}
             />
             <Text style={[
               text.textBold,
-              colors.textInverseOnSurface
+              colors.textOnBackground
             ]}>ארוחה {i + 1}</Text>
           </View>
           <MealContainer meal={meal} />

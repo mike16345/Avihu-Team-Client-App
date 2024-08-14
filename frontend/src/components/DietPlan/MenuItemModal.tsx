@@ -49,11 +49,12 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
   return (
     <CustomModal visible={isOpen} dismissable dismissableBackButton onDismiss={dismiss}>
       <ScrollView style={[
-        {backgroundColor:`black`},
+        colors.backgroundSecondaryContainer,
         spacing.pdMd,
         colors.borderPrimary,
         common.borderDefault,
-        common.roundedMd
+        common.roundedMd,
+        {height:`75%`}
       ]}>
         <View>
           <Text style={[
@@ -67,11 +68,12 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
             layout.flexRowReverse,
             layout.wrap,
             layout.justifyAround,
+            layout.itemsCenter,
             spacing.gapDefault
           ]}>
             {menuItems.map((menuItem) => (
               <View key={menuItem.name} style={{ maxWidth: `30%` }}>
-                <MenuItem menuItem={menuItem} />
+                <MenuItem menuItem={menuItem} styles={{colors,layout,spacing,text}} />
               </View>
             ))}
           </View>

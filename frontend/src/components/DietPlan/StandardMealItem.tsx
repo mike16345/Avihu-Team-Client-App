@@ -18,7 +18,7 @@ const StandardMealItem: React.FC<StandardMealItemProps> = ({ quantity, icon }) =
       spacing.gapXs
     ]}>
       {icon}
-      <Text style={colors.textInverseOnSurface}>חלבונים: {quantity}</Text>
+      <Text style={colors.textOnSecondaryContainer}>חלבונים: {quantity}</Text>
     </View>
   );
 };
