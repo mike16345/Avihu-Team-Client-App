@@ -1,69 +1,38 @@
-import { Colors } from "@/constants/Colors";
 import React from "react";
-import { Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, TouchableOpacityProps } from "react-native";
 import { DayState } from "react-native-calendars/src/types";
-import { ExtendedMarking } from "./WeightCalendar";
+import useFontSize from "@/styles/useFontSize";
+import useCalendarTheme, { ExtendedMarking } from "@/themes/useCalendarTheme";
 
-interface DayComponentProps {
+interface DayComponentProps extends TouchableOpacityProps {
   date: number;
   state: DayState;
   marking?: ExtendedMarking;
-  onPress: () => void;
-  onLongPress: () => void;
 }
 
-const DayComponent: React.FC<DayComponentProps> = ({
-  date,
-  state,
-  marking,
-  onPress,
-  onLongPress,
-}) => {
+const DayComponent: React.FC<DayComponentProps> = ({ date, state, marking, ...props }) => {
+  const dayStyles = useCalendarTheme().dayStyles;
+  const fontSize = useFontSize();
   const { weight, selected } = marking || {};
-
-  const selectedTwStyle = selected ? "  bg-primary rounded-2xl ios:overflow-hidden" : "";
 
   return (
     <TouchableOpacity
-      onPress={onPress}
-      onLongPress={onLongPress}
-      style={[styles.dayContainer, state == "today" && styles.todayContainer]}
+      {...props}
+      style={[dayStyles.dayContainer, state == "today" && dayStyles.todayContainer]}
     >
-      <Text className={`${selectedTwStyle}  `} style={[styles.dateText]}>
+      <Text
+        style={[dayStyles.dateText, selected && dayStyles.selected, fontSize.default]}
+        maxFontSizeMultiplier={1}
+      >
         {date}
       </Text>
-      {weight && <Text style={[styles.valueText]}>{weight}</Text>}
+      {weight && (
+        <Text style={[dayStyles.valueText, fontSize.md]} maxFontSizeMultiplier={1.5}>
+          {weight}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  dayContainer: {
-    alignItems: "center",
-    padding: 5,
-    backgroundColor: Colors.bgSecondary,
-    borderRadius: 5,
-  },
-
-  dateText: {
-    color: Colors.light,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  disabledText: {
-    color: Colors.dark,
-  },
-  valueText: {
-    color: Colors.primary,
-    fontWeight: "400",
-    fontSize: 12,
-  },
-  todayContainer: {
-    borderBottomWidth: 2,
-    borderBottomColor: Colors.info,
-  },
-});
 
 export default DayComponent;

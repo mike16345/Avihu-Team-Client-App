@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { Appearance } from "react-native";
-import { useTheme } from "react-native-paper";
 import {
   MD3DarkTheme as DefaultDarkTheme,
   MD3LightTheme as DefaultLightTheme,
@@ -124,16 +123,18 @@ export const DarkTheme = {
   },
 };
 
-export const useAppTheme = () => {
-  const { getColorScheme } = Appearance;
-  const getPreferredTheme = () => (getColorScheme() === "light" ? LightTheme : DarkTheme);
-  const [theme, setTheme] = useState(getPreferredTheme);
+type ThemeContextType = {
+  theme: typeof LightTheme;
+  setTheme: (theme: typeof LightTheme) => void;
+};
 
-  const memoizedTheme = useMemo(() => theme, [theme]);
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [theme, setTheme] = useState(getPreferredTheme);
 
   useEffect(() => {
     const listener = Appearance.addChangeListener(({ colorScheme }) => {
-      console.log("setting theme", colorScheme);
       setTheme(colorScheme === "light" ? LightTheme : DarkTheme);
     });
 
@@ -142,5 +143,15 @@ export const useAppTheme = () => {
     };
   }, []);
 
-  return useTheme<typeof memoizedTheme>();
+  return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
+};
+
+const getPreferredTheme = () => (Appearance.getColorScheme() === "light" ? LightTheme : DarkTheme);
+
+export const useThemeContext = (): ThemeContextType => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error("useThemeContext must be used within a ThemeProvider");
+  }
+  return context;
 };

@@ -1,33 +1,31 @@
-import { StyleSheet, Text, View } from "react-native";
+import { View } from "react-native";
 import React from "react";
+import useStyles from "@/styles/useGlobalStyles";
+import { Text } from "react-native-paper";
+import useCardStyles from "@/styles/useCardStyles";
 
-interface WeightCardProps {
-  currentWeight: number;
+interface CardProps {
+  title: string;
+  value: string | number;
+  unit: string;
+  valueStyle?: any;
 }
 
-const WeightCard: React.FC<WeightCardProps> = ({ currentWeight }) => {
+const WeightCard: React.FC<CardProps> = ({ title, value, unit, valueStyle }) => {
+  const { text, fonts, layout, spacing, colors } = useStyles();
+  const { weightCard } = useCardStyles();
+
   return (
-    <View style={styles.card}>
-      <Text className="text-white font-bold text-right ">משקל נוכחי</Text>
-      <View style={{ flexDirection: "row-reverse", alignItems: "center", gap: 3 }}>
-        <Text className="text-white text-2xl  font-bold">{currentWeight}</Text>
-        <Text style={{ color: "white", fontSize: 12 }} className="text-white">
-          ק"ג
+    <View style={weightCard}>
+      <Text style={[text.textBold, text.textRight, colors.textOnSecondaryContainer]}>{title}</Text>
+      <View style={[layout.itemsCenter, layout.wrap, layout.flexRowReverse, spacing.gapSm]}>
+        <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.xl, valueStyle]}>
+          {value}
         </Text>
+        <Text style={[colors.textOnSecondaryContainer, fonts.default]}>{unit}</Text>
       </View>
     </View>
   );
 };
 
 export default WeightCard;
-
-const styles = StyleSheet.create({
-  card: {
-    flex: 1,
-    gap: 2,
-    borderRadius: 16,
-    padding: 20,
-    height: "100%",
-    backgroundColor: "#18181b",
-  },
-});

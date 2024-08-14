@@ -82,6 +82,20 @@ class DateUtils {
     });
   }
 
+  static getLatestItem<T>(items: T[], dateKey: keyof T): T | null {
+    if (items.length === 0) return null;
+
+    return items.reduce((latestItem, currentItem) => {
+      const latestDate = new Date(latestItem[dateKey] as any);
+      const currentDate = new Date(currentItem[dateKey] as any);
+
+      if (currentDate > latestDate) {
+        return currentItem;
+      }
+      return latestItem;
+    });
+  }
+
   static extractLabels<T>(data: ItemsInDateRangeParams<T>) {
     try {
       switch (data.range) {
