@@ -1,15 +1,14 @@
-import { View, StyleSheet, useWindowDimensions } from "react-native";
+import { View, useWindowDimensions } from "react-native";
 import { FC, useEffect, useState } from "react";
 import { LineChart } from "react-native-chart-kit";
 import { IWeighIn } from "@/interfaces/User";
 import { ItemsInDateRangeParams, DateRanges } from "@/types/dateTypes";
 import DateUtils from "@/utils/dateUtils";
-import { Colors } from "@/constants/Colors";
-import WeightCard from "./WeightCard";
 import WeeklyScoreCard from "./WeeklyScoreCard";
-import AddWeight from "./AddWeight";
 import ChangeRangeBtns from "./ChangeRangeBtns";
-import { useWeighInApi } from "@/hooks/useWeighInApi";
+import useGraphTheme from "@/themes/useGraphTheme";
+import useStyles from "@/styles/useGlobalStyles";
+import CurrentWeightCard from "./CurrentWeightCard";
 
 const rangeParams: ItemsInDateRangeParams<IWeighIn> = {
   items: [],
@@ -23,13 +22,17 @@ interface WeightGraphProps {
 }
 
 export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
-  const { width } = useWindowDimensions();
-  const { addWeighIn } = useWeighInApi();
+  const { layout, colors, spacing } = useStyles();
+
+  const { width, height } = useWindowDimensions();
 
   const [selectedWeight, setSelectedWeight] = useState<number | null>(null);
   const [currentRange, setCurrentRange] = useState<DateRanges>("weeks");
-  const [userWeighIns, setUserWeighIns] = useState<IWeighIn[]>([]);
   const [weights, setWeights] = useState<number[]>([]);
+
+  const graphTheme = useGraphTheme(weights);
+
+  const currentWeight = selectedWeight || DateUtils.getLatestItem(weighIns, "date")?.weight;
 
   const hidePointsAtIndex = () => {
     if (weights.length < 100) return;
@@ -54,21 +57,7 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
     const weights = extractWeights(newWeighIns);
 
     setWeights(weights);
-    setUserWeighIns(newWeighIns);
     setCurrentRange(range);
-  };
-
-  const handleSaveNewWeighIn = (newWeighIn: IWeighIn) => {
-    addWeighIn("665f0b0b00b1a04e8f1c4478", newWeighIn)
-      .then((res) => {
-        const updatedWeighIns = res.weighIns;
-        const newWeighIns = DateUtils.getItemsInRange({ ...rangeParams, items: updatedWeighIns });
-        const weights = extractWeights(newWeighIns);
-
-        setUserWeighIns(newWeighIns);
-        setWeights(weights);
-      })
-      .catch((err) => console.log("err", err));
   };
 
   function extractWeights(items: IWeighIn[]) {
@@ -76,87 +65,60 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
   }
 
   useEffect(() => {
-    try {
-      const weighInsInRange = DateUtils.getItemsInRange({ ...rangeParams, items: weighIns });
-      const weights = extractWeights(weighInsInRange);
+    const weighInsInRange = DateUtils.getItemsInRange({ ...rangeParams, items: weighIns });
+    const weights = extractWeights(weighInsInRange);
 
-      setUserWeighIns(weighInsInRange);
-      setWeights(weights);
-    } catch (err) {}
+    setWeights(weights);
   }, [weighIns]);
 
   return (
-    <View style={[styles.container, { width: width - 4 }]}>
-      <View style={styles.weightContainer}>
-        <LineChart
-          data={{
-            labels: DateUtils.extractLabels({
-              ...rangeParams,
-              items: weighIns,
-              range: currentRange,
-            }),
-            datasets: [
-              {
-                data: weights.length > 0 ? weights : [0],
-                strokeWidth: 2,
-              },
-            ],
-            legend: ["מעקב שקילה"],
-          }}
-          hidePointsAtIndex={hidePointsAtIndex()}
-          width={width - 15}
-          height={220}
-          onDataPointClick={({ value }) => {
-            setSelectedWeight(value);
-          }}
-          chartConfig={{
-            backgroundColor: Colors.bgSecondary,
-            backgroundGradientFrom: Colors.bgSecondary,
-            backgroundGradientTo: Colors.bgSecondary,
-
-            decimalPlaces: 2,
-            color: (opacity = 1) => `rgba(16, 185, 129, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(256, 256, 256, ${opacity})`,
-            style: {
-              borderRadius: 16,
-            },
-            propsForLabels: {
-              fontSize: 12,
-              fontWeight: "bold",
-              fontFamily: "sans-serif-light",
-            },
-
-            propsForDots: {
-              r: weights.length > 35 ? "2" : "4",
-              strokeWidth: weights.length > 35 ? "0.5" : "1",
-              stroke: "#fff",
-            },
-          }}
-          withInnerLines={false}
-          withOuterLines={false}
-          style={{
-            borderRadius: 12,
-            padding: 4,
-          }}
-        />
-        <ChangeRangeBtns onRangeChange={handleRangeChange} />
-        <View style={{ height: 120 }} className="flex-row items-center justify-between  gap-4">
-          <WeightCard currentWeight={selectedWeight || weights[weights.length - 1]} />
-          <WeeklyScoreCard weights={weights} range={currentRange} />
+    <>
+      <View style={[layout.container, layout.sizeFull, layout.center, { width: width - 4 }]}>
+        <View style={spacing.gapMd}>
+          <LineChart
+            data={{
+              labels: DateUtils.extractLabels({
+                ...rangeParams,
+                items: weighIns,
+                range: currentRange,
+              }),
+              datasets: [
+                {
+                  data: weights.length > 0 ? weights : [0],
+                  strokeWidth: 2,
+                  color: (_: number) => colors.textPrimary.color,
+                },
+              ],
+              legend: ["מעקב שקילה"],
+            }}
+            hidePointsAtIndex={hidePointsAtIndex()}
+            width={width - 20}
+            height={220}
+            onDataPointClick={({ value }) => {
+              setSelectedWeight(value);
+            }}
+            chartConfig={graphTheme}
+            withInnerLines={false}
+            withOuterLines={false}
+            style={{
+              borderRadius: 12,
+              padding: 4,
+            }}
+          />
+          <ChangeRangeBtns onRangeChange={handleRangeChange} />
+          <View
+            style={[
+              spacing.gapLg,
+              layout.flexRow,
+              spacing.pdHorizontalSm,
+              { minHeight: 100, flexShrink: 0 },
+            ]}
+          >
+            <CurrentWeightCard currentWeight={currentWeight || 0} />
+            <WeeklyScoreCard weights={weights} range={currentRange} />
+          </View>
         </View>
       </View>
-      <AddWeight onSave={handleSaveNewWeighIn} />
-    </View>
+    </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    gap: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  weightContainer: {
-    gap: 12,
-  },
-});

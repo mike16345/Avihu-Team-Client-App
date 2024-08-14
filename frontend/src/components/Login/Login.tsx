@@ -5,18 +5,13 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
 } from "react-native";
 import React, { useState } from "react";
 import avihuBg from "@assets/avihuFlyTrap.jpeg";
 import { testEmail } from "@/utils/utils";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { Button, Text, TextInput, useTheme } from "react-native-paper";
-import useTextStyles from "@/styles/useTextStyles";
-import { useAppTheme } from "@/themes/useAppTheme";
-import useFontSize from "@/styles/useFontSize";
-import { useLayoutStyles } from "@/styles/useLayoutStyles";
-import useCommonStyles from "@/styles/useCommonStyles";
+import { Button, Text, TextInput } from "react-native-paper";
+import useStyles from "@/styles/useGlobalStyles";
 
 interface IUserCredentials {
   email: string;
@@ -33,11 +28,7 @@ interface ILoginProps {
 }
 
 export default function Login({ setIsLoggedIn }: ILoginProps) {
-  const theme = useAppTheme();
-  const textStyles = useTextStyles();
-  const fontSize = useFontSize();
-  const layoutStyles = useLayoutStyles();
-  const commonStyles = useCommonStyles();
+  const { text, colors, fonts, layout, spacing } = useStyles();
 
   const hardcodedUser: IUserCredentials = {
     email: `avihu123@gmail.com`,
@@ -85,23 +76,15 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     }
   };
 
-  console.log("theme colors", theme.colors.onPrimary);
   return (
-    <View style={[layoutStyles.fullSize, layoutStyles.center]}>
+    <View style={[layout.sizeFull, layout.center]}>
       <ImageBackground source={avihuBg} className="w-full h-full flex-2 absolute z-0" />
-      <View className=" w-full h-full absolute top-0 left-0 bg-black opacity-55 z-10"></View>
+      <View className=" w-full h-full absolute top-0 left-0 bg-black opacity-40 z-10"></View>
       <KeyboardAvoidingView behavior="padding" className=" items-center z-30">
-        <Text
-          style={[
-            textStyles.textPrimary,
-            textStyles.textBold,
-            commonStyles.paddingLarge,
-            fontSize.xxl,
-          ]}
-        >
+        <Text style={[colors.textPrimary, text.textBold, spacing.pdLg, fonts.xxxl]}>
           כניסה לחשבון
         </Text>
-        <View className=" w-80">
+        <View className=" w-80 gap-2 ">
           <View>
             <TextInput
               style={{ width: "100%" }}
@@ -117,7 +100,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
                 })
               }
             />
-            <Text style={textStyles.textDanger}>{formErrors.email}</Text>
+            <Text style={[text.textDanger, text.textRight]}>{formErrors.email}</Text>
           </View>
           <View>
             <TextInput
@@ -134,19 +117,13 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
                 />
               }
             />
-            <Text style={textStyles.textDanger}>{formErrors.password}</Text>
+            <Text style={[text.textDanger, text.textRight]}>{formErrors.password}</Text>
           </View>
-          <TouchableOpacity style={layoutStyles.fullWidth}>
-            <Text style={[textStyles.textRight, textStyles.textPrimary, textStyles.textUnderline]}>
-              הרשמה
-            </Text>
+          <TouchableOpacity>
+            <Text style={[text.textRight, text.textPrimary, text.textUnderline]}>הרשמה</Text>
           </TouchableOpacity>
         </View>
-        <Button
-          style={{ backgroundColor: theme.colors.primary }}
-          mode="contained"
-          onPress={handleSubmit}
-        >
+        <Button mode="contained" onPress={handleSubmit}>
           התחברות
         </Button>
         {didSucceed ? (
@@ -158,10 +135,3 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  registerBtn: {
-    textAlign: "right",
-    textDecorationLine: "underline",
-  },
-});

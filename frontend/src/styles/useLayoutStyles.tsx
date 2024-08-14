@@ -10,20 +10,14 @@ export const useLayoutStyles = () => {
       justifyContent: "center",
       alignItems: "center",
     },
-    row: {
-      flexDirection: "row",
+    direction: {
+      direction: "inherit",
     },
-    column: {
-      flexDirection: "column",
+    rtl: {
+      direction: "rtl",
     },
-    spaceBetween: {
-      justifyContent: "space-between",
-    },
-    spaceAround: {
-      justifyContent: "space-around",
-    },
-    spaceEvenly: {
-      justifyContent: "space-evenly",
+    ltr: {
+      direction: "ltr",
     },
     wrap: {
       flexWrap: "wrap",
@@ -31,38 +25,59 @@ export const useLayoutStyles = () => {
     noWrap: {
       flexWrap: "nowrap",
     },
-    fullWidth: {
+    widthFull: {
       width: "100%",
     },
-    fullHeight: {
+    heightFull: {
       height: "100%",
     },
-    fullSize: {
+    sizeFull: {
       width: "100%",
       height: "100%",
     },
     flex1: {
       flex: 1,
     },
+    flexGrow: {
+      flexGrow: 1,
+    },
     flexRow: {
       flexDirection: "row",
+    },
+    flexRowReverse: {
+      flexDirection: "row-reverse",
+    },
+    flexColumnReverse: {
+      flexDirection: "column-reverse",
     },
     flexColumn: {
       flexDirection: "column",
     },
-    justifyContentCenter: {
+    justifyStart: {
+      justifyContent: "flex-start",
+    },
+    justifyEnd: {
+      justifyContent: "flex-end",
+    },
+    justifyAround: {
+      justifyContent: "space-around",
+    },
+    justifyEvenly: {
+      justifyContent: "space-evenly",
+    },
+    justifyCenter: {
       justifyContent: "center",
     },
-    justifyContentBetween: {
+    justifyBetween: {
       justifyContent: "space-between",
     },
-    alignItemsCenter: {
+    itemsCenter: {
       alignItems: "center",
     },
-    alignItemsStart: {
+    itemsStart: {
       alignItems: "flex-start",
     },
-    alignItemsEnd: {
+    itemsEnd: {
       alignItems: "flex-end",
     },
   });

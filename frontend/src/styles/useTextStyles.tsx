@@ -1,8 +1,8 @@
-import { useAppTheme } from "@/themes/useAppTheme";
+import { useThemeContext } from "@/themes/useAppTheme";
 import { StyleSheet } from "react-native";
 
 const useTextStyles = () => {
-  const theme = useAppTheme();
+  const { theme } = useThemeContext();
 
   const textStyles = StyleSheet.create({
     textRight: {
@@ -38,14 +38,8 @@ const useTextStyles = () => {
     textSecondary: {
       color: theme.colors.secondary,
     },
-    textSuccess: {
-      color: theme.colors.tertiary,
-    },
     textDanger: {
       color: theme.colors.error,
-    },
-    textWarning: {
-      color: theme.colors.warning,
     },
     textInfo: {
       color: theme.colors.info,
