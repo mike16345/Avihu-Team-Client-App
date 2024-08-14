@@ -1,22 +1,17 @@
 import { Colors } from "@/constants/Colors";
-import { IExercise, IWorkout } from "@/interfaces/Workout";
+import { IExercise } from "@/interfaces/Workout";
 import { FC, useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Button from "@/components/Button/Button";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
 import RecordWorkout from "./RecordWorkout";
 import Divider from "../ui/Divider";
+import { extractVideoId, getYouTubeThumbnail } from "@/utils/utils";
+import SetContainer from "./SetContainer";
 
 interface WorkoutProps {
   workout: IExercise;
 }
-const extractVideoId = (url: string) => {
-  return url.split("v=")[1].split("&")[0];
-};
-
-const getYouTubeThumbnail = (id: string) => {
-  return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
-};
 
 const Workout: FC<WorkoutProps> = ({ workout }) => {
   const videoId = extractVideoId(workout.linkToVideo!);
@@ -24,13 +19,13 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [openRecordWorkout, setOpenRecordWorkout] = useState(false);
-  const [currentSet,setCurrentSet]=useState(workout.sets[0])
-  const [currentSetNumber,setCurrentSetNumber]=useState(workout.sets.indexOf(currentSet)+1)
+  const [currentSet, setCurrentSet] = useState(workout.sets[0]);
+  const [currentSetNumber, setCurrentSetNumber] = useState(workout.sets.indexOf(currentSet) + 1);
 
-  useEffect(()=>{
-    setCurrentSet(workout.sets[0])
-    setCurrentSetNumber(1)
-  },[workout])
+  useEffect(() => {
+    setCurrentSet(workout.sets[0]);
+    setCurrentSetNumber(1);
+  }, [workout]);
 
   return (
     <View style={styles.workoutContainer}>
@@ -47,17 +42,10 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
       <View style={styles.workoutDescriptionContainer}>
         <Text style={styles.workoutTitle}>{workout.name}</Text>
         <View style={styles.workoutInfoContainer}>
-          <View style={styles.setsContainer}>
-            <Text style={styles.set}>סט:{currentSetNumber}</Text>
-            <View style={styles.RepsContainer}>
-              <Text style={styles.set}>חזרות:</Text>
-              <Text style={styles.set}>מינ:{currentSet.minReps}</Text>
-              <Text style={styles.set}>מקס:{currentSet.minReps}</Text>
-            </View>
-          </View>
-          
+          <SetContainer currentSet={currentSet} currentSetNumber={currentSetNumber} />
+
           <Button
-            textProps={{ style: styles.recordBtnText}}
+            textProps={{ style: styles.recordBtnText }}
             style={styles.recordWorkoutBtn}
             onPress={() => setOpenRecordWorkout(true)}
           >
@@ -67,7 +55,7 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
       </View>
       <RecordWorkout
         workoutName={workout.name}
-        setNumber={currentSetNumber} 
+        setNumber={currentSetNumber}
         isOpen={openRecordWorkout}
         setIsOpen={setOpenRecordWorkout}
       />
@@ -85,7 +73,7 @@ export default Workout;
 
 const styles = StyleSheet.create({
   workoutContainer: {
-    direction:`ltr`,
+    direction: `ltr`,
     display: "flex",
     flexDirection: "row-reverse",
     alignItems: "center",
@@ -93,7 +81,7 @@ const styles = StyleSheet.create({
     height: 100,
     backgroundColor: Colors.bgSecondary,
     padding: 2,
-    margin:5,
+    margin: 5,
     borderRadius: 10,
     justifyContent: "space-between",
   },
@@ -120,15 +108,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  setsContainer:{
-    flexDirection:"column",
-    alignItems:`flex-end`,
-    gap:5
+  setsContainer: {
+    flexDirection: "column",
+    alignItems: `flex-end`,
+    gap: 5,
   },
-  RepsContainer:{
-    flexDirection:`row-reverse`,
-    justifyContent:`space-around`,
-    gap:8
+  RepsContainer: {
+    flexDirection: `row-reverse`,
+    justifyContent: `space-around`,
+    gap: 8,
   },
   recordWorkoutBtn: {
     backgroundColor: Colors.primary,

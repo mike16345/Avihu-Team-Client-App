@@ -1,11 +1,5 @@
 import { WorkoutType } from "@/enums/WorkoutTypes";
 
-export interface ISet {
-  minReps: number;
-  maxReps?: number;
-  restTime: number;
-}
-
 export interface IWorkout {
   id: string;
   tipFromTrainer?: string;
@@ -13,8 +7,6 @@ export interface IWorkout {
   name: string;
   sets: ISet[];
 }
-
-
 
 export interface IDetailedWorkoutPlan extends IWorkoutPlan {
   [WorkoutType.CHEST]: IWorkoutPlan[];
