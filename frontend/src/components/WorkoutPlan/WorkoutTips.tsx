@@ -34,7 +34,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ openTips, setOpenTips }) => {
           color={"white"}
         />
       </View>
-        <Text style={styles.title}>דגשים לאימון</Text>
+      <Text style={styles.title}>דגשים לאימון</Text>
       <FlatList
         renderItem={({ item, index }) => (
           <Text style={styles.tip}>
@@ -53,23 +53,23 @@ export default WorkoutTips;
 const styles = StyleSheet.create({
   centeredView: {
     backgroundColor: Colors.darkLight,
-    height:'40%',
-    top:'20%',
-    padding:12,
-    borderRadius:'20px'
+    height: "40%",
+    top: "20%",
+    padding: 12,
+    borderRadius: 20,
   },
-  icon:{
-    display:"flex",
-    alignItems:"flex-end",
-    paddingBottom:20,
-    paddingRight:10
+  icon: {
+    display: "flex",
+    alignItems: "flex-end",
+    paddingBottom: 20,
+    paddingRight: 10,
   },
   title: {
     color: Colors.primary,
     fontSize: 20,
     fontWeight: "600",
-    textAlign:"right",
-    paddingVertical:15
+    textAlign: "right",
+    paddingVertical: 15,
   },
   tip: {
     ...Platform.select({

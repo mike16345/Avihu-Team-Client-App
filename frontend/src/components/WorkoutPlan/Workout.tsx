@@ -8,6 +8,7 @@ import RecordWorkout from "./RecordWorkout";
 import Divider from "../ui/Divider";
 import { extractVideoId, getYouTubeThumbnail } from "@/utils/utils";
 import SetContainer from "./SetContainer";
+import useStyles from "@/styles/useGlobalStyles";
 
 interface WorkoutProps {
   workout: IExercise;
@@ -16,6 +17,8 @@ interface WorkoutProps {
 const Workout: FC<WorkoutProps> = ({ workout }) => {
   const videoId = extractVideoId(workout.linkToVideo!);
   const thumbnail = getYouTubeThumbnail(videoId);
+
+  const { layout } = useStyles();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [openRecordWorkout, setOpenRecordWorkout] = useState(false);
@@ -29,14 +32,8 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
 
   return (
     <View style={styles.workoutContainer}>
-      <Button
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        onPress={() => setModalVisible(true)}
-      >
-        <Image source={{ uri: thumbnail }} borderRadius={2} style={styles.thumbnail} />
+      <Button style={layout.center} onPress={() => setModalVisible(true)}>
+        <Image source={{ uri: thumbnail }} style={styles.thumbnail} />
       </Button>
       <Divider orientation="vertical" />
       <View style={styles.workoutDescriptionContainer}>
@@ -129,10 +126,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   thumbnail: {
-    width: 95,
-    height: 90,
-    resizeMode: "cover",
-    marginLeft: 8,
+    width: 105,
+    height: "100%",
+    resizeMode: "stretch",
+    marginLeft: 4,
   },
   modalView: {
     margin: 20,

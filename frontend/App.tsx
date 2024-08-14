@@ -9,7 +9,7 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useUserStore } from "@/store/userStore";
-import { useUserApi } from "@/hooks/useUserApi";
+import { useUserApi } from "@/hooks/api/useUserApi";
 import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
 import {
   LightTheme as CustomLightTheme,

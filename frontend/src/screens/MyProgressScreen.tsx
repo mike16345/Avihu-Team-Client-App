@@ -3,7 +3,7 @@ import FABGroup from "@/components/ui/FABGroup";
 import { WeightGraph } from "@/components/WeightGraph/WeightGraph";
 import WeightInputModal from "@/components/WeightGraph/WeightInputModal";
 import { DEFAULT_INITIAL_WEIGHT, DEFAULT_MESSAGE_TO_TRAINER } from "@/constants/Constants";
-import { useWeighInApi } from "@/hooks/useWeighInApi";
+import { useWeighInApi } from "@/hooks/api/useWeighInApi";
 import { IWeighIn, IWeighInPost } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
 import useStyles from "@/styles/useGlobalStyles";
