@@ -1,67 +1,122 @@
 import { IMeal } from "@/interfaces/DietPlan";
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View } from "react-native";
 import CustomInstructionsContainer from "./CustomInstructionsContainer";
 import StandardMealItem from "./StandardMealItem";
+import NativeIcon from "../Icon/NativeIcon";
+import useStyles from "@/styles/useGlobalStyles";
+import { useThemeContext } from "@/themes/useAppTheme";
 
 interface MealContainerProps {
   meal: IMeal;
 }
 
 const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
+
+  const {layout, spacing,}=useStyles()
+  const {theme}=useThemeContext()
+
   const { totalCarbs, totalProtein, totalFats, totalVeggies } = meal;
   return (
-    <View style={styles.mealItemsContainer}>
+    <View style={[
+      layout.rtl,
+      layout.flexRow,
+      layout.justifyStart,
+      layout.wrap,
+      spacing.gapDefault,
+      spacing.pdDefault,
+      {
+        width:`80%`
+      },
+
+    ]}>
       {totalProtein.customInstructions && totalProtein.customInstructions[0] ? (
         <CustomInstructionsContainer
           customInstructions={totalProtein.customInstructions}
-          icon="fish"
+          icon={
+            <NativeIcon 
+              library="MaterialCommunityIcons" 
+              name='fish' 
+              size={20} 
+              color={theme.colors.primary} 
+            />
+          }
           foodGroup="חלבונים"
         />
       ) : (
         totalProtein &&
         totalProtein.quantity > 0 && (
-          <StandardMealItem iconName="fish" quantity={totalProtein.quantity} />
+          <StandardMealItem 
+            icon={
+                <NativeIcon
+                  library="MaterialCommunityIcons"
+                  name='fish'
+                  size={20}
+                  color={theme.colors.primary}
+                />
+              } 
+            quantity={totalProtein.quantity} />
         )
       )}
 
       {totalCarbs.customInstructions && totalCarbs.customInstructions[0] ? (
         <CustomInstructionsContainer
           customInstructions={totalCarbs.customInstructions}
-          icon="baguette"
+          icon={
+            <NativeIcon 
+              library="MaterialCommunityIcons" 
+              name='baguette' 
+              size={20} 
+              color={theme.colors.primary} 
+            />
+          }
           foodGroup="פחמימות"
         />
       ) : (
         totalCarbs.quantity > 0 && (
-          <StandardMealItem iconName="baguette" quantity={totalCarbs.quantity} />
+          <StandardMealItem 
+            icon={
+               <NativeIcon
+                  library="MaterialCommunityIcons"
+                  name='baguette'
+                  size={20}
+                  color={theme.colors.primary}
+                />
+            }
+            quantity={totalCarbs.quantity} 
+          />
         )
       )}
       {totalFats && totalFats.quantity > 0 && (
-        <StandardMealItem iconName="cheese" quantity={totalFats.quantity} />
+        <StandardMealItem 
+          icon={
+             <NativeIcon
+                  library="MaterialCommunityIcons"
+                  name='cheese'
+                  size={20}
+                  color={theme.colors.primary}
+                />
+          }
+          quantity={totalFats.quantity} 
+        />
       )}
       {totalVeggies && totalVeggies?.quantity > 0 && (
-        <StandardMealItem iconName="leaf" quantity={totalVeggies.quantity} />
+        <StandardMealItem 
+          icon={
+             <NativeIcon
+                  library="MaterialCommunityIcons"
+                  name='leaf'
+                  size={20}
+                  color={theme.colors.primary}
+                />
+          }
+          quantity={totalVeggies.quantity} 
+        />
       )}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  mealItemsContainer: {
-    direction: "rtl",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    flexWrap: `wrap`,
-    gap: 8,
-    width: "80%",
-    padding: 10,
-  },
-  mealCol: {
-    display: `flex`,
-    alignItems: `flex-start`,
-    justifyContent: `flex-end`,
-  },
-});
+
 
 export default MealContainer;

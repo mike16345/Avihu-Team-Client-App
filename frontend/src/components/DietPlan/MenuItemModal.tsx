@@ -1,11 +1,11 @@
-import { Colors } from "@/constants/Colors";
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { CustomModal } from "../ui/Modal";
 import useFontSize from "@/styles/useFontSize";
 import useMenuItemApi from "@/hooks/useMenuItemApi";
 import { IMenuItem } from "@/interfaces/DietPlan";
 import MenuItem from "./MenuItem";
+import useStyles from "@/styles/useGlobalStyles";
 
 interface MenuItemModalProps {
   isOpen: boolean;
@@ -15,29 +15,31 @@ interface MenuItemModalProps {
 
 const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismiss }) => {
   const { xl } = useFontSize();
+  const {colors,common,layout,spacing,text}=useStyles()
   const { getMenuItems } = useMenuItemApi();
 
   const [menuItems, setMenuItems] = useState<IMenuItem[]>([]);
-  const [title, setTitle] = useState<string | null>(null);
 
-  const changeTitle = (foodGroup: string) => {
-    let title: string;
-    if (foodGroup === `protein`) {
-      title = `חלבונים`;
-    } else if (foodGroup === `carbs`) {
-      title = `פחמימות`;
-    } else if (foodGroup === `vegetables`) {
-      title = `ירקות`;
-    } else {
-      title = `שומנים`;
+  const changeTitle= (foodGroup: string) => {
+
+    switch (foodGroup) {
+      case 'protein':
+        
+        return 'חלבונים';
+      case 'carbs':
+        
+        return 'פחמימות';
+      case 'vegetables':
+        
+        return 'ירקות';
+      case `fats`:
+        
+        return 'שומנים';
     }
-
-    setTitle(title);
   };
 
   useEffect(() => {
     if (!foodGroup) return;
-    changeTitle(foodGroup);
 
     getMenuItems(foodGroup)
       .then((res) => setMenuItems(res))
@@ -46,10 +48,27 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
 
   return (
     <CustomModal visible={isOpen} dismissable dismissableBackButton onDismiss={dismiss}>
-      <ScrollView style={styles.modal}>
+      <ScrollView style={[
+        {backgroundColor:`black`},
+        spacing.pdMd,
+        colors.borderPrimary,
+        common.borderDefault,
+        common.roundedMd
+      ]}>
         <View>
-          <Text style={[styles.modalHeader, xl]}>{title}</Text>
-          <View style={styles.menuItemContainer}>
+          <Text style={[
+            xl,
+            text.textCenter,
+            text.textBold,
+            colors.textPrimary,
+            spacing.pdMd
+          ]}>{changeTitle(foodGroup||``)}</Text>
+          <View style={[
+            layout.flexRowReverse,
+            layout.wrap,
+            layout.justifyAround,
+            spacing.gapDefault
+          ]}>
             {menuItems.map((menuItem) => (
               <View key={menuItem.name} style={{ maxWidth: `30%` }}>
                 <MenuItem menuItem={menuItem} />
@@ -62,28 +81,6 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
   );
 };
 
-const styles = StyleSheet.create({
-  modal: {
-    height: `80%`,
-    backgroundColor: Colors.bgSecondary,
-    padding: 10,
-    borderRadius: 20,
-    borderColor: Colors.primary,
-    borderWidth: 2,
-  },
-  modalHeader: {
-    color: Colors.primary,
-    textAlign: `center`,
-    fontWeight: `bold`,
-    padding: 10,
-  },
-  menuItemContainer: {
-    display: `flex`,
-    flexDirection: `row-reverse`,
-    justifyContent: `space-around`,
-    gap: 10,
-    flexWrap: `wrap`,
-  },
-});
+
 
 export default MenuItemModal;

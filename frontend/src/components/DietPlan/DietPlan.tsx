@@ -1,4 +1,4 @@
-import { View, ImageBackground, ScrollView, Text, StyleSheet } from "react-native";
+import { View, ImageBackground, ScrollView, Text,  } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import logoBlack from "../../../assets/images/avihu-logo-black.png";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
@@ -6,15 +6,18 @@ import { useDietPlanApi } from "@/hooks/useDietPlanApi";
 import { useUserStore } from "@/store/userStore";
 import { IDietPlan } from "@/interfaces/DietPlan";
 import MealContainer from "./MealContainer";
-import { Colors } from "@/constants/Colors";
 import NativeIcon from "../Icon/NativeIcon";
 import FABGroup from "../ui/FABGroup";
 import MenuItemModal from "./MenuItemModal";
+import useStyles from "@/styles/useGlobalStyles";
+import { useThemeContext } from "@/themes/useAppTheme";
 
 export default function DietPlan() {
   const { handleScroll } = useHideTabBarOnScroll();
   const currentUser = useUserStore((state) => state.currentUser);
   const { getDietPlanByUserId } = useDietPlanApi();
+  const {layout, spacing, colors,common,text}=useStyles()
+  const {theme}=useThemeContext()
 
   const [dietPlan, setDietPlan] = useState<IDietPlan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,20 +43,43 @@ export default function DietPlan() {
     <ScrollView
       ref={scrollRef}
       onScroll={handleScroll}
-      className="w-screen h-screen flex-1 bg-black  relative"
+      style={[
+        layout.flex1,
+        colors.background,
+        spacing.pdBottomBar,
+        spacing.pdStatusBar
+      ]}
     >
       <ImageBackground source={logoBlack} className="w-screen h-[30vh]" />
 
       {dietPlan?.meals.map((meal, i) => (
-        <View key={i} style={styles.meal}>
-          <View style={styles.mealIcon}>
+        <View key={i} style={[
+          layout.flexRowReverse,
+          layout.itemsCenter,
+          spacing.pdDefault,
+          spacing.mgSm,
+          colors.backgroundSecondary,
+          common.rounded
+        ]}>
+          <View style={[
+            layout.itemsCenter,
+            spacing.pdXs,
+            spacing.pdHorizontalXs,
+            spacing.gapSm,
+            common.borderLeftSm,
+            colors.borderInverseOnSurface,
+            {paddingLeft:10}
+          ]}>
             <NativeIcon
               library="MaterialCommunityIcons"
               name="food-outline"
-              color={Colors.light}
+              color={theme.colors.inverseOnSurface}
               size={20}
             />
-            <Text style={styles.mealTitle}>ארוחה {i + 1}</Text>
+            <Text style={[
+              text.textBold,
+              colors.textInverseOnSurface
+            ]}>ארוחה {i + 1}</Text>
           </View>
           <MealContainer meal={meal} />
         </View>
@@ -65,10 +91,11 @@ export default function DietPlan() {
         dismiss={() => setIsModalOpen(false)}
       />
       <FABGroup
-        style={{ bottom: 100 }}
         open={isFabOpen}
         visible
+        variant="primary"
         icon={isFabOpen ? `close` : `food-outline`}
+        onStateChange={({ open }) => setIsFabOpen(open)}
         actions={[
           {
             icon: "fish",
@@ -91,34 +118,8 @@ export default function DietPlan() {
             onPress: () => displayMenuItems(`vegetables`),
           },
         ]}
-        onStateChange={({ open }) => setIsFabOpen(open)}
       />
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  meal: {
-    backgroundColor: Colors.darkLight,
-    padding: 10,
-    margin: 7,
-    borderRadius: 10,
-    display: `flex`,
-    flexDirection: `row-reverse`,
-    alignItems: `center`,
-  },
-  mealIcon: {
-    display: `flex`,
-    justifyContent: `center`,
-    alignItems: `center`,
-    padding: 5,
-    paddingLeft: 10,
-    borderLeftColor: Colors.light,
-    borderLeftWidth: 2,
-    gap: 5,
-  },
-  mealTitle: {
-    color: Colors.light,
-    fontWeight: "bold",
-  },
-});

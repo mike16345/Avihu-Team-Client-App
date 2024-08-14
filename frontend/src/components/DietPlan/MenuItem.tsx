@@ -1,6 +1,8 @@
 import { Colors } from "@/constants/Colors";
 import { IMenuItem } from "@/interfaces/DietPlan";
 import useFontSize from "@/styles/useFontSize";
+import useStyles from "@/styles/useGlobalStyles";
+import { useLayoutStyles } from "@/styles/useLayoutStyles";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -10,6 +12,7 @@ interface MenuItemProps {
 
 const MenuItem: React.FC<MenuItemProps> = ({ menuItem }) => {
   const { xsm } = useFontSize();
+  const {itemsCenter}=useLayoutStyles();
 
   return (
     <View style={styles.menuItemContainer}>
