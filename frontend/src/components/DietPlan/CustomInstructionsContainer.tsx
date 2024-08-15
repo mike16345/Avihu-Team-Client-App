@@ -6,7 +6,7 @@ import useStyles from "@/styles/useGlobalStyles";
 interface CustomInstructionsContainerProps {
   customInstructions: ICustomItemInstructions[];
   icon: JSX.Element;
-  foodGroup: string;
+  foodGroup?: string;
 }
 
 const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = ({

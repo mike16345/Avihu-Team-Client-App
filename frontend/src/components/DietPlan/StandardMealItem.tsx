@@ -5,9 +5,10 @@ import useStyles from "@/styles/useGlobalStyles";
 interface StandardMealItemProps {
   quantity: number;
   icon: JSX.Element;
+  foodGroup?:string
 }
 
-const StandardMealItem: React.FC<StandardMealItemProps> = ({ quantity, icon }) => {
+const StandardMealItem: React.FC<StandardMealItemProps> = ({ quantity, icon, foodGroup }) => {
   const {colors,layout,spacing}=useStyles();
 
   return (
@@ -18,7 +19,7 @@ const StandardMealItem: React.FC<StandardMealItemProps> = ({ quantity, icon }) =
       spacing.gapXs
     ]}>
       {icon}
-      <Text style={colors.textOnSecondaryContainer}>חלבונים: {quantity}</Text>
+      <Text style={colors.textOnSecondaryContainer}>{foodGroup}: {quantity}</Text>
     </View>
   );
 };

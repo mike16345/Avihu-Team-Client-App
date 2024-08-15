@@ -13,11 +13,46 @@ interface MealContainerProps {
 
 const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
 
-  const {layout, spacing,}=useStyles()
-  const {theme}=useThemeContext()
+  const { layout, spacing, } = useStyles()
+  const { theme } = useThemeContext()
 
-  const mealItems=Object.values(meal)
+  const mealItems = Object.entries(meal)
+
+  const getIcon=(key:string)=>{
+    switch (key) {
+      case `totalProtein`:
+        return `fish`
+    
+      case `totalCarbs`:
+        return `baguette`
+    
+      case `totalFats`:
+        return `cheese`
+    
+      case `totalVeggies`:
+        return `leaf`
+
+      default:
+         return `food-takeout-box-outline`;
+    }
+  }
+  const getName=(key:string)=>{
+    switch (key) {
+      case `totalProtein`:
+        return `חלבונים`
+      
+      case `totalCarbs`:
+        return `פחמימות`
+    
+      case `totalFats`:
+        return `שומנים`
+    
+      case `totalVeggies`:
+        return `ירקות`
+    }
+  }
   
+
   return (
     <View style={[
       layout.rtl,
@@ -27,41 +62,43 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
       spacing.gapDefault,
       spacing.pdDefault,
       {
-        width:`80%`
+        width: `80%`
       },
 
     ]}>
-      {mealItems.map(mealItem => 
-  mealItem.customInstructions && mealItem.customInstructions[0] ? (
-    <CustomInstructionsContainer
-      key={mealItem._id} 
-      customInstructions={mealItem.customInstructions}
-      icon={
-        <NativeIcon 
-          library="MaterialCommunityIcons" 
-          name="fish" 
-          size={20} 
-          color={theme.colors.primary} 
-        />
-      }
-      foodGroup='חלבונים'
-    />
-  ) : mealItem.quantity > 0 ? (
-    <StandardMealItem 
-      key={mealItem._id} 
-      icon={
-        <NativeIcon
-          library="MaterialCommunityIcons"
-          name="fish"
-          size={20}
-          color={theme.colors.primary}
-        />
-      } 
-      quantity={mealItem.quantity} 
-    />
-  ) 
-  : null
-)}
+     {mealItems.map(mealItem => (
+  <React.Fragment key={mealItem[1]._id}>
+    {mealItem[1].customInstructions && mealItem[1].customInstructions.length>0 && (
+      <CustomInstructionsContainer
+        customInstructions={mealItem[1].customInstructions}
+        icon={
+          <NativeIcon
+            library="MaterialCommunityIcons"
+            name={getIcon(mealItem[0])}
+            size={20}
+            color={theme.colors.primary}
+          />
+        }
+        foodGroup={getName(mealItem[0])}
+      />
+    )}
+    
+    {mealItem[1].quantity > 0 && mealItem[1].customInstructions.length == 0 &&(
+      <StandardMealItem
+        icon={
+          <NativeIcon
+            library="MaterialCommunityIcons"
+            name={getIcon(mealItem[0])}
+            size={20}
+            color={theme.colors.primary}
+          />
+        }
+        quantity={mealItem[1].quantity}
+        foodGroup={getName(mealItem[0])}
+      />
+    )}
+  </React.Fragment>
+))}
     </View>
   );
 };
