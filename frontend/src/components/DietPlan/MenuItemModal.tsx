@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { CustomModal } from "../ui/Modal";
 import useFontSize from "@/styles/useFontSize";
-import useMenuItemApi from "@/hooks/useMenuItemApi";
+import useMenuItemApi from "@/hooks/api/useMenuItemApi";
 import { IMenuItem } from "@/interfaces/DietPlan";
 import MenuItem from "./MenuItem";
 import useStyles from "@/styles/useGlobalStyles";
@@ -15,26 +15,21 @@ interface MenuItemModalProps {
 
 const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismiss }) => {
   const { xl } = useFontSize();
-  const {colors,common,layout,spacing,text}=useStyles()
+  const { colors, common, layout, spacing, text } = useStyles();
   const { getMenuItems } = useMenuItemApi();
 
   const [menuItems, setMenuItems] = useState<IMenuItem[]>([]);
 
-  const changeTitle= (foodGroup: string) => {
-
+  const changeTitle = (foodGroup: string) => {
     switch (foodGroup) {
-      case 'protein':
-        
-        return 'חלבונים';
-      case 'carbs':
-        
-        return 'פחמימות';
-      case 'vegetables':
-        
-        return 'ירקות';
+      case "protein":
+        return "חלבונים";
+      case "carbs":
+        return "פחמימות";
+      case "vegetables":
+        return "ירקות";
       case `fats`:
-        
-        return 'שומנים';
+        return "שומנים";
     }
   };
 
@@ -48,32 +43,32 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
 
   return (
     <CustomModal visible={isOpen} dismissable dismissableBackButton onDismiss={dismiss}>
-      <ScrollView style={[
-        colors.backgroundSecondaryContainer,
-        spacing.pdMd,
-        colors.borderPrimary,
-        common.borderDefault,
-        common.roundedMd,
-        {height:`80%`}
-      ]}>
+      <ScrollView
+        style={[
+          colors.backgroundSecondaryContainer,
+          spacing.pdMd,
+          colors.borderPrimary,
+          common.borderDefault,
+          common.roundedMd,
+          { height: `90%` },
+        ]}
+      >
         <View>
-          <Text style={[
-            xl,
-            text.textCenter,
-            text.textBold,
-            colors.textPrimary,
-            spacing.pdMd
-          ]}>{changeTitle(foodGroup||``)}</Text>
-          <View style={[
-            layout.flexRowReverse,
-            layout.wrap,
-            layout.justifyAround,
-            layout.itemsCenter,
-            spacing.gapDefault
-          ]}>
+          <Text style={[xl, text.textCenter, text.textBold, colors.textPrimary, spacing.pdMd]}>
+            {changeTitle(foodGroup || ``)}
+          </Text>
+          <View
+            style={[
+              layout.flexRowReverse,
+              layout.wrap,
+              layout.justifyAround,
+              layout.itemsCenter,
+              spacing.gapDefault,
+            ]}
+          >
             {menuItems.map((menuItem) => (
               <View key={menuItem.name} style={{ maxWidth: `30%` }}>
-                <MenuItem menuItem={menuItem} styles={{colors,layout,spacing,text}} />
+                <MenuItem menuItem={menuItem} styles={{ colors, layout, spacing, text }} />
               </View>
             ))}
           </View>
@@ -82,7 +77,5 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
     </CustomModal>
   );
 };
-
-
 
 export default MenuItemModal;

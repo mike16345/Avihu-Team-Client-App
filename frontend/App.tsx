@@ -45,11 +45,13 @@ export default function App() {
   }, []);
 
   return (
-    <PaperProvider theme={/* colorScheme == "dark" ? CustomDarkTheme : CustomLightTheme */ CustomDarkTheme}>
+    <PaperProvider
+      theme={/* colorScheme == "dark" ? CustomDarkTheme : CustomLightTheme */ CustomDarkTheme}
+    >
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <NavigationContainer theme={colorScheme == "dark" ? DarkTheme : LightTheme}>
+            <NavigationContainer theme={DarkTheme}>
               {currentUser && <RootNavigator />}
               <StatusBar
                 key={colorScheme}

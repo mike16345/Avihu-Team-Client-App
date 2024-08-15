@@ -1,5 +1,5 @@
 import { fetchData, sendData, updateItem, deleteItem } from "@/API/api";
-import { IMenuItem } from "@/interfaces/IDietPlan";
+import { IMenuItem } from "@/interfaces/DietPlan";
 
 const MENU_ITEMS_ENDPOINT = `presets/menuItems/`;
 
