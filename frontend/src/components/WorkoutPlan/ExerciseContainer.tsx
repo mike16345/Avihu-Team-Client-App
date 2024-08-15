@@ -30,7 +30,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({ exercise, muscleGroup, plan }) =>
   const { getSession } = useSessionsApi();
   const { addRecordedSet } = useRecordedSetsApi();
 
-  const { layout } = useStyles();
+  const { layout, text, common, spacing, colors } = useStyles();
 
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -93,16 +93,14 @@ const ExerciseContainer: FC<WorkoutProps> = ({ exercise, muscleGroup, plan }) =>
   }, []);
 
   return (
-    <View style={styles.workoutContainer}>
-      <Button style={layout.center} onPress={() => setModalVisible(true)}>
+    <View style={[styles.workoutContainer, common.rounded, colors.backgroundSecondaryContainer]}>
+      {/* <Button style={layout.center} onPress={() => setModalVisible(true)}>
         <Image source={{ uri: thumbnail }} style={styles.thumbnail} />
-      </Button>
-      <Divider orientation="vertical" />
+      </Button> */}
+      {/* <Divider orientation="vertical" /> */}
       <View style={styles.workoutDescriptionContainer}>
-        <Text style={styles.workoutTitle}>{exercise.name}</Text>
+        <Text style={[colors.textOnSecondaryContainer, text.textBold]}>{exercise.name}</Text>
         <View style={styles.workoutInfoContainer}>
-          <SetContainer currentSet={currentSet} currentSetNumber={currentSetNumber} />
-
           <Button
             textProps={{ style: styles.recordBtnText }}
             style={styles.recordWorkoutBtn}
@@ -110,6 +108,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({ exercise, muscleGroup, plan }) =>
           >
             הקלט
           </Button>
+          <SetContainer currentSet={currentSet} currentSetNumber={currentSetNumber} />
         </View>
       </View>
       <RecordExercise
@@ -133,17 +132,10 @@ export default ExerciseContainer;
 
 const styles = StyleSheet.create({
   workoutContainer: {
-    direction: `ltr`,
-    display: "flex",
     flexDirection: "row-reverse",
     alignItems: "center",
     width: "100%",
-    height: 100,
-    backgroundColor: Colors.bgSecondary,
-    padding: 2,
-    margin: 5,
-    borderRadius: 10,
-    justifyContent: "space-between",
+    height: 125,
   },
   workoutTitle: {
     textAlign: "right",
@@ -162,7 +154,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   workoutInfoContainer: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     width: "100%",
     flexWrap: "wrap",
     justifyContent: "space-between",
@@ -191,8 +183,8 @@ const styles = StyleSheet.create({
   thumbnail: {
     width: 105,
     height: "100%",
-    resizeMode: "stretch",
-    marginLeft: 4,
+    resizeMode: "center",
+    marginHorizontal: 4,
   },
   modalView: {
     margin: 20,

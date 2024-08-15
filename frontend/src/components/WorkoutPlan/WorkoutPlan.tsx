@@ -1,4 +1,12 @@
-import { FlatList, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useState, useEffect } from "react";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
 import DropDownPicker, { ValueType } from "react-native-dropdown-picker";
@@ -10,16 +18,17 @@ import ExerciseContainer from "./ExerciseContainer";
 import useStyles from "@/styles/useGlobalStyles";
 import { useUserStore } from "@/store/userStore";
 
+const width = Dimensions.get("window").width;
+
 const WorkoutPlan = () => {
   const [open, setOpen] = useState(false);
   const [plans, setPlans] = useState<any[] | null>(null);
   const [value, setValue] = useState<ValueType>();
   const [openTips, setOpenTips] = useState(false);
   const [workoutPlan, setWorkoutPlan] = useState<ICompleteWorkoutPlan>();
-
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
 
-  const { fonts, text } = useStyles();
+  const { fonts, text, spacing, layout } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
   const { currentUser } = useUserStore();
 
@@ -53,8 +62,8 @@ const WorkoutPlan = () => {
 
   const renderHeader = () => (
     <>
-      <ImageBackground source={logoBlack} style={styles.headerImage} />
-      <View style={styles.container}>
+      <ImageBackground source={logoBlack} className="w-screen h-[30vh]" />
+      <View style={[styles.container, spacing.gapLg, spacing.pdDefault]}>
         {value && plans && (
           <DropDownPicker
             rtl
@@ -81,19 +90,25 @@ const WorkoutPlan = () => {
 
   return (
     <FlatList
-      data={currentWorkoutPlan?.muscleGroups}
+      data={currentWorkoutPlan?.muscleGroups || []}
+      ListEmptyComponent={() => (
+        <View>
+          <Text>No Exercises</Text>
+        </View>
+      )}
       keyExtractor={(item) => item.muscleGroup}
       ListHeaderComponent={renderHeader}
       renderItem={({ item }) => (
         <View>
-          <Text style={[styles.muscleGroupText, text.textRight, fonts.lg]}>{item.muscleGroup}</Text>
+          <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>{item.muscleGroup}</Text>
           {item.exercises.map((exercise, index) => (
-            <ExerciseContainer
-              plan={currentWorkoutPlan?.planName || ""}
-              muscleGroup={item.muscleGroup}
-              exercise={exercise}
-              key={index}
-            />
+            <View style={[spacing.mgHorizontalXs]} key={index}>
+              <ExerciseContainer
+                plan={currentWorkoutPlan?.planName || ""}
+                muscleGroup={item.muscleGroup}
+                exercise={exercise}
+              />
+            </View>
           ))}
         </View>
       )}
@@ -107,17 +122,13 @@ export default WorkoutPlan;
 
 const styles = StyleSheet.create({
   headerImage: {
-    width: "100%",
+    width: width,
     height: 250,
-    justifyContent: "center",
-    alignItems: "center",
   },
   container: {
     zIndex: 10,
     width: "100%",
     alignItems: "flex-end",
-    padding: 12,
-    gap: 20,
   },
   tipsText: {
     color: Colors.primary,
@@ -128,7 +139,6 @@ const styles = StyleSheet.create({
   },
   workoutContainer: {
     zIndex: 1,
-    padding: 4,
     gap: 12,
   },
   muscleGroupText: {

@@ -1,12 +1,11 @@
 import { View } from "react-native";
 import WorkoutPlan from "../components/WorkoutPlan/WorkoutPlan";
+import useStyles from "@/styles/useGlobalStyles";
 
 const MyWorkoutPlanScreen = () => {
-  return (
-    <View className="h-screen justify-center items-center bg-black">
-      <WorkoutPlan />
-    </View>
-  );
+  // const { layout, colors } = useStyles();
+
+  return <WorkoutPlan />;
 };
 
 export default MyWorkoutPlanScreen;

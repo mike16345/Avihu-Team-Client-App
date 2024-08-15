@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import { FC } from "react";
 import { ISet } from "@/interfaces/Workout";
-import { Colors } from "@/constants/Colors";
+import useStyles from "@/styles/useGlobalStyles";
 
 interface SetContainerProps {
   currentSetNumber: number;
@@ -9,13 +9,18 @@ interface SetContainerProps {
 }
 
 const SetContainer: FC<SetContainerProps> = ({ currentSet, currentSetNumber }) => {
+  const { layout, colors, spacing, text, fonts } = useStyles();
+  const maxReps = currentSet.maxReps && currentSet.maxReps !== 0 ? currentSet.maxReps : "";
+
   return (
-    <View style={styles.setsContainer}>
-      <Text style={styles.set}>סט: {currentSetNumber}</Text>
-      <View style={styles.RepsContainer}>
-        <Text style={styles.set}>חזרות:</Text>
-        <Text style={styles.set}>מינ:{currentSet.minReps}</Text>
-        <Text style={styles.set}>מקס:{currentSet.minReps}</Text>
+    <View style={[spacing.gapSm]}>
+      <Text style={[text.textBold, colors.textOnSecondaryContainer]}>סט: {currentSetNumber}</Text>
+      <View style={[layout.flexRow, layout.itemsCenter, spacing.gapXs]}>
+        <Text style={[colors.textOnSecondaryContainer]}>
+          {currentSet.minReps}
+          {maxReps && ` - ${maxReps}`}
+        </Text>
+        <Text style={[text.textBold, colors.textOnSecondaryContainer]}>חזרות:</Text>
       </View>
     </View>
   );
@@ -29,13 +34,7 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   set: {
-    color: Colors.light,
     fontSize: 14,
     fontWeight: "600",
-  },
-  RepsContainer: {
-    flexDirection: `row-reverse`,
-    justifyContent: `space-around`,
-    gap: 8,
   },
 });
