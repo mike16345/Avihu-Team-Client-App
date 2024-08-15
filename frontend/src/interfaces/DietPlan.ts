@@ -12,7 +12,7 @@ export interface ICustomItemInstructions {
   quantity: number;
 }
 
-interface IMealItem{
+export interface IMealItem{
   quantity:number,
   unit:string
   customInstructions?: ICustomItemInstructions[];

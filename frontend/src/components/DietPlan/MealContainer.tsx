@@ -16,7 +16,8 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
   const {layout, spacing,}=useStyles()
   const {theme}=useThemeContext()
 
-  const { totalCarbs, totalProtein, totalFats, totalVeggies } = meal;
+  const mealItems=Object.values(meal)
+  
   return (
     <View style={[
       layout.rtl,
@@ -30,89 +31,37 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
       },
 
     ]}>
-      {totalProtein.customInstructions && totalProtein.customInstructions[0] ? (
-        <CustomInstructionsContainer
-          customInstructions={totalProtein.customInstructions}
-          icon={
-            <NativeIcon 
-              library="MaterialCommunityIcons" 
-              name='fish' 
-              size={20} 
-              color={theme.colors.primary} 
-            />
-          }
-          foodGroup="חלבונים"
+      {mealItems.map(mealItem => 
+  mealItem.customInstructions && mealItem.customInstructions[0] ? (
+    <CustomInstructionsContainer
+      key={mealItem._id} 
+      customInstructions={mealItem.customInstructions}
+      icon={
+        <NativeIcon 
+          library="MaterialCommunityIcons" 
+          name="fish" 
+          size={20} 
+          color={theme.colors.primary} 
         />
-      ) : (
-        totalProtein &&
-        totalProtein.quantity > 0 && (
-          <StandardMealItem 
-            icon={
-                <NativeIcon
-                  library="MaterialCommunityIcons"
-                  name='fish'
-                  size={20}
-                  color={theme.colors.primary}
-                />
-              } 
-            quantity={totalProtein.quantity} />
-        )
-      )}
-
-      {totalCarbs.customInstructions && totalCarbs.customInstructions[0] ? (
-        <CustomInstructionsContainer
-          customInstructions={totalCarbs.customInstructions}
-          icon={
-            <NativeIcon 
-              library="MaterialCommunityIcons" 
-              name='baguette' 
-              size={20} 
-              color={theme.colors.primary} 
-            />
-          }
-          foodGroup="פחמימות"
+      }
+      foodGroup='חלבונים'
+    />
+  ) : mealItem.quantity > 0 ? (
+    <StandardMealItem 
+      key={mealItem._id} 
+      icon={
+        <NativeIcon
+          library="MaterialCommunityIcons"
+          name="fish"
+          size={20}
+          color={theme.colors.primary}
         />
-      ) : (
-        totalCarbs.quantity > 0 && (
-          <StandardMealItem 
-            icon={
-               <NativeIcon
-                  library="MaterialCommunityIcons"
-                  name='baguette'
-                  size={20}
-                  color={theme.colors.primary}
-                />
-            }
-            quantity={totalCarbs.quantity} 
-          />
-        )
-      )}
-      {totalFats && totalFats.quantity > 0 && (
-        <StandardMealItem 
-          icon={
-             <NativeIcon
-                  library="MaterialCommunityIcons"
-                  name='cheese'
-                  size={20}
-                  color={theme.colors.primary}
-                />
-          }
-          quantity={totalFats.quantity} 
-        />
-      )}
-      {totalVeggies && totalVeggies?.quantity > 0 && (
-        <StandardMealItem 
-          icon={
-             <NativeIcon
-                  library="MaterialCommunityIcons"
-                  name='leaf'
-                  size={20}
-                  color={theme.colors.primary}
-                />
-          }
-          quantity={totalVeggies.quantity} 
-        />
-      )}
+      } 
+      quantity={mealItem.quantity} 
+    />
+  ) 
+  : null
+)}
     </View>
   );
 };
