@@ -1,4 +1,5 @@
 import { WorkoutType } from "@/enums/WorkoutTypes";
+import { ISession } from "./ISession";
 
 export interface IWorkout {
   id: string;
@@ -44,6 +45,14 @@ export interface IRecordedSet {
   repsDone: number;
   weight: number;
   note: string;
+  plan: string;
+}
+
+export interface IRecordedSetPost {
+  userId: string;
+  muscleGroup: string;
+  exercise: string;
+  recordedSet: IRecordedSet;
 }
 
 export interface IWorkoutPlan {
@@ -62,6 +71,11 @@ export interface ISet {
   id: number;
   minReps: number;
   maxReps?: number;
+}
+
+export interface IRecordedSetResponse {
+  sessionId: ISession;
+  recordedSet: IRecordedSet;
 }
 
 export interface IExercise {

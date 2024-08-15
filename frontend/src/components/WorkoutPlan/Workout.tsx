@@ -1,34 +1,96 @@
 import { Colors } from "@/constants/Colors";
-import { IExercise } from "@/interfaces/Workout";
+import { IExercise, IRecordedSet, IRecordedSetPost } from "@/interfaces/Workout";
 import { FC, useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Button from "@/components/Button/Button";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
-import RecordWorkout from "./RecordWorkout";
+import RecordExercise from "./RecordExercise";
 import Divider from "../ui/Divider";
 import { extractVideoId, getYouTubeThumbnail } from "@/utils/utils";
 import SetContainer from "./SetContainer";
 import useStyles from "@/styles/useGlobalStyles";
+import { useSessionsApi } from "@/hooks/api/useSessionsApi";
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import { useRecordedSetsApi } from "@/hooks/api/useRecordedSetsApi";
+import { useUserStore } from "@/store/userStore";
 
 interface WorkoutProps {
-  workout: IExercise;
+  plan: string;
+  muscleGroup: string;
+  exercise: IExercise;
 }
 
-const Workout: FC<WorkoutProps> = ({ workout }) => {
-  const videoId = extractVideoId(workout.linkToVideo!);
+const Workout: FC<WorkoutProps> = ({ exercise, muscleGroup, plan }) => {
+  const videoId = extractVideoId(exercise.linkToVideo!);
   const thumbnail = getYouTubeThumbnail(videoId);
+
+  const currentUser = useUserStore((state) => state.currentUser);
+
+  const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
+  const { getSession } = useSessionsApi();
+  const { addRecordedSet } = useRecordedSetsApi();
 
   const { layout } = useStyles();
 
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [openRecordWorkout, setOpenRecordWorkout] = useState(false);
-  const [currentSet, setCurrentSet] = useState(workout.sets[0]);
-  const [currentSetNumber, setCurrentSetNumber] = useState(workout.sets.indexOf(currentSet) + 1);
+  const [openRecordWorkout, setOpenRecordExercise] = useState(false);
+  const [currentSet, setCurrentSet] = useState(exercise.sets[0]);
+  const [currentSetNumber, setCurrentSetNumber] = useState(exercise.sets.indexOf(currentSet) + 1);
+
+  const getWorkoutSession = async () => {
+    const session = await getItem();
+
+    if (!session) return;
+
+    try {
+      const sessionJSON = JSON.parse(session);
+      console.log("session from loical", sessionJSON);
+      const sessionId = sessionJSON.session._id;
+      const currentWorkoutSession = await getSession(sessionId || "");
+
+      if (!currentWorkoutSession) {
+        removeItem();
+        setCurrentSessionId(null);
+      }
+
+      console.log("session ", session);
+
+      setCurrentSessionId(sessionId);
+      return currentWorkoutSession;
+    } catch (e) {
+      console.error(e);
+      setCurrentSessionId(null);
+      return null;
+    }
+  };
+
+  const handleRecordSet = (recordedSet: Omit<IRecordedSet, "plan">) => {
+    if (!currentUser) return;
+
+    const setToRecord: IRecordedSetPost = {
+      userId: currentUser._id,
+      exercise: exercise.name,
+      recordedSet: {
+        ...recordedSet,
+        plan: plan,
+      },
+      muscleGroup,
+    };
+
+    addRecordedSet(setToRecord, currentSessionId || "")
+      .then((response) => {
+        console.log("Recorded set added successfully", response);
+        return setItem(JSON.stringify(response));
+      })
+      .catch((err) => console.error(err));
+  };
 
   useEffect(() => {
-    setCurrentSet(workout.sets[0]);
-    setCurrentSetNumber(1);
-  }, [workout]);
+    getWorkoutSession()
+      .then((session: any) => setCurrentSetNumber(session.data.setNumber))
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
     <View style={styles.workoutContainer}>
@@ -37,27 +99,28 @@ const Workout: FC<WorkoutProps> = ({ workout }) => {
       </Button>
       <Divider orientation="vertical" />
       <View style={styles.workoutDescriptionContainer}>
-        <Text style={styles.workoutTitle}>{workout.name}</Text>
+        <Text style={styles.workoutTitle}>{exercise.name}</Text>
         <View style={styles.workoutInfoContainer}>
           <SetContainer currentSet={currentSet} currentSetNumber={currentSetNumber} />
 
           <Button
             textProps={{ style: styles.recordBtnText }}
             style={styles.recordWorkoutBtn}
-            onPress={() => setOpenRecordWorkout(true)}
+            onPress={() => setOpenRecordExercise(true)}
           >
             הקלט
           </Button>
         </View>
       </View>
-      <RecordWorkout
-        workoutName={workout.name}
+      <RecordExercise
+        exerciseName={exercise.name}
+        handleRecordSet={(recordedSet) => handleRecordSet(recordedSet)}
         setNumber={currentSetNumber}
         isOpen={openRecordWorkout}
-        setIsOpen={setOpenRecordWorkout}
+        setIsOpen={setOpenRecordExercise}
       />
       <WorkoutVideoPopup
-        title={workout.name}
+        title={exercise.name}
         isVisible={modalVisible}
         setIsVisible={setModalVisible}
         videoId={videoId}

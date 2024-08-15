@@ -99,7 +99,12 @@ const WorkoutPlan = () => {
                 <View>
                   <Text style={[styles.muscleGroupText, lg]}>{muscleGroup.muscleGroup}</Text>
                   {muscleGroup.exercises.map((exercise) => (
-                    <Workout workout={exercise} key={index} />
+                    <Workout
+                      plan={currentWorkoutPlan.planName}
+                      muscleGroup={muscleGroup.muscleGroup}
+                      exercise={exercise}
+                      key={index}
+                    />
                   ))}
                 </View>
               );
