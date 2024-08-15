@@ -131,17 +131,18 @@ type ThemeContextType = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState(getPreferredTheme);
+  const [theme, setTheme] = useState(DarkTheme);
 
-  useEffect(() => {
+  /* useEffect(() => {
     const listener = Appearance.addChangeListener(({ colorScheme }) => {
-      setTheme(colorScheme === "light" ? LightTheme : DarkTheme);
+      setTheme(DarkTheme);
     });
 
     return () => {
       listener.remove();
     };
-  }, []);
+  }, []); */
+  
 
   return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };

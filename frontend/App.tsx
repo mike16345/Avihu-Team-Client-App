@@ -45,7 +45,7 @@ export default function App() {
   }, []);
 
   return (
-    <PaperProvider theme={colorScheme == "dark" ? CustomDarkTheme : CustomLightTheme}>
+    <PaperProvider theme={/* colorScheme == "dark" ? CustomDarkTheme : CustomLightTheme */ CustomDarkTheme}>
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>

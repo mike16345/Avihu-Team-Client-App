@@ -28,6 +28,36 @@ const useCommonStyles = () => {
     roundedFull: {
       borderRadius: 9999,
     },
+    borderSm:{
+      borderWidth:2
+    },
+    borderXsm:{
+      borderWidth:1
+    },
+    borderDefault:{
+      borderWidth:4
+    },
+    borderLg:{
+      borderWidth:6
+    },
+    borderXl:{
+      borderWidth:8
+    },
+    borderLeftSm:{
+      borderLeftWidth:2
+    },
+    borderLeftXsm:{
+      borderLeftWidth:1
+    },
+    borderLeftDefault:{
+      borderLeftWidth:4
+    },
+    borderLeftLg:{
+      borderLeftWidth:6
+    },
+    borderLeftXl:{
+      borderLeftWidth:8
+    },
   });
 
   return commonStyles;

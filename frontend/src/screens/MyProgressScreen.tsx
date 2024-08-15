@@ -102,7 +102,7 @@ const MyProgressScreen = () => {
           <WeightGraph weighIns={weighIns} />
         </View>
         <FABGroup
-          icon="plus"
+          icon={isFabOpen?"close":"plus"}
           visible
           onStateChange={({ open }) => {
             setIsFabOpen(open);

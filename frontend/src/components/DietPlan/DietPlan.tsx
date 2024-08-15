@@ -1,71 +1,135 @@
-import { View, ImageBackground, ScrollView, TouchableOpacity, Text } from "react-native";
-import { useRef, useState } from "react";
-import dietPlan from "../../constants/dietPlan.json";
+import { View, ImageBackground, ScrollView, Text,  } from "react-native";
+import { useEffect, useRef, useState } from "react";
 import logoBlack from "../../../assets/images/avihu-logo-black.png";
-import CarbTable from "./CarbTable";
-import ProteinTable from "./ProteinTable";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
+import { useDietPlanApi } from "@/hooks/useDietPlanApi";
+import { useUserStore } from "@/store/userStore";
+import { IDietPlan } from "@/interfaces/DietPlan";
+import MealContainer from "./MealContainer";
+import NativeIcon from "../Icon/NativeIcon";
+import FABGroup from "../ui/FABGroup";
+import MenuItemModal from "./MenuItemModal";
+import useStyles from "@/styles/useGlobalStyles";
+import { DarkTheme, useThemeContext } from "@/themes/useAppTheme";
+import { Portal } from "react-native-paper";
 
 export default function DietPlan() {
-  const UI_TYPES = {
-    STANDARD: "STANDARD",
-    CARBS: "CARBS",
-    PROTEIN: "PROTEIN",
-  };
-
   const { handleScroll } = useHideTabBarOnScroll();
+  const currentUser = useUserStore((state) => state.currentUser);
+  const { getDietPlanByUserId } = useDietPlanApi();
+  const {layout, spacing, colors,common,text}=useStyles()
+  const {theme}=useThemeContext()
 
-  const [meals, setMeals] = useState(dietPlan.meals);
-  const [uiView, setUiView] = useState(UI_TYPES.STANDARD);
+  const [dietPlan, setDietPlan] = useState<IDietPlan | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFabOpen, setIsFabOpen] = useState(false);
+  const [selectedFoodGroup, setSelectedFoodGroup] = useState<string | null>(null);
   const scrollRef = useRef(null);
 
+  const displayMenuItems = (foodGroup: string) => {
+    setIsModalOpen(true);
+    setIsFabOpen(false);
+    setSelectedFoodGroup(foodGroup);
+  };
+
+  console.log(colors.background);
+  
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    getDietPlanByUserId(currentUser?._id)
+      .then((res) => setDietPlan(res))
+      .catch((err) => console.log(err));
+  }, []);
+
   return (
+    <Portal.Host>
     <ScrollView
       ref={scrollRef}
       onScroll={handleScroll}
-      className="w-screen h-screen flex-1 bg-black  relative"
+      style={[
+        layout.flex1,
+        colors.backgroundSecondary,
+        spacing.pdBottomBar,
+        spacing.pdStatusBar,
+        {backgroundColor:DarkTheme.colors.background}
+      ]}
     >
       <ImageBackground source={logoBlack} className="w-screen h-[30vh]" />
 
-      <View className="flex-row justify-center gap-9 pb-6">
-        <TouchableOpacity onPress={() => setUiView(UI_TYPES.PROTEIN)}>
-          <View className="bg-emerald-300 p-2 rounded">
-            <Text className="text-lg font-bold">חלבונים</Text>
+      {dietPlan?.meals.map((meal, i) => (
+        <View key={i} style={[
+          layout.flexRowReverse,
+          layout.itemsCenter,
+          spacing.pdDefault,
+          spacing.mgSm,
+          colors.backgroundSecondaryContainer,
+          common.rounded
+        ]}
+        >
+          <View style={[
+            layout.itemsCenter,
+            spacing.pdXs,
+            spacing.gapSm,
+            common.borderLeftSm,
+            colors.borderSecondary,
+            {paddingLeft:10}
+          ]} 
+          >
+            <NativeIcon
+              library="MaterialCommunityIcons"
+              name="food-outline"
+              color={theme.colors.secondary}
+              size={20}
+            />
+            <Text style={[
+              text.textBold,
+              colors.textOnBackground
+            ]}>ארוחה {i + 1}</Text>
           </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setUiView(UI_TYPES.CARBS)}>
-          <View className="bg-emerald-300 p-2 rounded">
-            <Text className="text-lg font-bold">פחמימות</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
-      {meals.map((meal) => (
-        <View className="p-4 rtl items-center" key={meal.title}>
-          <Text className="text-emerald-300 underline font-bold text-lg p-2">{meal.title}</Text>
-          <View className="flex-row">
-            {typeof meal.optOne == `string` ? (
-              <Text className="text-white">{meal.optOne}</Text>
-            ) : (
-              <View className="flex-row-reverse w-[100vw] flex-wrap p-1 justify-center">
-                {meal.optOne.map((opt) => (
-                  <Text className="text-white px-1">{opt} /</Text>
-                ))}
-              </View>
-            )}
-          </View>
-          <Text className="text-emerald-300 font-bold">+</Text>
-          <View className="flex-row-reverse gap-2">
-            <Text className="text-white py-1">{meal.optTwo}</Text>
-            <Text className="text-emerald-300 font-bold py-1">+</Text>
-            <Text className="text-white py-1">{meal.optThree}</Text>
-          </View>
+          <MealContainer meal={meal} />
         </View>
       ))}
 
-      <View className="absolute top-16 ">
-        {uiView === UI_TYPES.CARBS && <CarbTable setUiState={setUiView} uiStates={UI_TYPES} />}
-        {uiView === UI_TYPES.PROTEIN && <ProteinTable setUiState={setUiView} uiStates={UI_TYPES} />}
-      </View>
+      <MenuItemModal
+        foodGroup={selectedFoodGroup}
+        isOpen={isModalOpen}
+        dismiss={() => setIsModalOpen(false)}
+      />
+      
+      <FABGroup
+        open={isFabOpen}
+        visible
+        variant="primary"
+        icon={isFabOpen ? `close` : `food-outline`}
+        onStateChange={({ open }) => setIsFabOpen(open)}
+        actions={[
+          {
+            icon: "fish",
+            label: "חלבונים",
+            onPress: () => displayMenuItems(`protein`),
+          },
+          {
+            icon: "baguette",
+            label: "פחמימות",
+            onPress: () => displayMenuItems(`carbs`),
+          },
+          {
+            icon: "cheese",
+            label: "שומנים",
+            onPress: () => displayMenuItems(`fats`),
+          },
+          {
+            icon: `leaf`,
+            label: `ירקות`,
+            onPress: () => displayMenuItems(`vegetables`),
+          },
+        ]}
+      />
+      
     </ScrollView>
+    </Portal.Host>
   );
 }
+
