@@ -1,6 +1,6 @@
 import { View, ImageBackground, ScrollView, Text } from "react-native";
 import { useEffect, useState } from "react";
-import logoBlack from "../../../assets/images/avihu-logo-black.png";
+import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
 import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
 import { useUserStore } from "@/store/userStore";
 import { IDietPlan } from "@/interfaces/DietPlan";
@@ -11,12 +11,12 @@ import MenuItemModal from "./MenuItemModal";
 import useStyles from "@/styles/useGlobalStyles";
 import { DarkTheme, useThemeContext } from "@/themes/useAppTheme";
 import { Portal } from "react-native-paper";
+import Divider from "../ui/Divider";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
   const { getDietPlanByUserId } = useDietPlanApi();
   const { layout, spacing, colors, common, text } = useStyles();
-  const { theme } = useThemeContext();
 
   const [dietPlan, setDietPlan] = useState<IDietPlan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,40 +51,36 @@ export default function DietPlan() {
         ]}
       >
         <ImageBackground source={logoBlack} className="w-screen h-[30vh]" />
-
-        {dietPlan?.meals.map((meal, i) => (
-          <View
-            key={i}
-            style={[
-              layout.flexRowReverse,
-              layout.itemsCenter,
-              spacing.pdDefault,
-              spacing.mgSm,
-              colors.backgroundSecondaryContainer,
-              common.rounded,
-            ]}
-          >
+        <View style={[spacing.pdDefault, spacing.gapLg]}>
+          {dietPlan?.meals.map((meal, i) => (
             <View
+              key={i}
               style={[
+                layout.flexRowReverse,
                 layout.itemsCenter,
-                spacing.pdXs,
-                spacing.gapSm,
-                common.borderLeftSm,
-                colors.borderSecondary,
-                { paddingLeft: 10 },
+                spacing.pdDefault,
+                colors.backgroundSecondaryContainer,
+                common.rounded,
               ]}
             >
-              <NativeIcon
-                library="MaterialCommunityIcons"
-                name="food-outline"
-                color={theme.colors.secondary}
-                size={20}
+              <View style={[layout.itemsCenter, spacing.pdXs, spacing.gapSm, { paddingLeft: 10 }]}>
+                <NativeIcon
+                  library="MaterialCommunityIcons"
+                  name="food-outline"
+                  color={colors.textOnSecondaryContainer.color}
+                  size={20}
+                />
+                <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
+              </View>
+              <Divider
+                orientation="vertical"
+                thickness={1}
+                color={colors.textOnSecondaryContainer.color}
               />
-              <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
+              <MealContainer meal={meal} />
             </View>
-            <MealContainer meal={meal} />
-          </View>
-        ))}
+          ))}
+        </View>
 
         <MenuItemModal
           foodGroup={selectedFoodGroup}
