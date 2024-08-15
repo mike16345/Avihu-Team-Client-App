@@ -36,6 +36,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ openTips, setOpenTips }) => {
       </View>
       <Text style={styles.title}>דגשים לאימון</Text>
       <FlatList
+        keyExtractor={(_, i) => i.toString()}
         renderItem={({ item, index }) => (
           <Text style={styles.tip}>
             {index + 1 + ". "}

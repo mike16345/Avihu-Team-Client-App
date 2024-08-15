@@ -41,3 +41,6 @@ yarn-error.*
 
 # test 
 **/test.tsx
+
+# JavaScript Inspector thing
+**/%PROGRAMDATA%/*

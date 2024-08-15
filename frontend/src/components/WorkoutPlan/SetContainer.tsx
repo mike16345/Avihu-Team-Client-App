@@ -11,7 +11,7 @@ interface SetContainerProps {
 const SetContainer: FC<SetContainerProps> = ({ currentSet, currentSetNumber }) => {
   return (
     <View style={styles.setsContainer}>
-      <Text style={styles.set}>סט:{currentSetNumber}</Text>
+      <Text style={styles.set}>סט: {currentSetNumber}</Text>
       <View style={styles.RepsContainer}>
         <Text style={styles.set}>חזרות:</Text>
         <Text style={styles.set}>מינ:{currentSet.minReps}</Text>

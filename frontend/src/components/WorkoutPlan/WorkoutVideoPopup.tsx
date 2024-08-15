@@ -1,8 +1,8 @@
 import { Colors } from "@/constants/Colors";
 import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, ActivityIndicator, useWindowDimensions } from "react-native";
-import { Dialog } from "react-native-paper";
 import YoutubePlayer, { YoutubeIframeRef } from "react-native-youtube-iframe";
+import { CustomModal } from "../ui/Modal";
 
 interface WorkoutVideoPopupProps {
   isVisible: boolean;
@@ -36,12 +36,11 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({
   }, []);
 
   return (
-    <Dialog
+    <CustomModal
       style={{
-        backgroundColor: Colors.secondary,
-        width: width - 25,
-        height: height / 2,
+        height: height / 2.5,
         alignItems: "center",
+        justifyContent: "center",
       }}
       visible={isVisible}
       onDismiss={() => setIsVisible(false)}
@@ -61,7 +60,7 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({
         />
       </View>
       <Text style={styles.tip}>דגשים: אל תשבור את הכתף</Text>
-    </Dialog>
+    </CustomModal>
   );
 };
 
@@ -72,7 +71,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.secondary,
     alignItems: "center",
-    justifyContent: "space-evenly",
+    justifyContent: "center",
   },
   title: {
     fontSize: 20,

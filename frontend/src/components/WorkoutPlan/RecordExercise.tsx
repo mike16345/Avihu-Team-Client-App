@@ -14,7 +14,7 @@ import { CustomModal } from "../ui/Modal";
 import { IRecordedSet } from "@/interfaces/Workout";
 
 interface RecordExerciseProps {
-  handleRecordSet: (recordSet: IRecordedSet) => void;
+  handleRecordSet: (recordSet: Omit<IRecordedSet, "plan">) => void;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   exerciseName: string;

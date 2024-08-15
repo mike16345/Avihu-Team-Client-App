@@ -1,35 +1,25 @@
-import {
-  ImageBackground,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { useState, useRef, useEffect } from "react";
+import { FlatList, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState, useEffect } from "react";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
-import DropDownPicker, { ItemType, ValueType } from "react-native-dropdown-picker";
+import DropDownPicker, { ValueType } from "react-native-dropdown-picker";
 import { ICompleteWorkoutPlan, IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
-import Workout from "./Workout";
-import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
 import { Colors } from "@/constants/Colors";
 import { useWorkoutPlanApi } from "@/hooks/api/useWorkoutPlanApi";
+import ExerciseContainer from "./ExerciseContainer";
+import useStyles from "@/styles/useGlobalStyles";
 import { useUserStore } from "@/store/userStore";
-import useFontSize from "@/styles/useFontSize";
 
 const WorkoutPlan = () => {
   const [open, setOpen] = useState(false);
-  const [plans, setPlans] = useState<ItemType[] | null>(null);
+  const [plans, setPlans] = useState<any[] | null>(null);
   const [value, setValue] = useState<ValueType>();
   const [openTips, setOpenTips] = useState(false);
-  const scrollViewRef = useRef(null);
   const [workoutPlan, setWorkoutPlan] = useState<ICompleteWorkoutPlan>();
 
-  const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan>();
+  const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
 
-  const { handleScroll } = useHideTabBarOnScroll();
-  const { lg } = useFontSize();
+  const { fonts, text } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
   const { currentUser } = useUserStore();
 
@@ -38,49 +28,45 @@ const WorkoutPlan = () => {
       (plan) => plan.planName === planName
     );
 
-    setCurrentWorkoutPlan(selectedWorkoutPlan);
+    if (selectedWorkoutPlan) setCurrentWorkoutPlan(selectedWorkoutPlan);
   };
 
   useEffect(() => {
-    getWorkoutPlanByUserId(`665f0b0b00b1a04e8f1c4478`)
+    if (!currentUser) return;
+
+    getWorkoutPlanByUserId(currentUser._id)
       .then((res) => setWorkoutPlan(res))
       .catch((err) => console.log(err));
   }, []);
 
   useEffect(() => {
-    if (workoutPlan) {
-      const plans = workoutPlan.workoutPlans.map((workout) => {
-        return { label: workout.planName, value: workout.planName };
-      });
-      setPlans(plans);
-      setValue(plans[0].label);
+    if (!workoutPlan) return;
 
-      setCurrentWorkoutPlan(workoutPlan.workoutPlans[0]);
-    }
+    const plans = workoutPlan.workoutPlans.map((workout) => {
+      return { label: workout.planName, value: workout.planName };
+    });
+
+    setPlans(plans);
+    setValue(plans[0].label);
+    setCurrentWorkoutPlan(workoutPlan.workoutPlans[0]);
   }, [workoutPlan]);
 
-  return (
-    <ScrollView
-      style={styles.scrollView}
-      ref={scrollViewRef}
-      onScroll={handleScroll}
-      scrollEventThrottle={16}
-    >
+  const renderHeader = () => (
+    <>
       <ImageBackground source={logoBlack} style={styles.headerImage} />
       <View style={styles.container}>
         {value && plans && (
           <DropDownPicker
-            ltr
+            rtl
             open={open}
             value={value}
             items={plans}
             theme="DARK"
             setOpen={setOpen}
             setValue={setValue}
-            setItems={setPlans}
-            labelStyle={{ textAlign: "left" }}
-            listItemLabelStyle={{ textAlign: "left" }}
-            onChangeValue={(val) => selectNewWorkoutPlan(val)}
+            labelStyle={text.textRight}
+            listItemLabelStyle={text.textRight}
+            onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
           />
         )}
         <TouchableOpacity
@@ -90,39 +76,36 @@ const WorkoutPlan = () => {
           <Text style={styles.tipsText}>דגשים</Text>
         </TouchableOpacity>
       </View>
+    </>
+  );
 
-      <View>
-        <View style={styles.workoutContainer}>
-          {currentWorkoutPlan &&
-            currentWorkoutPlan.muscleGroups.map((muscleGroup, index) => {
-              return (
-                <View>
-                  <Text style={[styles.muscleGroupText, lg]}>{muscleGroup.muscleGroup}</Text>
-                  {muscleGroup.exercises.map((exercise) => (
-                    <Workout
-                      plan={currentWorkoutPlan.planName}
-                      muscleGroup={muscleGroup.muscleGroup}
-                      exercise={exercise}
-                      key={index}
-                    />
-                  ))}
-                </View>
-              );
-            })}
+  return (
+    <FlatList
+      data={currentWorkoutPlan?.muscleGroups}
+      keyExtractor={(item) => item.muscleGroup}
+      ListHeaderComponent={renderHeader}
+      renderItem={({ item }) => (
+        <View>
+          <Text style={[styles.muscleGroupText, text.textRight, fonts.lg]}>{item.muscleGroup}</Text>
+          {item.exercises.map((exercise, index) => (
+            <ExerciseContainer
+              plan={currentWorkoutPlan?.planName || ""}
+              muscleGroup={item.muscleGroup}
+              exercise={exercise}
+              key={index}
+            />
+          ))}
         </View>
-      </View>
-      <WorkoutTips openTips={openTips} setOpenTips={setOpenTips} />
-    </ScrollView>
+      )}
+      ListFooterComponent={<WorkoutTips openTips={openTips} setOpenTips={setOpenTips} />}
+      contentContainerStyle={styles.workoutContainer}
+    />
   );
 };
 
 export default WorkoutPlan;
 
 const styles = StyleSheet.create({
-  scrollView: {
-    width: `100%`,
-    direction: `rtl`,
-  },
   headerImage: {
     width: "100%",
     height: 250,

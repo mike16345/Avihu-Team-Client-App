@@ -20,7 +20,7 @@ interface WorkoutProps {
   exercise: IExercise;
 }
 
-const Workout: FC<WorkoutProps> = ({ exercise, muscleGroup, plan }) => {
+const ExerciseContainer: FC<WorkoutProps> = ({ exercise, muscleGroup, plan }) => {
   const videoId = extractVideoId(exercise.linkToVideo!);
   const thumbnail = getYouTubeThumbnail(videoId);
 
@@ -35,8 +35,8 @@ const Workout: FC<WorkoutProps> = ({ exercise, muscleGroup, plan }) => {
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [openRecordWorkout, setOpenRecordExercise] = useState(false);
-  const [currentSet, setCurrentSet] = useState(exercise.sets[0]);
-  const [currentSetNumber, setCurrentSetNumber] = useState(exercise.sets.indexOf(currentSet) + 1);
+  const [currentSetNumber, setCurrentSetNumber] = useState(1);
+  const [currentSet, setCurrentSet] = useState(exercise.sets[currentSetNumber - 1]);
 
   const getWorkoutSession = async () => {
     const session = await getItem();
@@ -45,7 +45,6 @@ const Workout: FC<WorkoutProps> = ({ exercise, muscleGroup, plan }) => {
 
     try {
       const sessionJSON = JSON.parse(session);
-      console.log("session from loical", sessionJSON);
       const sessionId = sessionJSON.session._id;
       const currentWorkoutSession = await getSession(sessionId || "");
 
@@ -54,14 +53,10 @@ const Workout: FC<WorkoutProps> = ({ exercise, muscleGroup, plan }) => {
         setCurrentSessionId(null);
       }
 
-      console.log("session ", session);
-
       setCurrentSessionId(sessionId);
       return currentWorkoutSession;
     } catch (e) {
-      console.error(e);
-      setCurrentSessionId(null);
-      return null;
+      throw e;
     }
   };
 
@@ -79,17 +74,22 @@ const Workout: FC<WorkoutProps> = ({ exercise, muscleGroup, plan }) => {
     };
 
     addRecordedSet(setToRecord, currentSessionId || "")
-      .then((response) => {
-        console.log("Recorded set added successfully", response);
-        return setItem(JSON.stringify(response));
-      })
+      .then((response) => setItem(JSON.stringify(response)))
       .catch((err) => console.error(err));
+  };
+
+  const handleSessionNotFound = (e: any) => {
+    if (e.response.status === 404) {
+      setCurrentSetNumber(1);
+      removeItem();
+    }
+    setCurrentSessionId(null);
   };
 
   useEffect(() => {
     getWorkoutSession()
-      .then((session: any) => setCurrentSetNumber(session.data.setNumber))
-      .catch((err) => console.error(err));
+      .then((session: any) => setCurrentSetNumber(session?.data?.setNumber || 1))
+      .catch((err) => handleSessionNotFound(err));
   }, []);
 
   return (
@@ -129,7 +129,7 @@ const Workout: FC<WorkoutProps> = ({ exercise, muscleGroup, plan }) => {
   );
 };
 
-export default Workout;
+export default ExerciseContainer;
 
 const styles = StyleSheet.create({
   workoutContainer: {
