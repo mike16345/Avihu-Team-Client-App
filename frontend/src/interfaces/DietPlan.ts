@@ -7,12 +7,34 @@ export interface IDietPlan {
   totalCalories: number;
 }
 
+export interface ICustomItemInstructions {
+  item: string;
+  quantity: number;
+}
+
+export interface IMealItem{
+  quantity:number,
+  unit:string
+  customInstructions?: ICustomItemInstructions[];
+}
+
 export interface IMeal {
   id: string;
-  totalProtein: number;
-  totalCarbs: number;
-  totalFats?: number;
-  totalVeggies?: number;
+  totalProtein: IMealItem;
+  totalCarbs: IMealItem;
+  totalFats?: IMealItem;
+  totalVeggies?: IMealItem;
+}
+export interface IServingItem {
+  spoons: number;
+  grams: number;
+}
+
+export interface IMenuItem {
+  name: string;
+  dietaryType: string[];
+  foodGroup: string;
+  oneServing: IServingItem;
 }
 
 export interface IRecordedMeal {
