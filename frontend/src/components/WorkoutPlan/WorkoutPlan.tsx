@@ -17,6 +17,8 @@ import { useWorkoutPlanApi } from "@/hooks/api/useWorkoutPlanApi";
 import ExerciseContainer from "./ExerciseContainer";
 import useStyles from "@/styles/useGlobalStyles";
 import { useUserStore } from "@/store/userStore";
+import { useSessionsApi } from "@/hooks/api/useSessionsApi";
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 const width = Dimensions.get("window").width;
 
@@ -27,17 +29,20 @@ const WorkoutPlan = () => {
   const [openTips, setOpenTips] = useState(false);
   const [workoutPlan, setWorkoutPlan] = useState<ICompleteWorkoutPlan>();
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
+  const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
 
-  const { fonts, text, spacing, layout } = useStyles();
+  const { fonts, text, spacing } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
   const { currentUser } = useUserStore();
+  const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
+  const { getSession } = useSessionsApi();
 
   const selectNewWorkoutPlan = (planName: string) => {
     const selectedWorkoutPlan = workoutPlan?.workoutPlans.find(
       (plan) => plan.planName === planName
     );
 
-    if (selectedWorkoutPlan) setCurrentWorkoutPlan(selectedWorkoutPlan);
+    if (selectedWorkoutPlan) setCurrentWorkoutPlan({ ...selectedWorkoutPlan });
   };
 
   useEffect(() => {
@@ -58,7 +63,39 @@ const WorkoutPlan = () => {
     setPlans(plans);
     setValue(plans[0].label);
     setCurrentWorkoutPlan(workoutPlan.workoutPlans[0]);
+
+    // Load the session details for the current workout plan
+    loadWorkoutSession();
   }, [workoutPlan]);
+
+  const loadWorkoutSession = async () => {
+    const session = await getItem();
+    if (!session) return;
+
+    try {
+      const sessionJSON = JSON.parse(session);
+      const sessionId = sessionJSON?._id || "";
+      const currentWorkoutSession = await getSession(sessionId || "");
+      if (!currentWorkoutSession) {
+        removeItem();
+      } else {
+        setCurrentWorkoutSession(currentWorkoutSession);
+      }
+    } catch (e) {
+      handleSessionNotFound(e);
+    }
+  };
+
+  const handleSessionNotFound = (e: any) => {
+    console.error(e);
+    removeItem();
+    setCurrentWorkoutSession(null);
+  };
+
+  const handleUpdateSession = async (session: any) => {
+    setCurrentWorkoutSession(session);
+    await setItem(JSON.stringify(session));
+  };
 
   const renderHeader = () => (
     <>
@@ -99,17 +136,20 @@ const WorkoutPlan = () => {
       keyExtractor={(item) => item.muscleGroup}
       ListHeaderComponent={renderHeader}
       renderItem={({ item }) => (
-        <View>
+        <View style={[spacing.pdHorizontalSm]}>
           <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>{item.muscleGroup}</Text>
-          {item.exercises.map((exercise, index) => (
-            <View style={[spacing.mgHorizontalXs]} key={index}>
+          <View style={[spacing.gapLg]}>
+            {item.exercises.map((exercise, index) => (
               <ExerciseContainer
+                key={currentWorkoutPlan?.planName + "-" + index}
                 plan={currentWorkoutPlan?.planName || ""}
                 muscleGroup={item.muscleGroup}
                 exercise={exercise}
+                session={currentWorkoutSession} // Pass down the session
+                updateSession={handleUpdateSession} // Handler for recording a set
               />
-            </View>
-          ))}
+            ))}
+          </View>
         </View>
       )}
       ListFooterComponent={<WorkoutTips openTips={openTips} setOpenTips={setOpenTips} />}

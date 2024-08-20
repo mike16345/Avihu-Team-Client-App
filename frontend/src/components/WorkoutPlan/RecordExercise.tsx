@@ -95,6 +95,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>משקל:</Text>
               <TextInput
+                placeholder="משקל..."
                 className="inpt w-24 h-10"
                 keyboardType="number-pad"
                 inputMode="numeric"
@@ -110,7 +111,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({
               <TextInput
                 className="inpt w-24 h-10"
                 keyboardType="number-pad"
-                value={recordedSet.repsDone.toString()}
                 onChangeText={(text) => handleUpdateRecordedSet("repsDone", text)}
               />
             </View>
@@ -126,7 +126,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({
               placeholderTextColor={"gray"}
               placeholder="איך עבר לך?"
               textAlignVertical="top"
-              value={recordedSet.note.toString()}
               onChangeText={(text) => handleUpdateRecordedSet("note", text)}
             />
           </View>

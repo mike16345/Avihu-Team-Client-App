@@ -74,7 +74,7 @@ export interface ISet {
 }
 
 export interface IRecordedSetResponse {
-  sessionId: ISession;
+  session: ISession;
   recordedSet: IRecordedSet;
 }
 
