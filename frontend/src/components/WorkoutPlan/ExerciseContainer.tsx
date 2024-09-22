@@ -1,8 +1,6 @@
 import { FC, useState, useEffect } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
-import Button from "@/components/Button/Button";
+import { StyleSheet, Text, View } from "react-native";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
-import RecordExercise from "./RecordExercise";
 import SetContainer from "./SetContainer";
 import NativeIcon from "../Icon/NativeIcon";
 import { IExercise, IRecordedSet, IRecordedSetPost, ISet } from "@/interfaces/Workout";
@@ -12,6 +10,9 @@ import { useRecordedSetsApi } from "@/hooks/api/useRecordedSetsApi";
 import { useUserStore } from "@/store/userStore";
 import { extractVideoId, getYouTubeThumbnail } from "@/utils/utils";
 import { Colors } from "@/constants/Colors";
+import { useNavigation } from "@react-navigation/native";
+import { WorkoutPlanStackParamList } from "@/types/navigatorTypes";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 interface WorkoutProps {
   plan: string;
@@ -28,8 +29,9 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   session,
   updateSession,
 }) => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<WorkoutPlanStackParamList, "RecordSet">>();
   const videoId = extractVideoId(exercise.linkToVideo!);
-  const thumbnail = getYouTubeThumbnail(videoId);
 
   const currentUser = useUserStore((state) => state.currentUser);
 
@@ -38,7 +40,6 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
   const [isSetDone, setIsSetDone] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [openRecordWorkout, setOpenRecordExercise] = useState(false);
   const [currentSetNumber, setCurrentSetNumber] = useState(1);
   const [currentSet, setCurrentSet] = useState<ISet>(exercise.sets[currentSetNumber - 1]);
 
@@ -107,30 +108,23 @@ const ExerciseContainer: FC<WorkoutProps> = ({
         </View>
         <View style={styles.workoutInfoContainer}>
           <NativeIcon
+            onPress={() => {
+              navigation.navigate("RecordSet", {
+                exerciseName: exercise.name,
+                handleRecordSet: (recordedSet) => handleRecordSet(recordedSet),
+                setNumber: currentSetNumber,
+              });
+            }}
             color={colors.textOnSecondaryContainer.color}
             library="MaterialCommunityIcons"
             name="chevron-left"
             size={28}
           />
-          <Button
-            textProps={{ style: styles.recordBtnText }}
-            style={styles.recordWorkoutBtn}
-            onPress={() => setOpenRecordExercise(true)}
-          >
-            הקלט
-          </Button>
+
           <SetContainer currentSet={currentSet} currentSetNumber={currentSetNumber} />
         </View>
       </View>
-      {openRecordWorkout && (
-        <RecordExercise
-          exerciseName={exercise.name}
-          handleRecordSet={(recordedSet) => handleRecordSet(recordedSet)}
-          setNumber={currentSetNumber}
-          isOpen={openRecordWorkout}
-          setIsOpen={setOpenRecordExercise}
-        />
-      )}
+
       <WorkoutVideoPopup
         title={exercise.name}
         isVisible={modalVisible}

@@ -1,13 +1,13 @@
 import NativeIcon from "@/components/Icon/NativeIcon";
-import MyWorkoutPlanPage from "@/screens/MyWorkoutPlanPage";
 import MyDietPlanScreen from "@/screens/MyDietPlanScreen";
 import MyProgressScreen from "@/screens/MyProgressScreen";
 import { NavigatorTab } from "@/types/navigatorTypes";
+import WorkoutPlanStack from "../WorkoutPlanStack";
 
 const BottomScreenNavigatorTabs: NavigatorTab[] = [
   {
     name: "MyWorkoutPlanPage",
-    component: MyWorkoutPlanPage,
+    component: WorkoutPlanStack,
     options: {
       tabBarLabel: "Workout",
       tabBarAccessibilityLabel: "Workout Tab",

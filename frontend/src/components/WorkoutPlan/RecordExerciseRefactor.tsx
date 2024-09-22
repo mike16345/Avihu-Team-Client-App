@@ -1,35 +1,20 @@
-import React, { FC, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  useWindowDimensions,
-  TextInput,
-  KeyboardAvoidingView,
-} from "react-native";
+import { FC, useState } from "react";
+import { StyleSheet, View, Text, useWindowDimensions, KeyboardAvoidingView } from "react-native";
 import { Colors } from "@/constants/Colors";
 import OpacityButton from "@/components/Button/OpacityButton";
 import Divider from "../ui/Divider";
-import { CustomModal } from "../ui/Modal";
 import { IRecordedSet } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
+import useStyles from "@/styles/useGlobalStyles";
+import { TextInput } from "react-native-paper";
 
-interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {
-  handleRecordSet: (recordSet: Omit<IRecordedSet, "plan">) => void;
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  exerciseName: string;
-  setNumber: number;
-}
+interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
 
-const RecordExercise: FC<RecordExerciseProps> = ({
-  isOpen,
-  setIsOpen,
-  handleRecordSet,
-  exerciseName,
-  setNumber,
-}) => {
+const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
+  const { handleRecordSet, exerciseName, setNumber } = route.params;
   const { width } = useWindowDimensions();
+  const customStyles = useStyles();
+  const { colors, layout, spacing } = customStyles;
 
   const [recordedSet, setRecordedSet] = useState<Omit<IRecordedSet, "plan">>({
     weight: 0,
@@ -71,33 +56,27 @@ const RecordExercise: FC<RecordExerciseProps> = ({
 
     console.log("Workout saved", recordedSet);
     handleRecordSet(recordedSet);
-
-    setIsOpen(false);
   };
 
   return (
-    <CustomModal
-      contentContainerStyle={{
-        backgroundColor: Colors.bgSecondary,
-        borderWidth: 1.5,
-        borderColor: Colors.primary,
-        padding: 20,
-        alignItems: "center",
-      }}
-      visible={isOpen}
-      dismissableBackButton
-      onDismiss={() => setIsOpen(false)}
-    >
-      <Text style={styles.title}>{`${exerciseName} סט ${setNumber}`}</Text>
+    <View style={[spacing.pdDefault, layout.center]}>
+      <Text
+        style={[
+          colors.textOnSecondaryContainer,
+          spacing.pdDefault,
+          customStyles.fonts.lg,
+          customStyles.text.textBold,
+        ]}
+      >{`${exerciseName} סט ${setNumber}`}</Text>
       <Divider thickness={0.5} style={{ marginBottom: 20 }} />
       <View style={styles.container}>
-        <KeyboardAvoidingView className="gap-8">
+        <KeyboardAvoidingView>
           <View className=" gap-2 h-16 px-2   justify-center">
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>משקל:</Text>
               <TextInput
                 placeholder="משקל..."
-                className="inpt w-24 h-10"
+                className=" w-24 h-10"
                 keyboardType="number-pad"
                 inputMode="numeric"
                 value={recordedSet.weight.toString()}
@@ -106,7 +85,10 @@ const RecordExercise: FC<RecordExerciseProps> = ({
             </View>
             {errors.weight ? <Text style={styles.errorText}>{errors.weight}</Text> : null}
           </View>
-          <View className=" gap-2 h-16 px-2   justify-center">
+          <View
+            style={[spacing.gapSm, spacing.pdHorizontalSm, layout.justifyCenter]}
+            className=" gap-2 h-16 px-2   justify-center"
+          >
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>חזרות:</Text>
               <TextInput
@@ -118,18 +100,16 @@ const RecordExercise: FC<RecordExerciseProps> = ({
             {errors.reps ? <Text style={styles.errorText}>{errors.reps}</Text> : null}
           </View>
 
-          <View style={styles.notesContainer}>
-            <Text style={styles.inputLabel}>פתק:</Text>
-            <TextInput
-              className="inpt "
-              style={[styles.multilineInput, { width: width - 80 }]}
-              multiline
-              placeholderTextColor={"gray"}
-              placeholder="איך עבר לך?"
-              textAlignVertical="top"
-              onChangeText={(text) => handleUpdateRecordedSet("note", text)}
-            />
-          </View>
+          <Text style={styles.inputLabel}>פתק:</Text>
+          <TextInput
+            style={[layout.ltr, customStyles.text.textRight]}
+            multiline
+            placeholderTextColor={"gray"}
+            placeholder="איך עבר לך?"
+            textAlign="right"
+            textAlignVertical="top"
+            onChangeText={(text) => handleUpdateRecordedSet("note", text)}
+          />
         </KeyboardAvoidingView>
         <View style={[]}>
           <OpacityButton
@@ -141,11 +121,11 @@ const RecordExercise: FC<RecordExerciseProps> = ({
           </OpacityButton>
         </View>
       </View>
-    </CustomModal>
+    </View>
   );
 };
 
-export default RecordExercise;
+export default RecordExerciseNew;
 
 const styles = StyleSheet.create({
   container: {
@@ -167,17 +147,7 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: Colors.bgSecondary,
   },
-  notesContainer: {
-    width: "100%",
-    gap: 12,
-  },
-  title: {
-    fontSize: 17,
-    padding: 8,
-    textAlign: "right",
-    fontWeight: "bold",
-    color: Colors.primary,
-  },
+
   saveBtn: {
     backgroundColor: Colors.bgPrimary,
     justifyContent: "center",
@@ -191,14 +161,6 @@ const styles = StyleSheet.create({
     color: Colors.bgSecondary,
     fontWeight: "bold",
     fontSize: 16,
-  },
-  multilineInput: {
-    width: "100%",
-    height: 120,
-    textAlign: "right",
-    backgroundColor: Colors.light,
-    textAlignVertical: "top",
-    padding: 8,
   },
   errorText: {
     color: "red",

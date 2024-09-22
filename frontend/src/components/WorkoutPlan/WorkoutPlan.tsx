@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FC } from "react";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
 import DropDownPicker, { ValueType } from "react-native-dropdown-picker";
 import { ICompleteWorkoutPlan, IWorkoutPlan } from "@/interfaces/Workout";
@@ -19,10 +19,13 @@ import useStyles from "@/styles/useGlobalStyles";
 import { useUserStore } from "@/store/userStore";
 import { useSessionsApi } from "@/hooks/api/useSessionsApi";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 
 const width = Dimensions.get("window").width;
-
-const WorkoutPlan = () => {
+interface WorkoutPlanProps
+  extends StackNavigatorProps<WorkoutPlanStackParamList, "WorkoutPlanPage"> {}
+  
+const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
   const [open, setOpen] = useState(false);
   const [plans, setPlans] = useState<any[] | null>(null);
   const [value, setValue] = useState<ValueType>();
