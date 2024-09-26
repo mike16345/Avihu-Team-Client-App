@@ -1,30 +1,40 @@
-import { Carbs } from "@/enums/Carbs";
-import { Proteins } from "@/enums/Proteins";
-
-export interface IDietPlan {
-  id: string;
-  meals: IMeal[];
-  totalCalories: number;
+export interface ICustomItem {
+  name: string;
+  dietaryType: string[];
+  foodGroup: string;
+  oneServing: {
+    grams: number;
+    spoons: number;
+  };
 }
 
-export interface ICustomItemInstructions {
-  item: string;
+export interface IDietItem {
   quantity: number;
-}
-
-export interface IMealItem{
-  quantity:number,
-  unit:string
-  customInstructions?: ICustomItemInstructions[];
+  unit: DietItemUnit;
+  customItems?: ICustomItem[];
 }
 
 export interface IMeal {
-  id: string;
-  totalProtein: IMealItem;
-  totalCarbs: IMealItem;
-  totalFats?: IMealItem;
-  totalVeggies?: IMealItem;
+  _id?: string;
+  totalProtein: IDietItem;
+  totalCarbs: IDietItem;
+  totalFats?: IDietItem;
+  totalVeggies?: IDietItem;
 }
+
+export interface IDietPlan {
+  meals: IMeal[];
+  totalCalories?: number;
+  freeCalories: number;
+  customInstructions?: string;
+}
+
+export interface IDietPlanPreset extends IDietPlan {
+  name: string;
+}
+
+export type DietItemUnit = "grams" | "spoons";
+
 export interface IServingItem {
   spoons: number;
   grams: number;
@@ -37,15 +47,14 @@ export interface IMenuItem {
   oneServing: IServingItem;
 }
 
-export interface IRecordedMeal {
-  id: string;
-  protein: {
-    type: Proteins; // e.g., chicken, meat, etc.
-    amount: number; // in grams
-  };
-  carb: {
-    type: Carbs; // e.g., bread, rice, etc.
-    amount: number; // in grams
-  };
-  note: string; // e.g., "Shit was ass and I am still hungry!"
+export interface IMenue {
+  menuName: string;
+  menuItems: IMenuItem[];
 }
+
+export type CustomItems = {
+  fats: string[];
+  carbs: string[];
+  vegetables: string[];
+  protein: string[];
+};

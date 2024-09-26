@@ -1,7 +1,7 @@
 import axiosInstance from "@/config/apiConfig";
 import { Method } from "axios";
 
-const API_AUTH_TOKEN = process.env.EXPO_API_AUTH_TOKEN;
+const API_AUTH_TOKEN = process.env.EXPO_PUBLIC_API_AUTH_TOKEN;
 
 async function request<T>(
   method: Method,
@@ -34,10 +34,15 @@ export async function sendData<T>(endpoint: string, data: any, headers?: any): P
   return request<T>("post", endpoint, data, undefined, headers);
 }
 
-export async function updateItem<T>(endpoint: string, data: any, headers?: any): Promise<T> {
-  return request<T>("put", endpoint, data, undefined, headers);
+export async function updateItem<T>(
+  endpoint: string,
+  data: any,
+  headers?: any,
+  params?: any
+): Promise<T> {
+  return request<T>("put", endpoint, data, params, headers);
 }
 
-export async function deleteItem<T>(endpoint: string, id: string, headers?: any): Promise<T> {
-  return request<T>("delete", `${endpoint}/${id}`, undefined, undefined, headers);
+export async function deleteItem<T>(endpoint: string, params?: any, headers?: any): Promise<T> {
+  return request<T>("delete", `${endpoint}/${params}`, undefined, undefined, headers);
 }
