@@ -5,7 +5,7 @@ export const useUserApi = () => {
   const USER_ENDPOINT = "users/";
 
   const getUserById = (id: string) => {
-    return fetchData<IUser>(USER_ENDPOINT + id);
+    return fetchData<IUser>(USER_ENDPOINT + `one/`, { id });
   };
 
   return {

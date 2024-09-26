@@ -1,7 +1,7 @@
 import axiosInstance from "@/config/apiConfig";
 import { Method } from "axios";
 
-const API_AUTH_TOKEN = process.env.VITE_API_AUTH_TOKEN;
+const API_AUTH_TOKEN = process.env.EXPO_API_AUTH_TOKEN;
 
 async function request<T>(
   method: Method,

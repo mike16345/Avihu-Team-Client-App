@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 
-const SERVER = process.env.VITE_SERVER;
+const SERVER = process.env.EXPO_SERVER;
 
 console.log("Server", SERVER);
 
