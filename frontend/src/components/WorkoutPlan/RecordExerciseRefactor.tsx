@@ -11,7 +11,7 @@ import { TextInput } from "react-native-paper";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
 
 const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
-  const { handleRecordSet, exerciseName, setNumber } = route.params;
+  const { handleRecordSet, exerciseName, setNumber } = route!.params;
   const { width } = useWindowDimensions();
   const customStyles = useStyles();
   const { colors, layout, spacing } = customStyles;
