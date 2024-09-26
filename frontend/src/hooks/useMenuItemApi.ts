@@ -3,17 +3,19 @@ import { CustomItems } from "@/interfaces/DietPlan";
 import { IMenuItem } from "@/interfaces/DietPlan";
 import { ApiResponse } from "@/types/ApiTypes";
 
-const MENU_ITEMS_ENDPOINT = `presets/menuItems/`;
+const MENU_ITEMS_ENDPOINT = `menuItems`;
 
 const useMenuItemApi = () => {
   const getAllMenuItems = () =>
     fetchData<ApiResponse<CustomItems>>(MENU_ITEMS_ENDPOINT).then((res) => res.data);
 
   const getMenuItems = (foodGroup: string) =>
-    fetchData<ApiResponse<IMenuItem[]>>(MENU_ITEMS_ENDPOINT + `/foodGroup`, { foodGroup });
+    fetchData<ApiResponse<IMenuItem[]>>(MENU_ITEMS_ENDPOINT + `/foodGroup`, { foodGroup }).then(
+      (res) => res.data
+    );
 
   const getOneMenuItem = (id: string) =>
-    fetchData<ApiResponse<IMenuItem>>(`${MENU_ITEMS_ENDPOINT}/one`, { id });
+    fetchData<ApiResponse<IMenuItem>>(`${MENU_ITEMS_ENDPOINT}/one`, { id }).then((res) => res.data);
 
   const addMenuItem = (newMenuItem: IMenuItem) => sendData(MENU_ITEMS_ENDPOINT, newMenuItem);
 

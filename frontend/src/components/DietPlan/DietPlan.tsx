@@ -35,7 +35,7 @@ export default function DietPlan() {
   useEffect(() => {
     if (!currentUser) return;
 
-    getDietPlanByUserId(`66eb21052c9fd96253c299ff`)
+    getDietPlanByUserId(currentUser._id)
       .then((res) => setDietPlan(res))
       .catch((err) => console.log(err));
   }, []);
