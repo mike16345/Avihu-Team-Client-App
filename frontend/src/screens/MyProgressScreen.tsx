@@ -35,7 +35,7 @@ const MyProgressScreen = () => {
 
     if (isNew && currentUser) {
       return addWeighIn(currentUser._id, weighIn)
-        .then((res) => setWeighIns(res.weighIns))
+        .then((res) => setWeighIns(res.data.weighIns))
         .catch((err) => console.log("err", err));
     }
     if (!weighInId) return;
@@ -45,7 +45,7 @@ const MyProgressScreen = () => {
 
   const handleUpdateWeighIn = async (weighInId: string, weighIn: IWeighInPost) => {
     try {
-      const updateResult = await updateWeighInById(weighInId, weighIn);
+      const updateResult = await (await updateWeighInById(weighInId, weighIn)).data;
 
       setWeighIns((prev) => prev.map((item) => (item._id === weighInId ? updateResult : item)));
     } catch (e) {
@@ -57,9 +57,10 @@ const MyProgressScreen = () => {
     if (!weighInId) return;
 
     try {
+      console.log("weigh in id", weighInId);
       const response = await deleteWeighIn(weighInId);
 
-      setWeighIns(response.weighIns);
+      setWeighIns(response.data.weighIns);
       setOpenWeightModal(false);
     } catch (e) {
       console.error(e);
@@ -67,10 +68,12 @@ const MyProgressScreen = () => {
   };
 
   const getUserWeightIns = async () => {
+    console.log("current user ", currentUser);
     if (!currentUser) return;
 
     getWeighInsByUserId(currentUser._id)
       .then((weighIns) => {
+        console.log("got weigh ins", weighIns[0].weight);
         setWeighIns(weighIns);
       })
       .catch((err) => console.log(err));
@@ -102,7 +105,7 @@ const MyProgressScreen = () => {
           <WeightGraph weighIns={weighIns} />
         </View>
         <FABGroup
-          icon={isFabOpen?"close":"plus"}
+          icon={isFabOpen ? "close" : "plus"}
           visible
           onStateChange={({ open }) => {
             setIsFabOpen(open);

@@ -22,7 +22,6 @@ const useCalendarTheme = (weighIns: IWeighIn[] = [], selected: string = "") => {
 
     weighIns.forEach((weighIn) => {
       const dateString = new Date(weighIn.date).toISOString().split("T")[0];
-
       marks[dateString] = {
         selected: selected === dateString,
         selectedColor: theme.colors.primary,
@@ -40,7 +39,6 @@ const useCalendarTheme = (weighIns: IWeighIn[] = [], selected: string = "") => {
         weight: weighIn.weight,
       };
     });
-
     return marks;
   }, [selected, weighIns, theme.colors]);
 

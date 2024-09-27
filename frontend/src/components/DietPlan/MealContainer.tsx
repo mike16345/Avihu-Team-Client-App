@@ -1,6 +1,6 @@
 import { IMeal } from "@/interfaces/DietPlan";
 import React from "react";
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import CustomInstructionsContainer from "./CustomInstructionsContainer";
 import StandardMealItem from "./StandardMealItem";
 import NativeIcon from "../Icon/NativeIcon";
@@ -52,10 +52,22 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
   };
 
   return (
-    <View style={[layout.rtl, layout.wrap, spacing.gapDefault, spacing.pdDefault]}>
+    <View
+      style={[
+        layout.rtl,
+        layout.flexRow,
+        layout.justifyStart,
+        layout.wrap,
+        spacing.gapDefault,
+        spacing.pdDefault,
+        {
+          width: `80%`,
+        },
+      ]}
+    >
       {mealItems.map((mealItem) => (
         <React.Fragment key={mealItem[1]._id}>
-          {mealItem[1].customInstructions && mealItem[1].customInstructions.length > 0 && (
+          {mealItem[1].customItems && mealItem[1].customItems.length > 0 && (
             <CustomInstructionsContainer
               customInstructions={mealItem[1].customInstructions}
               icon={
@@ -70,7 +82,7 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
             />
           )}
 
-          {mealItem[1].quantity > 0 && mealItem[1].customInstructions.length == 0 && (
+          {mealItem[1].quantity > 0 && mealItem[1].customItems.length == 0 && (
             <StandardMealItem
               icon={
                 <NativeIcon

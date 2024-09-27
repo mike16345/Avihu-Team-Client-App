@@ -23,7 +23,6 @@ interface WeightGraphProps {
 
 export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
   const { layout, colors, spacing } = useStyles();
-
   const { width, height } = useWindowDimensions();
 
   const [selectedWeight, setSelectedWeight] = useState<number | null>(null);
@@ -67,7 +66,6 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
   useEffect(() => {
     const weighInsInRange = DateUtils.getItemsInRange({ ...rangeParams, items: weighIns });
     const weights = extractWeights(weighInsInRange);
-
     setWeights(weights);
   }, [weighIns]);
 

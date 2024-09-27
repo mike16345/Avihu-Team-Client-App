@@ -9,7 +9,7 @@ import NativeIcon from "../Icon/NativeIcon";
 import FABGroup from "../ui/FABGroup";
 import MenuItemModal from "./MenuItemModal";
 import useStyles from "@/styles/useGlobalStyles";
-import { DarkTheme, useThemeContext } from "@/themes/useAppTheme";
+import { DarkTheme } from "@/themes/useAppTheme";
 import { Portal } from "react-native-paper";
 import Divider from "../ui/Divider";
 
@@ -29,12 +29,10 @@ export default function DietPlan() {
     setSelectedFoodGroup(foodGroup);
   };
 
-  console.log(colors.background);
-
   useEffect(() => {
     if (!currentUser) return;
 
-    getDietPlanByUserId(currentUser?._id)
+    getDietPlanByUserId(currentUser._id)
       .then((res) => setDietPlan(res))
       .catch((err) => console.log(err));
   }, []);
