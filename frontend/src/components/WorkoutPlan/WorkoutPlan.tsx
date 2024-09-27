@@ -24,7 +24,7 @@ import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigato
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "WorkoutPlanPage"> {}
-  
+
 const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
   const [open, setOpen] = useState(false);
   const [plans, setPlans] = useState<any[] | null>(null);

@@ -1,4 +1,3 @@
-import { WorkoutType } from "@/enums/WorkoutTypes";
 import { ISession } from "./ISession";
 
 export interface IWorkout {
@@ -7,17 +6,6 @@ export interface IWorkout {
   linkToVideo?: string;
   name: string;
   sets: ISet[];
-}
-
-export interface IDetailedWorkoutPlan extends IWorkoutPlan {
-  [WorkoutType.CHEST]: IWorkoutPlan[];
-  [WorkoutType.LEGS]: IWorkout[];
-  [WorkoutType.BICEPS]?: IWorkout[];
-  [WorkoutType.BACK]?: IWorkout[];
-  [WorkoutType.SHOULDERS]?: IWorkout[];
-  [WorkoutType.TRICEPS]?: IWorkout[];
-  [WorkoutType.ABS]?: IWorkout[];
-  [WorkoutType.CARDIO]?: IWorkout[];
 }
 
 export interface ICompletedSet {

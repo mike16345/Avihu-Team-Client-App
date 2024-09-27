@@ -6,7 +6,10 @@ const RECORDED_SETS_ENDPOINT = "recordedSets";
 
 export const useRecordedSetsApi = () => {
   const addRecordedSet = (recordedSet: IRecordedSetPost, sessionId: string = "") => {
-    return sendData<IRecordedSetResponse>(RECORDED_SETS_ENDPOINT + "/" + sessionId, recordedSet);
+    return sendData<IRecordedSetResponse>(
+      RECORDED_SETS_ENDPOINT + "?sessionId=" + sessionId,
+      recordedSet
+    );
   };
 
   const updateRecordedSet = (id: string, recordedSet: IRecordedSet) => {
