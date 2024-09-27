@@ -37,7 +37,7 @@ export default function App() {
 
   useEffect(() => {
     Appearance.setColorScheme("dark");
-    getUserById("665f0b0b00b1a04e8f1c4478")
+    getUserById("66eb21052c9fd96253c299ff")
       .then((user) => {
         setCurrentUser(user);
       })
@@ -45,7 +45,9 @@ export default function App() {
   }, []);
 
   return (
-    <PaperProvider theme={/* colorScheme == "dark" ? CustomDarkTheme : CustomLightTheme */ CustomDarkTheme}>
+    <PaperProvider
+      theme={/* colorScheme == "dark" ? CustomDarkTheme : CustomLightTheme */ CustomDarkTheme}
+    >
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>

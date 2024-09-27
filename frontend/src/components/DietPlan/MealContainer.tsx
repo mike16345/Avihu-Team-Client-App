@@ -1,6 +1,6 @@
 import { IMeal } from "@/interfaces/DietPlan";
 import React from "react";
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import CustomInstructionsContainer from "./CustomInstructionsContainer";
 import StandardMealItem from "./StandardMealItem";
 import NativeIcon from "../Icon/NativeIcon";
@@ -12,97 +12,94 @@ interface MealContainerProps {
 }
 
 const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
+  const { layout, spacing } = useStyles();
+  const { theme } = useThemeContext();
 
-  const { layout, spacing, } = useStyles()
-  const { theme } = useThemeContext()
+  const mealItems = Object.entries(meal);
 
-  const mealItems = Object.entries(meal)
-
-  const getIcon=(key:string)=>{
+  const getIcon = (key: string) => {
     switch (key) {
       case `totalProtein`:
-        return `fish`
-    
+        return `fish`;
+
       case `totalCarbs`:
-        return `baguette`
-    
+        return `baguette`;
+
       case `totalFats`:
-        return `cheese`
-    
+        return `cheese`;
+
       case `totalVeggies`:
-        return `leaf`
+        return `leaf`;
 
       default:
-         return `food-takeout-box-outline`;
+        return `food-takeout-box-outline`;
     }
-  }
-  const getName=(key:string)=>{
+  };
+  const getName = (key: string) => {
     switch (key) {
       case `totalProtein`:
-        return `חלבונים`
-      
+        return `חלבונים`;
+
       case `totalCarbs`:
-        return `פחמימות`
-    
+        return `פחמימות`;
+
       case `totalFats`:
-        return `שומנים`
-    
+        return `שומנים`;
+
       case `totalVeggies`:
-        return `ירקות`
+        return `ירקות`;
     }
-  }
-  
+  };
 
   return (
-    <View style={[
-      layout.rtl,
-      layout.flexRow,
-      layout.justifyStart,
-      layout.wrap,
-      spacing.gapDefault,
-      spacing.pdDefault,
-      {
-        width: `80%`
-      },
+    <View
+      style={[
+        layout.rtl,
+        layout.flexRow,
+        layout.justifyStart,
+        layout.wrap,
+        spacing.gapDefault,
+        spacing.pdDefault,
+        {
+          width: `80%`,
+        },
+      ]}
+    >
+      {mealItems.map((mealItem) => (
+        <React.Fragment key={mealItem[1]._id}>
+          {mealItem[1].customItems && mealItem[1].customItems.length > 0 && (
+            <CustomInstructionsContainer
+              customInstructions={mealItem[1].customInstructions}
+              icon={
+                <NativeIcon
+                  library="MaterialCommunityIcons"
+                  name={getIcon(mealItem[0])}
+                  size={20}
+                  color={theme.colors.primary}
+                />
+              }
+              foodGroup={getName(mealItem[0])}
+            />
+          )}
 
-    ]}>
-     {mealItems.map(mealItem => (
-  <React.Fragment key={mealItem[1]._id}>
-    {mealItem[1].customInstructions && mealItem[1].customInstructions.length>0 && (
-      <CustomInstructionsContainer
-        customInstructions={mealItem[1].customInstructions}
-        icon={
-          <NativeIcon
-            library="MaterialCommunityIcons"
-            name={getIcon(mealItem[0])}
-            size={20}
-            color={theme.colors.primary}
-          />
-        }
-        foodGroup={getName(mealItem[0])}
-      />
-    )}
-    
-    {mealItem[1].quantity > 0 && mealItem[1].customInstructions.length == 0 &&(
-      <StandardMealItem
-        icon={
-          <NativeIcon
-            library="MaterialCommunityIcons"
-            name={getIcon(mealItem[0])}
-            size={20}
-            color={theme.colors.primary}
-          />
-        }
-        quantity={mealItem[1].quantity}
-        foodGroup={getName(mealItem[0])}
-      />
-    )}
-  </React.Fragment>
-))}
+          {mealItem[1].quantity > 0 && mealItem[1].customItems.length == 0 && (
+            <StandardMealItem
+              icon={
+                <NativeIcon
+                  library="MaterialCommunityIcons"
+                  name={getIcon(mealItem[0])}
+                  size={20}
+                  color={theme.colors.primary}
+                />
+              }
+              quantity={mealItem[1].quantity}
+              foodGroup={getName(mealItem[0])}
+            />
+          )}
+        </React.Fragment>
+      ))}
     </View>
   );
 };
-
-
 
 export default MealContainer;
