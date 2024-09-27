@@ -21,7 +21,6 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns, onSaveWeighIn, onDe
   const [selectedWeighInId, setSelectedWeighInId] = useState<string | null>(null);
   const [isEditWeighOpen, setIsEditWeightOpen] = useState(false);
   const [selected, setSelected] = useState(DateUtils.getCurrentDate("YYYY-MM-DD"));
-
   const { calendar, marked } = useCalendarTheme(weighIns, selected);
 
   const handleSaveWeighIn = useCallback(
@@ -31,9 +30,6 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns, onSaveWeighIn, onDe
         weight: updatedWeighIn,
         date: selected,
       };
-
-      console.log("weigh in", weighIn);
-      console.log("weigh in id", selectedWeighInId);
 
       setIsEditWeightOpen(false);
       setSelectedWeighInId(null);

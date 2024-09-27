@@ -11,13 +11,15 @@ async function request<T>(
   headers?: any
 ): Promise<T> {
   try {
-    const response = await axiosInstance.request<T>({
+    const request = {
       method,
       url: endpoint,
       data,
       params,
       headers: { ["X-Api-Key"]: API_AUTH_TOKEN, ...headers },
-    });
+    };
+    console.log("request", request);
+    const response = await axiosInstance.request<T>(request);
 
     return response.data;
   } catch (error) {
@@ -44,5 +46,5 @@ export async function updateItem<T>(
 }
 
 export async function deleteItem<T>(endpoint: string, params?: any, headers?: any): Promise<T> {
-  return request<T>("delete", `${endpoint}/${params}`, undefined, undefined, headers);
+  return request<T>("delete", `${endpoint}`, undefined, params, headers);
 }
