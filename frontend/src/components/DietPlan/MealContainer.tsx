@@ -53,8 +53,8 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
 
   return (
     <View style={[layout.rtl, layout.wrap, spacing.gapDefault, spacing.pdDefault]}>
-      {mealItems.map((mealItem) => (
-        <React.Fragment key={mealItem[1]._id}>
+      {mealItems.map((mealItem, i) => (
+        <React.Fragment key={mealItem[1]._id + i}>
           {mealItem[1].customItems && mealItem[1].customItems.length > 0 && (
             <CustomInstructionsContainer
               customInstructions={mealItem[1].customInstructions}

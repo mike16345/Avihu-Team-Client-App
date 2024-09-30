@@ -1,12 +1,12 @@
 import useStyles from "@/styles/useGlobalStyles";
-import React from "react";
 import { View } from "react-native";
 import SkeletonLoader from "./SkeletonLoader";
 
-const WorkoutplanSkeleton = () => {
+const WorkoutPlanSkeleton = () => {
   const { layout, spacing } = useStyles();
+  
   return (
-    <View style={[layout.container, layout.heightFull, spacing.gapDefault, layout.itemsEnd]}>
+    <View style={[layout.container, layout.heightFull, spacing.gapLg, layout.itemsEnd]}>
       <SkeletonLoader height={40} />
       <SkeletonLoader height={20} width={50} />
       <SkeletonLoader height={80} />
@@ -18,4 +18,4 @@ const WorkoutplanSkeleton = () => {
   );
 };
 
-export default WorkoutplanSkeleton;
+export default WorkoutPlanSkeleton;

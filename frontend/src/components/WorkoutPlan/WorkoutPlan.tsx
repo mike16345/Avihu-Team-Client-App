@@ -20,6 +20,7 @@ import { useUserStore } from "@/store/userStore";
 import { useSessionsApi } from "@/hooks/api/useSessionsApi";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
+import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutplanSkeleton";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
@@ -131,11 +132,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
   return (
     <FlatList
       data={currentWorkoutPlan?.muscleGroups || []}
-      ListEmptyComponent={() => (
-        <View>
-          <Text>No Exercises</Text>
-        </View>
-      )}
+      ListEmptyComponent={() => <WorkoutPlanSkeleton />}
       keyExtractor={(item) => item.muscleGroup}
       ListHeaderComponent={renderHeader}
       renderItem={({ item }) => (
