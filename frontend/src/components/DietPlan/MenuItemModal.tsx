@@ -47,6 +47,7 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
         style={[
           colors.backgroundSecondaryContainer,
           spacing.pdMd,
+          spacing.pdBottomBar,
           colors.borderPrimary,
           common.borderDefault,
           common.roundedMd,
