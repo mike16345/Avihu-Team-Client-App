@@ -41,7 +41,6 @@ const WorkoutPlan = () => {
   return (
     <ScrollView ref={scrollViewRef} onScroll={handleScroll} scrollEventThrottle={16}>
       <ImageBackground source={logoBlack} style={styles.headerImage} />
-      <WorkoutplanSkeleton />
       <View style={styles.container}>
         <DropDownPicker
           rtl
