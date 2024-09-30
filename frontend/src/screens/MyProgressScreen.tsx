@@ -1,5 +1,6 @@
 import WeightCalendar from "@/components/Calendar/WeightCalendar";
 import FABGroup from "@/components/ui/FABGroup";
+import ProgressScreenSkeleton from "@/components/ui/loaders/skeletons/ProgressScreenSkeleton";
 import { WeightGraph } from "@/components/WeightGraph/WeightGraph";
 import WeightInputModal from "@/components/WeightGraph/WeightInputModal";
 import { DEFAULT_INITIAL_WEIGHT, DEFAULT_MESSAGE_TO_TRAINER } from "@/constants/Constants";
@@ -7,9 +8,11 @@ import { useWeighInApi } from "@/hooks/useWeighInApi";
 import { IWeighIn, IWeighInPost } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
 import useStyles from "@/styles/useGlobalStyles";
+import useSlideFadeIn from "@/styles/useSlideFadeIn";
+import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import DateUtils from "@/utils/dateUtils";
 import { useEffect, useState } from "react";
-import { StyleSheet, ScrollView, View, Linking } from "react-native";
+import { StyleSheet, ScrollView, View, Linking, Animated } from "react-native";
 import { Portal } from "react-native-paper";
 
 const MyProgressScreen = () => {
@@ -19,8 +22,10 @@ const MyProgressScreen = () => {
   const { getWeighInsByUserId, updateWeighInById, deleteWeighIn, addWeighIn } = useWeighInApi();
 
   const { colors, spacing, layout } = useStyles();
+  const { slideInLeftDelay0, slideInRightDelay100 } = useSlideInAnimations();
 
   const [weighIns, setWeighIns] = useState<IWeighIn[]>([]);
+  const [isLoading, setisLoading] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [openWeightModal, setOpenWeightModal] = useState(false);
 
@@ -70,18 +75,21 @@ const MyProgressScreen = () => {
   const getUserWeightIns = async () => {
     console.log("current user ", currentUser);
     if (!currentUser) return;
-
+    setisLoading(true);
     getWeighInsByUserId(currentUser._id)
       .then((weighIns) => {
         console.log("got weigh ins", weighIns[0].weight);
         setWeighIns(weighIns);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setisLoading(false));
   };
 
   useEffect(() => {
     getUserWeightIns();
   }, []);
+
+  if (isLoading) return <ProgressScreenSkeleton />;
 
   return (
     <Portal.Host>
@@ -94,16 +102,16 @@ const MyProgressScreen = () => {
           spacing.pdStatusBar,
         ]}
       >
-        <View style={styles.calendarContainer}>
+        <Animated.View style={[styles.calendarContainer, slideInLeftDelay0]}>
           <WeightCalendar
             weighIns={weighIns}
             onSaveWeighIn={handleSaveWeighIn}
             onDeleteWeighIn={(weighInId) => handleDeleteWeighIn(weighInId)}
           />
-        </View>
-        <View style={styles.graphContainer}>
+        </Animated.View>
+        <Animated.View style={[styles.graphContainer, slideInRightDelay100]}>
           <WeightGraph weighIns={weighIns} />
-        </View>
+        </Animated.View>
         <FABGroup
           icon={isFabOpen ? "close" : "plus"}
           visible

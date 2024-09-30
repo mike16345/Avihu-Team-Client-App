@@ -1,9 +1,10 @@
-import { View } from "react-native";
+import { Animated, View } from "react-native";
 import { FC, useState } from "react";
 import { DateRanges } from "@/types/dateTypes";
 import { SegmentedButtons } from "react-native-paper";
 import useColors from "@/styles/useColors";
 import { useSpacingStyles } from "@/styles/useSpacingStyles";
+import useSlideInAnimations from "@/styles/useSlideInAnimations";
 
 const selectedRangeToRange = (selectedRange: string) => {
   switch (selectedRange) {
@@ -25,12 +26,13 @@ interface ChangeRangeProps {
 const ChangeRangeBtns: FC<ChangeRangeProps> = ({ onRangeChange }) => {
   const colors = useColors();
   const spacing = useSpacingStyles();
+  const { slideInRightDelay100 } = useSlideInAnimations();
   const ranges = ["1W", "1M", "1Y"];
 
   const [selectedRangeIndex, setSelectedRangeIndex] = useState(0);
 
   return (
-    <View>
+    <Animated.View style={slideInRightDelay100}>
       <SegmentedButtons
         value={ranges[selectedRangeIndex]}
         onValueChange={(range) => {
@@ -48,7 +50,7 @@ const ChangeRangeBtns: FC<ChangeRangeProps> = ({ onRangeChange }) => {
           uncheckedColor: colors.textOnBackground.color,
         }))}
       />
-    </View>
+    </Animated.View>
   );
 };
 

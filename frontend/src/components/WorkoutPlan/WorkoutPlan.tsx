@@ -17,6 +17,7 @@ import WorkoutTips from "./WorkoutTips";
 import Workout from "./Workout";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
 import { Colors } from "@/constants/Colors";
+import WorkoutplanSkeleton from "../ui/loaders/skeletons/WorkoutplanSkeleton";
 
 const WorkoutPlan = () => {
   const keys = Object.keys(workoutPlans);

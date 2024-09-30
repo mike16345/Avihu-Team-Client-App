@@ -8,5 +8,5 @@
 }
 
 .inpt {
-  @apply bg-white border-2 px-2  rounded-md
+  @apply bg-white border-2 px-2  rounded-md;
 }
