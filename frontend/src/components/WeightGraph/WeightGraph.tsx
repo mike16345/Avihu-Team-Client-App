@@ -1,4 +1,4 @@
-import { View, useWindowDimensions } from "react-native";
+import { Animated, View, useWindowDimensions } from "react-native";
 import { FC, useEffect, useState } from "react";
 import { LineChart } from "react-native-chart-kit";
 import { IWeighIn } from "@/interfaces/User";
@@ -9,6 +9,7 @@ import ChangeRangeBtns from "./ChangeRangeBtns";
 import useGraphTheme from "@/themes/useGraphTheme";
 import useStyles from "@/styles/useGlobalStyles";
 import CurrentWeightCard from "./CurrentWeightCard";
+import useSlideInAnimations from "@/styles/useSlideInAnimations";
 
 const rangeParams: ItemsInDateRangeParams<IWeighIn> = {
   items: [],
@@ -24,6 +25,7 @@ interface WeightGraphProps {
 export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
   const { layout, colors, spacing } = useStyles();
   const { width, height } = useWindowDimensions();
+  const { slideInRightDelay300 } = useSlideInAnimations();
 
   const [selectedWeight, setSelectedWeight] = useState<number | null>(null);
   const [currentRange, setCurrentRange] = useState<DateRanges>("weeks");
@@ -104,17 +106,18 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
             }}
           />
           <ChangeRangeBtns onRangeChange={handleRangeChange} />
-          <View
+          <Animated.View
             style={[
               spacing.gapLg,
               layout.flexRow,
               spacing.pdHorizontalSm,
               { minHeight: 100, flexShrink: 0 },
+              slideInRightDelay300,
             ]}
           >
             <CurrentWeightCard currentWeight={currentWeight || 0} />
             <WeeklyScoreCard weights={weights} range={currentRange} />
-          </View>
+          </Animated.View>
         </View>
       </View>
     </>
