@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { Animated, Easing, View } from "react-native";
 
 const Loader = () => {
-  const { layout, colors, spacing } = useStyles();
+  const { layout, colors, spacing, common } = useStyles();
   // Create animated value
   const scaleAnim1 = useRef(new Animated.Value(1)).current;
   const scaleAnim2 = useRef(new Animated.Value(1)).current;
@@ -42,23 +42,23 @@ const Loader = () => {
     <View style={[layout.flexRow, layout.heightFull, layout.center, spacing.gapXxl]}>
       <Animated.View
         style={[
-          { height: 0.5, width: 0.5 },
+          { height: 0.5, width: 0.5, transform: [{ scale: scaleAnim1 }] },
           colors.backgroundPrimary,
-          { borderRadius: 100, transform: [{ scale: scaleAnim1 }] },
+          common.roundedFull,
         ]}
       />
       <Animated.View
         style={[
-          { height: 0.5, width: 0.5 },
+          { height: 0.5, width: 0.5, transform: [{ scale: scaleAnim2 }] },
           colors.backgroundPrimary,
-          { borderRadius: 100, transform: [{ scale: scaleAnim2 }] },
+          common.roundedFull,
         ]}
       />
       <Animated.View
         style={[
-          { height: 0.5, width: 0.5 },
+          { height: 0.5, width: 0.5, transform: [{ scale: scaleAnim3 }] },
           colors.backgroundPrimary,
-          { borderRadius: 100, transform: [{ scale: scaleAnim3 }] },
+          common.roundedFull,
         ]}
       />
     </View>

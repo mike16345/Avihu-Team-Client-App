@@ -22,7 +22,7 @@ const MyProgressScreen = () => {
   const { getWeighInsByUserId, updateWeighInById, deleteWeighIn, addWeighIn } = useWeighInApi();
 
   const { colors, spacing, layout } = useStyles();
-  const { slideInTopDelay0, slideInTopDelay100 } = useSlideInAnimations();
+  const { slideInLeftDelay0, slideInRightDelay100 } = useSlideInAnimations();
 
   const [weighIns, setWeighIns] = useState<IWeighIn[]>([]);
   const [isLoading, setisLoading] = useState(false);
@@ -102,14 +102,14 @@ const MyProgressScreen = () => {
           spacing.pdStatusBar,
         ]}
       >
-        <Animated.View style={[styles.calendarContainer, slideInTopDelay0]}>
+        <Animated.View style={[styles.calendarContainer, slideInLeftDelay0]}>
           <WeightCalendar
             weighIns={weighIns}
             onSaveWeighIn={handleSaveWeighIn}
             onDeleteWeighIn={(weighInId) => handleDeleteWeighIn(weighInId)}
           />
         </Animated.View>
-        <Animated.View style={[styles.graphContainer, slideInTopDelay100]}>
+        <Animated.View style={[styles.graphContainer, slideInRightDelay100]}>
           <WeightGraph weighIns={weighIns} />
         </Animated.View>
         <FABGroup

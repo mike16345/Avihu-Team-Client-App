@@ -25,7 +25,7 @@ interface WeightGraphProps {
 export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
   const { layout, colors, spacing } = useStyles();
   const { width, height } = useWindowDimensions();
-  const { slideInRightDelay300 } = useSlideInAnimations();
+  const { slideInRightDelay200 } = useSlideInAnimations();
 
   const [selectedWeight, setSelectedWeight] = useState<number | null>(null);
   const [currentRange, setCurrentRange] = useState<DateRanges>("weeks");
@@ -112,7 +112,7 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
               layout.flexRow,
               spacing.pdHorizontalSm,
               { minHeight: 100, flexShrink: 0 },
-              slideInRightDelay300,
+              slideInRightDelay200,
             ]}
           >
             <CurrentWeightCard currentWeight={currentWeight || 0} />

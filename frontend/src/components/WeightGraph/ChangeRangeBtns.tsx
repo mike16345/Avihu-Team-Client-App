@@ -26,13 +26,13 @@ interface ChangeRangeProps {
 const ChangeRangeBtns: FC<ChangeRangeProps> = ({ onRangeChange }) => {
   const colors = useColors();
   const spacing = useSpacingStyles();
-  const { slideInRightDelay200 } = useSlideInAnimations();
+  const { slideInRightDelay100 } = useSlideInAnimations();
   const ranges = ["1W", "1M", "1Y"];
 
   const [selectedRangeIndex, setSelectedRangeIndex] = useState(0);
 
   return (
-    <Animated.View style={slideInRightDelay200}>
+    <Animated.View style={slideInRightDelay100}>
       <SegmentedButtons
         value={ranges[selectedRangeIndex]}
         onValueChange={(range) => {
