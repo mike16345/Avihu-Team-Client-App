@@ -1,7 +1,7 @@
-import { View, ImageBackground, ScrollView, Text } from "react-native";
-import { useEffect, useState } from "react";
+import { View, ImageBackground, ScrollView, Text, Animated } from "react-native";
+import { useEffect, useRef, useState } from "react";
 import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
-import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
+import { useDietPlanApi } from "@/hooks/useDietPlanApi";
 import { useUserStore } from "@/store/userStore";
 import { IDietPlan } from "@/interfaces/DietPlan";
 import MealContainer from "./MealContainer";
@@ -11,6 +11,8 @@ import MenuItemModal from "./MenuItemModal";
 import useStyles from "@/styles/useGlobalStyles";
 import { DarkTheme } from "@/themes/useAppTheme";
 import { Portal } from "react-native-paper";
+import DietPlanSkeleton from "../ui/loaders/skeletons/DietPlanSkeleton";
+import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import Divider from "../ui/Divider";
 
 export default function DietPlan() {
@@ -19,9 +21,25 @@ export default function DietPlan() {
   const { layout, spacing, colors, common, text } = useStyles();
 
   const [dietPlan, setDietPlan] = useState<IDietPlan | null>(null);
+  const [isLoading, setisLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [selectedFoodGroup, setSelectedFoodGroup] = useState<string | null>(null);
+  const {
+    slideInRightDelay0,
+    slideInRightDelay100,
+    slideInRightDelay200,
+    slideInRightDelay300,
+    slideInRightDelay400,
+  } = useSlideInAnimations();
+
+  const slideAnimations = [
+    slideInRightDelay0,
+    slideInRightDelay100,
+    slideInRightDelay200,
+    slideInRightDelay300,
+    slideInRightDelay400,
+  ];
 
   const displayMenuItems = (foodGroup: string) => {
     setIsModalOpen(true);
@@ -31,10 +49,11 @@ export default function DietPlan() {
 
   useEffect(() => {
     if (!currentUser) return;
-
+    setisLoading(true);
     getDietPlanByUserId(currentUser._id)
       .then((res) => setDietPlan(res))
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setisLoading(false));
   }, []);
 
   return (
@@ -49,17 +68,14 @@ export default function DietPlan() {
         ]}
       >
         <ImageBackground source={logoBlack} className="w-screen h-[30vh]" />
-        <View style={[spacing.pdDefault, spacing.gapLg]}>
-          {dietPlan?.meals.map((meal, i) => (
-            <View
-              key={i}
-              style={[
-                layout.flexRowReverse,
-                layout.itemsCenter,
-                spacing.pdDefault,
-                colors.backgroundSecondaryContainer,
-                common.rounded,
-              ]}
+
+        {isLoading ? (
+          <DietPlanSkeleton />
+        ) : (
+          dietPlan?.meals.map((meal, i) => (
+            <Animated.View
+              key={meal._id}
+              style={[spacing.pdDefault, spacing.gapLg, slideAnimations[i]]}
             >
               <View style={[layout.itemsCenter, spacing.pdXs, spacing.gapSm, { paddingLeft: 10 }]}>
                 <NativeIcon
@@ -76,9 +92,9 @@ export default function DietPlan() {
                 color={colors.textOnSecondaryContainer.color}
               />
               <MealContainer meal={meal} />
-            </View>
-          ))}
-        </View>
+            </Animated.View>
+          ))
+        )}
 
         <MenuItemModal
           foodGroup={selectedFoodGroup}
