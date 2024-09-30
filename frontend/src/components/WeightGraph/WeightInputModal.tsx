@@ -7,6 +7,7 @@ import { useThemeContext } from "@/themes/useAppTheme";
 import WeightWheelPicker from "./WeightWheelPicker";
 import NativeIcon from "../Icon/NativeIcon";
 import OpacityButton from "../Button/OpacityButton";
+import BottomDrawer from "../ui/BottomDrawer";
 
 interface WeightInputModalProps {
   currentWeight: number;
@@ -21,8 +22,7 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
   handleDeleteWeighIn,
   handleDismiss,
 }) => {
-  const { width, height } = useWindowDimensions();
-  const { theme } = useThemeContext();
+  const { height } = useWindowDimensions();
   const [weight, setWeight] = useState(currentWeight);
   const { text, spacing, fonts, colors, layout } = useStyles();
 
@@ -37,19 +37,7 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
   const canDelete = handleDeleteWeighIn !== undefined;
 
   return (
-    <CustomModal
-      dismissable
-      dismissableBackButton
-      contentContainerStyle={{
-        borderRadius: theme.roundness,
-        marginHorizontal: "auto",
-        width: width - 10,
-        height: height / 1.4,
-        ...colors.backgroundSurface,
-      }}
-      visible={true}
-      onDismiss={handleDismiss}
-    >
+    <BottomDrawer open={true} onClose={handleDismiss}>
       <View style={[layout.container]}>
         <View style={[layout.itemsEnd, layout.widthFull, spacing.gapSm]}>
           <View
@@ -81,15 +69,15 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
             {weight}
           </Text>
         </View>
-        <View style={[layout.center, { maxHeight: height / 2 }]}>
+        <View style={[layout.center]}>
           <WeightWheelPicker
             onValueChange={handleUpdateWeight}
             activeItemColor={colors.textOnSurface.color}
             inactiveItemColor={colors.textOnSurfaceDisabled.color}
-            minWeight={40}
-            maxWeight={currentWeight + 100}
+            minWeight={30}
+            maxWeight={currentWeight + 150}
             stepSize={1}
-            height={height / 2.2}
+            height={height / 4.8}
             itemHeight={40}
             selectedWeight={weight}
           />
@@ -99,13 +87,13 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
             <Button mode="contained" onPress={handleClickSave}>
               <Text style={[text.textBold, fonts.lg]}>שמור</Text>
             </Button>
-            <Button mode="outlined" onPress={() => handleDismiss()}>
+            <Button mode="outlined" onPress={handleDismiss}>
               <Text style={[text.textBold, fonts.lg]}>בטל</Text>
             </Button>
           </View>
         </View>
       </View>
-    </CustomModal>
+    </BottomDrawer>
   );
 };
 
