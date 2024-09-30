@@ -17,6 +17,7 @@ import WorkoutTips from "./WorkoutTips";
 import Workout from "./Workout";
 import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
 import { Colors } from "@/constants/Colors";
+import WorkoutplanSkeleton from "../ui/loaders/skeletons/WorkoutplanSkeleton";
 
 const WorkoutPlan = () => {
   const keys = Object.keys(workoutPlans);
@@ -40,6 +41,7 @@ const WorkoutPlan = () => {
   return (
     <ScrollView ref={scrollViewRef} onScroll={handleScroll} scrollEventThrottle={16}>
       <ImageBackground source={logoBlack} style={styles.headerImage} />
+      <WorkoutplanSkeleton />
       <View style={styles.container}>
         <DropDownPicker
           rtl
