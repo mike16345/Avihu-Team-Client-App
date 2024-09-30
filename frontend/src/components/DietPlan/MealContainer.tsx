@@ -1,6 +1,6 @@
 import { IMeal } from "@/interfaces/DietPlan";
 import React from "react";
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import CustomInstructionsContainer from "./CustomInstructionsContainer";
 import StandardMealItem from "./StandardMealItem";
 import NativeIcon from "../Icon/NativeIcon";
@@ -52,19 +52,7 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
   };
 
   return (
-    <View
-      style={[
-        layout.rtl,
-        layout.flexRow,
-        layout.justifyStart,
-        layout.wrap,
-        spacing.gapDefault,
-        spacing.pdDefault,
-        {
-          width: `80%`,
-        },
-      ]}
-    >
+    <View style={[layout.rtl, layout.wrap, spacing.gapDefault, spacing.pdDefault]}>
       {mealItems.map((mealItem) => (
         <React.Fragment key={mealItem[1]._id}>
           {mealItem[1].customItems && mealItem[1].customItems.length > 0 && (

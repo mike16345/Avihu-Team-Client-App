@@ -1,7 +1,7 @@
 import { View, ImageBackground, ScrollView, Text, Animated } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
-import { useDietPlanApi } from "@/hooks/useDietPlanApi";
+import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
 import { useUserStore } from "@/store/userStore";
 import { IDietPlan } from "@/interfaces/DietPlan";
 import MealContainer from "./MealContainer";
@@ -75,7 +75,15 @@ export default function DietPlan() {
           dietPlan?.meals.map((meal, i) => (
             <Animated.View
               key={meal._id}
-              style={[spacing.pdDefault, spacing.gapLg, slideAnimations[i]]}
+              style={[
+                layout.flexRowReverse,
+                layout.itemsCenter,
+                spacing.pdDefault,
+                spacing.mgSm,
+                colors.backgroundSecondaryContainer,
+                common.rounded,
+                slideAnimations[i],
+              ]}
             >
               <View style={[layout.itemsCenter, spacing.pdXs, spacing.gapSm, { paddingLeft: 10 }]}>
                 <NativeIcon
