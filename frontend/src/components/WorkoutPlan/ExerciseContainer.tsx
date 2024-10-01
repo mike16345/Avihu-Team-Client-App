@@ -110,7 +110,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
           <NativeIcon
             onPress={() => {
               navigation.navigate("RecordSet", {
-                exerciseName: exercise.name,
+                exercise: exercise,
                 handleRecordSet: (recordedSet) => handleRecordSet(recordedSet),
                 setNumber: currentSetNumber,
               });
@@ -125,12 +125,12 @@ const ExerciseContainer: FC<WorkoutProps> = ({
         </View>
       </View>
 
-      <WorkoutVideoPopup
+      {/* <WorkoutVideoPopup
         title={exercise.name}
         isVisible={modalVisible}
         setIsVisible={setModalVisible}
         videoId={videoId}
-      />
+      /> */}
     </View>
   );
 };

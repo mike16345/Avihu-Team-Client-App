@@ -1,23 +1,23 @@
 import { Colors } from "@/constants/Colors";
-import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from "react";
-import { StyleSheet, View, Text, ActivityIndicator, useWindowDimensions } from "react-native";
+import { FC, useEffect, useRef, useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ActivityIndicator,
+  useWindowDimensions,
+  Dimensions,
+} from "react-native";
 import YoutubePlayer, { YoutubeIframeRef } from "react-native-youtube-iframe";
-import { CustomModal } from "../ui/Modal";
+import React from "react";
 
 interface WorkoutVideoPopupProps {
-  isVisible: boolean;
   videoId: string;
   title: string;
-  setIsVisible: Dispatch<SetStateAction<boolean>>;
 }
 
-const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({
-  isVisible,
-  setIsVisible,
-  videoId,
-  title,
-}) => {
-  const { width, height } = useWindowDimensions();
+const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, title }) => {
+  const { width } = useWindowDimensions();
 
   const [isLoading, setIsLoading] = useState(true);
   const [canPlay, setCanPlay] = useState(false);
@@ -36,19 +36,8 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({
   }, []);
 
   return (
-    <CustomModal
-      style={{
-        height: height / 2.5,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-      visible={isVisible}
-      onDismiss={() => setIsVisible(false)}
-      dismissableBackButton
-    >
-      <View style={styles.container}>
-        <Text style={styles.title}>{title}</Text>
-        {isLoading && <ActivityIndicator size="large" color={Colors.primary} />}
+    <React.Fragment>
+      <View>
         <YoutubePlayer
           ref={playerRef}
           play={canPlay}
@@ -59,30 +48,9 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({
           videoId={videoId}
         />
       </View>
-      <Text style={styles.tip}>דגשים: אל תשבור את הכתף</Text>
-    </CustomModal>
+    </React.Fragment>
   );
 };
 
 export default WorkoutVideoPopup;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.secondary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: Colors.primary,
-    // alignSelf: "center",
-  },
-  tip: {
-    fontSize: 12,
-    fontWeight: "bold",
-    textAlign: "right",
-    color: Colors.primary,
-  },
-});
+2

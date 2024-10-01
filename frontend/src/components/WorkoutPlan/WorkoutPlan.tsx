@@ -20,7 +20,7 @@ import { useUserStore } from "@/store/userStore";
 import { useSessionsApi } from "@/hooks/api/useSessionsApi";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
-import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutplanSkeleton";
+import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutPlanSkeleton";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
@@ -57,21 +57,6 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
       .catch((err) => console.log(err));
   }, []);
 
-  useEffect(() => {
-    if (!workoutPlan) return;
-
-    const plans = workoutPlan.workoutPlans.map((workout) => {
-      return { label: workout.planName, value: workout.planName };
-    });
-
-    setPlans(plans);
-    setValue(plans[0].label);
-    setCurrentWorkoutPlan(workoutPlan.workoutPlans[0]);
-
-    // Load the session details for the current workout plan
-    loadWorkoutSession();
-  }, [workoutPlan]);
-
   const loadWorkoutSession = async () => {
     const session = await getItem();
     if (!session) return;
@@ -100,6 +85,21 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
     setCurrentWorkoutSession(session);
     await setItem(JSON.stringify(session));
   };
+
+  useEffect(() => {
+    if (!workoutPlan) return;
+
+    const plans = workoutPlan.workoutPlans.map((workout) => {
+      return { label: workout.planName, value: workout.planName };
+    });
+
+    setPlans(plans);
+    setValue(plans[0].label);
+    setCurrentWorkoutPlan(workoutPlan.workoutPlans[0]);
+
+    // Load the session details for the current workout plan
+    loadWorkoutSession();
+  }, [workoutPlan]);
 
   const renderHeader = () => (
     <>

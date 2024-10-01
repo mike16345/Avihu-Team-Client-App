@@ -1,5 +1,5 @@
 import { ISession } from "@/interfaces/ISession";
-import { IRecordedSet } from "@/interfaces/Workout";
+import { IExercise, IRecordedSet } from "@/interfaces/Workout";
 import { ParamListBase, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -18,7 +18,7 @@ export type WorkoutPlanStackParamList = {
   WorkoutPlanPage: undefined;
   RecordSet: {
     handleRecordSet: (recordSet: Omit<IRecordedSet, "plan">) => void;
-    exerciseName: string;
+    exercise: IExercise;
     setNumber: number;
   };
 };
