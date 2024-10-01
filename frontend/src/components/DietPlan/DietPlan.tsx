@@ -16,6 +16,7 @@ import Loader from "../ui/loaders/Loader";
 import DietPlanSkeleton from "../ui/loaders/skeletons/DietPlanSkeleton";
 import useSlideFadeIn from "@/styles/useSlideFadeIn";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
+import TipsAndCaloriesContainer from "./TipsAndCaloriesContainer";
 
 export default function DietPlan() {
   const { handleScroll } = useHideTabBarOnScroll();
@@ -56,7 +57,10 @@ export default function DietPlan() {
     if (!currentUser) return;
     setisLoading(true);
     getDietPlanByUserId(currentUser._id)
-      .then((res) => setDietPlan(res))
+      .then((res) => {
+        console.log(res);
+        setDietPlan(res);
+      })
       .catch((err) => console.log(err))
       .finally(() => setisLoading(false));
   }, []);
@@ -79,40 +83,43 @@ export default function DietPlan() {
         {isLoading ? (
           <DietPlanSkeleton />
         ) : (
-          dietPlan?.meals.map((meal, i) => (
-            <Animated.View
-              key={i}
-              style={[
-                layout.flexRowReverse,
-                layout.itemsCenter,
-                spacing.pdDefault,
-                spacing.mgSm,
-                colors.backgroundSecondaryContainer,
-                common.rounded,
-                slideAnimations[i],
-              ]}
-            >
-              <View
+          <View>
+            <TipsAndCaloriesContainer />
+            {dietPlan?.meals.map((meal, i) => (
+              <Animated.View
+                key={i}
                 style={[
+                  layout.flexRowReverse,
                   layout.itemsCenter,
-                  spacing.pdXs,
-                  spacing.gapSm,
-                  common.borderLeftSm,
-                  colors.borderSecondary,
-                  { paddingLeft: 10 },
+                  spacing.pdDefault,
+                  spacing.mgSm,
+                  colors.backgroundSecondaryContainer,
+                  common.rounded,
+                  slideAnimations[i],
                 ]}
               >
-                <NativeIcon
-                  library="MaterialCommunityIcons"
-                  name="food-outline"
-                  color={theme.colors.secondary}
-                  size={20}
-                />
-                <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
-              </View>
-              <MealContainer meal={meal} />
-            </Animated.View>
-          ))
+                <View
+                  style={[
+                    layout.itemsCenter,
+                    spacing.pdXs,
+                    spacing.gapSm,
+                    common.borderLeftSm,
+                    colors.borderSecondary,
+                    { paddingLeft: 10 },
+                  ]}
+                >
+                  <NativeIcon
+                    library="MaterialCommunityIcons"
+                    name="food-outline"
+                    color={theme.colors.secondary}
+                    size={20}
+                  />
+                  <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
+                </View>
+                <MealContainer meal={meal} />
+              </Animated.View>
+            ))}
+          </View>
         )}
 
         <MenuItemModal
