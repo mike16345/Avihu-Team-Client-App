@@ -12,11 +12,10 @@ import MenuItemModal from "./MenuItemModal";
 import useStyles from "@/styles/useGlobalStyles";
 import { DarkTheme, useThemeContext } from "@/themes/useAppTheme";
 import { Portal } from "react-native-paper";
-import Loader from "../ui/loaders/Loader";
 import DietPlanSkeleton from "../ui/loaders/skeletons/DietPlanSkeleton";
-import useSlideFadeIn from "@/styles/useSlideFadeIn";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
-import TipsAndCaloriesContainer from "./TipsAndCaloriesContainer";
+import FreeCaloriesContainer from "./FreeCaloriesContainer";
+import Tips from "./Tips";
 
 export default function DietPlan() {
   const { handleScroll } = useHideTabBarOnScroll();
@@ -83,8 +82,20 @@ export default function DietPlan() {
         {isLoading ? (
           <DietPlanSkeleton />
         ) : (
-          <View>
-            <TipsAndCaloriesContainer />
+          <View style={[spacing.pdDefault, spacing.gapLg]}>
+            <Animated.View
+              style={[
+                layout.flexRowReverse,
+                layout.justifyBetween,
+                spacing.gapDefault,
+                slideInRightDelay0,
+              ]}
+            >
+              {dietPlan?.customInstructions && <Tips tips={dietPlan.customInstructions} />}
+              {Boolean(dietPlan?.freeCalories) && (
+                <FreeCaloriesContainer calorieAmount={dietPlan?.freeCalories} />
+              )}
+            </Animated.View>
             {dietPlan?.meals.map((meal, i) => (
               <Animated.View
                 key={i}
@@ -92,7 +103,6 @@ export default function DietPlan() {
                   layout.flexRowReverse,
                   layout.itemsCenter,
                   spacing.pdDefault,
-                  spacing.mgSm,
                   colors.backgroundSecondaryContainer,
                   common.rounded,
                   slideAnimations[i],

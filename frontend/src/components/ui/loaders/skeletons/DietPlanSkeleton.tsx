@@ -19,6 +19,10 @@ const DietPlanSkeleton = () => {
         { height: seventyVhHeight },
       ]}
     >
+      <View style={[layout.flexRowReverse, layout.justifyBetween, spacing.gapDefault]}>
+        <SkeletonLoader height={70} style={{ width: `48%` }} />
+        <SkeletonLoader height={70} style={{ width: `48%` }} />
+      </View>
       <SkeletonLoader height={70} />
       <SkeletonLoader height={70} />
       <SkeletonLoader height={70} />
