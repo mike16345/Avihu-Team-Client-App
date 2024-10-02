@@ -21,7 +21,7 @@ const Tips: React.FC<TipsProps> = ({ tips }) => {
           common.rounded,
           layout.itemsCenter,
           spacing.pdDefault,
-          { width: `48%` },
+          { width: `47%` },
         ]}
         onPress={() => setOpen(true)}
       >

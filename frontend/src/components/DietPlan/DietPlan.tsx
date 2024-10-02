@@ -14,8 +14,8 @@ import { DarkTheme, useThemeContext } from "@/themes/useAppTheme";
 import { Portal } from "react-native-paper";
 import DietPlanSkeleton from "../ui/loaders/skeletons/DietPlanSkeleton";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
-import FreeCaloriesContainer from "./FreeCaloriesContainer";
 import Tips from "./Tips";
+import AmountContainer from "./AmountContainer";
 
 export default function DietPlan() {
   const { handleScroll } = useHideTabBarOnScroll();
@@ -56,10 +56,7 @@ export default function DietPlan() {
     if (!currentUser) return;
     setisLoading(true);
     getDietPlanByUserId(currentUser._id)
-      .then((res) => {
-        console.log(res);
-        setDietPlan(res);
-      })
+      .then((res) => setDietPlan(res))
       .catch((err) => console.log(err))
       .finally(() => setisLoading(false));
   }, []);
@@ -87,14 +84,18 @@ export default function DietPlan() {
               style={[
                 layout.flexRowReverse,
                 layout.justifyBetween,
-                spacing.gapDefault,
+                spacing.gapLg,
+                { flexWrap: `wrap` },
                 slideInRightDelay0,
               ]}
             >
               {dietPlan?.customInstructions && <Tips tips={dietPlan.customInstructions} />}
+
               {Boolean(dietPlan?.freeCalories) && (
-                <FreeCaloriesContainer calorieAmount={dietPlan?.freeCalories} />
+                <AmountContainer title="קלוריות חופשיות" amount={dietPlan?.freeCalories} />
               )}
+
+              <AmountContainer title="כמות שומנים ליום" variant="gr" amount={250} />
             </Animated.View>
             {dietPlan?.meals.map((meal, i) => (
               <Animated.View
