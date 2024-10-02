@@ -27,7 +27,7 @@ const TipsModal: React.FC<TipsModalProps> = ({ isOpen, dismiss, tips }) => {
         <Text
           style={[text.textRight, fonts.xl, text.textBold, colors.textPrimary, spacing.pdDefault]}
         >
-          הערות
+          דגשים
         </Text>
         <Text style={[colors.textOnSecondaryContainer, text.textRight, spacing.pdDefault]}>
           {tips}

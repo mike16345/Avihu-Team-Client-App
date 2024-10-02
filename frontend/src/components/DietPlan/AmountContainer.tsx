@@ -17,12 +17,19 @@ const AmountContainer: React.FC<AmountContainerProps> = ({ amount, title, varian
         common.rounded,
         layout.itemsEnd,
         spacing.pdDefault,
-        { width: `47%` },
+        layout.flex1,
+        { maxWidth: `48%` },
       ]}
     >
-      <Text style={[fonts.lg, colors.textPrimary, text.textBold]}>{title}</Text>
+      <Text style={[fonts.lg, colors.textPrimary, text.textBold, text.textRight]}>{title}</Text>
       <View
-        style={[layout.widthFull, layout.flexRowReverse, layout.itemsCenter, layout.justifyCenter]}
+        style={[
+          layout.widthFull,
+          layout.flexRowReverse,
+          layout.itemsCenter,
+          layout.justifyCenter,
+          spacing.gapSm,
+        ]}
       >
         <Text
           style={[
@@ -30,7 +37,7 @@ const AmountContainer: React.FC<AmountContainerProps> = ({ amount, title, varian
             text.textBold,
             text.textCenter,
             colors.textOnSecondaryContainer,
-            spacing.pdDefault,
+            spacing.pdVerticalDefault,
           ]}
         >
           {amount}
