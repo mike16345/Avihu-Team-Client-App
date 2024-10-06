@@ -12,10 +12,10 @@ import MenuItemModal from "./MenuItemModal";
 import useStyles from "@/styles/useGlobalStyles";
 import { DarkTheme, useThemeContext } from "@/themes/useAppTheme";
 import { Portal } from "react-native-paper";
-import Loader from "../ui/loaders/Loader";
 import DietPlanSkeleton from "../ui/loaders/skeletons/DietPlanSkeleton";
-import useSlideFadeIn from "@/styles/useSlideFadeIn";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
+import Tips from "./Tips";
+import AmountContainer from "./AmountContainer";
 
 export default function DietPlan() {
   const { handleScroll } = useHideTabBarOnScroll();
@@ -79,40 +79,58 @@ export default function DietPlan() {
         {isLoading ? (
           <DietPlanSkeleton />
         ) : (
-          dietPlan?.meals.map((meal, i) => (
+          <View style={[spacing.pdDefault, spacing.gapLg]}>
             <Animated.View
-              key={i}
               style={[
                 layout.flexRowReverse,
-                layout.itemsCenter,
-                spacing.pdDefault,
-                spacing.mgSm,
-                colors.backgroundSecondaryContainer,
-                common.rounded,
-                slideAnimations[i],
+                layout.justifyBetween,
+                spacing.gapLg,
+                { flexWrap: `wrap` },
+                slideInRightDelay0,
               ]}
             >
-              <View
+              {dietPlan?.customInstructions && <Tips tips={dietPlan.customInstructions} />}
+
+              {Boolean(dietPlan?.freeCalories) && (
+                <AmountContainer title="קלוריות חופשיות" amount={dietPlan?.freeCalories} />
+              )}
+
+              <AmountContainer title="כמות שומנים ליום" variant="gr" amount={250} />
+            </Animated.View>
+            {dietPlan?.meals.map((meal, i) => (
+              <Animated.View
+                key={i}
                 style={[
+                  layout.flexRowReverse,
                   layout.itemsCenter,
-                  spacing.pdXs,
-                  spacing.gapSm,
-                  common.borderLeftSm,
-                  colors.borderSecondary,
-                  { paddingLeft: 10 },
+                  spacing.pdDefault,
+                  colors.backgroundSecondaryContainer,
+                  common.rounded,
+                  slideAnimations[i],
                 ]}
               >
-                <NativeIcon
-                  library="MaterialCommunityIcons"
-                  name="food-outline"
-                  color={theme.colors.secondary}
-                  size={20}
-                />
-                <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
-              </View>
-              <MealContainer meal={meal} />
-            </Animated.View>
-          ))
+                <View
+                  style={[
+                    layout.itemsCenter,
+                    spacing.pdXs,
+                    spacing.gapSm,
+                    common.borderLeftSm,
+                    colors.borderSecondary,
+                    { paddingLeft: 10 },
+                  ]}
+                >
+                  <NativeIcon
+                    library="MaterialCommunityIcons"
+                    name="food-outline"
+                    color={theme.colors.secondary}
+                    size={20}
+                  />
+                  <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
+                </View>
+                <MealContainer meal={meal} />
+              </Animated.View>
+            ))}
+          </View>
         )}
 
         <MenuItemModal
