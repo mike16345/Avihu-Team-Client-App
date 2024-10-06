@@ -14,8 +14,6 @@ import { DarkTheme, useThemeContext } from "@/themes/useAppTheme";
 import { Portal } from "react-native-paper";
 import DietPlanSkeleton from "../ui/loaders/skeletons/DietPlanSkeleton";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
-import Tips from "./Tips";
-import AmountContainer from "./AmountContainer";
 import ExtraInfoContainer from "./ExtraInfoContainer";
 
 export default function DietPlan() {

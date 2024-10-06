@@ -1,11 +1,10 @@
 import useStyles from "@/styles/useGlobalStyles";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
-import React, { useRef } from "react";
+import React from "react";
 import { Animated } from "react-native";
 import AmountContainer from "./AmountContainer";
 import Tips from "./Tips";
 import { ScrollView } from "react-native-gesture-handler";
-import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
 
 interface ExtraInfoContainerProps {
   fats?: number;
@@ -18,9 +17,8 @@ const ExtraInfoContainer: React.FC<ExtraInfoContainerProps> = ({
   freeCalories,
   fats,
 }) => {
-  const { layout, spacing, colors, common, text } = useStyles();
+  const { layout, spacing } = useStyles();
   const { slideInRightDelay0 } = useSlideInAnimations();
-  const { handleScroll } = useHideTabBarOnScroll();
 
   return (
     <ScrollView horizontal>
