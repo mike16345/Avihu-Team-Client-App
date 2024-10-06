@@ -13,7 +13,8 @@ import { DarkTheme } from "@/themes/useAppTheme";
 import { Portal } from "react-native-paper";
 import DietPlanSkeleton from "../ui/loaders/skeletons/DietPlanSkeleton";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
-import Divider from "../ui/Divider";
+import Tips from "./Tips";
+import AmountContainer from "./AmountContainer";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
@@ -72,36 +73,51 @@ export default function DietPlan() {
         {isLoading ? (
           <DietPlanSkeleton />
         ) : (
-          dietPlan?.meals.map((meal, i) => (
+          <View style={[spacing.pdDefault, spacing.gapLg]}>
             <Animated.View
-              key={meal._id}
               style={[
                 layout.flexRowReverse,
-                layout.itemsCenter,
-                spacing.pdDefault,
-                spacing.mgSm,
-                colors.backgroundSecondaryContainer,
-                common.rounded,
-                slideAnimations[i],
+                layout.justifyBetween,
+                spacing.gapLg,
+                { flexWrap: `wrap` },
+                slideInRightDelay0,
               ]}
             >
-              <View style={[layout.itemsCenter, spacing.pdXs, spacing.gapSm, { paddingLeft: 10 }]}>
-                <NativeIcon
-                  library="MaterialCommunityIcons"
-                  name="food-outline"
-                  color={colors.textOnSecondaryContainer.color}
-                  size={20}
-                />
-                <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
-              </View>
-              <Divider
-                orientation="vertical"
-                thickness={1}
-                color={colors.textOnSecondaryContainer.color}
-              />
-              <MealContainer meal={meal} />
+              {dietPlan?.customInstructions && <Tips tips={dietPlan.customInstructions} />}
+
+              {Boolean(dietPlan?.freeCalories) && (
+                <AmountContainer title="קלוריות חופשיות" amount={dietPlan?.freeCalories} />
+              )}
+
+              <AmountContainer title="כמות שומנים ליום" variant="gr" amount={250} />
             </Animated.View>
-          ))
+            {dietPlan?.meals.map((meal, i) => (
+              <Animated.View
+                key={meal._id}
+                style={[
+                  layout.flexRowReverse,
+                  layout.itemsCenter,
+                  spacing.pdDefault,
+                  colors.backgroundSecondaryContainer,
+                  common.rounded,
+                  slideAnimations[i],
+                ]}
+              >
+                <View
+                  style={[layout.itemsCenter, spacing.pdXs, spacing.gapSm, { paddingLeft: 10 }]}
+                >
+                  <NativeIcon
+                    library="MaterialCommunityIcons"
+                    name="food-outline"
+                    color={colors.backgroundSecondary.backgroundColor}
+                    size={20}
+                  />
+                  <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
+                </View>
+                <MealContainer meal={meal} />
+              </Animated.View>
+            ))}
+          </View>
         )}
 
         <MenuItemModal

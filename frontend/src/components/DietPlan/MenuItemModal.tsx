@@ -6,6 +6,7 @@ import useMenuItemApi from "@/hooks/api/useMenuItemApi";
 import { IMenuItem } from "@/interfaces/DietPlan";
 import MenuItem from "./MenuItem";
 import useStyles from "@/styles/useGlobalStyles";
+import Loader from "../ui/loaders/Loader";
 
 interface MenuItemModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
   const { getMenuItems } = useMenuItemApi();
 
   const [menuItems, setMenuItems] = useState<IMenuItem[]>([]);
+  const [isLoading, setisLoading] = useState(false);
 
   const changeTitle = (foodGroup: string) => {
     switch (foodGroup) {
@@ -36,9 +38,11 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
   useEffect(() => {
     if (!foodGroup) return;
 
+    setisLoading(true);
     getMenuItems(foodGroup)
       .then((res) => setMenuItems(res))
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
+      .finally(() => setisLoading(false));
   }, [foodGroup]);
 
   return (
@@ -47,33 +51,38 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
         style={[
           colors.backgroundSecondaryContainer,
           spacing.pdMd,
-          spacing.pdBottomBar,
           colors.borderPrimary,
           common.borderDefault,
           common.roundedMd,
-          { height: `90%` },
+          spacing.pdBottomBar,
+
+          { height: `80%` },
         ]}
       >
-        <View>
-          <Text style={[xl, text.textCenter, text.textBold, colors.textPrimary, spacing.pdMd]}>
-            {changeTitle(foodGroup || ``)}
-          </Text>
-          <View
-            style={[
-              layout.flexRowReverse,
-              layout.wrap,
-              layout.justifyAround,
-              layout.itemsCenter,
-              spacing.gapDefault,
-            ]}
-          >
-            {menuItems.map((menuItem) => (
-              <View key={menuItem.name} style={{ maxWidth: `30%` }}>
-                <MenuItem menuItem={menuItem} styles={{ colors, layout, spacing, text }} />
-              </View>
-            ))}
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <View>
+            <Text style={[xl, text.textCenter, text.textBold, colors.textPrimary, spacing.pdMd]}>
+              {changeTitle(foodGroup || ``)}
+            </Text>
+            <View
+              style={[
+                layout.flexRowReverse,
+                layout.wrap,
+                layout.justifyAround,
+                layout.itemsCenter,
+                spacing.gapDefault,
+              ]}
+            >
+              {menuItems.map((menuItem) => (
+                <View key={menuItem.name} style={{ maxWidth: `30%` }}>
+                  <MenuItem menuItem={menuItem} styles={{ colors, layout, spacing, text }} />
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
+        )}
       </ScrollView>
     </CustomModal>
   );
