@@ -18,7 +18,7 @@ const AmountContainer: React.FC<AmountContainerProps> = ({ amount, title, varian
         layout.itemsEnd,
         spacing.pdDefault,
         layout.flex1,
-        { maxWidth: `48%` },
+        { width: 150 },
       ]}
     >
       <Text style={[fonts.lg, colors.textPrimary, text.textBold, text.textRight]}>{title}</Text>

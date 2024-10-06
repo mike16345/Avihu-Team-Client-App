@@ -23,7 +23,7 @@ const Tips: React.FC<TipsProps> = ({ tips }) => {
           spacing.pdDefault,
           spacing.gapDefault,
           layout.flex1,
-          { maxWidth: `48%` },
+          { width: 150 },
         ]}
         onPress={() => setOpen(true)}
       >
