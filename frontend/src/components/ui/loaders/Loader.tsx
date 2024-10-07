@@ -39,9 +39,7 @@ const Loader = () => {
   }, []);
 
   return (
-    <View
-      style={[layout.flexRow, layout.sizeFull, layout.center, spacing.gapXxl, colors.background]}
-    >
+    <View style={[layout.flexRow, layout.flex1, layout.center, spacing.gapXxl, colors.background]}>
       <Animated.View
         style={[
           { height: 0.5, width: 0.5, transform: [{ scale: scaleAnim1 }] },

@@ -75,7 +75,7 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
             >
               {menuItems.map((menuItem) => (
                 <View key={menuItem.name} style={{ maxWidth: `30%` }}>
-                  <MenuItem menuItem={menuItem} styles={{ colors, layout, spacing, text }} />
+                  <MenuItem menuItem={menuItem} />
                 </View>
               ))}
             </View>
