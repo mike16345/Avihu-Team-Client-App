@@ -13,8 +13,7 @@ import { DarkTheme } from "@/themes/useAppTheme";
 import { Portal } from "react-native-paper";
 import DietPlanSkeleton from "../ui/loaders/skeletons/DietPlanSkeleton";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
-import Tips from "./Tips";
-import AmountContainer from "./AmountContainer";
+import ExtraInfoContainer from "./ExtraInfoContainer";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
@@ -74,23 +73,12 @@ export default function DietPlan() {
           <DietPlanSkeleton />
         ) : (
           <View style={[spacing.pdDefault, spacing.gapLg]}>
-            <Animated.View
-              style={[
-                layout.flexRowReverse,
-                layout.justifyBetween,
-                spacing.gapLg,
-                { flexWrap: `wrap` },
-                slideInRightDelay0,
-              ]}
-            >
-              {dietPlan?.customInstructions && <Tips tips={dietPlan.customInstructions} />}
-
-              {Boolean(dietPlan?.freeCalories) && (
-                <AmountContainer title="קלוריות חופשיות" amount={dietPlan?.freeCalories} />
-              )}
-
-              <AmountContainer title="כמות שומנים ליום" variant="gr" amount={250} />
-            </Animated.View>
+            <View style={{ direction: `rtl` }}>
+              <ExtraInfoContainer
+                customInstructions={dietPlan?.customInstructions}
+                freeCalories={dietPlan?.freeCalories}
+              />
+            </View>
             {dietPlan?.meals.map((meal, i) => (
               <Animated.View
                 key={meal._id}

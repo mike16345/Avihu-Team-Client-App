@@ -1,17 +1,17 @@
 import { IMenuItem } from "@/interfaces/DietPlan";
 import useFontSize from "@/styles/useFontSize";
+import useStyles from "@/styles/useGlobalStyles";
 
 import React from "react";
 import { Text, View } from "react-native";
 
 interface MenuItemProps {
   menuItem: IMenuItem;
-  styles: any;
 }
 
-const MenuItem: React.FC<MenuItemProps> = ({ menuItem, styles }) => {
+const MenuItem: React.FC<MenuItemProps> = ({ menuItem }) => {
   const { md } = useFontSize();
-  const { colors, layout, spacing, text } = styles;
+  const { colors, layout, spacing, text } = useStyles();
 
   return (
     <View style={[layout.itemsCenter, spacing.pdXs, spacing.gapXs]}>
