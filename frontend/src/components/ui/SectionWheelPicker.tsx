@@ -14,24 +14,6 @@ const SectionWheelPicker: React.FC<SectionWheelPickerProps> = ({
   selectedValues,
   onValueChange,
 }) => {
-  const handleValueChange = (sectionIndex: number, value: any) => {
-    try {
-      const updatedValues = [...selectedValues];
-      const updatedIndices = updatedValues.map((v, i) =>
-        data[i].data.findIndex((item) => item.value === v)
-      );
-
-      updatedValues[sectionIndex] = value;
-      updatedIndices[sectionIndex] = data[sectionIndex].data.findIndex(
-        (item) => item.value === value
-      );
-
-      onValueChange(updatedValues, updatedIndices);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   return (
     <View style={styles.container}>
       {data.map((item, index) => (
@@ -39,7 +21,7 @@ const SectionWheelPicker: React.FC<SectionWheelPickerProps> = ({
           <WheelPicker
             {...item}
             selectedValue={selectedValues[index]}
-            onValueChange={(value) => handleValueChange(index, value)}
+            onValueChange={(value) => item.onValueChange(value)}
           />
         </View>
       ))}

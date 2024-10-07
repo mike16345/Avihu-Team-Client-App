@@ -1,14 +1,6 @@
 import { FC, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  useWindowDimensions,
-  KeyboardAvoidingView,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, View, Text, KeyboardAvoidingView, ScrollView } from "react-native";
 import { Colors } from "@/constants/Colors";
-import OpacityButton from "@/components/Button/OpacityButton";
 import Divider from "../ui/Divider";
 import { IRecordedSet } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
@@ -16,6 +8,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { Button, TextInput } from "react-native-paper";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
 import { extractVideoId } from "@/utils/utils";
+import WheelInputDrawer from "../ui/WheelInputDrawer";
 
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
 
@@ -29,6 +22,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
     repsDone: 0,
     note: "",
   });
+  const [showWeightInputModal, setShowWeightInputModal] = useState(false);
 
   const handleUpdateRecordedSet = <K extends keyof IRecordedSet>(
     key: keyof IRecordedSet,
@@ -59,13 +53,17 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
         />
       </View>
       <KeyboardAvoidingView behavior="padding" style={styles.container}>
-        <View style={[spacing.gapXl]}>
+        <View style={[spacing.gapLg]}>
           <View style={[layout.flexRow, layout.justifyAround]}>
             <View style={[layout.center, spacing.gapDefault]}>
               <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
                 משקל
               </Text>
-              <Button style={[{ borderRadius: 4 }]} mode="outlined">
+              <Button
+                onPress={() => setShowWeightInputModal(true)}
+                style={[{ borderRadius: 4 }]}
+                mode="outlined"
+              >
                 10
               </Button>
             </View>
@@ -83,7 +81,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
           <Text style={[colors.textOnSecondaryContainer, fonts.default]}>פתק:</Text>
           <TextInput
             mode="outlined"
-            style={[layout.ltr, { height: 60 }, colors.background, customStyles.text.textRight]}
+            style={[layout.ltr, { height: 100 }, colors.background, customStyles.text.textRight]}
             multiline
             placeholderTextColor={"white"}
             placeholder="איך עבר לך?"
@@ -101,6 +99,16 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
           </Button>
         </View>
       </KeyboardAvoidingView>
+      {showWeightInputModal && (
+        <WheelInputDrawer
+          currentValue={1}
+          onDismiss={() => setShowWeightInputModal(false)}
+          onSave={(val) => {
+            handleUpdateRecordedSet("weight", val);
+            setShowWeightInputModal(false);
+          }}
+        />
+      )}
     </ScrollView>
   );
 };
