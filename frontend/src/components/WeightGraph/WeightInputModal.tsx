@@ -22,6 +22,7 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
   handleDeleteWeighIn,
   handleDismiss,
 }) => {
+  console.log("weight ", currentWeight);
   const { height } = useWindowDimensions();
   const [weight, setWeight] = useState(currentWeight);
   const { text, spacing, fonts, colors, layout } = useStyles();
@@ -66,7 +67,7 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
             </Text>
           </View>
           <Text style={[text.textCenter, text.textBold, fonts.xl, colors.textPrimary]}>
-            {weight}
+            {weight.toFixed(2)}
           </Text>
         </View>
         <View style={[layout.center]}>

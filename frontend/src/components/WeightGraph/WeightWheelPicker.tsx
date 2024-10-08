@@ -33,7 +33,9 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
 }) => {
   const dividend = showZeroDecimal ? 100 : 10;
   const wholePart = Math.floor(selectedWeight);
-  const decimalPart = (selectedWeight - wholePart) * dividend;
+  const decimalPart = showZeroDecimal
+    ? Math.round((selectedWeight - wholePart) * dividend)
+    : (selectedWeight - wholePart) * dividend;
 
   const generateWholeWeightOptions = (): WheelPickerOption[] => {
     const options: WheelPickerOption[] = [];

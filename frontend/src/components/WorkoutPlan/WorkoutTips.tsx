@@ -6,10 +6,11 @@ import { CustomModal } from "../ui/Modal";
 
 interface WorkoutTipsProps {
   openTips: boolean;
+  tips: string[];
   setOpenTips: Dispatch<SetStateAction<boolean>>;
 }
 
-const tips = [
+const generalTips = [
   "כל תחילת אימון הליכה 5 דק לחמם את הגוף",
   "אימון משקולות תמיד יהיה לפני האירובי",
   "בתחילת האימון יש לבצע שני סטים של חימום בתרגיל הראשון",
@@ -17,7 +18,7 @@ const tips = [
   "מנוחה בין סט לסט 40-60 שניות",
 ];
 
-const WorkoutTips: FC<WorkoutTipsProps> = ({ openTips, setOpenTips }) => {
+const WorkoutTips: FC<WorkoutTipsProps> = ({ tips = generalTips, openTips, setOpenTips }) => {
   return (
     <CustomModal
       style={styles.centeredView}

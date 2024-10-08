@@ -17,6 +17,8 @@ import { extractVideoId, generateWheelPickerData } from "@/utils/utils";
 import WheelInputDrawer from "../ui/WheelInputDrawer";
 import WeightWheelPicker from "../WeightGraph/WeightWheelPicker";
 import WheelPicker from "../ui/WheelPicker";
+import TipsModal from "../DietPlan/TipsModal";
+import WorkoutTips from "./WorkoutTips";
 
 type InputTypes = "reps" | "weight";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
@@ -69,6 +71,16 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
         behavior="padding"
         style={[layout.flexGrow, layout.justifyBetween, spacing.pdDefault]}
       >
+        <View style={[spacing.gapSm]}>
+          {/* <Text style={styles.setInfo}>סט: 1</Text>
+          <Text style={styles.setInfo}>חזרות: 12-15</Text>
+          <Text style={styles.setInfo}>דגשים: קקי</Text> */}
+          {/* <WorkoutTips
+            tips={[exercise.tipFromTrainer || ""]}
+            openTips
+            setOpenTips={() => console.log("open")}
+          /> */}
+        </View>
         <View style={[spacing.gapXxl]}>
           <View style={[layout.flexRow, layout.justifyAround]}>
             <View style={[layout.center, spacing.gapDefault]}>
@@ -207,5 +219,10 @@ const styles = StyleSheet.create({
   },
   textInput: {
     textAlign: "right",
+  },
+  setInfo: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "white",
   },
 });
