@@ -1,9 +1,14 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useEffect, useRef } from "react";
-import { Animated, Easing, View } from "react-native";
+import { Animated, Easing, View, Dimensions } from "react-native";
 
-const Loader = () => {
+interface LoaderProps {
+  variant?: `Screen` | `Standard`;
+}
+
+const Loader: React.FC<LoaderProps> = ({ variant = `Standard` }) => {
   const { layout, colors, spacing, common } = useStyles();
+  const { height, width } = Dimensions.get(`screen`);
   // Create animated value
   const scaleAnim1 = useRef(new Animated.Value(1)).current;
   const scaleAnim2 = useRef(new Animated.Value(1)).current;
@@ -39,7 +44,21 @@ const Loader = () => {
   }, []);
 
   return (
-    <View style={[layout.flexRow, layout.flex1, layout.center, spacing.gapXxl, colors.background]}>
+    <View
+      style={
+        variant === `Standard`
+          ? [layout.flexRow, layout.flex1, layout.center, spacing.gapXxl, colors.background]
+          : [
+              [
+                layout.flexRow,
+                layout.center,
+                spacing.gapXxl,
+                { height: height, width: width, position: `absolute` },
+                colors.backdrop,
+              ],
+            ]
+      }
+    >
       <Animated.View
         style={[
           { height: 0.5, width: 0.5, transform: [{ scale: scaleAnim1 }] },

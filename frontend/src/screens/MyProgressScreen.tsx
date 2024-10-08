@@ -1,5 +1,6 @@
 import WeightCalendar from "@/components/Calendar/WeightCalendar";
 import FABGroup from "@/components/ui/FABGroup";
+import Loader from "@/components/ui/loaders/Loader";
 import ProgressScreenSkeleton from "@/components/ui/loaders/skeletons/ProgressScreenSkeleton";
 import { WeightGraph } from "@/components/WeightGraph/WeightGraph";
 import WeightInputModal from "@/components/WeightGraph/WeightInputModal";
@@ -15,6 +16,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { StyleSheet, ScrollView, Linking, Animated } from "react-native";
 import { Portal } from "react-native-paper";
+import ErrorScreen from "./ErrorScreen";
 
 const MyProgressScreen = () => {
   const TRAINER_PHONE_NUMBER = process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER;
@@ -93,6 +95,14 @@ const MyProgressScreen = () => {
   };
 
   if (isLoading) return <ProgressScreenSkeleton />;
+  if (addNewWeighIn.isLoading || updateWeighIn.isLoading || removeWeighIn.isLoading)
+    return <Loader variant="Screen" />;
+  if (isError || addNewWeighIn.isError || updateWeighIn.isError || removeWeighIn.isError)
+    return (
+      <ErrorScreen
+        error={error || addNewWeighIn.error || updateWeighIn.error || removeWeighIn.error}
+      />
+    );
 
   return (
     <Portal.Host>

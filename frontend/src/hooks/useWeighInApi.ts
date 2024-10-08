@@ -13,7 +13,7 @@ export const useWeighInApi = () => {
 
   const deleteWeighIn = (weighInId: string) =>
     deleteItem<ApiResponse<IWeighInResponse>>(WEIGH_INS_ENDPOINT + `/one?id=${weighInId}`);
-  
+
   const deleteWeighInByUserId = (userID: string) =>
     deleteItem(WEIGH_INS_ENDPOINT + "/user", { id: userID });
 
