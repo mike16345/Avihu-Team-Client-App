@@ -95,8 +95,10 @@ const MyProgressScreen = () => {
   };
 
   if (isLoading) return <ProgressScreenSkeleton />;
+
   if (addNewWeighIn.isLoading || updateWeighIn.isLoading || removeWeighIn.isLoading)
     return <Loader variant="Screen" />;
+
   if (isError || addNewWeighIn.isError || updateWeighIn.isError || removeWeighIn.isError)
     return (
       <ErrorScreen

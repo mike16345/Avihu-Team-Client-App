@@ -16,6 +16,7 @@ import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import ExtraInfoContainer from "./ExtraInfoContainer";
 import { useQuery } from "@tanstack/react-query";
 import { DIET_PLAN_KEY, ONE_DAY } from "@/constants/reactQuery";
+import ErrorScreen from "@/screens/ErrorScreen";
 
 export default function DietPlan() {
   const { handleScroll } = useHideTabBarOnScroll();
@@ -56,6 +57,8 @@ export default function DietPlan() {
     setIsFabOpen(false);
     setSelectedFoodGroup(foodGroup);
   };
+
+  if (isError) return <ErrorScreen error={error} />;
 
   return (
     <Portal.Host>
