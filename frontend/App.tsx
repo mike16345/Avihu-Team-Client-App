@@ -21,6 +21,7 @@ import RootNavigator from "@/navigators/RootNavigator";
 import "react-native-gesture-handler";
 import "./global.css";
 import Loader from "@/components/ui/loaders/Loader";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // import { I18nManager } from "react-native";
 // Enable RTL
@@ -36,6 +37,7 @@ export default function App() {
   const { currentUser, setCurrentUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const colorScheme = Appearance.getColorScheme();
+  const queryClient = new QueryClient();
 
   useEffect(() => {
     Appearance.setColorScheme("dark");
@@ -55,14 +57,16 @@ export default function App() {
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <NavigationContainer theme={colorScheme == "dark" ? DarkTheme : LightTheme}>
-              {isLoading ? <Loader /> : currentUser && <RootNavigator />}
-              <StatusBar
-                key={colorScheme}
-                translucent
-                style={colorScheme == "dark" ? "light" : "dark"}
-              />
-            </NavigationContainer>
+            <QueryClientProvider client={queryClient}>
+              <NavigationContainer theme={colorScheme == "dark" ? DarkTheme : LightTheme}>
+                {isLoading ? <Loader /> : currentUser && <RootNavigator />}
+                <StatusBar
+                  key={colorScheme}
+                  translucent
+                  style={colorScheme == "dark" ? "light" : "dark"}
+                />
+              </NavigationContainer>
+            </QueryClientProvider>
           </SafeAreaProvider>
         </GestureHandlerRootView>
       </ThemeProvider>

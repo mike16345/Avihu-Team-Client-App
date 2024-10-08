@@ -4,15 +4,16 @@ import ProgressScreenSkeleton from "@/components/ui/loaders/skeletons/ProgressSc
 import { WeightGraph } from "@/components/WeightGraph/WeightGraph";
 import WeightInputModal from "@/components/WeightGraph/WeightInputModal";
 import { DEFAULT_INITIAL_WEIGHT, DEFAULT_MESSAGE_TO_TRAINER } from "@/constants/Constants";
+import { ONE_DAY, WEIGH_INS_KEY } from "@/constants/reactQuery";
 import { useWeighInApi } from "@/hooks/useWeighInApi";
-import { IWeighIn, IWeighInPost } from "@/interfaces/User";
+import { IWeighInPost } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
 import useStyles from "@/styles/useGlobalStyles";
-import useSlideFadeIn from "@/styles/useSlideFadeIn";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import DateUtils from "@/utils/dateUtils";
-import { useEffect, useState } from "react";
-import { StyleSheet, ScrollView, View, Linking, Animated } from "react-native";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { StyleSheet, ScrollView, Linking, Animated } from "react-native";
 import { Portal } from "react-native-paper";
 
 const MyProgressScreen = () => {
@@ -20,16 +21,54 @@ const MyProgressScreen = () => {
 
   const currentUser = useUserStore((state) => state.currentUser);
   const { getWeighInsByUserId, updateWeighInById, deleteWeighIn, addWeighIn } = useWeighInApi();
+  const queryClient = useQueryClient();
 
   const { colors, spacing, layout } = useStyles();
   const { slideInLeftDelay0, slideInRightDelay100 } = useSlideInAnimations();
 
-  const [weighIns, setWeighIns] = useState<IWeighIn[]>([]);
-  const [isLoading, setisLoading] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [openWeightModal, setOpenWeightModal] = useState(false);
 
-  const currentWeight = DateUtils.getLatestItem(weighIns, "date")?.weight || DEFAULT_INITIAL_WEIGHT;
+  const { data, isLoading, isError, error } = useQuery({
+    queryFn: () => getWeighInsByUserId(currentUser?._id || ``),
+    queryKey: [WEIGH_INS_KEY + currentUser?._id],
+    enabled: !!currentUser,
+    staleTime: ONE_DAY,
+  });
+
+  const successFunc = () => {
+    queryClient.invalidateQueries({ queryKey: [WEIGH_INS_KEY + currentUser?._id] });
+  };
+
+  const failureFunc = (err: any) => {
+    console.log(err);
+  };
+
+  const addNewWeighIn = useMutation({
+    mutationFn: ({ userId, weighIn }: { userId: string; weighIn: IWeighInPost }) =>
+      addWeighIn(userId, weighIn),
+    onSuccess: successFunc,
+    onError: failureFunc,
+  });
+
+  const updateWeighIn = useMutation({
+    mutationFn: ({ weighInId, weighIn }: { weighInId: string; weighIn: IWeighInPost }) =>
+      updateWeighInById(weighInId, weighIn),
+    onSuccess: successFunc,
+    onError: failureFunc,
+  });
+
+  const removeWeighIn = useMutation({
+    mutationFn: (weighInId: string) => deleteWeighIn(weighInId),
+    onSuccess: () => {
+      successFunc();
+      setOpenWeightModal(false);
+    },
+    onError: failureFunc,
+  });
+
+  const currentWeight =
+    DateUtils.getLatestItem(data || [], "date")?.weight || DEFAULT_INITIAL_WEIGHT;
 
   const handleSaveWeighIn = (
     weighIn: IWeighInPost,
@@ -39,55 +78,19 @@ const MyProgressScreen = () => {
     setOpenWeightModal(false);
 
     if (isNew && currentUser) {
-      return addWeighIn(currentUser._id, weighIn)
-        .then((res) => setWeighIns(res.data.weighIns))
-        .catch((err) => console.log("err", err));
+      const userId = currentUser._id;
+      addNewWeighIn.mutate({ userId, weighIn });
     }
     if (!weighInId) return;
 
-    handleUpdateWeighIn(weighInId, weighIn);
-  };
-
-  const handleUpdateWeighIn = async (weighInId: string, weighIn: IWeighInPost) => {
-    try {
-      const updateResult = await (await updateWeighInById(weighInId, weighIn)).data;
-
-      setWeighIns((prev) => prev.map((item) => (item._id === weighInId ? updateResult : item)));
-    } catch (e) {
-      console.error(e);
-    }
+    updateWeighIn.mutate({ weighInId, weighIn });
   };
 
   const handleDeleteWeighIn = async (weighInId: string | null) => {
     if (!weighInId) return;
 
-    try {
-      console.log("weigh in id", weighInId);
-      const response = await deleteWeighIn(weighInId);
-
-      setWeighIns(response.data.weighIns);
-      setOpenWeightModal(false);
-    } catch (e) {
-      console.error(e);
-    }
+    removeWeighIn.mutate(weighInId);
   };
-
-  const getUserWeightIns = async () => {
-    console.log("current user ", currentUser);
-    if (!currentUser) return;
-    setisLoading(true);
-    getWeighInsByUserId(currentUser._id)
-      .then((weighIns) => {
-        console.log("got weigh ins", weighIns[0].weight);
-        setWeighIns(weighIns);
-      })
-      .catch((err) => console.log(err))
-      .finally(() => setisLoading(false));
-  };
-
-  useEffect(() => {
-    getUserWeightIns();
-  }, []);
 
   if (isLoading) return <ProgressScreenSkeleton />;
 
@@ -104,13 +107,13 @@ const MyProgressScreen = () => {
       >
         <Animated.View style={[styles.calendarContainer, slideInLeftDelay0]}>
           <WeightCalendar
-            weighIns={weighIns}
+            weighIns={data || []}
             onSaveWeighIn={handleSaveWeighIn}
             onDeleteWeighIn={(weighInId) => handleDeleteWeighIn(weighInId)}
           />
         </Animated.View>
         <Animated.View style={[styles.graphContainer, slideInRightDelay100]}>
-          <WeightGraph weighIns={weighIns} />
+          <WeightGraph weighIns={data || []} />
         </Animated.View>
         <FABGroup
           icon={isFabOpen ? "close" : "plus"}
