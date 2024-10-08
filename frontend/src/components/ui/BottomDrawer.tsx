@@ -1,3 +1,4 @@
+import useStyles from "@/styles/useGlobalStyles";
 import React, { useEffect } from "react";
 import {
   View,
@@ -18,6 +19,8 @@ interface BottomDrawerProps {
 }
 
 const BottomDrawer: React.FC<BottomDrawerProps> = ({ open, onClose, children }) => {
+  const { colors } = useStyles();
+
   useEffect(() => {
     const onBackPress = () => {
       onClose();
@@ -27,10 +30,11 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({ open, onClose, children }) 
 
     return () => backHandler.remove();
   }, []);
+
   return (
     <Modal transparent visible={open} animationType="slide">
-      <TouchableOpacity style={styles.overlay} onPress={onClose} activeOpacity={1} />
-      <Animated.View style={[styles.drawerContainer]}>
+      <TouchableOpacity style={[styles.overlay]} onPress={onClose} activeOpacity={1} />
+      <Animated.View style={[styles.drawerContainer, colors.background]}>
         <View style={styles.drawerContent}>{children}</View>
       </Animated.View>
     </Modal>
@@ -52,7 +56,6 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     height: height * 0.5,
-    backgroundColor: "black",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     shadowColor: "#000",

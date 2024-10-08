@@ -5,9 +5,21 @@ const Stack = createNativeStackNavigator();
 
 const WorkoutPlanStack = () => {
   return (
-    <Stack.Navigator initialRouteName="WorkoutPlan" screenOptions={{ navigationBarHidden: true }}>
+    <Stack.Navigator
+      initialRouteName="WorkoutPlan"
+      screenOptions={{
+        navigationBarHidden: false,
+        headerTitleAlign: "center",
+        headerTitleStyle: { fontSize: 18 },
+      }}
+    >
       {stacks.map((stack) => (
-        <Stack.Screen key={stack.name} name={stack.name} component={stack.component} />
+        <Stack.Screen
+          key={stack.name}
+          options={{ title: stack.title }}
+          name={stack.name}
+          component={stack.component}
+        />
       ))}
     </Stack.Navigator>
   );

@@ -1,6 +1,5 @@
 import { FC, useState, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import WorkoutVideoPopup from "./WorkoutVideoPopup";
 import SetContainer from "./SetContainer";
 import NativeIcon from "../Icon/NativeIcon";
 import { IExercise, IRecordedSet, IRecordedSetPost, ISet } from "@/interfaces/Workout";
@@ -8,11 +7,11 @@ import { ISession } from "@/interfaces/ISession";
 import useStyles from "@/styles/useGlobalStyles";
 import { useRecordedSetsApi } from "@/hooks/api/useRecordedSetsApi";
 import { useUserStore } from "@/store/userStore";
-import { extractVideoId, getYouTubeThumbnail } from "@/utils/utils";
 import { Colors } from "@/constants/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import Toast from "react-native-toast-message";
 
 interface WorkoutProps {
   plan: string;
@@ -31,7 +30,6 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 }) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<WorkoutPlanStackParamList, "RecordSet">>();
-  const videoId = extractVideoId(exercise.linkToVideo!);
 
   const currentUser = useUserStore((state) => state.currentUser);
 
@@ -39,7 +37,6 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   const { addRecordedSet } = useRecordedSetsApi();
 
   const [isSetDone, setIsSetDone] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
   const [currentSetNumber, setCurrentSetNumber] = useState(1);
   const [currentSet, setCurrentSet] = useState<ISet>(exercise.sets[currentSetNumber - 1]);
 
@@ -62,6 +59,15 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
         updateSession(updatedSession);
         handleSetCurrentSetInfo(updatedSession);
+
+        Toast.show({
+          text1: "Test toast",
+          text2: "NOOOOOOOO",
+          autoHide: true,
+          type: "success",
+          swipeable: true,
+        });
+        navigation?.goBack();
       })
       .catch((err) => console.error(err));
   };
@@ -109,6 +115,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
         <View style={styles.workoutInfoContainer}>
           <NativeIcon
             onPress={() => {
+              navigation.setOptions({ title: exercise.name });
               navigation.navigate("RecordSet", {
                 exercise: exercise,
                 handleRecordSet: (recordedSet) => handleRecordSet(recordedSet),

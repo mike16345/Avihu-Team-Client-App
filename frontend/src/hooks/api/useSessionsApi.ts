@@ -1,10 +1,14 @@
 import { deleteItem, fetchData, sendData } from "@/API/api";
+import { ISession } from "@/interfaces/ISession";
+import { ApiResponse } from "@/types/ApiTypes";
 
-const SESSIONS_API_ENDPOINT = "sessions/";
+const SESSIONS_API_ENDPOINT = "sessions";
 
 export const useSessionsApi = () => {
   const getSession = async (sessionId: string) => {
-    const response = await fetchData(SESSIONS_API_ENDPOINT + sessionId);
+    const response = await fetchData<ApiResponse<ISession>>(
+      `${SESSIONS_API_ENDPOINT}/one?sessionId=${sessionId}`
+    );
 
     return response;
   };

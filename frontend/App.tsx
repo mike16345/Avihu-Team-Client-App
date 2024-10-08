@@ -21,6 +21,8 @@ import RootNavigator from "@/navigators/RootNavigator";
 import "react-native-gesture-handler";
 import "./global.css";
 import Loader from "@/components/ui/loaders/Loader";
+import Toast from "react-native-toast-message";
+import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 
 // import { I18nManager } from "react-native";
 // Enable RTL
@@ -45,7 +47,9 @@ export default function App() {
         setCurrentUser(user);
       })
       .catch((err) => console.error(err))
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   return (
@@ -62,6 +66,7 @@ export default function App() {
                 translucent
                 style={colorScheme == "dark" ? "light" : "dark"}
               />
+              <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} />
             </NavigationContainer>
           </SafeAreaProvider>
         </GestureHandlerRootView>

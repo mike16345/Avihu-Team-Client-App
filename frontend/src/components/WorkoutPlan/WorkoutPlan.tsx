@@ -68,7 +68,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
       if (!currentWorkoutSession) {
         removeItem();
       } else {
-        setCurrentWorkoutSession(currentWorkoutSession);
+        setCurrentWorkoutSession(currentWorkoutSession.data);
       }
     } catch (e) {
       handleSessionNotFound(e);
@@ -76,7 +76,6 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
   };
 
   const handleSessionNotFound = (e: any) => {
-    console.error(e);
     removeItem();
     setCurrentWorkoutSession(null);
   };

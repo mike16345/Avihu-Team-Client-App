@@ -9,8 +9,8 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     name: "MyWorkoutPlanPage",
     component: WorkoutPlanStack,
     options: {
-      tabBarLabel: "Workout",
-      tabBarAccessibilityLabel: "Workout Tab",
+      tabBarLabel: "אימונים",
+      tabBarAccessibilityLabel: "אימונים",
 
       tabBarIcon: ({ color }) => (
         <NativeIcon library="MaterialCommunityIcons" color={color} name="weight-lifter" size={28} />
