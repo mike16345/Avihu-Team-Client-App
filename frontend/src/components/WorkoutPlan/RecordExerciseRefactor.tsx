@@ -152,7 +152,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             decimalRange={10}
             maxWeight={200}
             stepSize={1}
-            height={height / 4.8}
+            height={height / 3.8}
             itemHeight={40}
             selectedWeight={currentInput == "reps" ? recordedSet.repsDone : recordedSet.weight}
           />

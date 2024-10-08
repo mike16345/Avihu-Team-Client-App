@@ -75,7 +75,7 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
             ref={playerRef}
             play={isPlaying}
             onReady={onReady}
-            onChangeState={handleVideoStateChange} // Handle video state changes (like "ended")
+            onChangeState={handleVideoStateChange}
             initialPlayerParams={{ loop: false, rel: false }}
             width={videoWidth}
             height={height}
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   container: {
     position: "relative",
     width: "100%",
-    overflow: "hidden", // Ensures video and thumbnail conform to rounded corners
+    overflow: "hidden",
   },
   thumbnailContainer: {
     justifyContent: "center",

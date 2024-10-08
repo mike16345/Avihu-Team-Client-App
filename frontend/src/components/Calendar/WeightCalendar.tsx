@@ -62,9 +62,9 @@ const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns, onSaveWeighIn, onDe
     const selectedDateTime = selectedDate.getTime();
 
     if (selectedDateTime > todayTime) return;
-    setIsEditWeightOpen(true);
     handlePressOnDay(date);
     setSelectedWeighInId(marking?.weighInId || null);
+    setIsEditWeightOpen(true);
   };
 
   const handlePressOnDay = (date: string | undefined) => {

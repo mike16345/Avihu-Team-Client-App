@@ -20,7 +20,7 @@ import { useUserStore } from "@/store/userStore";
 import { useSessionsApi } from "@/hooks/api/useSessionsApi";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
-import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutPlanSkeleton";
+import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutPlanSkeletonLoader";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps

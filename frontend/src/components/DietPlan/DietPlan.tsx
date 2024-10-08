@@ -14,6 +14,7 @@ import { Portal } from "react-native-paper";
 import DietPlanSkeleton from "../ui/loaders/skeletons/DietPlanSkeleton";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import ExtraInfoContainer from "./ExtraInfoContainer";
+import Divider from "../ui/Divider";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
@@ -102,6 +103,7 @@ export default function DietPlan() {
                   />
                   <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
                 </View>
+                <Divider orientation="vertical" color="white" thickness={0.8} />
                 <MealContainer meal={meal} />
               </Animated.View>
             ))}

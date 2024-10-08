@@ -62,11 +62,11 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
                 />
               </OpacityButton>
             )}
-            <Text style={[text.textRight, fonts.xl, text.textBold, colors.textOnSurfaceVariant]}>
+            <Text style={[text.textRight, fonts.lg, text.textBold, colors.textOnSurfaceVariant]}>
               הוסף משקל
             </Text>
           </View>
-          <Text style={[text.textCenter, text.textBold, fonts.xl, colors.textPrimary]}>
+          <Text style={[text.textCenter, text.textBold, fonts.lg, colors.textPrimary]}>
             {weight.toFixed(2)}
           </Text>
         </View>
@@ -78,7 +78,7 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
             minWeight={30}
             maxWeight={currentWeight + 150}
             stepSize={1}
-            height={height / 4.8}
+            height={height / 3.8}
             itemHeight={40}
             selectedWeight={weight}
           />
@@ -86,10 +86,10 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
         <View style={[layout.flex1, layout.flexRow, layout.itemsEnd]}>
           <View style={[layout.flexRow, spacing.gapDefault]}>
             <Button mode="contained" onPress={handleClickSave}>
-              <Text style={[text.textBold, fonts.lg]}>שמור</Text>
+              <Text style={[text.textBold, fonts.default]}>שמור</Text>
             </Button>
             <Button mode="outlined" onPress={handleDismiss}>
-              <Text style={[text.textBold, fonts.lg]}>בטל</Text>
+              <Text style={[text.textBold, fonts.default]}>בטל</Text>
             </Button>
           </View>
         </View>
