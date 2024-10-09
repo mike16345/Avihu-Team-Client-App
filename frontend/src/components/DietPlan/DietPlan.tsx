@@ -1,9 +1,8 @@
 import { View, ImageBackground, ScrollView, Text, Animated } from "react-native";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
-import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
+import { useDietPlanApi } from "@/hooks/useDietPlanApi";
 import { useUserStore } from "@/store/userStore";
-import { IDietPlan } from "@/interfaces/DietPlan";
 import MealContainer from "./MealContainer";
 import NativeIcon from "../Icon/NativeIcon";
 import FABGroup from "../ui/FABGroup";
@@ -15,14 +14,15 @@ import DietPlanSkeleton from "../ui/loaders/skeletons/DietPlanSkeleton";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import ExtraInfoContainer from "./ExtraInfoContainer";
 import Divider from "../ui/Divider";
+import { useQuery } from "@tanstack/react-query";
+import { DIET_PLAN_KEY, ONE_DAY } from "@/constants/reactQuery";
+import ErrorScreen from "@/screens/ErrorScreen";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
   const { getDietPlanByUserId } = useDietPlanApi();
   const { layout, spacing, colors, common, text } = useStyles();
 
-  const [dietPlan, setDietPlan] = useState<IDietPlan | null>(null);
-  const [isLoading, setisLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [selectedFoodGroup, setSelectedFoodGroup] = useState<string | null>(null);
@@ -32,6 +32,8 @@ export default function DietPlan() {
     slideInRightDelay200,
     slideInRightDelay300,
     slideInRightDelay400,
+    slideInBottomDelay500,
+    slideInBottomDelay600,
   } = useSlideInAnimations();
 
   const slideAnimations = [
@@ -40,7 +42,16 @@ export default function DietPlan() {
     slideInRightDelay200,
     slideInRightDelay300,
     slideInRightDelay400,
+    slideInBottomDelay500,
+    slideInBottomDelay600,
   ];
+
+  const { data, isError, error, isLoading } = useQuery({
+    queryFn: () => getDietPlanByUserId(currentUser?._id || ``),
+    queryKey: [DIET_PLAN_KEY + currentUser?._id],
+    enabled: !!currentUser,
+    staleTime: ONE_DAY,
+  });
 
   const displayMenuItems = (foodGroup: string) => {
     setIsModalOpen(true);
@@ -48,14 +59,7 @@ export default function DietPlan() {
     setSelectedFoodGroup(foodGroup);
   };
 
-  useEffect(() => {
-    if (!currentUser) return;
-    setisLoading(true);
-    getDietPlanByUserId(currentUser._id)
-      .then((res) => setDietPlan(res))
-      .catch((err) => console.log(err))
-      .finally(() => setisLoading(false));
-  }, []);
+  if (isError) return <ErrorScreen error={error} />;
 
   return (
     <Portal.Host>
@@ -76,11 +80,11 @@ export default function DietPlan() {
           <View style={[spacing.pdDefault, spacing.gapLg]}>
             <View style={{ direction: `rtl` }}>
               <ExtraInfoContainer
-                customInstructions={dietPlan?.customInstructions}
-                freeCalories={dietPlan?.freeCalories}
+                customInstructions={data?.customInstructions}
+                freeCalories={data?.freeCalories}
               />
             </View>
-            {dietPlan?.meals.map((meal, i) => (
+            {data?.meals.map((meal, i) => (
               <Animated.View
                 key={meal._id}
                 style={[
@@ -89,7 +93,7 @@ export default function DietPlan() {
                   spacing.pdDefault,
                   colors.backgroundSecondaryContainer,
                   common.rounded,
-                  slideAnimations[i],
+                  slideAnimations[i + 1],
                 ]}
               >
                 <View

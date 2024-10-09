@@ -21,6 +21,7 @@ import RootNavigator from "@/navigators/RootNavigator";
 import "react-native-gesture-handler";
 import "./global.css";
 import Loader from "@/components/ui/loaders/Loader";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 
@@ -38,6 +39,7 @@ export default function App() {
   const { currentUser, setCurrentUser } = useUserStore();
   const [isLoading, setIsLoading] = useState(false);
   const colorScheme = Appearance.getColorScheme();
+  const queryClient = new QueryClient();
 
   useEffect(() => {
     Appearance.setColorScheme("dark");
@@ -59,15 +61,13 @@ export default function App() {
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <NavigationContainer theme={DarkTheme}>
-              {isLoading ? <Loader /> : currentUser && <RootNavigator />}
-              <StatusBar
-                key={colorScheme}
-                translucent
-                style={colorScheme == "dark" ? "light" : "dark"}
-              />
-              <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} />
-            </NavigationContainer>
+            <QueryClientProvider client={queryClient}>
+              <NavigationContainer theme={DarkTheme}>
+                {isLoading ? <Loader /> : currentUser && <RootNavigator />}
+                <StatusBar key={colorScheme} translucent style={"light"} />
+                <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} />
+              </NavigationContainer>
+            </QueryClientProvider>
           </SafeAreaProvider>
         </GestureHandlerRootView>
       </ThemeProvider>

@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ScrollView, Text, View } from "react-native";
 import { CustomModal } from "../ui/Modal";
 import useFontSize from "@/styles/useFontSize";
 import useMenuItemApi from "@/hooks/api/useMenuItemApi";
-import { IMenuItem } from "@/interfaces/DietPlan";
 import MenuItem from "./MenuItem";
 import useStyles from "@/styles/useGlobalStyles";
 import Loader from "../ui/loaders/Loader";
+import { useQuery } from "@tanstack/react-query";
+import { MENU_ITEMS_KEY, ONE_DAY } from "@/constants/reactQuery";
 
 interface MenuItemModalProps {
   isOpen: boolean;
@@ -18,9 +19,6 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
   const { xl } = useFontSize();
   const { colors, common, layout, spacing, text } = useStyles();
   const { getMenuItems } = useMenuItemApi();
-
-  const [menuItems, setMenuItems] = useState<IMenuItem[]>([]);
-  const [isLoading, setisLoading] = useState(false);
 
   const changeTitle = (foodGroup: string) => {
     switch (foodGroup) {
@@ -35,15 +33,12 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
     }
   };
 
-  useEffect(() => {
-    if (!foodGroup) return;
-
-    setisLoading(true);
-    getMenuItems(foodGroup)
-      .then((res) => setMenuItems(res))
-      .catch((err) => console.log(err))
-      .finally(() => setisLoading(false));
-  }, [foodGroup]);
+  const { data, isError, error, isLoading } = useQuery({
+    queryFn: () => getMenuItems(foodGroup || ``),
+    queryKey: [MENU_ITEMS_KEY + foodGroup],
+    enabled: !!foodGroup,
+    staleTime: ONE_DAY,
+  });
 
   return (
     <CustomModal visible={isOpen} dismissable dismissableBackButton onDismiss={dismiss}>
@@ -75,7 +70,7 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
                 spacing.gapDefault,
               ]}
             >
-              {menuItems.map((menuItem) => (
+              {data?.map((menuItem) => (
                 <View key={menuItem.name} style={{ maxWidth: `30%` }}>
                   <MenuItem menuItem={menuItem} />
                 </View>
