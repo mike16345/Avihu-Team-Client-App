@@ -22,7 +22,6 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
   handleDeleteWeighIn,
   handleDismiss,
 }) => {
-  console.log("weight ", currentWeight);
   const { height } = useWindowDimensions();
   const [weight, setWeight] = useState(currentWeight);
   const { text, spacing, fonts, colors, layout } = useStyles();

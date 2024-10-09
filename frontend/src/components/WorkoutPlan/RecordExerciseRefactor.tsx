@@ -2,22 +2,20 @@ import { FC, useEffect, useMemo, useState } from "react";
 import {
   StyleSheet,
   View,
-  Text,
   KeyboardAvoidingView,
-  ScrollView,
   useWindowDimensions,
+  Pressable,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { IRecordedSet } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import useStyles from "@/styles/useGlobalStyles";
-import { Button, TextInput } from "react-native-paper";
+import { Button, Text, TextInput } from "react-native-paper";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
 import { extractVideoId, generateWheelPickerData } from "@/utils/utils";
 import WheelInputDrawer from "../ui/WheelInputDrawer";
 import WeightWheelPicker from "../WeightGraph/WeightWheelPicker";
 import WheelPicker from "../ui/WheelPicker";
-import TipsModal from "../DietPlan/TipsModal";
 import WorkoutTips from "./WorkoutTips";
 
 type InputTypes = "reps" | "weight";
@@ -29,7 +27,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
 
   const { height, width } = useWindowDimensions();
   const customStyles = useStyles();
-  const { colors, fonts, layout, spacing } = customStyles;
+  const { colors, fonts, layout, spacing, text } = customStyles;
 
   const [recordedSet, setRecordedSet] = useState<Omit<IRecordedSet, "plan">>({
     weight: 0,
@@ -38,8 +36,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
   });
   const [showWeightInputModal, setShowWeightInputModal] = useState(false);
   const [showRepsInputDrawer, setShowRepsInputDrawer] = useState(false);
-
-  const [currentInput, setCurrentInput] = useState<InputTypes | null>(null);
+  const [openTrainerTips, setOpenTrainerTips] = useState(false);
 
   const handleUpdateRecordedSet = <K extends keyof IRecordedSet>(
     key: keyof IRecordedSet,
@@ -63,23 +60,29 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
   useEffect(() => {
     navigation?.setOptions({ title: exercise.name });
   }, [navigation]);
+  const strippedTips = exercise.tipFromTrainer?.replace(" ", "");
 
   return (
-    <ScrollView contentContainerStyle={[layout.sizeFull]}>
+    <KeyboardAvoidingView behavior="padding" style={[layout.sizeFull]}>
       <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
-      <KeyboardAvoidingView
-        behavior="padding"
-        style={[layout.flexGrow, layout.justifyBetween, spacing.pdDefault]}
-      >
-        <View style={[spacing.gapSm]}>
-          {/* <Text style={styles.setInfo}>סט: 1</Text>
-          <Text style={styles.setInfo}>חזרות: 12-15</Text>
-          <Text style={styles.setInfo}>דגשים: קקי</Text> */}
-          {/* <WorkoutTips
-            tips={[exercise.tipFromTrainer || ""]}
-            openTips
-            setOpenTips={() => console.log("open")}
-          /> */}
+      <View style={[layout.flexGrow, layout.justifyBetween, spacing.pdDefault]}>
+        <View style={[layout.itemsEnd, spacing.gapSm]}>
+          {strippedTips && strippedTips.length && (
+            <Pressable onPress={() => setOpenTrainerTips(true)}>
+              <Text style={[fonts.lg, colors.textPrimary, text.textUnderline, text.textBold]}>
+                דגשים
+              </Text>
+            </Pressable>
+          )}
+          <Text style={styles.setInfo}>סט: {setNumber}</Text>
+          <Text style={styles.setInfo}>
+            חזרות: {exercise.sets[setNumber - 1].minReps}-{exercise.sets[setNumber - 1].maxReps}
+          </Text>
+          <WorkoutTips
+            tips={[exercise.tipFromTrainer!]}
+            openTips={openTrainerTips}
+            setOpenTips={setOpenTrainerTips}
+          />
         </View>
         <View style={[spacing.gapXxl]}>
           <View style={[layout.flexRow, layout.justifyAround]}>
@@ -129,7 +132,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             בטל
           </Button>
         </View>
-      </KeyboardAvoidingView>
+      </View>
       {showWeightInputModal && (
         <WheelInputDrawer
           title="משקל"
@@ -154,7 +157,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             stepSize={1}
             height={height / 3.8}
             itemHeight={40}
-            selectedWeight={currentInput == "reps" ? recordedSet.repsDone : recordedSet.weight}
+            selectedWeight={recordedSet.weight}
           />
         </WheelInputDrawer>
       )}
@@ -174,12 +177,12 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             data={repsOptions}
             onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
             selectedValue={recordedSet.repsDone}
-            height={height / 4.8}
+            height={height / 3.8}
             itemHeight={40}
           />
         </WheelInputDrawer>
       )}
-    </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
