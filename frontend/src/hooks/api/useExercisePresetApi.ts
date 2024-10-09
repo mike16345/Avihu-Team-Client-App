@@ -1,27 +1,23 @@
 import { deleteItem, fetchData, sendData, updateItem } from "@/API/api";
-import { ApiResponse } from "@/types/ApiTypes";
+import { IExercisePresetItem } from "@/interfaces/Workout";
 
 const EXERCISE_PRESETS_ENDPOINT = "presets/exercises/";
 
 const useExercisePresetApi = () => {
-  const getExercisePresets = () =>
-    fetchData<ApiResponse<IExercisePresetItem[]>>(EXERCISE_PRESETS_ENDPOINT);
+  const getExercisePresets = () => fetchData<IExercisePresetItem[]>(EXERCISE_PRESETS_ENDPOINT);
 
   const getExerciseById = (id: string) =>
-    fetchData<ApiResponse<IExercisePresetItem>>(EXERCISE_PRESETS_ENDPOINT + `/one`, { id });
+    fetchData<IExercisePresetItem>(EXERCISE_PRESETS_ENDPOINT + id);
 
   const getExerciseByMuscleGroup = (muscleGroup: string) =>
-    fetchData<ApiResponse<IExercisePresetItem[]>>(EXERCISE_PRESETS_ENDPOINT + `/muscleGroup`, {
-      muscleGroup,
-    });
+    fetchData<IExercisePresetItem[]>(EXERCISE_PRESETS_ENDPOINT + `/1/` + muscleGroup);
 
   const updateExercise = (id: string, newExercise: IExercisePresetItem) =>
-    updateItem(EXERCISE_PRESETS_ENDPOINT + `/one`, newExercise, null, { id });
+    updateItem(EXERCISE_PRESETS_ENDPOINT + id, newExercise);
 
   const addExercise = (newExercise: IExercisePresetItem) =>
     sendData<IExercisePresetItem>(EXERCISE_PRESETS_ENDPOINT, newExercise);
-
-  const deleteExercise = (id: string) => deleteItem(EXERCISE_PRESETS_ENDPOINT + `/one`, { id });
+  const deleteExercise = (id: string) => deleteItem(EXERCISE_PRESETS_ENDPOINT, id);
 
   return {
     getExercisePresets,

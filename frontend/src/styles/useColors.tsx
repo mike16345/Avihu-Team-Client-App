@@ -202,133 +202,133 @@ const useColors = () => {
     //borders
 
     // Primary
-borderPrimary: {
-  borderColor: theme.colors.primary,
-},
-borderOnPrimary: {
-  borderColor: theme.colors.onPrimary,
-},
-borderPrimaryContainer: {
-  borderColor: theme.colors.primaryContainer,
-},
-borderOnPrimaryContainer: {
-  borderColor: theme.colors.onPrimaryContainer,
-},
+    borderPrimary: {
+      borderColor: theme.colors.primary,
+    },
+    borderOnPrimary: {
+      borderColor: theme.colors.onPrimary,
+    },
+    borderPrimaryContainer: {
+      borderColor: theme.colors.primaryContainer,
+    },
+    borderOnPrimaryContainer: {
+      borderColor: theme.colors.onPrimaryContainer,
+    },
 
-// Secondary
-borderSecondary: {
-  borderColor: theme.colors.secondary,
-},
-borderOnSecondary: {
-  borderColor: theme.colors.onSecondary,
-},
-borderSecondaryContainer: {
-  borderColor: theme.colors.secondaryContainer,
-},
-borderOnSecondaryContainer: {
-  borderColor: theme.colors.onSecondaryContainer,
-},
+    // Secondary
+    borderSecondary: {
+      borderColor: theme.colors.secondary,
+    },
+    borderOnSecondary: {
+      borderColor: theme.colors.onSecondary,
+    },
+    borderSecondaryContainer: {
+      borderColor: theme.colors.secondaryContainer,
+    },
+    borderOnSecondaryContainer: {
+      borderColor: theme.colors.onSecondaryContainer,
+    },
 
-// Tertiary
-borderTertiary: {
-  borderColor: theme.colors.tertiary,
-},
-borderOnTertiary: {
-  borderColor: theme.colors.onTertiary,
-},
-borderTertiaryContainer: {
-  borderColor: theme.colors.tertiaryContainer,
-},
-borderOnTertiaryContainer: {
-  borderColor: theme.colors.onTertiaryContainer,
-},
+    // Tertiary
+    borderTertiary: {
+      borderColor: theme.colors.tertiary,
+    },
+    borderOnTertiary: {
+      borderColor: theme.colors.onTertiary,
+    },
+    borderTertiaryContainer: {
+      borderColor: theme.colors.tertiaryContainer,
+    },
+    borderOnTertiaryContainer: {
+      borderColor: theme.colors.onTertiaryContainer,
+    },
 
-// Info
-borderInfo: {
-  borderColor: theme.colors.info,
-},
-borderOnInfo: {
-  borderColor: theme.colors.onInfo,
-},
-borderInfoContainer: {
-  borderColor: theme.colors.infoContainer,
-},
-borderOnInfoContainer: {
-  borderColor: theme.colors.onInfoContainer,
-},
+    // Info
+    borderInfo: {
+      borderColor: theme.colors.info,
+    },
+    borderOnInfo: {
+      borderColor: theme.colors.onInfo,
+    },
+    borderInfoContainer: {
+      borderColor: theme.colors.infoContainer,
+    },
+    borderOnInfoContainer: {
+      borderColor: theme.colors.onInfoContainer,
+    },
 
-// Success
-borderSuccess: {
-  borderColor: theme.colors.success,
-},
-borderOnSuccess: {
-  borderColor: theme.colors.onSuccess,
-},
-borderSuccessContainer: {
-  borderColor: theme.colors.successContainer,
-},
-borderOnSuccessContainer: {
-  borderColor: theme.colors.onSuccessContainer,
-},
+    // Success
+    borderSuccess: {
+      borderColor: theme.colors.success,
+    },
+    borderOnSuccess: {
+      borderColor: theme.colors.onSuccess,
+    },
+    borderSuccessContainer: {
+      borderColor: theme.colors.successContainer,
+    },
+    borderOnSuccessContainer: {
+      borderColor: theme.colors.onSuccessContainer,
+    },
 
-// Warning
-borderWarning: {
-  borderColor: theme.colors.warning,
-},
-borderOnWarning: {
-  borderColor: theme.colors.onWarning,
-},
-borderWarningContainer: {
-  borderColor: theme.colors.warningContainer,
-},
-borderOnWarningContainer: {
-  borderColor: theme.colors.onWarningContainer,
-},
+    // Warning
+    borderWarning: {
+      borderColor: theme.colors.warning,
+    },
+    borderOnWarning: {
+      borderColor: theme.colors.onWarning,
+    },
+    borderWarningContainer: {
+      borderColor: theme.colors.warningContainer,
+    },
+    borderOnWarningContainer: {
+      borderColor: theme.colors.onWarningContainer,
+    },
 
-// Error
-borderError: {
-  borderColor: theme.colors.error,
-},
-borderOnError: {
-  borderColor: theme.colors.onError,
-},
-borderErrorContainer: {
-  borderColor: theme.colors.errorContainer,
-},
-borderOnErrorContainer: {
-  borderColor: theme.colors.onErrorContainer,
-},
+    // Error
+    borderError: {
+      borderColor: theme.colors.error,
+    },
+    borderOnError: {
+      borderColor: theme.colors.onError,
+    },
+    borderErrorContainer: {
+      borderColor: theme.colors.errorContainer,
+    },
+    borderOnErrorContainer: {
+      borderColor: theme.colors.onErrorContainer,
+    },
 
-// Background and Surface
-borderBackground: {
-  borderColor: theme.colors.background,
-},
-borderOnBackground: {
-  borderColor: theme.colors.onBackground,
-},
-borderSurface: {
-  borderColor: theme.colors.surface,
-},
-borderOnSurface: {
-  borderColor: theme.colors.onSurface,
-},
-borderSurfaceVariant: {
-  borderColor: theme.colors.surfaceVariant,
-},
-borderOnSurfaceVariant: {
-  borderColor: theme.colors.onSurfaceVariant,
-},
+    // Background and Surface
+    borderBackground: {
+      borderColor: theme.colors.background,
+    },
+    borderOnBackground: {
+      borderColor: theme.colors.onBackground,
+    },
+    borderSurface: {
+      borderColor: theme.colors.surface,
+    },
+    borderOnSurface: {
+      borderColor: theme.colors.onSurface,
+    },
+    borderSurfaceVariant: {
+      borderColor: theme.colors.surfaceVariant,
+    },
+    borderOnSurfaceVariant: {
+      borderColor: theme.colors.onSurfaceVariant,
+    },
 
-// Inverse
-borderInverseSurface: {
-  borderColor: theme.colors.inverseSurface,
-},
-borderInverseOnSurface: {
-  borderColor: theme.colors.inverseOnSurface,
-},
-borderInversePrimary: {
-  borderColor: theme.colors.inversePrimary,
-},
+    // Inverse
+    borderInverseSurface: {
+      borderColor: theme.colors.inverseSurface,
+    },
+    borderInverseOnSurface: {
+      borderColor: theme.colors.inverseOnSurface,
+    },
+    borderInversePrimary: {
+      borderColor: theme.colors.inversePrimary,
+    },
   });
 };
 

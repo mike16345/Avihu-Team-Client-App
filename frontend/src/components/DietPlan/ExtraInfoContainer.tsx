@@ -33,7 +33,9 @@ const ExtraInfoContainer: React.FC<ExtraInfoContainerProps> = ({
       >
         {customInstructions && <Tips tips={customInstructions} />}
 
-        {Boolean(freeCalories) && <AmountContainer title="קלוריות חופשיות" amount={freeCalories} />}
+        {Boolean(freeCalories) && (
+          <AmountContainer title="קלוריות חופשיות" variant="cal" amount={freeCalories} />
+        )}
 
         <AmountContainer title="כמות שומנים ליום" variant="gr" amount={250} />
       </Animated.View>

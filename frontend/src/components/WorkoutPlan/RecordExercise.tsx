@@ -11,28 +11,46 @@ import { Colors } from "@/constants/Colors";
 import OpacityButton from "@/components/Button/OpacityButton";
 import Divider from "../ui/Divider";
 import { CustomModal } from "../ui/Modal";
+import { IRecordedSet } from "@/interfaces/Workout";
+import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 
-interface RecordWorkoutProps {
+interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {
+  handleRecordSet: (recordSet: Omit<IRecordedSet, "plan">) => void;
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  workoutName: string;
+  exerciseName: string;
   setNumber: number;
 }
 
-const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName, setNumber }) => {
-  const { width, height } = useWindowDimensions();
+const RecordExercise: FC<RecordExerciseProps> = ({
+  isOpen,
+  setIsOpen,
+  handleRecordSet,
+  exerciseName,
+  setNumber,
+}) => {
+  const { width } = useWindowDimensions();
 
-  // TODO: Make RecordedSet object instead
-  const [weight, setWeight] = useState<string>("");
-  const [reps, setReps] = useState<string>("");
-  const [notes, setNotes] = useState<string>("");
+  const [recordedSet, setRecordedSet] = useState<Omit<IRecordedSet, "plan">>({
+    weight: 0,
+    repsDone: 0,
+    note: "",
+  });
   const [errors, setErrors] = useState<{ weight: string; reps: string }>({ weight: "", reps: "" });
 
-  const validateInput = (value: string, type: "weight" | "reps") => {
+  const handleUpdateRecordedSet = <K extends keyof IRecordedSet>(
+    key: keyof IRecordedSet,
+    value: IRecordedSet[K]
+  ) => {
+    setRecordedSet({ ...recordedSet, [key]: value });
+  };
+
+  const validateInput = (value: string) => {
     if (!value) {
       return "This field is required";
     }
     const numValue = parseFloat(value);
+
     if (isNaN(numValue) || numValue <= 0) {
       return "Value must be greater than 0";
     }
@@ -43,15 +61,16 @@ const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName,
   };
 
   const handleSave = () => {
-    const weightError = validateInput(weight, "weight");
-    const repsError = validateInput(reps, "reps");
+    const weightError = validateInput(recordedSet.weight.toString());
+    const repsError = validateInput(recordedSet.repsDone.toString());
 
     if (weightError || repsError) {
       setErrors({ weight: weightError, reps: repsError });
       return;
     }
 
-    console.log("Workout saved", { weight, reps, notes });
+    console.log("Workout saved", recordedSet);
+    handleRecordSet(recordedSet);
 
     setIsOpen(false);
   };
@@ -69,7 +88,7 @@ const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName,
       dismissableBackButton
       onDismiss={() => setIsOpen(false)}
     >
-      <Text style={styles.title}>{`${workoutName} סט ${setNumber}`}</Text>
+      <Text style={styles.title}>{`${exerciseName} סט ${setNumber}`}</Text>
       <Divider thickness={0.5} style={{ marginBottom: 20 }} />
       <View style={styles.container}>
         <KeyboardAvoidingView className="gap-8">
@@ -77,10 +96,12 @@ const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName,
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>משקל:</Text>
               <TextInput
+                placeholder="משקל..."
                 className="inpt w-24 h-10"
                 keyboardType="number-pad"
-                value={weight}
-                onChangeText={(text) => setWeight(text)}
+                inputMode="numeric"
+                value={recordedSet.weight.toString()}
+                onChangeText={(text) => handleUpdateRecordedSet("weight", text)}
               />
             </View>
             {errors.weight ? <Text style={styles.errorText}>{errors.weight}</Text> : null}
@@ -91,8 +112,7 @@ const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName,
               <TextInput
                 className="inpt w-24 h-10"
                 keyboardType="number-pad"
-                value={reps}
-                onChangeText={(text) => setReps(text)}
+                onChangeText={(text) => handleUpdateRecordedSet("repsDone", text)}
               />
             </View>
             {errors.reps ? <Text style={styles.errorText}>{errors.reps}</Text> : null}
@@ -107,24 +127,25 @@ const RecordWorkout: FC<RecordWorkoutProps> = ({ isOpen, setIsOpen, workoutName,
               placeholderTextColor={"gray"}
               placeholder="איך עבר לך?"
               textAlignVertical="top"
-              value={notes}
-              onChangeText={(text) => setNotes(text)}
+              onChangeText={(text) => handleUpdateRecordedSet("note", text)}
             />
           </View>
         </KeyboardAvoidingView>
-        <OpacityButton
-          onPress={handleSave}
-          textProps={{ style: styles.saveText }}
-          style={styles.saveBtn}
-        >
-          שמור
-        </OpacityButton>
+        <View style={[]}>
+          <OpacityButton
+            onPress={handleSave}
+            textProps={{ style: styles.saveText }}
+            style={styles.saveBtn}
+          >
+            שמור
+          </OpacityButton>
+        </View>
       </View>
     </CustomModal>
   );
 };
 
-export default RecordWorkout;
+export default RecordExercise;
 
 const styles = StyleSheet.create({
   container: {

@@ -21,6 +21,7 @@ const Divider: React.FC<DividerProps & { theme: any }> = ({
   const dividerStyle: ViewStyle = {
     borderWidth: thickness,
     borderStyle: "solid",
+    backgroundColor: dividerColor,
     borderColor: dividerColor,
     ...(orientation === "horizontal"
       ? { height: thickness, width: "100%" }

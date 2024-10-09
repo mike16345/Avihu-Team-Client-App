@@ -2,13 +2,10 @@ import React from "react";
 import { View, Text, ImageBackground, TouchableOpacity } from "react-native";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
 import { moderateScale } from "react-native-size-matters";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../types/navigatorTypes";
+import { RootStackParamList, StackNavigatorProps } from "../types/navigatorTypes";
 import { StatusBar } from "expo-status-bar";
 
-interface GetStartedScreenProps {
-  navigation?: NativeStackNavigationProp<RootStackParamList, "Home">;
-}
+interface GetStartedScreenProps extends StackNavigatorProps<RootStackParamList, "Home"> {}
 
 export const GetStartedScreen: React.FC<GetStartedScreenProps> = ({ navigation }) => {
   return (

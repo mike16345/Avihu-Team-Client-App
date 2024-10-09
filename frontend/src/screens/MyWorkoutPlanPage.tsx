@@ -1,12 +1,17 @@
-import { View } from "react-native";
+import { useEffect } from "react";
 import WorkoutPlan from "../components/WorkoutPlan/WorkoutPlan";
+import { useNavigation } from "@react-navigation/native";
 
 const MyWorkoutPlanScreen = () => {
-  return (
-    <View className="h-screen justify-center items-center bg-black">
-      <WorkoutPlan />
-    </View>
-  );
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: "אימונים",
+    });
+  }, [navigation]);
+
+  return <WorkoutPlan />;
 };
 
 export default MyWorkoutPlanScreen;

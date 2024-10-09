@@ -14,37 +14,23 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
   icon,
   foodGroup,
 }) => {
-
-  const {layout, spacing, colors,}=useStyles()
+  const { layout, spacing, colors, text } = useStyles();
 
   return (
-    <View>
-      <View style={[
-        layout.flexRow,
-        layout.itemsCenter,
-        spacing.gapSm,
-        spacing.pdVerticalXs,
-      ]}>
+    <View style={[layout.itemsEnd, spacing.gapSm, spacing.pdVerticalXs]}>
+      <View style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
+        <Text style={colors.textOnSecondaryContainer}>{foodGroup} : </Text>
         {icon}
-        <Text style={colors.textOnSecondaryContainer}>{foodGroup}:</Text>
       </View>
-      <View style={[
-        layout.flexRow,
-        layout.justifyCenter,
-        layout.widthFull,
-        spacing.pdXs,
-        spacing.gapSm
-      ]}>
+      <View style={[layout.flexRowReverse, layout.wrap]}>
         {customInstructions.map((item, i) => (
-          <Text key={i} style={colors.textOnSecondaryContainer}>
-            {item.item}: {item.quantity} {i + 1 !== customInstructions.length ? `/` : ``}{" "}
+          <Text key={i} style={[colors.textOnSecondaryContainer, text.textRight]}>
+            {item.quantity} {item.item} {i + 1 !== customInstructions.length ? `/ ` : ``}
           </Text>
         ))}
       </View>
     </View>
   );
 };
-
-
 
 export default CustomInstructionsContainer;

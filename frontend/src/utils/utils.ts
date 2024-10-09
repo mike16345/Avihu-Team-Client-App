@@ -10,3 +10,20 @@ export const hexToRgba = (hex: string, opacity: number) => {
   const b = parseInt(hex.slice(5, 7), 16);
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
+
+export const extractVideoId = (url: string) => {
+  return url.split("v=")[1].split("&")[0];
+};
+
+export const getYouTubeThumbnail = (id: string) => {
+  return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+};
+
+export const generateWheelPickerData = (minRange: number, maxRange: number, stepSize = 1) => {
+  const data = [];
+  for (var i = minRange; i <= maxRange; i += stepSize) {
+    data.push({ value: i, label: `${i}` });
+  }
+
+  return data;
+};

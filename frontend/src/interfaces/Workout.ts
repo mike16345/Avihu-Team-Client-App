@@ -1,10 +1,4 @@
-import { WorkoutType } from "@/enums/WorkoutTypes";
-
-export interface ISet {
-  minReps: number;
-  maxReps?: number;
-  restTime: number;
-}
+import { ISession } from "./ISession";
 
 export interface IWorkout {
   id: string;
@@ -12,22 +6,6 @@ export interface IWorkout {
   linkToVideo?: string;
   name: string;
   sets: ISet[];
-}
-
-export interface IWorkoutPlan {
-  id: string;
-  workouts: string[];
-}
-
-export interface IDetailedWorkoutPlan extends IWorkoutPlan {
-  [WorkoutType.CHEST]: IWorkoutPlan[];
-  [WorkoutType.LEGS]: IWorkout[];
-  [WorkoutType.BICEPS]?: IWorkout[];
-  [WorkoutType.BACK]?: IWorkout[];
-  [WorkoutType.SHOULDERS]?: IWorkout[];
-  [WorkoutType.TRICEPS]?: IWorkout[];
-  [WorkoutType.ABS]?: IWorkout[];
-  [WorkoutType.CARDIO]?: IWorkout[];
 }
 
 export interface ICompletedSet {
@@ -55,4 +33,47 @@ export interface IRecordedSet {
   repsDone: number;
   weight: number;
   note: string;
+  plan: string;
+}
+
+export interface IRecordedSetPost {
+  userId: string;
+  muscleGroup: string;
+  exercise: string;
+  recordedSet: IRecordedSet;
+}
+
+export interface IWorkoutPlan {
+  id?: string;
+  userId?: string;
+  planName: string;
+  muscleGroups: IMuscleGroupWorkouts[];
+}
+
+export interface ICompleteWorkoutPlan {
+  userId?: string;
+  workoutPlans: IWorkoutPlan[];
+}
+
+export interface ISet {
+  id: number;
+  minReps: number;
+  maxReps?: number;
+}
+
+export interface IRecordedSetResponse {
+  session: ISession;
+  recordedSet: IRecordedSet;
+}
+
+export interface IExercise {
+  tipFromTrainer?: string;
+  linkToVideo?: string;
+  name: string;
+  sets: ISet[];
+}
+
+export interface IMuscleGroupWorkouts {
+  muscleGroup: string;
+  exercises: IExercise[];
 }

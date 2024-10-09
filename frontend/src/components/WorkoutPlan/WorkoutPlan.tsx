@@ -1,64 +1,123 @@
 import {
+  Dimensions,
+  FlatList,
   ImageBackground,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState, useRef } from "react";
-import { workoutPlans, workoutPlanToName } from "@/constants/Workouts";
+import { useState, useEffect, FC } from "react";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
-import DropDownPicker from "react-native-dropdown-picker";
-import { WorkoutPlans } from "@/enums/WorkoutPlans";
-import { WorkoutType } from "@/enums/WorkoutTypes";
-import { IWorkout } from "@/interfaces/Workout";
+import DropDownPicker, { ValueType } from "react-native-dropdown-picker";
+import { ICompleteWorkoutPlan, IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
-import Workout from "./Workout";
-import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
 import { Colors } from "@/constants/Colors";
-import WorkoutplanSkeleton from "../ui/loaders/skeletons/WorkoutplanSkeleton";
+import { useWorkoutPlanApi } from "@/hooks/api/useWorkoutPlanApi";
+import ExerciseContainer from "./ExerciseContainer";
+import useStyles from "@/styles/useGlobalStyles";
+import { useUserStore } from "@/store/userStore";
+import { useSessionsApi } from "@/hooks/api/useSessionsApi";
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
+import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutPlanSkeletonLoader";
 
-const WorkoutPlan = () => {
-  const keys = Object.keys(workoutPlans);
-  const itms = keys.map((item) => ({
-    label: workoutPlanToName(item),
-    value: item,
-  }));
+const width = Dimensions.get("window").width;
+interface WorkoutPlanProps
+  extends StackNavigatorProps<WorkoutPlanStackParamList, "WorkoutPlanPage"> {}
 
+const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
   const [open, setOpen] = useState(false);
-  const [plans, setPlans] = useState(itms);
-  const [value, setValue] = useState(plans[0].value);
+  const [plans, setPlans] = useState<any[] | null>(null);
+  const [value, setValue] = useState<ValueType>();
   const [openTips, setOpenTips] = useState(false);
-  const scrollViewRef = useRef(null);
+  const [workoutPlan, setWorkoutPlan] = useState<ICompleteWorkoutPlan>();
+  const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
+  const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
 
-  const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<Record<WorkoutType, IWorkout[]>>(
-    workoutPlans[Number(keys[0]) as WorkoutPlans]
-  );
+  const { fonts, text, spacing } = useStyles();
+  const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
+  const { currentUser } = useUserStore();
+  const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
+  const { getSession } = useSessionsApi();
 
-  const { handleScroll } = useHideTabBarOnScroll();
+  const selectNewWorkoutPlan = (planName: string) => {
+    const selectedWorkoutPlan = workoutPlan?.workoutPlans.find(
+      (plan) => plan.planName === planName
+    );
 
-  return (
-    <ScrollView ref={scrollViewRef} onScroll={handleScroll} scrollEventThrottle={16}>
-      <ImageBackground source={logoBlack} style={styles.headerImage} />
-      <View style={styles.container}>
-        <DropDownPicker
-          rtl
-          open={open}
-          value={value}
-          items={plans}
-          theme="DARK"
-          setOpen={setOpen}
-          setValue={setValue}
-          setItems={setPlans}
-          labelStyle={{ textAlign: "right" }}
-          listItemLabelStyle={{ textAlign: "right" }}
-          onChangeValue={(val) => {
-            if (!val) return;
-            const key = Number(val) as WorkoutPlans;
-            setCurrentWorkoutPlan(workoutPlans[key]);
-          }}
-        />
+    if (selectedWorkoutPlan) setCurrentWorkoutPlan({ ...selectedWorkoutPlan });
+  };
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    getWorkoutPlanByUserId(currentUser._id)
+      .then((res) => setWorkoutPlan(res))
+      .catch((err) => console.log(err));
+  }, []);
+
+  const loadWorkoutSession = async () => {
+    const session = await getItem();
+    if (!session) return;
+
+    try {
+      const sessionJSON = JSON.parse(session);
+      const sessionId = sessionJSON?._id || "";
+      const currentWorkoutSession = await getSession(sessionId || "");
+      if (!currentWorkoutSession) {
+        removeItem();
+      } else {
+        setCurrentWorkoutSession(currentWorkoutSession.data);
+      }
+    } catch (e) {
+      handleSessionNotFound(e);
+    }
+  };
+
+  const handleSessionNotFound = (e: any) => {
+    removeItem();
+    setCurrentWorkoutSession(null);
+  };
+
+  const handleUpdateSession = async (session: any) => {
+    setCurrentWorkoutSession(session);
+    await setItem(JSON.stringify(session));
+  };
+
+  useEffect(() => {
+    if (!workoutPlan) return;
+
+    const plans = workoutPlan.workoutPlans.map((workout) => {
+      return { label: workout.planName, value: workout.planName };
+    });
+
+    setPlans(plans);
+    setValue(plans[0].label);
+    setCurrentWorkoutPlan(workoutPlan.workoutPlans[0]);
+
+    // Load the session details for the current workout plan
+    loadWorkoutSession();
+  }, [workoutPlan]);
+
+  const renderHeader = () => (
+    <>
+      <ImageBackground source={logoBlack} className="w-screen h-[30vh]" />
+      <View style={[styles.container, spacing.gapLg, spacing.pdDefault]}>
+        {value && plans && (
+          <DropDownPicker
+            rtl
+            open={open}
+            value={value}
+            items={plans}
+            theme="DARK"
+            setOpen={setOpen}
+            setValue={setValue}
+            labelStyle={text.textRight}
+            listItemLabelStyle={text.textRight}
+            onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
+          />
+        )}
         <TouchableOpacity
           style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
           onPress={() => setOpenTips(true)}
@@ -66,23 +125,35 @@ const WorkoutPlan = () => {
           <Text style={styles.tipsText}>דגשים</Text>
         </TouchableOpacity>
       </View>
+    </>
+  );
 
-      <View>
-        {Object.keys(currentWorkoutPlan).map((item, i) => {
-          const workoutType = Number(item) as WorkoutType;
-          const workouts = currentWorkoutPlan[workoutType];
-
-          return (
-            <View key={i} style={styles.workoutContainer}>
-              {workouts.map((workout, index) => {
-                return <Workout workout={workout} key={index} />;
-              })}
-            </View>
-          );
-        })}
-      </View>
-      <WorkoutTips openTips={openTips} setOpenTips={setOpenTips} />
-    </ScrollView>
+  return (
+    <FlatList
+      data={currentWorkoutPlan?.muscleGroups || []}
+      ListEmptyComponent={() => <WorkoutPlanSkeleton />}
+      keyExtractor={(item) => item.muscleGroup}
+      ListHeaderComponent={renderHeader}
+      renderItem={({ item }) => (
+        <View style={[spacing.pdHorizontalSm]}>
+          <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>{item.muscleGroup}</Text>
+          <View style={[spacing.gapLg]}>
+            {item.exercises.map((exercise, index) => (
+              <ExerciseContainer
+                key={currentWorkoutPlan?.planName + "-" + index}
+                plan={currentWorkoutPlan?.planName || ""}
+                muscleGroup={item.muscleGroup}
+                exercise={exercise}
+                session={currentWorkoutSession} // Pass down the session
+                updateSession={handleUpdateSession} // Handler for recording a set
+              />
+            ))}
+          </View>
+        </View>
+      )}
+      ListFooterComponent={<WorkoutTips openTips={openTips} setOpenTips={setOpenTips} />}
+      contentContainerStyle={styles.workoutContainer}
+    />
   );
 };
 
@@ -90,17 +161,13 @@ export default WorkoutPlan;
 
 const styles = StyleSheet.create({
   headerImage: {
-    width: "100%",
-    height: 150,
-    justifyContent: "center",
-    alignItems: "center",
+    width: width,
+    height: 250,
   },
   container: {
     zIndex: 10,
     width: "100%",
     alignItems: "flex-end",
-    padding: 12,
-    gap: 20,
   },
   tipsText: {
     color: Colors.primary,
@@ -111,7 +178,12 @@ const styles = StyleSheet.create({
   },
   workoutContainer: {
     zIndex: 1,
-    padding: 4,
     gap: 12,
+  },
+  muscleGroupText: {
+    color: Colors.light,
+    textAlign: "left",
+    fontWeight: "bold",
+    padding: 10,
   },
 });

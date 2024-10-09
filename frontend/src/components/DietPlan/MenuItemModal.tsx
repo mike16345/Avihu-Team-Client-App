@@ -2,7 +2,7 @@ import React from "react";
 import { ScrollView, Text, View } from "react-native";
 import { CustomModal } from "../ui/Modal";
 import useFontSize from "@/styles/useFontSize";
-import useMenuItemApi from "@/hooks/useMenuItemApi";
+import useMenuItemApi from "@/hooks/api/useMenuItemApi";
 import MenuItem from "./MenuItem";
 import useStyles from "@/styles/useGlobalStyles";
 import Loader from "../ui/loaders/Loader";
@@ -49,6 +49,8 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
           colors.borderPrimary,
           common.borderDefault,
           common.roundedMd,
+          spacing.pdBottomBar,
+
           { height: `80%` },
         ]}
       >

@@ -1,15 +1,16 @@
-import { FlatList, Platform, StyleSheet, Text, View } from "react-native";
+import { Dimensions, FlatList, Text, View } from "react-native";
 import { Dispatch, FC, SetStateAction } from "react";
-import { Colors } from "@/constants/Colors";
 import NativeIcon from "@/components/Icon/NativeIcon";
 import { CustomModal } from "../ui/Modal";
+import useStyles from "@/styles/useGlobalStyles";
 
 interface WorkoutTipsProps {
   openTips: boolean;
+  tips: string[];
   setOpenTips: Dispatch<SetStateAction<boolean>>;
 }
 
-const tips = [
+const generalTips = [
   "כל תחילת אימון הליכה 5 דק לחמם את הגוף",
   "אימון משקולות תמיד יהיה לפני האירובי",
   "בתחילת האימון יש לבצע שני סטים של חימום בתרגיל הראשון",
@@ -17,27 +18,51 @@ const tips = [
   "מנוחה בין סט לסט 40-60 שניות",
 ];
 
-const WorkoutTips: FC<WorkoutTipsProps> = ({ openTips, setOpenTips }) => {
+const WorkoutTips: FC<WorkoutTipsProps> = ({ tips = generalTips, openTips, setOpenTips }) => {
+  const { fonts, layout, text, colors, spacing } = useStyles();
+
   return (
     <CustomModal
-      style={styles.centeredView}
+      style={[
+        layout.center,
+        colors.backgroundSurface,
+        spacing.pdLg,
+        { height: Dimensions.get("screen").height / 2, top: "20%" },
+      ]}
       visible={openTips}
       onDismiss={() => setOpenTips(false)}
       dismissableBackButton
     >
-      <View className="flex-row justify-between items-center mb-4">
+      <View
+        style={[
+          layout.widthFull,
+          layout.flexRow,
+          layout.itemsCenter,
+          layout.justifyBetween,
+          spacing.mgVerticalDefault,
+        ]}
+      >
         <NativeIcon
           onPress={() => setOpenTips(false)}
           library="MaterialCommunityIcons"
           name="close"
           size={22}
-          color={"white"}
+          color={colors.textOnSurface.color}
         />
-        <Text style={styles.title}>דגשים לאימון</Text>
+        <Text style={[text.textBold, fonts.lg, colors.textPrimary]}>דגשים לאימון</Text>
       </View>
       <FlatList
+        keyExtractor={(_, i) => i.toString()}
         renderItem={({ item, index }) => (
-          <Text style={styles.tip}>
+          <Text
+            style={[
+              text.textBold,
+              text.textRight,
+              fonts.md,
+              colors.textOnSurface,
+              spacing.mgHorizontalSm,
+            ]}
+          >
             {index + 1 + ". "}
             {item}
           </Text>
@@ -49,25 +74,3 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ openTips, setOpenTips }) => {
 };
 
 export default WorkoutTips;
-
-const styles = StyleSheet.create({
-  centeredView: {
-    backgroundColor: Colors.dark,
-  },
-
-  title: {
-    color: Colors.primary,
-    fontSize: 20,
-    fontWeight: "600",
-  },
-  tip: {
-    ...Platform.select({
-      ios: {
-        textAlign: "right",
-      },
-    }),
-    color: Colors.light,
-    paddingBottom: 10,
-    fontWeight: "600",
-  },
-});

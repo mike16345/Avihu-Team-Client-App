@@ -18,7 +18,7 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({ error }) => {
         size={150}
         style={[colors.textDanger]}
       />
-      <Text style={[colors.textOnBackground, fonts.xxl]}>אירעה שגיאה</Text>
+      <Text style={[colors.textOnBackground, fonts.xl]}>אירעה שגיאה</Text>
       <Text style={[colors.textOnBackground, fonts.xl]}>{error.message}</Text>
     </View>
   );

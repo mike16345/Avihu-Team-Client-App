@@ -1,34 +1,31 @@
 import { View, ImageBackground, ScrollView, Text, Animated } from "react-native";
-import { useRef, useState } from "react";
-import logoBlack from "../../../assets/images/avihu-logo-black.png";
-import useHideTabBarOnScroll from "@/hooks/useHideTabBarOnScroll";
-import { useDietPlanApi } from "@/hooks/useDietPlanApi";
+import { useState } from "react";
+import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
+import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
 import { useUserStore } from "@/store/userStore";
 import MealContainer from "./MealContainer";
 import NativeIcon from "../Icon/NativeIcon";
 import FABGroup from "../ui/FABGroup";
 import MenuItemModal from "./MenuItemModal";
 import useStyles from "@/styles/useGlobalStyles";
-import { DarkTheme, useThemeContext } from "@/themes/useAppTheme";
+import { DarkTheme } from "@/themes/useAppTheme";
 import { Portal } from "react-native-paper";
 import DietPlanSkeleton from "../ui/loaders/skeletons/DietPlanSkeleton";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import ExtraInfoContainer from "./ExtraInfoContainer";
+import Divider from "../ui/Divider";
 import { useQuery } from "@tanstack/react-query";
 import { DIET_PLAN_KEY, ONE_DAY } from "@/constants/reactQuery";
 import ErrorScreen from "@/screens/ErrorScreen";
 
 export default function DietPlan() {
-  const { handleScroll } = useHideTabBarOnScroll();
   const currentUser = useUserStore((state) => state.currentUser);
   const { getDietPlanByUserId } = useDietPlanApi();
   const { layout, spacing, colors, common, text } = useStyles();
-  const { theme } = useThemeContext();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [selectedFoodGroup, setSelectedFoodGroup] = useState<string | null>(null);
-  const scrollRef = useRef(null);
   const {
     slideInRightDelay0,
     slideInRightDelay100,
@@ -67,13 +64,11 @@ export default function DietPlan() {
   return (
     <Portal.Host>
       <ScrollView
-        ref={scrollRef}
-        onScroll={handleScroll}
-        style={[
-          layout.flex1,
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          layout.flexGrow,
           colors.backgroundSecondary,
           spacing.pdBottomBar,
-          spacing.pdStatusBar,
           { backgroundColor: DarkTheme.colors.background },
         ]}
       >
@@ -91,7 +86,7 @@ export default function DietPlan() {
             </View>
             {data?.meals.map((meal, i) => (
               <Animated.View
-                key={i}
+                key={meal._id}
                 style={[
                   layout.flexRowReverse,
                   layout.itemsCenter,
@@ -102,23 +97,17 @@ export default function DietPlan() {
                 ]}
               >
                 <View
-                  style={[
-                    layout.itemsCenter,
-                    spacing.pdXs,
-                    spacing.gapSm,
-                    common.borderLeftSm,
-                    colors.borderSecondary,
-                    { paddingLeft: 10 },
-                  ]}
+                  style={[layout.itemsCenter, spacing.pdXs, spacing.gapSm, { paddingLeft: 10 }]}
                 >
                   <NativeIcon
                     library="MaterialCommunityIcons"
                     name="food-outline"
-                    color={theme.colors.secondary}
+                    color={colors.backgroundSecondary.backgroundColor}
                     size={20}
                   />
                   <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
                 </View>
+                <Divider orientation="vertical" color="white" thickness={0.8} />
                 <MealContainer meal={meal} />
               </Animated.View>
             ))}
