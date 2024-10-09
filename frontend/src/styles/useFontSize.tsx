@@ -17,11 +17,11 @@ const useFontSize = () => {
         sm: { fontSize: scaleFontSize(baseFontSize * 0.5) },
         md: { fontSize: scaleFontSize(baseFontSize * 0.875) },
         default: { fontSize: scaleFontSize(baseFontSize) },
-        xsm: { fontSize: scaleFontSize(baseFontSize * 0.675) },
         lg: { fontSize: scaleFontSize(baseFontSize * 1.25) },
-        xl: { fontSize: scaleFontSize(baseFontSize * 1.75) },
-        xxl: { fontSize: scaleFontSize(baseFontSize * 2) },
-        xxxl: { fontSize: scaleFontSize(baseFontSize * 2.5) },
+        xl: { fontSize: scaleFontSize(baseFontSize * 1.5) },
+        xxl: { fontSize: scaleFontSize(baseFontSize * 1.75) },
+        xxxl: { fontSize: scaleFontSize(baseFontSize * 2) },
+        xxxxl: { fontSize: scaleFontSize(baseFontSize * 2.5) },
       }),
     [fontScale]
   );

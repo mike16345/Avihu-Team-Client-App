@@ -1,7 +1,7 @@
 import { View, ImageBackground, ScrollView, Text, Animated } from "react-native";
 import { useState } from "react";
 import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
-import { useDietPlanApi } from "@/hooks/useDietPlanApi";
+import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
 import { useUserStore } from "@/store/userStore";
 import MealContainer from "./MealContainer";
 import NativeIcon from "../Icon/NativeIcon";
