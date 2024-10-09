@@ -53,7 +53,13 @@ const Loader: React.FC<LoaderProps> = ({ variant = `Standard` }) => {
                 layout.flexRow,
                 layout.center,
                 spacing.gapXxl,
-                { height: height, width: width, position: `absolute` },
+                {
+                  height: height,
+                  width: width,
+                  position: `absolute`,
+                  backgroundColor: `rgba(0, 0, 0, 0.8)`,
+                  zIndex: 100,
+                },
                 colors.backdrop,
               ],
             ]

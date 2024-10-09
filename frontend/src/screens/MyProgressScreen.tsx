@@ -96,9 +96,6 @@ const MyProgressScreen = () => {
 
   if (isLoading) return <ProgressScreenSkeleton />;
 
-  if (addNewWeighIn.isLoading || updateWeighIn.isLoading || removeWeighIn.isLoading)
-    return <Loader variant="Screen" />;
-
   if (isError || addNewWeighIn.isError || updateWeighIn.isError || removeWeighIn.isError)
     return (
       <ErrorScreen
@@ -117,6 +114,9 @@ const MyProgressScreen = () => {
           spacing.pdStatusBar,
         ]}
       >
+        {(addNewWeighIn.isLoading || updateWeighIn.isLoading || removeWeighIn.isLoading) && (
+          <Loader variant="Screen" />
+        )}
         <Animated.View style={[styles.calendarContainer, slideInLeftDelay0]}>
           <WeightCalendar
             weighIns={data || []}

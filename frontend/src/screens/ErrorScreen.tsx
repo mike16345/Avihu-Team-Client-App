@@ -8,9 +8,8 @@ interface ErrorScreenProps {
 }
 
 const ErrorScreen: React.FC<ErrorScreenProps> = ({ error }) => {
-  console.log(error);
+  const { colors, fonts, layout, spacing } = useStyles();
 
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
   return (
     <View style={[layout.flex1, layout.center, spacing.gapDefault]}>
       <NativeIcon

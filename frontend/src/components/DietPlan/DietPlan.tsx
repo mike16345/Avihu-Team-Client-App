@@ -35,6 +35,8 @@ export default function DietPlan() {
     slideInRightDelay200,
     slideInRightDelay300,
     slideInRightDelay400,
+    slideInBottomDelay500,
+    slideInBottomDelay600,
   } = useSlideInAnimations();
 
   const slideAnimations = [
@@ -43,6 +45,8 @@ export default function DietPlan() {
     slideInRightDelay200,
     slideInRightDelay300,
     slideInRightDelay400,
+    slideInBottomDelay500,
+    slideInBottomDelay600,
   ];
 
   const { data, isError, error, isLoading } = useQuery({
@@ -94,7 +98,7 @@ export default function DietPlan() {
                   spacing.pdDefault,
                   colors.backgroundSecondaryContainer,
                   common.rounded,
-                  slideAnimations[i],
+                  slideAnimations[i + 1],
                 ]}
               >
                 <View
