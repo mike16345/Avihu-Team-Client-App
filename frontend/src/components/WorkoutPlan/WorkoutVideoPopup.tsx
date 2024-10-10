@@ -6,6 +6,7 @@ import {
   Image,
   useWindowDimensions,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import YoutubePlayer, { PLAYER_STATES, YoutubeIframeRef } from "react-native-youtube-iframe";
 import NativeIcon from "@/components/Icon/NativeIcon"; // Assuming this is where your NativeIcon component is located
@@ -19,6 +20,7 @@ interface WorkoutVideoPopupProps {
 
 const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height = 200 }) => {
   const videoWidth = width || useWindowDimensions().width - 40;
+  const videoHeight = Platform.OS == "ios" ? height + 50 : height;
   const thumbnailUrl = getYouTubeThumbnail(videoId); // URL for high-quality thumbnail
 
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +55,10 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
     <View style={[styles.container, { width: width }]}>
       {!isPlaying ? (
         <TouchableOpacity style={styles.thumbnailContainer} onPress={handlePlay}>
-          <Image source={{ uri: thumbnailUrl }} style={[{ width: videoWidth, height }]} />
+          <Image
+            source={{ uri: thumbnailUrl }}
+            style={[{ width: videoWidth, height: videoHeight }]}
+          />
           <View style={styles.playButton}>
             <NativeIcon
               library="MaterialCommunityIcons"
@@ -78,7 +83,7 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
             onChangeState={handleVideoStateChange}
             initialPlayerParams={{ loop: false, rel: false }}
             width={videoWidth}
-            height={height}
+            height={videoHeight}
             videoId={videoId}
             webViewStyle={styles.video}
           />
