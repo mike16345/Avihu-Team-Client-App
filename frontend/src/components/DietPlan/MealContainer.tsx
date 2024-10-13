@@ -6,6 +6,7 @@ import StandardMealItem from "./StandardMealItem";
 import NativeIcon from "../Icon/NativeIcon";
 import useStyles from "@/styles/useGlobalStyles";
 import { useThemeContext } from "@/themes/useAppTheme";
+import MenuItemTicket from "./MenuItemTicket";
 
 interface MealContainerProps {
   meal: IMeal;
@@ -17,24 +18,6 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
 
   const mealItems = Object.entries(meal);
 
-  const getIcon = (key: string) => {
-    switch (key) {
-      case `totalProtein`:
-        return `fish`;
-
-      case `totalCarbs`:
-        return `baguette`;
-
-      case `totalFats`:
-        return `cheese`;
-
-      case `totalVeggies`:
-        return `leaf`;
-
-      default:
-        return `food-takeout-box-outline`;
-    }
-  };
   const getName = (key: string) => {
     switch (key) {
       case `totalProtein`:
@@ -67,20 +50,12 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
           {mealItem[1].customItems && mealItem[1].customItems.length > 0 && (
             <CustomInstructionsContainer
               customInstructions={mealItem[1].customItems}
-              icon={
-                <NativeIcon
-                  library="MaterialCommunityIcons"
-                  name={getIcon(mealItem[0])}
-                  size={20}
-                  color={theme.colors.primary}
-                />
-              }
               foodGroup={getName(mealItem[0])}
             />
           )}
 
           {mealItem[1].quantity > 0 && mealItem[1].customItems.length == 0 && (
-            <StandardMealItem
+            /*  <StandardMealItem
               icon={
                 <NativeIcon
                   library="MaterialCommunityIcons"
@@ -91,7 +66,8 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
               }
               quantity={mealItem[1].quantity}
               foodGroup={getName(mealItem[0])}
-            />
+            /> */
+            <MenuItemTicket foodGroup={getName(mealItem[0])} quantity={mealItem[1].quantity} />
           )}
         </React.Fragment>
       ))}

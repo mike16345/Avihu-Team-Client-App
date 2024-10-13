@@ -1,32 +1,28 @@
-import { ICustomItemInstructions } from "@/interfaces/DietPlan";
+import { ICustomMenuItem } from "@/interfaces/DietPlan";
 import React from "react";
 import { Text, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
+import MenuItemTicket from "./MenuItemTicket";
+import { List } from "react-native-paper";
 
 interface CustomInstructionsContainerProps {
-  customInstructions: ICustomItemInstructions[];
-  icon: JSX.Element;
+  customInstructions: ICustomMenuItem[];
   foodGroup?: string;
 }
 
 const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = ({
   customInstructions,
-  icon,
   foodGroup,
 }) => {
-  const { layout, spacing, colors, text } = useStyles();
+  const { layout, spacing, colors, text, common } = useStyles();
+  console.log(customInstructions);
 
   return (
-    <View style={[layout.itemsEnd, spacing.gapSm, spacing.pdVerticalXs]}>
-      <View style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
-        <Text style={colors.textOnSecondaryContainer}>{foodGroup} : </Text>
-        {icon}
-      </View>
-      <View style={[layout.flexRowReverse, layout.wrap]}>
+    <View style={[layout.itemsStart, spacing.gapSm, spacing.pdVerticalXs]}>
+      <Text style={[colors.textPrimary]}>בחר אחד מה{foodGroup}</Text>
+      <View style={[layout.flexRow, layout.wrap, spacing.gapDefault]}>
         {customInstructions.map((item, i) => (
-          <Text key={i} style={[colors.textOnSecondaryContainer, text.textRight]}>
-            {item.quantity} {item.item} {i + 1 !== customInstructions.length ? `/ ` : ``}
-          </Text>
+          <MenuItemTicket foodGroup={foodGroup} quantity={item.quantity} name={item.item} key={i} />
         ))}
       </View>
     </View>

@@ -82,6 +82,8 @@ export default function DietPlan() {
               <ExtraInfoContainer
                 customInstructions={data?.customInstructions}
                 freeCalories={data?.freeCalories}
+                fatsPerDay={data?.fatsPerDay}
+                veggiesPerDay={data?.veggiesPerDay}
               />
             </View>
             {data?.meals.map((meal, i) => (

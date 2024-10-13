@@ -7,7 +7,8 @@ import Tips from "./Tips";
 import { ScrollView } from "react-native-gesture-handler";
 
 interface ExtraInfoContainerProps {
-  fats?: number;
+  veggiesPerDay?: number;
+  fatsPerDay?: number;
   freeCalories?: number;
   customInstructions?: string;
 }
@@ -15,7 +16,8 @@ interface ExtraInfoContainerProps {
 const ExtraInfoContainer: React.FC<ExtraInfoContainerProps> = ({
   customInstructions,
   freeCalories,
-  fats,
+  fatsPerDay,
+  veggiesPerDay,
 }) => {
   const { layout, spacing } = useStyles();
   const { slideInRightDelay0 } = useSlideInAnimations();
@@ -37,7 +39,13 @@ const ExtraInfoContainer: React.FC<ExtraInfoContainerProps> = ({
           <AmountContainer title="קלוריות חופשיות" variant="cal" amount={freeCalories} />
         )}
 
-        <AmountContainer title="כמות שומנים ליום" variant="gr" amount={250} />
+        {fatsPerDay && (
+          <AmountContainer title="כמות שומנים ליום" variant="gr" amount={fatsPerDay} />
+        )}
+
+        {veggiesPerDay && (
+          <AmountContainer title="כמות ירקות ליום" variant="unit" amount={veggiesPerDay} />
+        )}
       </Animated.View>
     </ScrollView>
   );
