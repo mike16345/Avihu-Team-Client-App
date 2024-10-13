@@ -50,7 +50,6 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
           common.borderDefault,
           common.roundedMd,
           spacing.pdBottomBar,
-
           { height: `80%` },
         ]}
       >

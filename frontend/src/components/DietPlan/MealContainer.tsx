@@ -55,18 +55,6 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
           )}
 
           {mealItem[1].quantity > 0 && mealItem[1].customItems.length == 0 && (
-            /*  <StandardMealItem
-              icon={
-                <NativeIcon
-                  library="MaterialCommunityIcons"
-                  name={getIcon(mealItem[0])}
-                  size={20}
-                  color={theme.colors.primary}
-                />
-              }
-              quantity={mealItem[1].quantity}
-              foodGroup={getName(mealItem[0])}
-            /> */
             <MenuItemTicket foodGroup={getName(mealItem[0])} quantity={mealItem[1].quantity} />
           )}
         </React.Fragment>

@@ -10,13 +10,13 @@ interface MenuItemTicketProps {
 }
 
 const MenuItemTicket: React.FC<MenuItemTicketProps> = ({ quantity, foodGroup, name }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, common, layout, spacing } = useStyles();
 
   return (
     <View
       style={[
         colors.background,
-        common.roundedFull,
+        common.rounded,
         layout.flexRow,
         layout.itemsCenter,
         spacing.pdSm,
