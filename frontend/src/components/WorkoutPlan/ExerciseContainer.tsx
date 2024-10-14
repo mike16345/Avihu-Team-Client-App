@@ -128,7 +128,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
             size={28}
           />
 
-          <SetContainer currentSet={currentSet} currentSetNumber={currentSetNumber} />
+          <SetContainer currentSetNumber={currentSetNumber} totalSets={exercise.sets.length} />
         </View>
       </View>
 
