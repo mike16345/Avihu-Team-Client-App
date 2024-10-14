@@ -71,7 +71,9 @@ const CustomItemContent: React.FC<CustomItemContentProps> = ({
               >
                 <Text style={[colors.textOnSecondary, text.textBold]}>{item}</Text>
                 <View style={[colors.backgroundPrimary, { width: 3, height: 14 }]}></View>
-                <Text style={[colors.textOnSecondary]}>{quantity} מנות</Text>
+                <Text style={[colors.textOnSecondary]}>
+                  {quantity > 1 ? `${quantity} מנות` : `מנה אחת`}
+                </Text>
               </View>
             </View>
           ))}
