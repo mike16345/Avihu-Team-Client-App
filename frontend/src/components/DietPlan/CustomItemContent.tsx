@@ -2,6 +2,7 @@ import { ICustomMenuItem } from "@/interfaces/DietPlan";
 import useStyles from "@/styles/useGlobalStyles";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import MenuItemTicket from "./MenuItemTicket";
 
 interface CustomItemContentProps {
   customInstructions: ICustomMenuItem[];
@@ -12,16 +13,22 @@ const CustomItemContent: React.FC<CustomItemContentProps> = ({ customInstruction
   const { layout, spacing, colors, text, common, fonts } = useStyles();
 
   return (
-    <View style={[spacing.gapXxl, layout.justifyAround, layout.heightFull, spacing.pdDefault]}>
+    <View
+      style={[
+        spacing.gapXxl,
+        layout.justifyAround,
+        layout.heightFull,
+        spacing.pdDefault,
+        colors.backdrop,
+      ]}
+    >
       <Text style={[text.textCenter, colors.textOnBackground, fonts.xl, text.textBold]}>
         בחר אחת מהאפשרויות הבאות
       </Text>
 
       <View style={[layout.flexRow, layout.center, layout.wrap, spacing.gapXl]}>
         {customInstructions.map(({ item, quantity }, i) => (
-          <Text key={i} style={[fonts.default, colors.textOnBackground]}>
-            {quantity} מנות {item}
-          </Text>
+          <MenuItemTicket quantity={quantity} name={item} key={i} />
         ))}
       </View>
       <TouchableOpacity

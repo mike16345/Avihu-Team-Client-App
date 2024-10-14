@@ -1,6 +1,6 @@
 import { ICustomMenuItem } from "@/interfaces/DietPlan";
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { Button } from "react-native-paper";
 import BottomDrawer from "../ui/BottomDrawer";
@@ -20,12 +20,12 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
 
   return (
     <View style={[layout.itemsStart, spacing.gapSm, spacing.pdVerticalXs]}>
-      <Button
-        style={[colors.background, common.rounded, fonts.sm]}
+      <TouchableOpacity
+        style={[colors.background, common.rounded, spacing.pdSm]}
         onPress={() => setOpenModal(true)}
       >
         <Text style={[colors.textOnBackground, fonts.md]}>צפה ב{foodGroup}</Text>
-      </Button>
+      </TouchableOpacity>
 
       <BottomDrawer
         onClose={() => setOpenModal(false)}
