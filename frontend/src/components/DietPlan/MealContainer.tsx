@@ -2,8 +2,6 @@ import { IMeal } from "@/interfaces/DietPlan";
 import React from "react";
 import { View } from "react-native";
 import CustomInstructionsContainer from "./CustomInstructionsContainer";
-import StandardMealItem from "./StandardMealItem";
-import NativeIcon from "../Icon/NativeIcon";
 import useStyles from "@/styles/useGlobalStyles";
 import { useThemeContext } from "@/themes/useAppTheme";
 import MenuItemTicket from "./MenuItemTicket";

@@ -24,7 +24,7 @@ const MenuItemTicket: React.FC<MenuItemTicketProps> = ({ quantity, foodGroup, na
       ]}
     >
       <NativeIcon
-        size={15}
+        size={18}
         style={[colors.textPrimary]}
         library="MaterialCommunityIcons"
         name={foodGroup == `חלבונים` ? `fish` : `baguette`}

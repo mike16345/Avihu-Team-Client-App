@@ -5,6 +5,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { Button } from "react-native-paper";
 import BottomDrawer from "../ui/BottomDrawer";
 import CustomItemContent from "./CustomItemContent";
+import NativeIcon from "../Icon/NativeIcon";
 
 interface CustomInstructionsContainerProps {
   customInstructions: ICustomMenuItem[];
@@ -21,9 +22,22 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
   return (
     <View style={[layout.itemsStart, spacing.gapSm, spacing.pdVerticalXs]}>
       <TouchableOpacity
-        style={[colors.background, common.rounded, spacing.pdSm]}
+        style={[
+          colors.background,
+          layout.flexRow,
+          layout.center,
+          spacing.gapSm,
+          common.rounded,
+          spacing.pdSm,
+        ]}
         onPress={() => setOpenModal(true)}
       >
+        <NativeIcon
+          size={18}
+          style={[colors.textPrimary]}
+          library="MaterialCommunityIcons"
+          name={foodGroup == `חלבונים` ? `fish` : `baguette`}
+        />
         <Text style={[colors.textOnBackground, fonts.md]}>צפה ב{foodGroup}</Text>
       </TouchableOpacity>
 
@@ -33,6 +47,7 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
         children={
           <CustomItemContent
             customInstructions={customInstructions}
+            foodGroup={foodGroup}
             close={() => setOpenModal(false)}
           />
         }
