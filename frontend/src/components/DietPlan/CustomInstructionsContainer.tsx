@@ -39,9 +39,9 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
           name={foodGroup == `חלבונים` ? `fish` : `baguette`}
         />
         <Text style={[colors.textOnBackground, fonts.md]}>צפה ב{foodGroup}</Text>
-      </TouchableOpacity> */}
+      </TouchableOpacity>
 
-      {/* <BottomDrawer
+      <BottomDrawer
         onClose={() => setOpenModal(false)}
         open={openModal}
         children={
@@ -51,7 +51,7 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
             close={() => setOpenModal(false)}
           />
         }
-      /> */}
+      />
     </View>
   );
 };
