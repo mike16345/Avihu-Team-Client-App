@@ -96,6 +96,7 @@ export default function DietPlan() {
                   colors.backgroundSecondaryContainer,
                   common.rounded,
                   slideAnimations[i + 1],
+                  { overflow: "hidden" },
                 ]}
               >
                 <View
