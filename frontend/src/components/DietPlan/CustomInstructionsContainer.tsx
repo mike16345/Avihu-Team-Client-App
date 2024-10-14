@@ -1,8 +1,7 @@
 import { ICustomMenuItem } from "@/interfaces/DietPlan";
 import React, { useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import { Button } from "react-native-paper";
 import BottomDrawer from "../ui/BottomDrawer";
 import CustomItemContent from "./CustomItemContent";
 import NativeIcon from "../Icon/NativeIcon";
@@ -16,7 +15,7 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
   customInstructions,
   foodGroup,
 }) => {
-  const { layout, spacing, colors, common, fonts, text } = useStyles();
+  const { layout, spacing, colors, common, fonts } = useStyles();
   const [openModal, setOpenModal] = useState(false);
 
   return (
