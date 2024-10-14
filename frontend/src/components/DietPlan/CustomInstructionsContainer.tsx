@@ -1,6 +1,6 @@
 import { ICustomMenuItem } from "@/interfaces/DietPlan";
 import React, { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { Button } from "react-native-paper";
 import BottomDrawer from "../ui/BottomDrawer";
@@ -16,7 +16,7 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
   customInstructions,
   foodGroup,
 }) => {
-  const { layout, spacing, colors, common, fonts } = useStyles();
+  const { layout, spacing, colors, common, fonts, text } = useStyles();
   const [openModal, setOpenModal] = useState(false);
 
   return (
@@ -39,9 +39,9 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
           name={foodGroup == `חלבונים` ? `fish` : `baguette`}
         />
         <Text style={[colors.textOnBackground, fonts.md]}>צפה ב{foodGroup}</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
-      <BottomDrawer
+      {/* <BottomDrawer
         onClose={() => setOpenModal(false)}
         open={openModal}
         children={
@@ -51,7 +51,7 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
             close={() => setOpenModal(false)}
           />
         }
-      />
+      /> */}
     </View>
   );
 };
