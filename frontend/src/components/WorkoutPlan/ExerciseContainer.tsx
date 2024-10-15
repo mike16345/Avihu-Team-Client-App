@@ -118,6 +118,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
               navigation.setOptions({ title: exercise.name });
               navigation.navigate("RecordSet", {
                 exercise: exercise,
+                muscleGroup: muscleGroup,
                 handleRecordSet: (recordedSet) => handleRecordSet(recordedSet),
                 setNumber: currentSetNumber,
               });

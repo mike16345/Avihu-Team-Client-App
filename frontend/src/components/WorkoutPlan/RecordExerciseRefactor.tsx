@@ -1,39 +1,74 @@
 import { FC, useEffect, useMemo, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  KeyboardAvoidingView,
-  useWindowDimensions,
-  Pressable,
-} from "react-native";
+import { StyleSheet, View, useWindowDimensions, Pressable, ScrollView } from "react-native";
 import { Colors } from "@/constants/Colors";
-import { IRecordedSet } from "@/interfaces/Workout";
+import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import useStyles from "@/styles/useGlobalStyles";
 import { Button, Text, TextInput } from "react-native-paper";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
-import { extractVideoId, generateWheelPickerData } from "@/utils/utils";
+import { createRetryFunction, extractVideoId, generateWheelPickerData } from "@/utils/utils";
 import WheelInputDrawer from "../ui/WheelInputDrawer";
 import WeightWheelPicker from "../WeightGraph/WeightWheelPicker";
 import WheelPicker from "../ui/WheelPicker";
 import WorkoutTips from "./WorkoutTips";
+import NativeIcon from "../Icon/NativeIcon";
+import { useRecordedSetsApi } from "@/hooks/api/useRecordedSetsApi";
+import { useUserStore } from "@/store/userStore";
+import { useQuery } from "@tanstack/react-query";
+import Loader from "../ui/loaders/Loader";
+import RecordedSetInfo from "./RecordedSetInfo";
+import { ONE_DAY } from "@/constants/reactQuery";
 
 type InputTypes = "reps" | "weight";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
 
+const findLatestRecordedSetByNumber = (
+  recordedSets: IRecordedSetResponse[],
+  setNumber: number
+): IRecordedSetResponse | null => {
+  if (!recordedSets.length) return null;
+
+  const matchingSets = recordedSets.filter((set) => set.setNumber === setNumber);
+
+  if (!matchingSets.length) return null;
+
+  const latestSet = matchingSets.reduce((latest, current) =>
+    new Date(latest.date) > new Date(current.date) ? latest : current
+  );
+
+  return latestSet;
+};
+
 const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const repsOptions = useMemo(() => generateWheelPickerData(1, 100), []);
-  const { handleRecordSet, exercise, setNumber } = route!.params;
+  const { handleRecordSet, exercise, muscleGroup, setNumber } = route!.params;
 
   const { height, width } = useWindowDimensions();
   const customStyles = useStyles();
   const { colors, fonts, layout, spacing, text } = customStyles;
+
+  const currentUser = useUserStore((state) => state.currentUser);
+  const { getUserRecordedSetsByExercise } = useRecordedSetsApi();
+
+  const { data, isLoading } = useQuery(
+    ["recordedSets", exercise],
+    () =>
+      getUserRecordedSetsByExercise(exercise.name, muscleGroup, currentUser?._id || "").then(
+        (res) => res.data
+      ),
+
+    { enabled: !!exercise, retry: createRetryFunction(404), staleTime: ONE_DAY }
+  );
+
+  const lastRecordedSet = findLatestRecordedSetByNumber(data || [], setNumber);
+  const strippedTips = exercise.tipFromTrainer?.replace(" ", "");
 
   const [recordedSet, setRecordedSet] = useState<Omit<IRecordedSet, "plan">>({
     weight: 0,
     repsDone: 0,
     note: "",
   });
+
   const [showWeightInputModal, setShowWeightInputModal] = useState(false);
   const [showRepsInputDrawer, setShowRepsInputDrawer] = useState(false);
   const [openTrainerTips, setOpenTrainerTips] = useState(false);
@@ -60,12 +95,15 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
   useEffect(() => {
     navigation?.setOptions({ title: exercise.name });
   }, [navigation]);
-  const strippedTips = exercise.tipFromTrainer?.replace(" ", "");
+
+  if (isLoading) return <Loader variant="Standard" />;
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={[layout.sizeFull]}>
+    <View style={[layout.sizeFull]}>
       <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
-      <View style={[layout.flexGrow, layout.justifyBetween, spacing.pdDefault]}>
+      <ScrollView
+        contentContainerStyle={[layout.flexGrow, layout.justifyBetween, spacing.pdDefault]}
+      >
         <View style={[layout.itemsEnd, spacing.gapSm]}>
           {strippedTips && strippedTips.length && (
             <Pressable onPress={() => setOpenTrainerTips(true)}>
@@ -124,6 +162,26 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             onChangeText={(text) => handleUpdateRecordedSet("note", text)}
           />
         </View>
+
+        {lastRecordedSet && (
+          <RecordedSetInfo
+            actionButton={
+              <NativeIcon
+                onPress={() => {
+                  navigation?.navigate("RecordedSets", {
+                    recordedSets: data || [],
+                  });
+                }}
+                color={colors.textOnSecondaryContainer.color}
+                library="MaterialCommunityIcons"
+                name="chevron-left"
+                size={28}
+              />
+            }
+            recordedSet={lastRecordedSet}
+          />
+        )}
+
         <View style={[layout.flexRow, layout.widthFull, spacing.gapLg, spacing.pdSm]}>
           <Button mode="contained" onPress={handleSave}>
             <Text style={[customStyles.text.textBold]}>שמור</Text>
@@ -132,7 +190,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             בטל
           </Button>
         </View>
-      </View>
+      </ScrollView>
       {showWeightInputModal && (
         <WheelInputDrawer
           title="משקל"
@@ -182,7 +240,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
           />
         </WheelInputDrawer>
       )}
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
