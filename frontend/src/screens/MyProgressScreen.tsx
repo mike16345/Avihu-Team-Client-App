@@ -13,7 +13,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import DateUtils from "@/utils/dateUtils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, ScrollView, Linking, Animated } from "react-native";
 import { Portal } from "react-native-paper";
 import ErrorScreen from "./ErrorScreen";
@@ -30,6 +30,8 @@ const MyProgressScreen = () => {
 
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [openWeightModal, setOpenWeightModal] = useState(false);
+  const [lastWeighIn,setLastWeighIn]=useState<IWeighIn|null>(null)
+  const [todaysWeighInExists, setTodaysWeighInExists] = useState(false);
 
   const { data, isLoading, isError, error } = useQuery({
     queryFn: () => getWeighInsByUserId(currentUser?._id || ``),
@@ -37,6 +39,18 @@ const MyProgressScreen = () => {
     enabled: !!currentUser,
     staleTime: ONE_DAY,
   });
+
+  const stripTime = (dateParam: Date) => {
+    return new Date(dateParam.getFullYear(), dateParam.getMonth(), dateParam.getDate());
+  };
+
+  const checkIfDatesMatch = (date1: Date, date2: Date) => {
+    if (stripTime(date1).getTime() === stripTime(date2).getTime()) {
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   const successFunc = () => {
     queryClient.invalidateQueries({ queryKey: [WEIGH_INS_KEY + currentUser?._id] });
@@ -93,6 +107,16 @@ const MyProgressScreen = () => {
 
     removeWeighIn.mutate(weighInId);
   };
+  
+
+  useEffect(() => {
+    if (!data) return;
+    const latestWeghIn=data[data?.length - 1]
+    const weighInExists = checkIfDatesMatch(new Date(latestWeghIn.date), new Date());
+
+    setLastWeighIn(latestWeghIn)
+    setTodaysWeighInExists(weighInExists);
+  }, [data]);
 
   if (isLoading) return <ProgressScreenSkeleton />;
 
@@ -161,7 +185,7 @@ const MyProgressScreen = () => {
         <WeightInputModal
           handleDismiss={() => setOpenWeightModal(false)}
           currentWeight={currentWeight || 0}
-          handleSaveWeight={(weight) => handleSaveWeighIn({ weight })}
+          handleSaveWeight={(weight) => handleSaveWeighIn(todaysWeighInExists?weight,lastWeighIn?._id,false :{ weight })}
         />
       )}
     </Portal.Host>
