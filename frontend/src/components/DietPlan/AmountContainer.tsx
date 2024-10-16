@@ -5,12 +5,13 @@ import { Text, View } from "react-native";
 interface AmountContainerProps {
   amount?: number;
   title: string;
-  variant?: `kg` | "cal" | `gr`;
+  variant?: `kg` | "cal" | `gr` | `unit`;
 }
 
 const AmountContainer: React.FC<AmountContainerProps> = ({ amount, title, variant }) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
-  const label = variant == `gr` ? `גרם` : variant == "kg" ? `ק"ג` : "קל";
+  const label =
+    variant == `gr` ? `גרם` : variant == "kg" ? `ק"ג` : variant === `unit` ? `יח'` : "קל";
   return (
     <View
       style={[
@@ -20,12 +21,10 @@ const AmountContainer: React.FC<AmountContainerProps> = ({ amount, title, varian
         spacing.pdDefault,
         layout.flex1,
         spacing.gapDefault,
-        { width: 125 },
+        { width: 135 },
       ]}
     >
-      <Text style={[fonts.default, colors.textPrimary, text.textBold, text.textRight]}>
-        {title}
-      </Text>
+      <Text style={[fonts.md, colors.textPrimary, text.textBold, text.textRight]}>{title}</Text>
       <View
         style={[
           layout.widthFull,
@@ -35,7 +34,7 @@ const AmountContainer: React.FC<AmountContainerProps> = ({ amount, title, varian
           spacing.gapSm,
         ]}
       >
-        <Text style={[fonts.xl, text.textBold, text.textCenter, colors.textOnSecondaryContainer]}>
+        <Text style={[fonts.lg, text.textBold, text.textCenter, colors.textOnSecondaryContainer]}>
           {amount}
         </Text>
         {variant && <Text style={[colors.textPrimary, text.textBold]}>{label}</Text>}

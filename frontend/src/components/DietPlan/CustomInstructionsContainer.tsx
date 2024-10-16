@@ -1,34 +1,56 @@
-import { ICustomItemInstructions } from "@/interfaces/DietPlan";
-import React from "react";
-import { Text, View } from "react-native";
+import { ICustomMenuItem } from "@/interfaces/DietPlan";
+import React, { useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
+import BottomDrawer from "../ui/BottomDrawer";
+import CustomItemContent from "./CustomItemContent";
+import NativeIcon from "../Icon/NativeIcon";
 
 interface CustomInstructionsContainerProps {
-  customInstructions: ICustomItemInstructions[];
-  icon: JSX.Element;
+  customInstructions: ICustomMenuItem[];
   foodGroup?: string;
 }
 
 const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = ({
   customInstructions,
-  icon,
   foodGroup,
 }) => {
-  const { layout, spacing, colors, text } = useStyles();
+  const { layout, spacing, colors, common, fonts } = useStyles();
+  const [openModal, setOpenModal] = useState(false);
 
   return (
-    <View style={[layout.itemsEnd, spacing.gapSm, spacing.pdVerticalXs]}>
-      <View style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
-        <Text style={colors.textOnSecondaryContainer}>{foodGroup} : </Text>
-        {icon}
-      </View>
-      <View style={[layout.flexRowReverse, layout.wrap]}>
-        {customInstructions.map((item, i) => (
-          <Text key={i} style={[colors.textOnSecondaryContainer, text.textRight]}>
-            {item.quantity} {item.item} {i + 1 !== customInstructions.length ? `/ ` : ``}
-          </Text>
-        ))}
-      </View>
+    <View style={[layout.itemsStart, spacing.gapSm, spacing.pdVerticalXs]}>
+      <TouchableOpacity
+        style={[
+          colors.background,
+          layout.flexRow,
+          layout.center,
+          spacing.gapSm,
+          common.rounded,
+          spacing.pdSm,
+        ]}
+        onPress={() => setOpenModal(true)}
+      >
+        <NativeIcon
+          size={18}
+          style={[colors.textPrimary]}
+          library="MaterialCommunityIcons"
+          name={foodGroup == `חלבונים` ? `fish` : `baguette`}
+        />
+        <Text style={[colors.textOnBackground, fonts.md]}>צפה ב{foodGroup}</Text>
+      </TouchableOpacity>
+
+      <BottomDrawer
+        onClose={() => setOpenModal(false)}
+        open={openModal}
+        children={
+          <CustomItemContent
+            customInstructions={customInstructions}
+            foodGroup={foodGroup}
+            close={() => setOpenModal(false)}
+          />
+        }
+      />
     </View>
   );
 };
