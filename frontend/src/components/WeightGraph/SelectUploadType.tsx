@@ -8,16 +8,12 @@ const SelectUploadType = () => {
 
   const uploadTypes = [
     {
-      title: `צלם תמונה`,
-      icon: (
-        <NativeIcon library="FontAwesome" name="camera" style={[colors.textPrimary, fonts.xl]} />
-      ),
+      title: `פתיחת מצלמה`,
+      iconName: `camera`,
     },
     {
-      title: `העלה תמונה`,
-      icon: (
-        <NativeIcon library="FontAwesome" name="upload" style={[colors.textPrimary, fonts.xl]} />
-      ),
+      title: `בחר תמונה קיימת`,
+      iconName: "upload",
     },
   ];
 
@@ -26,8 +22,8 @@ const SelectUploadType = () => {
       <Text style={[text.textLeft, fonts.xl, colors.textOnBackground, text.textBold]}>
         בחר צורת העלאה
       </Text>
-      <View style={spacing.gapDefault}>
-        {uploadTypes.map(({ icon, title }, i) => (
+      <View style={[spacing.gapLg, spacing.pdVerticalXxl]}>
+        {uploadTypes.map(({ iconName, title }, i) => (
           <TouchableOpacity
             key={i}
             style={[
@@ -40,7 +36,11 @@ const SelectUploadType = () => {
               common.rounded,
             ]}
           >
-            {icon}
+            <NativeIcon
+              library="FontAwesome"
+              name={iconName}
+              style={[colors.textPrimary, fonts.xl]}
+            />
             <Text style={[fonts.default]}>{title}</Text>
           </TouchableOpacity>
         ))}
