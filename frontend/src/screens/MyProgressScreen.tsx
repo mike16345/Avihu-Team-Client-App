@@ -17,6 +17,9 @@ import { useEffect, useState } from "react";
 import { StyleSheet, ScrollView, Linking, Animated } from "react-native";
 import { Portal } from "react-native-paper";
 import ErrorScreen from "./ErrorScreen";
+import { checkIfDatesMatch } from "@/utils/utils";
+import BottomDrawer from "@/components/ui/BottomDrawer";
+import SelectUploadType from "@/components/WeightGraph/SelectUploadType";
 
 const MyProgressScreen = () => {
   const TRAINER_PHONE_NUMBER = process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER;
@@ -30,7 +33,8 @@ const MyProgressScreen = () => {
 
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [openWeightModal, setOpenWeightModal] = useState(false);
-  const [lastWeighIn,setLastWeighIn]=useState<IWeighIn|null>(null)
+  const [openUploadModal, setOpenUploadModal] = useState(false);
+  const [lastWeighIn, setLastWeighIn] = useState<IWeighIn | null>(null);
   const [todaysWeighInExists, setTodaysWeighInExists] = useState(false);
 
   const { data, isLoading, isError, error } = useQuery({
@@ -39,18 +43,6 @@ const MyProgressScreen = () => {
     enabled: !!currentUser,
     staleTime: ONE_DAY,
   });
-
-  const stripTime = (dateParam: Date) => {
-    return new Date(dateParam.getFullYear(), dateParam.getMonth(), dateParam.getDate());
-  };
-
-  const checkIfDatesMatch = (date1: Date, date2: Date) => {
-    if (stripTime(date1).getTime() === stripTime(date2).getTime()) {
-      return true;
-    } else {
-      return false;
-    }
-  };
 
   const successFunc = () => {
     queryClient.invalidateQueries({ queryKey: [WEIGH_INS_KEY + currentUser?._id] });
@@ -93,6 +85,9 @@ const MyProgressScreen = () => {
   ) => {
     setOpenWeightModal(false);
 
+    console.log(weighInId);
+    console.log(isNew);
+
     if (isNew && currentUser) {
       const userId = currentUser._id;
       addNewWeighIn.mutate({ userId, weighIn });
@@ -107,14 +102,13 @@ const MyProgressScreen = () => {
 
     removeWeighIn.mutate(weighInId);
   };
-  
 
   useEffect(() => {
     if (!data) return;
-    const latestWeghIn=data[data?.length - 1]
+    const latestWeghIn = data[data?.length - 1];
     const weighInExists = checkIfDatesMatch(new Date(latestWeghIn.date), new Date());
 
-    setLastWeighIn(latestWeghIn)
+    setLastWeighIn(latestWeghIn);
     setTodaysWeighInExists(weighInExists);
   }, [data]);
 
@@ -163,12 +157,12 @@ const MyProgressScreen = () => {
             {
               icon: "plus",
               onPress: () => setOpenWeightModal(true),
-              label: "Add Weight",
+              label: todaysWeighInExists ? "עריכת שקילה יומית" : "הוספת שקילה יומית",
             },
             {
               icon: "camera",
-              onPress: () => console.log("Open camera to take weigh in photo"),
-              label: "Add Photo",
+              onPress: () => setOpenUploadModal(true),
+              label: "שלח/י תמונת מעקב",
             },
             {
               icon: "whatsapp",
@@ -176,7 +170,7 @@ const MyProgressScreen = () => {
                 Linking.openURL(
                   `whatsapp://send?phone=${TRAINER_PHONE_NUMBER}&text=${DEFAULT_MESSAGE_TO_TRAINER}`
                 ),
-              label: "Message Avihu",
+              label: "הודעה למאמן",
             },
           ]}
         />
@@ -185,9 +179,18 @@ const MyProgressScreen = () => {
         <WeightInputModal
           handleDismiss={() => setOpenWeightModal(false)}
           currentWeight={currentWeight || 0}
-          handleSaveWeight={(weight) => handleSaveWeighIn(todaysWeighInExists?weight,lastWeighIn?._id,false :{ weight })}
+          handleSaveWeight={
+            todaysWeighInExists
+              ? (weight) => handleSaveWeighIn({ weight }, lastWeighIn?._id, false)
+              : (weight) => handleSaveWeighIn({ weight })
+          }
         />
       )}
+      <BottomDrawer
+        open={openUploadModal}
+        onClose={() => setOpenUploadModal(false)}
+        children={<SelectUploadType />}
+      />
     </Portal.Host>
   );
 };

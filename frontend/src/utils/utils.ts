@@ -27,3 +27,15 @@ export const generateWheelPickerData = (minRange: number, maxRange: number, step
 
   return data;
 };
+
+const stripTime = (dateParam: Date) => {
+  return new Date(dateParam.getFullYear(), dateParam.getMonth(), dateParam.getDate());
+};
+
+export const checkIfDatesMatch = (date1: Date, date2: Date) => {
+  if (stripTime(date1).getTime() === stripTime(date2).getTime()) {
+    return true;
+  } else {
+    return false;
+  }
+};
