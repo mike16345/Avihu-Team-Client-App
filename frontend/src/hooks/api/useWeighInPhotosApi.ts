@@ -1,24 +1,39 @@
-import { deleteItem, fetchData } from "@/API/api";
-import { Photo } from "@/components/UserDashboard/WeightProgression/WeightProgressionPhotos";
-import axiosInstance from "@/config/apiConfig";
-const WEIGH_IN_PHOTOS_ENDPOINT = "weighIns/photos/";
+import { RNS3 } from "react-native-aws3";
+import moment from "moment";
 
 export const useWeighInPhotosApi = () => {
-  const deleteWeighInPhotos = (userID: string) => deleteItem(WEIGH_IN_PHOTOS_ENDPOINT, userID);
+  const uploadPhoto = async (userId: string, fileUri: string) => {
+    // Set up date-based file path and name
+    const date = moment().format("YYYY-MM-DD");
+    const filename = fileUri.split("/").pop();
+    const fileKey = `${userId}/${date}/${filename}`;
 
-  const deleteWeighInPhotosByUserId = (userID: string) =>
-    deleteItem(WEIGH_IN_PHOTOS_ENDPOINT + "user", userID);
+    const file = {
+      uri: fileUri,
+      name: fileKey,
+      type: "image/jpeg",
+    };
 
-  const getWeighInPhotosByUserId = (userID: string) =>
-    fetchData<Photo[]>(`${WEIGH_IN_PHOTOS_ENDPOINT}/${userID}`);
+    const options = {
+      keyPrefix: `${userId}/${date}/`, // Will create folders by userId and date
+      bucket: process.env.EXPO_PUBLIC_S3_BUCKET,
+      region: process.env.EXPO_PUBLIC_REGION,
+      accessKey: process.env.EXPO_PUBLIC_ACCESS_KEY,
+      secretKey: process.env.EXPO_PUBLIC_SECRET_KEY,
+      successActionStatus: 201,
+    };
 
-  const getWeighInPhotosById = (id: string) =>
-    axiosInstance.get<Photo[]>(WEIGH_IN_PHOTOS_ENDPOINT + id);
-
-  return {
-    getWeighInPhotosByUserId,
-    deleteWeighInPhotos,
-    deleteWeighInPhotosByUserId,
-    getWeighInPhotosById,
+    try {
+      const response = await RNS3.put(file, options);
+      if (response.status === 201) {
+        console.log("Successfully uploaded:", response);
+      } else {
+        console.error("Failed to upload:", response);
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
   };
+
+  return { uploadPhoto };
 };

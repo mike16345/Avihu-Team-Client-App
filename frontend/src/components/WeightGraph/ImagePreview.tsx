@@ -5,6 +5,8 @@ import { Text, View } from "react-native";
 import { Button } from "react-native-paper";
 import DisplayImage from "./DisplayImage";
 import ImagePreviewOption from "./ImagePreviewOption";
+import { useWeighInPhotosApi } from "@/hooks/api/useWeighInPhotosApi";
+import { useUserStore } from "@/store/userStore";
 
 interface ImagePreviewProps {
   close: () => void;
@@ -12,6 +14,8 @@ interface ImagePreviewProps {
 
 const ImagePreview: React.FC<ImagePreviewProps> = ({ close }) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { uploadPhoto } = useWeighInPhotosApi();
+  const currentUserId = useUserStore((state) => state.currentUser?._id);
 
   const [selectedImage, setSelectedImage] = useState<number>(0);
   const [images, setImages] = useState<ImagePickerResult[]>([]);
@@ -64,6 +68,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ close }) => {
           <Button
             style={[colors.backgroundPrimary, spacing.pdSm, common.roundedSm, { width: `50%` }]}
             children={<Text style={[colors.textOnBackground, fonts.default]}>שליחה</Text>}
+            onPress={() => uploadPhoto(currentUserId, images[0].assets[0].uri)}
           ></Button>
         </View>
       </View>
