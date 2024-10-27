@@ -20,6 +20,7 @@ import ErrorScreen from "./ErrorScreen";
 import { checkIfDatesMatch } from "@/utils/utils";
 import BottomDrawer from "@/components/ui/BottomDrawer";
 import SelectUploadType from "@/components/WeightGraph/SelectUploadType";
+import ImagePreview from "@/components/WeightGraph/ImagePreview";
 
 const MyProgressScreen = () => {
   const TRAINER_PHONE_NUMBER = process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER;
@@ -189,7 +190,7 @@ const MyProgressScreen = () => {
       <BottomDrawer
         open={openUploadModal}
         onClose={() => setOpenUploadModal(false)}
-        children={<SelectUploadType />}
+        children={<ImagePreview close={() => setOpenUploadModal(false)} />}
       />
     </Portal.Host>
   );

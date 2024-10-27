@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import useStyles from "@/styles/useGlobalStyles";
 import * as ImagePicker from "expo-image-picker";
-import ImagePreview from "./ImagePreview";
 
-const SelectUploadType = () => {
+interface SelectUploadTypeProps {
+  returnImage: (image: ImagePicker.ImagePickerResult) => void;
+}
+
+const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
 
   const [status, requestPermission] = ImagePicker.useCameraPermissions();
-  const [selectedImage, setSelectedImage] = useState<ImagePicker.ImagePickerResult | null>(null);
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -24,7 +26,7 @@ const SelectUploadType = () => {
       return;
     }
 
-    setSelectedImage(result);
+    returnImage(result);
   };
 
   const takePhoto = async () => {
@@ -39,18 +41,18 @@ const SelectUploadType = () => {
       return;
     }
 
-    setSelectedImage(result);
+    returnImage(result);
   };
 
   const uploadTypes = [
     {
-      title: `פתיחת מצלמה`,
       iconName: `camera`,
+      title: `מצלמה`,
       handlePress: () => takePhoto(),
     },
     {
-      title: `בחר תמונה קיימת`,
       iconName: "upload",
+      title: `גלרייה`,
       handlePress: () => pickImage(),
     },
   ];
@@ -60,40 +62,27 @@ const SelectUploadType = () => {
   }, []);
 
   return (
-    <View style={[spacing.gapXxl, layout.heightFull, { direction: "rtl" }]}>
-      {selectedImage ? (
-        <ImagePreview close={() => setSelectedImage(null)} image={selectedImage} />
-      ) : (
-        <>
-          <Text style={[text.textLeft, fonts.xl, colors.textOnBackground, text.textBold]}>
-            בחר צורת העלאה
-          </Text>
-          <View style={[spacing.gapLg, spacing.pdVerticalXxl]}>
-            {uploadTypes.map(({ iconName, title, handlePress }, i) => (
-              <TouchableOpacity
-                key={i}
-                style={[
-                  layout.flexRow,
-                  layout.itemsCenter,
-                  layout.justifyStart,
-                  colors.backgroundSecondary,
-                  spacing.gapXxl,
-                  spacing.pdDefault,
-                  common.rounded,
-                ]}
-                onPress={handlePress}
-              >
-                <NativeIcon
-                  library="FontAwesome"
-                  name={iconName}
-                  style={[colors.textPrimary, fonts.xl]}
-                />
-                <Text style={[fonts.default]}>{title}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </>
-      )}
+    <View style={[layout.flexRowReverse, layout.center, spacing.gapXxl, layout.widthFull]}>
+      {uploadTypes.map((item, i) => (
+        <TouchableOpacity
+          key={i}
+          style={[
+            colors.backgroundSecondary,
+            common.rounded,
+            spacing.pdDefault,
+            spacing.gapDefault,
+            layout.center,
+          ]}
+          onPress={item.handlePress}
+        >
+          <NativeIcon
+            library="FontAwesome"
+            name={item.iconName}
+            style={[colors.textPrimary, fonts.xl]}
+          />
+          <Text style={text.textBold}>{item.title}</Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
 };
