@@ -8,6 +8,11 @@ export interface ICustomItem {
   };
 }
 
+export interface ICustomMenuItem {
+  item: string;
+  quantity: number;
+}
+
 export interface IDietItem {
   quantity: number;
   unit: DietItemUnit;
@@ -18,14 +23,14 @@ export interface IMeal {
   _id?: string;
   totalProtein: IDietItem;
   totalCarbs: IDietItem;
-  totalFats?: IDietItem;
-  totalVeggies?: IDietItem;
 }
 
 export interface IDietPlan {
   meals: IMeal[];
   totalCalories?: number;
   freeCalories: number;
+  fatsPerDay?: number;
+  veggiesPerDay?: number;
   customInstructions?: string;
 }
 
