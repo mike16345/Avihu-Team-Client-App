@@ -34,13 +34,12 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   const currentUser = useUserStore((state) => state.currentUser);
 
   const { layout, text, fonts, common, colors } = useStyles();
-  const { addRecordedSet } = useRecordedSetsApi();
+  const { addRecordedSet, getUserRecordedSetsByExercise } = useRecordedSetsApi();
 
   const [isSetDone, setIsSetDone] = useState(false);
   const [currentSetNumber, setCurrentSetNumber] = useState(1);
-  const [currentSet, setCurrentSet] = useState<ISet>(exercise.sets[currentSetNumber - 1]);
 
-  const handleRecordSet = (recordedSet: Omit<IRecordedSet, "plan">) => {
+  const handleRecordSet = (recordedSet: Omit<IRecordedSet, "plan">, isEdit = false) => {
     if (!currentUser) return;
 
     const setToRecord: IRecordedSetPost = {
@@ -61,8 +60,8 @@ const ExerciseContainer: FC<WorkoutProps> = ({
         handleSetCurrentSetInfo(updatedSession);
 
         Toast.show({
-          text1: "Test toast",
-          text2: "NOOOOOOOO",
+          text1: "סט הוקלט בהצלחה",
+          text2: "כל הכבוד!",
           autoHide: true,
           type: "success",
           swipeable: true,
@@ -75,6 +74,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   const handleSetCurrentSetInfo = (updatedSession: ISession) => {
     if (!updatedSession) return;
     const data = updatedSession.data;
+    console.log("data", data);
     let exerciseData;
 
     const planData = data?.[plan];
@@ -86,7 +86,6 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
     if (setNumber - 1 <= exercise.sets.length - 1) {
       setCurrentSetNumber(setNumber);
-      setCurrentSet(exercise.sets[setNumber - 1]);
     } else {
       setIsSetDone(true);
     }
@@ -129,16 +128,22 @@ const ExerciseContainer: FC<WorkoutProps> = ({
             size={28}
           />
 
-          <SetContainer currentSetNumber={currentSetNumber} totalSets={exercise.sets.length} />
+          <SetContainer
+            currentSetNumber={currentSetNumber}
+            totalSets={exercise.sets.length}
+            handleViewSet={(setNumber) => () => {
+              navigation.setOptions({ title: exercise.name });
+              navigation.navigate("RecordSet", {
+                recordedSet: {},
+                exercise: exercise,
+                muscleGroup: muscleGroup,
+                handleRecordSet: (recordedSet) => handleRecordSet(recordedSet, true),
+                setNumber: currentSetNumber,
+              });
+            }}
+          />
         </View>
       </View>
-
-      {/* <WorkoutVideoPopup
-        title={exercise.name}
-        isVisible={modalVisible}
-        setIsVisible={setModalVisible}
-        videoId={videoId}
-      /> */}
     </View>
   );
 };

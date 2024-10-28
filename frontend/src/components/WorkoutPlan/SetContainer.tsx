@@ -1,14 +1,14 @@
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { FC } from "react";
-import { ISet } from "@/interfaces/Workout";
 import useStyles from "@/styles/useGlobalStyles";
 
 interface SetContainerProps {
   currentSetNumber: number;
   totalSets: number;
+  handleViewSet: (setNumber: number) => void;
 }
 
-const SetContainer: FC<SetContainerProps> = ({ currentSetNumber, totalSets }) => {
+const SetContainer: FC<SetContainerProps> = ({ currentSetNumber, totalSets, handleViewSet }) => {
   const { colors, common, layout, text } = useStyles();
 
   return (
@@ -16,7 +16,8 @@ const SetContainer: FC<SetContainerProps> = ({ currentSetNumber, totalSets }) =>
       <View style={[layout.itemsCenter, layout.flexRowReverse]}>
         {Array.from({ length: totalSets }).map((_, index) => (
           <View key={index} style={{ flexDirection: "row-reverse", alignItems: "center" }}>
-            <View
+            <Pressable
+              onPress={() => handleViewSet(index + 1)}
               style={[
                 layout.center,
                 common.rounded,
@@ -26,7 +27,7 @@ const SetContainer: FC<SetContainerProps> = ({ currentSetNumber, totalSets }) =>
                   zIndex: 1,
                 },
                 index < currentSetNumber
-                  ? [colors.backgroundPrimary, colors.borderSuccess, common.borderXsm]
+                  ? [colors.backgroundPrimary, colors.borderOnSecondary, common.borderSm]
                   : [colors.backgroundSurface, colors.borderOnSurface, common.borderXsm],
               ]}
             >
@@ -38,9 +39,8 @@ const SetContainer: FC<SetContainerProps> = ({ currentSetNumber, totalSets }) =>
               >
                 {index + 1}
               </Text>
-            </View>
+            </Pressable>
 
-            {/* Connecting Bar between circles */}
             {index < totalSets - 1 && (
               <View
                 style={{

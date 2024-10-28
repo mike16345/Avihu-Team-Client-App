@@ -17,6 +17,7 @@ export type WorkoutPlanStackParamList = {
   WorkoutPlanPage: undefined;
   RecordSet: {
     handleRecordSet: (recordSet: Omit<IRecordedSet, "plan">) => void;
+    recordedSet?: IRecordedSetResponse;
     exercise: IExercise;
     muscleGroup: string;
     setNumber: number;
