@@ -1,9 +1,17 @@
+import { sendData } from "@/API/api";
+import { ApiResponse } from "@/types/ApiTypes";
 import { useState } from "react";
 import Toast from "react-native-toast-message";
+
+const USER_IMAGE_URLS_ENDPOINT = "userImageUrls";
 
 export const useWeighInPhotosApi = () => {
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+
+  const addImageUrl = (userId: string, imageUrl: string) => {
+    return sendData<ApiResponse<string[]>>(USER_IMAGE_URLS_ENDPOINT, { userId, imageUrl });
+  };
 
   const fetchSignedUrl = async (url: string) => {
     try {
@@ -52,8 +60,9 @@ export const useWeighInPhotosApi = () => {
     if (!fileUri) return;
 
     const today = new Date().toISOString().split("T")[0];
-
-    const url = `https://11c0iu2i43.execute-api.il-central-1.amazonaws.com/test/signedUrl?userId=${userId}&date=${today}&imageName=${imageName}`;
+    const api = process.env.EXPO_PUBLIC_SERVER;
+    const url = `${api}/signedUrl?userId=${userId}&date=${today}&imageName=${imageName}`;
+    const urlToStore = `${userId}/${today}/${imageName}`;
 
     setUploading(true);
 
@@ -63,6 +72,7 @@ export const useWeighInPhotosApi = () => {
 
       // Upload the file from the URI using the presigned URL
       await uploadImageToS3(fileUri, presignedUrl);
+      await addImageUrl(userId, urlToStore);
     } catch (error) {
       Toast.show({
         text1: "אירעה שגיאה בהעלאת הקבצים!",
@@ -75,5 +85,5 @@ export const useWeighInPhotosApi = () => {
     }
   };
 
-  return { handleUpload, uploading, uploadProgress };
+  return { handleUpload, addImageUrl, uploading, uploadProgress };
 };
