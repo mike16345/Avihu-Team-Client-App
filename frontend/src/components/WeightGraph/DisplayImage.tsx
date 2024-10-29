@@ -3,23 +3,22 @@ import React from "react";
 import { Image, Text, View, TouchableOpacity } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import SelectUploadType from "./SelectUploadType";
-import { ImagePickerResult } from "expo-image-picker";
 
 interface DisplayImageProps {
-  image?: any;
+  image?: string;
   removeImage: () => void;
-  handleImageSelected: (image: ImagePickerResult) => void;
+  handleImageSelected: (image: string) => void;
 }
 
 const DisplayImage: React.FC<DisplayImageProps> = ({ image, removeImage, handleImageSelected }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, common, fonts, layout, spacing } = useStyles();
 
   return (
     <View>
       {image ? (
         <View style={{ position: `relative`, width: 300, height: 300, margin: `auto` }}>
           <Image
-            source={{ uri: image.uri }}
+            source={{ uri: image }}
             style={[
               { width: 300, height: 300 },
               layout.center,
@@ -52,9 +51,7 @@ const DisplayImage: React.FC<DisplayImageProps> = ({ image, removeImage, handleI
           />
           <Text style={colors.textOnBackground}>אין תמונה להצגה!</Text>
           <Text style={colors.textOnBackground}>בחרו אופן העלאת תמונה</Text>
-          <SelectUploadType
-            returnImage={(image: ImagePickerResult) => handleImageSelected(image)}
-          />
+          <SelectUploadType returnImage={(image: string) => handleImageSelected(image)} />
         </View>
       )}
     </View>

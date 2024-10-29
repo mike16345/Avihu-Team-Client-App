@@ -7,6 +7,8 @@ import DisplayImage from "./DisplayImage";
 import ImagePreviewOption from "./ImagePreviewOption";
 import { useWeighInPhotosApi } from "@/hooks/api/useWeighInPhotosApi";
 import { useUserStore } from "@/store/userStore";
+import Loader from "../ui/loaders/Loader";
+import Toast from "react-native-toast-message";
 
 interface ImagePreviewProps {
   close: () => void;
@@ -14,13 +16,13 @@ interface ImagePreviewProps {
 
 const ImagePreview: React.FC<ImagePreviewProps> = ({ close }) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
-  const { uploadPhoto } = useWeighInPhotosApi();
+  const { handleUpload, uploading } = useWeighInPhotosApi();
   const currentUserId = useUserStore((state) => state.currentUser?._id);
 
   const [selectedImage, setSelectedImage] = useState<number>(0);
-  const [images, setImages] = useState<ImagePickerResult[]>([]);
+  const [images, setImages] = useState<string[]>([]);
 
-  const setImageByIndex = (index: number, image: ImagePickerResult) => {
+  const setImageByIndex = (index: number, image: string) => {
     const newImagesArr = [...images];
 
     newImagesArr[index] = image;
@@ -35,27 +37,45 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ close }) => {
     setImages(newImagesArr);
   };
 
+  const uploadImage = async () => {
+    let index = 1;
+
+    for (const image of images) {
+      await handleUpload(image, currentUserId || ``, `${index}`);
+      index++;
+    }
+    Toast.show({
+      text1: "קבצים נשלחו בהצלחה!",
+      autoHide: true,
+      type: "success",
+      swipeable: true,
+    });
+    close();
+  };
+
+  if (uploading) return <Loader variant="Standard" />;
+
   return (
     <View style={[spacing.gapDefault, { direction: `rtl` }]}>
       <Text style={[text.textLeft, fonts.lg, colors.textOnBackground, text.textBold]}>
         תמונה שנבחרה
       </Text>
       <DisplayImage
-        image={images[selectedImage] ? images[selectedImage].assets[0] : undefined}
+        image={images[selectedImage] ? images[selectedImage] : undefined}
         removeImage={() => deleteimageByIndex(0)}
-        handleImageSelected={(image: ImagePickerResult) => setImageByIndex(selectedImage, image)}
+        handleImageSelected={(image: string) => setImageByIndex(selectedImage, image)}
       />
       <View style={[spacing.gapLg]}>
         <View style={[layout.flexRowReverse, layout.center, spacing.gapLg]}>
           <ImagePreviewOption
             handleImageSelect={() => setSelectedImage(0)}
             selected={selectedImage == 0}
-            image={images[0] ? images[0].assets[0] : undefined}
+            image={images[0]}
           />
           <ImagePreviewOption
             handleImageSelect={() => setSelectedImage(1)}
             selected={selectedImage == 1}
-            image={images[1] ? images[1].assets[0] : undefined}
+            image={images[1]}
           />
         </View>
         <View style={[layout.flexRow, layout.center, spacing.gapSm]}>
@@ -68,7 +88,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ close }) => {
           <Button
             style={[colors.backgroundPrimary, spacing.pdSm, common.roundedSm, { width: `50%` }]}
             children={<Text style={[colors.textOnBackground, fonts.default]}>שליחה</Text>}
-            onPress={() => uploadPhoto(currentUserId, images[0].assets[0].uri)}
+            onPress={uploadImage}
           ></Button>
         </View>
       </View>
