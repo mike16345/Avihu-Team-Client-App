@@ -1,39 +1,79 @@
-import { RNS3 } from "react-native-aws3";
-import moment from "moment";
+import { useState } from "react";
+import Toast from "react-native-toast-message";
 
 export const useWeighInPhotosApi = () => {
-  const uploadPhoto = async (userId: string, fileUri: string) => {
-    // Set up date-based file path and name
-    const date = moment().format("YYYY-MM-DD");
-    const filename = fileUri.split("/").pop();
-    const fileKey = `${userId}/${date}/${filename}`;
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
-    const file = {
-      uri: fileUri,
-      name: fileKey,
-      type: "image/jpeg",
-    };
-
-    const options = {
-      keyPrefix: `${userId}/${date}/`, // Will create folders by userId and date
-      bucket: process.env.EXPO_PUBLIC_S3_BUCKET,
-      region: process.env.EXPO_PUBLIC_REGION,
-      accessKey: process.env.EXPO_PUBLIC_ACCESS_KEY,
-      secretKey: process.env.EXPO_PUBLIC_SECRET_KEY,
-      successActionStatus: 201,
-    };
-
+  const fetchSignedUrl = async (url: string) => {
     try {
-      const response = await RNS3.put(file, options);
-      if (response.status === 201) {
-        console.log("Successfully uploaded:", response);
-      } else {
-        console.error("Failed to upload:", response);
-      }
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "X-Api-Key": process.env.EXPO_PUBLIC_API_AUTH_TOKEN },
+      });
+      const { data } = await response.json();
+      return data;
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Error fetching signed URL:", error);
+      throw new Error("Failed to fetch signed URL.");
     }
   };
 
-  return { uploadPhoto };
+  const uploadImageToS3 = async (fileUri: string, presignedUrl: string) => {
+    try {
+      // Fetch the file data from the URI
+      const fileResponse = await fetch(fileUri);
+      const fileBlob = await fileResponse.blob();
+
+      const response = await fetch(presignedUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": fileBlob.type || "image/jpeg",
+        },
+        body: fileBlob,
+      });
+
+      if (response.status === 200) {
+        setUploadProgress(null);
+      } else {
+        console.error("Failed to upload image:", response.status, await response.text());
+      }
+    } catch (error) {
+      Toast.show({
+        text1: "אירעה שגיאה בהעלאת הקבצים!",
+        autoHide: true,
+        type: "error",
+        swipeable: true,
+      });
+    }
+  };
+
+  const handleUpload = async (fileUri: string, userId: string, imageName: string) => {
+    if (!fileUri) return;
+
+    const today = new Date().toISOString().split("T")[0];
+
+    const url = `https://11c0iu2i43.execute-api.il-central-1.amazonaws.com/test/signedUrl?userId=${userId}&date=${today}&imageName=${imageName}`;
+
+    setUploading(true);
+
+    try {
+      // Fetch the presigned URL
+      const presignedUrl = await fetchSignedUrl(url);
+
+      // Upload the file from the URI using the presigned URL
+      await uploadImageToS3(fileUri, presignedUrl);
+    } catch (error) {
+      Toast.show({
+        text1: "אירעה שגיאה בהעלאת הקבצים!",
+        autoHide: true,
+        type: "error",
+        swipeable: true,
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return { handleUpload, uploading, uploadProgress };
 };

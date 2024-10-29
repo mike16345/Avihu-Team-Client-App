@@ -5,7 +5,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import * as ImagePicker from "expo-image-picker";
 
 interface SelectUploadTypeProps {
-  returnImage: (image: ImagePicker.ImagePickerResult) => void;
+  returnImage: (image: string) => void;
 }
 
 const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
@@ -26,7 +26,7 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
       return;
     }
 
-    returnImage(result);
+    returnImage(result.assets[0].uri);
   };
 
   const takePhoto = async () => {
@@ -41,7 +41,7 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
       return;
     }
 
-    returnImage(result);
+    returnImage(result.assets[0].uri);
   };
 
   const uploadTypes = [
