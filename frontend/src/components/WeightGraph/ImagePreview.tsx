@@ -87,9 +87,10 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ close }) => {
           </Button>
           <Button
             style={[colors.backgroundPrimary, spacing.pdSm, common.roundedSm, { width: `50%` }]}
-            children={<Text style={[colors.textOnBackground, fonts.default]}>שליחה</Text>}
             onPress={uploadImage}
-          ></Button>
+          >
+            <Text style={[colors.textOnBackground, fonts.default]}>שליחה</Text>
+          </Button>
         </View>
       </View>
     </View>

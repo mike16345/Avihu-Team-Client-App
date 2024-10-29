@@ -3,10 +3,18 @@ import { Text, TouchableOpacity, View } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import useStyles from "@/styles/useGlobalStyles";
 import * as ImagePicker from "expo-image-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 
 interface SelectUploadTypeProps {
   returnImage: (image: string) => void;
 }
+
+const imagePickerOptions: ImagePicker.ImagePickerOptions = {
+  mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  allowsEditing: true,
+  cameraType: ImagePicker.CameraType.front,
+  quality: 1,
+};
 
 const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
@@ -15,12 +23,7 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    let result = await ImagePicker.launchImageLibraryAsync(imagePickerOptions);
 
     if (result.canceled) {
       return;
@@ -30,16 +33,17 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
   };
 
   const takePhoto = async () => {
-    let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    let result = await ImagePicker.launchCameraAsync(imagePickerOptions);
 
-    if (result.canceled) {
-      return;
-    }
+    if (result.canceled) return;
+    // const fixedImage = await ImageManipulator.manipulateAsync(
+    //   result.assets[0].uri,
+    //   [{ flip: ImageManipulator.FlipType.Horizontal }],
+    //   {
+    //     compress: 1,
+    //     format: ImageManipulator.SaveFormat.JPEG,
+    //   }
+    // );
 
     returnImage(result.assets[0].uri);
   };
