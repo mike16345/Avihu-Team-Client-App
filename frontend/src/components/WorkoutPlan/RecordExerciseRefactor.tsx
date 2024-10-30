@@ -101,9 +101,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
   return (
     <View style={[layout.sizeFull]}>
       <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
-      <ScrollView
-        contentContainerStyle={[layout.flexGrow, layout.justifyBetween, spacing.pdDefault]}
-      >
+      <ScrollView contentContainerStyle={[layout.flexGrow, spacing.pdDefault]}>
         <View style={[layout.itemsEnd, spacing.gapSm]}>
           {strippedTips && strippedTips.length && (
             <Pressable onPress={() => setOpenTrainerTips(true)}>
@@ -153,7 +151,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
 
           <TextInput
             mode="outlined"
-            style={[layout.ltr, { height: 100 }, colors.background, customStyles.text.textRight]}
+            style={[layout.ltr, { height: 85 }, colors.background, customStyles.text.textRight]}
             multiline
             placeholderTextColor={"white"}
             placeholder="איך עבר לך?"
@@ -164,22 +162,25 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
         </View>
 
         {lastRecordedSet && (
-          <RecordedSetInfo
-            actionButton={
-              <NativeIcon
-                onPress={() => {
-                  navigation?.navigate("RecordedSets", {
-                    recordedSets: data || [],
-                  });
-                }}
-                color={colors.textOnSecondaryContainer.color}
-                library="MaterialCommunityIcons"
-                name="chevron-left"
-                size={28}
-              />
-            }
-            recordedSet={lastRecordedSet}
-          />
+          <View style={[spacing.mgVerticalDefault, spacing.gapSm]}>
+            <Text style={[text.textRight, text.textBold]}>אימון הקודם</Text>
+            <RecordedSetInfo
+              actionButton={
+                <NativeIcon
+                  onPress={() => {
+                    navigation?.navigate("RecordedSets", {
+                      recordedSets: data || [],
+                    });
+                  }}
+                  color={colors.textOnSecondaryContainer.color}
+                  library="MaterialCommunityIcons"
+                  name="chevron-left"
+                  size={28}
+                />
+              }
+              recordedSet={lastRecordedSet}
+            />
+          </View>
         )}
 
         <View style={[layout.flexRow, layout.widthFull, spacing.gapLg, spacing.pdSm]}>

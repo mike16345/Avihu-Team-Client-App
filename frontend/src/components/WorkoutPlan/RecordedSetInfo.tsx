@@ -12,14 +12,7 @@ const RecordedSetInfo: FC<RecordedSetInfoProps> = ({ recordedSet, actionButton }
   const { colors, layout, spacing, common, fonts, text } = useStyles();
 
   return (
-    <View
-      style={[
-        spacing.mgVerticalDefault,
-        spacing.pdDefault,
-        common.rounded,
-        colors.backgroundSecondaryContainer,
-      ]}
-    >
+    <View style={[spacing.pdDefault, common.rounded, colors.backgroundSecondaryContainer]}>
       <View style={[layout.itemsCenter, layout.flexRowReverse, layout.justifyBetween]}>
         <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.lg]}>
           {recordedSet?.plan}
