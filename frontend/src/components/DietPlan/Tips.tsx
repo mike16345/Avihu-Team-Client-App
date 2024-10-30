@@ -22,13 +22,13 @@ const Tips: React.FC<TipsProps> = ({ tips }) => {
           layout.itemsCenter,
           spacing.pdDefault,
           layout.flex1,
-          { width: 150 },
+          { width: 130 },
         ]}
         onPress={() => setOpen(true)}
       >
-        <Text style={[text.textBold, text.textRight, layout.widthFull, fonts.lg]}>דגשים</Text>
+        <Text style={[text.textBold, text.textRight, layout.widthFull, fonts.md]}>דגשים</Text>
         <View style={[layout.center, layout.flex1]}>
-          <NativeIcon library="FontAwesome5" name="list-ul" size={36} />
+          <NativeIcon library="FontAwesome5" name="list-ul" size={32} />
         </View>
       </TouchableOpacity>
       <TipsModal tips={tips} isOpen={open} dismiss={() => setOpen(false)} />

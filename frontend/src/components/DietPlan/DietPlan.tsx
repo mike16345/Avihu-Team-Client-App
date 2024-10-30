@@ -85,6 +85,8 @@ export default function DietPlan() {
               <ExtraInfoContainer
                 customInstructions={data?.customInstructions}
                 freeCalories={data?.freeCalories}
+                fatsPerDay={data?.fatsPerDay}
+                veggiesPerDay={data?.veggiesPerDay}
               />
             </View>
             {data?.meals.map((meal, i) => (
@@ -97,6 +99,7 @@ export default function DietPlan() {
                   colors.backgroundSecondaryContainer,
                   common.rounded,
                   slideAnimations[i + 1],
+                  { overflow: "hidden" },
                 ]}
               >
                 <View

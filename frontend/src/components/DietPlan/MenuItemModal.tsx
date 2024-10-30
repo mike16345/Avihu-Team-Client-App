@@ -50,7 +50,6 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
           common.borderDefault,
           common.roundedMd,
           spacing.pdBottomBar,
-
           { height: `80%` },
         ]}
       >
@@ -68,6 +67,7 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
                 layout.justifyAround,
                 layout.itemsCenter,
                 spacing.gapDefault,
+                spacing.pdBottomBar,
               ]}
             >
               {data?.map((menuItem) => (
