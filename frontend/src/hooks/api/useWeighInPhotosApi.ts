@@ -21,7 +21,6 @@ export const useWeighInPhotosApi = () => {
 
   const uploadImageToS3 = async (fileUri: string, presignedUrl: string) => {
     try {
-      // Fetch the file data from the URI
       const fileResponse = await fetch(fileUri);
       const fileBlob = await fileResponse.blob();
 
