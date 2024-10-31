@@ -14,15 +14,23 @@ const RecordedSetInfo: FC<RecordedSetInfoProps> = ({ recordedSet, actionButton }
   return (
     <View style={[spacing.pdDefault, common.rounded, colors.backgroundSecondaryContainer]}>
       <View style={[layout.itemsCenter, layout.flexRowReverse, layout.justifyBetween]}>
-        <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.lg]}>
-          {recordedSet?.plan}
-        </Text>
+        <View>
+          <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.lg]}>
+            {recordedSet?.plan}
+          </Text>
+          <Text style={[[colors.textOnSecondaryContainer]]}>סט {recordedSet?.setNumber}</Text>
+        </View>
         {actionButton}
       </View>
-      <Text style={colors.textOnBackground}>
-        סט {recordedSet?.setNumber}: {recordedSet?.weight} ק"ג x {recordedSet?.repsDone} חזרות
-      </Text>
-      <Text style={text.textSecondary}>{new Date(recordedSet.date).toLocaleDateString()}</Text>
+      <View style={[layout.center, layout.flexRow, spacing.gapLg]}>
+        <Text style={[colors.textOnBackground, fonts.default]}>
+          {recordedSet?.repsDone} <Text style={[fonts.sm, spacing.mgHorizontalXs]}>חזרות</Text>
+        </Text>
+        <Text style={[colors.textOnBackground, fonts.default]}>
+          {recordedSet?.weight} <Text style={[fonts.sm]}>ק"ג</Text>
+        </Text>
+      </View>
+      <Text style={text.textSecondary}>{new Date(recordedSet!.date).toLocaleDateString()}</Text>
     </View>
   );
 };

@@ -14,7 +14,7 @@ const useFontSize = () => {
     () =>
       StyleSheet.create({
         xs: { fontSize: scaleFontSize(baseFontSize * 0.25) },
-        sm: { fontSize: scaleFontSize(baseFontSize * 0.5) },
+        sm: { fontSize: scaleFontSize(baseFontSize * 0.7) },
         md: { fontSize: scaleFontSize(baseFontSize * 0.875) },
         default: { fontSize: scaleFontSize(baseFontSize) },
         lg: { fontSize: scaleFontSize(baseFontSize * 1.25) },
