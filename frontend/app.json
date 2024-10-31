@@ -23,7 +23,7 @@
       "supportsTablet": true,
       "splash": {
         "image": "./assets/avihu/avihu-logo-black.png",
-        "resizeMode": "cover",
+        "resizeMode": "fit",
         "backgroundColor": "black"
       }
     },

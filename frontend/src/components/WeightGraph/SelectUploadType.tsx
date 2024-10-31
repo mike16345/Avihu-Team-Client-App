@@ -12,7 +12,7 @@ interface SelectUploadTypeProps {
 const imagePickerOptions: ImagePicker.ImagePickerOptions = {
   mediaTypes: ImagePicker.MediaTypeOptions.Images,
   allowsEditing: true,
-  cameraType: ImagePicker.CameraType.front,
+  cameraType: ImagePicker.CameraType.back,
   quality: 1,
 };
 

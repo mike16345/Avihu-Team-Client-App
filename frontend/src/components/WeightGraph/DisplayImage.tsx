@@ -1,6 +1,6 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React from "react";
-import { Image, Text, View, TouchableOpacity } from "react-native";
+import { Image, Text, View, TouchableOpacity, useWindowDimensions } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import SelectUploadType from "./SelectUploadType";
 
@@ -12,15 +12,18 @@ interface DisplayImageProps {
 
 const DisplayImage: React.FC<DisplayImageProps> = ({ image, removeImage, handleImageSelected }) => {
   const { colors, common, fonts, layout, spacing } = useStyles();
+  const { height, width } = useWindowDimensions();
 
   return (
     <View>
       {image ? (
-        <View style={{ position: `relative`, width: 300, height: 300, margin: `auto` }}>
+        <View
+          style={{ position: `relative`, width: width * 0.7, height: height * 0.3, margin: `auto` }}
+        >
           <Image
             source={{ uri: image }}
             style={[
-              { width: 300, height: 300 },
+              { width: width * 0.7, height: height * 0.3 },
               layout.center,
               common.borderDefault,
               colors.borderPrimary,
@@ -28,7 +31,7 @@ const DisplayImage: React.FC<DisplayImageProps> = ({ image, removeImage, handleI
           />
           <TouchableOpacity
             style={[
-              { position: `absolute`, top: 0, right: 0, borderBottomStartRadius: 12 },
+              { position: `absolute`, top: 0, borderBottomEndRadius: 12 },
               colors.backgroundPrimary,
             ]}
             onPress={removeImage}
@@ -42,7 +45,12 @@ const DisplayImage: React.FC<DisplayImageProps> = ({ image, removeImage, handleI
         </View>
       ) : (
         <View
-          style={[{ height: 300, margin: `auto` }, layout.center, spacing.gapLg, layout.widthFull]}
+          style={[
+            { height: height * 0.3, margin: `auto` },
+            layout.center,
+            spacing.gapLg,
+            layout.widthFull,
+          ]}
         >
           <NativeIcon
             library="MaterialCommunityIcons"

@@ -1,5 +1,4 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { ImagePickerResult } from "expo-image-picker";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
 import { Button } from "react-native-paper";
@@ -53,10 +52,9 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ close }) => {
     close();
   };
 
-  if (uploading) return <Loader variant="Standard" />;
-
   return (
-    <View style={[spacing.gapDefault, { direction: `rtl` }]}>
+    <View style={[spacing.gapLg, { direction: `rtl` }]}>
+      {uploading && <Loader variant="Screen" />}
       <Text style={[text.textLeft, fonts.lg, colors.textOnBackground, text.textBold]}>
         תמונה שנבחרה
       </Text>

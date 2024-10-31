@@ -2,10 +2,12 @@ import { sendData } from "@/API/api";
 import { ApiResponse } from "@/types/ApiTypes";
 import { useState } from "react";
 import Toast from "react-native-toast-message";
+import { useUserApi } from "./useUserApi";
 
 const USER_IMAGE_URLS_ENDPOINT = "userImageUrls";
 
 export const useWeighInPhotosApi = () => {
+  const { changeImageUploadStatus } = useUserApi();
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
@@ -72,6 +74,7 @@ export const useWeighInPhotosApi = () => {
       // Upload the file from the URI using the presigned URL
       await uploadImageToS3(fileUri, presignedUrl);
       await addImageUrl(userId, urlToStore);
+      await changeImageUploadStatus(userId, true);
     } catch (error) {
       Toast.show({
         text1: "אירעה שגיאה בהעלאת הקבצים!",

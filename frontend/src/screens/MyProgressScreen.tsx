@@ -19,7 +19,6 @@ import { Portal } from "react-native-paper";
 import ErrorScreen from "./ErrorScreen";
 import { checkIfDatesMatch } from "@/utils/utils";
 import BottomDrawer from "@/components/ui/BottomDrawer";
-import SelectUploadType from "@/components/WeightGraph/SelectUploadType";
 import ImagePreview from "@/components/WeightGraph/ImagePreview";
 
 const MyProgressScreen = () => {
@@ -156,14 +155,17 @@ const MyProgressScreen = () => {
           open={isFabOpen}
           actions={[
             {
-              icon: "plus",
+              icon: todaysWeighInExists ? "update" : "plus",
               onPress: () => setOpenWeightModal(true),
               label: todaysWeighInExists ? "עריכת שקילה יומית" : "הוספת שקילה יומית",
             },
             {
               icon: "camera",
-              onPress: () => setOpenUploadModal(true),
+              onPress: currentUser?.imagesUploaded
+                ? () => console.log(`no`)
+                : () => setOpenUploadModal(true),
               label: "שלח/י תמונת מעקב",
+              color: currentUser?.imagesUploaded ? "grey" : "",
             },
             {
               icon: "whatsapp",
