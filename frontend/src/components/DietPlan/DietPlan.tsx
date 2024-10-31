@@ -1,4 +1,4 @@
-import { View, ImageBackground, ScrollView, Text, Animated } from "react-native";
+import { View, ImageBackground, ScrollView, Text, Animated, Dimensions } from "react-native";
 import { useState } from "react";
 import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
 import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
@@ -72,7 +72,10 @@ export default function DietPlan() {
           { backgroundColor: DarkTheme.colors.background },
         ]}
       >
-        <ImageBackground source={logoBlack} className="w-screen h-[30vh]" />
+        <ImageBackground
+          source={logoBlack}
+          style={{ height: Dimensions.get("screen").height / 4 }}
+        />
 
         {isLoading ? (
           <DietPlanSkeleton />
