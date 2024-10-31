@@ -10,10 +10,10 @@ import Loader from "../ui/loaders/Loader";
 import Toast from "react-native-toast-message";
 
 interface ImagePreviewProps {
-  close: () => void;
+  handleClose: () => void;
 }
 
-const ImagePreview: React.FC<ImagePreviewProps> = ({ close }) => {
+const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
   const { handleUpload, uploading } = useWeighInPhotosApi();
   const currentUserId = useUserStore((state) => state.currentUser?._id);
@@ -37,19 +37,17 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ close }) => {
   };
 
   const uploadImage = async () => {
-    let index = 1;
-
-    for (const image of images) {
-      await handleUpload(image, currentUserId || ``, `${index}`);
-      index++;
+    for (let i = 0; i < 2; i++) {
+      await handleUpload(images[i], currentUserId || ``, `${i + 1}`);
     }
+
     Toast.show({
       text1: "קבצים נשלחו בהצלחה!",
       autoHide: true,
       type: "success",
       swipeable: true,
     });
-    close();
+    handleClose();
   };
 
   return (

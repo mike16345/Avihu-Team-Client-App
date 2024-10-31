@@ -193,7 +193,7 @@ const MyProgressScreen = () => {
       <BottomDrawer
         open={openUploadModal}
         onClose={() => setOpenUploadModal(false)}
-        children={<ImagePreview close={() => setOpenUploadModal(false)} />}
+        children={<ImagePreview handleClose={() => setOpenUploadModal(false)} />}
       />
     </Portal.Host>
   );
