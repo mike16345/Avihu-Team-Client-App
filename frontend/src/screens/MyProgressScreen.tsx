@@ -17,9 +17,8 @@ import { useEffect, useState } from "react";
 import { StyleSheet, ScrollView, Linking, Animated } from "react-native";
 import { Portal } from "react-native-paper";
 import ErrorScreen from "./ErrorScreen";
-import { checkIfDatesMatch } from "@/utils/utils";
+import { calculateImageUploadTitle, checkIfDatesMatch } from "@/utils/utils";
 import BottomDrawer from "@/components/ui/BottomDrawer";
-import SelectUploadType from "@/components/WeightGraph/SelectUploadType";
 import ImagePreview from "@/components/WeightGraph/ImagePreview";
 
 const MyProgressScreen = () => {
@@ -37,6 +36,7 @@ const MyProgressScreen = () => {
   const [openUploadModal, setOpenUploadModal] = useState(false);
   const [lastWeighIn, setLastWeighIn] = useState<IWeighIn | null>(null);
   const [todaysWeighInExists, setTodaysWeighInExists] = useState(false);
+  const disabledTitle = calculateImageUploadTitle(currentUser?.checkInAt || 0);
 
   const { data, isLoading, isError, error } = useQuery({
     queryFn: () => getWeighInsByUserId(currentUser?._id || ``),
@@ -156,14 +156,17 @@ const MyProgressScreen = () => {
           open={isFabOpen}
           actions={[
             {
-              icon: "plus",
+              icon: todaysWeighInExists ? "update" : "plus",
               onPress: () => setOpenWeightModal(true),
               label: todaysWeighInExists ? "עריכת שקילה יומית" : "הוספת שקילה יומית",
             },
             {
               icon: "camera",
-              onPress: () => setOpenUploadModal(true),
-              label: "שלח/י תמונת מעקב",
+              onPress: currentUser?.imagesUploaded
+                ? () => console.log(`no`)
+                : () => setOpenUploadModal(true),
+              label: currentUser?.imagesUploaded ? disabledTitle : "שלח/י תמונת מעקב",
+              color: currentUser?.imagesUploaded ? "grey" : "",
             },
             {
               icon: "whatsapp",

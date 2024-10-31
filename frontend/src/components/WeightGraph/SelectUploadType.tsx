@@ -12,7 +12,7 @@ interface SelectUploadTypeProps {
 const imagePickerOptions: ImagePicker.ImagePickerOptions = {
   mediaTypes: ImagePicker.MediaTypeOptions.Images,
   allowsEditing: true,
-  cameraType: ImagePicker.CameraType.front,
+  cameraType: ImagePicker.CameraType.back,
   quality: 1,
 };
 
@@ -36,16 +36,16 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
     let result = await ImagePicker.launchCameraAsync(imagePickerOptions);
 
     if (result.canceled) return;
-    // const fixedImage = await ImageManipulator.manipulateAsync(
-    //   result.assets[0].uri,
-    //   [{ flip: ImageManipulator.FlipType.Horizontal }],
-    //   {
-    //     compress: 1,
-    //     format: ImageManipulator.SaveFormat.JPEG,
-    //   }
-    // );
+    const fixedImage = await ImageManipulator.manipulateAsync(
+      result.assets[0].uri,
+      [{ flip: ImageManipulator.FlipType.Horizontal }],
+      {
+        compress: 1,
+        format: ImageManipulator.SaveFormat.JPEG,
+      }
+    );
 
-    returnImage(result.assets[0].uri);
+    returnImage(fixedImage.uri);
   };
 
   const uploadTypes = [

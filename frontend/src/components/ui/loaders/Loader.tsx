@@ -59,6 +59,8 @@ const Loader: React.FC<LoaderProps> = ({ variant = `Standard` }) => {
                   position: `absolute`,
                   backgroundColor: `rgba(0, 0, 0, 0.8)`,
                   zIndex: 100,
+                  top: 0,
+                  left: 0,
                 },
                 colors.backdrop,
               ],

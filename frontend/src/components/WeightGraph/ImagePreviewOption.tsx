@@ -1,6 +1,6 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React from "react";
-import { Image, TouchableOpacity } from "react-native";
+import { Image, TouchableOpacity, useWindowDimensions } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 
 interface ImagePreviewOptionProps {
@@ -15,6 +15,7 @@ const ImagePreviewOption: React.FC<ImagePreviewOptionProps> = ({
   handleImageSelect,
 }) => {
   const { colors, common, layout } = useStyles();
+  const { height, width } = useWindowDimensions();
 
   return (
     <TouchableOpacity
@@ -23,12 +24,13 @@ const ImagePreviewOption: React.FC<ImagePreviewOptionProps> = ({
         colors.backdrop,
         common.borderSm,
         layout.center,
-        { width: 48, height: 48 },
+
+        { width: width * 0.12, height: height * 0.05 },
       ]}
       onPress={handleImageSelect}
     >
       {image ? (
-        <Image source={{ uri: image }} style={{ width: 44, height: 44 }} />
+        <Image source={{ uri: image }} style={{ width: width * 0.11, height: height * 0.047 }} />
       ) : (
         <NativeIcon
           style={[selected ? colors.textPrimary : colors.textOnBackground]}
