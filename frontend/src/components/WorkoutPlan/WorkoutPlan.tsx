@@ -102,7 +102,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
 
   const renderHeader = () => (
     <>
-      <ImageBackground source={logoBlack} className="w-screen h-[30vh]" />
+      <ImageBackground source={logoBlack} style={{ height: Dimensions.get("screen").height / 4 }} />
       <View style={[styles.container, spacing.gapLg, spacing.pdDefault]}>
         {value && plans && (
           <DropDownPicker
