@@ -16,7 +16,7 @@ interface WeightCalendarProps {
 }
 
 const WeightCalendar: FC<WeightCalendarProps> = ({ weighIns, onSaveWeighIn, onDeleteWeighIn }) => {
-  const { layout } = useStyles();
+  const { layout, fonts } = useStyles();
 
   const [selectedWeighInId, setSelectedWeighInId] = useState<string | null>(null);
   const [isEditWeighOpen, setIsEditWeightOpen] = useState(false);

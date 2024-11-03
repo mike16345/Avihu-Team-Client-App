@@ -13,10 +13,13 @@ import useStyles from "@/styles/useGlobalStyles";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import DateUtils from "@/utils/dateUtils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, ScrollView, Linking, Animated } from "react-native";
 import { Portal } from "react-native-paper";
 import ErrorScreen from "./ErrorScreen";
+import { calculateImageUploadTitle, checkIfDatesMatch } from "@/utils/utils";
+import BottomDrawer from "@/components/ui/BottomDrawer";
+import ImagePreview from "@/components/WeightGraph/ImagePreview";
 
 const MyProgressScreen = () => {
   const TRAINER_PHONE_NUMBER = process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER;
@@ -30,6 +33,10 @@ const MyProgressScreen = () => {
 
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [openWeightModal, setOpenWeightModal] = useState(false);
+  const [openUploadModal, setOpenUploadModal] = useState(false);
+  const [lastWeighIn, setLastWeighIn] = useState<IWeighIn | null>(null);
+  const [todaysWeighInExists, setTodaysWeighInExists] = useState(false);
+  const disabledTitle = calculateImageUploadTitle(currentUser?.checkInAt || 0);
 
   const { data, isLoading, isError, error } = useQuery({
     queryFn: () => getWeighInsByUserId(currentUser?._id || ``),
@@ -79,6 +86,9 @@ const MyProgressScreen = () => {
   ) => {
     setOpenWeightModal(false);
 
+    console.log(weighInId);
+    console.log(isNew);
+
     if (isNew && currentUser) {
       const userId = currentUser._id;
       addNewWeighIn.mutate({ userId, weighIn });
@@ -93,6 +103,15 @@ const MyProgressScreen = () => {
 
     removeWeighIn.mutate(weighInId);
   };
+
+  useEffect(() => {
+    if (!data) return;
+    const latestWeghIn = data[data?.length - 1];
+    const weighInExists = checkIfDatesMatch(new Date(latestWeghIn.date), new Date());
+
+    setLastWeighIn(latestWeghIn);
+    setTodaysWeighInExists(weighInExists);
+  }, [data]);
 
   if (isLoading) return <ProgressScreenSkeleton />;
 
@@ -137,14 +156,17 @@ const MyProgressScreen = () => {
           open={isFabOpen}
           actions={[
             {
-              icon: "plus",
+              icon: todaysWeighInExists ? "update" : "plus",
               onPress: () => setOpenWeightModal(true),
-              label: "Add Weight",
+              label: todaysWeighInExists ? "עריכת שקילה יומית" : "הוספת שקילה יומית",
             },
             {
               icon: "camera",
-              onPress: () => console.log("Open camera to take weigh in photo"),
-              label: "Add Photo",
+              onPress: currentUser?.imagesUploaded
+                ? () => console.log(`no`)
+                : () => setOpenUploadModal(true),
+              label: currentUser?.imagesUploaded ? disabledTitle : "שלח/י תמונת מעקב",
+              color: currentUser?.imagesUploaded ? "grey" : "",
             },
             {
               icon: "whatsapp",
@@ -152,7 +174,7 @@ const MyProgressScreen = () => {
                 Linking.openURL(
                   `whatsapp://send?phone=${TRAINER_PHONE_NUMBER}&text=${DEFAULT_MESSAGE_TO_TRAINER}`
                 ),
-              label: "Message Avihu",
+              label: "הודעה למאמן",
             },
           ]}
         />
@@ -161,9 +183,18 @@ const MyProgressScreen = () => {
         <WeightInputModal
           handleDismiss={() => setOpenWeightModal(false)}
           currentWeight={currentWeight || 0}
-          handleSaveWeight={(weight) => handleSaveWeighIn({ weight })}
+          handleSaveWeight={
+            todaysWeighInExists
+              ? (weight) => handleSaveWeighIn({ weight }, lastWeighIn?._id, false)
+              : (weight) => handleSaveWeighIn({ weight })
+          }
         />
       )}
+      <BottomDrawer
+        open={openUploadModal}
+        onClose={() => setOpenUploadModal(false)}
+        children={<ImagePreview handleClose={() => setOpenUploadModal(false)} />}
+      />
     </Portal.Host>
   );
 };

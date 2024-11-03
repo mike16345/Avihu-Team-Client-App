@@ -21,7 +21,7 @@ const DayComponent: React.FC<DayComponentProps> = ({ date, state, marking, ...pr
       style={[dayStyles.dayContainer, state == "today" && dayStyles.todayContainer]}
     >
       <Text
-        style={[dayStyles.dateText, selected && dayStyles.selected, fontSize.default]}
+        style={[dayStyles.dateText, selected && dayStyles.selected, fontSize.md]}
         maxFontSizeMultiplier={1}
       >
         {date}
