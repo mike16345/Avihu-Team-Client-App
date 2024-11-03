@@ -8,7 +8,15 @@
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/avihu/avihu-logo-black.png",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#000000",
+      "plugins": [
+        [
+          "expo-image-picker",
+          {
+            "photosPermission": "The app accesses your photos to let you share them with your friends."
+          }
+        ]
+      ]
     },
     "ios": {
       "supportsTablet": true,

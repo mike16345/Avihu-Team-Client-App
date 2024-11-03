@@ -1,3 +1,6 @@
+import { useUserApi } from "@/hooks/api/useUserApi";
+import { useUserStore } from "@/store/userStore";
+
 export const testEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -38,4 +41,35 @@ export const createRetryFunction = (ignoreStatusCode: number, maxRetries: number
     // Retry up to the specified max retries for other errors
     return failureCount < maxRetries;
   };
+};
+
+const stripTime = (dateParam: Date) => {
+  return new Date(dateParam.getFullYear(), dateParam.getMonth(), dateParam.getDate());
+};
+
+export const checkIfDatesMatch = (date1: Date, date2: Date) => {
+  if (stripTime(date1).getTime() === stripTime(date2).getTime()) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export const calculateImageUploadTitle = (usersCheckInDate: number) => {
+  const { changeImageUploadStatus } = useUserApi();
+  const MILLIESECONDS_IN_A_DAY = 86400000;
+  const timeLeft = usersCheckInDate - Date.now() - MILLIESECONDS_IN_A_DAY;
+
+  const daysLeft = timeLeft > 0 ? Math.floor(timeLeft / MILLIESECONDS_IN_A_DAY) : 0;
+
+  switch (daysLeft) {
+    case 0:
+      const currentUserId = useUserStore((store) => store.currentUser?._id);
+      changeImageUploadStatus(currentUserId || ``, false);
+      return ``;
+    case 1:
+      return `זמין בעוד יום`;
+    default:
+      return `זמין בעוד ${daysLeft} ימים`;
+  }
 };
