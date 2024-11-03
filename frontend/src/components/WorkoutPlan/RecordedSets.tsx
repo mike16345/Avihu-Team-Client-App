@@ -12,10 +12,11 @@ const RecordedSets: React.FC<RecordedSetsProps> = ({ route }) => {
   const { recordedSets } = route.params;
 
   return (
-    <View style={spacing.pdDefault}>
+    <View style={[spacing.pdDefault]}>
       {recordedSets?.length ? (
         <FlatList
           data={recordedSets}
+          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
           keyExtractor={(item) => `${item.date}-${item.setNumber}`}
           renderItem={({ item }) => <RecordedSetInfo recordedSet={item} />}
         />
