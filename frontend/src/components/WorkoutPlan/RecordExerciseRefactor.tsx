@@ -163,7 +163,9 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
 
         {lastRecordedSet && (
           <View style={[spacing.mgVerticalDefault, spacing.gapSm]}>
-            <Text style={[text.textRight, text.textBold]}>אימון הקודם</Text>
+            <Text style={[text.textRight, text.textBold]}>
+              אימון הקודם - {new Date(lastRecordedSet.date).toLocaleDateString()}
+            </Text>
             <RecordedSetInfo
               actionButton={
                 <NativeIcon

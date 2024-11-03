@@ -13,34 +13,32 @@ const RecordedSetInfo: FC<RecordedSetInfoProps> = ({ recordedSet, actionButton }
   const { colors, layout, spacing, common, fonts, text } = useStyles();
 
   return (
-    <View
-      style={[
-        spacing.pdHorizontalSm,
-        spacing.pdVerticalDefault,
-        common.rounded,
-        colors.backgroundSecondaryContainer,
-      ]}
-    >
-      <View style={[layout.itemsCenter, layout.flexRowReverse, layout.justifyBetween]}>
-        <Text style={[colors.textOnSecondaryContainer, fonts.lg]}>{recordedSet?.plan}</Text>
-        <Text style={[fonts.md, colors.textOnSecondaryContainer]}>
-          {new Date(recordedSet!.date).toLocaleDateString()}
+    <View style={[spacing.pdMd, common.rounded, colors.backgroundSecondaryContainer]}>
+      <View style={[layout.flexRowReverse]}>
+        <Text style={[colors.textOnSecondaryContainer, fonts.default, text.textBold]}>
+          סט {recordedSet?.setNumber}
         </Text>
+        <View style={[layout.center, layout.flexGrow, layout.flexRow, spacing.gapLg]}>
+          <View style={[layout.center]}>
+            <Text style={[colors.textOnBackground, fonts.md, text.textBold]}>חזרות</Text>
+            <Text style={[colors.textOnBackground, fonts.default]}>
+              <Text style={[fonts.sm]}>x</Text>
+              {recordedSet?.repsDone}
+              {/* <NativeIcon size={16} library="MaterialCommunityIcons" name="history" /> */}
+            </Text>
+          </View>
+          <View style={[layout.center]}>
+            <Text style={[colors.textOnBackground, fonts.md, text.textBold]}>משקל</Text>
+
+            <Text style={[colors.textOnBackground, fonts.default]}>
+              {recordedSet?.weight}
+              <Text style={[fonts.sm]}>{' ק"ג'}</Text>
+              {/* <NativeIcon size={14} library="MaterialCommunityIcons" name="dumbbell" /> */}
+            </Text>
+          </View>
+        </View>
+        {actionButton}
       </View>
-      <Text style={[colors.textOnSecondaryContainer, fonts.md]}>סט {recordedSet?.setNumber}</Text>
-      <View style={[layout.center, layout.flexRow, spacing.gapLg]}>
-        <Text style={[colors.textOnBackground, fonts.default]}>
-          {recordedSet?.repsDone}
-          {"x "}
-          <NativeIcon size={16} library="MaterialCommunityIcons" name="clock-plus" />
-        </Text>
-        <Text style={[colors.textOnBackground, fonts.default]}>
-          {recordedSet?.weight}
-          {"x "}
-          <NativeIcon size={12} library="FontAwesome5" name="dumbbell" />
-        </Text>
-      </View>
-      {actionButton}
     </View>
   );
 };
