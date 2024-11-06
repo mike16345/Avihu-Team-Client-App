@@ -1,17 +1,19 @@
 import {
   View,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Keyboard,
   ImageBackground,
   KeyboardAvoidingView,
-  Platform,
+  useWindowDimensions,
 } from "react-native";
 import React, { useState } from "react";
-import avihuBg from "@assets/avihuFlyTrap.jpeg";
+import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
 import { testEmail } from "@/utils/utils";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { Button, Text, TextInput } from "react-native-paper";
 import useStyles from "@/styles/useGlobalStyles";
+import { moderateScale } from "react-native-size-matters";
 
 interface IUserCredentials {
   email: string;
@@ -30,10 +32,7 @@ interface ILoginProps {
 export default function Login({ setIsLoggedIn }: ILoginProps) {
   const { text, colors, fonts, layout, spacing } = useStyles();
 
-  const hardcodedUser: IUserCredentials = {
-    email: `avihu123@gmail.com`,
-    password: `qwerty123`,
-  };
+  const { height, width } = useWindowDimensions();
 
   const { setItem } = useAsyncStorage("isLoggedIn");
 
@@ -41,10 +40,8 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     email: ``,
     password: ``,
   });
-  const [status, setStatus] = useState<string>();
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<ICredentialsErrors>({});
-  const [didSucceed, setDidSucceed] = useState<boolean>();
 
   const handleSubmit = () => {
     const { email, password } = inputtedCrendentials;
@@ -65,31 +62,59 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
       return;
     }
 
-    if (hardcodedUser.email === email && hardcodedUser.password === password) {
-      setStatus(`התחברות בוצעה בהצלחה`);
-      setDidSucceed(true);
-      setItem("true");
-      setIsLoggedIn(true);
-    } else {
-      setStatus(`התחברות נכשלה!`);
-      setDidSucceed(false);
-    }
+    //handle api call
+
+    /*  setItem("true");
+      setIsLoggedIn(true); */
   };
 
   return (
-    <View style={[layout.sizeFull, layout.center]}>
-      <ImageBackground source={avihuBg} className="w-full h-full flex-2 absolute z-0" />
-      <View className=" w-full h-full absolute top-0 left-0 bg-black opacity-40 z-10"></View>
-      <KeyboardAvoidingView behavior="padding" className=" items-center z-30">
+    <View style={[layout.center, { height: height, width: width }]}>
+      <ImageBackground
+        source={avihuFlyTrap}
+        style={[
+          layout.center,
+          layout.flex1,
+          {
+            width: moderateScale(350, 2),
+            height: moderateScale(700, 2),
+            zIndex: 0,
+          },
+        ]}
+      />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View
+          style={[
+            colors.background,
+            {
+              position: `absolute`,
+              top: 0,
+              left: 0,
+              zIndex: 10,
+              opacity: 0.7,
+              height: height,
+              width: width,
+            },
+          ]}
+        ></View>
+      </TouchableWithoutFeedback>
+      <KeyboardAvoidingView
+        behavior="padding"
+        style={[
+          layout.center,
+          spacing.gapDefault,
+          { zIndex: 30, position: `absolute`, width: width * 0.7 },
+        ]}
+      >
         <Text style={[colors.textPrimary, text.textBold, spacing.pdLg, fonts.xxxl]}>
           כניסה לחשבון
         </Text>
-        <View className=" w-80 gap-2 ">
+        <View style={[layout.widthFull]}>
           <View>
             <TextInput
-              style={{ width: "100%" }}
-              placeholder="Email..."
-              keyboardType={Platform.OS == "android" ? "email-address" : "default"}
+              style={[text.textRight, { width: "100%" }]}
+              placeholder="כתובת מייל..."
+              keyboardType={"email-address"}
               autoCorrect={false}
               autoComplete="email"
               textContentType="oneTimeCode"
@@ -104,13 +129,13 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
           </View>
           <View>
             <TextInput
-              style={{ width: "100%" }}
-              placeholder="Password..."
+              style={[text.textRight, { width: "100%" }]}
+              placeholder="סיסמא..."
               secureTextEntry={!showPassword}
               onChangeText={(val) =>
                 setInputtedCredentials({ ...inputtedCrendentials, password: val })
               }
-              right={
+              left={
                 <TextInput.Icon
                   onPress={() => setShowPassword((show) => !show)}
                   icon={showPassword ? "eye-off" : "eye"}
@@ -126,11 +151,6 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
         <Button mode="contained" onPress={handleSubmit}>
           התחברות
         </Button>
-        {didSucceed ? (
-          <Text className="text-emerald-300 text-lg">{status}</Text>
-        ) : (
-          <Text className="text-red-700 text-lg">{status}</Text>
-        )}
       </KeyboardAvoidingView>
     </View>
   );

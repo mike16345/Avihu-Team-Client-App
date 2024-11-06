@@ -10,7 +10,7 @@ const Stack = createNativeStackNavigator();
 const RootNavigator = () => {
   const { getItem, removeItem } = useAsyncStorage("isLoggedIn");
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const checkLoginStatus = async () => {
     const token = await getItem();
@@ -31,7 +31,7 @@ const RootNavigator = () => {
         <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
       ) : (
         <>
-          <Stack.Screen name="HomePage" component={GetStartedScreen} />
+          {/* <Stack.Screen name="HomePage" component={GetStartedScreen} /> */}
           <Stack.Screen
             children={() => <Login setIsLoggedIn={setIsLoggedIn} />}
             name="LoginScreen"
