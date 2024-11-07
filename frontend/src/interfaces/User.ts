@@ -1,9 +1,16 @@
 export interface IUser {
   _id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  checkInAt: number;
+  phone: string;
+  dietaryType: string[];
+  dateJoined: Date;
+  dateFinished: Date;
+  planType: string;
+  remindIn: number;
   imagesUploaded: boolean;
+  hasAccess: boolean;
 }
 
 // WeighIn interface

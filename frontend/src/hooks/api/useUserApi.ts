@@ -1,4 +1,4 @@
-import { fetchData, patchItem } from "@/API/api";
+import { fetchData, patchItem, updateItem } from "@/API/api";
 import { IUser } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
 import { ApiResponse } from "@/types/ApiTypes";
@@ -20,8 +20,20 @@ export const useUserApi = () => {
     );
   };
 
+  const updateUserField = <K extends keyof IUser>(
+    userId: string,
+    fieldName: K,
+    value: IUser[K]
+  ) => {
+    return updateItem<ApiResponse<IUser>>(USER_ENDPOINT + `/one/field?userId=${userId}`, {
+      fieldName,
+      value,
+    }).then((res) => setCurrentUser(res.data));
+  };
+
   return {
     getUserById,
     changeImageUploadStatus,
+    updateUserField,
   };
 };
