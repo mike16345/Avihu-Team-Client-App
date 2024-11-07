@@ -86,9 +86,6 @@ const MyProgressScreen = () => {
   ) => {
     setOpenWeightModal(false);
 
-    console.log(weighInId);
-    console.log(isNew);
-
     if (isNew && currentUser) {
       const userId = currentUser._id;
       addNewWeighIn.mutate({ userId, weighIn });

@@ -69,9 +69,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({
       return;
     }
 
-    console.log("Workout saved", recordedSet);
     handleRecordSet(recordedSet);
-
     setIsOpen(false);
   };
 

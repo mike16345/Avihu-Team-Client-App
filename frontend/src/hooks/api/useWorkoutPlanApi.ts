@@ -8,7 +8,6 @@ export const useWorkoutPlanApi = () => {
   const getWorkoutPlanByUserId = (userId: string) =>
     fetchData<ApiResponse<ICompleteWorkoutPlan>>(`${WORKOUT_PLAN_ENDPOINT}/user`, { userId }).then(
       (res) => {
-        console.log("res", res);
         return res.data;
       }
     );

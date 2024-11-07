@@ -74,7 +74,6 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   const handleSetCurrentSetInfo = (updatedSession: ISession) => {
     if (!updatedSession) return;
     const data = updatedSession.data;
-    console.log("data", data);
     let exerciseData;
 
     const planData = data?.[plan];
@@ -87,6 +86,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
     if (setNumber - 1 <= exercise.sets.length - 1) {
       setCurrentSetNumber(setNumber);
     } else {
+      setCurrentSetNumber(setNumber);
       setIsSetDone(true);
     }
   };

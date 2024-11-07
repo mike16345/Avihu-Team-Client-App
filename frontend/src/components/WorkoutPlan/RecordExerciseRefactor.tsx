@@ -101,7 +101,13 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
   return (
     <View style={[layout.sizeFull]}>
       <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
-      <ScrollView contentContainerStyle={[layout.flexGrow, spacing.pdDefault]}>
+      <ScrollView
+        contentContainerStyle={[
+          layout.flexGrow,
+          !lastRecordedSet && spacing.gapXxl,
+          spacing.pdDefault,
+        ]}
+      >
         <View style={[layout.itemsEnd, spacing.gapSm]}>
           {strippedTips && strippedTips.length && (
             <Pressable onPress={() => setOpenTrainerTips(true)}>
@@ -111,9 +117,11 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             </Pressable>
           )}
           <Text style={styles.setInfo}>סט: {setNumber}</Text>
-          <Text style={styles.setInfo}>
-            חזרות: {exercise.sets[setNumber - 1].minReps}-{exercise.sets[setNumber - 1].maxReps}
-          </Text>
+          {exercise.sets[setNumber - 1] && (
+            <Text style={styles.setInfo}>
+              חזרות: {exercise.sets[setNumber - 1].minReps}-{exercise.sets[setNumber - 1].maxReps}
+            </Text>
+          )}
           <WorkoutTips
             tips={[exercise.tipFromTrainer!]}
             openTips={openTrainerTips}
@@ -185,7 +193,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
           </View>
         )}
 
-        <View style={[layout.flexRow, layout.widthFull, spacing.gapLg, spacing.pdSm]}>
+        <View style={[layout.flexRow, layout.widthFull, spacing.gapLg]}>
           <Button mode="contained" onPress={handleSave}>
             <Text style={[customStyles.text.textBold]}>שמור</Text>
           </Button>
