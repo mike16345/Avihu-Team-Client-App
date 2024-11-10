@@ -1,4 +1,4 @@
-import { fetchData, patchItem } from "@/API/api";
+import { fetchData, patchItem, sendData, updateItem } from "@/API/api";
 import { IUser } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
 import { ApiResponse } from "@/types/ApiTypes";
@@ -20,8 +20,23 @@ export const useUserApi = () => {
     );
   };
 
+  const checkEmailAccess = (email: string) => {
+    return fetchData<ApiResponse<IUser>>(USER_ENDPOINT + `/user/email`, { email });
+  };
+
+  const registerUser = (email: string, password: string) => {
+    return updateItem<ApiResponse<IUser>>(USER_ENDPOINT + `/user/register`, { email, password });
+  };
+
+  const loginUser = (email: string, password: string) => {
+    return sendData<ApiResponse<IUser>>(USER_ENDPOINT + `/user/login`, { email, password });
+  };
+
   return {
     getUserById,
     changeImageUploadStatus,
+    checkEmailAccess,
+    registerUser,
+    loginUser,
   };
 };
