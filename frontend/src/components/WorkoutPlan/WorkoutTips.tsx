@@ -6,7 +6,7 @@ import useStyles from "@/styles/useGlobalStyles";
 
 interface WorkoutTipsProps {
   openTips: boolean;
-  tips: string[];
+  tips?: string[];
   setOpenTips: Dispatch<SetStateAction<boolean>>;
 }
 

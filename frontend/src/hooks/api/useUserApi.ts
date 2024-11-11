@@ -1,4 +1,4 @@
-import { fetchData, patchItem, sendData, updateItem } from "@/API/api";
+import { fetchData, patchItem, updateItem, sendData } from "@/API/api";
 import { IUser } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
 import { ApiResponse } from "@/types/ApiTypes";
@@ -14,10 +14,15 @@ export const useUserApi = () => {
     );
   };
 
-  const changeImageUploadStatus = (id: string, status: boolean) => {
-    return patchItem<ApiResponse<IUser>>(USER_ENDPOINT + `/one`, { userId: id, status }).then(
-      (res) => setCurrentUser(res.data)
-    );
+  const updateUserField = <K extends keyof IUser>(
+    userId: string,
+    fieldName: K,
+    value: IUser[K]
+  ) => {
+    return updateItem<ApiResponse<IUser>>(USER_ENDPOINT + `/one/field?userId=${userId}`, {
+      fieldName,
+      value,
+    }).then((res) => setCurrentUser(res.data));
   };
 
   const checkEmailAccess = (email: string) => {
@@ -35,9 +40,9 @@ export const useUserApi = () => {
 
   return {
     getUserById,
-    changeImageUploadStatus,
     checkEmailAccess,
     registerUser,
     loginUser,
+    updateUserField,
   };
 };
