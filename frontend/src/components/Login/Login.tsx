@@ -1,13 +1,13 @@
 import {
   View,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
   ImageBackground,
   KeyboardAvoidingView,
   useWindowDimensions,
+  Animated,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
 import { testEmail } from "@/utils/utils";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
@@ -129,6 +129,26 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     }
   };
 
+  const emailInputY = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (emailChecked) {
+      // Animate the email input to move upwards
+      Animated.timing(emailInputY, {
+        toValue: -60, // Move the email input up by 60 units
+        duration: 300, // Duration of the animation
+        useNativeDriver: true, // Use native driver for better performance
+      }).start();
+    } else {
+      // Reset position when emailChecked is false
+      Animated.timing(emailInputY, {
+        toValue: 0, // Reset to original position
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [emailChecked]);
+
   return (
     <View style={[layout.center, { height: height, width: width }]}>
       {loading && <Loader variant="Screen" />}
@@ -192,18 +212,21 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
               <Text style={[text.textDanger, text.textRight]}>{formErrors.email}</Text>
             </View>
           ) : (
-            <View style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}>
+            <Animated.View
+              style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}
+            >
               <Text
                 style={[
                   fonts.default,
                   text.textBold,
                   colors.textOnPrimaryContainer,
                   text.textCenter,
+                  { transform: [{ translateY: emailInputY }] },
                 ]}
               >
                 {inputtedCrendentials.email}
               </Text>
-            </View>
+            </Animated.View>
           )}
           {emailChecked && userRegistered && (
             <View>

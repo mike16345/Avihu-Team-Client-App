@@ -4,7 +4,6 @@ import { GetStartedScreen } from "@/screens/GetStartedScreen";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import BottomTabNavigator from "./BottomTabNavigator";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import InputEmail from "@/components/Login/InputEmail";
 
 const Stack = createNativeStackNavigator();
 
@@ -37,7 +36,6 @@ const RootNavigator = () => {
             children={() => <Login setIsLoggedIn={setIsLoggedIn} />}
             name="LoginScreen"
           />
-          <Stack.Screen children={() => <InputEmail />} name="EmailScreen" />
         </>
       )}
     </Stack.Navigator>
