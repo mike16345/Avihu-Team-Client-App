@@ -25,7 +25,10 @@ export const useUserApi = () => {
   };
 
   const registerUser = (email: string, password: string) => {
-    return updateItem<ApiResponse<IUser>>(USER_ENDPOINT + `/user/register`, { email, password });
+    return updateItem<ApiResponse<IUser>>(USER_ENDPOINT + `/user/register`, {
+      email,
+      password,
+    });
   };
 
   const loginUser = (email: string, password: string) => {

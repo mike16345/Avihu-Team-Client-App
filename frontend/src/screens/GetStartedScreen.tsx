@@ -46,7 +46,7 @@ export const GetStartedScreen: React.FC<GetStartedScreenProps> = ({ navigation }
           Avihu Busheri
         </Text>
         <TouchableOpacity
-          onPress={() => navigation!.navigate("EmailScreen")}
+          onPress={() => navigation!.navigate("LoginScreen")}
           style={[colors.backgroundPrimary, spacing.pdDefault, common.rounded]}
         >
           <Text style={[text.textBold]}>Get Started</Text>

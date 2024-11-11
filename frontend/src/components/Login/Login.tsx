@@ -14,15 +14,19 @@ import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { Button, Text, TextInput } from "react-native-paper";
 import useStyles from "@/styles/useGlobalStyles";
 import { moderateScale } from "react-native-size-matters";
+import { useUserApi } from "@/hooks/api/useUserApi";
+import Toast, { ToastType } from "react-native-toast-message";
+import ConfirmPassword from "./ConfirmPassword";
 
 interface IUserCredentials {
   email: string;
   password: string;
 }
 
-interface ICredentialsErrors {
+export interface ICredentialsErrors {
   email?: string;
   password?: string;
+  confirmPassword?: string;
 }
 
 interface ILoginProps {
@@ -31,6 +35,7 @@ interface ILoginProps {
 
 export default function Login({ setIsLoggedIn }: ILoginProps) {
   const { text, colors, fonts, layout, spacing } = useStyles();
+  const { checkEmailAccess, registerUser, loginUser } = useUserApi();
 
   const { height, width } = useWindowDimensions();
 
@@ -40,8 +45,34 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     email: ``,
     password: ``,
   });
+  const [confirmPassword, setConfirmPassowrd] = useState<string>(``);
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<ICredentialsErrors>({});
+  const [emailChecked, setEmailchecked] = useState(false);
+  const [userRegistered, setUserRegistered] = useState(false);
+
+  const showAlert = (type: ToastType, message: string) => {
+    Toast.show({
+      text1: message,
+      autoHide: true,
+      type: type,
+      swipeable: true,
+    });
+  };
+
+  const register = () => {
+    const { email, password } = inputtedCrendentials;
+    if (!email || !password) return;
+
+    registerUser(email, password)
+      .then((res) => {
+        showAlert("success", res.message);
+        setUserRegistered(true);
+      })
+      .catch((err) => {
+        showAlert("error", err.response.data.message);
+      });
+  };
 
   const handleSubmit = () => {
     const { email, password } = inputtedCrendentials;
@@ -53,19 +84,50 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
       errors[`email`] = `אנא הכניסו כתובת מייל תקינה`;
     }
 
-    if (!password) {
+    if (emailChecked && !password) {
       errors[`password`] = `אנא הזינו סיסמא`;
     }
 
-    if (errors[`email`] || errors[`password`]) {
+    if (emailChecked && password !== confirmPassword) {
+      errors[`confirmPassword`] = `סיסמאות לא תואמות`;
+    }
+
+    if (errors[`email`] || errors[`password`] || (!userRegistered && errors[`confirmPassword`])) {
       setFormErrors(errors);
       return;
     }
 
-    //handle api call
+    if (!emailChecked) {
+      checkEmailAccess(email)
+        .then((res) => {
+          showAlert("success", res.message);
+          setEmailchecked(true);
+          if (res.data.password) {
+            setUserRegistered(true);
+          }
+        })
+        .catch((err) => {
+          showAlert("error", err.response.data.message);
+        });
+    }
 
-    /*  setItem("true");
-      setIsLoggedIn(true); */
+    if (emailChecked && !userRegistered) {
+      register();
+    }
+
+    if (emailChecked && userRegistered) {
+      console.log(`a`);
+
+      loginUser(email, password)
+        .then((res) => {
+          showAlert("success", res.message);
+          setIsLoggedIn(true);
+          setItem("true");
+        })
+        .catch((err) => {
+          showAlert("error", err.response.data.message);
+        });
+    }
   };
 
   return (
@@ -124,29 +186,38 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
                   email: val.toLocaleLowerCase().trim(),
                 })
               }
+              value={inputtedCrendentials.email}
             />
             <Text style={[text.textDanger, text.textRight]}>{formErrors.email}</Text>
           </View>
-          <View>
-            <TextInput
-              style={[text.textRight, { width: "100%" }]}
-              placeholder="סיסמא..."
-              secureTextEntry={!showPassword}
-              onChangeText={(val) =>
+          {emailChecked && userRegistered && (
+            <View>
+              <TextInput
+                style={[text.textRight, { width: "100%" }]}
+                placeholder="סיסמא..."
+                secureTextEntry={!showPassword}
+                onChangeText={(val) =>
+                  setInputtedCredentials({ ...inputtedCrendentials, password: val })
+                }
+                left={
+                  <TextInput.Icon
+                    onPress={() => setShowPassword((show) => !show)}
+                    icon={showPassword ? "eye-off" : "eye"}
+                  />
+                }
+              />
+              <Text style={[text.textDanger, text.textRight]}>{formErrors.password}</Text>
+            </View>
+          )}
+          {emailChecked && !userRegistered && (
+            <ConfirmPassword
+              errors={formErrors}
+              handlePasswordChange={(val) =>
                 setInputtedCredentials({ ...inputtedCrendentials, password: val })
               }
-              left={
-                <TextInput.Icon
-                  onPress={() => setShowPassword((show) => !show)}
-                  icon={showPassword ? "eye-off" : "eye"}
-                />
-              }
+              handlePasswordConfirmChange={(val) => setConfirmPassowrd(val)}
             />
-            <Text style={[text.textDanger, text.textRight]}>{formErrors.password}</Text>
-          </View>
-          <TouchableOpacity>
-            <Text style={[text.textRight, text.textPrimary, text.textUnderline]}>הרשמה</Text>
-          </TouchableOpacity>
+          )}
         </View>
         <Button mode="contained" onPress={handleSubmit}>
           התחברות

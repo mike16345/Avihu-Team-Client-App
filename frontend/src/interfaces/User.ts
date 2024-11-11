@@ -4,6 +4,8 @@ export interface IUser {
   email: string;
   checkInAt: number;
   imagesUploaded: boolean;
+  password?: string;
+  hasAccess: boolean;
 }
 
 // WeighIn interface

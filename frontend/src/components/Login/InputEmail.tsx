@@ -23,10 +23,11 @@ const InputEmail = () => {
 
   const handleSubmit = () => {
     if (!email) return;
+    Keyboard.dismiss();
 
     checkEmailAccess(email)
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
+      .then((res) => console.log(`res`, res.message))
+      .catch((err) => console.log(`err`, err.response.data.message));
   };
 
   return (
