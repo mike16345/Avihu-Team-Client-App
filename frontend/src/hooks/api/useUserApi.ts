@@ -24,16 +24,14 @@ export const useUserApi = () => {
     return fetchData<ApiResponse<IUser>>(USER_ENDPOINT + `/user/email`, { email });
   };
 
-  const registerUser = (email: string, password: string) => {
-    return updateItem<ApiResponse<IUser>>(USER_ENDPOINT + `/user/register`, {
+  const registerUser = (email: string, password: string) =>
+    updateItem<ApiResponse<IUser>>(USER_ENDPOINT + `/user/register`, {
       email,
       password,
     });
-  };
 
-  const loginUser = (email: string, password: string) => {
-    return sendData<ApiResponse<IUser>>(USER_ENDPOINT + `/user/login`, { email, password });
-  };
+  const loginUser = (email: string, password: string) =>
+    sendData<ApiResponse<IUser>>(USER_ENDPOINT + `/user/login`, { email, password });
 
   return {
     getUserById,

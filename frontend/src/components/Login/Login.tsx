@@ -17,6 +17,7 @@ import { moderateScale } from "react-native-size-matters";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import Toast, { ToastType } from "react-native-toast-message";
 import ConfirmPassword from "./ConfirmPassword";
+import Loader from "../ui/loaders/Loader";
 
 interface IUserCredentials {
   email: string;
@@ -34,7 +35,7 @@ interface ILoginProps {
 }
 
 export default function Login({ setIsLoggedIn }: ILoginProps) {
-  const { text, colors, fonts, layout, spacing } = useStyles();
+  const { text, colors, fonts, layout, spacing, common } = useStyles();
   const { checkEmailAccess, registerUser, loginUser } = useUserApi();
 
   const { height, width } = useWindowDimensions();
@@ -50,6 +51,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
   const [formErrors, setFormErrors] = useState<ICredentialsErrors>({});
   const [emailChecked, setEmailchecked] = useState(false);
   const [userRegistered, setUserRegistered] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const showAlert = (type: ToastType, message: string) => {
     Toast.show({
@@ -58,20 +60,6 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
       type: type,
       swipeable: true,
     });
-  };
-
-  const register = () => {
-    const { email, password } = inputtedCrendentials;
-    if (!email || !password) return;
-
-    registerUser(email, password)
-      .then((res) => {
-        showAlert("success", res.message);
-        setUserRegistered(true);
-      })
-      .catch((err) => {
-        showAlert("error", err.response.data.message);
-      });
   };
 
   const handleSubmit = () => {
@@ -98,6 +86,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     }
 
     if (!emailChecked) {
+      setLoading(true);
       checkEmailAccess(email)
         .then((res) => {
           showAlert("success", res.message);
@@ -108,16 +97,25 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
         })
         .catch((err) => {
           showAlert("error", err.response.data.message);
-        });
+        })
+        .finally(() => setLoading(false));
     }
 
     if (emailChecked && !userRegistered) {
-      register();
+      setLoading(true);
+      registerUser(email, password)
+        .then((res) => {
+          showAlert("success", res.message);
+          setUserRegistered(true);
+        })
+        .catch((err) => {
+          showAlert("error", err.response.data.message);
+        })
+        .finally(() => setLoading(false));
     }
 
     if (emailChecked && userRegistered) {
-      console.log(`a`);
-
+      setLoading(true);
       loginUser(email, password)
         .then((res) => {
           showAlert("success", res.message);
@@ -126,12 +124,14 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
         })
         .catch((err) => {
           showAlert("error", err.response.data.message);
-        });
+        })
+        .finally(() => setLoading(false));
     }
   };
 
   return (
     <View style={[layout.center, { height: height, width: width }]}>
+      {loading && <Loader variant="Screen" />}
       <ImageBackground
         source={avihuFlyTrap}
         style={[
@@ -171,25 +171,40 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
         <Text style={[colors.textPrimary, text.textBold, spacing.pdLg, fonts.xxxl]}>
           כניסה לחשבון
         </Text>
-        <View style={[layout.widthFull]}>
-          <View>
-            <TextInput
-              style={[text.textRight, { width: "100%" }]}
-              placeholder="כתובת מייל..."
-              keyboardType={"email-address"}
-              autoCorrect={false}
-              autoComplete="email"
-              textContentType="oneTimeCode"
-              onChangeText={(val) =>
-                setInputtedCredentials({
-                  ...inputtedCrendentials,
-                  email: val.toLocaleLowerCase().trim(),
-                })
-              }
-              value={inputtedCrendentials.email}
-            />
-            <Text style={[text.textDanger, text.textRight]}>{formErrors.email}</Text>
-          </View>
+        <View style={[layout.widthFull, spacing.gapXl]}>
+          {!emailChecked ? (
+            <View>
+              <TextInput
+                style={[text.textRight, { width: "100%" }]}
+                placeholder="כתובת מייל..."
+                keyboardType={"email-address"}
+                autoCorrect={false}
+                autoComplete="email"
+                textContentType="oneTimeCode"
+                onChangeText={(val) =>
+                  setInputtedCredentials({
+                    ...inputtedCrendentials,
+                    email: val.toLocaleLowerCase().trim(),
+                  })
+                }
+                value={inputtedCrendentials.email}
+              />
+              <Text style={[text.textDanger, text.textRight]}>{formErrors.email}</Text>
+            </View>
+          ) : (
+            <View style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}>
+              <Text
+                style={[
+                  fonts.default,
+                  text.textBold,
+                  colors.textOnPrimaryContainer,
+                  text.textCenter,
+                ]}
+              >
+                {inputtedCrendentials.email}
+              </Text>
+            </View>
+          )}
           {emailChecked && userRegistered && (
             <View>
               <TextInput
