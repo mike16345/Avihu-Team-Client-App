@@ -6,6 +6,8 @@ import {
   KeyboardAvoidingView,
   useWindowDimensions,
   Animated,
+  useAnimatedValue,
+  TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
@@ -129,25 +131,42 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
     }
   };
 
-  const emailInputY = useRef(new Animated.Value(0)).current;
+  const chooseDifferentMail = () => {
+    setEmailchecked(false);
+    setUserRegistered(false);
+    setFormErrors({});
+  };
+
+  const emailInputY = useAnimatedValue(0);
+  const fadeValue = useAnimatedValue(0);
 
   useEffect(() => {
     if (emailChecked) {
-      // Animate the email input to move upwards
       Animated.timing(emailInputY, {
-        toValue: -60, // Move the email input up by 60 units
-        duration: 300, // Duration of the animation
-        useNativeDriver: true, // Use native driver for better performance
+        toValue: -30,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
+
+      Animated.timing(fadeValue, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
       }).start();
     } else {
-      // Reset position when emailChecked is false
       Animated.timing(emailInputY, {
-        toValue: 0, // Reset to original position
-        duration: 300,
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
+
+      Animated.timing(fadeValue, {
+        toValue: 0,
+        duration: 800,
         useNativeDriver: true,
       }).start();
     }
-  }, [emailChecked]);
+  }, [emailChecked, userRegistered]);
 
   return (
     <View style={[layout.center, { height: height, width: width }]}>
@@ -188,12 +207,14 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
           { zIndex: 30, position: `absolute`, width: width * 0.7 },
         ]}
       >
-        <Text style={[colors.textPrimary, text.textBold, spacing.pdLg, fonts.xxxl]}>
-          כניסה לחשבון
-        </Text>
+        <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
+          <Text style={[colors.textPrimary, text.textBold, spacing.pdLg, fonts.xxxl]}>
+            כניסה לחשבון
+          </Text>
+        </Animated.View>
         <View style={[layout.widthFull, spacing.gapXl]}>
           {!emailChecked ? (
-            <View>
+            <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
               <TextInput
                 style={[text.textRight, { width: "100%" }]}
                 placeholder="כתובת מייל..."
@@ -210,26 +231,34 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
                 value={inputtedCrendentials.email}
               />
               <Text style={[text.textDanger, text.textRight]}>{formErrors.email}</Text>
-            </View>
+            </Animated.View>
           ) : (
             <Animated.View
-              style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}
+              style={[spacing.gapDefault, { transform: [{ translateY: emailInputY }] }]}
             >
-              <Text
-                style={[
-                  fonts.default,
-                  text.textBold,
-                  colors.textOnPrimaryContainer,
-                  text.textCenter,
-                  { transform: [{ translateY: emailInputY }] },
-                ]}
+              <View
+                style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}
               >
-                {inputtedCrendentials.email}
-              </Text>
+                <Text
+                  style={[
+                    fonts.default,
+                    text.textBold,
+                    colors.textOnPrimaryContainer,
+                    text.textCenter,
+                  ]}
+                >
+                  {inputtedCrendentials.email}
+                </Text>
+              </View>
+              <TouchableOpacity onPress={chooseDifferentMail}>
+                <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>
+                  התחברות באמצעות מייל אחר
+                </Text>
+              </TouchableOpacity>
             </Animated.View>
           )}
           {emailChecked && userRegistered && (
-            <View>
+            <Animated.View style={{ opacity: fadeValue }}>
               <TextInput
                 style={[text.textRight, { width: "100%" }]}
                 placeholder="סיסמא..."
@@ -245,16 +274,18 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
                 }
               />
               <Text style={[text.textDanger, text.textRight]}>{formErrors.password}</Text>
-            </View>
+            </Animated.View>
           )}
           {emailChecked && !userRegistered && (
-            <ConfirmPassword
-              errors={formErrors}
-              handlePasswordChange={(val) =>
-                setInputtedCredentials({ ...inputtedCrendentials, password: val })
-              }
-              handlePasswordConfirmChange={(val) => setConfirmPassowrd(val)}
-            />
+            <Animated.View style={{ opacity: fadeValue }}>
+              <ConfirmPassword
+                errors={formErrors}
+                handlePasswordChange={(val) =>
+                  setInputtedCredentials({ ...inputtedCrendentials, password: val })
+                }
+                handlePasswordConfirmChange={(val) => setConfirmPassowrd(val)}
+              />
+            </Animated.View>
           )}
         </View>
         <Button mode="contained" onPress={handleSubmit}>
