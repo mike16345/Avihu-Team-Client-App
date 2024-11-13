@@ -6,15 +6,21 @@ import BottomTabNavigator from "./BottomTabNavigator";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useUserStore } from "@/store/userStore";
+import { IUser } from "@/interfaces/User";
 
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
   const { getItem, removeItem } = useAsyncStorage("sessionToken");
   const { checkUserSessionToken, getUserById } = useUserApi();
-  const setCurrentUser = useUserStore((state) => state.setCurrentUser);
+  const { currentUser, setCurrentUser } = useUserStore();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const onLogin = (user: IUser) => {
+    setCurrentUser(user);
+    setIsLoggedIn(true);
+  };
 
   const checkLoginStatus = async () => {
     const token = await getItem();
@@ -53,14 +59,13 @@ const RootNavigator = () => {
   return (
     <>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isLoggedIn && <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />}
+        {isLoggedIn && currentUser && (
+          <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
+        )}
         {!isLoggedIn && (
           <>
             <Stack.Screen name="HomePage" component={GetStartedScreen} />
-            <Stack.Screen
-              children={() => <Login setIsLoggedIn={setIsLoggedIn} />}
-              name="LoginScreen"
-            />
+            <Stack.Screen children={() => <Login onLogin={onLogin} />} name="LoginScreen" />
           </>
         )}
       </Stack.Navigator>

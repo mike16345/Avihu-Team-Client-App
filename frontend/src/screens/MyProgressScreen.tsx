@@ -39,11 +39,12 @@ const MyProgressScreen = () => {
   const disabledTitle = calculateImageUploadTitle(currentUser?.checkInAt || 0);
 
   const { data, isLoading, error } = useQuery({
-    queryFn: () => getWeighInsByUserId(currentUser?._id || ``),
-    queryKey: [WEIGH_INS_KEY + currentUser?._id],
+    queryFn: () => getWeighInsByUserId(currentUser!._id),
+    queryKey: [WEIGH_INS_KEY + currentUser!._id],
     enabled: !!currentUser,
     staleTime: ONE_DAY,
     retry: createRetryFunction(404, 3),
+    initialData: [],
   });
 
   const successFunc = () => {
@@ -102,10 +103,11 @@ const MyProgressScreen = () => {
 
   useEffect(() => {
     console.log("data", data);
-    if (!data) return;
+    if (!data || !data.length) return;
     const lastWeighInIndex = data?.length - 1;
     const latestWeghIn = data[lastWeighInIndex];
-    const weighInExists = checkIfDatesMatch(new Date(latestWeghIn.date), new Date());
+
+    const weighInExists = checkIfDatesMatch(new Date(latestWeghIn?.date), new Date());
 
     setLastWeighIn(latestWeghIn);
     setTodaysWeighInExists(weighInExists);

@@ -84,7 +84,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
     const setNumber = exerciseData?.setNumber + 1 || 1;
 
-    if (setNumber - 1 <= exercise.sets.length - 1) {
+    if (setNumber - 1 <= exercise.sets?.length - 1) {
       setCurrentSetNumber(setNumber);
       setCurrentSet(exercise.sets[setNumber - 1]);
     } else {

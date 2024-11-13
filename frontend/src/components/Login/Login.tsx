@@ -21,6 +21,7 @@ import Toast, { ToastType } from "react-native-toast-message";
 import ConfirmPassword from "./ConfirmPassword";
 import Loader from "../ui/loaders/Loader";
 import { useUserStore } from "@/store/userStore";
+import { IUser } from "@/interfaces/User";
 
 interface IUserCredentials {
   email: string;
@@ -34,10 +35,10 @@ export interface ICredentialsErrors {
 }
 
 interface ILoginProps {
-  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  onLogin: (user: IUser) => void;
 }
 
-export default function Login({ setIsLoggedIn }: ILoginProps) {
+export default function Login({ onLogin }: ILoginProps) {
   const { text, colors, fonts, layout, spacing, common } = useStyles();
   const { checkEmailAccess, registerUser, loginUser } = useUserApi();
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
@@ -101,7 +102,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
           }
         })
         .catch((err) => {
-          showAlert("error", err.response.data.message);
+          showAlert("error", err.response?.data.message);
         })
         .finally(() => setLoading(false));
     }
@@ -114,7 +115,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
           setUserRegistered(true);
         })
         .catch((err) => {
-          showAlert("error", err.response.data.message);
+          showAlert("error", err.response?.data.message);
         })
         .finally(() => setLoading(false));
     }
@@ -123,10 +124,10 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
       setLoading(true);
       loginUser(formattedEmail, password)
         .then((res) => {
-          console.log("res", res);
+          console.log("!!!!! login response !!!!!!!", res.data);
           showAlert("success", res.message);
-          setIsLoggedIn(true);
-          setCurrentUser(res.data.data.user);
+          onLogin(res.data.data.user);
+          setCurrentUser(res?.data.data.user);
           setItem(JSON.stringify(res.data));
         })
         .catch((err) => {

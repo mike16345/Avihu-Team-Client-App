@@ -21,7 +21,7 @@ const BottomTabNavigator = () => {
             borderTopColor: colors.textOnSurfaceDisabled.color,
           },
         ]}
-        initialRouteName="MyDietPlanPage"
+        initialRouteName="MyProgressScreen"
         activeIndicatorStyle={{
           ...layout.center,
           width: 45,
