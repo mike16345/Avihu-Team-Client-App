@@ -33,7 +33,7 @@ const WeeklyScoreCard: React.FC<WeeklyScoreCardProps> = ({ weights, range }) => 
   return (
     <WeightCard
       title={`מגמה ${rangeToName(range)}`}
-      value={weightLoss}
+      value={firstWeighIn && lastWeighIn ? weightLoss : 0}
       unit='ק"ג'
       valueStyle={weightStyle}
     />

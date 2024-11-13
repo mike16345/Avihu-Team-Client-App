@@ -159,7 +159,7 @@ const MyProgressScreen = () => {
                 ? () => console.log(`no`)
                 : () => setOpenUploadModal(true),
               label: currentUser?.imagesUploaded ? disabledTitle : "שלח/י תמונת מעקב",
-              color: "grey",
+              color: currentUser?.imagesUploaded ? "grey" : colors.textOnPrimaryContainer.color,
             },
             {
               icon: "whatsapp",
