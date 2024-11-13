@@ -6,7 +6,7 @@ const LARGE_AMOUNT_OF_DOTS = 35;
 
 const useGraphTheme = (data: number[] = []) => {
   const { theme } = useThemeContext();
-  const isLargeAmountOfDots = useMemo(() => data.length > LARGE_AMOUNT_OF_DOTS, [data]);
+  const isLargeAmountOfDots = useMemo(() => data?.length > LARGE_AMOUNT_OF_DOTS, [data]);
 
   const color = (opacity = 1) => hexToRgba(theme.colors.primary, opacity);
   const labelColor = (opacity = 1) => hexToRgba(theme.colors.onSurface, opacity);

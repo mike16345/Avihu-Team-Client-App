@@ -48,7 +48,7 @@ class DateUtils {
 
   static getItemsInRange<T>(data: ItemsInDateRangeParams<T>): T[] {
     const { items, dateKey, n, range } = data;
-    if (!items.length) return [];
+    if (!items?.length) return [];
 
     const now = new Date();
     let pastDate: Date;
@@ -83,7 +83,7 @@ class DateUtils {
   }
 
   static getLatestItem<T>(items: T[], dateKey: keyof T): T | null {
-    if (items.length === 0) return null;
+    if (items?.length === 0) return null;
 
     return items.reduce((latestItem, currentItem) => {
       const latestDate = new Date(latestItem[dateKey] as any);
@@ -193,7 +193,7 @@ class DateUtils {
       return found;
     });
 
-    return labels.length > 5 ? labels.map((label) => label.slice(0, 3)) : labels;
+    return labels?.length > 5 ? labels.map((label) => label.slice(0, 3)) : labels;
   }
 
   static convertToDate(date: string): Date {

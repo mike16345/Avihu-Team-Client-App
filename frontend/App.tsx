@@ -23,6 +23,7 @@ import Loader from "@/components/ui/loaders/Loader";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 // import { I18nManager } from "react-native";
 // Enable RTL
@@ -33,25 +34,10 @@ const { LightTheme, DarkTheme } = adaptNavigationTheme({
   reactNavigationDark: NavigationDarkTheme,
 });
 
-export default function App() {
-  const { getUserById } = useUserApi();
-  const { currentUser, setCurrentUser } = useUserStore();
-  const [isLoading, setIsLoading] = useState(false);
-  const colorScheme = Appearance.getColorScheme();
-  const queryClient = new QueryClient();
+const queryClient = new QueryClient();
 
-  useEffect(() => {
-    Appearance.setColorScheme("dark");
-    setIsLoading(true);
-    getUserById("66eb21052c9fd96253c299ff")
-      .then((user) => {
-        setCurrentUser(user);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
+export default function App() {
+  const colorScheme = Appearance.getColorScheme();
 
   return (
     <PaperProvider
@@ -62,7 +48,7 @@ export default function App() {
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
             <QueryClientProvider client={queryClient}>
               <NavigationContainer theme={DarkTheme}>
-                {isLoading ? <Loader /> : currentUser && <RootNavigator />}
+                <RootNavigator />
                 <StatusBar key={colorScheme} translucent style={"light"} />
                 <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} />
               </NavigationContainer>

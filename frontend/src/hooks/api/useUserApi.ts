@@ -1,4 +1,5 @@
-import { fetchData, patchItem, updateItem, sendData } from "@/API/api";
+import { fetchData, patchItem, sendData, updateItem } from "@/API/api";
+import { ISession } from "@/interfaces/ISession";
 import { IUser } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
 import { ApiResponse } from "@/types/ApiTypes";
@@ -36,9 +37,16 @@ export const useUserApi = () => {
     });
 
   const loginUser = (email: string, password: string) =>
-    sendData<ApiResponse<IUser>>(USER_ENDPOINT + `/user/login`, { email, password });
+    sendData<ApiResponse<ISession>>(USER_ENDPOINT + `/user/login`, { email, password });
+
+  const checkUserSessionToken = (token: ISession) => {
+    return sendData<ApiResponse<{ isValid: boolean }>>(USER_ENDPOINT + `/user/session`, {
+      token,
+    }).then((res) => res.data);
+  };
 
   return {
+    checkUserSessionToken,
     getUserById,
     checkEmailAccess,
     registerUser,

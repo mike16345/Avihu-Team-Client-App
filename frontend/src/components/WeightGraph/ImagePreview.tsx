@@ -77,7 +77,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
         <View style={[layout.flexRow, layout.center, spacing.gapSm]}>
           <Button
             style={[spacing.pdSm, colors.backgroundSecondary, common.roundedSm, { width: `50%` }]}
-            onPress={close}
+            onPress={handleClose}
           >
             ביטול
           </Button>

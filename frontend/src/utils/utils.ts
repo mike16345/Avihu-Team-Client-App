@@ -1,5 +1,6 @@
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useUserStore } from "@/store/userStore";
+import Toast, { ToastType } from "react-native-toast-message";
 
 export const testEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -53,11 +54,32 @@ export const calculateImageUploadTitle = (usersCheckInDate: number) => {
   switch (daysLeft) {
     case 0:
       const currentUserId = useUserStore((store) => store.currentUser?._id);
-      updateUserField(currentUserId || ``, "imagesUploaded", false);
+      // updateUserField(currentUserId || ``, "imagesUploaded", false);
       return ``;
     case 1:
       return `זמין בעוד יום`;
     default:
       return `זמין בעוד ${daysLeft} ימים`;
   }
+};
+
+export const showAlert = (type: ToastType, message: string) => {
+  Toast.show({
+    text1: message,
+    autoHide: true,
+    type: type,
+    swipeable: true,
+  });
+};
+
+export const createRetryFunction = (ignoreStatusCode: number, maxRetries: number = 3) => {
+  return (failureCount: number, error: any) => {
+    console.log("count ", failureCount);
+    // Check if error response exists and matches the ignored status code
+    if (error?.status === ignoreStatusCode) {
+      return false; // Stop retrying for the specified status code
+    }
+    // Retry up to the specified max retries for other errors
+    return failureCount < maxRetries;
+  };
 };

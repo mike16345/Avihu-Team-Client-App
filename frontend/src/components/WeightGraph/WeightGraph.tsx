@@ -36,7 +36,7 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
   const currentWeight = selectedWeight || DateUtils.getLatestItem(weighIns, "date")?.weight;
 
   const hidePointsAtIndex = () => {
-    if (weights.length < 100) return;
+    if (weights?.length < 100) return;
 
     const indices = weights
       .map((_, index) => {
@@ -84,7 +84,7 @@ export const WeightGraph: FC<WeightGraphProps> = ({ weighIns }) => {
               }),
               datasets: [
                 {
-                  data: weights.length > 0 ? weights : [0],
+                  data: weights?.length > 0 ? weights : [0],
                   strokeWidth: 2,
                   color: (_: number) => colors.textPrimary.color,
                 },

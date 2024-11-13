@@ -9,7 +9,7 @@ import {
   useAnimatedValue,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
 import { testEmail } from "@/utils/utils";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
@@ -20,6 +20,7 @@ import { useUserApi } from "@/hooks/api/useUserApi";
 import Toast, { ToastType } from "react-native-toast-message";
 import ConfirmPassword from "./ConfirmPassword";
 import Loader from "../ui/loaders/Loader";
+import { useUserStore } from "@/store/userStore";
 
 interface IUserCredentials {
   email: string;
@@ -39,10 +40,11 @@ interface ILoginProps {
 export default function Login({ setIsLoggedIn }: ILoginProps) {
   const { text, colors, fonts, layout, spacing, common } = useStyles();
   const { checkEmailAccess, registerUser, loginUser } = useUserApi();
+  const setCurrentUser = useUserStore((state) => state.setCurrentUser);
 
   const { height, width } = useWindowDimensions();
 
-  const { setItem } = useAsyncStorage("isLoggedIn");
+  const { setItem } = useAsyncStorage("sessionToken");
 
   const [inputtedCrendentials, setInputtedCredentials] = useState<IUserCredentials>({
     email: ``,
@@ -66,11 +68,12 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
 
   const handleSubmit = () => {
     const { email, password } = inputtedCrendentials;
+    const formattedEmail = email.toLowerCase().trim();
     const errors: ICredentialsErrors = {};
 
     Keyboard.dismiss();
 
-    if (!testEmail(email)) {
+    if (!testEmail(formattedEmail)) {
       errors[`email`] = `אנא הכניסו כתובת מייל תקינה`;
     }
 
@@ -89,7 +92,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
 
     if (!emailChecked) {
       setLoading(true);
-      checkEmailAccess(email)
+      checkEmailAccess(formattedEmail)
         .then((res) => {
           showAlert("success", res.message);
           setEmailchecked(true);
@@ -105,7 +108,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
 
     if (emailChecked && !userRegistered) {
       setLoading(true);
-      registerUser(email, password)
+      registerUser(formattedEmail, password)
         .then((res) => {
           showAlert("success", res.message);
           setUserRegistered(true);
@@ -118,11 +121,13 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
 
     if (emailChecked && userRegistered) {
       setLoading(true);
-      loginUser(email, password)
+      loginUser(formattedEmail, password)
         .then((res) => {
+          console.log("res", res);
           showAlert("success", res.message);
           setIsLoggedIn(true);
-          setItem("true");
+          setCurrentUser(res.data.data.user);
+          setItem(JSON.stringify(res.data));
         })
         .catch((err) => {
           showAlert("error", err.response.data.message);
@@ -225,7 +230,7 @@ export default function Login({ setIsLoggedIn }: ILoginProps) {
                 onChangeText={(val) =>
                   setInputtedCredentials({
                     ...inputtedCrendentials,
-                    email: val.toLocaleLowerCase().trim(),
+                    email: val,
                   })
                 }
                 value={inputtedCrendentials.email}

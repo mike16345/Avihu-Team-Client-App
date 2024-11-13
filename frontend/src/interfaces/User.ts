@@ -9,6 +9,7 @@ export interface IUser {
   dateFinished: Date;
   planType: string;
   remindIn: number;
+  checkInAt: number;
   imagesUploaded: boolean;
   password?: string;
   hasAccess: boolean;
