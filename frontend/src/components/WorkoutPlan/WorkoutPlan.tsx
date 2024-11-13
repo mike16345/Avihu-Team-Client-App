@@ -28,7 +28,7 @@ const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "WorkoutPlanPage"> {}
 
-const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
+const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const [open, setOpen] = useState(false);
   const [plans, setPlans] = useState<any[] | null>(null);
   const [value, setValue] = useState<ValueType>();
@@ -49,7 +49,37 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
       (plan) => plan.planName === planName
     );
 
-    if (selectedWorkoutPlan) setCurrentWorkoutPlan({ ...selectedWorkoutPlan });
+    if (!selectedWorkoutPlan) return;
+    setCurrentWorkoutPlan({ ...selectedWorkoutPlan });
+  };
+
+  const loadWorkoutSession = async () => {
+    const session = await getItem();
+    if (!session) return;
+
+    try {
+      const sessionJSON = JSON.parse(session);
+      const sessionId = sessionJSON?._id || "";
+      const currentWorkoutSession = await getSession(sessionId || "");
+
+      if (!currentWorkoutSession) {
+        removeItem();
+      } else {
+        setCurrentWorkoutSession(currentWorkoutSession.data);
+      }
+    } catch (e) {
+      handleSessionNotFound();
+    }
+  };
+
+  const handleSessionNotFound = () => {
+    removeItem();
+    setCurrentWorkoutSession(null);
+  };
+
+  const handleUpdateSession = async (session: any) => {
+    setCurrentWorkoutSession(session);
+    await setItem(JSON.stringify(session));
   };
 
   useEffect(() => {
@@ -65,34 +95,6 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
       });
   }, []);
 
-  const loadWorkoutSession = async () => {
-    const session = await getItem();
-    if (!session) return;
-
-    try {
-      const sessionJSON = JSON.parse(session);
-      const sessionId = sessionJSON?._id || "";
-      const currentWorkoutSession = await getSession(sessionId || "");
-      if (!currentWorkoutSession) {
-        removeItem();
-      } else {
-        setCurrentWorkoutSession(currentWorkoutSession.data);
-      }
-    } catch (e) {
-      handleSessionNotFound(e);
-    }
-  };
-
-  const handleSessionNotFound = (e: any) => {
-    removeItem();
-    setCurrentWorkoutSession(null);
-  };
-
-  const handleUpdateSession = async (session: any) => {
-    setCurrentWorkoutSession(session);
-    await setItem(JSON.stringify(session));
-  };
-
   useEffect(() => {
     if (!workoutPlan) return;
 
@@ -104,13 +106,11 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
     setValue(plans[0].label);
     setCurrentWorkoutPlan(workoutPlan.workoutPlans[0]);
 
-    // Load the session details for the current workout plan
     loadWorkoutSession();
   }, [workoutPlan]);
 
   if (error && error.status == 404) return <NoDataScreen variant="workoutPlan" />;
-  if (error && error.status && error.status !== 404)
-    return <ErrorScreen error={error.message || ``} />;
+  if (error && error.status) return <ErrorScreen error={error.message || ``} />;
 
   const renderHeader = () => (
     <>
@@ -156,8 +156,8 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
                 plan={currentWorkoutPlan?.planName || ""}
                 muscleGroup={item.muscleGroup}
                 exercise={exercise}
-                session={currentWorkoutSession} // Pass down the session
-                updateSession={handleUpdateSession} // Handler for recording a set
+                session={currentWorkoutSession}
+                updateSession={handleUpdateSession}
               />
             ))}
           </View>

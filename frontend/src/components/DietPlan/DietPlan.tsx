@@ -53,7 +53,7 @@ export default function DietPlan() {
     queryKey: [DIET_PLAN_KEY + currentUser?._id],
     enabled: !!currentUser,
     staleTime: ONE_DAY,
-    retry: createRetryFunction(404, 3),
+    retry: createRetryFunction(404, 2),
   });
 
   const displayMenuItems = (foodGroup: string) => {

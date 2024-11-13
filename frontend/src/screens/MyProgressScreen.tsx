@@ -38,20 +38,34 @@ const MyProgressScreen = () => {
 
   const disabledTitle = calculateImageUploadTitle(currentUser?.checkInAt || 0);
 
-  const { data, isLoading, error } = useQuery({
-    queryFn: () => getWeighInsByUserId(currentUser!._id),
+  const handleGetWeighInsByUserId = async () => {
+    if (!currentUser) return [];
+
+    try {
+      const weighIns = await getWeighInsByUserId(currentUser?._id);
+
+      return weighIns;
+    } catch (error: any) {
+      return [];
+    }
+  };
+
+  const { data, isLoading } = useQuery({
+    queryFn: handleGetWeighInsByUserId,
     queryKey: [WEIGH_INS_KEY + currentUser!._id],
     enabled: !!currentUser,
     staleTime: ONE_DAY,
-    retry: createRetryFunction(404, 3),
-    initialData: [],
+    retry: createRetryFunction(404, 2),
   });
 
   const successFunc = () => {
     queryClient.invalidateQueries({ queryKey: [WEIGH_INS_KEY + currentUser?._id] });
   };
 
-  const failureFunc = (err: any) => {};
+  const failureFunc = (err: any) => {
+    if (err.status == 404) {
+    }
+  };
 
   const addNewWeighIn = useMutation({
     mutationFn: ({ userId, weighIn }: { userId: string; weighIn: IWeighInPost }) =>

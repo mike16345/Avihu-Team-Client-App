@@ -11,7 +11,8 @@ import { IUser } from "@/interfaces/User";
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
-  const { getItem, removeItem } = useAsyncStorage("sessionToken");
+  const sessionStorage = useAsyncStorage("sessionToken");
+
   const { checkUserSessionToken, getUserById } = useUserApi();
   const { currentUser, setCurrentUser } = useUserStore();
 
@@ -23,7 +24,7 @@ const RootNavigator = () => {
   };
 
   const checkLoginStatus = async () => {
-    const token = await getItem();
+    const token = await sessionStorage.getItem();
     const tokenData = JSON.parse(token || "{}");
     if (!token || !tokenData) return;
 
@@ -32,27 +33,24 @@ const RootNavigator = () => {
 
       if (!isValidSession) {
         setIsLoggedIn(false);
-        removeItem();
+        sessionStorage.removeItem();
         return;
       }
       const user = await getUserById(tokenData.userId);
-      console.log("user", user);
 
       setCurrentUser(user);
       setIsLoggedIn(true);
     } catch (error) {
       setIsLoggedIn(false);
-      removeItem();
+      sessionStorage.removeItem();
     }
   };
 
   useEffect(() => {
-    removeItem();
-
     checkLoginStatus();
 
     return () => {
-      removeItem();
+      sessionStorage.removeItem();
     };
   }, []);
 
