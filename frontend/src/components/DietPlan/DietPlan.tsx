@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { DIET_PLAN_KEY, ONE_DAY } from "@/constants/reactQuery";
 import ErrorScreen from "@/screens/ErrorScreen";
 import NoDataScreen from "@/screens/NoDataScreen";
+import { createRetryFunction } from "@/utils/utils";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
@@ -52,7 +53,7 @@ export default function DietPlan() {
     queryKey: [DIET_PLAN_KEY + currentUser?._id],
     enabled: !!currentUser,
     staleTime: ONE_DAY,
-    retry: false,
+    retry: createRetryFunction(404, 3),
   });
 
   const displayMenuItems = (foodGroup: string) => {
