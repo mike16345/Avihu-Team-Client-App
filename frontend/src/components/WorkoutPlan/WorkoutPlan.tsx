@@ -21,6 +21,8 @@ import { useSessionsApi } from "@/hooks/api/useSessionsApi";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutPlanSkeletonLoader";
+import NoDataScreen from "@/screens/NoDataScreen";
+import ErrorScreen from "@/screens/ErrorScreen";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
@@ -34,6 +36,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
   const [workoutPlan, setWorkoutPlan] = useState<ICompleteWorkoutPlan>();
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
   const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
+  const [error, setError] = useState({ status: null, message: null });
 
   const { fonts, text, spacing } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
@@ -54,7 +57,12 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
 
     getWorkoutPlanByUserId(currentUser._id)
       .then((res) => setWorkoutPlan(res))
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const status = err.response.status;
+        const message = err.response.data.message;
+
+        setError({ status, message });
+      });
   }, []);
 
   const loadWorkoutSession = async () => {
@@ -99,6 +107,10 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
     // Load the session details for the current workout plan
     loadWorkoutSession();
   }, [workoutPlan]);
+
+  if (error && error.status == 404) return <NoDataScreen variant="workoutPlan" />;
+  if (error && error.status && error.status !== 404)
+    return <ErrorScreen error={error.message || ``} />;
 
   const renderHeader = () => (
     <>

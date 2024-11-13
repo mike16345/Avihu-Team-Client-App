@@ -17,6 +17,7 @@ import Divider from "../ui/Divider";
 import { useQuery } from "@tanstack/react-query";
 import { DIET_PLAN_KEY, ONE_DAY } from "@/constants/reactQuery";
 import ErrorScreen from "@/screens/ErrorScreen";
+import NoDataScreen from "@/screens/NoDataScreen";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
@@ -51,6 +52,7 @@ export default function DietPlan() {
     queryKey: [DIET_PLAN_KEY + currentUser?._id],
     enabled: !!currentUser,
     staleTime: ONE_DAY,
+    retry: false,
   });
 
   const displayMenuItems = (foodGroup: string) => {
@@ -59,6 +61,7 @@ export default function DietPlan() {
     setSelectedFoodGroup(foodGroup);
   };
 
+  if (error && error.response.status == 404) return <NoDataScreen variant="dietPlan" />;
   if (isError) return <ErrorScreen error={error} />;
 
   return (
