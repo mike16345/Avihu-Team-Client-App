@@ -1,29 +1,55 @@
 import React from "react";
-import { View, Text, ImageBackground, TouchableOpacity } from "react-native";
+import { View, Text, ImageBackground, TouchableOpacity, useWindowDimensions } from "react-native";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
 import { moderateScale } from "react-native-size-matters";
 import { RootStackParamList, StackNavigatorProps } from "../types/navigatorTypes";
 import { StatusBar } from "expo-status-bar";
+import useStyles from "@/styles/useGlobalStyles";
 
 interface GetStartedScreenProps extends StackNavigatorProps<RootStackParamList, "Home"> {}
 
 export const GetStartedScreen: React.FC<GetStartedScreenProps> = ({ navigation }) => {
+  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { height } = useWindowDimensions();
+
   return (
-    <View className="flex-1 items-center justify-center">
+    <View style={[layout.flex1, layout.center]}>
       <StatusBar hidden />
       <ImageBackground
-        className="items-center justify-center z-0"
         source={avihuFlyTrap}
-        style={{
-          width: moderateScale(350, 2),
-          height: moderateScale(700, 2),
-        }}
+        style={[
+          layout.center,
+          {
+            width: moderateScale(350, 2),
+            height: moderateScale(700, 2),
+            zIndex: 0,
+          },
+        ]}
       ></ImageBackground>
-      <View className="absolute  flex-1  h-screen w-screen bg-black opacity-40 z-40"></View>
-      <View className="absolute top-1/2 items-center z-[100] justify-center gap-2">
-        <Text className="text-3xl font-black text-white ">Avihu Busheri</Text>
-        <TouchableOpacity onPress={() => navigation!.navigate("LoginScreen")}>
-          <Text className="bg-emerald-300 p-3 rounded text-black font-bold ">Get Started</Text>
+      <View
+        style={[
+          layout.flex1,
+          layout.sizeFull,
+          colors.background,
+          { opacity: 0.4, position: `absolute`, zIndex: 40 },
+        ]}
+      ></View>
+      <View
+        style={[
+          layout.justifyAround,
+          layout.itemsCenter,
+          spacing.gapXxl,
+          { position: `absolute`, top: 0, zIndex: 100, height: height },
+        ]}
+      >
+        <Text style={[fonts.xxxxl, colors.textOnBackground, text.textBold, { paddingBottom: 80 }]}>
+          Avihu Busheri
+        </Text>
+        <TouchableOpacity
+          onPress={() => navigation!.navigate("LoginScreen")}
+          style={[colors.backgroundPrimary, spacing.pdDefault, common.rounded]}
+        >
+          <Text style={[text.textBold]}>Get Started</Text>
         </TouchableOpacity>
       </View>
     </View>

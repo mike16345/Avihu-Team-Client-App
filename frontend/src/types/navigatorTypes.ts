@@ -12,6 +12,7 @@ export type RootStackParamList = {
   VideoGallery: undefined;
   MyProgressScreen: undefined;
   LoginScreen: undefined;
+  EmailScreen: undefined;
 };
 
 export type WorkoutPlanStackParamList = {

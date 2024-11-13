@@ -16,8 +16,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { StyleSheet, ScrollView, Linking, Animated } from "react-native";
 import { Portal } from "react-native-paper";
-import ErrorScreen from "./ErrorScreen";
-import { calculateImageUploadTitle, checkIfDatesMatch } from "@/utils/utils";
+import { calculateImageUploadTitle, checkIfDatesMatch, createRetryFunction } from "@/utils/utils";
 import BottomDrawer from "@/components/ui/BottomDrawer";
 import ImagePreview from "@/components/WeightGraph/ImagePreview";
 
@@ -36,13 +35,27 @@ const MyProgressScreen = () => {
   const [openUploadModal, setOpenUploadModal] = useState(false);
   const [lastWeighIn, setLastWeighIn] = useState<IWeighIn | null>(null);
   const [todaysWeighInExists, setTodaysWeighInExists] = useState(false);
+
   const disabledTitle = calculateImageUploadTitle(currentUser?.checkInAt || 0);
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryFn: () => getWeighInsByUserId(currentUser?._id || ``),
-    queryKey: [WEIGH_INS_KEY + currentUser?._id],
+  const handleGetWeighInsByUserId = async () => {
+    if (!currentUser) return [];
+
+    try {
+      const weighIns = await getWeighInsByUserId(currentUser?._id);
+
+      return weighIns;
+    } catch (error: any) {
+      return [];
+    }
+  };
+
+  const { data, isLoading } = useQuery({
+    queryFn: handleGetWeighInsByUserId,
+    queryKey: [WEIGH_INS_KEY + currentUser!._id],
     enabled: !!currentUser,
     staleTime: ONE_DAY,
+    retry: createRetryFunction(404, 2),
   });
 
   const successFunc = () => {
@@ -50,7 +63,8 @@ const MyProgressScreen = () => {
   };
 
   const failureFunc = (err: any) => {
-    console.log(err);
+    if (err.status == 404) {
+    }
   };
 
   const addNewWeighIn = useMutation({
@@ -86,9 +100,6 @@ const MyProgressScreen = () => {
   ) => {
     setOpenWeightModal(false);
 
-    console.log(weighInId);
-    console.log(isNew);
-
     if (isNew && currentUser) {
       const userId = currentUser._id;
       addNewWeighIn.mutate({ userId, weighIn });
@@ -105,22 +116,18 @@ const MyProgressScreen = () => {
   };
 
   useEffect(() => {
-    if (!data) return;
-    const latestWeghIn = data[data?.length - 1];
-    const weighInExists = checkIfDatesMatch(new Date(latestWeghIn.date), new Date());
+    console.log("data", data);
+    if (!data || !data.length) return;
+    const lastWeighInIndex = data?.length - 1;
+    const latestWeghIn = data[lastWeighInIndex];
+
+    const weighInExists = checkIfDatesMatch(new Date(latestWeghIn?.date), new Date());
 
     setLastWeighIn(latestWeghIn);
     setTodaysWeighInExists(weighInExists);
   }, [data]);
 
   if (isLoading) return <ProgressScreenSkeleton />;
-
-  if (isError || addNewWeighIn.isError || updateWeighIn.isError || removeWeighIn.isError)
-    return (
-      <ErrorScreen
-        error={error || addNewWeighIn.error || updateWeighIn.error || removeWeighIn.error}
-      />
-    );
 
   return (
     <Portal.Host>
@@ -166,7 +173,7 @@ const MyProgressScreen = () => {
                 ? () => console.log(`no`)
                 : () => setOpenUploadModal(true),
               label: currentUser?.imagesUploaded ? disabledTitle : "שלח/י תמונת מעקב",
-              color: currentUser?.imagesUploaded ? "grey" : "",
+              color: currentUser?.imagesUploaded ? "grey" : colors.textOnPrimaryContainer.color,
             },
             {
               icon: "whatsapp",

@@ -23,7 +23,7 @@ interface WeeklyScoreCardProps {
 
 const WeeklyScoreCard: React.FC<WeeklyScoreCardProps> = ({ weights, range }) => {
   const firstWeighIn = weights[0];
-  const lastWeighIn = weights[weights.length - 1];
+  const lastWeighIn = weights[weights?.length - 1];
   const weightLoss = Math.abs(lastWeighIn - firstWeighIn).toFixed(2);
 
   const { colors } = useStyles();
@@ -33,7 +33,7 @@ const WeeklyScoreCard: React.FC<WeeklyScoreCardProps> = ({ weights, range }) => 
   return (
     <WeightCard
       title={`מגמה ${rangeToName(range)}`}
-      value={weightLoss}
+      value={firstWeighIn && lastWeighIn ? weightLoss : 0}
       unit='ק"ג'
       valueStyle={weightStyle}
     />

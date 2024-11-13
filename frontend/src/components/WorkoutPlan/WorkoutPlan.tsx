@@ -21,12 +21,14 @@ import { useSessionsApi } from "@/hooks/api/useSessionsApi";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutPlanSkeletonLoader";
+import NoDataScreen from "@/screens/NoDataScreen";
+import ErrorScreen from "@/screens/ErrorScreen";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "WorkoutPlanPage"> {}
 
-const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
+const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const [open, setOpen] = useState(false);
   const [plans, setPlans] = useState<any[] | null>(null);
   const [value, setValue] = useState<ValueType>();
@@ -34,6 +36,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
   const [workoutPlan, setWorkoutPlan] = useState<ICompleteWorkoutPlan>();
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
   const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
+  const [error, setError] = useState({ status: null, message: null });
 
   const { fonts, text, spacing } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
@@ -46,16 +49,9 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
       (plan) => plan.planName === planName
     );
 
-    if (selectedWorkoutPlan) setCurrentWorkoutPlan({ ...selectedWorkoutPlan });
+    if (!selectedWorkoutPlan) return;
+    setCurrentWorkoutPlan({ ...selectedWorkoutPlan });
   };
-
-  useEffect(() => {
-    if (!currentUser) return;
-
-    getWorkoutPlanByUserId(currentUser._id)
-      .then((res) => setWorkoutPlan(res))
-      .catch((err) => console.log(err));
-  }, []);
 
   const loadWorkoutSession = async () => {
     const session = await getItem();
@@ -65,17 +61,18 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
       const sessionJSON = JSON.parse(session);
       const sessionId = sessionJSON?._id || "";
       const currentWorkoutSession = await getSession(sessionId || "");
+
       if (!currentWorkoutSession) {
         removeItem();
       } else {
         setCurrentWorkoutSession(currentWorkoutSession.data);
       }
     } catch (e) {
-      handleSessionNotFound(e);
+      handleSessionNotFound();
     }
   };
 
-  const handleSessionNotFound = (e: any) => {
+  const handleSessionNotFound = () => {
     removeItem();
     setCurrentWorkoutSession(null);
   };
@@ -84,6 +81,19 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
     setCurrentWorkoutSession(session);
     await setItem(JSON.stringify(session));
   };
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    getWorkoutPlanByUserId(currentUser._id)
+      .then((res) => setWorkoutPlan(res))
+      .catch((err) => {
+        const status = err.response.status;
+        const message = err.response.data.message;
+
+        setError({ status, message });
+      });
+  }, []);
 
   useEffect(() => {
     if (!workoutPlan) return;
@@ -96,9 +106,11 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
     setValue(plans[0].label);
     setCurrentWorkoutPlan(workoutPlan.workoutPlans[0]);
 
-    // Load the session details for the current workout plan
     loadWorkoutSession();
   }, [workoutPlan]);
+
+  if (error && error.status == 404) return <NoDataScreen variant="workoutPlan" />;
+  if (error && error.status) return <ErrorScreen error={error.message || ``} />;
 
   const renderHeader = () => (
     <>
@@ -144,8 +156,8 @@ const WorkoutPlan: FC<WorkoutPlanProps> = ({ navigation }) => {
                 plan={currentWorkoutPlan?.planName || ""}
                 muscleGroup={item.muscleGroup}
                 exercise={exercise}
-                session={currentWorkoutSession} // Pass down the session
-                updateSession={handleUpdateSession} // Handler for recording a set
+                session={currentWorkoutSession}
+                updateSession={handleUpdateSession}
               />
             ))}
           </View>

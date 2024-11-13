@@ -22,8 +22,10 @@ async function request<T>(
     const response = await axiosInstance.request<T>(request);
 
     return response.data;
-  } catch (error) {
-    console.error("Error:", JSON.stringify(error));
+  } catch (error: any) {
+    console.error("Error Status Code:", error?.response?.status || "unknown");
+    console.error("Error Message:", error?.response?.data?.message || "unknown");
+
     throw error;
   }
 }
