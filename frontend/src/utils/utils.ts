@@ -32,6 +32,18 @@ export const generateWheelPickerData = (minRange: number, maxRange: number, step
   return data;
 };
 
+export const createRetryFunction = (ignoreStatusCode: number, maxRetries: number = 3) => {
+  return (failureCount: number, error: any) => {
+    console.log("error", error);
+    // Check if error response exists and matches the ignored status code
+    if (error?.status === ignoreStatusCode) {
+      return false; // Stop retrying for the specified status code
+    }
+    // Retry up to the specified max retries for other errors
+    return failureCount < maxRetries;
+  };
+};
+
 const stripTime = (dateParam: Date) => {
   return new Date(dateParam.getFullYear(), dateParam.getMonth(), dateParam.getDate());
 };
