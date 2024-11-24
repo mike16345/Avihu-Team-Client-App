@@ -8,6 +8,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import Loader from "../ui/loaders/Loader";
 import { useQuery } from "@tanstack/react-query";
 import { MENU_ITEMS_KEY, ONE_DAY } from "@/constants/reactQuery";
+import BottomDrawer from "../ui/BottomDrawer";
 
 interface MenuItemModalProps {
   isOpen: boolean;
@@ -41,18 +42,8 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
   });
 
   return (
-    <CustomModal visible={isOpen} dismissable dismissableBackButton onDismiss={dismiss}>
-      <ScrollView
-        style={[
-          colors.backgroundSecondaryContainer,
-          spacing.pdMd,
-          colors.borderPrimary,
-          common.borderDefault,
-          common.roundedMd,
-          spacing.pdBottomBar,
-          { height: `80%` },
-        ]}
-      >
+    <BottomDrawer open={isOpen} onClose={dismiss}>
+      <ScrollView style={[spacing.pdMd, spacing.pdBottomBar, { height: `80%` }]}>
         {isLoading ? (
           <Loader />
         ) : (
@@ -64,14 +55,14 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
               style={[
                 layout.flexRowReverse,
                 layout.wrap,
-                layout.justifyAround,
                 layout.itemsCenter,
+                layout.justifyAround,
                 spacing.gapDefault,
                 spacing.pdBottomBar,
               ]}
             >
               {data?.map((menuItem) => (
-                <View key={menuItem.name} style={{ maxWidth: `30%` }}>
+                <View key={menuItem.name} style={{ width: `48%` }}>
                   <MenuItem menuItem={menuItem} />
                 </View>
               ))}
@@ -79,7 +70,7 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
           </View>
         )}
       </ScrollView>
-    </CustomModal>
+    </BottomDrawer>
   );
 };
 

@@ -11,10 +11,10 @@ interface MenuItemProps {
 
 const MenuItem: React.FC<MenuItemProps> = ({ menuItem }) => {
   const { md } = useFontSize();
-  const { colors, layout, spacing, text } = useStyles();
+  const { colors, layout, spacing, text, common } = useStyles();
 
   return (
-    <View style={[layout.itemsCenter, spacing.pdXs, spacing.gapXs]}>
+    <View style={[spacing.pdXs, spacing.gapXs, common.rounded, colors.backgroundSurface]}>
       <View style={[colors.borderPrimary, { borderBottomWidth: 2 }, layout.widthFull]}>
         <Text style={[colors.textOnSecondaryContainer, text.textRight, spacing.pdXs]}>
           {menuItem.name}
