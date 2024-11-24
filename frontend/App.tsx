@@ -16,7 +16,7 @@ import {
   DarkTheme as CustomDarkTheme,
   ThemeProvider,
 } from "@/themes/useAppTheme";
-import { Appearance } from "react-native";
+import { Appearance, StyleSheet, View } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import "react-native-gesture-handler";
 import Loader from "@/components/ui/loaders/Loader";
