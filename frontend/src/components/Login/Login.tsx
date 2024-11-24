@@ -79,7 +79,7 @@ export default function Login({ onLogin }: ILoginProps) {
     }
 
     if (emailChecked && !password) {
-      errors[`password`] = `אנא הזינו סיסמא`;
+      errors[`password`] = `אנא הזינו סיסמה`;
     }
 
     if (emailChecked && password !== confirmPassword) {
@@ -214,19 +214,23 @@ export default function Login({ onLogin }: ILoginProps) {
         ]}
       >
         <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
-          <Text style={[colors.textPrimary, text.textBold, spacing.pdLg, fonts.xxxl]}>
+          <Text style={[colors.textOnBackground, text.textBold, spacing.pdLg, fonts.xxxl]}>
             כניסה לחשבון
           </Text>
         </Animated.View>
         <View style={[layout.widthFull, spacing.gapXl]}>
           {!emailChecked ? (
             <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
+              <Text style={[text.textRight, spacing.pdHorizontalXs]}>כתובת מייל</Text>
               <TextInput
-                style={[text.textRight, { width: "100%" }]}
-                placeholder="כתובת מייל..."
+                style={[{ width: "100%" }, text.textLeft, colors.background]}
+                mode="outlined"
+                activeOutlineColor={colors.borderSecondary.borderColor}
+                placeholder="user@example.com"
                 keyboardType={"email-address"}
                 autoCorrect={false}
                 autoComplete="email"
+                error={Boolean(formErrors.email)}
                 textContentType="oneTimeCode"
                 onChangeText={(val) =>
                   setInputtedCredentials({
@@ -246,12 +250,7 @@ export default function Login({ onLogin }: ILoginProps) {
                 style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}
               >
                 <Text
-                  style={[
-                    fonts.default,
-                    text.textBold,
-                    colors.textOnPrimaryContainer,
-                    text.textCenter,
-                  ]}
+                  style={[fonts.default, text.textBold, colors.textOnBackground, text.textCenter]}
                 >
                   {inputtedCrendentials.email}
                 </Text>
@@ -265,10 +264,13 @@ export default function Login({ onLogin }: ILoginProps) {
           )}
           {emailChecked && userRegistered && (
             <Animated.View style={{ opacity: fadeValue }}>
+              <Text style={[text.textRight, spacing.pdHorizontalXs]}>סיסמה</Text>
               <TextInput
                 style={[text.textRight, { width: "100%" }]}
-                placeholder="סיסמא..."
+                mode="outlined"
+                activeOutlineColor={colors.borderSecondary.borderColor}
                 secureTextEntry={!showPassword}
+                error={Boolean(formErrors.password)}
                 onChangeText={(val) =>
                   setInputtedCredentials({ ...inputtedCrendentials, password: val })
                 }
@@ -294,7 +296,11 @@ export default function Login({ onLogin }: ILoginProps) {
             </Animated.View>
           )}
         </View>
-        <Button mode="contained" onPress={handleSubmit}>
+        <Button
+          mode="contained-tonal"
+          style={[layout.widthFull, common.rounded]}
+          onPress={handleSubmit}
+        >
           התחברות
         </Button>
       </KeyboardAvoidingView>
