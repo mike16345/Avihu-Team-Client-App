@@ -18,24 +18,30 @@ const SetContainer: FC<SetContainerProps> = ({ currentSetNumber, totalSets, hand
         {Array.from({ length: totalSets }).map((_, index) => (
           <View key={index} style={{ flexDirection: "row-reverse", alignItems: "center" }}>
             <Pressable
-              onPress={() => handleViewSet(index + 1)}
+              onPress={() => {
+                // handleViewSet(index + 1);
+              }}
               style={[
                 layout.center,
                 common.rounded,
+
                 {
                   width: 24,
                   height: 24,
                   zIndex: 1,
                 },
                 index < currentSetNumber
-                  ? [colors.backgroundPrimary, colors.borderOnSecondary, common.borderSm]
-                  : [colors.backgroundSurface, colors.borderOnSurface, common.borderXsm],
+                  ? [colors.backgroundPrimary, colors.borderBackground, common.borderSm]
+                  : [colors.backgroundSurface, colors.borderOnSecondaryContainer, common.borderXsm],
               ]}
             >
               <Text
                 style={[
                   text.textCenter,
-                  index < currentSetNumber ? colors.textOnSuccess : colors.textOnPrimaryContainer,
+                  index < currentSetNumber
+                    ? [colors.textOnSecondaryContainer, text.textBold]
+                    : colors.textOnPrimaryContainer,
+                  text.textBold,
                 ]}
               >
                 {index + 1}

@@ -21,7 +21,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     name: "MyDietPlanPage",
     component: MyDietPlanScreen,
     options: {
-      tabBarLabel: "Diet",
+      tabBarLabel: "תפריט",
       tabBarIcon: ({ color }: { color: string }) => (
         <NativeIcon library="FontAwesome6" color={color} name="bowl-food" size={28} />
       ),
@@ -31,7 +31,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     name: "MyProgressScreen",
     component: MyProgressScreen,
     options: {
-      tabBarLabel: "Weight ",
+      tabBarLabel: "מעקב שקילה",
 
       tabBarIcon: ({ color }: { color: string }) => (
         <NativeIcon library="MaterialIcons" name="monitor-weight" color={color} size={28} />

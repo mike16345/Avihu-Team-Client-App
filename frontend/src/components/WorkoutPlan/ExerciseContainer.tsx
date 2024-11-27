@@ -99,16 +99,8 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   return (
     <View style={[styles.workoutContainer, common.rounded, colors.backgroundSecondaryContainer]}>
       <View style={styles.workoutDescriptionContainer}>
-        <View style={[layout.widthFull, layout.flexRow, layout.justifyBetween]}>
-          <NativeIcon
-            onPress={() => setIsSetDone((prev) => !prev)}
-            library="Ionicons"
-            name="checkmark-circle-outline"
-            size={28}
-            color={isSetDone ? colors.textPrimary.color : colors.textOnSecondaryContainer.color}
-          />
-
-          <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.lg]}>
+        <View style={[layout.widthFull]}>
+          <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.default]}>
             {exercise.name}
           </Text>
         </View>
@@ -132,7 +124,9 @@ const ExerciseContainer: FC<WorkoutProps> = ({
           <SetContainer
             currentSetNumber={currentSetNumber}
             totalSets={exercise.sets.length}
-            handleViewSet={(setNumber) => () => {
+            handleViewSet={(setNumber) => {
+              if (setNumber >= currentSetNumber) return;
+              console.log("viewSet", setNumber);
               navigation.setOptions({ title: exercise.name });
               navigation.navigate("RecordSet", {
                 recordedSet: {},
@@ -153,20 +147,17 @@ export default ExerciseContainer;
 
 const styles = StyleSheet.create({
   workoutContainer: {
-    flexDirection: "row-reverse",
-    alignItems: "center",
+    padding: 20,
     width: "100%",
     height: 125,
   },
   workoutDescriptionContainer: {
-    padding: 12,
-    gap: 20,
+    justifyContent: "space-between",
     flex: 1,
   },
   workoutInfoContainer: {
     flexDirection: "row",
     width: "100%",
-    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
   },
