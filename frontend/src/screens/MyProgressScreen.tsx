@@ -21,7 +21,10 @@ import BottomDrawer from "@/components/ui/BottomDrawer";
 import ImagePreview from "@/components/WeightGraph/ImagePreview";
 
 const MyProgressScreen = () => {
-  const TRAINER_PHONE_NUMBER = process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER;
+  const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
+  const TRAINER_PHONE_NUMBER = isDevMode
+    ? process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER
+    : process.env.TRAINER_PHONE_NUMBER;
 
   const currentUser = useUserStore((state) => state.currentUser);
   const { getWeighInsByUserId, updateWeighInById, deleteWeighIn, addWeighIn } = useWeighInApi();
@@ -116,7 +119,6 @@ const MyProgressScreen = () => {
   };
 
   useEffect(() => {
-    console.log("data", data);
     if (!data || !data.length) return;
     const lastWeighInIndex = data?.length - 1;
     const latestWeghIn = data[lastWeighInIndex];

@@ -1,8 +1,9 @@
 import axiosInstance from "@/config/apiConfig";
 import { Method } from "axios";
 
-const API_AUTH_TOKEN = process.env.EXPO_PUBLIC_API_AUTH_TOKEN;
-
+const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
+const API_AUTH_TOKEN = isDevMode ? process.env.EXPO_PUBLIC_API_AUTH_TOKEN : process.env.API_TOKEN;
+console.log("AVIHU TEAM, API_AUTH_TOKEN", API_AUTH_TOKEN);
 async function request<T>(
   method: Method,
   endpoint: string,
@@ -18,7 +19,7 @@ async function request<T>(
       params,
       headers: { ["X-Api-Key"]: API_AUTH_TOKEN, ...headers },
     };
-    console.log("request", request);
+    console.log("AVIHU TEAM request", request);
     const response = await axiosInstance.request<T>(request);
 
     return response.data;

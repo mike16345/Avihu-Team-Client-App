@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import { Appearance } from "react-native";
 import {
   MD3DarkTheme as DefaultDarkTheme,
@@ -142,7 +142,6 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       listener.remove();
     };
   }, []); */
-  
 
   return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };

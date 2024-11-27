@@ -4,7 +4,7 @@
     "slug": "avihu-team",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/avihu/avihu-logo-black.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/avihu/avihu-logo-black.png",
@@ -29,7 +29,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.avihuteam.avihuteam"
     },
     "web": {
       "bundler": "metro",
@@ -45,6 +46,8 @@
       "policy": "appVersion"
     },
     "updates": {
+      "enabled": true,
+      "runtimeVersion":"1.0.0",
       "url": "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2"
     }
   }
