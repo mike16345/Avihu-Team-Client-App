@@ -21,7 +21,7 @@ const CustomItemContent: React.FC<CustomItemContentProps> = ({
   return (
     <View
       style={[
-        spacing.gapXxl,
+        spacing.gapMd,
         layout.justifyAround,
         layout.heightFull,
         spacing.pdDefault,

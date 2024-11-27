@@ -9,7 +9,7 @@ import {
   Platform,
 } from "react-native";
 import YoutubePlayer, { PLAYER_STATES, YoutubeIframeRef } from "react-native-youtube-iframe";
-import NativeIcon from "@/components/Icon/NativeIcon"; // Assuming this is where your NativeIcon component is located
+import NativeIcon from "@/components/Icon/NativeIcon";
 import { getYouTubeThumbnail } from "@/utils/utils";
 
 interface WorkoutVideoPopupProps {
@@ -19,9 +19,9 @@ interface WorkoutVideoPopupProps {
 }
 
 const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height = 200 }) => {
-  const videoWidth = width || useWindowDimensions().width - 40;
-  const videoHeight = Platform.OS == "ios" ? height + 50 : height;
-  const thumbnailUrl = getYouTubeThumbnail(videoId); // URL for high-quality thumbnail
+  const videoWidth = width || useWindowDimensions().width - 40; // Account for padding
+  const videoHeight = Platform.OS === "ios" ? height + 50 : height;
+  const thumbnailUrl = getYouTubeThumbnail(videoId);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -39,7 +39,6 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
 
   const handleVideoStateChange = (state: PLAYER_STATES) => {
     if (state === "ended") {
-      // When the video ends, return to the thumbnail view
       setIsPlaying(false);
     }
   };
@@ -52,18 +51,21 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
   }, []);
 
   return (
-    <View style={[styles.container, { width: width }]}>
+    <View style={[styles.container, { width: videoWidth }]}>
       {!isPlaying ? (
         <TouchableOpacity style={styles.thumbnailContainer} onPress={handlePlay}>
           <Image
             source={{ uri: thumbnailUrl }}
-            style={[{ width: videoWidth, height: videoHeight }]}
+            style={[
+              styles.thumbnail,
+              { width: videoWidth - 10, height: videoHeight }, // Adjusted for spacing
+            ]}
           />
           <View style={styles.playButton}>
             <NativeIcon
               library="MaterialCommunityIcons"
               name="play"
-              color={"white"}
+              color="white"
               style={styles.playIcon}
             />
           </View>
@@ -102,12 +104,17 @@ const styles = StyleSheet.create({
   thumbnailContainer: {
     justifyContent: "center",
     alignItems: "center",
+    paddingTop: 16,
+  },
+  thumbnail: {
+    borderRadius: 4,
+    overflow: "hidden",
   },
   playButton: {
     position: "absolute",
     top: "50%",
     left: "50%",
-    transform: [{ translateX: -25 }, { translateY: -25 }], // Center the play button
+    transform: [{ translateX: -25 }, { translateY: -25 }],
     zIndex: 1,
   },
   playIcon: {
@@ -125,7 +132,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 2, // Make sure the loader is above the iframe
+    zIndex: 2,
   },
 });
 

@@ -31,7 +31,7 @@ const SetContainer: FC<SetContainerProps> = ({ currentSetNumber, totalSets, hand
                   zIndex: 1,
                 },
                 index < currentSetNumber
-                  ? [colors.backgroundPrimary, colors.borderBackground, common.borderSm]
+                  ? [colors.backgroundPrimary, colors.borderSurface, common.borderSm]
                   : [colors.backgroundSurface, colors.borderOnSecondaryContainer, common.borderXsm],
               ]}
             >

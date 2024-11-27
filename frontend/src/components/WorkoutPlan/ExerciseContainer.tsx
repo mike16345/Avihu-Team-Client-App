@@ -37,7 +37,6 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   const { layout, text, fonts, common, colors } = useStyles();
   const { addRecordedSet, getUserRecordedSetsByExercise } = useRecordedSetsApi();
 
-  const [isSetDone, setIsSetDone] = useState(false);
   const [currentSetNumber, setCurrentSetNumber] = useState(1);
 
   const handleRecordSet = (recordedSet: Omit<IRecordedSet, "plan">, isEdit = false) => {
@@ -69,7 +68,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
         });
         navigation?.goBack();
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error());
   };
 
   const handleSetCurrentSetInfo = (updatedSession: ISession) => {
@@ -88,7 +87,6 @@ const ExerciseContainer: FC<WorkoutProps> = ({
       setCurrentSetNumber(setNumber);
     } else {
       setCurrentSetNumber(setNumber);
-      setIsSetDone(true);
     }
   };
 

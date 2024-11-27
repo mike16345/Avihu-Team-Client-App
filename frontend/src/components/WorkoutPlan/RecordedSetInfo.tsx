@@ -21,19 +21,17 @@ const RecordedSetInfo: FC<RecordedSetInfoProps> = ({ recordedSet, actionButton }
         <View style={[layout.center, layout.flexGrow, layout.flexRow, spacing.gapLg]}>
           <View style={[layout.center]}>
             <Text style={[colors.textOnBackground, fonts.md, text.textBold]}>חזרות</Text>
-            <Text style={[colors.textOnBackground, fonts.default]}>
+            <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>
               <Text style={[fonts.sm]}>x</Text>
               {recordedSet?.repsDone}
-              {/* <NativeIcon size={16} library="MaterialCommunityIcons" name="history" /> */}
             </Text>
           </View>
           <View style={[layout.center]}>
             <Text style={[colors.textOnBackground, fonts.md, text.textBold]}>משקל</Text>
 
-            <Text style={[colors.textOnBackground, fonts.default]}>
+            <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>
               {recordedSet?.weight}
               <Text style={[fonts.sm]}>{' ק"ג'}</Text>
-              {/* <NativeIcon size={14} library="MaterialCommunityIcons" name="dumbbell" /> */}
             </Text>
           </View>
         </View>

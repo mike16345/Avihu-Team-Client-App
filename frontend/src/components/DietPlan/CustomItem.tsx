@@ -16,31 +16,43 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
   return (
     <View
       style={[
-        layout.itemsCenter,
-        layout.flexRow,
+        layout.flexRowReverse,
         colors.backgroundSecondary,
         common.rounded,
         spacing.pdSm,
         layout.wrap,
-        spacing.gapDefault,
         layout.widthFull,
+        layout.itemsCenter,
+        spacing.gapDefault,
       ]}
     >
-      <View style={[colors.background, common.roundedSm]}>
+      <View style={[colors.background, common.roundedSm, spacing.pdXs, layout.center]}>
         <NativeIcon
           size={25}
-          style={[colors.textPrimary]}
+          style={colors.textPrimary}
           library="MaterialCommunityIcons"
-          name={foodGroup == `חלבונים` ? `fish` : `baguette`}
+          name={foodGroup === `חלבונים` ? `fish` : `baguette`}
         />
       </View>
+
       <View
-        style={[layout.flexRow, layout.center, spacing.gapDefault, spacing.pdDefault, layout.wrap]}
+        style={[
+          layout.flexRow,
+          layout.itemsCenter,
+          layout.flex1,
+          spacing.gapDefault,
+          { justifyContent: "space-between" },
+        ]}
       >
-        <Text style={[colors.textOnSecondary, text.textBold]}>{name}</Text>
-        <View style={[colors.backgroundPrimary, { width: 3, height: 14 }]}></View>
-        <Text style={[colors.textOnSecondary]}>
+        <Text style={[colors.textOnSecondary, text.textBold, { flexShrink: 1, textAlign: "left" }]}>
           {quantity > 1 ? `${quantity} מנות` : `מנה אחת`}
+        </Text>
+        <View style={[colors.backgroundPrimary, { width: 3, height: 14 }]} />
+        <Text
+          style={[colors.textOnSecondary, text.textBold, layout.flex1, { textAlign: "right" }]}
+          numberOfLines={1}
+        >
+          {name}
         </Text>
       </View>
     </View>
