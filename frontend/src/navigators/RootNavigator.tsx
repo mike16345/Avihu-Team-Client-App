@@ -62,7 +62,6 @@ const RootNavigator = () => {
         )}
         {!isLoggedIn && (
           <>
-            <Stack.Screen name="HomePage" component={GetStartedScreen} />
             <Stack.Screen children={() => <Login onLogin={onLogin} />} name="LoginScreen" />
           </>
         )}
