@@ -1,8 +1,8 @@
 import { View } from "react-native";
 import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
-import { Text } from "react-native-paper";
 import useCardStyles from "@/styles/useCardStyles";
+import { Text } from "../ui/Text";
 
 interface CardProps {
   title: string;

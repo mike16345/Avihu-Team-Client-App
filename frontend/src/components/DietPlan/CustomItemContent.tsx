@@ -1,8 +1,9 @@
 import { ICustomMenuItem } from "@/interfaces/DietPlan";
 import useStyles from "@/styles/useGlobalStyles";
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 import CustomItem from "./CustomItem";
+import { Text } from "../ui/Text";
 
 interface CustomItemContentProps {
   customInstructions: ICustomMenuItem[];

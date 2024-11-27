@@ -1,6 +1,5 @@
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
-import { CustomModal } from "../ui/Modal";
+import { ScrollView, View } from "react-native";
 import useFontSize from "@/styles/useFontSize";
 import useMenuItemApi from "@/hooks/api/useMenuItemApi";
 import MenuItem from "./MenuItem";
@@ -9,6 +8,7 @@ import Loader from "../ui/loaders/Loader";
 import { useQuery } from "@tanstack/react-query";
 import { MENU_ITEMS_KEY, ONE_DAY } from "@/constants/reactQuery";
 import BottomDrawer from "../ui/BottomDrawer";
+import { Text } from "../ui/Text";
 
 interface MenuItemModalProps {
   isOpen: boolean;

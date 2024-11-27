@@ -1,10 +1,11 @@
 import { StyleSheet, View } from "react-native";
 import { FC, PropsWithChildren } from "react";
-import { Button, Text } from "react-native-paper";
+import { Button } from "react-native-paper";
 import useStyles from "@/styles/useGlobalStyles";
 import NativeIcon from "../Icon/NativeIcon";
 import OpacityButton from "../Button/OpacityButton";
 import BottomDrawer from "../ui/BottomDrawer";
+import { Text } from "./Text";
 
 interface WeightInputModalProps extends PropsWithChildren {
   title: string;

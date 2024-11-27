@@ -7,6 +7,25 @@ import {
 
 export const LightTheme = {
   ...DefaultLightTheme,
+  fonts: {
+    ...DefaultLightTheme.fonts,
+    regular: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    medium: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    light: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    thin: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+  },
   colors: {
     ...DefaultLightTheme.colors,
     primary: "#10b981",
@@ -66,6 +85,25 @@ export const LightTheme = {
 
 export const DarkTheme = {
   ...DefaultDarkTheme,
+  fonts: {
+    ...DefaultDarkTheme.fonts,
+    regular: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    medium: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    light: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    thin: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+  },
   colors: {
     ...DefaultDarkTheme.colors,
     primary: "#10b981",

@@ -1,8 +1,8 @@
 import { FC, useState, useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import SetContainer from "./SetContainer";
 import NativeIcon from "../Icon/NativeIcon";
-import { IExercise, IRecordedSet, IRecordedSetPost, ISet } from "@/interfaces/Workout";
+import { IExercise, IRecordedSet, IRecordedSetPost } from "@/interfaces/Workout";
 import { ISession } from "@/interfaces/ISession";
 import useStyles from "@/styles/useGlobalStyles";
 import { useRecordedSetsApi } from "@/hooks/api/useRecordedSetsApi";
@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import { WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Toast from "react-native-toast-message";
+import { Text } from "../ui/Text";
 
 interface WorkoutProps {
   plan: string;

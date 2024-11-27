@@ -1,7 +1,8 @@
-import { Text, View, SectionList } from "react-native";
+import { View, SectionList } from "react-native";
 import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import RecordedSetInfo from "./RecordedSetInfo";
+import { Text } from "../ui/Text";
 
 interface RecordedSetsProps {
   route: any;

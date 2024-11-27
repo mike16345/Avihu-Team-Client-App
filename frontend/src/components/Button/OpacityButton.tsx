@@ -1,4 +1,5 @@
-import { TouchableOpacity, Text, TextProps, TouchableOpacityProps } from "react-native";
+import { TouchableOpacity, TextProps, TouchableOpacityProps } from "react-native";
+import { Text } from "../ui/Text";
 
 interface OpacityButtonProps extends TouchableOpacityProps {
   textProps?: TextProps;

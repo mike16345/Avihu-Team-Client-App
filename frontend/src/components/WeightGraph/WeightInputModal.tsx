@@ -1,13 +1,12 @@
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { FC, useState } from "react";
-import { CustomModal } from "../ui/Modal";
-import { Button, Text } from "react-native-paper";
+import { Button } from "react-native-paper";
 import useStyles from "@/styles/useGlobalStyles";
-import { useThemeContext } from "@/themes/useAppTheme";
 import WeightWheelPicker from "./WeightWheelPicker";
 import NativeIcon from "../Icon/NativeIcon";
 import OpacityButton from "../Button/OpacityButton";
 import BottomDrawer from "../ui/BottomDrawer";
+import { Text } from "../ui/Text";
 
 interface WeightInputModalProps {
   currentWeight: number;

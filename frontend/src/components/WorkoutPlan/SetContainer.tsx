@@ -1,6 +1,7 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { FC } from "react";
 import useStyles from "@/styles/useGlobalStyles";
+import { Text } from "../ui/Text";
 
 interface SetContainerProps {
   currentSetNumber: number;

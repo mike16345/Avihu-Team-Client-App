@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import useStyles from "@/styles/useGlobalStyles";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
-
+import { Text } from "../ui/Text";
 interface SelectUploadTypeProps {
   returnImage: (image: string) => void;
 }

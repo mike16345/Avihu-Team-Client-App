@@ -1,8 +1,9 @@
 import { useThemeContext } from "@/themes/useAppTheme";
 import React, { useEffect, useState } from "react";
-import { Text, StyleSheet, Animated, View } from "react-native";
+import { StyleSheet, Animated, View } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import { IconLibrary, IconNames } from "@/types/iconTypes";
+import { Text } from "./Text";
 
 interface ToastProps {
   message: string;

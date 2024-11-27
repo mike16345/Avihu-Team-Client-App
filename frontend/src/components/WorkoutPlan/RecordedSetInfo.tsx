@@ -1,8 +1,8 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { FC } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { IRecordedSetResponse } from "@/interfaces/Workout";
-import NativeIcon from "../Icon/NativeIcon";
+import { Text } from "../ui/Text";
 
 interface RecordedSetInfoProps {
   recordedSet?: IRecordedSetResponse;

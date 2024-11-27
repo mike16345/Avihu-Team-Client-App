@@ -1,4 +1,4 @@
-import { View, ImageBackground, ScrollView, Text, Animated, Dimensions } from "react-native";
+import { View, ImageBackground, ScrollView, Animated, Dimensions } from "react-native";
 import { useState } from "react";
 import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
 import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
@@ -19,6 +19,7 @@ import { DIET_PLAN_KEY, ONE_DAY } from "@/constants/reactQuery";
 import ErrorScreen from "@/screens/ErrorScreen";
 import NoDataScreen from "@/screens/NoDataScreen";
 import { createRetryFunction } from "@/utils/utils";
+import { Text } from "../ui/Text";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);

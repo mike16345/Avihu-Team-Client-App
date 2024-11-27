@@ -9,11 +9,11 @@ import {
   useAnimatedValue,
   TouchableOpacity,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
 import { testEmail } from "@/utils/utils";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { Button, Text, TextInput } from "react-native-paper";
+import { Button, TextInput } from "react-native-paper";
 import useStyles from "@/styles/useGlobalStyles";
 import { moderateScale } from "react-native-size-matters";
 import { useUserApi } from "@/hooks/api/useUserApi";
@@ -22,6 +22,7 @@ import ConfirmPassword from "./ConfirmPassword";
 import Loader from "../ui/loaders/Loader";
 import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
+import { Text } from "../ui/Text";
 
 interface IUserCredentials {
   email: string;
@@ -264,7 +265,16 @@ export default function Login({ onLogin }: ILoginProps) {
           )}
           {emailChecked && userRegistered && (
             <Animated.View style={{ opacity: fadeValue }}>
-              <Text style={[text.textRight, spacing.pdHorizontalXs]}>סיסמה</Text>
+              <Text
+                style={[
+                  text.textRight,
+                  colors.textOnSecondaryContainer,
+                  text.textBold,
+                  spacing.pdHorizontalXs,
+                ]}
+              >
+                סיסמה
+              </Text>
               <TextInput
                 style={[text.textRight, { width: "100%" }]}
                 mode="outlined"

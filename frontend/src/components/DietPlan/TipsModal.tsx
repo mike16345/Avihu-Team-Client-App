@@ -1,8 +1,8 @@
 import React from "react";
 import { CustomModal } from "../ui/Modal";
 import { ScrollView } from "react-native-gesture-handler";
-import { Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
+import { Text } from "../ui/Text";
 
 interface TipsModalProps {
   isOpen: boolean;

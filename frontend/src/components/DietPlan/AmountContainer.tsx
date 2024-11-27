@@ -1,6 +1,7 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "../ui/Text";
 
 interface AmountContainerProps {
   amount?: number;

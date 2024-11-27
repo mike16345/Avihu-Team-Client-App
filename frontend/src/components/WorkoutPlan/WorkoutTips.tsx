@@ -1,8 +1,9 @@
-import { Dimensions, FlatList, Text, View } from "react-native";
+import { Dimensions, FlatList, View } from "react-native";
 import { Dispatch, FC, SetStateAction } from "react";
 import NativeIcon from "@/components/Icon/NativeIcon";
 import { CustomModal } from "../ui/Modal";
 import useStyles from "@/styles/useGlobalStyles";
+import { Text } from "../ui/Text";
 
 interface WorkoutTipsProps {
   openTips: boolean;

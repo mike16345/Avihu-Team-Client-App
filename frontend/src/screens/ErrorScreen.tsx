@@ -1,8 +1,8 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import NativeIcon from "@/components/Icon/NativeIcon";
-
+import { Text } from "@/components/ui/Text";
 interface ErrorScreenProps {
   error: any;
 }

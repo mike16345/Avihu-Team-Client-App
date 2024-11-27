@@ -1,7 +1,8 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import useStyles from "@/styles/useGlobalStyles";
+import { Text } from "../ui/Text";
 
 interface CustomItemProps {
   name: string;

@@ -1,6 +1,7 @@
 import { WheelPickerProps } from "@/types/wheelPickerTypes";
 import React, { useState, useRef, useEffect } from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { Text } from "./Text";
 
 const WheelPicker: React.FC<WheelPickerProps> = ({
   data,

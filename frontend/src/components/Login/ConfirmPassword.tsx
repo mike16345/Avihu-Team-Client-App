@@ -1,8 +1,9 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { TextInput } from "react-native-paper";
 import { ICredentialsErrors } from "./Login";
+import { Text } from "../ui/Text";
 
 interface ConfirmPasswordProps {
   handlePasswordChange: (val: string) => void;

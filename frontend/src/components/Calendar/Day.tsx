@@ -1,8 +1,9 @@
 import React from "react";
-import { Text, TouchableOpacity, TouchableOpacityProps } from "react-native";
+import { TouchableOpacity, TouchableOpacityProps } from "react-native";
 import { DayState } from "react-native-calendars/src/types";
 import useFontSize from "@/styles/useFontSize";
 import useCalendarTheme, { ExtendedMarking } from "@/themes/useCalendarTheme";
+import { Text } from "../ui/Text";
 
 interface DayComponentProps extends TouchableOpacityProps {
   date: number;

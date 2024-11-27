@@ -4,7 +4,7 @@ import { Colors } from "@/constants/Colors";
 import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import useStyles from "@/styles/useGlobalStyles";
-import { Button, Text, TextInput } from "react-native-paper";
+import { Button, TextInput } from "react-native-paper";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
 import { createRetryFunction, extractVideoId, generateWheelPickerData } from "@/utils/utils";
 import WheelInputDrawer from "../ui/WheelInputDrawer";
@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import Loader from "../ui/loaders/Loader";
 import RecordedSetInfo from "./RecordedSetInfo";
 import { ONE_DAY } from "@/constants/reactQuery";
+import { Text } from "../ui/Text";
 
 type InputTypes = "reps" | "weight";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}

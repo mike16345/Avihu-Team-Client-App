@@ -1,6 +1,6 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { Button } from "react-native-paper";
 import DisplayImage from "./DisplayImage";
 import ImagePreviewOption from "./ImagePreviewOption";
@@ -8,6 +8,7 @@ import { useWeighInPhotosApi } from "@/hooks/api/useWeighInPhotosApi";
 import { useUserStore } from "@/store/userStore";
 import Loader from "../ui/loaders/Loader";
 import Toast from "react-native-toast-message";
+import { Text } from "../ui/Text";
 
 interface ImagePreviewProps {
   handleClose: () => void;

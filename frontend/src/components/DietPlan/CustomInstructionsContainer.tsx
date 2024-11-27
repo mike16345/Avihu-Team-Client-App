@@ -1,10 +1,11 @@
 import { ICustomMenuItem } from "@/interfaces/DietPlan";
 import React, { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import BottomDrawer from "../ui/BottomDrawer";
 import CustomItemContent from "./CustomItemContent";
 import NativeIcon from "../Icon/NativeIcon";
+import { Text } from "../ui/Text";
 
 interface CustomInstructionsContainerProps {
   customInstructions: ICustomMenuItem[];
