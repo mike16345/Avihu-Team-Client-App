@@ -4,8 +4,8 @@
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start -c",
-    "android": "expo start -c --android",
-    "ios": "expo start -c --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start -c --web",
     "eas-build-android": "eas build --platform android --profile production",
     "eas-build-ios": "eas build --platform ios --profile production"
@@ -48,7 +48,8 @@
     "zustand": "^4.5.2",
     "react-native-screens": "3.31.1",
     "expo-updates": "~0.25.27",
-    "expo-constants": "~16.0.2"
+    "expo-constants": "~16.0.2",
+    "react-native-svg": "15.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

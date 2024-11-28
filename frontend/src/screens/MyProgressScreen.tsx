@@ -19,12 +19,13 @@ import { Portal } from "react-native-paper";
 import { calculateImageUploadTitle, checkIfDatesMatch, createRetryFunction } from "@/utils/utils";
 import BottomDrawer from "@/components/ui/BottomDrawer";
 import ImagePreview from "@/components/WeightGraph/ImagePreview";
+import Constants from "expo-constants";
 
 const MyProgressScreen = () => {
   const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
   const TRAINER_PHONE_NUMBER = isDevMode
     ? process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER
-    : process.env.TRAINER_PHONE_NUMBER;
+    : Constants?.expoConfig?.extra?.TRAINER_PHONE_NUMBER;
 
   const currentUser = useUserStore((state) => state.currentUser);
   const { getWeighInsByUserId, updateWeighInById, deleteWeighIn, addWeighIn } = useWeighInApi();

@@ -1,9 +1,12 @@
 import axiosInstance from "@/config/apiConfig";
 import { Method } from "axios";
+import Constants from "expo-constants";
 
 const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
-const API_AUTH_TOKEN = isDevMode ? process.env.EXPO_PUBLIC_API_AUTH_TOKEN : process.env.API_TOKEN;
-console.log("AVIHU TEAM, API_AUTH_TOKEN", API_AUTH_TOKEN);
+const API_AUTH_TOKEN = isDevMode
+  ? process.env.EXPO_PUBLIC_API_AUTH_TOKEN
+  : Constants?.expoConfig?.extra?.API_TOKEN;
+
 async function request<T>(
   method: Method,
   endpoint: string,

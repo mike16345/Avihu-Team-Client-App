@@ -1,10 +1,8 @@
 import axios, { AxiosInstance } from "axios";
+import Constants from "expo-constants";
 
 const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
-const SERVER = isDevMode ? process.env.EXPO_PUBLIC_SERVER : process.env.API_URL;
-console.log("ENVIRONMENT VALUES", Object.values(process.env));
-console.log("AVIHU TEAM server", SERVER);
-console.log("AVIHU TEAM API url", process.env.API_URL);
+const SERVER = isDevMode ? process.env.EXPO_PUBLIC_SERVER : Constants?.expoConfig?.extra?.API_URL;
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: SERVER,

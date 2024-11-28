@@ -3,6 +3,7 @@ import { ApiResponse } from "@/types/ApiTypes";
 import { useState } from "react";
 import Toast from "react-native-toast-message";
 import { useUserApi } from "./useUserApi";
+import Constants from "expo-constants";
 
 const USER_IMAGE_URLS_ENDPOINT = "userImageUrls";
 
@@ -19,7 +20,7 @@ export const useWeighInPhotosApi = () => {
     try {
       const response = await fetch(url, {
         method: "POST",
-        headers: { "X-Api-Key": process.env.EXPO_PUBLIC_API_AUTH_TOKEN },
+        headers: { "X-Api-Key": process.env.EXPO_PUBLIC_API_AUTH_TOKEN || Constants.API_TOKEN },
       });
       const { data } = await response.json();
       return data;
@@ -61,7 +62,7 @@ export const useWeighInPhotosApi = () => {
     if (!fileUri) return;
 
     const today = new Date().toISOString().split("T")[0];
-    const api = process.env.EXPO_PUBLIC_SERVER;
+    const api = process.env.EXPO_PUBLIC_SERVER || Constants.expoConfig?.extra?.API_URL;
     const url = `${api}/signedUrl?userId=${userId}&date=${today}&imageName=${imageName}`;
     const urlToStore = `${userId}/${today}/${imageName}`;
 

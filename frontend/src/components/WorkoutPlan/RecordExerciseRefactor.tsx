@@ -103,7 +103,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
   }, [navigation]);
 
   if (isLoading) return <Loader variant="Standard" />;
-  console.log(isSetUploading);
+  
   return (
     <>
       {isSetUploading && <Loader variant="Screen" />}

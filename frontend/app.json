@@ -4,7 +4,7 @@
     "slug": "avihu-team",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/avihu/avihu-logo-black.png",
+    "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/avihu/avihu-logo-black.png",
@@ -28,7 +28,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#000000"
       },
       "package": "com.avihuteam.avihuteam"
     },
@@ -42,9 +42,7 @@
       }
     },
     "owner": "avihuteam",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.0.0",
     "updates": {
       "enabled": true,
       "runtimeVersion":"1.0.0",
