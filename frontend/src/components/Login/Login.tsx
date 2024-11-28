@@ -222,7 +222,16 @@ export default function Login({ onLogin }: ILoginProps) {
         <View style={[layout.widthFull, spacing.gapXl]}>
           {!emailChecked ? (
             <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
-              <Text style={[text.textRight, spacing.pdHorizontalXs]}>כתובת מייל</Text>
+              <Text
+                style={[
+                  text.textRight,
+                  spacing.pdHorizontalXs,
+                  colors.textOnBackground,
+                  text.textBold,
+                ]}
+              >
+                כתובת מייל
+              </Text>
               <TextInput
                 style={[{ width: "100%" }, text.textLeft, colors.background]}
                 mode="outlined"
@@ -241,7 +250,9 @@ export default function Login({ onLogin }: ILoginProps) {
                 }
                 value={inputtedCrendentials.email}
               />
-              <Text style={[text.textDanger, text.textRight]}>{formErrors.email}</Text>
+              <Text style={[text.textDanger, text.textRight, text.textBold]}>
+                {formErrors.email}
+              </Text>
             </Animated.View>
           ) : (
             <Animated.View
@@ -291,7 +302,9 @@ export default function Login({ onLogin }: ILoginProps) {
                   />
                 }
               />
-              <Text style={[text.textDanger, text.textRight]}>{formErrors.password}</Text>
+              <Text style={[text.textDanger, text.textRight, text.textBold]}>
+                {formErrors.password}
+              </Text>
             </Animated.View>
           )}
           {emailChecked && !userRegistered && (
@@ -308,7 +321,7 @@ export default function Login({ onLogin }: ILoginProps) {
         </View>
         <Button
           mode="contained-tonal"
-          style={[layout.widthFull, common.rounded]}
+          style={[layout.widthFull, common.rounded, colors.backgroundPrimary]}
           onPress={handleSubmit}
         >
           התחברות
