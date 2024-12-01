@@ -24,7 +24,7 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
       <TouchableOpacity
         style={[
           colors.background,
-          layout.flexRow,
+          layout.flexDirectionByPlatform,
           layout.center,
           spacing.gapSm,
           common.rounded,

@@ -16,7 +16,7 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
   return (
     <View
       style={[
-        layout.flexRowReverse,
+        layout.flexDirectionByPlatform,
         colors.backgroundSecondary,
         common.rounded,
         spacing.pdSm,
@@ -37,22 +37,22 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
 
       <View
         style={[
-          layout.flexRow,
+          layout.flexDirectionByPlatform,
+          layout.justifyBetween,
           layout.itemsCenter,
           layout.flex1,
           spacing.gapDefault,
-          { justifyContent: "space-between" },
         ]}
       >
-        <Text style={[colors.textOnSecondary, text.textBold, { flexShrink: 1, textAlign: "left" }]}>
-          {quantity > 1 ? `${quantity} מנות` : `מנה אחת`}
-        </Text>
-        <View style={[colors.backgroundPrimary, { width: 3, height: 14 }]} />
         <Text
-          style={[colors.textOnSecondary, text.textBold, layout.flex1, { textAlign: "right" }]}
+          style={[colors.textOnSecondary, text.textBold, layout.flex1, text.textLeft]}
           numberOfLines={1}
         >
           {name}
+        </Text>
+        <View style={[colors.backgroundPrimary, { width: 3, height: 14 }]} />
+        <Text style={[colors.textOnSecondary, text.textBold, { flexShrink: 1 }]}>
+          {quantity > 1 ? `${quantity} מנות` : `מנה אחת`}
         </Text>
       </View>
     </View>

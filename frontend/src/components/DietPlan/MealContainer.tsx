@@ -3,7 +3,6 @@ import React from "react";
 import { View } from "react-native";
 import CustomInstructionsContainer from "./CustomInstructionsContainer";
 import useStyles from "@/styles/useGlobalStyles";
-import { useThemeContext } from "@/themes/useAppTheme";
 import MenuItemTicket from "./MenuItemTicket";
 
 interface MealContainerProps {
@@ -12,7 +11,6 @@ interface MealContainerProps {
 
 const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
   const { layout, spacing } = useStyles();
-  const { theme } = useThemeContext();
 
   const mealItems = Object.entries(meal);
 

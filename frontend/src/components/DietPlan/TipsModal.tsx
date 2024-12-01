@@ -12,12 +12,12 @@ interface TipsModalProps {
 }
 
 const TipsModal: React.FC<TipsModalProps> = ({ isOpen, dismiss, tips }) => {
-  const { colors, common, fonts, spacing, text } = useStyles();
+  const { colors, fonts, spacing, text } = useStyles();
   return (
     <BottomDrawer open={isOpen} onClose={dismiss}>
       <ScrollView style={[spacing.pdMd, { height: `auto` }]}>
         <Text
-          style={[text.textRight, fonts.xl, text.textBold, colors.textPrimary, spacing.pdDefault]}
+          style={[text.textRight, fonts.xxl, text.textBold, colors.textPrimary, spacing.pdDefault]}
         >
           דגשים
         </Text>
