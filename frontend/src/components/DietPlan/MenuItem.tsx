@@ -23,6 +23,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ menuItem }) => {
             text.textRight,
             spacing.pdXs,
             colors.textOnSecondary,
+            text.textBold,
           ]}
         >
           {menuItem.name}
