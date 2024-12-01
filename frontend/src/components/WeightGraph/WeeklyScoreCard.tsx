@@ -26,16 +26,15 @@ const WeeklyScoreCard: React.FC<WeeklyScoreCardProps> = ({ weights, range }) => 
   const lastWeighIn = weights[weights?.length - 1];
   const weightLoss = Math.abs(lastWeighIn - firstWeighIn).toFixed(2);
 
-  const { colors } = useStyles();
-  const isImproving = lastWeighIn < firstWeighIn;
-  const weightStyle = isImproving ? colors.textSuccess : colors.textDanger;
+  const isLosingWeight = lastWeighIn < firstWeighIn;
+  const operator = weightLoss == `0.00` ? `` : isLosingWeight ? `-` : `+`;
 
   return (
     <WeightCard
       title={`מגמה ${rangeToName(range)}`}
       value={firstWeighIn && lastWeighIn ? weightLoss : 0}
       unit='ק"ג'
-      valueStyle={weightStyle}
+      operator={operator}
     />
   );
 };
