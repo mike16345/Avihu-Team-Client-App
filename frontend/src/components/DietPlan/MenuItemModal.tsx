@@ -11,14 +11,13 @@ import BottomDrawer from "../ui/BottomDrawer";
 import { Text } from "../ui/Text";
 
 interface MenuItemModalProps {
-  isOpen: boolean;
   foodGroup: string | null;
   dismiss: () => void;
 }
 
-const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismiss }) => {
+const MenuItemModal: React.FC<MenuItemModalProps> = ({ foodGroup, dismiss }) => {
   const { xl } = useFontSize();
-  const { colors, common, layout, spacing, text } = useStyles();
+  const { colors, layout, spacing, text } = useStyles();
   const { getMenuItems } = useMenuItemApi();
 
   const changeTitle = (foodGroup: string) => {
@@ -42,7 +41,7 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
   });
 
   return (
-    <BottomDrawer open={isOpen} onClose={dismiss}>
+    <BottomDrawer open={Boolean(foodGroup)} onClose={dismiss}>
       <ScrollView style={[spacing.pdMd, spacing.pdBottomBar, { height: `80%` }]}>
         {isLoading ? (
           <Loader />

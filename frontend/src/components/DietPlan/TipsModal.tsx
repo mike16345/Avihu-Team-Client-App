@@ -3,6 +3,7 @@ import { CustomModal } from "../ui/Modal";
 import { ScrollView } from "react-native-gesture-handler";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
+import BottomDrawer from "../ui/BottomDrawer";
 
 interface TipsModalProps {
   isOpen: boolean;
@@ -11,21 +12,12 @@ interface TipsModalProps {
 }
 
 const TipsModal: React.FC<TipsModalProps> = ({ isOpen, dismiss, tips }) => {
-  const { colors, common, fonts, spacing, text } = useStyles();
+  const { colors, fonts, spacing, text } = useStyles();
   return (
-    <CustomModal visible={isOpen} dismissable dismissableBackButton onDismiss={dismiss}>
-      <ScrollView
-        style={[
-          colors.backgroundSecondaryContainer,
-          spacing.pdMd,
-          colors.borderPrimary,
-          common.borderDefault,
-          common.roundedMd,
-          { height: `auto` },
-        ]}
-      >
+    <BottomDrawer open={isOpen} onClose={dismiss}>
+      <ScrollView style={[spacing.pdMd, { height: `auto` }]}>
         <Text
-          style={[text.textRight, fonts.xl, text.textBold, colors.textPrimary, spacing.pdDefault]}
+          style={[text.textRight, fonts.xxl, text.textBold, colors.textPrimary, spacing.pdDefault]}
         >
           דגשים
         </Text>
@@ -33,7 +25,7 @@ const TipsModal: React.FC<TipsModalProps> = ({ isOpen, dismiss, tips }) => {
           {tips}
         </Text>
       </ScrollView>
-    </CustomModal>
+    </BottomDrawer>
   );
 };
 

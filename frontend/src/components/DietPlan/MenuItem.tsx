@@ -15,16 +15,26 @@ const MenuItem: React.FC<MenuItemProps> = ({ menuItem }) => {
   const { colors, layout, spacing, text, common } = useStyles();
 
   return (
-    <View style={[spacing.pdXs, spacing.gapXs, common.rounded, colors.backgroundSurface]}>
+    <View style={[spacing.pdXs, spacing.gapXs, common.rounded, colors.backgroundSecondary]}>
       <View style={[colors.borderPrimary, { borderBottomWidth: 2 }, layout.widthFull]}>
-        <Text style={[colors.textOnSecondaryContainer, text.textRight, spacing.pdXs]}>
+        <Text
+          style={[
+            colors.textOnSecondaryContainer,
+            text.textRight,
+            spacing.pdXs,
+            colors.textOnSecondary,
+            text.textBold,
+          ]}
+        >
           {menuItem.name}
         </Text>
       </View>
       <View style={[layout.flexRow, layout.justifyBetween, spacing.gapSm, spacing.pdXs]}>
-        <Text style={[colors.textOnSecondaryContainer, md]}>גרם: {menuItem.oneServing.grams}</Text>
+        <Text style={[colors.textOnSecondaryContainer, md, colors.textOnSecondary]}>
+          גרם: {menuItem.oneServing.grams}
+        </Text>
         <View style={[colors.borderPrimary, { borderLeftWidth: 1 }]}></View>
-        <Text style={[colors.textOnSecondaryContainer, md]}>
+        <Text style={[colors.textOnSecondaryContainer, md, colors.textOnSecondary]}>
           כפות: {menuItem.oneServing.spoons}
         </Text>
       </View>

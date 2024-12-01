@@ -16,10 +16,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { StyleSheet, ScrollView, Linking, Animated } from "react-native";
 import { Portal } from "react-native-paper";
-import { calculateImageUploadTitle, checkIfDatesMatch, createRetryFunction } from "@/utils/utils";
+import { checkIfDatesMatch, createRetryFunction } from "@/utils/utils";
 import BottomDrawer from "@/components/ui/BottomDrawer";
 import ImagePreview from "@/components/WeightGraph/ImagePreview";
 import Constants from "expo-constants";
+import useImageUploadStatus from "@/hooks/useImageUploadStatus";
 
 const MyProgressScreen = () => {
   const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
@@ -33,6 +34,7 @@ const MyProgressScreen = () => {
 
   const { colors, spacing, layout } = useStyles();
   const { slideInLeftDelay0, slideInRightDelay100 } = useSlideInAnimations();
+  const { calculateImageUploadTitle } = useImageUploadStatus();
 
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [openWeightModal, setOpenWeightModal] = useState(false);
