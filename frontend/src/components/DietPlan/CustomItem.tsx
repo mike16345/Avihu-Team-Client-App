@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
@@ -45,7 +45,12 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
         ]}
       >
         <Text
-          style={[colors.textOnSecondary, text.textBold, layout.flex1, text.textLeft]}
+          style={[
+            colors.textOnSecondary,
+            text.textBold,
+            layout.flex1,
+            { textAlign: Platform.OS == `android` ? `right` : `left` },
+          ]}
           numberOfLines={1}
         >
           {name}

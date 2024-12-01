@@ -34,7 +34,7 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
     <View
       style={[
         layout.rtl,
-        layout.flexRow,
+        layout.flexDirectionByPlatform,
         layout.itemsCenter,
         layout.wrap,
         spacing.gapDefault,
