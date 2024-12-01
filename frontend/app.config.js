@@ -1,4 +1,4 @@
-import "dotenv/config"; // If you are using a .env file locally
+import "dotenv/config";
 
 export default ({ config }) => ({
   ...config,
@@ -7,13 +7,14 @@ export default ({ config }) => ({
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/app-icon.png",
-  userInterfaceStyle: "light",
+  userInterfaceStyle: "dark",
   splash: {
     image: "./assets/avihu/avihu-logo-black.png",
     backgroundColor: "#000000",
   },
   ios: {
     supportsTablet: true,
+    bundleIdentifier: "com.avihuteam.avihuteam", // Added bundleIdentifier
     splash: {
       image: "./assets/avihu/avihu-logo-black.png",
       backgroundColor: "#000000",
@@ -30,11 +31,6 @@ export default ({ config }) => ({
     bundler: "metro",
     favicon: "./assets/favicon.png",
   },
-  updates: {
-    enabled: true,
-    runtimeVersion: "1.0.0",
-    url: "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2",
-  },
   extra: {
     eas: {
       projectId: "bbbbb60d-eb47-48fb-a278-517aba8dcea2",
@@ -43,4 +39,13 @@ export default ({ config }) => ({
     API_TOKEN: process.env.API_KEY,
     TRAINER_PHONE_NUMBER: process.env.TRAINER_PHONE_NUMBER,
   },
+  owner: "avihuteam",
+  runtimeVersion: "1.0.0",
+  updates: {
+    enabled: true,
+    runtimeVersion: "1.0.0",
+    url: "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2",
+  },
+  sdkVersion: "51.0.0",
+  platforms: ["ios", "android", "web"],
 });
