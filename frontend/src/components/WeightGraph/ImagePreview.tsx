@@ -52,11 +52,9 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
   };
 
   return (
-    <View style={[spacing.gapLg]}>
+    <View style={[spacing.gapLg, spacing.pdSm]}>
       {uploading && <Loader variant="Screen" />}
-      <Text style={[text.textLeft, fonts.lg, colors.textOnBackground, text.textBold]}>
-        תמונה שנבחרה
-      </Text>
+
       <DisplayImage
         image={images[selectedImage] ? images[selectedImage] : undefined}
         removeImage={() => deleteimageByIndex(0)}
@@ -75,18 +73,18 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
             image={images[1]}
           />
         </View>
-        <View style={[layout.flexRow, layout.center, spacing.gapSm]}>
-          <Button
-            style={[spacing.pdSm, colors.backgroundSecondary, common.roundedSm, { width: `50%` }]}
-            onPress={handleClose}
-          >
-            ביטול
-          </Button>
+        <View style={[layout.flexRow, layout.center, spacing.gapDefault]}>
           <Button
             style={[colors.backgroundPrimary, spacing.pdSm, common.roundedSm, { width: `50%` }]}
             onPress={uploadImage}
           >
-            <Text style={[colors.textOnBackground, fonts.default]}>שליחה</Text>
+            <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>שליחה</Text>
+          </Button>
+          <Button
+            style={[spacing.pdSm, colors.backgroundSecondary, common.roundedSm, { width: `50%` }]}
+            onPress={handleClose}
+          >
+            <Text style={[text.textBold, fonts.default]}>ביטול</Text>
           </Button>
         </View>
       </View>
