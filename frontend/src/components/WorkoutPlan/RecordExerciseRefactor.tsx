@@ -189,18 +189,23 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
               />
             </View>
           )}
-
-          <View
-            style={[layout.flexRow, layout.flex1, layout.itemsEnd, layout.widthFull, spacing.gapLg]}
-          >
-            <Button mode="contained" onPress={handleSave}>
-              <Text style={[customStyles.text.textBold]}>שמור</Text>
-            </Button>
-            <Button mode="contained-tonal" onPress={() => navigation?.goBack()}>
-              בטל
-            </Button>
-          </View>
         </ScrollView>
+        <View
+          style={[
+            layout.flexRow,
+            layout.flex1,
+            layout.itemsCenter,
+            layout.widthFull,
+            spacing.gapLg,
+          ]}
+        >
+          <Button mode="contained" onPress={handleSave}>
+            <Text style={[customStyles.text.textBold]}>שמור</Text>
+          </Button>
+          <Button mode="contained-tonal" onPress={() => navigation?.goBack()}>
+            בטל
+          </Button>
+        </View>
         {showWeightInputModal && (
           <WheelInputDrawer
             title="משקל"
