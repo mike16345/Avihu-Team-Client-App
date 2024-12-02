@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import SetContainer from "./SetContainer";
 import NativeIcon from "../Icon/NativeIcon";
 import { IExercise, IRecordedSet, IRecordedSetPost } from "@/interfaces/Workout";
@@ -65,6 +65,8 @@ const ExerciseContainer: FC<WorkoutProps> = ({
           autoHide: true,
           type: "success",
           swipeable: true,
+          text1Style: { textAlign: Platform.OS == `ios` ? `right` : `left` },
+          text2Style: { textAlign: Platform.OS == `ios` ? `right` : `left` },
         });
         navigation?.goBack();
       })
@@ -98,7 +100,14 @@ const ExerciseContainer: FC<WorkoutProps> = ({
     <View style={[styles.workoutContainer, common.rounded, colors.backgroundSecondaryContainer]}>
       <View style={styles.workoutDescriptionContainer}>
         <View style={[layout.widthFull]}>
-          <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.default]}>
+          <Text
+            style={[
+              colors.textOnSecondaryContainer,
+              text.textBold,
+              fonts.default,
+              { textAlign: Platform.OS == `ios` ? `right` : `left` },
+            ]}
+          >
             {exercise.name}
           </Text>
         </View>
