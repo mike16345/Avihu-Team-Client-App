@@ -126,12 +126,12 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
               </Pressable>
             )}
             <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
-            <Text style={styles.setInfo}>סט: {setNumber}</Text>
+            {/* <Text style={styles.setInfo}>סט: {setNumber}</Text>
             {exercise.sets[setNumber - 1] && (
               <Text style={styles.setInfo}>
                 חזרות: {exercise.sets[setNumber - 1].minReps}-{exercise.sets[setNumber - 1].maxReps}
               </Text>
-            )}
+            )} */}
 
             <CurrentSetContainer />
 
@@ -141,6 +141,31 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
               setOpenTips={setOpenTrainerTips}
             />
           </View>
+
+          {lastRecordedSet && (
+            <View style={[spacing.mgVerticalDefault, spacing.gapSm]}>
+              <Text style={[text.textRight, text.textBold, colors.textOnSecondaryContainer]}>
+                אימון הקודם - {new Date(lastRecordedSet.date).toLocaleDateString()}
+              </Text>
+              <RecordedSetInfo
+                actionButton={
+                  <NativeIcon
+                    onPress={() => {
+                      navigation?.navigate("RecordedSets", {
+                        recordedSets: data || [],
+                      });
+                    }}
+                    color={colors.textOnSecondaryContainer.color}
+                    library="MaterialCommunityIcons"
+                    name="chevron-left"
+                    size={28}
+                  />
+                }
+                recordedSet={lastRecordedSet}
+              />
+            </View>
+          )}
+
           <View style={[layout.justifyEvenly, layout.flex1]}>
             <View style={[layout.flexDirectionByPlatform, layout.justifyAround]}>
               <View style={[layout.center, spacing.gapDefault]}>
@@ -169,30 +194,6 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
               </View>
             </View>
           </View>
-
-          {lastRecordedSet && (
-            <View style={[spacing.mgVerticalDefault, spacing.gapSm]}>
-              <Text style={[text.textRight, text.textBold, colors.textOnSecondaryContainer]}>
-                אימון הקודם - {new Date(lastRecordedSet.date).toLocaleDateString()}
-              </Text>
-              <RecordedSetInfo
-                actionButton={
-                  <NativeIcon
-                    onPress={() => {
-                      navigation?.navigate("RecordedSets", {
-                        recordedSets: data || [],
-                      });
-                    }}
-                    color={colors.textOnSecondaryContainer.color}
-                    library="MaterialCommunityIcons"
-                    name="chevron-left"
-                    size={28}
-                  />
-                }
-                recordedSet={lastRecordedSet}
-              />
-            </View>
-          )}
         </ScrollView>
         <View
           style={[
@@ -201,6 +202,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             layout.itemsCenter,
             layout.widthFull,
             spacing.gapLg,
+            spacing.pdHorizontalDefault,
           ]}
         >
           <Button mode="contained" onPress={handleSave}>
