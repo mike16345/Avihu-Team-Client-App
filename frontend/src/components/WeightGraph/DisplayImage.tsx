@@ -47,7 +47,7 @@ const DisplayImage: React.FC<DisplayImageProps> = ({ image, removeImage, handleI
       ) : (
         <View
           style={[
-            { height: height * 0.3, margin: `auto` },
+            { height: height * 0.35, margin: `auto` },
             layout.center,
             spacing.gapLg,
             layout.widthFull,
