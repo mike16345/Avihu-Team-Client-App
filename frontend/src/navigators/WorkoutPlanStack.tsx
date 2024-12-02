@@ -8,7 +8,7 @@ const WorkoutPlanStack = () => {
     <Stack.Navigator
       initialRouteName="WorkoutPlan"
       screenOptions={{
-        navigationBarHidden: false,
+        navigationBarHidden: true,
         headerTitleAlign: "center",
         headerTitleStyle: { fontSize: 18 },
       }}

@@ -4,6 +4,7 @@ import NativeIcon from "@/components/Icon/NativeIcon";
 import { CustomModal } from "../ui/Modal";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
+import BottomDrawer from "../ui/BottomDrawer";
 
 interface WorkoutTipsProps {
   openTips: boolean;
@@ -23,17 +24,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ tips = generalTips, openTips, setOp
   const { fonts, layout, text, colors, spacing } = useStyles();
 
   return (
-    <CustomModal
-      style={[
-        layout.center,
-        colors.backgroundSurface,
-        spacing.pdLg,
-        { height: Dimensions.get("screen").height / 2, top: "20%" },
-      ]}
-      visible={openTips}
-      onDismiss={() => setOpenTips(false)}
-      dismissableBackButton
-    >
+    <BottomDrawer open={openTips} onClose={() => setOpenTips(false)}>
       <View
         style={[
           layout.widthFull,
@@ -41,6 +32,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ tips = generalTips, openTips, setOp
           layout.itemsCenter,
           layout.justifyBetween,
           spacing.mgVerticalDefault,
+          spacing.gapDefault,
         ]}
       >
         <NativeIcon
@@ -62,6 +54,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ tips = generalTips, openTips, setOp
               fonts.md,
               colors.textOnSurface,
               spacing.mgHorizontalSm,
+              spacing.pdVerticalDefault,
             ]}
           >
             {index + 1 + ". "}
@@ -70,7 +63,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ tips = generalTips, openTips, setOp
         )}
         data={tips}
       />
-    </CustomModal>
+    </BottomDrawer>
   );
 };
 

@@ -41,8 +41,7 @@ const MyProgressScreen = () => {
   const [openUploadModal, setOpenUploadModal] = useState(false);
   const [lastWeighIn, setLastWeighIn] = useState<IWeighIn | null>(null);
   const [todaysWeighInExists, setTodaysWeighInExists] = useState(false);
-
-  const disabledTitle = calculateImageUploadTitle(currentUser?.checkInAt || 0);
+  const [disabledTitle, setDisabledTitle] = useState<string | undefined>();
 
   const handleGetWeighInsByUserId = async () => {
     if (!currentUser) return [];
@@ -131,6 +130,12 @@ const MyProgressScreen = () => {
     setLastWeighIn(latestWeghIn);
     setTodaysWeighInExists(weighInExists);
   }, [data]);
+
+  useEffect(() => {
+    const title = calculateImageUploadTitle(currentUser?.checkInAt || 0);
+
+    setDisabledTitle(title);
+  }, []);
 
   if (isLoading) return <ProgressScreenSkeleton />;
 

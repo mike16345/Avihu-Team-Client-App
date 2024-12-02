@@ -3,8 +3,9 @@ import { useUserApi } from "./api/useUserApi";
 import { useUserStore } from "@/store/userStore";
 
 const useImageUploadStatus = () => {
+  const { updateUserField } = useUserApi();
+
   const calculateImageUploadTitle = (usersCheckInDate: number) => {
-    const { updateUserField } = useUserApi();
     const MILLIESECONDS_IN_A_DAY = 86400000;
     const timeLeft = usersCheckInDate - Date.now() - MILLIESECONDS_IN_A_DAY;
 

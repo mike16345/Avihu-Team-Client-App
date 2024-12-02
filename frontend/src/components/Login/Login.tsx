@@ -8,6 +8,7 @@ import {
   Animated,
   useAnimatedValue,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { useEffect, useState } from "react";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
@@ -65,6 +66,7 @@ export default function Login({ onLogin }: ILoginProps) {
       autoHide: true,
       type: type,
       swipeable: true,
+      text1Style: { textAlign: `center` },
     });
   };
 
