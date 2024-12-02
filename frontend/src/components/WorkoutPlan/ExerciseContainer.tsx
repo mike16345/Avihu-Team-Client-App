@@ -103,7 +103,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
           <Text
             style={[colors.textOnSecondaryContainer, text.textBold, fonts.default, text.textRight]}
           >
-            {exercise.name} Nigger
+            {exercise.name}
           </Text>
         </View>
         <View style={styles.workoutInfoContainer}>
