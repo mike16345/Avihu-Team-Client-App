@@ -52,7 +52,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
   };
 
   return (
-    <View style={[spacing.gapLg, { direction: `rtl` }]}>
+    <View style={[spacing.gapLg]}>
       {uploading && <Loader variant="Screen" />}
       <Text style={[text.textLeft, fonts.lg, colors.textOnBackground, text.textBold]}>
         תמונה שנבחרה
