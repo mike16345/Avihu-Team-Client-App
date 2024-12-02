@@ -101,12 +101,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
       <View style={styles.workoutDescriptionContainer}>
         <View style={[layout.widthFull]}>
           <Text
-            style={[
-              colors.textOnSecondaryContainer,
-              text.textBold,
-              fonts.default,
-              { textAlign: Platform.OS == `ios` ? `right` : `left` },
-            ]}
+            style={[colors.textOnSecondaryContainer, text.textBold, fonts.default, text.textRight]}
           >
             {exercise.name}
           </Text>
