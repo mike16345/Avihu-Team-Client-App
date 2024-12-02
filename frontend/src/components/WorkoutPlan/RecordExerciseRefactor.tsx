@@ -19,6 +19,7 @@ import Loader from "../ui/loaders/Loader";
 import RecordedSetInfo from "./RecordedSetInfo";
 import { ONE_DAY } from "@/constants/reactQuery";
 import { Text } from "../ui/Text";
+import CurrentSetContainer from "./CurrentSetContainer";
 
 type InputTypes = "reps" | "weight";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
@@ -131,6 +132,9 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 חזרות: {exercise.sets[setNumber - 1].minReps}-{exercise.sets[setNumber - 1].maxReps}
               </Text>
             )}
+
+            <CurrentSetContainer />
+
             <WorkoutTips
               tips={[exercise.tipFromTrainer!]}
               openTips={openTrainerTips}
