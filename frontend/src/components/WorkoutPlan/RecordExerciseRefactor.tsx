@@ -103,7 +103,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
   }, [navigation]);
 
   if (isLoading) return <Loader variant="Standard" />;
-  
+
   return (
     <>
       {isSetUploading && <Loader variant="Screen" />}
@@ -124,6 +124,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 </Text>
               </Pressable>
             )}
+            <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
             <Text style={styles.setInfo}>סט: {setNumber}</Text>
             {exercise.sets[setNumber - 1] && (
               <Text style={styles.setInfo}>
@@ -137,7 +138,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             />
           </View>
           <View style={[layout.justifyEvenly, layout.flex1]}>
-            <View style={[layout.flexRow, layout.justifyAround]}>
+            <View style={[layout.flexDirectionByPlatform, layout.justifyAround]}>
               <View style={[layout.center, spacing.gapDefault]}>
                 <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
                   חזרות
