@@ -11,6 +11,7 @@ export type RootStackParamList = {
   VideoGallery: undefined;
   MyProgressScreen: undefined;
   LoginScreen: undefined;
+  BlogScreen: undefined;
   EmailScreen: undefined;
 };
 
