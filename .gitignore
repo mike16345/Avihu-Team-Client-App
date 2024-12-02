@@ -44,3 +44,6 @@ yarn-error.*
 
 # JavaScript Inspector thing
 **/%PROGRAMDATA%/*
+
+# Apple csr
+*.csr
