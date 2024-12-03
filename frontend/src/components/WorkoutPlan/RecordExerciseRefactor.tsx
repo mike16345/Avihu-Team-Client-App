@@ -1,13 +1,19 @@
 import { FC, useEffect, useMemo, useState } from "react";
-import { StyleSheet, View, useWindowDimensions, Pressable, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  useWindowDimensions,
+  Pressable,
+  ScrollView,
+  Platform,
+} from "react-native";
 import { Colors } from "@/constants/Colors";
 import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import useStyles from "@/styles/useGlobalStyles";
-import { Button, TextInput } from "react-native-paper";
+import { Button } from "react-native-paper";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
 import { createRetryFunction, extractVideoId, generateWheelPickerData } from "@/utils/utils";
-import WheelInputDrawer from "../ui/WheelInputDrawer";
 import WeightWheelPicker from "../WeightGraph/WeightWheelPicker";
 import WheelPicker from "../ui/WheelPicker";
 import WorkoutTips from "./WorkoutTips";
@@ -19,6 +25,8 @@ import Loader from "../ui/loaders/Loader";
 import RecordedSetInfo from "./RecordedSetInfo";
 import { ONE_DAY } from "@/constants/reactQuery";
 import { Text } from "../ui/Text";
+
+import Toast from "react-native-toast-message";
 
 type InputTypes = "reps" | "weight";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
@@ -46,7 +54,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
 
   const { height, width } = useWindowDimensions();
   const customStyles = useStyles();
-  const { colors, fonts, layout, spacing, text } = customStyles;
+  const { colors, fonts, layout, spacing, text, common } = customStyles;
   const currentUser = useUserStore((state) => state.currentUser);
   const { getUserRecordedSetsByExercise } = useRecordedSetsApi();
 
@@ -69,8 +77,6 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
     note: "",
   });
 
-  const [showWeightInputModal, setShowWeightInputModal] = useState(false);
-  const [showRepsInputDrawer, setShowRepsInputDrawer] = useState(false);
   const [openTrainerTips, setOpenTrainerTips] = useState(false);
   const [isSetUploading, setIsSetUploading] = useState(false);
 
@@ -85,16 +91,18 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
     try {
       setIsSetUploading(true);
       await handleRecordSet(recordedSet);
-    } catch (err) {
+    } catch (err: any) {
+      Toast.show({
+        text1: "אופס, נתקלנו בבעיה",
+        text2: err.message,
+        autoHide: true,
+        type: "error",
+        swipeable: true,
+        text1Style: { textAlign: Platform.OS === "ios" ? "right" : "left" },
+        text2Style: { textAlign: Platform.OS === "ios" ? "right" : "left" },
+      });
+    } finally {
       setIsSetUploading(false);
-    }
-  };
-
-  const handleOpenInputModal = (input: InputTypes) => {
-    if (input === "reps") {
-      setShowRepsInputDrawer(true);
-    } else {
-      setShowWeightInputModal(true);
     }
   };
 
@@ -131,41 +139,72 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 חזרות: {exercise.sets[setNumber - 1].minReps}-{exercise.sets[setNumber - 1].maxReps}
               </Text>
             )}
+
             <WorkoutTips
               tips={[exercise.tipFromTrainer!]}
               openTips={openTrainerTips}
               setOpenTips={setOpenTrainerTips}
             />
           </View>
+
           <View style={[layout.justifyEvenly, layout.flex1]}>
-            <View style={[layout.flexDirectionByPlatform, layout.justifyAround]}>
+            <View style={[layout.flexDirectionByPlatform, layout.justifyEvenly]}>
               <View style={[layout.center, spacing.gapDefault]}>
                 <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
                   חזרות
                 </Text>
-                <Button
-                  mode="outlined"
-                  onPress={() => handleOpenInputModal("reps")}
-                  style={[{ borderRadius: 6 }]}
+
+                <View
+                  style={[
+                    { borderTopWidth: 2, borderBottomWidth: 2 },
+                    colors.borderSecondary,
+                    spacing.pdHorizontalDefault,
+                  ]}
                 >
-                  {recordedSet.repsDone}
-                </Button>
+                  <WheelPicker
+                    activeItemColor={colors.textOnSurface.color}
+                    inactiveItemColor={colors.textOnSurfaceDisabled.color}
+                    data={repsOptions}
+                    onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
+                    selectedValue={recordedSet.repsDone}
+                    height={height * 0.1}
+                    itemHeight={35}
+                  />
+                </View>
               </View>
               <View style={[layout.center, spacing.gapDefault]}>
                 <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
                   משקל
                 </Text>
-                <Button
-                  onPress={() => handleOpenInputModal("weight")}
-                  style={[{ borderRadius: 6 }]}
-                  mode="outlined"
+
+                <View
+                  style={[
+                    { borderTopWidth: 2, borderBottomWidth: 2 },
+                    colors.borderSecondary,
+                    spacing.pdHorizontalDefault,
+                    common.rounded,
+                  ]}
                 >
-                  {recordedSet.weight}
-                </Button>
+                  <WeightWheelPicker
+                    onValueChange={(val) => {
+                      handleUpdateRecordedSet("weight", val);
+                    }}
+                    activeItemColor={colors.textOnSurface.color}
+                    inactiveItemColor={colors.textOnSurfaceDisabled.color}
+                    minWeight={1}
+                    decimalStepSize={2.5}
+                    showZeroDecimal={false}
+                    decimalRange={10}
+                    maxWeight={200}
+                    stepSize={1}
+                    height={height * 0.1}
+                    itemHeight={35}
+                    selectedWeight={recordedSet.weight}
+                  />
+                </View>
               </View>
             </View>
           </View>
-
           {lastRecordedSet && (
             <View style={[spacing.mgVerticalDefault, spacing.gapSm]}>
               <Text style={[text.textRight, text.textBold, colors.textOnSecondaryContainer]}>
@@ -197,6 +236,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             layout.itemsCenter,
             layout.widthFull,
             spacing.gapLg,
+            spacing.pdHorizontalDefault,
           ]}
         >
           <Button mode="contained" onPress={handleSave}>
@@ -206,55 +246,6 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             בטל
           </Button>
         </View>
-        {showWeightInputModal && (
-          <WheelInputDrawer
-            title="משקל"
-            currentValue={recordedSet.weight}
-            onDismiss={() => setShowWeightInputModal(false)}
-            onSave={(val) => {
-              handleUpdateRecordedSet("weight", val);
-              setShowWeightInputModal(false);
-            }}
-          >
-            <WeightWheelPicker
-              onValueChange={(val) => {
-                handleUpdateRecordedSet("weight", val);
-              }}
-              activeItemColor={colors.textOnSurface.color}
-              inactiveItemColor={colors.textOnSurfaceDisabled.color}
-              minWeight={1}
-              decimalStepSize={2.5}
-              showZeroDecimal={false}
-              decimalRange={10}
-              maxWeight={200}
-              stepSize={1}
-              height={height / 3.8}
-              itemHeight={40}
-              selectedWeight={recordedSet.weight}
-            />
-          </WheelInputDrawer>
-        )}
-        {showRepsInputDrawer && (
-          <WheelInputDrawer
-            title="חזרות"
-            currentValue={recordedSet.repsDone}
-            onDismiss={() => setShowRepsInputDrawer(false)}
-            onSave={(val) => {
-              handleUpdateRecordedSet("repsDone", val);
-              setShowRepsInputDrawer(false);
-            }}
-          >
-            <WheelPicker
-              activeItemColor={colors.textOnSurface.color}
-              inactiveItemColor={colors.textOnSurfaceDisabled.color}
-              data={repsOptions}
-              onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
-              selectedValue={recordedSet.repsDone}
-              height={height / 3.8}
-              itemHeight={40}
-            />
-          </WheelInputDrawer>
-        )}
       </View>
     </>
   );

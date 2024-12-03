@@ -133,7 +133,6 @@ const MyProgressScreen = () => {
 
   useEffect(() => {
     const title = calculateImageUploadTitle(currentUser?.checkInAt || 0);
-
     setDisabledTitle(title);
   }, []);
 
