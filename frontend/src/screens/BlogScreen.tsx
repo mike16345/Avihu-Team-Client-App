@@ -15,6 +15,8 @@ import { useBlogsApi } from "@/hooks/api/useBlogsApi";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { IBlog } from "@/interfaces/IBlog";
 import { buildPhotoUrl } from "@/utils/utils";
+import BlogImage from "@/components/Blog/BlogImage";
+import DateUtils from "@/utils/dateUtils";
 
 interface PostCardProps {
   blog: IBlog;
@@ -22,8 +24,8 @@ interface PostCardProps {
 
 const PostCard: FC<PostCardProps> = ({ blog }) => {
   const [expanded, setExpanded] = useState(false);
-  const { width } = useWindowDimensions(); // For responsive HTML rendering
-  const { colors, text, fonts } = useStyles();
+  const { width } = useWindowDimensions();
+  const { colors, text, fonts, layout } = useStyles();
   const cardStyles = useCardStyles();
 
   const shouldTruncate = blog.content.length > 100;
@@ -32,9 +34,12 @@ const PostCard: FC<PostCardProps> = ({ blog }) => {
 
   return (
     <View style={[cardStyles.card]}>
-      <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.lg]}>
-        {blog.title.trimStart()}
-      </Text>
+      <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
+        <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.lg]}>
+          {blog.title.trimStart()}
+        </Text>
+        <Text style={[colors.textOnSecondaryContainer]}>{DateUtils.formatDate(blog.date)}</Text>
+      </View>
 
       <RenderHTML
         contentWidth={width}
@@ -50,18 +55,7 @@ const PostCard: FC<PostCardProps> = ({ blog }) => {
         </TouchableOpacity>
       )}
 
-      {blog.imageUrl && (
-        <Image
-          source={{ uri: buildPhotoUrl(blog.imageUrl) }}
-          style={{
-            width: "100%",
-            height: 200,
-            marginTop: 12,
-            borderRadius: 8,
-          }}
-          resizeMode="cover"
-        />
-      )}
+      {blog.imageUrl && <BlogImage imageUrl={buildPhotoUrl(blog.imageUrl)} />}
     </View>
   );
 };
