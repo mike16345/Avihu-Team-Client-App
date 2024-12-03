@@ -4,6 +4,7 @@ import { useUserStore } from "@/store/userStore";
 
 const useImageUploadStatus = () => {
   const { updateUserField } = useUserApi();
+  const currentUserId = useUserStore((store) => store.currentUser?._id);
 
   const calculateImageUploadTitle = (usersCheckInDate: number) => {
     const MILLIESECONDS_IN_A_DAY = 86400000;
@@ -13,7 +14,6 @@ const useImageUploadStatus = () => {
 
     switch (daysLeft) {
       case 0:
-        const currentUserId = useUserStore((store) => store.currentUser?._id);
         updateUserField(currentUserId || ``, "imagesUploaded", false);
         return ``;
       case 1:

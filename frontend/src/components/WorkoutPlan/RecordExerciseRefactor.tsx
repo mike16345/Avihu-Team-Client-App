@@ -20,6 +20,7 @@ import RecordedSetInfo from "./RecordedSetInfo";
 import { ONE_DAY } from "@/constants/reactQuery";
 import { Text } from "../ui/Text";
 import CurrentSetContainer from "./CurrentSetContainer";
+import SectionWheelPicker from "../ui/SectionWheelPicker";
 
 type InputTypes = "reps" | "weight";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
@@ -172,25 +173,50 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
                   חזרות
                 </Text>
-                <Button
+                {/* <Button
                   mode="outlined"
                   onPress={() => handleOpenInputModal("reps")}
                   style={[{ borderRadius: 6 }]}
                 >
                   {recordedSet.repsDone}
-                </Button>
+                </Button> */}
+                <WheelPicker
+                  activeItemColor={colors.textOnSurface.color}
+                  inactiveItemColor={colors.textOnSurfaceDisabled.color}
+                  data={repsOptions}
+                  onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
+                  selectedValue={recordedSet.repsDone}
+                  height={height / 3.8}
+                  itemHeight={40}
+                />
               </View>
               <View style={[layout.center, spacing.gapDefault]}>
                 <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
                   משקל
                 </Text>
-                <Button
+                {/* <Button
                   onPress={() => handleOpenInputModal("weight")}
                   style={[{ borderRadius: 6 }]}
                   mode="outlined"
                 >
                   {recordedSet.weight}
-                </Button>
+                </Button> */}
+                <WeightWheelPicker
+                  onValueChange={(val) => {
+                    handleUpdateRecordedSet("weight", val);
+                  }}
+                  activeItemColor={colors.textOnSurface.color}
+                  inactiveItemColor={colors.textOnSurfaceDisabled.color}
+                  minWeight={1}
+                  decimalStepSize={2.5}
+                  showZeroDecimal={false}
+                  decimalRange={10}
+                  maxWeight={200}
+                  stepSize={1}
+                  height={height / 3.8}
+                  itemHeight={40}
+                  selectedWeight={recordedSet.weight}
+                />
               </View>
             </View>
           </View>
