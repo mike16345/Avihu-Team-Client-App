@@ -39,40 +39,52 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
   const [currentSetNumber, setCurrentSetNumber] = useState(1);
 
-  const handleRecordSet = (recordedSet: Omit<IRecordedSet, "plan">, isEdit = false) => {
-    if (!currentUser) return;
+  const handleRecordSet = (
+    recordedSet: Omit<IRecordedSet, "plan">,
+    isEdit = false
+  ): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (!currentUser) {
+        reject(new Error("No current user available"));
+        return;
+      }
 
-    const setToRecord: IRecordedSetPost = {
-      userId: currentUser._id,
-      exercise: exercise.name,
-      recordedSet: {
-        ...recordedSet,
-        plan,
-      },
-      muscleGroup,
-    };
+      const setToRecord: IRecordedSetPost = {
+        userId: currentUser._id,
+        exercise: exercise.name,
+        recordedSet: {
+          ...recordedSet,
+          plan,
+        },
+        muscleGroup,
+      };
 
-    addRecordedSet(setToRecord, session?._id || "")
-      .then((response) => {
-        const updatedSession = response.session;
+      addRecordedSet(setToRecord, session?._id || "")
+        .then((response) => {
+          const updatedSession = response.session;
 
-        updateSession(updatedSession);
-        handleSetCurrentSetInfo(updatedSession);
+          updateSession(updatedSession);
+          handleSetCurrentSetInfo(updatedSession);
 
-        Toast.show({
-          text1: "סט הוקלט בהצלחה",
-          text2: "כל הכבוד!",
-          autoHide: true,
-          type: "success",
-          swipeable: true,
-          text1Style: { textAlign: Platform.OS == `ios` ? `right` : `left` },
-          text2Style: { textAlign: Platform.OS == `ios` ? `right` : `left` },
+          Toast.show({
+            text1: "סט הוקלט בהצלחה",
+            text2: "כל הכבוד!",
+            autoHide: true,
+            type: "success",
+            swipeable: true,
+            text1Style: { textAlign: Platform.OS === "ios" ? "right" : "left" },
+            text2Style: { textAlign: Platform.OS === "ios" ? "right" : "left" },
+          });
+          navigation?.goBack();
+
+          resolve(); // Resolve the promise after successful completion
+        })
+        .catch((err) => {
+          console.error(err);
+          reject(err); // Reject the promise if there's an error
         });
-        navigation?.goBack();
-      })
-      .catch((err) => console.error());
+    });
   };
-
   const handleSetCurrentSetInfo = (updatedSession: ISession) => {
     if (!updatedSession) return;
     const data = updatedSession.data;

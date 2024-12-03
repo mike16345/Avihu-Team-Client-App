@@ -91,7 +91,6 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       itemHeight,
       activeItemColor,
       inactiveItemColor,
-      label: 'ק"ג',
     },
   ];
 
