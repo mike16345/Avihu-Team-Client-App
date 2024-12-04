@@ -15,6 +15,16 @@ export interface IUser {
   hasAccess: boolean;
 }
 
+export interface IUserDetails {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dateJoined: Date;
+  dateFinished: Date;
+  planType: string;
+}
+
 // WeighIn interface
 export interface IWeighInPost extends Partial<IWeighIn> {}
 export interface IWeighIn {
