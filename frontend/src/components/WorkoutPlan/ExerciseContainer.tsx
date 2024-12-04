@@ -72,8 +72,8 @@ const ExerciseContainer: FC<WorkoutProps> = ({
             autoHide: true,
             type: "success",
             swipeable: true,
-            text1Style: { textAlign: Platform.OS === "ios" ? "right" : "left" },
-            text2Style: { textAlign: Platform.OS === "ios" ? "right" : "left" },
+            text1Style: { textAlign: `center` },
+            text2Style: { textAlign: `center` },
           });
           navigation?.goBack();
 
