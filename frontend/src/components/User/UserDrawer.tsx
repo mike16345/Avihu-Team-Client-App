@@ -16,12 +16,11 @@ const UserDrawer = () => {
   const { openUserDrawer, setOpenUserDrawer } = useUserDrawer();
   const { setCurrentUser } = useUserStore();
   const sessionStorage = useAsyncStorage("sessionToken");
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const logUserOut = () => {
+    setOpenUserDrawer(false);
     setCurrentUser(null);
     sessionStorage.removeItem();
-    navigation.navigate("LoginScreen");
   };
 
   return (
