@@ -251,7 +251,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
           ]}
         >
           <Button mode="contained" onPress={handleSave}>
-            <Text style={[customStyles.text.textBold]}>שמור</Text>
+            <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
           </Button>
           <Button mode="contained-tonal" onPress={() => navigation?.goBack()}>
             בטל

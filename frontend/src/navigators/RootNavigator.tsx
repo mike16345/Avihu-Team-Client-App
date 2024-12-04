@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Login from "@/components/Login/Login";
-import { GetStartedScreen } from "@/screens/GetStartedScreen";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import BottomTabNavigator from "./BottomTabNavigator";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -12,7 +11,7 @@ import Loader from "@/components/ui/loaders/Loader";
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
-  const sessionStorage = useAsyncStorage("sessionTokn");
+  const sessionStorage = useAsyncStorage("sessionToken");
 
   const { checkUserSessionToken, getUserById } = useUserApi();
   const { currentUser, setCurrentUser } = useUserStore();
