@@ -146,7 +146,7 @@ const MyProgressScreen = () => {
           layout.flexGrow,
           colors.background,
           spacing.pdBottomBar,
-          spacing.pdStatusBar,
+          spacing.pdVerticalDefault,
         ]}
       >
         {(addNewWeighIn.isLoading || updateWeighIn.isLoading || removeWeighIn.isLoading) && (

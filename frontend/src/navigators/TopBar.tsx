@@ -1,19 +1,33 @@
-import { View, Text } from "react-native";
-import { Avatar } from "@rneui/themed";
-import Entypo from "react-native-vector-icons/Entypo";
+import { View, useWindowDimensions } from "react-native";
+
+import useStyles from "@/styles/useGlobalStyles";
+import NativeIcon from "@/components/Icon/NativeIcon";
+import { useUserDrawer } from "@/store/userDrawerStore";
 
 export default function TopBar() {
+  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { height } = useWindowDimensions();
+  const { setOpenUserDrawer } = useUserDrawer();
+
   return (
-    <View className="flex flex-row p-2  bg-gray-800 h-[85px] w-full items-end justify-between   ">
-      <Avatar title="AB" size={"small"} rounded />
-      <Text className="text-2xl font-bold text-emerald-300">AB</Text>
-      <Entypo
-        onPress={() => {
-          console.log("hello");
-        }}
-        style={{ color: "white" }}
-        name="menu"
-        size={28}
+    <View
+      style={[
+        spacing.pdStatusBar,
+        layout.itemsEnd,
+        spacing.pdHorizontalDefault,
+        {
+          height: height * 0.1,
+          borderBottomWidth: 0.25,
+          borderBottomColor: colors.borderSecondaryContainer.borderColor,
+        },
+      ]}
+    >
+      <NativeIcon
+        library="Feather"
+        name="user"
+        color={colors.textOnBackground.color}
+        size={30}
+        onPress={() => setOpenUserDrawer(true)}
       />
     </View>
   );

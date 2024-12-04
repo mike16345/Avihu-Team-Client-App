@@ -1,25 +1,24 @@
 import useStyles from "@/styles/useGlobalStyles";
-import React, { useState } from "react";
-import { useWindowDimensions, View } from "react-native";
+import { View } from "react-native";
 import RightDrawer from "../ui/RightDrawer";
 import { Text } from "../ui/Text";
-import NativeIcon from "../Icon/NativeIcon";
 import UserInfoContainer from "./UserInfoContainer";
 import { Button } from "react-native-paper";
+import { useUserDrawer } from "@/store/userDrawerStore";
 
 const UserDrawer = () => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
-  const [open, setOpen] = useState(true);
+  const { openUserDrawer, setOpenUserDrawer } = useUserDrawer();
 
   return (
     <RightDrawer
-      open={open}
-      onClose={() => setOpen(false)}
+      open={openUserDrawer}
+      onClose={() => setOpenUserDrawer(false)}
       children={
         <View
           style={[
             layout.sizeFull,
-            spacing.pdHorizontalDefault,
+            spacing.pdHorizontalSm,
             spacing.pdStatusBar,
             layout.justifyBetween,
           ]}
@@ -28,7 +27,11 @@ const UserDrawer = () => {
             פרטי משתמש
           </Text>
           <UserInfoContainer />
-          <Button mode="contained" style={common.rounded} textColor={colors.textOnBackground.color}>
+          <Button
+            mode="contained-tonal"
+            style={common.rounded}
+            textColor={colors.textOnBackground.color}
+          >
             התנתקות
           </Button>
         </View>

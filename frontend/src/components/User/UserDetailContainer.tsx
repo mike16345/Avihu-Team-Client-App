@@ -10,7 +10,7 @@ interface UserDetailContainerProps {
 }
 
 const UserDetailContainer: React.FC<UserDetailContainerProps> = ({ label, value }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, spacing, text } = useStyles();
   return (
     <View style={[spacing.pdDefault, spacing.gapDefault]}>
       <Text style={[text.textRight, text.textBold, colors.textOnBackground]}>{label}</Text>
@@ -18,7 +18,7 @@ const UserDetailContainer: React.FC<UserDetailContainerProps> = ({ label, value 
         mode="outlined"
         value={value}
         editable={false}
-        style={[text.textRight, colors.backdrop]}
+        style={[text.textCenter, colors.backdrop]}
         outlineColor={colors.backdrop.backgroundColor}
       />
     </View>
