@@ -1,5 +1,4 @@
 import { useUserStore } from "@/store/userStore";
-import React from "react";
 import { View } from "react-native";
 import UserDetailContainer from "./UserDetailContainer";
 

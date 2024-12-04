@@ -5,7 +5,7 @@ import NativeIcon from "@/components/Icon/NativeIcon";
 import { useUserDrawer } from "@/store/userDrawerStore";
 
 export default function TopBar() {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, layout, spacing } = useStyles();
   const { height } = useWindowDimensions();
   const { setOpenUserDrawer } = useUserDrawer();
 
