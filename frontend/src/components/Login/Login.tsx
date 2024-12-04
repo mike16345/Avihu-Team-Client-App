@@ -240,10 +240,11 @@ export default function Login({ onLogin }: ILoginProps) {
                 activeOutlineColor={colors.borderSecondary.borderColor}
                 placeholder="user@example.com"
                 keyboardType={"email-address"}
+                multiline={Platform.OS === `ios` ? true : false}
                 autoCorrect={false}
                 autoComplete="email"
                 error={Boolean(formErrors.email)}
-                textContentType="oneTimeCode"
+                textContentType="emailAddress"
                 onChangeText={(val) =>
                   setInputtedCredentials({
                     ...inputtedCrendentials,

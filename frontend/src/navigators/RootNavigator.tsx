@@ -12,7 +12,7 @@ import Loader from "@/components/ui/loaders/Loader";
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
-  const sessionStorage = useAsyncStorage("sessionToken");
+  const sessionStorage = useAsyncStorage("sessionTokn");
 
   const { checkUserSessionToken, getUserById } = useUserApi();
   const { currentUser, setCurrentUser } = useUserStore();
