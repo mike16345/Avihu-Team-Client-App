@@ -35,7 +35,7 @@ const RecordedSetInfo: FC<RecordedSetInfoProps> = ({ recordedSet, actionButton }
             </Text>
           </View>
         </View>
-        {actionButton}
+        <View style={[layout.center]}>{actionButton}</View>
       </View>
     </View>
   );
