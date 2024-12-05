@@ -16,12 +16,10 @@ const RootNavigator = () => {
   const { checkUserSessionToken, getUserById } = useUserApi();
   const { currentUser, setCurrentUser } = useUserStore();
 
-  //const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const onLogin = (user: IUser) => {
     setCurrentUser(user);
-    //setIsLoggedIn(true);
   };
 
   const checkLoginStatus = async () => {
@@ -34,17 +32,14 @@ const RootNavigator = () => {
       const isValidSession = (await checkUserSessionToken(tokenData)).isValid;
 
       if (!isValidSession) {
-        //setIsLoggedIn(false);
         sessionStorage.removeItem();
         return;
       }
       const user = await getUserById(tokenData.userId);
 
       setCurrentUser(user);
-      //setIsLoggedIn(true);
       setIsLoading(false);
     } catch (error) {
-      //setIsLoggedIn(false);
       setIsLoading(false);
       sessionStorage.removeItem();
     }
