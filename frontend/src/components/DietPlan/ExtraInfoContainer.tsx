@@ -10,7 +10,7 @@ interface ExtraInfoContainerProps {
   veggiesPerDay?: number;
   fatsPerDay?: number;
   freeCalories?: number;
-  customInstructions?: string;
+  customInstructions?: string[];
 }
 
 const ExtraInfoContainer: React.FC<ExtraInfoContainerProps> = ({
