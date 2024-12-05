@@ -327,7 +327,7 @@ export default function Login({ onLogin }: ILoginProps) {
           style={[layout.widthFull, common.rounded, colors.backgroundPrimary]}
           onPress={handleSubmit}
         >
-          התחברות
+          אישור
         </Button>
       </KeyboardAvoidingView>
     </View>

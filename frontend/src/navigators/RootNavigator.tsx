@@ -16,12 +16,12 @@ const RootNavigator = () => {
   const { checkUserSessionToken, getUserById } = useUserApi();
   const { currentUser, setCurrentUser } = useUserStore();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  //const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const onLogin = (user: IUser) => {
     setCurrentUser(user);
-    setIsLoggedIn(true);
+    //setIsLoggedIn(true);
   };
 
   const checkLoginStatus = async () => {
@@ -34,17 +34,17 @@ const RootNavigator = () => {
       const isValidSession = (await checkUserSessionToken(tokenData)).isValid;
 
       if (!isValidSession) {
-        setIsLoggedIn(false);
+        //setIsLoggedIn(false);
         sessionStorage.removeItem();
         return;
       }
       const user = await getUserById(tokenData.userId);
 
       setCurrentUser(user);
-      setIsLoggedIn(true);
+      //setIsLoggedIn(true);
       setIsLoading(false);
     } catch (error) {
-      setIsLoggedIn(false);
+      //setIsLoggedIn(false);
       setIsLoading(false);
       sessionStorage.removeItem();
     }
@@ -61,10 +61,9 @@ const RootNavigator = () => {
   return (
     <>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isLoggedIn && currentUser && (
+        {currentUser ? (
           <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
-        )}
-        {!isLoggedIn && (
+        ) : (
           <>
             <Stack.Screen children={() => <Login onLogin={onLogin} />} name="LoginScreen" />
           </>

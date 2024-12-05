@@ -10,6 +10,7 @@ import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { RootStackParamList } from "@/types/navigatorTypes";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import NativeIcon from "../Icon/NativeIcon";
 
 const UserDrawer = () => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
@@ -45,8 +46,15 @@ const UserDrawer = () => {
             style={common.rounded}
             textColor={colors.textOnBackground.color}
             onPress={logUserOut}
+            icon={() => (
+              <NativeIcon
+                library="Ionicons"
+                name="exit-outline"
+                style={[fonts.lg, colors.textOnBackground]}
+              />
+            )}
           >
-            התנתקות
+            התנתק
           </Button>
         </View>
       }
