@@ -38,7 +38,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
   const [error, setError] = useState({ status: null, message: null });
 
-  const { fonts, text, spacing } = useStyles();
+  const { fonts, text, spacing, colors } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
   const { currentUser } = useUserStore();
   const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
@@ -122,6 +122,8 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
             open={open}
             value={value}
             items={plans}
+            style={colors.backgroundSecondaryContainer}
+            listItemContainerStyle={colors.backgroundSecondaryContainer}
             theme="DARK"
             setOpen={setOpen}
             setValue={setValue}
