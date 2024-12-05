@@ -8,7 +8,6 @@ import {
   Animated,
   useAnimatedValue,
   TouchableOpacity,
-  Platform,
 } from "react-native";
 import { useEffect, useState } from "react";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
@@ -24,6 +23,8 @@ import Loader from "../ui/loaders/Loader";
 import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
 import { Text } from "../ui/Text";
+import ForgotPassword from "./ForgotPassword";
+import { EMAIL_ERROR, INVALID_PASSWORD_MATCH } from "@/constants/Constants";
 
 interface IUserCredentials {
   email: string;
@@ -59,6 +60,7 @@ export default function Login({ onLogin }: ILoginProps) {
   const [emailChecked, setEmailchecked] = useState(false);
   const [userRegistered, setUserRegistered] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   const showAlert = (type: ToastType, message: string) => {
     Toast.show({
@@ -78,7 +80,7 @@ export default function Login({ onLogin }: ILoginProps) {
     Keyboard.dismiss();
 
     if (!testEmail(formattedEmail)) {
-      errors[`email`] = `אנא הכניסו כתובת מייל תקינה`;
+      errors[`email`] = EMAIL_ERROR;
     }
 
     if (emailChecked && !password) {
@@ -86,7 +88,7 @@ export default function Login({ onLogin }: ILoginProps) {
     }
 
     if (emailChecked && password !== confirmPassword) {
-      errors[`confirmPassword`] = `סיסמאות לא תואמות`;
+      errors[`confirmPassword`] = INVALID_PASSWORD_MATCH;
     }
 
     if (errors[`email`] || errors[`password`] || (!userRegistered && errors[`confirmPassword`])) {
@@ -100,7 +102,7 @@ export default function Login({ onLogin }: ILoginProps) {
         .then((res) => {
           showAlert("success", res.message);
           setEmailchecked(true);
-          if (res.data.password) {
+          if (res.data.hasPassword) {
             setUserRegistered(true);
           }
         })
@@ -178,157 +180,189 @@ export default function Login({ onLogin }: ILoginProps) {
   }, [emailChecked, userRegistered]);
 
   return (
-    <View style={[layout.center, { height: height, width: width }]}>
-      {loading && <Loader variant="Screen" />}
-      <ImageBackground
-        source={avihuFlyTrap}
-        style={[
-          layout.center,
-          layout.flex1,
-          {
-            width: moderateScale(350, 2),
-            height: moderateScale(700, 2),
-            zIndex: 0,
-          },
-        ]}
-      />
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View
+    <>
+      <View style={[layout.center, { height: height, width: width }]}>
+        {loading && <Loader variant="Screen" />}
+        <ImageBackground
+          source={avihuFlyTrap}
           style={[
-            colors.background,
+            layout.center,
+            layout.flex1,
             {
-              position: `absolute`,
-              top: 0,
-              left: 0,
-              zIndex: 10,
-              opacity: 0.7,
-              height: height,
-              width: width,
+              width: moderateScale(350, 2),
+              height: moderateScale(700, 2),
+              zIndex: 0,
             },
           ]}
-        ></View>
-      </TouchableWithoutFeedback>
-      <KeyboardAvoidingView
-        behavior="padding"
-        style={[
-          layout.center,
-          spacing.gapDefault,
-          { zIndex: 30, position: `absolute`, width: width * 0.7 },
-        ]}
-      >
-        <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
-          <Text style={[colors.textOnBackground, text.textBold, spacing.pdLg, fonts.xxxl]}>
-            כניסה לחשבון
-          </Text>
-        </Animated.View>
-        <View style={[layout.widthFull, spacing.gapXl]}>
-          {!emailChecked ? (
-            <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
-              <Text
-                style={[
-                  text.textRight,
-                  spacing.pdHorizontalXs,
-                  colors.textOnBackground,
-                  text.textBold,
-                ]}
-              >
-                כתובת מייל
-              </Text>
-              <TextInput
-                style={[{ width: "100%" }, text.textLeft, colors.background]}
-                mode="outlined"
-                activeOutlineColor={colors.borderSecondary.borderColor}
-                placeholder="user@example.com"
-                keyboardType={"email-address"}
-                autoCorrect={false}
-                autoComplete="email"
-                error={Boolean(formErrors.email)}
-                textContentType="oneTimeCode"
-                onChangeText={(val) =>
-                  setInputtedCredentials({
-                    ...inputtedCrendentials,
-                    email: val,
-                  })
-                }
-                value={inputtedCrendentials.email}
-              />
-              <Text style={[text.textDanger, text.textRight, text.textBold]}>
-                {formErrors.email}
-              </Text>
-            </Animated.View>
-          ) : (
-            <Animated.View
-              style={[spacing.gapDefault, { transform: [{ translateY: emailInputY }] }]}
-            >
-              <View
-                style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}
-              >
-                <Text
-                  style={[fonts.default, text.textBold, colors.textOnBackground, text.textCenter]}
-                >
-                  {inputtedCrendentials.email}
-                </Text>
-              </View>
-              <TouchableOpacity onPress={chooseDifferentMail}>
-                <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>
-                  התחברות באמצעות מייל אחר
-                </Text>
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-          {emailChecked && userRegistered && (
-            <Animated.View style={{ opacity: fadeValue }}>
-              <Text
-                style={[
-                  text.textRight,
-                  colors.textOnSecondaryContainer,
-                  text.textBold,
-                  spacing.pdHorizontalXs,
-                ]}
-              >
-                סיסמה
-              </Text>
-              <TextInput
-                style={[text.textRight, { width: "100%" }]}
-                mode="outlined"
-                activeOutlineColor={colors.borderSecondary.borderColor}
-                secureTextEntry={!showPassword}
-                error={Boolean(formErrors.password)}
-                onChangeText={(val) =>
-                  setInputtedCredentials({ ...inputtedCrendentials, password: val })
-                }
-                left={
-                  <TextInput.Icon
-                    onPress={() => setShowPassword((show) => !show)}
-                    icon={showPassword ? "eye-off" : "eye"}
-                  />
-                }
-              />
-              <Text style={[text.textDanger, text.textRight, text.textBold]}>
-                {formErrors.password}
-              </Text>
-            </Animated.View>
-          )}
-          {emailChecked && !userRegistered && (
-            <Animated.View style={{ opacity: fadeValue }}>
-              <ConfirmPassword
-                errors={formErrors}
-                handlePasswordChange={(val) =>
-                  setInputtedCredentials({ ...inputtedCrendentials, password: val })
-                }
-                handlePasswordConfirmChange={(val) => setConfirmPassowrd(val)}
-              />
-            </Animated.View>
-          )}
-        </View>
-        <Button
-          mode="contained-tonal"
-          style={[layout.widthFull, common.rounded, colors.backgroundPrimary]}
-          onPress={handleSubmit}
+        />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View
+            style={[
+              colors.background,
+              {
+                position: `absolute`,
+                top: 0,
+                left: 0,
+                zIndex: 10,
+                opacity: 0.7,
+                height: height,
+                width: width,
+              },
+            ]}
+          ></View>
+        </TouchableWithoutFeedback>
+        <KeyboardAvoidingView
+          behavior="padding"
+          style={[
+            layout.center,
+            spacing.gapXl,
+            { zIndex: 30, position: `absolute`, width: width * 0.7 },
+          ]}
         >
-          התחברות
-        </Button>
-      </KeyboardAvoidingView>
-    </View>
+          <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
+            <Text style={[colors.textOnBackground, text.textBold, fonts.xxxl]}>כניסה לחשבון</Text>
+          </Animated.View>
+          <View style={[layout.widthFull, spacing.gapLg]}>
+            {isForgotPassword && (
+              <ForgotPassword onConfirmChangePasswordSuccess={() => setIsForgotPassword(false)} />
+            )}
+            {!isForgotPassword && (
+              <>
+                {!emailChecked && (
+                  <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
+                    <Text
+                      style={[
+                        text.textRight,
+                        spacing.pdHorizontalXs,
+                        colors.textOnBackground,
+                        text.textBold,
+                      ]}
+                    >
+                      כתובת מייל
+                    </Text>
+                    <TextInput
+                      style={[{ width: "100%" }, text.textLeft, colors.background]}
+                      mode="outlined"
+                      activeOutlineColor={colors.borderSecondary.borderColor}
+                      placeholder="user@example.com"
+                      keyboardType={"email-address"}
+                      autoCorrect={false}
+                      autoComplete="email"
+                      error={Boolean(formErrors.email)}
+                      textContentType="oneTimeCode"
+                      onChangeText={(val) =>
+                        setInputtedCredentials({
+                          ...inputtedCrendentials,
+                          email: val,
+                        })
+                      }
+                      value={inputtedCrendentials.email}
+                    />
+                    <Text style={[text.textDanger, text.textRight, text.textBold]}>
+                      {formErrors.email}
+                    </Text>
+                  </Animated.View>
+                )}
+                {emailChecked && (
+                  <Animated.View
+                    style={[spacing.gapDefault, { transform: [{ translateY: emailInputY }] }]}
+                  >
+                    <View
+                      style={[
+                        spacing.pdDefault,
+                        colors.backgroundSecondaryContainer,
+                        common.rounded,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          fonts.default,
+                          text.textBold,
+                          colors.textOnBackground,
+                          text.textCenter,
+                        ]}
+                      >
+                        {inputtedCrendentials.email}
+                      </Text>
+                    </View>
+                    <TouchableOpacity onPress={chooseDifferentMail}>
+                      <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>
+                        התחברות באמצעות מייל אחר
+                      </Text>
+                    </TouchableOpacity>
+                  </Animated.View>
+                )}
+                {emailChecked && userRegistered && (
+                  <Animated.View style={{ opacity: fadeValue }}>
+                    <Text
+                      style={[
+                        text.textRight,
+                        colors.textOnSecondaryContainer,
+                        text.textBold,
+                        spacing.pdHorizontalXs,
+                      ]}
+                    >
+                      סיסמה
+                    </Text>
+                    <TextInput
+                      style={[text.textRight, { width: "100%" }]}
+                      mode="outlined"
+                      activeOutlineColor={colors.borderSecondary.borderColor}
+                      secureTextEntry={!showPassword}
+                      error={Boolean(formErrors.password)}
+                      onChangeText={(val) =>
+                        setInputtedCredentials({ ...inputtedCrendentials, password: val })
+                      }
+                      left={
+                        <TextInput.Icon
+                          onPress={() => setShowPassword((show) => !show)}
+                          icon={showPassword ? "eye-off" : "eye"}
+                        />
+                      }
+                    />
+                    {formErrors.password && (
+                      <Text style={[text.textDanger, text.textRight, text.textBold]}>
+                        {formErrors.password}
+                      </Text>
+                    )}
+                    <TouchableOpacity onPress={() => setIsForgotPassword(true)}>
+                      <Text
+                        style={[
+                          text.textRight,
+                          colors.textOnSecondaryContainer,
+                          text.textUnderline,
+                        ]}
+                      >
+                        שכחתי סיסמה
+                      </Text>
+                    </TouchableOpacity>
+                  </Animated.View>
+                )}
+                {emailChecked && !userRegistered && (
+                  <Animated.View style={{ opacity: fadeValue }}>
+                    <ConfirmPassword
+                      errors={formErrors}
+                      handlePasswordChange={(val) =>
+                        setInputtedCredentials({ ...inputtedCrendentials, password: val })
+                      }
+                      handlePasswordConfirmChange={(val) => setConfirmPassowrd(val)}
+                    />
+                  </Animated.View>
+                )}
+              </>
+            )}
+          </View>
+          {!isForgotPassword && (
+            <Button
+              mode="contained-tonal"
+              style={[layout.widthFull, common.rounded, colors.backgroundPrimary]}
+              onPress={handleSubmit}
+            >
+              התחברות
+            </Button>
+          )}
+        </KeyboardAvoidingView>
+      </View>
+    </>
   );
 }

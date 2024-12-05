@@ -27,7 +27,10 @@ export const useUserApi = () => {
   };
 
   const checkEmailAccess = (email: string) => {
-    return fetchData<ApiResponse<IUser>>(USER_ENDPOINT + `/user/email`, { email });
+    return fetchData<ApiResponse<{ user: IUser; hasPassword: boolean }>>(
+      USER_ENDPOINT + `/user/email`,
+      { email }
+    );
   };
 
   const registerUser = (email: string, password: string) =>
