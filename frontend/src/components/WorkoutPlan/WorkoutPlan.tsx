@@ -117,27 +117,30 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       <ImageBackground source={logoBlack} style={{ height: Dimensions.get("screen").height / 4 }} />
       <View style={[styles.container, spacing.gapLg, spacing.pdDefault]}>
         {value && plans && (
-          <DropDownPicker
-            rtl
-            open={open}
-            value={value}
-            items={plans}
-            style={colors.backgroundSecondaryContainer}
-            listItemContainerStyle={colors.backgroundSecondaryContainer}
-            theme="DARK"
-            setOpen={setOpen}
-            setValue={setValue}
-            labelStyle={text.textRight}
-            listItemLabelStyle={text.textRight}
-            onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
-          />
+          <>
+            <DropDownPicker
+              rtl
+              open={open}
+              value={value}
+              items={plans}
+              style={colors.backgroundSecondaryContainer}
+              listItemContainerStyle={colors.backgroundSecondaryContainer}
+              theme="DARK"
+              setOpen={setOpen}
+              setValue={setValue}
+              labelStyle={text.textRight}
+              listItemLabelStyle={text.textRight}
+              onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
+            />
+
+            <TouchableOpacity
+              style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
+              onPress={() => setOpenTips(true)}
+            >
+              <Text style={styles.tipsText}>דגשים</Text>
+            </TouchableOpacity>
+          </>
         )}
-        <TouchableOpacity
-          style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
-          onPress={() => setOpenTips(true)}
-        >
-          <Text style={styles.tipsText}>דגשים</Text>
-        </TouchableOpacity>
       </View>
     </>
   );
@@ -165,7 +168,9 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
           </View>
         </View>
       )}
-      ListFooterComponent={<WorkoutTips openTips={openTips} setOpenTips={setOpenTips} />}
+      ListFooterComponent={
+        <WorkoutTips tips={workoutPlan?.tips} openTips={openTips} setOpenTips={setOpenTips} />
+      }
       contentContainerStyle={styles.workoutContainer}
     />
   );
