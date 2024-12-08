@@ -137,7 +137,8 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             <Text style={styles.setInfo}>סט: {setNumber}</Text>
             {exercise.sets[setNumber - 1] && (
               <Text style={styles.setInfo}>
-                חזרות: {exercise.sets[setNumber - 1].minReps}-{exercise.sets[setNumber - 1].maxReps}
+                חזרות: {exercise.sets[setNumber - 1].minReps}
+                {exercise.sets[setNumber - 1].maxReps && `-${exercise.sets[setNumber - 1].maxReps}`}
               </Text>
             )}
 
@@ -224,7 +225,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
               style={[spacing.mgVerticalDefault, spacing.gapSm]}
             >
               <Text style={[text.textRight, text.textBold, colors.textOnSecondaryContainer]}>
-                אימון הקודם - {new Date(lastRecordedSet.date).toLocaleDateString()}
+                אימון קודם - {new Date(lastRecordedSet.date).toLocaleDateString()}
               </Text>
               <RecordedSetInfo
                 actionButton={
@@ -242,19 +243,23 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
         </ScrollView>
         <View
           style={[
-            layout.flexRow,
+            layout.flexDirectionByPlatform,
             layout.flex1,
-            layout.itemsCenter,
+            layout.center,
             layout.widthFull,
             spacing.gapLg,
             spacing.pdHorizontalDefault,
           ]}
         >
-          <Button mode="contained" onPress={handleSave}>
-            <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
-          </Button>
-          <Button mode="contained-tonal" onPress={() => navigation?.goBack()}>
+          <Button
+            mode="contained-tonal"
+            onPress={() => navigation?.goBack()}
+            style={[common.rounded, { width: `48%` }]}
+          >
             בטל
+          </Button>
+          <Button mode="contained" onPress={handleSave} style={[common.rounded, { width: `48%` }]}>
+            <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
           </Button>
         </View>
       </View>

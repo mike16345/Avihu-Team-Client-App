@@ -100,7 +100,8 @@ export default function Login({ onLogin }: ILoginProps) {
         .then((res) => {
           showAlert("success", res.message);
           setEmailchecked(true);
-          if (res.data.password) {
+
+          if (res.data.hasPassword) {
             setUserRegistered(true);
           }
         })

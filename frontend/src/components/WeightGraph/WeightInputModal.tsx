@@ -23,7 +23,7 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
 }) => {
   const { height } = useWindowDimensions();
   const [weight, setWeight] = useState(currentWeight);
-  const { text, spacing, fonts, colors, layout } = useStyles();
+  const { text, spacing, fonts, colors, layout, common } = useStyles();
 
   const handleUpdateWeight = (value: number) => {
     setWeight(value);
@@ -81,13 +81,28 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
             selectedWeight={weight}
           />
         </View>
-        <View style={[layout.flex1, layout.flexRow, layout.itemsEnd]}>
+        <View
+          style={[
+            layout.flex1,
+            layout.flexDirectionByPlatform,
+            layout.itemsEnd,
+            layout.justifyCenter,
+          ]}
+        >
           <View style={[layout.flexRow, spacing.gapDefault]}>
-            <Button mode="contained" onPress={handleClickSave}>
-              <Text style={[text.textBold, fonts.default]}>שמור</Text>
-            </Button>
-            <Button mode="outlined" onPress={handleDismiss}>
+            <Button
+              mode="outlined"
+              onPress={handleDismiss}
+              style={[common.rounded, { width: `50%` }]}
+            >
               <Text style={[text.textBold, fonts.default]}>בטל</Text>
+            </Button>
+            <Button
+              mode="contained"
+              onPress={handleClickSave}
+              style={[common.rounded, { width: `50%` }]}
+            >
+              <Text style={[text.textBold, fonts.default, colors.textOnBackground]}>שמור</Text>
             </Button>
           </View>
         </View>
