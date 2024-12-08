@@ -47,6 +47,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
       autoHide: true,
       type: "success",
       swipeable: true,
+      text1Style: { textAlign: `center` },
     });
     handleClose();
   };
