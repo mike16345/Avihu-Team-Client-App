@@ -1,5 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import RightDrawer from "../ui/RightDrawer";
 import { Text } from "../ui/Text";
 import UserInfoContainer from "./UserInfoContainer";
@@ -29,13 +29,9 @@ const UserDrawer = () => {
       open={openUserDrawer}
       onClose={() => setOpenUserDrawer(false)}
       children={
-        <View
-          style={[
-            layout.sizeFull,
-            spacing.pdHorizontalSm,
-            spacing.pdStatusBar,
-            layout.justifyBetween,
-          ]}
+        <ScrollView
+          style={[layout.sizeFull, spacing.pdHorizontalSm, spacing.pdStatusBar]}
+          contentContainerStyle={[layout.justifyBetween, spacing.gapXxl]}
         >
           <Text style={[text.textRight, text.textBold, colors.textOnBackground, fonts.lg]}>
             פרטי משתמש
@@ -56,7 +52,7 @@ const UserDrawer = () => {
           >
             התנתק
           </Button>
-        </View>
+        </ScrollView>
       }
     />
   );

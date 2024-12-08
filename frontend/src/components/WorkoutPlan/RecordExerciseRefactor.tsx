@@ -116,15 +116,9 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
   return (
     <>
       {isSetUploading && <Loader variant="Screen" />}
-      <View style={[layout.sizeFull]}>
+      <ScrollView style={[layout.sizeFull]}>
         <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
-        <ScrollView
-          contentContainerStyle={[
-            layout.flexGrow,
-            !lastRecordedSet && spacing.gapXxl,
-            spacing.pdDefault,
-          ]}
-        >
+        <View style={[layout.flexGrow, !lastRecordedSet && spacing.gapXxl, spacing.pdDefault]}>
           <View style={[layout.itemsEnd, spacing.gapSm]}>
             {strippedTips && strippedTips.length && (
               <Pressable onPress={() => setOpenTrainerTips(true)}>
@@ -150,12 +144,32 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
           </View>
 
           <View style={[layout.justifyEvenly, layout.flex1]}>
-            <View
-              style={[
-                { flexDirection: Platform.OS == `ios` ? `row-reverse` : `row` },
-                layout.justifyEvenly,
-              ]}
-            >
+            <View style={[layout.flexDirectionByPlatform, layout.justifyEvenly]}>
+              <View style={[layout.center, spacing.gapDefault]}>
+                <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
+                  חזרות
+                </Text>
+
+                <View
+                  style={[
+                    { borderTopWidth: 2, borderBottomWidth: 2 },
+                    colors.borderSecondary,
+                    spacing.pdHorizontalDefault,
+                    spacing.pdVerticalMd,
+                    common.rounded,
+                  ]}
+                >
+                  <WheelPicker
+                    activeItemColor={colors.textOnSurface.color}
+                    inactiveItemColor={colors.textOnSurfaceDisabled.color}
+                    data={repsOptions}
+                    onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
+                    selectedValue={recordedSet.repsDone}
+                    height={height * 0.1}
+                    itemHeight={35}
+                  />
+                </View>
+              </View>
               <View style={[layout.center, spacing.gapDefault]}>
                 <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
                   משקל
@@ -188,31 +202,6 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   />
                 </View>
               </View>
-              <View style={[layout.center, spacing.gapDefault]}>
-                <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
-                  חזרות
-                </Text>
-
-                <View
-                  style={[
-                    { borderTopWidth: 2, borderBottomWidth: 2 },
-                    colors.borderSecondary,
-                    spacing.pdHorizontalDefault,
-                    spacing.pdVerticalMd,
-                    common.rounded,
-                  ]}
-                >
-                  <WheelPicker
-                    activeItemColor={colors.textOnSurface.color}
-                    inactiveItemColor={colors.textOnSurfaceDisabled.color}
-                    data={repsOptions}
-                    onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
-                    selectedValue={recordedSet.repsDone}
-                    height={height * 0.1}
-                    itemHeight={35}
-                  />
-                </View>
-              </View>
             </View>
           </View>
           {lastRecordedSet && (
@@ -240,7 +229,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
               />
             </TouchableOpacity>
           )}
-        </ScrollView>
+        </View>
         <View
           style={[
             layout.flexDirectionByPlatform,
@@ -262,7 +251,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
           </Button>
         </View>
-      </View>
+      </ScrollView>
     </>
   );
 };
