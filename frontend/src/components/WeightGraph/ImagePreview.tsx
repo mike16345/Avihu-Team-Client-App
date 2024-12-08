@@ -53,7 +53,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
 
   return (
     <View style={[spacing.gapLg, spacing.pdSm]}>
-      {uploading && <Loader variant="Screen" />}
+      {uploading && <Loader variant="Screen" positionTop={`-90%`} positionLeft={`-5%`} />}
 
       <DisplayImage
         image={images[selectedImage] ? images[selectedImage] : undefined}
