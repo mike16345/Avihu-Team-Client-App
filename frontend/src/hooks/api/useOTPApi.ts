@@ -11,10 +11,13 @@ export const useOTPApi = () => {
   };
 
   const validateOTP = async (email: string, otp: string) => {
-    const response = await sendData<ApiResponse<undefined>>(`${OTP_API_ENDPOINT}/validate`, {
-      email,
-      otp,
-    });
+    const response = await sendData<ApiResponse<{ changePasswordSessionId: string }>>(
+      `${OTP_API_ENDPOINT}/validate`,
+      {
+        email,
+        otp,
+      }
+    );
 
     return response;
   };

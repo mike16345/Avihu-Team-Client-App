@@ -1,4 +1,4 @@
-import { View, Text, BackHandler } from "react-native";
+import { View, Text, BackHandler, Touchable, TouchableOpacity } from "react-native";
 import { FC, useEffect, useState } from "react";
 import { useOTPApi } from "@/hooks/api/useOTPApi";
 import useStyles from "@/styles/useGlobalStyles";
@@ -17,7 +17,7 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess })
   const { getOTP, validateOTP } = useOTPApi();
   const { changePassword } = usePasswordsApi();
 
-  const { colors, spacing, text } = useStyles();
+  const { colors, spacing, layout, text } = useStyles();
 
   const [email, setEmail] = useState("");
   const [formErrors, setFormErrors] = useState<ICredentialsErrors & { otp?: string }>({});
@@ -26,6 +26,7 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess })
   const [isOtpConfirmed, setIsOtpConfirmed] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [sessionId, setSessionId] = useState("");
 
   const handleConfirmPasswordChange = async () => {
     if (confirmPassword !== password) {
@@ -34,7 +35,7 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess })
     }
 
     try {
-      await changePassword(email, password);
+      await changePassword(email, password, sessionId);
       onConfirmChangePasswordSuccess();
     } catch (error: any) {
       setFormErrors({ ...formErrors, ["password"]: error?.response?.data?.message });
@@ -63,7 +64,8 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess })
     }
 
     try {
-      await validateOTP(email, otp);
+      const sessionId = (await validateOTP(email, otp))?.data?.changePasswordSessionId || "";
+      setSessionId(sessionId);
       setIsOtpConfirmed(true);
     } catch (error: any) {
       setFormErrors({ ...formErrors, ["otp"]: error?.response?.data?.message });
@@ -112,19 +114,33 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess })
           >
             קוד אימות
           </Text>
-          <TextInput
-            style={[{ width: "100%" }, text.textLeft, colors.background]}
-            mode="outlined"
-            activeOutlineColor={colors.borderSecondary.borderColor}
-            placeholder="Enter 6-digit OTP"
-            keyboardType="numeric"
-            maxLength={6}
-            textContentType="oneTimeCode"
-            onChangeText={(val) => setOtp(val)}
-            value={otp}
-          />
-          <Text style={[text.textDanger, text.textRight, text.textBold]}>{formErrors["otp"]}</Text>
-          <Button onPress={handleValidateOtp}>אישור</Button>
+          <View style={[spacing.gapLg]}>
+            <View>
+              <TextInput
+                style={[{ width: "100%" }, text.textLeft, colors.background]}
+                mode="outlined"
+                activeOutlineColor={colors.borderSecondary.borderColor}
+                placeholder="Enter 6-digit OTP"
+                keyboardType="numeric"
+                maxLength={6}
+                textContentType="oneTimeCode"
+                onChangeText={(val) => setOtp(val)}
+                value={otp}
+              />
+              <TouchableOpacity onPress={() => getOTP(email)}>
+                <Text style={[colors.textInfo, text.textRight]}>תשלח חדש</Text>
+              </TouchableOpacity>
+              {formErrors["otp"] && (
+                <Text style={[text.textDanger, text.textCenter, text.textBold]}>
+                  {formErrors["otp"]}
+                </Text>
+              )}
+            </View>
+
+            <Button mode="contained" onPress={handleValidateOtp}>
+              אישור
+            </Button>
+          </View>
         </>
       )}
       {isOtpConfirmed && (
