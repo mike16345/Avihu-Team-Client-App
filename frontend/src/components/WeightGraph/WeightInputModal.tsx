@@ -91,7 +91,7 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
         >
           <View style={[layout.flexRow, spacing.gapDefault]}>
             <Button
-              mode="outlined"
+              mode="contained-tonal"
               onPress={handleDismiss}
               style={[common.rounded, { width: `50%` }]}
             >
