@@ -9,6 +9,9 @@ import { useQuery } from "@tanstack/react-query";
 import { MENU_ITEMS_KEY, ONE_DAY } from "@/constants/reactQuery";
 import BottomDrawer from "../ui/BottomDrawer";
 import { Text } from "../ui/Text";
+import { useUserStore } from "@/store/userStore";
+import NoDataScreen from "@/screens/NoDataScreen";
+import ErrorScreen from "@/screens/ErrorScreen";
 
 interface MenuItemModalProps {
   foodGroup: string | null;
@@ -17,8 +20,9 @@ interface MenuItemModalProps {
 
 const MenuItemModal: React.FC<MenuItemModalProps> = ({ foodGroup, dismiss }) => {
   const { xl } = useFontSize();
-  const { colors, layout, spacing, text } = useStyles();
+  const { colors, layout, spacing, text, fonts } = useStyles();
   const { getMenuItems } = useMenuItemApi();
+  const currentUser = useUserStore((store) => store.currentUser);
 
   const changeTitle = (foodGroup: string) => {
     switch (foodGroup) {
@@ -34,11 +38,13 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ foodGroup, dismiss }) => 
   };
 
   const { data, isError, error, isLoading } = useQuery({
-    queryFn: () => getMenuItems(foodGroup || ``),
+    queryFn: () => getMenuItems(foodGroup || ``, currentUser?.dietaryType),
     queryKey: [MENU_ITEMS_KEY + foodGroup],
-    enabled: !!foodGroup,
+    enabled: !!(foodGroup && currentUser),
     staleTime: ONE_DAY,
   });
+
+  if (isError) return <ErrorScreen error={error.message} />;
 
   return (
     <BottomDrawer open={Boolean(foodGroup)} onClose={dismiss}>
@@ -60,11 +66,15 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ foodGroup, dismiss }) => 
                 spacing.pdBottomBar,
               ]}
             >
-              {data?.map((menuItem) => (
-                <View key={menuItem.name} style={{ width: `48%` }}>
-                  <MenuItem menuItem={menuItem} />
-                </View>
-              ))}
+              {data && data?.length > 0 ? (
+                data?.map((menuItem) => (
+                  <View key={menuItem.name} style={{ width: `48%` }}>
+                    <MenuItem menuItem={menuItem} />
+                  </View>
+                ))
+              ) : (
+                <NoDataScreen message="לא נמצאו פריטים!" />
+              )}
             </View>
           </View>
         )}

@@ -8,6 +8,7 @@ import {
   Animated,
   useAnimatedValue,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { useEffect, useState } from "react";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
@@ -247,9 +248,10 @@ export default function Login({ onLogin }: ILoginProps) {
                       placeholder="user@example.com"
                       keyboardType={"email-address"}
                       autoCorrect={false}
+                      multiline={Platform.OS === `ios` ? true : false}
                       autoComplete="email"
                       error={Boolean(formErrors.email)}
-                      textContentType="oneTimeCode"
+                      textContentType="emailAddress"
                       onChangeText={(val) =>
                         setInputtedCredentials({
                           ...inputtedCrendentials,
@@ -358,7 +360,7 @@ export default function Login({ onLogin }: ILoginProps) {
               style={[layout.widthFull, common.rounded, colors.backgroundPrimary]}
               onPress={handleSubmit}
             >
-              התחברות
+              אישור
             </Button>
           )}
         </KeyboardAvoidingView>

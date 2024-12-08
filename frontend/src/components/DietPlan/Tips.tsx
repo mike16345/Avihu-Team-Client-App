@@ -6,7 +6,7 @@ import TipsModal from "./TipsModal";
 import { Text } from "../ui/Text";
 
 interface TipsProps {
-  tips: string;
+  tips: string[];
 }
 
 const Tips: React.FC<TipsProps> = ({ tips }) => {

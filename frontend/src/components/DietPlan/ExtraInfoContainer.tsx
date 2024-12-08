@@ -10,7 +10,7 @@ interface ExtraInfoContainerProps {
   veggiesPerDay?: number;
   fatsPerDay?: number;
   freeCalories?: number;
-  customInstructions?: string;
+  customInstructions?: string[];
 }
 
 const ExtraInfoContainer: React.FC<ExtraInfoContainerProps> = ({
@@ -33,7 +33,7 @@ const ExtraInfoContainer: React.FC<ExtraInfoContainerProps> = ({
           { direction: `ltr` },
         ]}
       >
-        {customInstructions && <Tips tips={customInstructions} />}
+        {customInstructions && customInstructions?.length > 0 && <Tips tips={customInstructions} />}
 
         {Boolean(freeCalories) && (
           <AmountContainer title="קלוריות חופשיות" variant="cal" amount={freeCalories} />

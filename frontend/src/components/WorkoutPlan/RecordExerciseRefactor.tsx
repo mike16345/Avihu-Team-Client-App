@@ -6,6 +6,7 @@ import {
   Pressable,
   ScrollView,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
@@ -98,8 +99,8 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
         autoHide: true,
         type: "error",
         swipeable: true,
-        text1Style: { textAlign: Platform.OS === "ios" ? "right" : "left" },
-        text2Style: { textAlign: Platform.OS === "ios" ? "right" : "left" },
+        text1Style: { textAlign: `center` },
+        text2Style: { textAlign: `center` },
       });
     } finally {
       setIsSetUploading(false);
@@ -136,7 +137,8 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
             <Text style={styles.setInfo}>סט: {setNumber}</Text>
             {exercise.sets[setNumber - 1] && (
               <Text style={styles.setInfo}>
-                חזרות: {exercise.sets[setNumber - 1].minReps}-{exercise.sets[setNumber - 1].maxReps}
+                חזרות: {exercise.sets[setNumber - 1].minReps}
+                {exercise.sets[setNumber - 1].maxReps && `-${exercise.sets[setNumber - 1].maxReps}`}
               </Text>
             )}
 
@@ -148,30 +150,12 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
           </View>
 
           <View style={[layout.justifyEvenly, layout.flex1]}>
-            <View style={[layout.flexDirectionByPlatform, layout.justifyEvenly]}>
-              <View style={[layout.center, spacing.gapDefault]}>
-                <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
-                  חזרות
-                </Text>
-
-                <View
-                  style={[
-                    { borderTopWidth: 2, borderBottomWidth: 2 },
-                    colors.borderSecondary,
-                    spacing.pdHorizontalDefault,
-                  ]}
-                >
-                  <WheelPicker
-                    activeItemColor={colors.textOnSurface.color}
-                    inactiveItemColor={colors.textOnSurfaceDisabled.color}
-                    data={repsOptions}
-                    onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
-                    selectedValue={recordedSet.repsDone}
-                    height={height * 0.1}
-                    itemHeight={35}
-                  />
-                </View>
-              </View>
+            <View
+              style={[
+                { flexDirection: Platform.OS == `ios` ? `row-reverse` : `row` },
+                layout.justifyEvenly,
+              ]}
+            >
               <View style={[layout.center, spacing.gapDefault]}>
                 <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
                   משקל
@@ -182,6 +166,7 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
                     { borderTopWidth: 2, borderBottomWidth: 2 },
                     colors.borderSecondary,
                     spacing.pdHorizontalDefault,
+                    spacing.pdVerticalMd,
                     common.rounded,
                   ]}
                 >
@@ -203,21 +188,48 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   />
                 </View>
               </View>
+              <View style={[layout.center, spacing.gapDefault]}>
+                <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
+                  חזרות
+                </Text>
+
+                <View
+                  style={[
+                    { borderTopWidth: 2, borderBottomWidth: 2 },
+                    colors.borderSecondary,
+                    spacing.pdHorizontalDefault,
+                    spacing.pdVerticalMd,
+                    common.rounded,
+                  ]}
+                >
+                  <WheelPicker
+                    activeItemColor={colors.textOnSurface.color}
+                    inactiveItemColor={colors.textOnSurfaceDisabled.color}
+                    data={repsOptions}
+                    onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
+                    selectedValue={recordedSet.repsDone}
+                    height={height * 0.1}
+                    itemHeight={35}
+                  />
+                </View>
+              </View>
             </View>
           </View>
           {lastRecordedSet && (
-            <View style={[spacing.mgVerticalDefault, spacing.gapSm]}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation?.navigate("RecordedSets", {
+                  recordedSets: data || [],
+                });
+              }}
+              style={[spacing.mgVerticalDefault, spacing.gapSm]}
+            >
               <Text style={[text.textRight, text.textBold, colors.textOnSecondaryContainer]}>
-                אימון הקודם - {new Date(lastRecordedSet.date).toLocaleDateString()}
+                אימון קודם - {new Date(lastRecordedSet.date).toLocaleDateString()}
               </Text>
               <RecordedSetInfo
                 actionButton={
                   <NativeIcon
-                    onPress={() => {
-                      navigation?.navigate("RecordedSets", {
-                        recordedSets: data || [],
-                      });
-                    }}
                     color={colors.textOnSecondaryContainer.color}
                     library="MaterialCommunityIcons"
                     name="chevron-left"
@@ -226,24 +238,28 @@ const RecordExerciseNew: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 }
                 recordedSet={lastRecordedSet}
               />
-            </View>
+            </TouchableOpacity>
           )}
         </ScrollView>
         <View
           style={[
-            layout.flexRow,
+            layout.flexDirectionByPlatform,
             layout.flex1,
-            layout.itemsCenter,
+            layout.center,
             layout.widthFull,
             spacing.gapLg,
             spacing.pdHorizontalDefault,
           ]}
         >
-          <Button mode="contained" onPress={handleSave}>
-            <Text style={[customStyles.text.textBold]}>שמור</Text>
-          </Button>
-          <Button mode="contained-tonal" onPress={() => navigation?.goBack()}>
+          <Button
+            mode="contained-tonal"
+            onPress={() => navigation?.goBack()}
+            style={[common.rounded, { width: `48%` }]}
+          >
             בטל
+          </Button>
+          <Button mode="contained" onPress={handleSave} style={[common.rounded, { width: `48%` }]}>
+            <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
           </Button>
         </View>
       </View>
