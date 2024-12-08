@@ -36,6 +36,16 @@ export interface IRecordedSet {
   plan: string;
 }
 
+export interface IRecordedSetResponse {
+  plan: string;
+  exercise: string;
+  setNumber: number;
+  weight: number;
+  repsDone: number;
+  note: string;
+  date: Date;
+}
+
 export interface IRecordedSetPost {
   userId: string;
   muscleGroup: string;
@@ -52,6 +62,7 @@ export interface IWorkoutPlan {
 
 export interface ICompleteWorkoutPlan {
   userId?: string;
+  tips?: string[];
   workoutPlans: IWorkoutPlan[];
 }
 

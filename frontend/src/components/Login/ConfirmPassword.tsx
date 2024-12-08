@@ -1,8 +1,9 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { TextInput } from "react-native-paper";
 import { ICredentialsErrors } from "./Login";
+import { Text } from "../ui/Text";
 
 interface ConfirmPasswordProps {
   handlePasswordChange: (val: string) => void;
@@ -15,7 +16,7 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
   handlePasswordChange,
   handlePasswordConfirmChange,
 }) => {
-  const { text } = useStyles();
+  const { text, colors, spacing } = useStyles();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowconfirmPassword] = useState(false);
@@ -23,9 +24,12 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
   return (
     <View>
       <View>
+        <Text style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground]}>סיסמה</Text>
         <TextInput
           style={[text.textRight, { width: "100%" }]}
-          placeholder="סיסמא..."
+          mode="outlined"
+          activeOutlineColor={colors.borderSecondary.borderColor}
+          error={Boolean(errors.password)}
           secureTextEntry={!showPassword}
           onChangeText={(val) => handlePasswordChange(val)}
           left={
@@ -38,9 +42,14 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
         <Text style={[text.textDanger, text.textRight]}>{errors.password}</Text>
       </View>
       <View>
+        <Text style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground]}>
+          אישור סיסמה
+        </Text>
         <TextInput
           style={[text.textRight, { width: "100%" }]}
-          placeholder="הקלידו את הסיסמא שוב..."
+          mode="outlined"
+          activeOutlineColor={colors.borderSecondary.borderColor}
+          error={Boolean(errors.confirmPassword)}
           secureTextEntry={!showConfirmPassword}
           onChangeText={(val) => handlePasswordConfirmChange(val)}
           left={

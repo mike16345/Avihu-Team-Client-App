@@ -1,4 +1,4 @@
-import { View, ImageBackground, ScrollView, Text, Animated, Dimensions } from "react-native";
+import { View, ImageBackground, ScrollView, Animated, Dimensions } from "react-native";
 import { useState } from "react";
 import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
 import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
@@ -19,15 +19,16 @@ import { DIET_PLAN_KEY, ONE_DAY } from "@/constants/reactQuery";
 import ErrorScreen from "@/screens/ErrorScreen";
 import NoDataScreen from "@/screens/NoDataScreen";
 import { createRetryFunction } from "@/utils/utils";
+import { Text } from "../ui/Text";
+import { useFoodGroupStore } from "@/store/foodgroupStore";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
   const { getDietPlanByUserId } = useDietPlanApi();
   const { layout, spacing, colors, common, text } = useStyles();
+  const { foodGroupToDisplay, setFoodGroupToDisplay } = useFoodGroupStore();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFabOpen, setIsFabOpen] = useState(false);
-  const [selectedFoodGroup, setSelectedFoodGroup] = useState<string | null>(null);
   const {
     slideInRightDelay0,
     slideInRightDelay100,
@@ -57,9 +58,12 @@ export default function DietPlan() {
   });
 
   const displayMenuItems = (foodGroup: string) => {
-    setIsModalOpen(true);
     setIsFabOpen(false);
-    setSelectedFoodGroup(foodGroup);
+    setFoodGroupToDisplay(foodGroup);
+  };
+
+  const closeMenuItemsModal = () => {
+    setFoodGroupToDisplay(null);
   };
 
   if (error && error.response.status == 404) return <NoDataScreen variant="dietPlan" />;
@@ -124,11 +128,7 @@ export default function DietPlan() {
           </View>
         )}
 
-        <MenuItemModal
-          foodGroup={selectedFoodGroup}
-          isOpen={isModalOpen}
-          dismiss={() => setIsModalOpen(false)}
-        />
+        <MenuItemModal foodGroup={foodGroupToDisplay} dismiss={closeMenuItemsModal} />
 
         <FABGroup
           open={isFabOpen}

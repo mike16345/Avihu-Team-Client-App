@@ -1,29 +1,27 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React from "react";
-import { Text, View } from "react-native";
+import { TouchableOpacity } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
+import { Text } from "../ui/Text";
+import { useFoodGroupStore } from "@/store/foodgroupStore";
 
 interface MenuItemTicketProps {
   quantity: number;
   foodGroup?: string;
   name?: string;
-  backgroundColor?: any;
 }
 
-const MenuItemTicket: React.FC<MenuItemTicketProps> = ({
-  quantity,
-  foodGroup,
-  name,
-  backgroundColor,
-}) => {
+const MenuItemTicket: React.FC<MenuItemTicketProps> = ({ quantity, foodGroup, name }) => {
   const { colors, common, layout, spacing } = useStyles();
+  const { setFoodGroupToDisplay } = useFoodGroupStore();
 
   return (
-    <View
+    <TouchableOpacity
+      onPress={() => setFoodGroupToDisplay(foodGroup == `חלבונים` ? `protein` : `carbs`)}
       style={[
-        backgroundColor || colors.background,
+        colors.background,
         common.rounded,
-        layout.flexRow,
+        layout.flexDirectionByPlatform,
         layout.itemsCenter,
         spacing.pdSm,
         spacing.gapSm,
@@ -37,7 +35,7 @@ const MenuItemTicket: React.FC<MenuItemTicketProps> = ({
       />
       <Text style={[colors.textOnBackground]}>{quantity}</Text>
       <Text style={[colors.textOnBackground]}>{name || foodGroup}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 

@@ -9,10 +9,14 @@ const useMenuItemApi = () => {
   const getAllMenuItems = () =>
     fetchData<ApiResponse<CustomItems>>(MENU_ITEMS_ENDPOINT).then((res) => res.data);
 
-  const getMenuItems = (foodGroup: string) =>
-    fetchData<ApiResponse<IMenuItem[]>>(MENU_ITEMS_ENDPOINT + `/foodGroup`, { foodGroup }).then(
-      (res) => res.data
-    );
+  const getMenuItems = (foodGroup: string, dietaryRestrictionsArray?: string[]) => {
+    let dietaryRestrictions = dietaryRestrictionsArray ? dietaryRestrictionsArray : undefined;
+
+    return fetchData<ApiResponse<IMenuItem[]>>(MENU_ITEMS_ENDPOINT + `/foodGroup`, {
+      foodGroup,
+      dietaryRestrictions,
+    }).then((res) => res.data);
+  };
 
   const getOneMenuItem = (id: string) =>
     fetchData<ApiResponse<IMenuItem>>(`${MENU_ITEMS_ENDPOINT}/one`, { id }).then((res) => res.data);

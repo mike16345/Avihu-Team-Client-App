@@ -38,7 +38,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
   const [error, setError] = useState({ status: null, message: null });
 
-  const { fonts, text, spacing } = useStyles();
+  const { fonts, text, spacing, colors } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
   const { currentUser } = useUserStore();
   const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
@@ -117,25 +117,30 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       <ImageBackground source={logoBlack} style={{ height: Dimensions.get("screen").height / 4 }} />
       <View style={[styles.container, spacing.gapLg, spacing.pdDefault]}>
         {value && plans && (
-          <DropDownPicker
-            rtl
-            open={open}
-            value={value}
-            items={plans}
-            theme="DARK"
-            setOpen={setOpen}
-            setValue={setValue}
-            labelStyle={text.textRight}
-            listItemLabelStyle={text.textRight}
-            onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
-          />
+          <>
+            <DropDownPicker
+              rtl
+              open={open}
+              value={value}
+              items={plans}
+              style={colors.backgroundSecondaryContainer}
+              listItemContainerStyle={colors.backgroundSecondaryContainer}
+              theme="DARK"
+              setOpen={setOpen}
+              setValue={setValue}
+              labelStyle={text.textRight}
+              listItemLabelStyle={text.textRight}
+              onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
+            />
+
+            <TouchableOpacity
+              style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
+              onPress={() => setOpenTips(true)}
+            >
+              <Text style={styles.tipsText}>דגשים</Text>
+            </TouchableOpacity>
+          </>
         )}
-        <TouchableOpacity
-          style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
-          onPress={() => setOpenTips(true)}
-        >
-          <Text style={styles.tipsText}>דגשים</Text>
-        </TouchableOpacity>
       </View>
     </>
   );
@@ -163,7 +168,9 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
           </View>
         </View>
       )}
-      ListFooterComponent={<WorkoutTips openTips={openTips} setOpenTips={setOpenTips} />}
+      ListFooterComponent={
+        <WorkoutTips tips={workoutPlan?.tips} openTips={openTips} setOpenTips={setOpenTips} />
+      }
       contentContainerStyle={styles.workoutContainer}
     />
   );

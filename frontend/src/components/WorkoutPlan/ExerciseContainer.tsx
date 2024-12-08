@@ -1,8 +1,8 @@
 import { FC, useState, useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import SetContainer from "./SetContainer";
 import NativeIcon from "../Icon/NativeIcon";
-import { IExercise, IRecordedSet, IRecordedSetPost, ISet } from "@/interfaces/Workout";
+import { IExercise, IRecordedSet, IRecordedSetPost } from "@/interfaces/Workout";
 import { ISession } from "@/interfaces/ISession";
 import useStyles from "@/styles/useGlobalStyles";
 import { useRecordedSetsApi } from "@/hooks/api/useRecordedSetsApi";
@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import { WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Toast from "react-native-toast-message";
+import { Text } from "../ui/Text";
 
 interface WorkoutProps {
   plan: string;
@@ -34,44 +35,56 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   const currentUser = useUserStore((state) => state.currentUser);
 
   const { layout, text, fonts, common, colors } = useStyles();
-  const { addRecordedSet } = useRecordedSetsApi();
+  const { addRecordedSet, getUserRecordedSetsByExercise } = useRecordedSetsApi();
 
-  const [isSetDone, setIsSetDone] = useState(false);
   const [currentSetNumber, setCurrentSetNumber] = useState(1);
-  const [currentSet, setCurrentSet] = useState<ISet>(exercise.sets[currentSetNumber - 1]);
 
-  const handleRecordSet = (recordedSet: Omit<IRecordedSet, "plan">) => {
-    if (!currentUser) return;
+  const handleRecordSet = (
+    recordedSet: Omit<IRecordedSet, "plan">,
+    isEdit = false
+  ): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (!currentUser) {
+        reject(new Error("No current user available"));
+        return;
+      }
 
-    const setToRecord: IRecordedSetPost = {
-      userId: currentUser._id,
-      exercise: exercise.name,
-      recordedSet: {
-        ...recordedSet,
-        plan,
-      },
-      muscleGroup,
-    };
+      const setToRecord: IRecordedSetPost = {
+        userId: currentUser._id,
+        exercise: exercise.name,
+        recordedSet: {
+          ...recordedSet,
+          plan,
+        },
+        muscleGroup,
+      };
 
-    addRecordedSet(setToRecord, session?._id || "")
-      .then((response) => {
-        const updatedSession = response.session;
+      addRecordedSet(setToRecord, session?._id || "")
+        .then((response) => {
+          const updatedSession = response.session;
 
-        updateSession(updatedSession);
-        handleSetCurrentSetInfo(updatedSession);
+          updateSession(updatedSession);
+          handleSetCurrentSetInfo(updatedSession);
 
-        Toast.show({
-          text1: "Test toast",
-          text2: "NOOOOOOOO",
-          autoHide: true,
-          type: "success",
-          swipeable: true,
+          Toast.show({
+            text1: "סט הוקלט בהצלחה",
+            text2: "כל הכבוד!",
+            autoHide: true,
+            type: "success",
+            swipeable: true,
+            text1Style: { textAlign: `center` },
+            text2Style: { textAlign: `center` },
+          });
+          navigation?.goBack();
+
+          resolve(); // Resolve the promise after successful completion
+        })
+        .catch((err) => {
+          console.error(err);
+          reject(err); // Reject the promise if there's an error
         });
-        navigation?.goBack();
-      })
-      .catch((err) => console.error(err));
+    });
   };
-
   const handleSetCurrentSetInfo = (updatedSession: ISession) => {
     if (!updatedSession) return;
     const data = updatedSession.data;
@@ -86,9 +99,8 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
     if (setNumber - 1 <= exercise.sets?.length - 1) {
       setCurrentSetNumber(setNumber);
-      setCurrentSet(exercise.sets[setNumber - 1]);
     } else {
-      setIsSetDone(true);
+      setCurrentSetNumber(setNumber);
     }
   };
 
@@ -99,16 +111,10 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   return (
     <View style={[styles.workoutContainer, common.rounded, colors.backgroundSecondaryContainer]}>
       <View style={styles.workoutDescriptionContainer}>
-        <View style={[layout.widthFull, layout.flexRow, layout.justifyBetween]}>
-          <NativeIcon
-            onPress={() => setIsSetDone((prev) => !prev)}
-            library="Ionicons"
-            name="checkmark-circle-outline"
-            size={28}
-            color={isSetDone ? colors.textPrimary.color : colors.textOnSecondaryContainer.color}
-          />
-
-          <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.lg]}>
+        <View style={[layout.widthFull]}>
+          <Text
+            style={[colors.textOnSecondaryContainer, text.textBold, fonts.default, text.textRight]}
+          >
             {exercise.name}
           </Text>
         </View>
@@ -118,6 +124,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
               navigation.setOptions({ title: exercise.name });
               navigation.navigate("RecordSet", {
                 exercise: exercise,
+                muscleGroup: muscleGroup,
                 handleRecordSet: (recordedSet) => handleRecordSet(recordedSet),
                 setNumber: currentSetNumber,
               });
@@ -128,16 +135,24 @@ const ExerciseContainer: FC<WorkoutProps> = ({
             size={28}
           />
 
-          <SetContainer currentSet={currentSet} currentSetNumber={currentSetNumber} />
+          <SetContainer
+            currentSetNumber={currentSetNumber}
+            totalSets={exercise.sets.length}
+            handleViewSet={(setNumber) => {
+              if (setNumber >= currentSetNumber) return;
+              console.log("viewSet", setNumber);
+              navigation.setOptions({ title: exercise.name });
+              navigation.navigate("RecordSet", {
+                recordedSet: {},
+                exercise: exercise,
+                muscleGroup: muscleGroup,
+                handleRecordSet: (recordedSet) => handleRecordSet(recordedSet, true),
+                setNumber: currentSetNumber,
+              });
+            }}
+          />
         </View>
       </View>
-
-      {/* <WorkoutVideoPopup
-        title={exercise.name}
-        isVisible={modalVisible}
-        setIsVisible={setModalVisible}
-        videoId={videoId}
-      /> */}
     </View>
   );
 };
@@ -146,20 +161,17 @@ export default ExerciseContainer;
 
 const styles = StyleSheet.create({
   workoutContainer: {
-    flexDirection: "row-reverse",
-    alignItems: "center",
+    padding: 20,
     width: "100%",
     height: 125,
   },
   workoutDescriptionContainer: {
-    padding: 12,
-    gap: 20,
+    justifyContent: "space-between",
     flex: 1,
   },
   workoutInfoContainer: {
     flexDirection: "row",
     width: "100%",
-    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
   },

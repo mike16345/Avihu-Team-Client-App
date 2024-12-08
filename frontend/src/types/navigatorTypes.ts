@@ -1,5 +1,4 @@
-import { ISession } from "@/interfaces/ISession";
-import { IExercise, IRecordedSet } from "@/interfaces/Workout";
+import { IExercise, IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { ParamListBase, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -12,15 +11,21 @@ export type RootStackParamList = {
   VideoGallery: undefined;
   MyProgressScreen: undefined;
   LoginScreen: undefined;
+  BlogScreen: undefined;
   EmailScreen: undefined;
 };
 
 export type WorkoutPlanStackParamList = {
   WorkoutPlanPage: undefined;
   RecordSet: {
-    handleRecordSet: (recordSet: Omit<IRecordedSet, "plan">) => void;
+    handleRecordSet: (recordSet: Omit<IRecordedSet, "plan">) => Promise<void>;
+    recordedSet?: IRecordedSetResponse;
     exercise: IExercise;
+    muscleGroup: string;
     setNumber: number;
+  };
+  RecordedSets: {
+    recordedSets: IRecordedSetResponse[];
   };
 };
 

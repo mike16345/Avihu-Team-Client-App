@@ -1,7 +1,8 @@
 import NativeIcon from "@/components/Icon/NativeIcon";
+import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 interface NoDataScreenProps {
   variant?: "dietPlan" | "workoutPlan";

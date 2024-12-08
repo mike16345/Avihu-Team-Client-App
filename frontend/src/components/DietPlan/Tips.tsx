@@ -1,11 +1,12 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import TipsModal from "./TipsModal";
+import { Text } from "../ui/Text";
 
 interface TipsProps {
-  tips: string;
+  tips: string[];
 }
 
 const Tips: React.FC<TipsProps> = ({ tips }) => {

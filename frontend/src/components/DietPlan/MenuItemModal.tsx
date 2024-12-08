@@ -1,6 +1,5 @@
 import React from "react";
-import { ScrollView, Text, View } from "react-native";
-import { CustomModal } from "../ui/Modal";
+import { ScrollView, View } from "react-native";
 import useFontSize from "@/styles/useFontSize";
 import useMenuItemApi from "@/hooks/api/useMenuItemApi";
 import MenuItem from "./MenuItem";
@@ -8,17 +7,22 @@ import useStyles from "@/styles/useGlobalStyles";
 import Loader from "../ui/loaders/Loader";
 import { useQuery } from "@tanstack/react-query";
 import { MENU_ITEMS_KEY, ONE_DAY } from "@/constants/reactQuery";
+import BottomDrawer from "../ui/BottomDrawer";
+import { Text } from "../ui/Text";
+import { useUserStore } from "@/store/userStore";
+import NoDataScreen from "@/screens/NoDataScreen";
+import ErrorScreen from "@/screens/ErrorScreen";
 
 interface MenuItemModalProps {
-  isOpen: boolean;
   foodGroup: string | null;
   dismiss: () => void;
 }
 
-const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismiss }) => {
+const MenuItemModal: React.FC<MenuItemModalProps> = ({ foodGroup, dismiss }) => {
   const { xl } = useFontSize();
-  const { colors, common, layout, spacing, text } = useStyles();
+  const { colors, layout, spacing, text, fonts } = useStyles();
   const { getMenuItems } = useMenuItemApi();
+  const currentUser = useUserStore((store) => store.currentUser);
 
   const changeTitle = (foodGroup: string) => {
     switch (foodGroup) {
@@ -34,25 +38,17 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
   };
 
   const { data, isError, error, isLoading } = useQuery({
-    queryFn: () => getMenuItems(foodGroup || ``),
+    queryFn: () => getMenuItems(foodGroup || ``, currentUser?.dietaryType),
     queryKey: [MENU_ITEMS_KEY + foodGroup],
-    enabled: !!foodGroup,
+    enabled: !!(foodGroup && currentUser),
     staleTime: ONE_DAY,
   });
 
+  if (isError) return <ErrorScreen error={error.message} />;
+
   return (
-    <CustomModal visible={isOpen} dismissable dismissableBackButton onDismiss={dismiss}>
-      <ScrollView
-        style={[
-          colors.backgroundSecondaryContainer,
-          spacing.pdMd,
-          colors.borderPrimary,
-          common.borderDefault,
-          common.roundedMd,
-          spacing.pdBottomBar,
-          { height: `80%` },
-        ]}
-      >
+    <BottomDrawer open={Boolean(foodGroup)} onClose={dismiss}>
+      <ScrollView style={[spacing.pdMd, spacing.pdBottomBar, { height: `80%` }]}>
         {isLoading ? (
           <Loader />
         ) : (
@@ -64,22 +60,26 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ isOpen, foodGroup, dismis
               style={[
                 layout.flexRowReverse,
                 layout.wrap,
-                layout.justifyAround,
                 layout.itemsCenter,
+                layout.justifyAround,
                 spacing.gapDefault,
                 spacing.pdBottomBar,
               ]}
             >
-              {data?.map((menuItem) => (
-                <View key={menuItem.name} style={{ maxWidth: `30%` }}>
-                  <MenuItem menuItem={menuItem} />
-                </View>
-              ))}
+              {data && data?.length > 0 ? (
+                data?.map((menuItem) => (
+                  <View key={menuItem.name} style={{ width: `48%` }}>
+                    <MenuItem menuItem={menuItem} />
+                  </View>
+                ))
+              ) : (
+                <NoDataScreen message="לא נמצאו פריטים!" />
+              )}
             </View>
           </View>
         )}
       </ScrollView>
-    </CustomModal>
+    </BottomDrawer>
   );
 };
 

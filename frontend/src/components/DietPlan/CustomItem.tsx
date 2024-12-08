@@ -1,7 +1,8 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Platform, View } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import useStyles from "@/styles/useGlobalStyles";
+import { Text } from "../ui/Text";
 
 interface CustomItemProps {
   name: string;
@@ -15,30 +16,47 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
   return (
     <View
       style={[
-        layout.itemsCenter,
-        layout.flexRow,
+        layout.flexDirectionByPlatform,
         colors.backgroundSecondary,
         common.rounded,
         spacing.pdSm,
         layout.wrap,
-        spacing.gapDefault,
         layout.widthFull,
+        layout.itemsCenter,
+        spacing.gapDefault,
       ]}
     >
-      <View style={[colors.background, common.roundedSm]}>
+      <View style={[colors.background, common.roundedSm, spacing.pdXs, layout.center]}>
         <NativeIcon
           size={25}
-          style={[colors.textPrimary]}
+          style={colors.textPrimary}
           library="MaterialCommunityIcons"
-          name={foodGroup == `חלבונים` ? `fish` : `baguette`}
+          name={foodGroup === `חלבונים` ? `fish` : `baguette`}
         />
       </View>
+
       <View
-        style={[layout.flexRow, layout.center, spacing.gapDefault, spacing.pdDefault, layout.wrap]}
+        style={[
+          layout.flexDirectionByPlatform,
+          layout.justifyBetween,
+          layout.itemsCenter,
+          layout.flex1,
+          spacing.gapDefault,
+        ]}
       >
-        <Text style={[colors.textOnSecondary, text.textBold]}>{name}</Text>
-        <View style={[colors.backgroundPrimary, { width: 3, height: 14 }]}></View>
-        <Text style={[colors.textOnSecondary]}>
+        <Text
+          style={[
+            colors.textOnSecondary,
+            text.textBold,
+            layout.flex1,
+            { textAlign: Platform.OS == `android` ? `right` : `left` },
+          ]}
+          numberOfLines={1}
+        >
+          {name}
+        </Text>
+        <View style={[colors.backgroundPrimary, { width: 3, height: 14 }]} />
+        <Text style={[colors.textOnSecondary, text.textBold, { flexShrink: 1 }]}>
           {quantity > 1 ? `${quantity} מנות` : `מנה אחת`}
         </Text>
       </View>

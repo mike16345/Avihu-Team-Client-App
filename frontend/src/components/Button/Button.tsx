@@ -1,4 +1,5 @@
-import { Pressable, PressableProps, TextProps, Text } from "react-native";
+import { Pressable, PressableProps, TextProps } from "react-native";
+import { Text } from "../ui/Text";
 
 interface ButtonProps extends PressableProps {
   textProps?: TextProps;

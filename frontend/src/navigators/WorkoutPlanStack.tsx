@@ -8,9 +8,7 @@ const WorkoutPlanStack = () => {
     <Stack.Navigator
       initialRouteName="WorkoutPlan"
       screenOptions={{
-        navigationBarHidden: false,
-        headerTitleAlign: "center",
-        headerTitleStyle: { fontSize: 18 },
+        headerShown: false,
       }}
     >
       {stacks.map((stack) => (

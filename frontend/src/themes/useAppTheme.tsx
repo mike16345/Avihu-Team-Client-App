@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import { Appearance } from "react-native";
 import {
   MD3DarkTheme as DefaultDarkTheme,
@@ -7,6 +7,25 @@ import {
 
 export const LightTheme = {
   ...DefaultLightTheme,
+  fonts: {
+    ...DefaultLightTheme.fonts,
+    regular: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    medium: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    light: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    thin: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+  },
   colors: {
     ...DefaultLightTheme.colors,
     primary: "#10b981",
@@ -66,6 +85,25 @@ export const LightTheme = {
 
 export const DarkTheme = {
   ...DefaultDarkTheme,
+  fonts: {
+    ...DefaultDarkTheme.fonts,
+    regular: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    medium: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    light: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+    thin: {
+      fontFamily: "Assistant",
+      fontWeight: "normal",
+    },
+  },
   colors: {
     ...DefaultDarkTheme.colors,
     primary: "#10b981",
@@ -142,7 +180,6 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       listener.remove();
     };
   }, []); */
-  
 
   return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };

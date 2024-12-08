@@ -1,8 +1,9 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React from "react";
-import { Image, Text, View, TouchableOpacity, useWindowDimensions } from "react-native";
+import { Image, View, TouchableOpacity, useWindowDimensions } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import SelectUploadType from "./SelectUploadType";
+import { Text } from "../ui/Text";
 
 interface DisplayImageProps {
   image?: string;
@@ -46,7 +47,7 @@ const DisplayImage: React.FC<DisplayImageProps> = ({ image, removeImage, handleI
       ) : (
         <View
           style={[
-            { height: height * 0.3, margin: `auto` },
+            { height: height * 0.35, margin: `auto` },
             layout.center,
             spacing.gapLg,
             layout.widthFull,

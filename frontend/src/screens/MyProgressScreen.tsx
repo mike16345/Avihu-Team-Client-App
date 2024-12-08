@@ -16,12 +16,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { StyleSheet, ScrollView, Linking, Animated } from "react-native";
 import { Portal } from "react-native-paper";
-import { calculateImageUploadTitle, checkIfDatesMatch, createRetryFunction } from "@/utils/utils";
+import { checkIfDatesMatch, createRetryFunction } from "@/utils/utils";
 import BottomDrawer from "@/components/ui/BottomDrawer";
 import ImagePreview from "@/components/WeightGraph/ImagePreview";
+import Constants from "expo-constants";
+import useImageUploadStatus from "@/hooks/useImageUploadStatus";
 
 const MyProgressScreen = () => {
-  const TRAINER_PHONE_NUMBER = process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER;
+  const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
+  const TRAINER_PHONE_NUMBER = isDevMode
+    ? process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER
+    : Constants?.expoConfig?.extra?.TRAINER_PHONE_NUMBER;
 
   const currentUser = useUserStore((state) => state.currentUser);
   const { getWeighInsByUserId, updateWeighInById, deleteWeighIn, addWeighIn } = useWeighInApi();
@@ -29,14 +34,14 @@ const MyProgressScreen = () => {
 
   const { colors, spacing, layout } = useStyles();
   const { slideInLeftDelay0, slideInRightDelay100 } = useSlideInAnimations();
+  const { calculateImageUploadTitle } = useImageUploadStatus();
 
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [openWeightModal, setOpenWeightModal] = useState(false);
   const [openUploadModal, setOpenUploadModal] = useState(false);
   const [lastWeighIn, setLastWeighIn] = useState<IWeighIn | null>(null);
   const [todaysWeighInExists, setTodaysWeighInExists] = useState(false);
-
-  const disabledTitle = calculateImageUploadTitle(currentUser?.checkInAt || 0);
+  const [disabledTitle, setDisabledTitle] = useState<string | undefined>();
 
   const handleGetWeighInsByUserId = async () => {
     if (!currentUser) return [];
@@ -116,7 +121,6 @@ const MyProgressScreen = () => {
   };
 
   useEffect(() => {
-    console.log("data", data);
     if (!data || !data.length) return;
     const lastWeighInIndex = data?.length - 1;
     const latestWeghIn = data[lastWeighInIndex];
@@ -126,6 +130,11 @@ const MyProgressScreen = () => {
     setLastWeighIn(latestWeghIn);
     setTodaysWeighInExists(weighInExists);
   }, [data]);
+
+  useEffect(() => {
+    const title = calculateImageUploadTitle(currentUser?.checkInAt || 0);
+    setDisabledTitle(title);
+  }, []);
 
   if (isLoading) return <ProgressScreenSkeleton />;
 
@@ -137,7 +146,7 @@ const MyProgressScreen = () => {
           layout.flexGrow,
           colors.background,
           spacing.pdBottomBar,
-          spacing.pdStatusBar,
+          spacing.pdVerticalDefault,
         ]}
       >
         {(addNewWeighIn.isLoading || updateWeighIn.isLoading || removeWeighIn.isLoading) && (

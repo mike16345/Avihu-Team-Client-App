@@ -1,6 +1,6 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { Button } from "react-native-paper";
 import DisplayImage from "./DisplayImage";
 import ImagePreviewOption from "./ImagePreviewOption";
@@ -8,6 +8,7 @@ import { useWeighInPhotosApi } from "@/hooks/api/useWeighInPhotosApi";
 import { useUserStore } from "@/store/userStore";
 import Loader from "../ui/loaders/Loader";
 import Toast from "react-native-toast-message";
+import { Text } from "../ui/Text";
 
 interface ImagePreviewProps {
   handleClose: () => void;
@@ -46,16 +47,15 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
       autoHide: true,
       type: "success",
       swipeable: true,
+      text1Style: { textAlign: `center` },
     });
     handleClose();
   };
 
   return (
-    <View style={[spacing.gapLg, { direction: `rtl` }]}>
-      {uploading && <Loader variant="Screen" />}
-      <Text style={[text.textLeft, fonts.lg, colors.textOnBackground, text.textBold]}>
-        תמונה שנבחרה
-      </Text>
+    <View style={[spacing.gapLg, spacing.pdSm]}>
+      {uploading && <Loader variant="Screen" positionTop={`-90%`} positionLeft={`-5%`} />}
+
       <DisplayImage
         image={images[selectedImage] ? images[selectedImage] : undefined}
         removeImage={() => deleteimageByIndex(0)}
@@ -74,18 +74,20 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
             image={images[1]}
           />
         </View>
-        <View style={[layout.flexRow, layout.center, spacing.gapSm]}>
+        <View style={[layout.flexDirectionByPlatform, layout.center, spacing.gapDefault]}>
           <Button
-            style={[spacing.pdSm, colors.backgroundSecondary, common.roundedSm, { width: `50%` }]}
+            style={[spacing.pdXs, common.roundedSm, { width: `50%` }]}
             onPress={handleClose}
+            mode="contained-tonal"
           >
-            ביטול
+            <Text style={[text.textBold, fonts.default]}>בטל</Text>
           </Button>
           <Button
-            style={[colors.backgroundPrimary, spacing.pdSm, common.roundedSm, { width: `50%` }]}
+            mode="contained"
+            style={[spacing.pdXs, common.roundedSm, { width: `50%` }]}
             onPress={uploadImage}
           >
-            <Text style={[colors.textOnBackground, fonts.default]}>שליחה</Text>
+            <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>שלח</Text>
           </Button>
         </View>
       </View>

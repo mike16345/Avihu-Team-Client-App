@@ -32,6 +32,18 @@ export const generateWheelPickerData = (minRange: number, maxRange: number, step
   return data;
 };
 
+export const createRetryFunction = (ignoreStatusCode: number, maxRetries: number = 3) => {
+  return (failureCount: number, error: any) => {
+    console.log("error", error);
+    // Check if error response exists and matches the ignored status code
+    if (error?.status === ignoreStatusCode) {
+      return false; // Stop retrying for the specified status code
+    }
+    // Retry up to the specified max retries for other errors
+    return failureCount < maxRetries;
+  };
+};
+
 const stripTime = (dateParam: Date) => {
   return new Date(dateParam.getFullYear(), dateParam.getMonth(), dateParam.getDate());
 };
@@ -44,25 +56,6 @@ export const checkIfDatesMatch = (date1: Date, date2: Date) => {
   }
 };
 
-export const calculateImageUploadTitle = (usersCheckInDate: number) => {
-  const { updateUserField } = useUserApi();
-  const MILLIESECONDS_IN_A_DAY = 86400000;
-  const timeLeft = usersCheckInDate - Date.now() - MILLIESECONDS_IN_A_DAY;
-
-  const daysLeft = timeLeft > 0 ? Math.floor(timeLeft / MILLIESECONDS_IN_A_DAY) : 0;
-
-  switch (daysLeft) {
-    case 0:
-      const currentUserId = useUserStore((store) => store.currentUser?._id);
-      // updateUserField(currentUserId || ``, "imagesUploaded", false);
-      return ``;
-    case 1:
-      return `זמין בעוד יום`;
-    default:
-      return `זמין בעוד ${daysLeft} ימים`;
-  }
-};
-
 export const showAlert = (type: ToastType, message: string) => {
   Toast.show({
     text1: message,
@@ -70,16 +63,4 @@ export const showAlert = (type: ToastType, message: string) => {
     type: type,
     swipeable: true,
   });
-};
-
-export const createRetryFunction = (ignoreStatusCode: number, maxRetries: number = 3) => {
-  return (failureCount: number, error: any) => {
-    console.log("count ", failureCount);
-    // Check if error response exists and matches the ignored status code
-    if (error?.status === ignoreStatusCode) {
-      return false; // Stop retrying for the specified status code
-    }
-    // Retry up to the specified max retries for other errors
-    return failureCount < maxRetries;
-  };
 };

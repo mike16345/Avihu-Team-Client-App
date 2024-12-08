@@ -4,9 +4,15 @@ import { Animated, Easing, View, Dimensions } from "react-native";
 
 interface LoaderProps {
   variant?: `Screen` | `Standard`;
+  positionTop?: string | number;
+  positionLeft?: string | number;
 }
 
-const Loader: React.FC<LoaderProps> = ({ variant = `Standard` }) => {
+const Loader: React.FC<LoaderProps> = ({
+  variant = `Standard`,
+  positionLeft = 0,
+  positionTop = 0,
+}) => {
   const { layout, colors, spacing, common } = useStyles();
   const { height, width } = Dimensions.get(`screen`);
   // Create animated value
@@ -59,8 +65,8 @@ const Loader: React.FC<LoaderProps> = ({ variant = `Standard` }) => {
                   position: `absolute`,
                   backgroundColor: `rgba(0, 0, 0, 0.8)`,
                   zIndex: 100,
-                  top: 0,
-                  left: 0,
+                  top: positionTop,
+                  left: positionLeft,
                 },
                 colors.backdrop,
               ],

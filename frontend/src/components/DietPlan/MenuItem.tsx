@@ -3,7 +3,8 @@ import useFontSize from "@/styles/useFontSize";
 import useStyles from "@/styles/useGlobalStyles";
 
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "../ui/Text";
 
 interface MenuItemProps {
   menuItem: IMenuItem;
@@ -11,19 +12,29 @@ interface MenuItemProps {
 
 const MenuItem: React.FC<MenuItemProps> = ({ menuItem }) => {
   const { md } = useFontSize();
-  const { colors, layout, spacing, text } = useStyles();
+  const { colors, layout, spacing, text, common } = useStyles();
 
   return (
-    <View style={[layout.itemsCenter, spacing.pdXs, spacing.gapXs]}>
+    <View style={[spacing.pdXs, spacing.gapXs, common.rounded, colors.backgroundSecondary]}>
       <View style={[colors.borderPrimary, { borderBottomWidth: 2 }, layout.widthFull]}>
-        <Text style={[colors.textOnSecondaryContainer, text.textRight, spacing.pdXs]}>
+        <Text
+          style={[
+            colors.textOnSecondaryContainer,
+            text.textRight,
+            spacing.pdXs,
+            colors.textOnSecondary,
+            text.textBold,
+          ]}
+        >
           {menuItem.name}
         </Text>
       </View>
       <View style={[layout.flexRow, layout.justifyBetween, spacing.gapSm, spacing.pdXs]}>
-        <Text style={[colors.textOnSecondaryContainer, md]}>גרם: {menuItem.oneServing.grams}</Text>
+        <Text style={[colors.textOnSecondaryContainer, md, colors.textOnSecondary]}>
+          גרם: {menuItem.oneServing.grams}
+        </Text>
         <View style={[colors.borderPrimary, { borderLeftWidth: 1 }]}></View>
-        <Text style={[colors.textOnSecondaryContainer, md]}>
+        <Text style={[colors.textOnSecondaryContainer, md, colors.textOnSecondary]}>
           כפות: {menuItem.oneServing.spoons}
         </Text>
       </View>

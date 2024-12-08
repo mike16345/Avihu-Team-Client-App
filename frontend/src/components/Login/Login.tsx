@@ -8,12 +8,13 @@ import {
   Animated,
   useAnimatedValue,
   TouchableOpacity,
+  Platform,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
 import { testEmail } from "@/utils/utils";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { Button, Text, TextInput } from "react-native-paper";
+import { Button, TextInput } from "react-native-paper";
 import useStyles from "@/styles/useGlobalStyles";
 import { moderateScale } from "react-native-size-matters";
 import { useUserApi } from "@/hooks/api/useUserApi";
@@ -22,6 +23,7 @@ import ConfirmPassword from "./ConfirmPassword";
 import Loader from "../ui/loaders/Loader";
 import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
+import { Text } from "../ui/Text";
 
 interface IUserCredentials {
   email: string;
@@ -64,6 +66,7 @@ export default function Login({ onLogin }: ILoginProps) {
       autoHide: true,
       type: type,
       swipeable: true,
+      text1Style: { textAlign: `center` },
     });
   };
 
@@ -79,7 +82,7 @@ export default function Login({ onLogin }: ILoginProps) {
     }
 
     if (emailChecked && !password) {
-      errors[`password`] = `אנא הזינו סיסמא`;
+      errors[`password`] = `אנא הזינו סיסמה`;
     }
 
     if (emailChecked && password !== confirmPassword) {
@@ -97,7 +100,8 @@ export default function Login({ onLogin }: ILoginProps) {
         .then((res) => {
           showAlert("success", res.message);
           setEmailchecked(true);
-          if (res.data.password) {
+
+          if (res.data.hasPassword) {
             setUserRegistered(true);
           }
         })
@@ -214,20 +218,34 @@ export default function Login({ onLogin }: ILoginProps) {
         ]}
       >
         <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
-          <Text style={[colors.textPrimary, text.textBold, spacing.pdLg, fonts.xxxl]}>
+          <Text style={[colors.textOnBackground, text.textBold, spacing.pdLg, fonts.xxxl]}>
             כניסה לחשבון
           </Text>
         </Animated.View>
         <View style={[layout.widthFull, spacing.gapXl]}>
           {!emailChecked ? (
             <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
+              <Text
+                style={[
+                  text.textRight,
+                  spacing.pdHorizontalXs,
+                  colors.textOnBackground,
+                  text.textBold,
+                ]}
+              >
+                כתובת מייל
+              </Text>
               <TextInput
-                style={[text.textRight, { width: "100%" }]}
-                placeholder="כתובת מייל..."
+                style={[{ width: "100%" }, text.textLeft, colors.background]}
+                mode="outlined"
+                activeOutlineColor={colors.borderSecondary.borderColor}
+                placeholder="user@example.com"
                 keyboardType={"email-address"}
+                multiline={Platform.OS === `ios` ? true : false}
                 autoCorrect={false}
                 autoComplete="email"
-                textContentType="oneTimeCode"
+                error={Boolean(formErrors.email)}
+                textContentType="emailAddress"
                 onChangeText={(val) =>
                   setInputtedCredentials({
                     ...inputtedCrendentials,
@@ -236,7 +254,9 @@ export default function Login({ onLogin }: ILoginProps) {
                 }
                 value={inputtedCrendentials.email}
               />
-              <Text style={[text.textDanger, text.textRight]}>{formErrors.email}</Text>
+              <Text style={[text.textDanger, text.textRight, text.textBold]}>
+                {formErrors.email}
+              </Text>
             </Animated.View>
           ) : (
             <Animated.View
@@ -246,12 +266,7 @@ export default function Login({ onLogin }: ILoginProps) {
                 style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}
               >
                 <Text
-                  style={[
-                    fonts.default,
-                    text.textBold,
-                    colors.textOnPrimaryContainer,
-                    text.textCenter,
-                  ]}
+                  style={[fonts.default, text.textBold, colors.textOnBackground, text.textCenter]}
                 >
                   {inputtedCrendentials.email}
                 </Text>
@@ -265,10 +280,22 @@ export default function Login({ onLogin }: ILoginProps) {
           )}
           {emailChecked && userRegistered && (
             <Animated.View style={{ opacity: fadeValue }}>
+              <Text
+                style={[
+                  text.textRight,
+                  colors.textOnSecondaryContainer,
+                  text.textBold,
+                  spacing.pdHorizontalXs,
+                ]}
+              >
+                סיסמה
+              </Text>
               <TextInput
                 style={[text.textRight, { width: "100%" }]}
-                placeholder="סיסמא..."
+                mode="outlined"
+                activeOutlineColor={colors.borderSecondary.borderColor}
                 secureTextEntry={!showPassword}
+                error={Boolean(formErrors.password)}
                 onChangeText={(val) =>
                   setInputtedCredentials({ ...inputtedCrendentials, password: val })
                 }
@@ -279,7 +306,9 @@ export default function Login({ onLogin }: ILoginProps) {
                   />
                 }
               />
-              <Text style={[text.textDanger, text.textRight]}>{formErrors.password}</Text>
+              <Text style={[text.textDanger, text.textRight, text.textBold]}>
+                {formErrors.password}
+              </Text>
             </Animated.View>
           )}
           {emailChecked && !userRegistered && (
@@ -294,8 +323,12 @@ export default function Login({ onLogin }: ILoginProps) {
             </Animated.View>
           )}
         </View>
-        <Button mode="contained" onPress={handleSubmit}>
-          התחברות
+        <Button
+          mode="contained-tonal"
+          style={[layout.widthFull, common.rounded, colors.backgroundPrimary]}
+          onPress={handleSubmit}
+        >
+          אישור
         </Button>
       </KeyboardAvoidingView>
     </View>
