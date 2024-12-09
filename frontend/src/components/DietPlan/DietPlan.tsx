@@ -134,6 +134,8 @@ export default function DietPlan() {
           open={isFabOpen}
           visible
           variant="primary"
+          color={colors.textOnBackground.color}
+          fabStyle={[colors.backgroundPrimary]}
           icon={isFabOpen ? `close` : `food-outline`}
           onStateChange={({ open }) => setIsFabOpen(open)}
           actions={[

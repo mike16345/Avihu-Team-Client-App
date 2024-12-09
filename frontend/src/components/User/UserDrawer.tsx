@@ -28,7 +28,7 @@ const UserDrawer = () => {
       children={
         <ScrollView
           style={[layout.sizeFull, spacing.pdHorizontalSm, spacing.pdStatusBar]}
-          contentContainerStyle={[layout.justifyBetween, spacing.gapXxl]}
+          contentContainerStyle={[layout.justifyBetween, spacing.gapXxl, spacing.pdBottomBar]}
         >
           <Text style={[text.textRight, text.textBold, colors.textOnBackground, fonts.lg]}>
             פרטי משתמש

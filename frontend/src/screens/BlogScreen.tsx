@@ -16,6 +16,7 @@ import { buildPhotoUrl } from "@/utils/utils";
 import BlogImage from "@/components/Blog/BlogImage";
 import DateUtils from "@/utils/dateUtils";
 import { Text } from "@/components/ui/Text";
+import Loader from "@/components/ui/loaders/Loader";
 
 interface PostCardProps {
   blog: IBlog;
@@ -63,7 +64,7 @@ const BlogScreen = () => {
   const { getPaginatedPosts } = useBlogsApi();
   const styles = useStyles();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery(
     ["posts"],
     ({ pageParam = 1 }) => getPaginatedPosts({ page: pageParam, limit: 5 }),
     {
@@ -78,6 +79,8 @@ const BlogScreen = () => {
       fetchNextPage();
     }
   };
+
+  if (isLoading || isFetchingNextPage) return <Loader />;
 
   return (
     <FlatList

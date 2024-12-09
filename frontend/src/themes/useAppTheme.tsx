@@ -106,7 +106,7 @@ export const DarkTheme = {
   },
   colors: {
     ...DefaultDarkTheme.colors,
-    primary: "#10b981",
+    primary: "#128472",
     onPrimary: "#064e3b",
     primaryContainer: "#065f46",
     onPrimaryContainer: "#a7f3d0",

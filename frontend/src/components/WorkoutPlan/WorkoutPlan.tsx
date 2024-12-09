@@ -137,7 +137,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
               style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
               onPress={() => setOpenTips(true)}
             >
-              <Text style={styles.tipsText}>דגשים</Text>
+              <Text style={[styles.tipsText, colors.textPrimary]}>דגשים</Text>
             </TouchableOpacity>
           </>
         )}
@@ -189,7 +189,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   tipsText: {
-    color: Colors.primary,
     textAlign: "right",
     fontSize: 18,
     fontWeight: "bold",

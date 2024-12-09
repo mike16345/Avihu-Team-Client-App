@@ -130,7 +130,6 @@ export default function Login({ onLogin }: ILoginProps) {
       setLoading(true);
       loginUser(formattedEmail, password)
         .then((res) => {
-          console.log("!!!!! login response !!!!!!!", res.data);
           showAlert("success", res.message);
           onLogin(res.data.data.user);
           setCurrentUser(res?.data.data.user);
@@ -153,7 +152,13 @@ export default function Login({ onLogin }: ILoginProps) {
   const fadeValue = useAnimatedValue(0);
 
   useEffect(() => {
-    if (emailChecked) {
+    if (emailChecked && isForgotPassword) {
+      Animated.timing(emailInputY, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
+    } else if (emailChecked) {
       Animated.timing(emailInputY, {
         toValue: -30,
         duration: 800,
@@ -224,7 +229,7 @@ export default function Login({ onLogin }: ILoginProps) {
             <Text style={[colors.textOnBackground, text.textBold, fonts.xxxl]}>כניסה לחשבון</Text>
           </Animated.View>
           <View style={[layout.widthFull, spacing.gapLg]}>
-            {(!emailChecked || isForgotPassword) && (
+            {!emailChecked ? (
               <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
                 <Text
                   style={[
@@ -259,6 +264,29 @@ export default function Login({ onLogin }: ILoginProps) {
                   {formErrors.email}
                 </Text>
               </Animated.View>
+            ) : (
+              <Animated.View
+                style={[spacing.gapDefault, { transform: [{ translateY: emailInputY }] }]}
+              >
+                <View
+                  style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}
+                >
+                  <Text
+                    style={[fonts.default, text.textBold, colors.textOnBackground, text.textCenter]}
+                  >
+                    {inputtedCrendentials.email}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={
+                    isForgotPassword ? () => setIsForgotPassword(false) : chooseDifferentMail
+                  }
+                >
+                  <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>
+                    {isForgotPassword ? `לא חשוב, נזכרתי` : `התחברות באמצעות מייל אחר`}
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
             )}
             {isForgotPassword && (
               <ForgotPassword
@@ -268,29 +296,6 @@ export default function Login({ onLogin }: ILoginProps) {
             )}
             {!isForgotPassword && emailChecked && (
               <>
-                <Animated.View
-                  style={[spacing.gapDefault, { transform: [{ translateY: emailInputY }] }]}
-                >
-                  <View
-                    style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}
-                  >
-                    <Text
-                      style={[
-                        fonts.default,
-                        text.textBold,
-                        colors.textOnBackground,
-                        text.textCenter,
-                      ]}
-                    >
-                      {inputtedCrendentials.email}
-                    </Text>
-                  </View>
-                  <TouchableOpacity onPress={chooseDifferentMail}>
-                    <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>
-                      התחברות באמצעות מייל אחר
-                    </Text>
-                  </TouchableOpacity>
-                </Animated.View>
                 {userRegistered && (
                   <Animated.View style={{ opacity: fadeValue }}>
                     <Text
