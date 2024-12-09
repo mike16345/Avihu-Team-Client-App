@@ -19,7 +19,7 @@ interface BottomDrawerProps {
 }
 
 const BottomDrawer: React.FC<BottomDrawerProps> = ({ open, onClose, children }) => {
-  const { colors } = useStyles();
+  const { colors, common } = useStyles();
 
   useEffect(() => {
     const onBackPress = () => {
@@ -34,7 +34,14 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({ open, onClose, children }) 
   return (
     <Modal transparent visible={open} animationType="slide">
       <TouchableOpacity style={[styles.overlay]} onPress={onClose} activeOpacity={1} />
-      <Animated.View style={[styles.drawerContainer, colors.background]}>
+      <Animated.View
+        style={[
+          styles.drawerContainer,
+          colors.background,
+          { borderWidth: 1, borderBottomWidth: 0 },
+          colors.borderSecondaryContainer,
+        ]}
+      >
         <View style={styles.drawerContent}>{children}</View>
       </Animated.View>
     </Modal>
