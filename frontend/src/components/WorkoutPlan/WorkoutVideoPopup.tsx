@@ -84,8 +84,8 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
             onReady={onReady}
             onChangeState={handleVideoStateChange}
             initialPlayerParams={{ loop: false, rel: false }}
-            width={videoWidth}
-            height={videoHeight}
+            width={videoWidth * 0.95}
+            height={videoHeight * 0.85}
             videoId={videoId}
             webViewStyle={styles.video}
           />
@@ -100,6 +100,8 @@ const styles = StyleSheet.create({
     position: "relative",
     width: "100%",
     overflow: "hidden",
+    alignItems: `center`,
+    padding: 10,
   },
   thumbnailContainer: {
     alignItems: "center",
@@ -121,7 +123,7 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   video: {
-    borderRadius: 12,
+    borderRadius: 15,
   },
   loader: {
     position: "absolute",
