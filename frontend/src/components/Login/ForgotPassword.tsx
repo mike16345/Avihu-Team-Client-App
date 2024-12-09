@@ -1,4 +1,4 @@
-import { View, Text, BackHandler, Touchable, TouchableOpacity } from "react-native";
+import { View, BackHandler, TouchableOpacity } from "react-native";
 import { FC, useEffect, useState } from "react";
 import { useOTPApi } from "@/hooks/api/useOTPApi";
 import useStyles from "@/styles/useGlobalStyles";
@@ -8,6 +8,7 @@ import { EMAIL_ERROR, INVALID_PASSWORD_MATCH } from "@/constants/Constants";
 import ConfirmPassword from "./ConfirmPassword";
 import { usePasswordsApi } from "@/hooks/api/usePasswordsApi";
 import { ICredentialsErrors } from "./Login";
+import { Text } from "../ui/Text";
 
 interface IForgotPassword {
   email: string;

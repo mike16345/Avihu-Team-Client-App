@@ -1,9 +1,7 @@
 import { FC, useState } from "react";
 import {
   View,
-  Text,
   TouchableOpacity,
-  Image,
   useWindowDimensions,
   ActivityIndicator,
   FlatList,
@@ -17,6 +15,7 @@ import { IBlog } from "@/interfaces/IBlog";
 import { buildPhotoUrl } from "@/utils/utils";
 import BlogImage from "@/components/Blog/BlogImage";
 import DateUtils from "@/utils/dateUtils";
+import { Text } from "@/components/ui/Text";
 
 interface PostCardProps {
   blog: IBlog;
