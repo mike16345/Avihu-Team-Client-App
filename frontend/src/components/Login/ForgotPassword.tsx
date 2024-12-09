@@ -10,16 +10,16 @@ import { usePasswordsApi } from "@/hooks/api/usePasswordsApi";
 import { ICredentialsErrors } from "./Login";
 
 interface IForgotPassword {
+  email: string;
   onConfirmChangePasswordSuccess: () => void;
 }
 
-const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess }) => {
+const ForgotPassword: FC<IForgotPassword> = ({ email, onConfirmChangePasswordSuccess }) => {
   const { getOTP, validateOTP } = useOTPApi();
   const { changePassword } = usePasswordsApi();
 
   const { colors, spacing, layout, text } = useStyles();
 
-  const [email, setEmail] = useState("");
   const [formErrors, setFormErrors] = useState<ICredentialsErrors & { otp?: string }>({});
   const [otp, setOtp] = useState("");
   const [showOtpInput, setShowOtpInput] = useState(false);
@@ -83,28 +83,9 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess })
     <View style={[]}>
       {!showOtpInput && (
         <>
-          <Text
-            style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground, text.textBold]}
-          >
-            כתובת מייל
-          </Text>
-          <TextInput
-            style={[{ width: "100%" }, text.textLeft, colors.background]}
-            mode="outlined"
-            activeOutlineColor={colors.borderSecondary.borderColor}
-            placeholder="user@example.com"
-            keyboardType={"email-address"}
-            autoCorrect={false}
-            autoComplete="email"
-            error={!!formErrors.email}
-            textContentType="emailAddress"
-            onChangeText={(val) => setEmail(val)}
-            value={email}
-          />
-          <Text style={[text.textDanger, text.textRight, text.textBold]}>
-            {formErrors["email"]}
-          </Text>
-          <Button onPress={handleGetOtp}>Get OTP</Button>
+          <Button mode="contained" onPress={handleGetOtp}>
+            Get OTP
+          </Button>
         </>
       )}
       {showOtpInput && !isOtpConfirmed && (

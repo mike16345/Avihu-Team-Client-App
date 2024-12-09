@@ -178,7 +178,7 @@ export default function Login({ onLogin }: ILoginProps) {
         useNativeDriver: true,
       }).start();
     }
-  }, [emailChecked, userRegistered]);
+  }, [emailChecked, userRegistered, isForgotPassword]);
 
   return (
     <>
@@ -224,77 +224,74 @@ export default function Login({ onLogin }: ILoginProps) {
             <Text style={[colors.textOnBackground, text.textBold, fonts.xxxl]}>כניסה לחשבון</Text>
           </Animated.View>
           <View style={[layout.widthFull, spacing.gapLg]}>
-            {isForgotPassword && (
-              <ForgotPassword onConfirmChangePasswordSuccess={() => setIsForgotPassword(false)} />
+            {(!emailChecked || isForgotPassword) && (
+              <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
+                <Text
+                  style={[
+                    text.textRight,
+                    spacing.pdHorizontalXs,
+                    colors.textOnBackground,
+                    text.textBold,
+                  ]}
+                >
+                  כתובת מייל
+                </Text>
+                <TextInput
+                  style={[{ width: "100%" }, text.textLeft, colors.background]}
+                  mode="outlined"
+                  activeOutlineColor={colors.borderSecondary.borderColor}
+                  placeholder="user@example.com"
+                  keyboardType={"email-address"}
+                  autoCorrect={false}
+                  multiline={Platform.OS === `ios` ? true : false}
+                  autoComplete="email"
+                  error={Boolean(formErrors.email)}
+                  textContentType="emailAddress"
+                  onChangeText={(val) =>
+                    setInputtedCredentials({
+                      ...inputtedCrendentials,
+                      email: val,
+                    })
+                  }
+                  value={inputtedCrendentials.email}
+                />
+                <Text style={[text.textDanger, text.textRight, text.textBold]}>
+                  {formErrors.email}
+                </Text>
+              </Animated.View>
             )}
-            {!isForgotPassword && (
+            {isForgotPassword && (
+              <ForgotPassword
+                email={inputtedCrendentials.email}
+                onConfirmChangePasswordSuccess={() => setIsForgotPassword(false)}
+              />
+            )}
+            {!isForgotPassword && emailChecked && (
               <>
-                {!emailChecked && (
-                  <Animated.View style={{ transform: [{ translateY: emailInputY }] }}>
+                <Animated.View
+                  style={[spacing.gapDefault, { transform: [{ translateY: emailInputY }] }]}
+                >
+                  <View
+                    style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}
+                  >
                     <Text
                       style={[
-                        text.textRight,
-                        spacing.pdHorizontalXs,
-                        colors.textOnBackground,
+                        fonts.default,
                         text.textBold,
+                        colors.textOnBackground,
+                        text.textCenter,
                       ]}
                     >
-                      כתובת מייל
+                      {inputtedCrendentials.email}
                     </Text>
-                    <TextInput
-                      style={[{ width: "100%" }, text.textLeft, colors.background]}
-                      mode="outlined"
-                      activeOutlineColor={colors.borderSecondary.borderColor}
-                      placeholder="user@example.com"
-                      keyboardType={"email-address"}
-                      autoCorrect={false}
-                      multiline={Platform.OS === `ios` ? true : false}
-                      autoComplete="email"
-                      error={Boolean(formErrors.email)}
-                      textContentType="emailAddress"
-                      onChangeText={(val) =>
-                        setInputtedCredentials({
-                          ...inputtedCrendentials,
-                          email: val,
-                        })
-                      }
-                      value={inputtedCrendentials.email}
-                    />
-                    <Text style={[text.textDanger, text.textRight, text.textBold]}>
-                      {formErrors.email}
+                  </View>
+                  <TouchableOpacity onPress={chooseDifferentMail}>
+                    <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>
+                      התחברות באמצעות מייל אחר
                     </Text>
-                  </Animated.View>
-                )}
-                {emailChecked && (
-                  <Animated.View
-                    style={[spacing.gapDefault, { transform: [{ translateY: emailInputY }] }]}
-                  >
-                    <View
-                      style={[
-                        spacing.pdDefault,
-                        colors.backgroundSecondaryContainer,
-                        common.rounded,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          fonts.default,
-                          text.textBold,
-                          colors.textOnBackground,
-                          text.textCenter,
-                        ]}
-                      >
-                        {inputtedCrendentials.email}
-                      </Text>
-                    </View>
-                    <TouchableOpacity onPress={chooseDifferentMail}>
-                      <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>
-                        התחברות באמצעות מייל אחר
-                      </Text>
-                    </TouchableOpacity>
-                  </Animated.View>
-                )}
-                {emailChecked && userRegistered && (
+                  </TouchableOpacity>
+                </Animated.View>
+                {userRegistered && (
                   <Animated.View style={{ opacity: fadeValue }}>
                     <Text
                       style={[
@@ -340,7 +337,7 @@ export default function Login({ onLogin }: ILoginProps) {
                     </TouchableOpacity>
                   </Animated.View>
                 )}
-                {emailChecked && !userRegistered && (
+                {!userRegistered && (
                   <Animated.View style={{ opacity: fadeValue }}>
                     <ConfirmPassword
                       errors={formErrors}

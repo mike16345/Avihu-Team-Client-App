@@ -7,9 +7,6 @@ import { Button } from "react-native-paper";
 import { useUserDrawer } from "@/store/userDrawerStore";
 import { useUserStore } from "@/store/userStore";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { RootStackParamList } from "@/types/navigatorTypes";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import NativeIcon from "../Icon/NativeIcon";
 
 const UserDrawer = () => {
