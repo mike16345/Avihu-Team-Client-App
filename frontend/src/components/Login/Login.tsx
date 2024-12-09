@@ -62,6 +62,7 @@ export default function Login({ onLogin }: ILoginProps) {
   const [userRegistered, setUserRegistered] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [isShowingOtpInputs, setIsShowingOtpInputs] = useState(false);
 
   const showAlert = (type: ToastType, message: string) => {
     Toast.show({
@@ -148,16 +149,30 @@ export default function Login({ onLogin }: ILoginProps) {
     setFormErrors({});
   };
 
+  const handleChangePasswordSuccess = () => {
+    setIsForgotPassword(false);
+    setIsShowingOtpInputs(false);
+    showAlert("success", `סיסמה עודכנה בהצלחה`);
+  };
+
   const emailInputY = useAnimatedValue(0);
   const fadeValue = useAnimatedValue(0);
 
   useEffect(() => {
     if (emailChecked && isForgotPassword) {
-      Animated.timing(emailInputY, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }).start();
+      if (isShowingOtpInputs) {
+        Animated.timing(emailInputY, {
+          toValue: -30,
+          duration: 800,
+          useNativeDriver: true,
+        }).start();
+      } else {
+        Animated.timing(emailInputY, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: true,
+        }).start();
+      }
     } else if (emailChecked) {
       Animated.timing(emailInputY, {
         toValue: -30,
@@ -183,7 +198,7 @@ export default function Login({ onLogin }: ILoginProps) {
         useNativeDriver: true,
       }).start();
     }
-  }, [emailChecked, userRegistered, isForgotPassword]);
+  }, [emailChecked, userRegistered, isForgotPassword, isShowingOtpInputs]);
 
   return (
     <>
@@ -291,7 +306,8 @@ export default function Login({ onLogin }: ILoginProps) {
             {isForgotPassword && (
               <ForgotPassword
                 email={inputtedCrendentials.email}
-                onConfirmChangePasswordSuccess={() => setIsForgotPassword(false)}
+                onConfirmChangePasswordSuccess={handleChangePasswordSuccess}
+                onShowingOtpInputs={() => setIsShowingOtpInputs(true)}
               />
             )}
             {!isForgotPassword && emailChecked && (
