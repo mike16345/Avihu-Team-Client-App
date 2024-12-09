@@ -4,8 +4,8 @@ import {
   View,
   useWindowDimensions,
   Pressable,
-  ScrollView,
   TouchableOpacity,
+  BackHandler,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
@@ -105,6 +105,19 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     }
   };
 
+  const handlePressBack = () => {
+    navigation?.goBack();
+    return true;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handlePressBack);
+
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handlePressBack);
+    };
+  }, []);
+
   useEffect(() => {
     navigation?.setOptions({ title: "" });
   }, [navigation]);
@@ -120,13 +133,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
           style={[layout.flexGrow, !lastRecordedSet && layout.justifyEvenly, spacing.pdDefault]}
         >
           <View style={[layout.itemsEnd, spacing.gapSm]}>
-            {strippedTips && strippedTips.length && (
-              <Pressable onPress={() => setOpenTrainerTips(true)}>
-                <Text style={[fonts.lg, colors.textPrimary, text.textUnderline, text.textBold]}>
-                  דגשים
-                </Text>
-              </Pressable>
-            )}
             <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
             <Text style={styles.setInfo}>סט: {setNumber}</Text>
             {exercise.sets[setNumber - 1] && (
@@ -135,7 +141,13 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 {exercise.sets[setNumber - 1].maxReps && `-${exercise.sets[setNumber - 1].maxReps}`}
               </Text>
             )}
-
+            {strippedTips && strippedTips.length && (
+              <Pressable onPress={() => setOpenTrainerTips(true)}>
+                <Text style={[fonts.lg, colors.textPrimary, text.textUnderline, text.textBold]}>
+                  דגשים
+                </Text>
+              </Pressable>
+            )}
             <WorkoutTips
               tips={[exercise.tipFromTrainer!]}
               openTips={openTrainerTips}

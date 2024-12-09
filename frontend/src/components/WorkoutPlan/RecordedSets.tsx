@@ -1,8 +1,9 @@
-import { View, SectionList } from "react-native";
-import React from "react";
+import { View, SectionList, BackHandler } from "react-native";
+import React, { useEffect } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import RecordedSetInfo from "./RecordedSetInfo";
 import { Text } from "../ui/Text";
+import { useNavigation } from "@react-navigation/native";
 
 interface RecordedSetsProps {
   route: any;
@@ -20,6 +21,7 @@ const formatDate = (dateString: string) => {
 const RecordedSets: React.FC<RecordedSetsProps> = ({ route }) => {
   const { spacing, text, fonts, colors } = useStyles();
   const { recordedSets } = route.params;
+  const navigator = useNavigation();
 
   // Group recordedSets by date
   const sections = recordedSets.reduce((acc: any[], set: any) => {
@@ -32,6 +34,17 @@ const RecordedSets: React.FC<RecordedSetsProps> = ({ route }) => {
       acc.push({ title: formattedDate, data: [set] });
     }
     return acc;
+  }, []);
+
+  const handlePressBack = () => {
+    navigator.goBack();
+    return true;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handlePressBack);
+
+    return BackHandler.removeEventListener("hardwareBackPress", handlePressBack);
   }, []);
 
   return (
