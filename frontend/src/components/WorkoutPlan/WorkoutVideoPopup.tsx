@@ -102,9 +102,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   thumbnailContainer: {
-    justifyContent: "center",
     alignItems: "center",
-    paddingTop: 16,
+    paddingTop: 4,
   },
   thumbnail: {
     borderRadius: 4,
