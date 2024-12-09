@@ -115,7 +115,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   return (
     <>
       {isSetUploading && <Loader variant="Screen" />}
-      <ScrollView style={[layout.sizeFull]}>
+      <View style={[layout.sizeFull]}>
         <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
         <View style={[layout.flexGrow, !lastRecordedSet && spacing.gapXxl, spacing.pdDefault]}>
           <View style={[layout.itemsEnd, spacing.gapSm]}>
@@ -164,7 +164,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                     data={repsOptions}
                     onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
                     selectedValue={recordedSet.repsDone}
-                    height={height * 0.1}
+                    height={height * 0.08}
                     itemHeight={35}
                   />
                 </View>
@@ -195,7 +195,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                     decimalRange={10}
                     maxWeight={200}
                     stepSize={1}
-                    height={height * 0.1}
+                    height={height * 0.08}
                     itemHeight={35}
                     selectedWeight={recordedSet.weight}
                   />
@@ -250,7 +250,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
           </Button>
         </View>
-      </ScrollView>
+      </View>
     </>
   );
 };
