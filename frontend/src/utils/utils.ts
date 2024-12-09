@@ -44,6 +44,20 @@ export const createRetryFunction = (ignoreStatusCode: number, maxRetries: number
   };
 };
 
+export const buildPhotoUrls = (urls: string[]) => {
+  const imageUrls = urls.map((url) => {
+    return buildPhotoUrl(url);
+  });
+
+  return imageUrls;
+};
+
+export const buildPhotoUrl = (url: string) => {
+  const cloudfrontUrl = process.env.EXPO_PUBLIC_CLOUDFRONT_URL;
+
+  return `${cloudfrontUrl}/images/${url}`;
+};
+
 const stripTime = (dateParam: Date) => {
   return new Date(dateParam.getFullYear(), dateParam.getMonth(), dateParam.getDate());
 };

@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Modal, Portal, ThemeProvider } from "react-native-paper";
+import { Modal, Portal } from "react-native-paper";
 import { Props } from "react-native-paper/lib/typescript/components/Modal";
 
 interface CustomModalProps extends Props {}

@@ -44,31 +44,16 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
       ),
     },
   },
-  // {
-  //   nameent: "BlogScreen",
-  //   compon: BlogScreen,
-  //   options: {
-  //     tabBarLabel: "",
-  //     tabBarIcon: ({ color }: { color: string }) => (
-  //       <NativeIcon library="MaterialIcons" name="post-add" color={color} size={28} />
-  //     ),
-  //   },
-  // },
-  // {
-  //   name: "Profile",
-  //   component: BlogScreen,
-  //   options: {
-  //     tabBarLabel: "",
-  //     tabBarIcon: ({ color, focused }) => (
-  //       <NativeIcon
-  //         library="MaterialIcons"
-  //         name={focused ? "person" : "person-outline"}
-  //         color={color}
-  //         size={28}
-  //       />
-  //     ),
-  //   },
-  // },
+  {
+    name: "BlogScreen",
+    component: BlogScreen,
+    options: {
+      tabBarLabel: "",
+      tabBarIcon: ({ color }: { color: string }) => (
+        <NativeIcon library="MaterialIcons" name="post-add" color={color} size={28} />
+      ),
+    },
+  },
 ];
 
 export default BottomScreenNavigatorTabs;

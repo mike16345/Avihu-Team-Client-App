@@ -1,43 +1,75 @@
-import { useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { FC, useState } from "react";
+import {
+  View,
+  TouchableOpacity,
+  useWindowDimensions,
+  ActivityIndicator,
+  FlatList,
+} from "react-native";
+import RenderHTML from "react-native-render-html";
 import useStyles from "@/styles/useGlobalStyles";
 import useCardStyles from "@/styles/useCardStyles";
+import { useBlogsApi } from "@/hooks/api/useBlogsApi";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { IBlog } from "@/interfaces/IBlog";
+import { buildPhotoUrl } from "@/utils/utils";
+import BlogImage from "@/components/Blog/BlogImage";
+import DateUtils from "@/utils/dateUtils";
+import { Text } from "@/components/ui/Text";
 
-const fetchPosts = async ({ pageParam = 1 }) => {
-  const response = await axios.get(
-    `https://jsonplaceholder.typicode.com/posts?_page=${pageParam}&_limit=5`
-  );
+interface PostCardProps {
+  blog: IBlog;
+}
 
-  return response.data;
-};
-
-const BlogCard = ({ title, body }: { title: string; body: string }) => {
+const PostCard: FC<PostCardProps> = ({ blog }) => {
   const [expanded, setExpanded] = useState(false);
-  const { colors, text, fonts } = useStyles();
+  const { width } = useWindowDimensions();
+  const { colors, text, fonts, layout } = useStyles();
   const cardStyles = useCardStyles();
+
+  const shouldTruncate = blog.content.length > 100;
+  const displayContent =
+    expanded || !shouldTruncate ? blog.content : `${blog.content.slice(0, 100)}...`;
 
   return (
     <View style={[cardStyles.card]}>
-      <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.lg]}>{title}</Text>
-      <Text style={[colors.textOnSecondaryContainer]}>
-        {expanded ? body : `${body.slice(0, 100)}...`}
-      </Text>
-      <TouchableOpacity onPress={() => setExpanded(!expanded)}>
-        <Text style={[colors.textOnSurfaceDisabled]}>{expanded ? "View Less" : "View More"}</Text>
-      </TouchableOpacity>
+      <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
+        <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.lg]}>
+          {blog.title.trimStart()}
+        </Text>
+        <Text style={[colors.textOnSecondaryContainer]}>{DateUtils.formatDate(blog.date)}</Text>
+      </View>
+
+      <RenderHTML
+        contentWidth={width}
+        source={{ html: displayContent }}
+        baseStyle={{
+          color: colors.textOnSecondaryContainer.color,
+        }}
+      />
+
+      {shouldTruncate && (
+        <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+          <Text style={[colors.textOnSurfaceDisabled]}>{expanded ? "View Less" : "View More"}</Text>
+        </TouchableOpacity>
+      )}
+
+      {blog.imageUrl && <BlogImage imageUrl={buildPhotoUrl(blog.imageUrl)} />}
     </View>
   );
 };
 
 const BlogScreen = () => {
+  const { getPaginatedPosts } = useBlogsApi();
   const styles = useStyles();
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
     ["posts"],
-    fetchPosts,
+    ({ pageParam = 1 }) => getPaginatedPosts({ page: pageParam, limit: 5 }),
     {
-      getNextPageParam: (_lastPage, pages) => (pages.length < 20 ? pages.length + 1 : undefined),
+      getNextPageParam: (lastPage) => {
+        return lastPage.hasNextPage ? lastPage.currentPage + 1 : undefined;
+      },
     }
   );
 
@@ -49,12 +81,12 @@ const BlogScreen = () => {
 
   return (
     <FlatList
-      data={data?.pages.flat()}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => <BlogCard title={item.title} body={item.body} />}
+      data={data?.pages.flatMap((page) => page.results)} // Flatten paginated results
+      keyExtractor={(item) => item._id} // Use MongoDB `_id` as the key
+      renderItem={({ item }) => <PostCard blog={item} />}
       onEndReached={loadMore}
-      ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
       onEndReachedThreshold={0.5}
+      ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
       ListFooterComponent={
         isFetchingNextPage ? <ActivityIndicator size="large" color="#FFF" /> : null
       }

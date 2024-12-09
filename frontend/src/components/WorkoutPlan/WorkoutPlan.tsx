@@ -3,7 +3,6 @@ import {
   FlatList,
   ImageBackground,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -23,6 +22,7 @@ import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigato
 import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutPlanSkeletonLoader";
 import NoDataScreen from "@/screens/NoDataScreen";
 import ErrorScreen from "@/screens/ErrorScreen";
+import { Text } from "../ui/Text";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps

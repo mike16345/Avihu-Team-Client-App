@@ -28,6 +28,7 @@ const BottomTabNavigator = () => {
           ...layout.center,
           width: 45,
           height: 40,
+          backgroundColor: "",
           borderRadius: 999,
         }}
         inactiveColor={colors.textOnBackground.color}

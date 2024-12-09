@@ -12,7 +12,7 @@ export default function TopBar() {
   return (
     <View
       style={[
-        spacing.pdStatusBar,
+        { paddingTop: spacing.pdStatusBar.paddingTop! + 5 },
         layout.itemsEnd,
         spacing.pdHorizontalDefault,
         {

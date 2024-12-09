@@ -1,42 +1,84 @@
-import React, { FC, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import {
   StyleSheet,
   View,
-  Text,
   useWindowDimensions,
-  TextInput,
-  KeyboardAvoidingView,
+  Pressable,
+  ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
-import OpacityButton from "@/components/Button/OpacityButton";
-import Divider from "../ui/Divider";
-import { CustomModal } from "../ui/Modal";
-import { IRecordedSet } from "@/interfaces/Workout";
+import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
+import useStyles from "@/styles/useGlobalStyles";
+import { Button } from "react-native-paper";
+import WorkoutVideoPopup from "./WorkoutVideoPopup";
+import { createRetryFunction, extractVideoId, generateWheelPickerData } from "@/utils/utils";
+import WeightWheelPicker from "../WeightGraph/WeightWheelPicker";
+import WheelPicker from "../ui/WheelPicker";
+import WorkoutTips from "./WorkoutTips";
+import NativeIcon from "../Icon/NativeIcon";
+import { useRecordedSetsApi } from "@/hooks/api/useRecordedSetsApi";
+import { useUserStore } from "@/store/userStore";
+import { useQuery } from "@tanstack/react-query";
+import Loader from "../ui/loaders/Loader";
+import RecordedSetInfo from "./RecordedSetInfo";
+import { ONE_DAY } from "@/constants/reactQuery";
+import { Text } from "../ui/Text";
 
-interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {
-  handleRecordSet: (recordSet: Omit<IRecordedSet, "plan">) => void;
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  exerciseName: string;
-  setNumber: number;
-}
+import Toast from "react-native-toast-message";
 
-const RecordExercise: FC<RecordExerciseProps> = ({
-  isOpen,
-  setIsOpen,
-  handleRecordSet,
-  exerciseName,
-  setNumber,
-}) => {
-  const { width } = useWindowDimensions();
+type InputTypes = "reps" | "weight";
+interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
+
+const findLatestRecordedSetByNumber = (
+  recordedSets: IRecordedSetResponse[],
+  setNumber: number
+): IRecordedSetResponse | null => {
+  if (!recordedSets.length) return null;
+
+  const matchingSets = recordedSets.filter((set) => set.setNumber === setNumber);
+
+  if (!matchingSets.length) return null;
+
+  const latestSet = matchingSets.reduce((latest, current) =>
+    new Date(latest.date) > new Date(current.date) ? latest : current
+  );
+
+  return latestSet;
+};
+
+const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
+  const repsOptions = useMemo(() => generateWheelPickerData(1, 100), []);
+  const { handleRecordSet, exercise, muscleGroup, setNumber } = route!.params;
+
+  const { height, width } = useWindowDimensions();
+  const customStyles = useStyles();
+  const { colors, fonts, layout, spacing, text, common } = customStyles;
+  const currentUser = useUserStore((state) => state.currentUser);
+  const { getUserRecordedSetsByExercise } = useRecordedSetsApi();
+
+  const { data, isLoading } = useQuery(
+    ["recordedSets", exercise],
+    () =>
+      getUserRecordedSetsByExercise(exercise.name, muscleGroup, currentUser?._id || "").then(
+        (res) => res.data
+      ),
+
+    { enabled: !!exercise, retry: createRetryFunction(404), staleTime: ONE_DAY }
+  );
+
+  const lastRecordedSet = findLatestRecordedSetByNumber(data || [], setNumber);
+  const strippedTips = exercise.tipFromTrainer?.replace(" ", "");
 
   const [recordedSet, setRecordedSet] = useState<Omit<IRecordedSet, "plan">>({
     weight: 0,
     repsDone: 0,
     note: "",
   });
-  const [errors, setErrors] = useState<{ weight: string; reps: string }>({ weight: "", reps: "" });
+
+  const [openTrainerTips, setOpenTrainerTips] = useState(false);
+  const [isSetUploading, setIsSetUploading] = useState(false);
 
   const handleUpdateRecordedSet = <K extends keyof IRecordedSet>(
     key: keyof IRecordedSet,
@@ -45,101 +87,171 @@ const RecordExercise: FC<RecordExerciseProps> = ({
     setRecordedSet({ ...recordedSet, [key]: value });
   };
 
-  const validateInput = (value: string) => {
-    if (!value) {
-      return "This field is required";
+  const handleSave = async () => {
+    try {
+      setIsSetUploading(true);
+      await handleRecordSet(recordedSet);
+    } catch (err: any) {
+      Toast.show({
+        text1: "אופס, נתקלנו בבעיה",
+        text2: err.message,
+        autoHide: true,
+        type: "error",
+        swipeable: true,
+        text1Style: { textAlign: `center` },
+        text2Style: { textAlign: `center` },
+      });
+    } finally {
+      setIsSetUploading(false);
     }
-    const numValue = parseFloat(value);
-
-    if (isNaN(numValue) || numValue <= 0) {
-      return "Value must be greater than 0";
-    }
-    if (!/^\d+(\.\d{1,1})?$/.test(value)) {
-      return "Only one decimal place allowed";
-    }
-    return "";
   };
 
-  const handleSave = () => {
-    const weightError = validateInput(recordedSet.weight.toString());
-    const repsError = validateInput(recordedSet.repsDone.toString());
+  useEffect(() => {
+    navigation?.setOptions({ title: "" });
+  }, [navigation]);
 
-    if (weightError || repsError) {
-      setErrors({ weight: weightError, reps: repsError });
-      return;
-    }
-
-    handleRecordSet(recordedSet);
-    setIsOpen(false);
-  };
+  if (isLoading) return <Loader variant="Standard" />;
 
   return (
-    <CustomModal
-      contentContainerStyle={{
-        backgroundColor: Colors.bgSecondary,
-        borderWidth: 1.5,
-        borderColor: Colors.primary,
-        padding: 20,
-        alignItems: "center",
-      }}
-      visible={isOpen}
-      dismissableBackButton
-      onDismiss={() => setIsOpen(false)}
-    >
-      <Text style={styles.title}>{`${exerciseName} סט ${setNumber}`}</Text>
-      <Divider thickness={0.5} style={{ marginBottom: 20 }} />
-      <View style={styles.container}>
-        <KeyboardAvoidingView className="gap-8">
-          <View className=" gap-2 h-16 px-2   justify-center">
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>משקל:</Text>
-              <TextInput
-                placeholder="משקל..."
-                className="inpt w-24 h-10"
-                keyboardType="number-pad"
-                inputMode="numeric"
-                value={recordedSet.weight.toString()}
-                onChangeText={(text) => handleUpdateRecordedSet("weight", text)}
-              />
-            </View>
-            {errors.weight ? <Text style={styles.errorText}>{errors.weight}</Text> : null}
-          </View>
-          <View className=" gap-2 h-16 px-2   justify-center">
-            <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>חזרות:</Text>
-              <TextInput
-                className="inpt w-24 h-10"
-                keyboardType="number-pad"
-                onChangeText={(text) => handleUpdateRecordedSet("repsDone", text)}
-              />
-            </View>
-            {errors.reps ? <Text style={styles.errorText}>{errors.reps}</Text> : null}
-          </View>
+    <>
+      {isSetUploading && <Loader variant="Screen" />}
+      <View style={[layout.sizeFull]}>
+        <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
+        <View style={[layout.flexGrow, !lastRecordedSet && spacing.gapXxl, spacing.pdDefault]}>
+          <View style={[layout.itemsEnd, spacing.gapSm]}>
+            {strippedTips && strippedTips.length && (
+              <Pressable onPress={() => setOpenTrainerTips(true)}>
+                <Text style={[fonts.lg, colors.textPrimary, text.textUnderline, text.textBold]}>
+                  דגשים
+                </Text>
+              </Pressable>
+            )}
+            <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
+            <Text style={styles.setInfo}>סט: {setNumber}</Text>
+            {exercise.sets[setNumber - 1] && (
+              <Text style={styles.setInfo}>
+                חזרות: {exercise.sets[setNumber - 1].minReps}
+                {exercise.sets[setNumber - 1].maxReps && `-${exercise.sets[setNumber - 1].maxReps}`}
+              </Text>
+            )}
 
-          <View style={styles.notesContainer}>
-            <Text style={styles.inputLabel}>פתק:</Text>
-            <TextInput
-              className="inpt "
-              style={[styles.multilineInput, { width: width - 80 }]}
-              multiline
-              placeholderTextColor={"gray"}
-              placeholder="איך עבר לך?"
-              textAlignVertical="top"
-              onChangeText={(text) => handleUpdateRecordedSet("note", text)}
+            <WorkoutTips
+              tips={[exercise.tipFromTrainer!]}
+              openTips={openTrainerTips}
+              setOpenTips={setOpenTrainerTips}
             />
           </View>
-        </KeyboardAvoidingView>
-        <View style={[]}>
-          <OpacityButton
-            onPress={handleSave}
-            textProps={{ style: styles.saveText }}
-            style={styles.saveBtn}
+
+          <View style={[layout.justifyEvenly, layout.flex1]}>
+            <View style={[layout.flexDirectionByPlatform, layout.justifyEvenly]}>
+              <View style={[layout.center, spacing.gapDefault]}>
+                <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
+                  חזרות
+                </Text>
+
+                <View
+                  style={[
+                    { borderTopWidth: 2, borderBottomWidth: 2 },
+                    colors.borderSecondary,
+                    spacing.pdHorizontalDefault,
+                    spacing.pdVerticalMd,
+                    common.rounded,
+                  ]}
+                >
+                  <WheelPicker
+                    activeItemColor={colors.textOnSurface.color}
+                    inactiveItemColor={colors.textOnSurfaceDisabled.color}
+                    data={repsOptions}
+                    onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
+                    selectedValue={recordedSet.repsDone}
+                    height={height * 0.08}
+                    itemHeight={35}
+                  />
+                </View>
+              </View>
+              <View style={[layout.center, spacing.gapDefault]}>
+                <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
+                  משקל
+                </Text>
+
+                <View
+                  style={[
+                    { borderTopWidth: 2, borderBottomWidth: 2 },
+                    colors.borderSecondary,
+                    spacing.pdHorizontalDefault,
+                    spacing.pdVerticalMd,
+                    common.rounded,
+                  ]}
+                >
+                  <WeightWheelPicker
+                    onValueChange={(val) => {
+                      handleUpdateRecordedSet("weight", val);
+                    }}
+                    activeItemColor={colors.textOnSurface.color}
+                    inactiveItemColor={colors.textOnSurfaceDisabled.color}
+                    minWeight={1}
+                    decimalStepSize={2.5}
+                    showZeroDecimal={false}
+                    decimalRange={10}
+                    maxWeight={200}
+                    stepSize={1}
+                    height={height * 0.08}
+                    itemHeight={35}
+                    selectedWeight={recordedSet.weight}
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+          {lastRecordedSet && (
+            <TouchableOpacity
+              onPress={() => {
+                navigation?.navigate("RecordedSets", {
+                  recordedSets: data || [],
+                });
+              }}
+              style={[spacing.mgVerticalDefault, spacing.gapSm]}
+            >
+              <Text style={[text.textRight, text.textBold, colors.textOnSecondaryContainer]}>
+                אימון קודם - {new Date(lastRecordedSet.date).toLocaleDateString()}
+              </Text>
+              <RecordedSetInfo
+                actionButton={
+                  <NativeIcon
+                    color={colors.textOnSecondaryContainer.color}
+                    library="MaterialCommunityIcons"
+                    name="chevron-left"
+                    size={28}
+                  />
+                }
+                recordedSet={lastRecordedSet}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+        <View
+          style={[
+            layout.flexDirectionByPlatform,
+            layout.flex1,
+            layout.center,
+            layout.widthFull,
+            spacing.gapLg,
+            spacing.pdHorizontalDefault,
+          ]}
+        >
+          <Button
+            mode="contained-tonal"
+            onPress={() => navigation?.goBack()}
+            style={[common.rounded, { width: `48%` }]}
           >
-            שמור
-          </OpacityButton>
+            בטל
+          </Button>
+          <Button mode="contained" onPress={handleSave} style={[common.rounded, { width: `48%` }]}>
+            <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
+          </Button>
         </View>
       </View>
-    </CustomModal>
+    </>
   );
 };
 
@@ -148,34 +260,16 @@ export default RecordExercise;
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    alignItems: "flex-end",
     justifyContent: "space-between",
   },
-  inputLabel: {
-    fontSize: 16,
-    textAlign: "right",
-    color: Colors.primary,
-    fontWeight: "bold",
-    backgroundColor: Colors.bgSecondary,
-  },
+  inputLabel: {},
   inputContainer: {
     flexDirection: "row-reverse",
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    backgroundColor: Colors.bgSecondary,
   },
-  notesContainer: {
-    width: "100%",
-    gap: 12,
-  },
-  title: {
-    fontSize: 17,
-    padding: 8,
-    textAlign: "right",
-    fontWeight: "bold",
-    color: Colors.primary,
-  },
+
   saveBtn: {
     backgroundColor: Colors.bgPrimary,
     justifyContent: "center",
@@ -190,14 +284,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
-  multilineInput: {
-    width: "100%",
-    height: 120,
-    textAlign: "right",
-    backgroundColor: Colors.light,
-    textAlignVertical: "top",
-    padding: 8,
-  },
   errorText: {
     color: "red",
     fontSize: 12,
@@ -205,5 +291,10 @@ const styles = StyleSheet.create({
   },
   textInput: {
     textAlign: "right",
+  },
+  setInfo: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "white",
   },
 });

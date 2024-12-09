@@ -18,8 +18,14 @@ class DateUtils {
     });
   }
 
-  static formatDate(date: Date, formatType: DateFormatType = "DD/MM/YYYY"): string {
-    return moment(date).format(formatType);
+  static formatDate(date: Date | string, formatType: DateFormatType = "DD/MM/YYYY"): string {
+    let dateToFormat = date;
+
+    if (typeof date == "string") {
+      dateToFormat = new Date(date);
+    }
+
+    return moment(dateToFormat).format(formatType);
   }
 
   static getCurrentDate(formatType: DateFormatType, timezone: Timezone = "Asia/Jerusalem"): string {

@@ -1,5 +1,5 @@
 import RecordedSets from "@/components/WorkoutPlan/RecordedSets";
-import RecordExerciseNew from "@/components/WorkoutPlan/RecordExerciseRefactor";
+import RecordExercise from "@/components/WorkoutPlan/RecordExercise";
 import MyWorkoutPlanScreen from "@/screens/MyWorkoutPlanPage";
 
 export const stacks = [
@@ -10,7 +10,7 @@ export const stacks = [
   },
   {
     name: "RecordSet",
-    component: RecordExerciseNew,
+    component: RecordExercise,
   },
   {
     name: "RecordedSets",

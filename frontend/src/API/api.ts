@@ -22,7 +22,7 @@ async function request<T>(
       params,
       headers: { ["X-Api-Key"]: API_AUTH_TOKEN, ...headers },
     };
-    console.log("AVIHU TEAM request", request);
+    console.log("AVIHU TEAM request", JSON.stringify(request, undefined, 2));
     const response = await axiosInstance.request<T>(request);
 
     return response.data;
