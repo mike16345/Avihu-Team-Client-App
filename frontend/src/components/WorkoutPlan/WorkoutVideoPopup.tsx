@@ -53,12 +53,18 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
   return (
     <View style={[styles.container, { width: videoWidth }]}>
       {!isPlaying ? (
-        <TouchableOpacity style={styles.thumbnailContainer} onPress={handlePlay}>
+        <TouchableOpacity
+          style={[
+            styles.thumbnailContainer,
+            { height: videoHeight * 0.85, width: videoWidth * 0.95 },
+          ]}
+          onPress={handlePlay}
+        >
           <Image
             source={{ uri: thumbnailUrl }}
             style={[
               styles.thumbnail,
-              { width: videoWidth - 10, height: videoHeight }, // Adjusted for spacing
+              { height: videoHeight * 0.85, width: videoWidth * 0.95 }, // Adjusted for spacing
             ]}
           />
           <View style={styles.playButton}>
@@ -106,9 +112,10 @@ const styles = StyleSheet.create({
   thumbnailContainer: {
     alignItems: "center",
     paddingTop: 4,
+    borderRadius: 15,
   },
   thumbnail: {
-    borderRadius: 4,
+    borderRadius: 15,
     overflow: "hidden",
   },
   playButton: {
