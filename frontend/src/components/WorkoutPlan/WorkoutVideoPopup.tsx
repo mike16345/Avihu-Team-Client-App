@@ -94,6 +94,7 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
             height={videoHeight * 0.85}
             videoId={videoId}
             webViewStyle={styles.video}
+            contentScale={Platform.OS == `android` ? 0.8 : 1}
           />
         </>
       )}
@@ -131,6 +132,7 @@ const styles = StyleSheet.create({
   },
   video: {
     borderRadius: 15,
+    overflow: `hidden`,
   },
   loader: {
     position: "absolute",
