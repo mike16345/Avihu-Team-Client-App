@@ -35,10 +35,10 @@ const PostCard: FC<PostCardProps> = ({ blog }) => {
   return (
     <View style={[cardStyles.card]}>
       <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
+        <Text style={[colors.textOnSecondaryContainer]}>{DateUtils.formatDate(blog.date)}</Text>
         <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.lg]}>
           {blog.title.trimStart()}
         </Text>
-        <Text style={[colors.textOnSecondaryContainer]}>{DateUtils.formatDate(blog.date)}</Text>
       </View>
 
       <RenderHTML
@@ -50,7 +50,7 @@ const PostCard: FC<PostCardProps> = ({ blog }) => {
       />
 
       {shouldTruncate && (
-        <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+        <TouchableOpacity style={{ paddingBottom: 10 }} onPress={() => setExpanded(!expanded)}>
           <Text style={[colors.textOnSurfaceDisabled]}>{expanded ? "View Less" : "View More"}</Text>
         </TouchableOpacity>
       )}
