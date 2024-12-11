@@ -107,7 +107,11 @@ const styles = StyleSheet.create({
     width: "100%",
     overflow: "hidden",
     alignItems: `center`,
-    padding: 10,
+    ...Platform.select({
+      ios: {
+        padding: 10,
+      },
+    }),
   },
   thumbnailContainer: {
     alignItems: "center",
