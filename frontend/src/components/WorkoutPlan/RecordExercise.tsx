@@ -118,10 +118,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     };
   }, []);
 
-  useEffect(() => {
-    navigation?.setOptions({ title: "" });
-  }, [navigation]);
-
   if (isLoading) return <Loader variant="Standard" />;
 
   return (
