@@ -151,7 +151,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             />
           </View>
 
-          <View style={[layout.flexRow, layout.justifyEvenly]}>
+          <View style={[layout.flexRow, layout.justifyEvenly, spacing.pdVerticalSm]}>
             <View style={[layout.center, spacing.gapDefault]}>
               <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
                 חזרות
