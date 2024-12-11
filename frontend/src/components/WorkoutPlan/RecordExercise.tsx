@@ -4,8 +4,8 @@ import {
   View,
   useWindowDimensions,
   Pressable,
-  ScrollView,
   TouchableOpacity,
+  BackHandler,
 } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
@@ -25,7 +25,6 @@ import Loader from "../ui/loaders/Loader";
 import RecordedSetInfo from "./RecordedSetInfo";
 import { ONE_DAY } from "@/constants/reactQuery";
 import { Text } from "../ui/Text";
-
 import Toast from "react-native-toast-message";
 
 type InputTypes = "reps" | "weight";
@@ -106,26 +105,30 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     }
   };
 
+  const handlePressBack = () => {
+    navigation?.goBack();
+    return true;
+  };
+
   useEffect(() => {
-    navigation?.setOptions({ title: "" });
-  }, [navigation]);
+    BackHandler.addEventListener("hardwareBackPress", handlePressBack);
+
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handlePressBack);
+    };
+  }, []);
 
   if (isLoading) return <Loader variant="Standard" />;
 
   return (
     <>
       {isSetUploading && <Loader variant="Screen" />}
-      <View style={[layout.sizeFull]}>
+      <View style={[layout.sizeFull, layout.flex1, spacing.pdBottomBar]}>
         <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
-        <View style={[layout.flexGrow, !lastRecordedSet && spacing.gapXxl, spacing.pdDefault]}>
+        <View
+          style={[layout.flexGrow, !lastRecordedSet && layout.justifyEvenly, spacing.pdDefault]}
+        >
           <View style={[layout.itemsEnd, spacing.gapSm]}>
-            {strippedTips && strippedTips.length && (
-              <Pressable onPress={() => setOpenTrainerTips(true)}>
-                <Text style={[fonts.lg, colors.textPrimary, text.textUnderline, text.textBold]}>
-                  דגשים
-                </Text>
-              </Pressable>
-            )}
             <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
             <Text style={styles.setInfo}>סט: {setNumber}</Text>
             {exercise.sets[setNumber - 1] && (
@@ -134,7 +137,13 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 {exercise.sets[setNumber - 1].maxReps && `-${exercise.sets[setNumber - 1].maxReps}`}
               </Text>
             )}
-
+            {strippedTips && strippedTips.length && (
+              <Pressable onPress={() => setOpenTrainerTips(true)}>
+                <Text style={[fonts.lg, colors.textPrimary, text.textUnderline, text.textBold]}>
+                  דגשים
+                </Text>
+              </Pressable>
+            )}
             <WorkoutTips
               tips={[exercise.tipFromTrainer!]}
               openTips={openTrainerTips}
@@ -142,64 +151,62 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             />
           </View>
 
-          <View style={[layout.justifyEvenly, layout.flex1]}>
-            <View style={[layout.flexDirectionByPlatform, layout.justifyEvenly]}>
-              <View style={[layout.center, spacing.gapDefault]}>
-                <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
-                  חזרות
-                </Text>
+          <View style={[layout.flexRow, layout.justifyEvenly, spacing.pdVerticalSm]}>
+            <View style={[layout.center, spacing.gapDefault]}>
+              <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
+                חזרות
+              </Text>
 
-                <View
-                  style={[
-                    { borderTopWidth: 2, borderBottomWidth: 2 },
-                    colors.borderSecondary,
-                    spacing.pdHorizontalDefault,
-                    spacing.pdVerticalMd,
-                    common.rounded,
-                  ]}
-                >
-                  <WheelPicker
-                    activeItemColor={colors.textOnSurface.color}
-                    inactiveItemColor={colors.textOnSurfaceDisabled.color}
-                    data={repsOptions}
-                    onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
-                    selectedValue={recordedSet.repsDone}
-                    height={height * 0.08}
-                    itemHeight={35}
-                  />
-                </View>
+              <View
+                style={[
+                  { borderTopWidth: 2, borderBottomWidth: 2 },
+                  colors.borderSecondary,
+                  spacing.pdHorizontalDefault,
+                  spacing.pdVerticalMd,
+                  common.rounded,
+                ]}
+              >
+                <WheelPicker
+                  activeItemColor={colors.textOnSurface.color}
+                  inactiveItemColor={colors.textOnSurfaceDisabled.color}
+                  data={repsOptions}
+                  onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
+                  selectedValue={recordedSet.repsDone}
+                  height={height * 0.08}
+                  itemHeight={35}
+                />
               </View>
-              <View style={[layout.center, spacing.gapDefault]}>
-                <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
-                  משקל
-                </Text>
+            </View>
+            <View style={[layout.center, spacing.gapDefault]}>
+              <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
+                משקל
+              </Text>
 
-                <View
-                  style={[
-                    { borderTopWidth: 2, borderBottomWidth: 2 },
-                    colors.borderSecondary,
-                    spacing.pdHorizontalDefault,
-                    spacing.pdVerticalMd,
-                    common.rounded,
-                  ]}
-                >
-                  <WeightWheelPicker
-                    onValueChange={(val) => {
-                      handleUpdateRecordedSet("weight", val);
-                    }}
-                    activeItemColor={colors.textOnSurface.color}
-                    inactiveItemColor={colors.textOnSurfaceDisabled.color}
-                    minWeight={1}
-                    decimalStepSize={2.5}
-                    showZeroDecimal={false}
-                    decimalRange={10}
-                    maxWeight={200}
-                    stepSize={1}
-                    height={height * 0.08}
-                    itemHeight={35}
-                    selectedWeight={recordedSet.weight}
-                  />
-                </View>
+              <View
+                style={[
+                  { borderTopWidth: 2, borderBottomWidth: 2 },
+                  colors.borderSecondary,
+                  spacing.pdHorizontalDefault,
+                  spacing.pdVerticalMd,
+                  common.rounded,
+                ]}
+              >
+                <WeightWheelPicker
+                  onValueChange={(val) => {
+                    handleUpdateRecordedSet("weight", val);
+                  }}
+                  activeItemColor={colors.textOnSurface.color}
+                  inactiveItemColor={colors.textOnSurfaceDisabled.color}
+                  minWeight={1}
+                  decimalStepSize={2.5}
+                  showZeroDecimal={false}
+                  decimalRange={10}
+                  maxWeight={200}
+                  stepSize={1}
+                  height={height * 0.08}
+                  itemHeight={35}
+                  selectedWeight={recordedSet.weight}
+                />
               </View>
             </View>
           </View>
@@ -232,7 +239,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
         <View
           style={[
             layout.flexDirectionByPlatform,
-            layout.flex1,
             layout.center,
             layout.widthFull,
             spacing.gapLg,

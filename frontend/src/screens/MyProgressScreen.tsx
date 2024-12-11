@@ -168,6 +168,8 @@ const MyProgressScreen = () => {
           onStateChange={({ open }) => {
             setIsFabOpen(open);
           }}
+          color={colors.textOnBackground.color}
+          fabStyle={[colors.backgroundPrimary]}
           variant="primary"
           open={isFabOpen}
           actions={[

@@ -16,6 +16,7 @@ import { buildPhotoUrl } from "@/utils/utils";
 import BlogImage from "@/components/Blog/BlogImage";
 import DateUtils from "@/utils/dateUtils";
 import { Text } from "@/components/ui/Text";
+import Loader from "@/components/ui/loaders/Loader";
 
 interface PostCardProps {
   blog: IBlog;
@@ -34,10 +35,10 @@ const PostCard: FC<PostCardProps> = ({ blog }) => {
   return (
     <View style={[cardStyles.card]}>
       <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
+        <Text style={[colors.textOnSecondaryContainer]}>{DateUtils.formatDate(blog.date)}</Text>
         <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.lg]}>
           {blog.title.trimStart()}
         </Text>
-        <Text style={[colors.textOnSecondaryContainer]}>{DateUtils.formatDate(blog.date)}</Text>
       </View>
 
       <RenderHTML
@@ -49,7 +50,7 @@ const PostCard: FC<PostCardProps> = ({ blog }) => {
       />
 
       {shouldTruncate && (
-        <TouchableOpacity onPress={() => setExpanded(!expanded)}>
+        <TouchableOpacity style={{ paddingBottom: 10 }} onPress={() => setExpanded(!expanded)}>
           <Text style={[colors.textOnSurfaceDisabled]}>{expanded ? "View Less" : "View More"}</Text>
         </TouchableOpacity>
       )}
@@ -63,7 +64,7 @@ const BlogScreen = () => {
   const { getPaginatedPosts } = useBlogsApi();
   const styles = useStyles();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery(
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery(
     ["posts"],
     ({ pageParam = 1 }) => getPaginatedPosts({ page: pageParam, limit: 5 }),
     {
@@ -78,6 +79,8 @@ const BlogScreen = () => {
       fetchNextPage();
     }
   };
+
+  if (isLoading || isFetchingNextPage) return <Loader />;
 
   return (
     <FlatList

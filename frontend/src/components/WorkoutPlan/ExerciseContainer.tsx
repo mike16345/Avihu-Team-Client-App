@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from "react";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import SetContainer from "./SetContainer";
 import NativeIcon from "../Icon/NativeIcon";
 import { IExercise, IRecordedSet, IRecordedSetPost } from "@/interfaces/Workout";
@@ -109,51 +109,59 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   }, [session]);
 
   return (
-    <View style={[styles.workoutContainer, common.rounded, colors.backgroundSecondaryContainer]}>
-      <View style={styles.workoutDescriptionContainer}>
-        <View style={[layout.widthFull]}>
-          <Text
-            style={[colors.textOnSecondaryContainer, text.textBold, fonts.default, text.textRight]}
-          >
-            {exercise.name}
-          </Text>
-        </View>
-        <View style={styles.workoutInfoContainer}>
-          <NativeIcon
-            onPress={() => {
-              navigation.setOptions({ title: exercise.name });
-              navigation.navigate("RecordSet", {
-                exercise: exercise,
-                muscleGroup: muscleGroup,
-                handleRecordSet: (recordedSet) => handleRecordSet(recordedSet),
-                setNumber: currentSetNumber,
-              });
-            }}
-            color={colors.textOnSecondaryContainer.color}
-            library="MaterialCommunityIcons"
-            name="chevron-left"
-            size={28}
-          />
+    <TouchableOpacity
+      onPress={() => {
+        navigation.setOptions({ title: exercise.name });
+        navigation.navigate("RecordSet", {
+          exercise: exercise,
+          muscleGroup: muscleGroup,
+          handleRecordSet: (recordedSet) => handleRecordSet(recordedSet),
+          setNumber: currentSetNumber,
+        });
+      }}
+    >
+      <View style={[styles.workoutContainer, common.rounded, colors.backgroundSecondaryContainer]}>
+        <View style={styles.workoutDescriptionContainer}>
+          <View style={[layout.widthFull]}>
+            <Text
+              style={[
+                colors.textOnSecondaryContainer,
+                text.textBold,
+                fonts.default,
+                text.textRight,
+              ]}
+            >
+              {exercise.name}
+            </Text>
+          </View>
+          <View style={styles.workoutInfoContainer}>
+            <NativeIcon
+              color={colors.textOnSecondaryContainer.color}
+              library="MaterialCommunityIcons"
+              name="chevron-left"
+              size={28}
+            />
 
-          <SetContainer
-            currentSetNumber={currentSetNumber}
-            totalSets={exercise.sets.length}
-            handleViewSet={(setNumber) => {
-              if (setNumber >= currentSetNumber) return;
-              console.log("viewSet", setNumber);
-              navigation.setOptions({ title: exercise.name });
-              navigation.navigate("RecordSet", {
-                recordedSet: {},
-                exercise: exercise,
-                muscleGroup: muscleGroup,
-                handleRecordSet: (recordedSet) => handleRecordSet(recordedSet, true),
-                setNumber: currentSetNumber,
-              });
-            }}
-          />
+            <SetContainer
+              currentSetNumber={currentSetNumber}
+              totalSets={exercise.sets.length}
+              handleViewSet={(setNumber) => {
+                if (setNumber >= currentSetNumber) return;
+                console.log("viewSet", setNumber);
+                navigation.setOptions({ title: exercise.name });
+                navigation.navigate("RecordSet", {
+                  recordedSet: {},
+                  exercise: exercise,
+                  muscleGroup: muscleGroup,
+                  handleRecordSet: (recordedSet) => handleRecordSet(recordedSet, true),
+                  setNumber: currentSetNumber,
+                });
+              }}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

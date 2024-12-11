@@ -1,6 +1,5 @@
 import React from "react";
 import { DateRanges } from "../../types/dateTypes";
-import useStyles from "@/styles/useGlobalStyles";
 import WeightCard from "./WeightCard";
 
 const rangeToName = (range: DateRanges) => {

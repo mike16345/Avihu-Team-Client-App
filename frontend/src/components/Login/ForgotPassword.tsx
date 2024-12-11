@@ -1,25 +1,31 @@
-import { View, BackHandler, TouchableOpacity } from "react-native";
+import { View, BackHandler, TouchableOpacity, useAnimatedValue, Animated } from "react-native";
 import { FC, useEffect, useState } from "react";
 import { useOTPApi } from "@/hooks/api/useOTPApi";
 import useStyles from "@/styles/useGlobalStyles";
 import { Button, TextInput } from "react-native-paper";
 import { testEmail } from "@/utils/utils";
-import { EMAIL_ERROR, INVALID_PASSWORD_MATCH } from "@/constants/Constants";
+import { EMAIL_ERROR, INVALID_PASSWORD_MATCH, NO_PASSWORD } from "@/constants/Constants";
 import ConfirmPassword from "./ConfirmPassword";
 import { usePasswordsApi } from "@/hooks/api/usePasswordsApi";
 import { ICredentialsErrors } from "./Login";
 import { Text } from "../ui/Text";
+import Loader from "../ui/loaders/Loader";
 
 interface IForgotPassword {
   email: string;
   onConfirmChangePasswordSuccess: () => void;
+  onShowingOtpInputs?: () => void;
 }
 
-const ForgotPassword: FC<IForgotPassword> = ({ email, onConfirmChangePasswordSuccess }) => {
+const ForgotPassword: FC<IForgotPassword> = ({
+  email,
+  onConfirmChangePasswordSuccess,
+  onShowingOtpInputs,
+}) => {
   const { getOTP, validateOTP } = useOTPApi();
   const { changePassword } = usePasswordsApi();
 
-  const { colors, spacing, layout, text } = useStyles();
+  const { colors, spacing, layout, text, common } = useStyles();
 
   const [formErrors, setFormErrors] = useState<ICredentialsErrors & { otp?: string }>({});
   const [otp, setOtp] = useState("");
@@ -28,18 +34,26 @@ const ForgotPassword: FC<IForgotPassword> = ({ email, onConfirmChangePasswordSuc
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [sessionId, setSessionId] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleConfirmPasswordChange = async () => {
+    if (!password) {
+      setFormErrors({ ...formErrors, ["password"]: NO_PASSWORD });
+      return;
+    }
     if (confirmPassword !== password) {
       setFormErrors({ ...formErrors, ["confirmPassword"]: INVALID_PASSWORD_MATCH });
       return;
     }
 
     try {
+      setIsLoading(true);
       await changePassword(email, password, sessionId);
       onConfirmChangePasswordSuccess();
     } catch (error: any) {
       setFormErrors({ ...formErrors, ["password"]: error?.response?.data?.message });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -50,28 +64,55 @@ const ForgotPassword: FC<IForgotPassword> = ({ email, onConfirmChangePasswordSuc
     }
 
     try {
+      setIsLoading(true);
       const res = await getOTP(email!);
       console.log(JSON.stringify(res, undefined, 2));
       setShowOtpInput(true);
+
+      if (!onShowingOtpInputs) return;
+      onShowingOtpInputs();
     } catch (error: any) {
       setFormErrors({ ...formErrors, ["otp"]: error?.response?.data?.message });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleValidateOtp = async () => {
     if (!otp || otp.length !== 6) {
-      setFormErrors({ ...formErrors, ["otp"]: "Please enter a valid 6-digit OTP." });
+      setFormErrors({ ...formErrors, ["otp"]: "קוד האימות חייב להיות בעל 6 ספרות" });
       return;
     }
 
     try {
+      setIsLoading(true);
       const sessionId = (await validateOTP(email, otp))?.data?.changePasswordSessionId || "";
       setSessionId(sessionId);
       setIsOtpConfirmed(true);
     } catch (error: any) {
-      setFormErrors({ ...formErrors, ["otp"]: error?.response?.data?.message });
+      setFormErrors({ ...formErrors, ["otp"]: "קוד שגוי" });
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const fadeValue = useAnimatedValue(0);
+
+  useEffect(() => {
+    if (showOtpInput) {
+      Animated.timing(fadeValue, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(fadeValue, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [showOtpInput]);
 
   useEffect(() => {
     BackHandler.addEventListener("hardwareBackPress", () => {
@@ -80,17 +121,29 @@ const ForgotPassword: FC<IForgotPassword> = ({ email, onConfirmChangePasswordSuc
     });
   }, []);
 
+  if (isLoading)
+    return (
+      <View style={[spacing.pdLg]}>
+        <Loader />
+      </View>
+    );
+
   return (
     <View style={[]}>
       {!showOtpInput && (
         <>
-          <Button mode="contained" onPress={handleGetOtp}>
-            Get OTP
+          <Button
+            mode="contained"
+            style={[common.rounded]}
+            textColor={colors.textOnBackground.color}
+            onPress={handleGetOtp}
+          >
+            שלח קוד אימות
           </Button>
         </>
       )}
       {showOtpInput && !isOtpConfirmed && (
-        <>
+        <Animated.View style={{ opacity: fadeValue }}>
           <Text
             style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground, text.textBold]}
           >
@@ -99,41 +152,56 @@ const ForgotPassword: FC<IForgotPassword> = ({ email, onConfirmChangePasswordSuc
           <View style={[spacing.gapLg]}>
             <View>
               <TextInput
-                style={[{ width: "100%" }, text.textLeft, colors.background]}
+                style={[{ width: "100%" }, text.textCenter, colors.background]}
                 mode="outlined"
                 activeOutlineColor={colors.borderSecondary.borderColor}
-                placeholder="Enter 6-digit OTP"
+                placeholder="קוד אימות בעל 6 ספרות"
+                error={!!formErrors["otp"]}
                 keyboardType="numeric"
                 maxLength={6}
                 textContentType="oneTimeCode"
                 onChangeText={(val) => setOtp(val)}
                 value={otp}
               />
-              <TouchableOpacity onPress={() => getOTP(email)}>
-                <Text style={[colors.textInfo, text.textRight]}>תשלח חדש</Text>
-              </TouchableOpacity>
               {formErrors["otp"] && (
                 <Text style={[text.textDanger, text.textCenter, text.textBold]}>
                   {formErrors["otp"]}
                 </Text>
               )}
+              <TouchableOpacity onPress={() => getOTP(email)}>
+                <Text style={[colors.textOnBackground, text.textUnderline, text.textRight]}>
+                  לא קיבלתי, שלח שוב
+                </Text>
+              </TouchableOpacity>
             </View>
 
-            <Button mode="contained" onPress={handleValidateOtp}>
+            <Button
+              mode="contained"
+              style={[common.rounded]}
+              textColor={colors.textOnBackground.color}
+              onPress={handleValidateOtp}
+            >
               אישור
             </Button>
           </View>
-        </>
+        </Animated.View>
       )}
       {isOtpConfirmed && (
-        <View>
+        <Animated.View style={{ opacity: fadeValue }}>
           <ConfirmPassword
             errors={formErrors}
             handlePasswordChange={(val) => setPassword(val)}
             handlePasswordConfirmChange={(val) => setConfirmPassword(val)}
           />
-          <Button onPress={handleConfirmPasswordChange}>Change Password</Button>
-        </View>
+          <Button
+            mode="contained"
+            style={common.rounded}
+            textColor={colors.textOnBackground.color}
+            onPress={handleConfirmPasswordChange}
+          >
+            שנה סיסמה
+          </Button>
+        </Animated.View>
       )}
     </View>
   );
