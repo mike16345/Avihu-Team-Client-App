@@ -1,4 +1,11 @@
-import { View, ImageBackground, ScrollView, Animated, Dimensions } from "react-native";
+import {
+  View,
+  ImageBackground,
+  ScrollView,
+  Animated,
+  Dimensions,
+  RefreshControl,
+} from "react-native";
 import { useState } from "react";
 import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
 import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
@@ -29,6 +36,7 @@ export default function DietPlan() {
   const { foodGroupToDisplay, setFoodGroupToDisplay } = useFoodGroupStore();
 
   const [isFabOpen, setIsFabOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const {
     slideInRightDelay0,
     slideInRightDelay100,
@@ -49,7 +57,7 @@ export default function DietPlan() {
     slideInBottomDelay600,
   ];
 
-  const { data, isError, error, isLoading } = useQuery({
+  const { data, isError, error, isLoading, refetch } = useQuery({
     queryFn: () => getDietPlanByUserId(currentUser?._id || ``),
     queryKey: [DIET_PLAN_KEY + currentUser?._id],
     enabled: !!currentUser,
@@ -66,6 +74,12 @@ export default function DietPlan() {
     setFoodGroupToDisplay(null);
   };
 
+  const refresh = async () => {
+    setIsRefreshing(true);
+    await refetch();
+    setIsRefreshing(false);
+  };
+
   if (error && error.response.status == 404) return <NoDataScreen variant="dietPlan" />;
   if (isError) return <ErrorScreen error={error} />;
 
@@ -73,6 +87,7 @@ export default function DietPlan() {
     <Portal.Host>
       <ScrollView
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refresh} />}
         contentContainerStyle={[
           layout.flexGrow,
           colors.backgroundSecondary,

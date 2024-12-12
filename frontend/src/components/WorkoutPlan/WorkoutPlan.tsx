@@ -2,6 +2,7 @@ import {
   Dimensions,
   FlatList,
   ImageBackground,
+  RefreshControl,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -37,6 +38,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
   const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
   const [error, setError] = useState({ status: null, message: null });
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { fonts, text, spacing, colors } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
@@ -82,17 +84,31 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     await setItem(JSON.stringify(session));
   };
 
-  useEffect(() => {
+  const getWorkoutPlan = (isOnRefresh = false) => {
     if (!currentUser) return;
 
+    if (isOnRefresh) {
+      setIsRefreshing(true);
+    }
     getWorkoutPlanByUserId(currentUser._id)
-      .then((res) => setWorkoutPlan(res))
+      .then((res) => {
+        setWorkoutPlan(res);
+        setError({ status: null, message: null });
+      })
       .catch((err) => {
         const status = err.response.status;
         const message = err.response.data.message;
 
         setError({ status, message });
+      })
+      .finally(() => {
+        if (!isOnRefresh) return;
+        setIsRefreshing(false);
       });
+  };
+
+  useEffect(() => {
+    getWorkoutPlan();
   }, []);
 
   useEffect(() => {
@@ -109,7 +125,14 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     loadWorkoutSession();
   }, [workoutPlan]);
 
-  if (error && error.status == 404) return <NoDataScreen variant="workoutPlan" />;
+  if (error && error.status == 404)
+    return (
+      <NoDataScreen
+        variant="workoutPlan"
+        refreshFunc={() => getWorkoutPlan(true)}
+        refreshing={isRefreshing}
+      />
+    );
   if (error && error.status) return <ErrorScreen error={error.message || ``} />;
 
   const renderHeader = () => (
@@ -151,6 +174,9 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       ListEmptyComponent={() => <WorkoutPlanSkeleton />}
       keyExtractor={(item) => item.muscleGroup}
       ListHeaderComponent={renderHeader}
+      refreshControl={
+        <RefreshControl refreshing={isRefreshing} onRefresh={() => getWorkoutPlan(true)} />
+      }
       renderItem={({ item }) => (
         <View style={[spacing.pdHorizontalSm]}>
           <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>{item.muscleGroup}</Text>

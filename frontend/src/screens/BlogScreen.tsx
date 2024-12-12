@@ -5,6 +5,7 @@ import {
   useWindowDimensions,
   ActivityIndicator,
   FlatList,
+  RefreshControl,
 } from "react-native";
 import RenderHTML from "react-native-render-html";
 import useStyles from "@/styles/useGlobalStyles";
@@ -64,15 +65,24 @@ const BlogScreen = () => {
   const { getPaginatedPosts } = useBlogsApi();
   const styles = useStyles();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery(
-    ["posts"],
-    ({ pageParam = 1 }) => getPaginatedPosts({ page: pageParam, limit: 5 }),
-    {
-      getNextPageParam: (lastPage) => {
-        return lastPage.hasNextPage ? lastPage.currentPage + 1 : undefined;
-      },
-    }
-  );
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setIsRefreshing(true);
+    await refetch();
+    setIsRefreshing(false);
+  };
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
+    useInfiniteQuery(
+      ["posts"],
+      ({ pageParam = 1 }) => getPaginatedPosts({ page: pageParam, limit: 5 }),
+      {
+        getNextPageParam: (lastPage) => {
+          return lastPage.hasNextPage ? lastPage.currentPage + 1 : undefined;
+        },
+      }
+    );
 
   const loadMore = () => {
     if (hasNextPage) {
@@ -89,6 +99,7 @@ const BlogScreen = () => {
       renderItem={({ item }) => <PostCard blog={item} />}
       onEndReached={loadMore}
       onEndReachedThreshold={0.5}
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
       ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
       ListFooterComponent={
         isFetchingNextPage ? <ActivityIndicator size="large" color="#FFF" /> : null
