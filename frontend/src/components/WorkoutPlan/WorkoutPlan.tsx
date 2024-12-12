@@ -189,7 +189,9 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
         </View>
       )}
       ListFooterComponent={
-        <WorkoutTips tips={workoutPlan?.tips} openTips={openTips} setOpenTips={setOpenTips} />
+        workoutPlan?.tips && (
+          <WorkoutTips tips={workoutPlan?.tips} openTips={openTips} setOpenTips={setOpenTips} />
+        )
       }
       contentContainerStyle={styles.workoutContainer}
     />
