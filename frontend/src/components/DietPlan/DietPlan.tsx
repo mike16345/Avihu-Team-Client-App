@@ -28,15 +28,16 @@ import NoDataScreen from "@/screens/NoDataScreen";
 import { createRetryFunction } from "@/utils/utils";
 import { Text } from "../ui/Text";
 import { useFoodGroupStore } from "@/store/foodgroupStore";
+import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
   const { getDietPlanByUserId } = useDietPlanApi();
   const { layout, spacing, colors, common, text } = useStyles();
   const { foodGroupToDisplay, setFoodGroupToDisplay } = useFoodGroupStore();
+  const { isRefreshing, refresh } = usePullDownToRefresh();
 
   const [isFabOpen, setIsFabOpen] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const {
     slideInRightDelay0,
     slideInRightDelay100,
@@ -74,20 +75,23 @@ export default function DietPlan() {
     setFoodGroupToDisplay(null);
   };
 
-  const refresh = async () => {
-    setIsRefreshing(true);
-    await refetch();
-    setIsRefreshing(false);
-  };
-
-  if (error && error.response.status == 404) return <NoDataScreen variant="dietPlan" />;
+  if (error && error.response.status == 404)
+    return (
+      <NoDataScreen
+        variant="dietPlan"
+        refreshing={isRefreshing}
+        refreshFunc={() => refresh(refetch)}
+      />
+    );
   if (isError) return <ErrorScreen error={error} />;
 
   return (
     <Portal.Host>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refresh} />}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+        }
         contentContainerStyle={[
           layout.flexGrow,
           colors.backgroundSecondary,

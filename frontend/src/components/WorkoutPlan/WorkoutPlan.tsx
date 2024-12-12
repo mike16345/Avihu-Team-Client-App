@@ -24,6 +24,7 @@ import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutPlanSkeletonLoad
 import NoDataScreen from "@/screens/NoDataScreen";
 import ErrorScreen from "@/screens/ErrorScreen";
 import { Text } from "../ui/Text";
+import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
@@ -38,13 +39,13 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
   const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
   const [error, setError] = useState({ status: null, message: null });
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { fonts, text, spacing, colors } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
   const { currentUser } = useUserStore();
   const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
   const { getSession } = useSessionsApi();
+  const { isRefreshing, refresh } = usePullDownToRefresh();
 
   const selectNewWorkoutPlan = (planName: string) => {
     const selectedWorkoutPlan = workoutPlan?.workoutPlans.find(
@@ -84,12 +85,9 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     await setItem(JSON.stringify(session));
   };
 
-  const getWorkoutPlan = (isOnRefresh = false) => {
+  const getWorkoutPlan = () => {
     if (!currentUser) return;
 
-    if (isOnRefresh) {
-      setIsRefreshing(true);
-    }
     getWorkoutPlanByUserId(currentUser._id)
       .then((res) => {
         setWorkoutPlan(res);
@@ -100,10 +98,6 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
         const message = err.response.data.message;
 
         setError({ status, message });
-      })
-      .finally(() => {
-        if (!isOnRefresh) return;
-        setIsRefreshing(false);
       });
   };
 
@@ -129,7 +123,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     return (
       <NoDataScreen
         variant="workoutPlan"
-        refreshFunc={() => getWorkoutPlan(true)}
+        refreshFunc={() => refresh(getWorkoutPlan)}
         refreshing={isRefreshing}
       />
     );
@@ -175,7 +169,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       keyExtractor={(item) => item.muscleGroup}
       ListHeaderComponent={renderHeader}
       refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={() => getWorkoutPlan(true)} />
+        <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(getWorkoutPlan)} />
       }
       renderItem={({ item }) => (
         <View style={[spacing.pdHorizontalSm]}>

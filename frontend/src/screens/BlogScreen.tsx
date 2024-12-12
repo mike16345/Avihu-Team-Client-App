@@ -18,6 +18,7 @@ import BlogImage from "@/components/Blog/BlogImage";
 import DateUtils from "@/utils/dateUtils";
 import { Text } from "@/components/ui/Text";
 import Loader from "@/components/ui/loaders/Loader";
+import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 
 interface PostCardProps {
   blog: IBlog;
@@ -64,14 +65,7 @@ const PostCard: FC<PostCardProps> = ({ blog }) => {
 const BlogScreen = () => {
   const { getPaginatedPosts } = useBlogsApi();
   const styles = useStyles();
-
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const onRefresh = async () => {
-    setIsRefreshing(true);
-    await refetch();
-    setIsRefreshing(false);
-  };
+  const { isRefreshing, refresh } = usePullDownToRefresh();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
     useInfiniteQuery(
@@ -99,7 +93,9 @@ const BlogScreen = () => {
       renderItem={({ item }) => <PostCard blog={item} />}
       onEndReached={loadMore}
       onEndReachedThreshold={0.5}
-      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
+      refreshControl={
+        <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+      }
       ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
       ListFooterComponent={
         isFetchingNextPage ? <ActivityIndicator size="large" color="#FFF" /> : null
