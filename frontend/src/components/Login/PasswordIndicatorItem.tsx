@@ -16,7 +16,7 @@ const PasswordIndicatorItem: React.FC<PasswordIndicatorItemProps> = ({ checked, 
       <Text style={colors.textOnBackground}>{message}</Text>
       <NativeIcon
         library="Feather"
-        name="check"
+        name={checked ? "check" : `x`}
         style={[checked ? colors.textSuccess : colors.textDanger, fonts.xl]}
       />
     </View>
