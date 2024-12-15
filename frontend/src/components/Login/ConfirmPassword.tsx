@@ -43,7 +43,7 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
           }
         />
 
-        {(errors.validPassword || errors.password) && <PasswordIndicator password={value || ``} />}
+        <PasswordIndicator password={value || ``} />
       </View>
       <View>
         <Text style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground]}>
