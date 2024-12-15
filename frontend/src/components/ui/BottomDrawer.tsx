@@ -16,10 +16,16 @@ interface BottomDrawerProps {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  heightVariant?: `auto` | `fixed`;
 }
 
-const BottomDrawer: React.FC<BottomDrawerProps> = ({ open, onClose, children }) => {
-  const { colors, common } = useStyles();
+const BottomDrawer: React.FC<BottomDrawerProps> = ({
+  open,
+  onClose,
+  children,
+  heightVariant = `fixed`,
+}) => {
+  const { colors } = useStyles();
 
   useEffect(() => {
     const onBackPress = () => {
@@ -38,7 +44,11 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({ open, onClose, children }) 
         style={[
           styles.drawerContainer,
           colors.background,
-          { borderWidth: 1, borderBottomWidth: 0 },
+          {
+            borderWidth: 1,
+            borderBottomWidth: 0,
+            height: heightVariant === `fixed` ? height * 0.6 : `auto`,
+          },
           colors.borderSecondaryContainer,
         ]}
       >
@@ -62,7 +72,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: height * 0.6,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     shadowColor: "#000",
