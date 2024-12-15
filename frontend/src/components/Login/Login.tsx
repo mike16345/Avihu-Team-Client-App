@@ -29,6 +29,7 @@ import {
   EMAIL_ERROR,
   INVALID_PASSWORD,
   INVALID_PASSWORD_MATCH,
+  NO_ACCESS,
   NO_PASSWORD,
 } from "@/constants/Constants";
 
@@ -151,6 +152,11 @@ export default function Login({ onLogin }: ILoginProps) {
       setLoading(true);
       loginUser(formattedEmail, password)
         .then((res) => {
+          if (!res.data.data.user.hasAccess) {
+            showAlert("error", NO_ACCESS);
+            setEmailchecked(false);
+            return;
+          }
           showAlert("success", res.message);
           onLogin(res.data.data.user);
           setCurrentUser(res?.data.data.user);
