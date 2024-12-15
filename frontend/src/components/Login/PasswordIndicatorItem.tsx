@@ -13,16 +13,7 @@ interface PasswordIndicatorItemProps {
 const PasswordIndicatorItem: React.FC<PasswordIndicatorItemProps> = ({ checked, message }) => {
   const { colors, layout, spacing } = useStyles();
   return (
-    <View
-      style={[
-        layout.flexDirectionByPlatform,
-        layout.justifyEnd,
-        layout.itemsCenter,
-        spacing.gapDefault,
-        checked ? colors.borderSuccess : colors.borderError,
-        { borderBottomWidth: 2 },
-      ]}
-    >
+    <View style={[layout.flexRow, layout.justifyEnd, layout.itemsCenter, spacing.gapDefault]}>
       <Text style={colors.textOnBackground}>{message}</Text>
       <Checkbox status={"checked"} color={colors.textSuccess.color} disabled={!checked} />
     </View>

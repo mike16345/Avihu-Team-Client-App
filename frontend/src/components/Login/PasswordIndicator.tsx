@@ -9,15 +9,17 @@ interface PasswordIndicatorProps {
 }
 
 const PasswordIndicator: React.FC<PasswordIndicatorProps> = ({ password }) => {
-  const { colors, layout, spacing, text } = useStyles();
+  const { layout, spacing } = useStyles();
 
   const DIGIT_REGEX = /\d/;
   const SPECIAL_CHAR_REGEX = /[!@#$%]/;
   const UPPERCASE_REGEX = /[A-Z]/;
+  const LENGTH_REGEX = /^.{8,}$/;
 
   const passwordIndicators = [
-    { message: "לפחות תו אחד גדול באנגלית", checked: !!UPPERCASE_REGEX.test(password) },
-    { message: "לפחות מספר אחד", checked: !!DIGIT_REGEX.test(password) },
+    { message: "8 תווים או יותר", checked: !!LENGTH_REGEX.test(password) },
+    { message: "אות גדולה אחת באנגלית או יותר", checked: !!UPPERCASE_REGEX.test(password) },
+    { message: "מספר אחד או יותר", checked: !!DIGIT_REGEX.test(password) },
     {
       message: "לפחות אחד מהסימנים הבאים: ! @ # $ %",
       checked: !!SPECIAL_CHAR_REGEX.test(password),
@@ -25,10 +27,7 @@ const PasswordIndicator: React.FC<PasswordIndicatorProps> = ({ password }) => {
   ];
 
   return (
-    <View style={[layout.widthFull, spacing.gapSm, spacing.pdVerticalSm, spacing.pdHorizontalXs]}>
-      <Text style={[text.textRight, colors.textOnBackground, text.textBold]}>
-        סיסמה צריכה לכלול:
-      </Text>
+    <View style={[layout.widthFull, spacing.pdVerticalSm, spacing.pdHorizontalXs]}>
       {passwordIndicators.map(({ checked, message }, i) => (
         <PasswordIndicatorItem checked={checked} message={message} key={i} />
       ))}
