@@ -29,7 +29,7 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
           style={[text.textRight, { width: "100%" }]}
           mode="outlined"
           activeOutlineColor={colors.borderSecondary.borderColor}
-          error={Boolean(errors.password)}
+          error={!!(errors.password || errors.validPassword)}
           secureTextEntry={!showPassword}
           onChangeText={(val) => handlePasswordChange(val)}
           left={
@@ -39,7 +39,9 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
             />
           }
         />
-        <Text style={[text.textDanger, text.textRight]}>{errors.password}</Text>
+        <Text style={[text.textDanger, text.textRight]}>
+          {errors.validPassword || errors.password}
+        </Text>
       </View>
       <View>
         <Text style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground]}>

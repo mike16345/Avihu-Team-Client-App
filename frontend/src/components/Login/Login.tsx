@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
-import { testEmail } from "@/utils/utils";
+import { testEmail, testPassword } from "@/utils/utils";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { Button, TextInput } from "react-native-paper";
 import useStyles from "@/styles/useGlobalStyles";
@@ -25,7 +25,12 @@ import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
 import { Text } from "../ui/Text";
 import ForgotPassword from "./ForgotPassword";
-import { EMAIL_ERROR, INVALID_PASSWORD_MATCH } from "@/constants/Constants";
+import {
+  EMAIL_ERROR,
+  INVALID_PASSWORD,
+  INVALID_PASSWORD_MATCH,
+  NO_PASSWORD,
+} from "@/constants/Constants";
 
 interface IUserCredentials {
   email: string;
@@ -36,6 +41,7 @@ export interface ICredentialsErrors {
   email?: string;
   password?: string;
   confirmPassword?: string;
+  validPassword?: string;
 }
 
 interface ILoginProps {
@@ -63,6 +69,7 @@ export default function Login({ onLogin }: ILoginProps) {
   const [loading, setLoading] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isShowingOtpInputs, setIsShowingOtpInputs] = useState(false);
+  const [showConfirmButton, setShowConfirmButton] = useState(true);
 
   const showAlert = (type: ToastType, message: string) => {
     Toast.show({
@@ -85,15 +92,26 @@ export default function Login({ onLogin }: ILoginProps) {
       errors[`email`] = EMAIL_ERROR;
     }
 
-    if (emailChecked && !password) {
-      errors[`password`] = `אנא הזינו סיסמה`;
+    if (emailChecked) {
+      if (!password) {
+        errors[`password`] = NO_PASSWORD;
+      }
+
+      if (!testPassword(password)) {
+        errors[`validPassword`] = INVALID_PASSWORD;
+      }
+
+      if (password !== confirmPassword) {
+        errors[`confirmPassword`] = INVALID_PASSWORD_MATCH;
+      }
     }
 
-    if (emailChecked && password !== confirmPassword) {
-      errors[`confirmPassword`] = INVALID_PASSWORD_MATCH;
-    }
-
-    if (errors[`email`] || errors[`password`] || (!userRegistered && errors[`confirmPassword`])) {
+    if (
+      errors[`email`] ||
+      errors[`password`] ||
+      (!userRegistered && errors[`confirmPassword`]) ||
+      errors[`validPassword`]
+    ) {
       setFormErrors(errors);
       return;
     }
@@ -106,6 +124,8 @@ export default function Login({ onLogin }: ILoginProps) {
           setEmailchecked(true);
           if (res.data.hasPassword) {
             setUserRegistered(true);
+          } else {
+            setShowConfirmButton(false);
           }
         })
         .catch((err) => {
@@ -146,11 +166,14 @@ export default function Login({ onLogin }: ILoginProps) {
   const chooseDifferentMail = () => {
     setEmailchecked(false);
     setUserRegistered(false);
+    setShowConfirmButton(true);
     setFormErrors({});
   };
 
   const handleChangePasswordSuccess = () => {
+    setUserRegistered(true);
     setIsForgotPassword(false);
+    setShowConfirmButton(true);
     setIsShowingOtpInputs(false);
     showAlert("success", `סיסמה עודכנה בהצלחה`);
   };
@@ -294,7 +317,12 @@ export default function Login({ onLogin }: ILoginProps) {
                 </View>
                 <TouchableOpacity
                   onPress={
-                    isForgotPassword ? () => setIsForgotPassword(false) : chooseDifferentMail
+                    isForgotPassword
+                      ? () => {
+                          setIsForgotPassword(false);
+                          setShowConfirmButton(true);
+                        }
+                      : chooseDifferentMail
                   }
                 >
                   <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>
@@ -345,7 +373,12 @@ export default function Login({ onLogin }: ILoginProps) {
                         {formErrors.password}
                       </Text>
                     )}
-                    <TouchableOpacity onPress={() => setIsForgotPassword(true)}>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setIsForgotPassword(true);
+                        setShowConfirmButton(false);
+                      }}
+                    >
                       <Text
                         style={[
                           text.textRight,
@@ -360,19 +393,18 @@ export default function Login({ onLogin }: ILoginProps) {
                 )}
                 {!userRegistered && (
                   <Animated.View style={{ opacity: fadeValue }}>
-                    <ConfirmPassword
-                      errors={formErrors}
-                      handlePasswordChange={(val) =>
-                        setInputtedCredentials({ ...inputtedCrendentials, password: val })
-                      }
-                      handlePasswordConfirmChange={(val) => setConfirmPassowrd(val)}
+                    <ForgotPassword
+                      isRegistering
+                      email={inputtedCrendentials.email}
+                      onConfirmChangePasswordSuccess={handleChangePasswordSuccess}
+                      onShowingOtpInputs={() => setIsShowingOtpInputs(true)}
                     />
                   </Animated.View>
                 )}
               </>
             )}
           </View>
-          {!isForgotPassword && (
+          {showConfirmButton && (
             <Button
               mode="contained-tonal"
               style={[layout.widthFull, common.rounded, colors.backgroundPrimary]}

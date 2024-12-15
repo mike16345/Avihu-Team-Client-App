@@ -5,4 +5,5 @@ export const BOTTOM_BAR_HEIGHT = 60;
 export const TOP_BAR_HEIGHT = 40;
 export const EMAIL_ERROR = "אנא הכניסו כתובת מייל תקינה";
 export const INVALID_PASSWORD_MATCH = `סיסמאות לא תואמות`;
+export const INVALID_PASSWORD = `סיסמה לא תקינה`;
 export const NO_PASSWORD = `אנא הזינו סיסמה`;

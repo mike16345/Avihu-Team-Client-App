@@ -48,6 +48,7 @@ const PostCard: FC<PostCardProps> = ({ blog }) => {
         source={{ html: displayContent }}
         baseStyle={{
           color: colors.textOnSecondaryContainer.color,
+          textAlign: `right`,
         }}
       />
 
