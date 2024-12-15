@@ -206,6 +206,7 @@ const ForgotPassword: FC<IForgotPassword> = ({
         <Animated.View style={{ opacity: fadeValue }}>
           <ConfirmPassword
             errors={formErrors}
+            value={password}
             handlePasswordChange={(val) => setPassword(val)}
             handlePasswordConfirmChange={(val) => setConfirmPassword(val)}
           />

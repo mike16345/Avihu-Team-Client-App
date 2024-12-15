@@ -12,26 +12,19 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
-import { testEmail, testPassword } from "@/utils/utils";
+import { testEmail } from "@/utils/utils";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { Button, TextInput } from "react-native-paper";
 import useStyles from "@/styles/useGlobalStyles";
 import { moderateScale } from "react-native-size-matters";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import Toast, { ToastType } from "react-native-toast-message";
-import ConfirmPassword from "./ConfirmPassword";
 import Loader from "../ui/loaders/Loader";
 import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
 import { Text } from "../ui/Text";
 import ForgotPassword from "./ForgotPassword";
-import {
-  EMAIL_ERROR,
-  INVALID_PASSWORD,
-  INVALID_PASSWORD_MATCH,
-  NO_ACCESS,
-  NO_PASSWORD,
-} from "@/constants/Constants";
+import { EMAIL_ERROR, NO_ACCESS } from "@/constants/Constants";
 
 interface IUserCredentials {
   email: string;
@@ -62,7 +55,6 @@ export default function Login({ onLogin }: ILoginProps) {
     email: ``,
     password: ``,
   });
-  const [confirmPassword, setConfirmPassowrd] = useState<string>(``);
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<ICredentialsErrors>({});
   const [emailChecked, setEmailchecked] = useState(false);
@@ -93,20 +85,6 @@ export default function Login({ onLogin }: ILoginProps) {
       errors[`email`] = EMAIL_ERROR;
     }
 
-    if (emailChecked) {
-      if (!password) {
-        errors[`password`] = NO_PASSWORD;
-      }
-
-      if (!testPassword(password)) {
-        errors[`validPassword`] = INVALID_PASSWORD;
-      }
-
-      if (password !== confirmPassword) {
-        errors[`confirmPassword`] = INVALID_PASSWORD_MATCH;
-      }
-    }
-
     if (
       errors[`email`] ||
       errors[`password`] ||
@@ -128,19 +106,6 @@ export default function Login({ onLogin }: ILoginProps) {
           } else {
             setShowConfirmButton(false);
           }
-        })
-        .catch((err) => {
-          showAlert("error", err.response?.data.message);
-        })
-        .finally(() => setLoading(false));
-    }
-
-    if (emailChecked && !userRegistered) {
-      setLoading(true);
-      registerUser(formattedEmail, password)
-        .then((res) => {
-          showAlert("success", res.message);
-          setUserRegistered(true);
         })
         .catch((err) => {
           showAlert("error", err.response?.data.message);

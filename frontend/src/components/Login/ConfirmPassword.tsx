@@ -4,17 +4,20 @@ import { View } from "react-native";
 import { TextInput } from "react-native-paper";
 import { ICredentialsErrors } from "./Login";
 import { Text } from "../ui/Text";
+import PasswordIndicator from "./PasswordIndicator";
 
 interface ConfirmPasswordProps {
   handlePasswordChange: (val: string) => void;
   handlePasswordConfirmChange: (val: string) => void;
   errors: ICredentialsErrors;
+  value?: string;
 }
 
 const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
   errors,
   handlePasswordChange,
   handlePasswordConfirmChange,
+  value,
 }) => {
   const { text, colors, spacing } = useStyles();
 
@@ -39,9 +42,8 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
             />
           }
         />
-        <Text style={[text.textDanger, text.textRight]}>
-          {errors.validPassword || errors.password}
-        </Text>
+
+        {(errors.validPassword || errors.password) && <PasswordIndicator password={value || ``} />}
       </View>
       <View>
         <Text style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground]}>

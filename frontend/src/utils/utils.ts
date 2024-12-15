@@ -7,7 +7,7 @@ export const testEmail = (email: string) => {
 };
 
 export const testPassword = (password: string) => {
-  const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d).+$/;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%])(?=.*\d).+$/;
 
   return passwordRegex.test(password);
 };
