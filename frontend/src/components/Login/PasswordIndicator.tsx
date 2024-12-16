@@ -17,12 +17,12 @@ const PasswordIndicator: React.FC<PasswordIndicatorProps> = ({ password }) => {
   const LENGTH_REGEX = /^.{8,}$/;
 
   const passwordIndicators = [
-    { message: "8 תווים או יותר", checked: !!LENGTH_REGEX.test(password) },
-    { message: "אות גדולה אחת באנגלית או יותר", checked: !!UPPERCASE_REGEX.test(password) },
-    { message: "מספר אחד או יותר", checked: !!DIGIT_REGEX.test(password) },
+    { message: "8 תווים או יותר", checked: LENGTH_REGEX.test(password) },
+    { message: "אות גדולה אחת באנגלית או יותר", checked: UPPERCASE_REGEX.test(password) },
+    { message: "מספר אחד או יותר", checked: DIGIT_REGEX.test(password) },
     {
       message: "לפחות אחד מהסימנים הבאים: ! @ # $ %",
-      checked: !!SPECIAL_CHAR_REGEX.test(password),
+      checked: SPECIAL_CHAR_REGEX.test(password),
     },
   ];
 

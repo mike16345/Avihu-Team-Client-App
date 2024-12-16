@@ -11,6 +11,7 @@ interface PasswordIndicatorItemProps {
 
 const PasswordIndicatorItem: React.FC<PasswordIndicatorItemProps> = ({ checked, message }) => {
   const { colors, layout, spacing, fonts } = useStyles();
+
   return (
     <View style={[layout.flexRow, layout.justifyEnd, layout.itemsCenter, spacing.gapDefault]}>
       <Text style={colors.textOnBackground}>{message}</Text>

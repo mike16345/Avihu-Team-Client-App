@@ -24,7 +24,7 @@ import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
 import { Text } from "../ui/Text";
 import ForgotPassword from "./ForgotPassword";
-import { EMAIL_ERROR, NO_ACCESS } from "@/constants/Constants";
+import { EMAIL_ERROR, NO_ACCESS, NO_PASSWORD } from "@/constants/Constants";
 
 interface IUserCredentials {
   email: string;
@@ -44,7 +44,7 @@ interface ILoginProps {
 
 export default function Login({ onLogin }: ILoginProps) {
   const { text, colors, fonts, layout, spacing, common } = useStyles();
-  const { checkEmailAccess, registerUser, loginUser } = useUserApi();
+  const { checkEmailAccess, loginUser } = useUserApi();
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
 
   const { height, width } = useWindowDimensions();
@@ -85,12 +85,11 @@ export default function Login({ onLogin }: ILoginProps) {
       errors[`email`] = EMAIL_ERROR;
     }
 
-    if (
-      errors[`email`] ||
-      errors[`password`] ||
-      (!userRegistered && errors[`confirmPassword`]) ||
-      errors[`validPassword`]
-    ) {
+    if (emailChecked && !password) {
+      errors[`password`] = NO_PASSWORD;
+    }
+
+    if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
@@ -147,6 +146,16 @@ export default function Login({ onLogin }: ILoginProps) {
     setShowConfirmButton(true);
     setIsShowingOtpInputs(false);
     showAlert("success", `סיסמה עודכנה בהצלחה`);
+  };
+
+  const showPasswordInputs = (show: boolean) => {
+    if (!show) {
+      setIsForgotPassword(false);
+      setShowConfirmButton(true);
+    } else {
+      setIsForgotPassword(true);
+      setShowConfirmButton(false);
+    }
   };
 
   const emailInputY = useAnimatedValue(0);
@@ -287,14 +296,7 @@ export default function Login({ onLogin }: ILoginProps) {
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={
-                    isForgotPassword
-                      ? () => {
-                          setIsForgotPassword(false);
-                          setShowConfirmButton(true);
-                        }
-                      : chooseDifferentMail
-                  }
+                  onPress={isForgotPassword ? () => showPasswordInputs(false) : chooseDifferentMail}
                 >
                   <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>
                     {isForgotPassword ? `לא חשוב, נזכרתי` : `התחברות באמצעות מייל אחר`}
@@ -344,12 +346,7 @@ export default function Login({ onLogin }: ILoginProps) {
                         {formErrors.password}
                       </Text>
                     )}
-                    <TouchableOpacity
-                      onPress={() => {
-                        setIsForgotPassword(true);
-                        setShowConfirmButton(false);
-                      }}
-                    >
+                    <TouchableOpacity onPress={() => showPasswordInputs(true)}>
                       <Text
                         style={[
                           text.textRight,
