@@ -1,19 +1,29 @@
 import NativeIcon from "@/components/Icon/NativeIcon";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
-import React from "react";
-import { View } from "react-native";
+import React, { useState } from "react";
+import { RefreshControl, ScrollView, View } from "react-native";
 
 interface NoDataScreenProps {
   variant?: "dietPlan" | "workoutPlan";
   message?: string;
+  refreshFunc?: () => void;
+  refreshing?: boolean;
 }
 
-const NoDataScreen: React.FC<NoDataScreenProps> = ({ variant, message }) => {
+const NoDataScreen: React.FC<NoDataScreenProps> = ({
+  variant,
+  message,
+  refreshFunc,
+  refreshing = false,
+}) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
 
   return (
-    <View style={[layout.flex1, layout.sizeFull, layout.center, spacing.gapDefault]}>
+    <ScrollView
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refreshFunc} />}
+      contentContainerStyle={[layout.flex1, layout.sizeFull, layout.center, spacing.gapDefault]}
+    >
       <NativeIcon
         library="Ionicons"
         name="cloud-offline-outline"
@@ -27,7 +37,7 @@ const NoDataScreen: React.FC<NoDataScreenProps> = ({ variant, message }) => {
           ? `טרם בנו לך תפריט תזונה`
           : `טרם בנו לך תוכנית אימון`}
       </Text>
-    </View>
+    </ScrollView>
   );
 };
 

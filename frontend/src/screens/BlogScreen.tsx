@@ -5,6 +5,7 @@ import {
   useWindowDimensions,
   ActivityIndicator,
   FlatList,
+  RefreshControl,
 } from "react-native";
 import RenderHTML from "react-native-render-html";
 import useStyles from "@/styles/useGlobalStyles";
@@ -17,6 +18,7 @@ import BlogImage from "@/components/Blog/BlogImage";
 import DateUtils from "@/utils/dateUtils";
 import { Text } from "@/components/ui/Text";
 import Loader from "@/components/ui/loaders/Loader";
+import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 
 interface PostCardProps {
   blog: IBlog;
@@ -46,6 +48,7 @@ const PostCard: FC<PostCardProps> = ({ blog }) => {
         source={{ html: displayContent }}
         baseStyle={{
           color: colors.textOnSecondaryContainer.color,
+          textAlign: `right`,
         }}
       />
 
@@ -63,16 +66,18 @@ const PostCard: FC<PostCardProps> = ({ blog }) => {
 const BlogScreen = () => {
   const { getPaginatedPosts } = useBlogsApi();
   const styles = useStyles();
+  const { isRefreshing, refresh } = usePullDownToRefresh();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery(
-    ["posts"],
-    ({ pageParam = 1 }) => getPaginatedPosts({ page: pageParam, limit: 5 }),
-    {
-      getNextPageParam: (lastPage) => {
-        return lastPage.hasNextPage ? lastPage.currentPage + 1 : undefined;
-      },
-    }
-  );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
+    useInfiniteQuery(
+      ["posts"],
+      ({ pageParam = 1 }) => getPaginatedPosts({ page: pageParam, limit: 5 }),
+      {
+        getNextPageParam: (lastPage) => {
+          return lastPage.hasNextPage ? lastPage.currentPage + 1 : undefined;
+        },
+      }
+    );
 
   const loadMore = () => {
     if (hasNextPage) {
@@ -89,6 +94,9 @@ const BlogScreen = () => {
       renderItem={({ item }) => <PostCard blog={item} />}
       onEndReached={loadMore}
       onEndReachedThreshold={0.5}
+      refreshControl={
+        <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+      }
       ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
       ListFooterComponent={
         isFetchingNextPage ? <ActivityIndicator size="large" color="#FFF" /> : null

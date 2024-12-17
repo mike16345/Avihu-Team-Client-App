@@ -24,26 +24,12 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ tips = generalTips, openTips, setOp
   const { fonts, layout, text, colors, spacing } = useStyles();
 
   return (
-    <BottomDrawer open={openTips} onClose={() => setOpenTips(false)}>
-      <View
-        style={[
-          layout.widthFull,
-          layout.flexRow,
-          layout.itemsCenter,
-          layout.justifyBetween,
-          spacing.mgVerticalDefault,
-          spacing.gapDefault,
-        ]}
+    <BottomDrawer heightVariant="auto" open={openTips} onClose={() => setOpenTips(false)}>
+      <Text
+        style={[text.textRight, fonts.xxl, text.textBold, colors.textPrimary, spacing.pdDefault]}
       >
-        <NativeIcon
-          onPress={() => setOpenTips(false)}
-          library="MaterialCommunityIcons"
-          name="close"
-          size={22}
-          color={colors.textOnSurface.color}
-        />
-        <Text style={[text.textBold, fonts.lg, colors.textPrimary]}>דגשים לאימון</Text>
-      </View>
+        דגשים לאימון
+      </Text>
       <FlatList
         keyExtractor={(_, i) => i.toString()}
         renderItem={({ item, index }) => (

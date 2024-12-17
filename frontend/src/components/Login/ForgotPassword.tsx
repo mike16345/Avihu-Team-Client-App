@@ -3,29 +3,38 @@ import { FC, useEffect, useState } from "react";
 import { useOTPApi } from "@/hooks/api/useOTPApi";
 import useStyles from "@/styles/useGlobalStyles";
 import { Button, TextInput } from "react-native-paper";
-import { testEmail } from "@/utils/utils";
-import { EMAIL_ERROR, INVALID_PASSWORD_MATCH, NO_PASSWORD } from "@/constants/Constants";
+import { testEmail, testPassword } from "@/utils/utils";
+import {
+  EMAIL_ERROR,
+  INVALID_PASSWORD,
+  INVALID_PASSWORD_MATCH,
+  NO_PASSWORD,
+} from "@/constants/Constants";
 import ConfirmPassword from "./ConfirmPassword";
 import { usePasswordsApi } from "@/hooks/api/usePasswordsApi";
 import { ICredentialsErrors } from "./Login";
 import { Text } from "../ui/Text";
 import Loader from "../ui/loaders/Loader";
+import { useUserApi } from "@/hooks/api/useUserApi";
 
 interface IForgotPassword {
   email: string;
   onConfirmChangePasswordSuccess: () => void;
   onShowingOtpInputs?: () => void;
+  isRegistering?: boolean;
 }
 
 const ForgotPassword: FC<IForgotPassword> = ({
   email,
   onConfirmChangePasswordSuccess,
   onShowingOtpInputs,
+  isRegistering = false,
 }) => {
   const { getOTP, validateOTP } = useOTPApi();
   const { changePassword } = usePasswordsApi();
+  const { registerUser } = useUserApi();
 
-  const { colors, spacing, layout, text, common } = useStyles();
+  const { colors, spacing, text, common } = useStyles();
 
   const [formErrors, setFormErrors] = useState<ICredentialsErrors & { otp?: string }>({});
   const [otp, setOtp] = useState("");
@@ -41,6 +50,10 @@ const ForgotPassword: FC<IForgotPassword> = ({
       setFormErrors({ ...formErrors, ["password"]: NO_PASSWORD });
       return;
     }
+    if (!testPassword(password)) {
+      setFormErrors({ ...formErrors, ["validPassword"]: INVALID_PASSWORD });
+      return;
+    }
     if (confirmPassword !== password) {
       setFormErrors({ ...formErrors, ["confirmPassword"]: INVALID_PASSWORD_MATCH });
       return;
@@ -48,7 +61,10 @@ const ForgotPassword: FC<IForgotPassword> = ({
 
     try {
       setIsLoading(true);
-      await changePassword(email, password, sessionId);
+      isRegistering
+        ? await registerUser(email, password)
+        : await changePassword(email, password, sessionId);
+
       onConfirmChangePasswordSuccess();
     } catch (error: any) {
       setFormErrors({ ...formErrors, ["password"]: error?.response?.data?.message });
@@ -190,6 +206,7 @@ const ForgotPassword: FC<IForgotPassword> = ({
         <Animated.View style={{ opacity: fadeValue }}>
           <ConfirmPassword
             errors={formErrors}
+            value={password}
             handlePasswordChange={(val) => setPassword(val)}
             handlePasswordConfirmChange={(val) => setConfirmPassword(val)}
           />

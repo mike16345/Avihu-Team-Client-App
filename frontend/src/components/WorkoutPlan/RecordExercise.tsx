@@ -124,7 +124,27 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     <>
       {isSetUploading && <Loader variant="Screen" />}
       <View style={[layout.sizeFull, layout.flex1, spacing.pdBottomBar]}>
-        <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
+        {exercise.linkToVideo && (
+          <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
+        )}
+
+        {!exercise.linkToVideo && (
+          <View
+            style={[
+              { width: width, height: 200 },
+              colors.backgroundSecondaryContainer,
+              layout.center,
+              spacing.gapDefault,
+            ]}
+          >
+            <NativeIcon
+              library="AntDesign"
+              name="exclamationcircleo"
+              style={[fonts.xxxxl, colors.textOnSecondaryContainer]}
+            />
+            <Text style={[colors.textOnSecondaryContainer]}>סרטון לא נמצא</Text>
+          </View>
+        )}
         <View
           style={[layout.flexGrow, !lastRecordedSet && layout.justifyEvenly, spacing.pdDefault]}
         >

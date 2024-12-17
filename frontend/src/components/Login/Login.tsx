@@ -19,13 +19,12 @@ import useStyles from "@/styles/useGlobalStyles";
 import { moderateScale } from "react-native-size-matters";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import Toast, { ToastType } from "react-native-toast-message";
-import ConfirmPassword from "./ConfirmPassword";
 import Loader from "../ui/loaders/Loader";
 import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
 import { Text } from "../ui/Text";
 import ForgotPassword from "./ForgotPassword";
-import { EMAIL_ERROR, INVALID_PASSWORD_MATCH } from "@/constants/Constants";
+import { EMAIL_ERROR, NO_ACCESS, NO_PASSWORD } from "@/constants/Constants";
 
 interface IUserCredentials {
   email: string;
@@ -36,6 +35,7 @@ export interface ICredentialsErrors {
   email?: string;
   password?: string;
   confirmPassword?: string;
+  validPassword?: string;
 }
 
 interface ILoginProps {
@@ -44,7 +44,7 @@ interface ILoginProps {
 
 export default function Login({ onLogin }: ILoginProps) {
   const { text, colors, fonts, layout, spacing, common } = useStyles();
-  const { checkEmailAccess, registerUser, loginUser } = useUserApi();
+  const { checkEmailAccess, loginUser } = useUserApi();
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
 
   const { height, width } = useWindowDimensions();
@@ -55,7 +55,6 @@ export default function Login({ onLogin }: ILoginProps) {
     email: ``,
     password: ``,
   });
-  const [confirmPassword, setConfirmPassowrd] = useState<string>(``);
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState<ICredentialsErrors>({});
   const [emailChecked, setEmailchecked] = useState(false);
@@ -63,6 +62,7 @@ export default function Login({ onLogin }: ILoginProps) {
   const [loading, setLoading] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isShowingOtpInputs, setIsShowingOtpInputs] = useState(false);
+  const [showConfirmButton, setShowConfirmButton] = useState(true);
 
   const showAlert = (type: ToastType, message: string) => {
     Toast.show({
@@ -86,14 +86,10 @@ export default function Login({ onLogin }: ILoginProps) {
     }
 
     if (emailChecked && !password) {
-      errors[`password`] = `אנא הזינו סיסמה`;
+      errors[`password`] = NO_PASSWORD;
     }
 
-    if (emailChecked && password !== confirmPassword) {
-      errors[`confirmPassword`] = INVALID_PASSWORD_MATCH;
-    }
-
-    if (errors[`email`] || errors[`password`] || (!userRegistered && errors[`confirmPassword`])) {
+    if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
@@ -106,20 +102,9 @@ export default function Login({ onLogin }: ILoginProps) {
           setEmailchecked(true);
           if (res.data.hasPassword) {
             setUserRegistered(true);
+          } else {
+            setShowConfirmButton(false);
           }
-        })
-        .catch((err) => {
-          showAlert("error", err.response?.data.message);
-        })
-        .finally(() => setLoading(false));
-    }
-
-    if (emailChecked && !userRegistered) {
-      setLoading(true);
-      registerUser(formattedEmail, password)
-        .then((res) => {
-          showAlert("success", res.message);
-          setUserRegistered(true);
         })
         .catch((err) => {
           showAlert("error", err.response?.data.message);
@@ -131,6 +116,11 @@ export default function Login({ onLogin }: ILoginProps) {
       setLoading(true);
       loginUser(formattedEmail, password)
         .then((res) => {
+          if (!res.data.data.user.hasAccess) {
+            showAlert("error", NO_ACCESS);
+            setEmailchecked(false);
+            return;
+          }
           showAlert("success", res.message);
           onLogin(res.data.data.user);
           setCurrentUser(res?.data.data.user);
@@ -146,13 +136,26 @@ export default function Login({ onLogin }: ILoginProps) {
   const chooseDifferentMail = () => {
     setEmailchecked(false);
     setUserRegistered(false);
+    setShowConfirmButton(true);
     setFormErrors({});
   };
 
   const handleChangePasswordSuccess = () => {
+    setUserRegistered(true);
     setIsForgotPassword(false);
+    setShowConfirmButton(true);
     setIsShowingOtpInputs(false);
     showAlert("success", `סיסמה עודכנה בהצלחה`);
+  };
+
+  const showPasswordInputs = (show: boolean) => {
+    if (!show) {
+      setIsForgotPassword(false);
+      setShowConfirmButton(true);
+    } else {
+      setIsForgotPassword(true);
+      setShowConfirmButton(false);
+    }
   };
 
   const emailInputY = useAnimatedValue(0);
@@ -293,9 +296,7 @@ export default function Login({ onLogin }: ILoginProps) {
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={
-                    isForgotPassword ? () => setIsForgotPassword(false) : chooseDifferentMail
-                  }
+                  onPress={isForgotPassword ? () => showPasswordInputs(false) : chooseDifferentMail}
                 >
                   <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>
                     {isForgotPassword ? `לא חשוב, נזכרתי` : `התחברות באמצעות מייל אחר`}
@@ -345,7 +346,7 @@ export default function Login({ onLogin }: ILoginProps) {
                         {formErrors.password}
                       </Text>
                     )}
-                    <TouchableOpacity onPress={() => setIsForgotPassword(true)}>
+                    <TouchableOpacity onPress={() => showPasswordInputs(true)}>
                       <Text
                         style={[
                           text.textRight,
@@ -360,19 +361,18 @@ export default function Login({ onLogin }: ILoginProps) {
                 )}
                 {!userRegistered && (
                   <Animated.View style={{ opacity: fadeValue }}>
-                    <ConfirmPassword
-                      errors={formErrors}
-                      handlePasswordChange={(val) =>
-                        setInputtedCredentials({ ...inputtedCrendentials, password: val })
-                      }
-                      handlePasswordConfirmChange={(val) => setConfirmPassowrd(val)}
+                    <ForgotPassword
+                      isRegistering
+                      email={inputtedCrendentials.email}
+                      onConfirmChangePasswordSuccess={handleChangePasswordSuccess}
+                      onShowingOtpInputs={() => setIsShowingOtpInputs(true)}
                     />
                   </Animated.View>
                 )}
               </>
             )}
           </View>
-          {!isForgotPassword && (
+          {showConfirmButton && (
             <Button
               mode="contained-tonal"
               style={[layout.widthFull, common.rounded, colors.backgroundPrimary]}

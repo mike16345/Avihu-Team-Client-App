@@ -1,11 +1,15 @@
-import { useUserApi } from "@/hooks/api/useUserApi";
-import { useUserStore } from "@/store/userStore";
 import Toast, { ToastType } from "react-native-toast-message";
 
 export const testEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   return emailRegex.test(email);
+};
+
+export const testPassword = (password: string) => {
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%])(?=.*\d).+$/;
+
+  return passwordRegex.test(password);
 };
 
 export const hexToRgba = (hex: string, opacity: number) => {

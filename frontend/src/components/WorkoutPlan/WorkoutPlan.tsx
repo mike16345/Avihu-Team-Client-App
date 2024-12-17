@@ -2,6 +2,7 @@ import {
   Dimensions,
   FlatList,
   ImageBackground,
+  RefreshControl,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -9,7 +10,7 @@ import {
 import { useState, useEffect, FC } from "react";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
 import DropDownPicker, { ValueType } from "react-native-dropdown-picker";
-import { ICompleteWorkoutPlan, IWorkoutPlan } from "@/interfaces/Workout";
+import { IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
 import { Colors } from "@/constants/Colors";
 import { useWorkoutPlanApi } from "@/hooks/api/useWorkoutPlanApi";
@@ -23,6 +24,9 @@ import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutPlanSkeletonLoad
 import NoDataScreen from "@/screens/NoDataScreen";
 import ErrorScreen from "@/screens/ErrorScreen";
 import { Text } from "../ui/Text";
+import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
+import { useQuery } from "@tanstack/react-query";
+import { ONE_DAY, WORKOUT_PLAN_KEY } from "@/constants/reactQuery";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
@@ -33,21 +37,25 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const [plans, setPlans] = useState<any[] | null>(null);
   const [value, setValue] = useState<ValueType>();
   const [openTips, setOpenTips] = useState(false);
-  const [workoutPlan, setWorkoutPlan] = useState<ICompleteWorkoutPlan>();
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
   const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
-  const [error, setError] = useState({ status: null, message: null });
 
   const { fonts, text, spacing, colors } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
   const { currentUser } = useUserStore();
   const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
   const { getSession } = useSessionsApi();
+  const { isRefreshing, refresh } = usePullDownToRefresh();
+
+  const { data, isError, error, refetch } = useQuery({
+    queryFn: () => getWorkoutPlanByUserId(currentUser?._id || ``),
+    enabled: !!currentUser?._id,
+    queryKey: [WORKOUT_PLAN_KEY + currentUser?._id],
+    staleTime: ONE_DAY,
+  });
 
   const selectNewWorkoutPlan = (planName: string) => {
-    const selectedWorkoutPlan = workoutPlan?.workoutPlans.find(
-      (plan) => plan.planName === planName
-    );
+    const selectedWorkoutPlan = data?.workoutPlans.find((plan) => plan.planName === planName);
 
     if (!selectedWorkoutPlan) return;
     setCurrentWorkoutPlan({ ...selectedWorkoutPlan });
@@ -83,34 +91,29 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   };
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!data) return;
 
-    getWorkoutPlanByUserId(currentUser._id)
-      .then((res) => setWorkoutPlan(res))
-      .catch((err) => {
-        const status = err.response.status;
-        const message = err.response.data.message;
-
-        setError({ status, message });
-      });
-  }, []);
-
-  useEffect(() => {
-    if (!workoutPlan) return;
-
-    const plans = workoutPlan.workoutPlans.map((workout) => {
+    const plans = data.workoutPlans.map((workout) => {
       return { label: workout.planName, value: workout.planName };
     });
 
     setPlans(plans);
     setValue(plans[0].label);
-    setCurrentWorkoutPlan(workoutPlan.workoutPlans[0]);
+    setCurrentWorkoutPlan(data.workoutPlans[0]);
 
     loadWorkoutSession();
-  }, [workoutPlan]);
+  }, [data]);
 
-  if (error && error.status == 404) return <NoDataScreen variant="workoutPlan" />;
-  if (error && error.status) return <ErrorScreen error={error.message || ``} />;
+  if (isError && error.response.status == 404)
+    return (
+      <NoDataScreen
+        variant="workoutPlan"
+        refreshFunc={() => refresh(refetch)}
+        refreshing={isRefreshing}
+      />
+    );
+  if (isError && error.response.status)
+    return <ErrorScreen error={error.response.data.message || ``} />;
 
   const renderHeader = () => (
     <>
@@ -133,12 +136,14 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
               onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
             />
 
-            <TouchableOpacity
-              style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
-              onPress={() => setOpenTips(true)}
-            >
-              <Text style={[styles.tipsText, colors.textPrimary]}>דגשים</Text>
-            </TouchableOpacity>
+            {data?.tips && (
+              <TouchableOpacity
+                style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
+                onPress={() => setOpenTips(true)}
+              >
+                <Text style={[styles.tipsText, colors.textPrimary]}>דגשים</Text>
+              </TouchableOpacity>
+            )}
           </>
         )}
       </View>
@@ -151,6 +156,9 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       ListEmptyComponent={() => <WorkoutPlanSkeleton />}
       keyExtractor={(item) => item.muscleGroup}
       ListHeaderComponent={renderHeader}
+      refreshControl={
+        <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+      }
       renderItem={({ item }) => (
         <View style={[spacing.pdHorizontalSm]}>
           <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>{item.muscleGroup}</Text>
@@ -169,7 +177,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
         </View>
       )}
       ListFooterComponent={
-        <WorkoutTips tips={workoutPlan?.tips} openTips={openTips} setOpenTips={setOpenTips} />
+        <WorkoutTips tips={data?.tips} openTips={openTips} setOpenTips={setOpenTips} />
       }
       contentContainerStyle={styles.workoutContainer}
     />

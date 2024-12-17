@@ -3,7 +3,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
 import BottomDrawer from "../ui/BottomDrawer";
-import { FlatList } from "react-native";
+import { FlatList, View } from "react-native";
 
 interface TipsModalProps {
   isOpen: boolean;
@@ -14,8 +14,8 @@ interface TipsModalProps {
 const TipsModal: React.FC<TipsModalProps> = ({ isOpen, dismiss, tips }) => {
   const { colors, fonts, spacing, text } = useStyles();
   return (
-    <BottomDrawer open={isOpen} onClose={dismiss}>
-      <ScrollView style={[spacing.pdMd, { height: `auto` }]}>
+    <BottomDrawer heightVariant="auto" open={isOpen} onClose={dismiss}>
+      <View style={[spacing.pdMd, { height: `auto` }]}>
         <Text
           style={[text.textRight, fonts.xxl, text.textBold, colors.textPrimary, spacing.pdDefault]}
         >
@@ -40,7 +40,7 @@ const TipsModal: React.FC<TipsModalProps> = ({ isOpen, dismiss, tips }) => {
           )}
           data={tips}
         />
-      </ScrollView>
+      </View>
     </BottomDrawer>
   );
 };

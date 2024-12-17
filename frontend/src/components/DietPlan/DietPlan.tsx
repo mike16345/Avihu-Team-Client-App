@@ -1,4 +1,11 @@
-import { View, ImageBackground, ScrollView, Animated, Dimensions } from "react-native";
+import {
+  View,
+  ImageBackground,
+  ScrollView,
+  Animated,
+  Dimensions,
+  RefreshControl,
+} from "react-native";
 import { useState } from "react";
 import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
 import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
@@ -21,12 +28,14 @@ import NoDataScreen from "@/screens/NoDataScreen";
 import { createRetryFunction } from "@/utils/utils";
 import { Text } from "../ui/Text";
 import { useFoodGroupStore } from "@/store/foodgroupStore";
+import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
   const { getDietPlanByUserId } = useDietPlanApi();
   const { layout, spacing, colors, common, text } = useStyles();
   const { foodGroupToDisplay, setFoodGroupToDisplay } = useFoodGroupStore();
+  const { isRefreshing, refresh } = usePullDownToRefresh();
 
   const [isFabOpen, setIsFabOpen] = useState(false);
   const {
@@ -49,7 +58,7 @@ export default function DietPlan() {
     slideInBottomDelay600,
   ];
 
-  const { data, isError, error, isLoading } = useQuery({
+  const { data, isError, error, isLoading, refetch } = useQuery({
     queryFn: () => getDietPlanByUserId(currentUser?._id || ``),
     queryKey: [DIET_PLAN_KEY + currentUser?._id],
     enabled: !!currentUser,
@@ -66,13 +75,23 @@ export default function DietPlan() {
     setFoodGroupToDisplay(null);
   };
 
-  if (error && error.response.status == 404) return <NoDataScreen variant="dietPlan" />;
+  if (error && error.response.status == 404)
+    return (
+      <NoDataScreen
+        variant="dietPlan"
+        refreshing={isRefreshing}
+        refreshFunc={() => refresh(refetch)}
+      />
+    );
   if (isError) return <ErrorScreen error={error} />;
 
   return (
     <Portal.Host>
       <ScrollView
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+        }
         contentContainerStyle={[
           layout.flexGrow,
           colors.backgroundSecondary,
