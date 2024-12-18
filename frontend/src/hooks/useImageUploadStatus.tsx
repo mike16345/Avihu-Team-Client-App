@@ -4,18 +4,24 @@ import { useUserStore } from "@/store/userStore";
 
 const useImageUploadStatus = () => {
   const { updateUserField } = useUserApi();
-  const currentUserId = useUserStore((store) => store.currentUser?._id);
+  const currentUser = useUserStore((store) => store.currentUser);
 
   const calculateImageUploadTitle = (usersCheckInDate: number) => {
     const MILLIESECONDS_IN_A_DAY = 86400000;
-    const timeLeft = usersCheckInDate - Date.now() - MILLIESECONDS_IN_A_DAY;
+    const timeLeft = usersCheckInDate - Date.now();
 
-    const daysLeft = timeLeft > 0 ? Math.floor(timeLeft / MILLIESECONDS_IN_A_DAY) : 0;
+    if (timeLeft < 0) {
+      if (!currentUser?.imagesUploaded) return;
+
+      updateUserField(currentUser?._id || ``, "imagesUploaded", false);
+      return ``;
+    }
+
+    const result = Math.round(timeLeft / MILLIESECONDS_IN_A_DAY);
+
+    const daysLeft = result == 0 ? 1 : result;
 
     switch (daysLeft) {
-      case 0:
-        updateUserField(currentUserId || ``, "imagesUploaded", false);
-        return ``;
       case 1:
         return `זמין בעוד יום`;
       default:
