@@ -136,7 +136,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
               onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
             />
 
-            {data?.tips && (
+            {!data?.tips?.length == 0 && (
               <TouchableOpacity
                 style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
                 onPress={() => setOpenTips(true)}
