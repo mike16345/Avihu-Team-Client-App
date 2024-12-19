@@ -1,5 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   TouchableOpacity,
@@ -8,7 +8,12 @@ import {
   Dimensions,
   Modal,
   BackHandler,
+  ImageBackground,
 } from "react-native";
+import { useNavigationState } from "@react-navigation/native";
+import workoutPage from "@assets/avihu/workoutPage.jpeg";
+import dietScreen from "@assets/avihu/dietScreen.jpeg";
+import progressPage from "@assets/avihu/progressPage.jpeg";
 
 const { height } = Dimensions.get("window");
 
@@ -25,7 +30,28 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
   children,
   heightVariant = `fixed`,
 }) => {
-  const { colors } = useStyles();
+  const { colors, spacing } = useStyles();
+  const activePageIndex = useNavigationState((state) => state.index);
+  const slideAnim = useRef(new Animated.Value(height)).current;
+
+  const [isVisible, setIsVisible] = useState(open);
+
+  useEffect(() => {
+    if (open) {
+      setIsVisible(true); // Show the modal when open is true
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(slideAnim, {
+        toValue: height, // Slide out to the right
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setIsVisible(false)); // Hide modal after animation completes
+    }
+  }, [open]);
 
   useEffect(() => {
     const onBackPress = () => {
@@ -38,8 +64,22 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
   }, []);
 
   return (
-    <Modal transparent visible={open} animationType="slide">
-      <TouchableOpacity style={[styles.overlay]} onPress={onClose} activeOpacity={1} />
+    <Modal transparent visible={open} animationType="fade">
+      <TouchableOpacity style={[styles.overlay]} onPress={onClose} activeOpacity={1}>
+        <ImageBackground
+          source={
+            activePageIndex == 0
+              ? workoutPage
+              : activePageIndex == 1
+              ? dietScreen
+              : activePageIndex == 2
+              ? progressPage
+              : workoutPage
+          }
+          style={styles.overlay}
+          blurRadius={50}
+        />
+      </TouchableOpacity>
       <Animated.View
         style={[
           styles.drawerContainer,
@@ -50,6 +90,8 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
             height: heightVariant === `fixed` ? height * 0.6 : `auto`,
           },
           colors.borderSecondaryContainer,
+          spacing.pdBottomBar,
+          { transform: [{ translateY: slideAnim }] },
         ]}
       >
         <View style={styles.drawerContent}>{children}</View>
@@ -65,7 +107,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
   drawerContainer: {
     position: "absolute",

@@ -86,6 +86,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
             mode="contained"
             style={[spacing.pdXs, common.roundedSm, { width: `50%` }]}
             onPress={uploadImage}
+            disabled={!!(images.length == 0)}
           >
             <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>שלח</Text>
           </Button>

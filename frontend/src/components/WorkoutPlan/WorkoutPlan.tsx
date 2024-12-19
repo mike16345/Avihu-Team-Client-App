@@ -118,7 +118,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const renderHeader = () => (
     <>
       <ImageBackground source={logoBlack} style={{ height: Dimensions.get("screen").height / 4 }} />
-      <View style={[styles.container, spacing.gapLg, spacing.pdDefault]}>
+      <View style={[styles.container, spacing.gapLg, spacing.pdDefault, colors.background]}>
         {value && plans && (
           <>
             <DropDownPicker
@@ -126,7 +126,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
               open={open}
               value={value}
               items={plans}
-              style={colors.backgroundSecondaryContainer}
+              style={[colors.backgroundSecondaryContainer, { zIndex: 100 }]}
               listItemContainerStyle={colors.backgroundSecondaryContainer}
               theme="DARK"
               setOpen={setOpen}
@@ -155,6 +155,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       data={currentWorkoutPlan?.muscleGroups || []}
       ListEmptyComponent={() => <WorkoutPlanSkeleton />}
       keyExtractor={(item) => item.muscleGroup}
+      style={colors.background}
       ListHeaderComponent={renderHeader}
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />

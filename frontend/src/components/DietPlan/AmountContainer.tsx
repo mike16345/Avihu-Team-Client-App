@@ -38,7 +38,9 @@ const AmountContainer: React.FC<AmountContainerProps> = ({ amount, title, varian
         <Text style={[fonts.lg, text.textBold, text.textCenter, colors.textOnSecondaryContainer]}>
           {amount}
         </Text>
-        {variant && <Text style={[colors.textPrimary, text.textBold]}>{label}</Text>}
+        {variant && (
+          <Text style={[colors.textOnBackground, text.textBold, { opacity: 0.8 }]}>{label}</Text>
+        )}
       </View>
     </View>
   );

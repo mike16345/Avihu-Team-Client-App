@@ -8,7 +8,12 @@ import {
   Dimensions,
   Modal,
   BackHandler,
+  ImageBackground,
 } from "react-native";
+import { useNavigationState } from "@react-navigation/native";
+import workoutPage from "@assets/avihu/workoutPage.jpeg";
+import dietScreen from "@assets/avihu/dietScreen.jpeg";
+import progressPage from "@assets/avihu/progressPage.jpeg";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,6 +27,9 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) =>
   const { colors } = useStyles();
   const slideAnim = useRef(new Animated.Value(width)).current; // Start off-screen to the right
   const [isVisible, setIsVisible] = useState(open); // Manage modal visibility
+  const activePageIndex = useNavigationState((state) => {
+    return state?.routes[0].state?.index;
+  });
 
   useEffect(() => {
     if (open) {
@@ -56,8 +64,22 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) =>
   if (!isVisible) return null; // Avoid rendering the modal if not visible
 
   return (
-    <Modal transparent visible={isVisible} animationType="none">
-      <TouchableOpacity style={styles.overlay} onPress={onClose} activeOpacity={1} />
+    <Modal transparent visible={isVisible} animationType="fade">
+      <TouchableOpacity style={[styles.overlay]} onPress={onClose} activeOpacity={1}>
+        <ImageBackground
+          source={
+            activePageIndex == 0
+              ? workoutPage
+              : activePageIndex == 1
+              ? dietScreen
+              : activePageIndex == 2
+              ? progressPage
+              : workoutPage
+          }
+          style={styles.overlay}
+          blurRadius={20}
+        />
+      </TouchableOpacity>
       <Animated.View
         style={[
           styles.drawerContainer,
