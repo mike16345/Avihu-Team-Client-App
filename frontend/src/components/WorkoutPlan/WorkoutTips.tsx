@@ -32,6 +32,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ tips = generalTips, openTips, setOp
       </Text>
       <FlatList
         keyExtractor={(_, i) => i.toString()}
+        style={spacing.pdBottomBar}
         renderItem={({ item, index }) => (
           <Text
             style={[

@@ -14,6 +14,8 @@ import { useNavigationState } from "@react-navigation/native";
 import workoutPage from "@assets/avihu/workoutPage.jpeg";
 import dietScreen from "@assets/avihu/dietScreen.jpeg";
 import progressPage from "@assets/avihu/progressPage.jpeg";
+import recordExercisePage from "@assets/avihu/recordExercisePage.jpeg";
+import blogsPage from "@assets/avihu/blogsPage.jpeg";
 
 const { width, height } = Dimensions.get("window");
 
@@ -28,7 +30,10 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) =>
   const slideAnim = useRef(new Animated.Value(width)).current; // Start off-screen to the right
   const [isVisible, setIsVisible] = useState(open); // Manage modal visibility
   const activePageIndex = useNavigationState((state) => {
-    return state?.routes[0].state?.index;
+    const index = state?.routes[0].state?.index;
+    const isRecordSet = state?.routes[0].state?.routes[0].state?.index == 1;
+    if (index !== 0 || !isRecordSet) return index;
+    return 4;
   });
 
   useEffect(() => {
@@ -74,10 +79,12 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) =>
               ? dietScreen
               : activePageIndex == 2
               ? progressPage
-              : workoutPage
+              : activePageIndex == 3
+              ? blogsPage
+              : recordExercisePage
           }
           style={styles.overlay}
-          blurRadius={20}
+          blurRadius={50}
         />
       </TouchableOpacity>
       <Animated.View

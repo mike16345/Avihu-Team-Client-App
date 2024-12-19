@@ -112,7 +112,7 @@ export const DarkTheme = {
     onPrimaryContainer: "#a7f3d0",
     secondary: "#d1d5db",
     onSecondary: "#1f2937",
-    secondaryContainer: "#2A2929",
+    secondaryContainer: "#25262A",
     onSecondaryContainer: "#e5e7eb",
     tertiary: "#ffa4a8",
     onTertiary: "#7f1d1d",

@@ -14,6 +14,7 @@ import { useNavigationState } from "@react-navigation/native";
 import workoutPage from "@assets/avihu/workoutPage.jpeg";
 import dietScreen from "@assets/avihu/dietScreen.jpeg";
 import progressPage from "@assets/avihu/progressPage.jpeg";
+import recordExercisePage from "@assets/avihu/recordExercisePage.jpeg";
 
 const { height } = Dimensions.get("window");
 
@@ -30,8 +31,16 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
   children,
   heightVariant = `fixed`,
 }) => {
-  const { colors, spacing } = useStyles();
-  const activePageIndex = useNavigationState((state) => state.index);
+  const { colors } = useStyles();
+  const activePageIndex = useNavigationState((state) => {
+    const index = state.index;
+    const isRecordSet = state?.routes[1]?.name == `RecordSet`;
+
+    if (index !== 1 || !isRecordSet) return index;
+
+    return 3;
+  });
+
   const slideAnim = useRef(new Animated.Value(height)).current;
 
   const [isVisible, setIsVisible] = useState(open);
@@ -64,7 +73,7 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
   }, []);
 
   return (
-    <Modal transparent visible={open} animationType="fade">
+    <Modal transparent visible={isVisible} animationType="fade">
       <TouchableOpacity style={[styles.overlay]} onPress={onClose} activeOpacity={1}>
         <ImageBackground
           source={
@@ -74,7 +83,7 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
               ? dietScreen
               : activePageIndex == 2
               ? progressPage
-              : workoutPage
+              : recordExercisePage
           }
           style={styles.overlay}
           blurRadius={50}
@@ -90,7 +99,6 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
             height: heightVariant === `fixed` ? height * 0.6 : `auto`,
           },
           colors.borderSecondaryContainer,
-          spacing.pdBottomBar,
           { transform: [{ translateY: slideAnim }] },
         ]}
       >
