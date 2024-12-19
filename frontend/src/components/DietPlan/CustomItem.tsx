@@ -26,7 +26,7 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
         spacing.gapDefault,
       ]}
     >
-      <View style={[, spacing.pdXs, layout.center]}>
+      <View style={[spacing.pdXs, layout.center]}>
         <NativeIcon
           size={25}
           style={colors.textPrimary}

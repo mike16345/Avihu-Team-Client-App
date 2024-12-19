@@ -58,7 +58,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
 
       <DisplayImage
         image={images[selectedImage] ? images[selectedImage] : undefined}
-        removeImage={() => deleteimageByIndex(0)}
+        removeImage={() => deleteimageByIndex(selectedImage)}
         handleImageSelected={(image: string) => setImageByIndex(selectedImage, image)}
       />
       <View style={[spacing.gapLg]}>

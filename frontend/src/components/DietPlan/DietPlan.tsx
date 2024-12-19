@@ -135,7 +135,7 @@ export default function DietPlan() {
                   <NativeIcon
                     library="MaterialCommunityIcons"
                     name="food-outline"
-                    color={colors.backgroundSecondary.backgroundColor}
+                    color={colors.textOnBackground.color}
                     size={20}
                   />
                   <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>

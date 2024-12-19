@@ -83,7 +83,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     key: keyof IRecordedSet,
     value: IRecordedSet[K]
   ) => {
-    setRecordedSet({ ...recordedSet, [key]: value });
+    setRecordedSet((prev) => {
+      return { ...prev, [key]: value };
+    });
   };
 
   const handleSave = async () => {
