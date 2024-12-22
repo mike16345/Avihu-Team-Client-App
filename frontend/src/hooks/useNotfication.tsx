@@ -31,8 +31,9 @@ export const useNotification = () => {
           body: "לא לשכוח לשלוח את השקילה היומית שלכם!",
         },
         trigger: {
-          hour: 9, // Set the desired time (9:00 AM here)
-          minute: 0,
+          //hour: 9, // Set the desired time (9:00 AM here)
+          //minute: 0,
+          seconds: 60,
           repeats: true, // Ensure it repeats daily
         },
       });
