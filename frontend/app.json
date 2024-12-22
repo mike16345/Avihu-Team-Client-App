@@ -4,8 +4,8 @@
     "slug": "avihu-team",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/app-icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/app-icon.jpeg",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/avihu/avihu-logo-black.png",
       "backgroundColor": "#000000",
@@ -14,6 +14,15 @@
           "expo-image-picker",
           {
             "photosPermission": "The app accesses your photos to let you share them with your friends."
+          }
+        ],
+        [
+          "expo-notifications",
+          {
+            "icon": "./assets/app-icon.jpeg",
+            "color": "#ffffff",
+            "defaultChannel": "default",
+            "enableBackgroundRemoteNotifications": false
           }
         ]
       ]
@@ -45,7 +54,7 @@
     "runtimeVersion": "1.0.0",
     "updates": {
       "enabled": true,
-      "runtimeVersion":"1.0.0",
+      "runtimeVersion": "1.0.0",
       "url": "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2"
     }
   }

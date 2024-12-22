@@ -22,6 +22,7 @@ import Toast from "react-native-toast-message";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import { useFonts } from "expo-font";
 import UserDrawer from "@/components/User/UserDrawer";
+import useNotification from "@/hooks/useNotfication";
 
 // import { I18nManager } from "react-native";
 // Enable RTL
@@ -39,6 +40,8 @@ export default function App() {
     Assistant: require("./assets/fonts/Assistant-VariableFont_wght.ttf"),
   });
   if (!loaded) return;
+
+  useNotification();
 
   return (
     <PaperProvider
