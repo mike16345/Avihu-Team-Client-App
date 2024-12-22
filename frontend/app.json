@@ -28,12 +28,12 @@
       ]
     },
     "ios": {
+      "bundleIdentifier": "com.avihuteam.test",
       "supportsTablet": true,
       "splash": {
         "image": "./assets/avihu/avihu-logo-black.png",
         "backgroundColor": "#000000"
-      },
-      "bundleIdentifier": "com.avihuteam.test"
+      }
     },
     "android": {
       "adaptiveIcon": {
