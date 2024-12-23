@@ -175,9 +175,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
 
           <View style={[layout.flexRow, layout.justifyEvenly, spacing.pdVerticalSm]}>
             <View style={[layout.center, spacing.gapDefault]}>
-              <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
-                חזרות
-              </Text>
+              <Text style={[colors.textOnSecondaryContainer, fonts.default]}>חזרות</Text>
 
               <View
                 style={[
@@ -200,9 +198,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               </View>
             </View>
             <View style={[layout.center, spacing.gapDefault]}>
-              <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
-                משקל
-              </Text>
+              <Text style={[colors.textOnSecondaryContainer, fonts.default]}>משקל</Text>
 
               <View
                 style={[
@@ -286,40 +282,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
 export default RecordExercise;
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-  },
-  inputLabel: {},
-  inputContainer: {
-    flexDirection: "row-reverse",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-  },
-
-  saveBtn: {
-    backgroundColor: Colors.bgPrimary,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    paddingHorizontal: 4,
-    paddingVertical: 12,
-    borderRadius: 4,
-  },
-  saveText: {
-    color: Colors.bgSecondary,
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  errorText: {
-    color: "red",
-    fontSize: 12,
-    textAlign: "right",
-  },
-  textInput: {
-    textAlign: "right",
-  },
   setInfo: {
     fontSize: 14,
     fontWeight: "bold",
