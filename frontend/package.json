@@ -7,8 +7,10 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start -c --web",
-    "eas-build-android": "eas build --platform android --profile production",
-    "eas-build-ios": "eas build --platform ios --profile production"
+    "build:android:dev": "eas build --platform android --profile development",
+    "build:android:prod": "eas build --platform android --profile production",
+    "build:ios:dev": "eas build --platform ios --profile development",
+    "build:ios:prod": "eas build --platform ios --profile production"
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.2.3",
@@ -26,6 +28,7 @@
     "expo-file-system": "^17.0.1",
     "expo-image-manipulator": "~12.0.5",
     "expo-image-picker": "~15.0.7",
+    "expo-notifications": "~0.28.19",
     "expo-status-bar": "~1.12.1",
     "expo-updates": "~0.25.27",
     "moment": "^2.30.1",
@@ -52,8 +55,7 @@
     "react-native-web-webview": "^1.0.2",
     "react-native-webview": "13.8.6",
     "react-native-youtube-iframe": "^2.3.0",
-    "zustand": "^4.5.2",
-    "expo-notifications": "~0.28.19"
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

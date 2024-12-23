@@ -105,6 +105,7 @@ const BlogScreen = () => {
         styles.spacing.pdBottomBar,
         styles.spacing.pdStatusBar,
         styles.spacing.pdHorizontalDefault,
+        styles.colors.background,
       ]}
     />
   );
