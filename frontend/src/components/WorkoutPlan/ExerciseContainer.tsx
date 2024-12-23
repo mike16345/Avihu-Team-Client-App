@@ -183,20 +183,4 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  recordWorkoutBtn: {
-    backgroundColor: Colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  recordBtnText: {
-    color: Colors.dark,
-    fontWeight: "600",
-  },
-  thumbnail: {
-    width: 105,
-    height: "100%",
-    resizeMode: "center",
-    marginHorizontal: 4,
-  },
 });
