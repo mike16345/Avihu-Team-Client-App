@@ -7,6 +7,7 @@ import { useUserApi } from "@/hooks/api/useUserApi";
 import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
 import Loader from "@/components/ui/loaders/Loader";
+import useNotification from "@/hooks/useNotfication";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ const RootNavigator = () => {
 
   const { checkUserSessionToken, getUserById } = useUserApi();
   const { currentUser, setCurrentUser } = useUserStore();
+  const { initializeNotifications, requestPermissions } = useNotification();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,6 +49,11 @@ const RootNavigator = () => {
 
   useEffect(() => {
     checkLoginStatus();
+    requestPermissions()
+      .then(() => {
+        initializeNotifications();
+      })
+      .catch((err) => console.log(err));
 
     return () => {
       sessionStorage.removeItem();
