@@ -6,7 +6,7 @@ export default ({ config }) => ({
   slug: "avihu-team",
   version: "1.0.0",
   orientation: "portrait",
-  icon: "./assets/app-icon.jpeg",
+  icon: "./assets/app-icon.png",
   userInterfaceStyle: "dark",
   splash: {
     image: "./assets/avihu/avihu-logo-black.png",
