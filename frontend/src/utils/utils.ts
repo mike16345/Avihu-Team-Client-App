@@ -57,7 +57,7 @@ export const buildPhotoUrls = (urls: string[]) => {
 };
 
 export const buildPhotoUrl = (url: string) => {
-  const cloudfrontUrl = process.env.EXPO_PUBLIC_CLOUDFRONT_URL;
+  const cloudfrontUrl = process.env.EXPO_PUBLIC_CLOUDFRONT_URL || process.env.CLOUDFRONT_URL;
 
   return `${cloudfrontUrl}/images/${url}`;
 };

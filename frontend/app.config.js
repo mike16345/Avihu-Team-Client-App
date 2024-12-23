@@ -14,7 +14,7 @@ export default ({ config }) => ({
   },
   ios: {
     supportsTablet: true,
-    bundleIdentifier: "com.avihuteam.avihuteam", // Added bundleIdentifier
+    bundleIdentifier: "com.avihuteam.test",
     splash: {
       image: "./assets/avihu/avihu-logo-black.png",
       backgroundColor: "#000000",
@@ -38,6 +38,7 @@ export default ({ config }) => ({
     API_URL: process.env.API_URL,
     API_TOKEN: process.env.API_KEY,
     TRAINER_PHONE_NUMBER: process.env.TRAINER_PHONE_NUMBER,
+    CLOUDFRONT_URL: process.env.CLOUDFRONT_URL,
   },
   owner: "avihuteam",
   runtimeVersion: "1.0.0",
