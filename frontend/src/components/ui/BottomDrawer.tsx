@@ -94,7 +94,7 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
           styles.drawerContainer,
           colors.background,
           {
-            borderWidth: 1,
+            borderWidth: 2,
             borderBottomWidth: 0,
             height: heightVariant === `fixed` ? height * 0.6 : `auto`,
           },
