@@ -1,3 +1,4 @@
+import Constants from "expo-constants";
 import Toast, { ToastType } from "react-native-toast-message";
 
 export const testEmail = (email: string) => {
@@ -57,7 +58,10 @@ export const buildPhotoUrls = (urls: string[]) => {
 };
 
 export const buildPhotoUrl = (url: string) => {
-  const cloudfrontUrl = process.env.EXPO_PUBLIC_CLOUDFRONT_URL || process.env.CLOUDFRONT_URL;
+  const isDev = !!process.env.DEV_MODE || !!Constants?.expoConfig?.extra?.DEV_MODE;
+  const cloudfrontUrl = isDev
+    ? process.env.EXPO_PUBLIC_CLOUDFRONT_URL
+    : Constants?.expoConfig?.extra?.CLOUDFRONT_URL;
 
   return `${cloudfrontUrl}/images/${url}`;
 };

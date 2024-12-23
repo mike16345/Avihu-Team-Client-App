@@ -127,7 +127,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
               value={value}
               items={plans}
               style={[colors.backgroundSecondaryContainer, { zIndex: 100 }]}
-              listItemContainerStyle={colors.backgroundSecondaryContainer}
+              listItemContainerStyle={[colors.backgroundSecondaryContainer, { zIndex: 100 }]}
               theme="DARK"
               setOpen={setOpen}
               setValue={setValue}
@@ -193,7 +193,6 @@ const styles = StyleSheet.create({
     height: 250,
   },
   container: {
-    zIndex: 10,
     width: "100%",
     alignItems: "flex-end",
   },
@@ -204,7 +203,6 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   workoutContainer: {
-    zIndex: 1,
     gap: 12,
   },
   muscleGroupText: {

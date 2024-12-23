@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   BackHandler,
 } from "react-native";
-import { Colors } from "@/constants/Colors";
 import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import useStyles from "@/styles/useGlobalStyles";
