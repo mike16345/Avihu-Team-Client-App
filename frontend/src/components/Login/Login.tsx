@@ -229,7 +229,7 @@ export default function Login({ onLogin }: ILoginProps) {
                 left: 0,
                 zIndex: 10,
                 opacity: 0.7,
-                height: height,
+                height: height + 100,
                 width: width,
               },
             ]}
