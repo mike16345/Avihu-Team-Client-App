@@ -82,7 +82,6 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       itemHeight,
       activeItemColor,
       inactiveItemColor,
-      activeItemBackgroundStyle,
     },
     {
       data: decimalWeightOptions,
@@ -94,7 +93,6 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       itemHeight,
       activeItemColor,
       inactiveItemColor,
-      activeItemBackgroundStyle,
       label: label,
     },
   ];
