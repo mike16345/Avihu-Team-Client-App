@@ -28,7 +28,9 @@ interface RightDrawerProps {
 const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) => {
   const { colors } = useStyles();
   const slideAnim = useRef(new Animated.Value(width)).current; // Start off-screen to the right
-  const [isVisible, setIsVisible] = useState(open); // Manage modal visibility
+
+  const [isVisible, setIsVisible] = useState(open);
+
   const activePageIndex = useNavigationState((state) => {
     const index = state?.routes[0].state?.index;
     const isRecordSet = state?.routes[0].state?.routes[0].state?.index == 1;
@@ -115,8 +117,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0, // Align to the right side of the screen
     width: width * 0.8, // Set the drawer width
-    borderTopLeftRadius: 20,
-    borderBottomLeftRadius: 20,
     shadowColor: "#000",
     shadowOffset: { width: -2, height: 0 }, // Adjust shadow direction
     shadowOpacity: 0.8,
@@ -125,8 +125,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff", // Ensure background color is set
   },
   drawerContent: {
-    flex: 1,
-    padding: 20,
     justifyContent: "center",
   },
 });

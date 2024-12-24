@@ -26,9 +26,8 @@ const UserDrawer = () => {
       open={openUserDrawer}
       onClose={() => setOpenUserDrawer(false)}
       children={
-        <ScrollView
-          style={[layout.sizeFull, spacing.pdHorizontalSm, spacing.pdStatusBar]}
-          contentContainerStyle={[layout.justifyBetween, spacing.gapXxl, spacing.pdBottomBar]}
+        <View
+          style={[layout.sizeFull, spacing.pdHorizontalMd, spacing.pdStatusBar, spacing.gapDefault]}
         >
           <Text style={[text.textRight, text.textBold, colors.textOnBackground, fonts.lg]}>
             פרטי משתמש
@@ -49,7 +48,7 @@ const UserDrawer = () => {
           >
             התנתק
           </Button>
-        </ScrollView>
+        </View>
       }
     />
   );

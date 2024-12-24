@@ -124,7 +124,15 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   return (
     <>
       {isSetUploading && <Loader variant="Screen" />}
-      <View style={[layout.sizeFull, layout.flex1, spacing.pdBottomBar]}>
+      <View
+        style={[
+          layout.sizeFull,
+          layout.flex1,
+          spacing.gapLg,
+          spacing.pdBottomBar,
+          colors.background,
+        ]}
+      >
         {exercise.linkToVideo && (
           <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
         )}

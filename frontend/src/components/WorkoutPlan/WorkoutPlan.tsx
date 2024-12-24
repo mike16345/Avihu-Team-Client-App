@@ -118,7 +118,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const Header = () => (
     <>
       <ImageBackground source={logoBlack} style={{ height: Dimensions.get("screen").height / 4 }} />
-      <View style={[styles.container, spacing.gapLg, colors.background]}>
+      <View style={[spacing.gapLg, spacing.pdHorizontalDefault, colors.background]}>
         {value && plans && (
           <>
             <DropDownPicker
