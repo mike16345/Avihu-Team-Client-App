@@ -2,7 +2,7 @@ import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
 export const useNotification = () => {
-  const now = new Date();
+  /*  const now = new Date();
   const triggerTime = new Date();
   triggerTime.setHours(8, 0, 0, 0);
 
@@ -10,10 +10,10 @@ export const useNotification = () => {
     triggerTime.setDate(triggerTime.getDate() + 1);
   }
 
-  const triggerInSeconds = Math.round((triggerTime.getTime() - now.getTime()) / 1000);
+  const triggerInSeconds = Math.round((triggerTime.getTime() - now.getTime()) / 1000); */
 
   const androidTrigger = {
-    seconds: triggerInSeconds,
+    seconds: 10, //triggerInSeconds,
     repeats: true,
   };
 
