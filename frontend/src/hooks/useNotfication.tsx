@@ -1,6 +1,29 @@
 import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
 
 export const useNotification = () => {
+  const now = new Date();
+  const triggerTime = new Date();
+  triggerTime.setHours(8, 0, 0, 0);
+
+  if (now > triggerTime) {
+    triggerTime.setDate(triggerTime.getDate() + 1);
+  }
+
+  const triggerInSeconds = Math.round((triggerTime.getTime() - now.getTime()) / 1000);
+
+  const androidTrigger = {
+    seconds: triggerInSeconds,
+    repeats: true,
+  };
+
+  const iosTrigger = {
+    hour: 8,
+    minute: 0,
+    timezone: `Asia/Jerusalem`,
+    repeats: true,
+  };
+
   // Set the global notification handler
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -26,15 +49,10 @@ export const useNotification = () => {
     try {
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: "שקילה יומית",
+          title: "Avihu Team",
           body: "לא לשכוח לשלוח את השקילה היומית שלכם!",
         },
-        trigger: {
-          hour: 9, // Set the desired time (9:00 AM here)
-          minute: 0,
-          timezone: `Asia/Jerusalem`,
-          repeats: true,
-        },
+        trigger: Platform.OS == `ios` ? iosTrigger : androidTrigger,
       });
     } catch (error) {
       console.log(error);
