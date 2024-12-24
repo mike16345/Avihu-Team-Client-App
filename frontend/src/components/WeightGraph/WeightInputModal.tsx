@@ -77,6 +77,7 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
             maxWeight={currentWeight + 150}
             stepSize={1}
             height={height / 3.8}
+            label='ק"ג'
             itemHeight={40}
             selectedWeight={weight}
           />

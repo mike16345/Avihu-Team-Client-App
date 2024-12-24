@@ -220,6 +220,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   decimalRange={10}
                   maxWeight={200}
                   stepSize={1}
+                  label=""
                   height={height * 0.08}
                   itemHeight={35}
                   selectedWeight={recordedSet.weight}

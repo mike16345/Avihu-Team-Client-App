@@ -115,10 +115,10 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   if (isError && error.response.status)
     return <ErrorScreen error={error.response.data.message || ``} />;
 
-  const renderHeader = () => (
+  const Header = () => (
     <>
       <ImageBackground source={logoBlack} style={{ height: Dimensions.get("screen").height / 4 }} />
-      <View style={[styles.container, spacing.gapLg, spacing.pdDefault, colors.background]}>
+      <View style={[styles.container, spacing.gapLg, colors.background]}>
         {value && plans && (
           <>
             <DropDownPicker
@@ -126,8 +126,8 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
               open={open}
               value={value}
               items={plans}
-              style={[colors.backgroundSecondaryContainer, { zIndex: 100 }]}
-              listItemContainerStyle={[colors.backgroundSecondaryContainer, { zIndex: 100 }]}
+              style={[colors.backgroundSecondaryContainer]}
+              listItemContainerStyle={[colors.backgroundSecondaryContainer]}
               theme="DARK"
               setOpen={setOpen}
               setValue={setValue}
@@ -136,11 +136,8 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
               onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
             />
 
-            {data?.tips && data?.tips?.length > 0 && (
-              <TouchableOpacity
-                style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
-                onPress={() => setOpenTips(true)}
-              >
+            {data?.tips && data.tips.length > 0 && (
+              <TouchableOpacity onPress={() => setOpenTips(true)}>
                 <Text style={[styles.tipsText, colors.textPrimary]}>דגשים</Text>
               </TouchableOpacity>
             )}
@@ -151,37 +148,43 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   );
 
   return (
-    <FlatList
-      data={currentWorkoutPlan?.muscleGroups || []}
-      ListEmptyComponent={() => <WorkoutPlanSkeleton />}
-      keyExtractor={(item) => item.muscleGroup}
-      style={colors.background}
-      ListHeaderComponent={renderHeader}
-      refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
-      }
-      renderItem={({ item }) => (
-        <View style={[spacing.pdHorizontalSm]}>
-          <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>{item.muscleGroup}</Text>
-          <View style={[spacing.gapLg]}>
-            {item.exercises.map((exercise, index) => (
-              <ExerciseContainer
-                key={currentWorkoutPlan?.planName + "-" + index}
-                plan={currentWorkoutPlan?.planName || ""}
-                muscleGroup={item.muscleGroup}
-                exercise={exercise}
-                session={currentWorkoutSession}
-                updateSession={handleUpdateSession}
-              />
-            ))}
+    <>
+      <View style={{ zIndex: 100 }}>
+        <Header />
+      </View>
+      <FlatList
+        data={currentWorkoutPlan?.muscleGroups || []}
+        ListEmptyComponent={() => <WorkoutPlanSkeleton />}
+        keyExtractor={(item) => item.muscleGroup}
+        style={colors.background}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+        }
+        renderItem={({ item }) => (
+          <View style={[spacing.pdHorizontalSm]}>
+            <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>
+              {item.muscleGroup}
+            </Text>
+            <View style={[spacing.gapLg]}>
+              {item.exercises.map((exercise, index) => (
+                <ExerciseContainer
+                  key={currentWorkoutPlan?.planName + "-" + index}
+                  plan={currentWorkoutPlan?.planName || ""}
+                  muscleGroup={item.muscleGroup}
+                  exercise={exercise}
+                  session={currentWorkoutSession}
+                  updateSession={handleUpdateSession}
+                />
+              ))}
+            </View>
           </View>
-        </View>
-      )}
-      ListFooterComponent={
-        <WorkoutTips tips={data?.tips} openTips={openTips} setOpenTips={setOpenTips} />
-      }
-      contentContainerStyle={styles.workoutContainer}
-    />
+        )}
+        ListFooterComponent={
+          <WorkoutTips tips={data?.tips} openTips={openTips} setOpenTips={setOpenTips} />
+        }
+        contentContainerStyle={styles.workoutContainer}
+      />
+    </>
   );
 };
 

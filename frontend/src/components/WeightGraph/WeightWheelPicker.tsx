@@ -15,6 +15,7 @@ interface WeightWheelPickerProps {
   itemHeight?: number;
   activeItemColor: string;
   inactiveItemColor: string;
+  label?: string;
 }
 
 const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
@@ -23,6 +24,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
   stepSize = 1,
   decimalStepSize = 1,
   decimalRange = 100,
+  label = "",
   showZeroDecimal = true,
   selectedWeight,
   onValueChange,
@@ -91,6 +93,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       itemHeight,
       activeItemColor,
       inactiveItemColor,
+      label: label,
     },
   ];
 
