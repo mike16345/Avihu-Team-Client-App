@@ -137,15 +137,10 @@ const ForgotPassword: FC<IForgotPassword> = ({
     });
   }, []);
 
-  if (isLoading)
-    return (
-      <View style={[spacing.pdLg]}>
-        <Loader />
-      </View>
-    );
+  if (isLoading) return <Loader />;
 
   return (
-    <View style={[]}>
+    <View>
       {!showOtpInput && (
         <>
           <Button
@@ -216,7 +211,7 @@ const ForgotPassword: FC<IForgotPassword> = ({
             textColor={colors.textOnBackground.color}
             onPress={handleConfirmPasswordChange}
           >
-            שנה סיסמה
+            צור סיסמה
           </Button>
         </Animated.View>
       )}

@@ -10,6 +10,6 @@ const useHideTabBarOnScroll = () => {
   };
 
   return { handleScroll };
-};
+}; 
 
 export default useHideTabBarOnScroll;

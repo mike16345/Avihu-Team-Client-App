@@ -15,6 +15,7 @@ interface WeightWheelPickerProps {
   itemHeight?: number;
   activeItemColor: string;
   inactiveItemColor: string;
+  label?: string;
 }
 
 const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
@@ -23,6 +24,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
   stepSize = 1,
   decimalStepSize = 1,
   decimalRange = 100,
+  label = "",
   showZeroDecimal = true,
   selectedWeight,
   onValueChange,
@@ -31,10 +33,11 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
   activeItemColor,
   inactiveItemColor,
 }) => {
-  const dividend = showZeroDecimal ? 100 : 10;
+  const dividend = 10;
   const wholePart = Math.floor(selectedWeight);
+
   const decimalPart = showZeroDecimal
-    ? Math.round((selectedWeight - wholePart) * dividend)
+    ? selectedWeight - wholePart
     : (selectedWeight - wholePart) * dividend;
 
   const generateWholeWeightOptions = (): WheelPickerOption[] => {
@@ -52,7 +55,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
 
     for (let decimal = 0; decimal < decimalRange; decimal += decimalStepSize) {
       options.push({
-        value: decimal < 10 && showZeroDecimal ? `0${decimal}` : `${decimal}`,
+        value: decimal < 10 && showZeroDecimal ? `.0${decimal}` : `.${decimal}`,
         label: `.${decimal < 10 && showZeroDecimal ? `0${decimal}` : `${decimal}`}`,
       });
     }
@@ -64,7 +67,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
 
   const handleValueChange = (values: any[]) => {
     const wholeValue = values[0];
-    const decimalValue = showZeroDecimal ? Number(values[1]) / 100 : Number(values[1]) / 10;
+    const decimalValue = showZeroDecimal ? Number(values[1]) : Number(values[1]) / 10;
 
     onValueChange(wholeValue + decimalValue);
   };
@@ -91,6 +94,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       itemHeight,
       activeItemColor,
       inactiveItemColor,
+      label: label,
     },
   ];
 

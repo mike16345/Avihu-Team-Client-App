@@ -18,7 +18,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   );
   const flatListRef = useRef<FlatList>(null);
 
-  const handleItemPress = (index: number) => {
+  /*  const handleItemPress = (index: number) => {
     flatListRef.current?.scrollToOffset({
       offset: index * itemHeight,
       animated: true,
@@ -26,18 +26,19 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 
     setSelectedIndex(index);
     onValueChange(data[index].value);
-  };
+  }; */
 
   const handleScroll = (event: any) => {
     const { contentOffset } = event.nativeEvent;
-    const index = Math.round(contentOffset.y / itemHeight);
+    const index = returnIndex(contentOffset.y);
 
     setSelectedIndex(index);
+    onValueChange(data[index].value);
   };
 
   const handleScrollEnd = (event: any) => {
     const { contentOffset } = event.nativeEvent;
-    const index = Math.round(contentOffset.y / itemHeight);
+    const index = returnIndex(contentOffset.y);
 
     flatListRef.current?.scrollToOffset({
       offset: index * itemHeight,
@@ -46,6 +47,14 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 
     onValueChange(data[index].value);
     setSelectedIndex(selectedIndex);
+  };
+
+  const returnIndex = (contentYOffset: any) => {
+    let index = Math.round(contentYOffset / itemHeight);
+
+    index = index >= data.length - 1 ? data.length - 1 : index < 0 ? 0 : index;
+
+    return index;
   };
 
   useEffect(() => {
@@ -72,9 +81,9 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
               style={[
                 styles.item,
                 index === selectedIndex ? [styles.selectedItem] : null,
-                { height: itemHeight },
+                { height: itemHeight, paddingHorizontal: 20 },
               ]}
-              onPress={() => handleItemPress(index)}
+              //onPress={() => handleItemPress(index)}
             >
               <Text
                 style={[

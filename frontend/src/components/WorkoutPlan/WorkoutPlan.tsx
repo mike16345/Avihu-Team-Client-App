@@ -1,4 +1,5 @@
 import {
+  Animated,
   Dimensions,
   FlatList,
   ImageBackground,
@@ -27,6 +28,8 @@ import { Text } from "../ui/Text";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import { useQuery } from "@tanstack/react-query";
 import { ONE_DAY, WORKOUT_PLAN_KEY } from "@/constants/reactQuery";
+import useSlideInAnimations from "@/styles/useSlideInAnimations";
+import useSlideFadeIn from "@/styles/useSlideFadeIn";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
@@ -46,6 +49,25 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
   const { getSession } = useSessionsApi();
   const { isRefreshing, refresh } = usePullDownToRefresh();
+  const {
+    slideInRightDelay0,
+    slideInRightDelay100,
+    slideInRightDelay200,
+    slideInRightDelay300,
+    slideInRightDelay400,
+    slideInBottomDelay500,
+    slideInBottomDelay600,
+  } = useSlideInAnimations();
+
+  const slideAnimations = [
+    slideInRightDelay0,
+    slideInRightDelay100,
+    slideInRightDelay200,
+    slideInRightDelay300,
+    slideInRightDelay400,
+    slideInBottomDelay500,
+    slideInBottomDelay600,
+  ];
 
   const { data, isError, error, refetch } = useQuery({
     queryFn: () => getWorkoutPlanByUserId(currentUser?._id || ``),
@@ -115,10 +137,10 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   if (isError && error.response.status)
     return <ErrorScreen error={error.response.data.message || ``} />;
 
-  const renderHeader = () => (
+  const Header = () => (
     <>
       <ImageBackground source={logoBlack} style={{ height: Dimensions.get("screen").height / 4 }} />
-      <View style={[styles.container, spacing.gapLg, spacing.pdDefault]}>
+      <View style={[spacing.gapLg, spacing.pdHorizontalDefault, colors.background]}>
         {value && plans && (
           <>
             <DropDownPicker
@@ -126,8 +148,8 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
               open={open}
               value={value}
               items={plans}
-              style={colors.backgroundSecondaryContainer}
-              listItemContainerStyle={colors.backgroundSecondaryContainer}
+              style={[colors.backgroundSecondaryContainer]}
+              listItemContainerStyle={[colors.backgroundSecondaryContainer]}
               theme="DARK"
               setOpen={setOpen}
               setValue={setValue}
@@ -136,11 +158,8 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
               onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
             />
 
-            {data?.tips && (
-              <TouchableOpacity
-                style={{ display: "flex", flexDirection: "row-reverse", width: 60 }}
-                onPress={() => setOpenTips(true)}
-              >
+            {data?.tips && data.tips.length > 0 && (
+              <TouchableOpacity onPress={() => setOpenTips(true)}>
                 <Text style={[styles.tipsText, colors.textPrimary]}>דגשים</Text>
               </TouchableOpacity>
             )}
@@ -151,36 +170,43 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   );
 
   return (
-    <FlatList
-      data={currentWorkoutPlan?.muscleGroups || []}
-      ListEmptyComponent={() => <WorkoutPlanSkeleton />}
-      keyExtractor={(item) => item.muscleGroup}
-      ListHeaderComponent={renderHeader}
-      refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
-      }
-      renderItem={({ item }) => (
-        <View style={[spacing.pdHorizontalSm]}>
-          <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>{item.muscleGroup}</Text>
-          <View style={[spacing.gapLg]}>
-            {item.exercises.map((exercise, index) => (
-              <ExerciseContainer
-                key={currentWorkoutPlan?.planName + "-" + index}
-                plan={currentWorkoutPlan?.planName || ""}
-                muscleGroup={item.muscleGroup}
-                exercise={exercise}
-                session={currentWorkoutSession}
-                updateSession={handleUpdateSession}
-              />
-            ))}
-          </View>
-        </View>
-      )}
-      ListFooterComponent={
-        <WorkoutTips tips={data?.tips} openTips={openTips} setOpenTips={setOpenTips} />
-      }
-      contentContainerStyle={styles.workoutContainer}
-    />
+    <>
+      <View style={{ zIndex: 100 }}>
+        <Header />
+      </View>
+      <FlatList
+        data={currentWorkoutPlan?.muscleGroups || []}
+        ListEmptyComponent={() => <WorkoutPlanSkeleton />}
+        keyExtractor={(item) => item.muscleGroup}
+        style={colors.background}
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+        }
+        renderItem={({ item, index }) => (
+          <Animated.View style={[spacing.pdHorizontalSm, slideAnimations[index + 1]]}>
+            <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>
+              {item.muscleGroup}
+            </Text>
+            <View style={[spacing.gapLg]}>
+              {item.exercises.map((exercise, index) => (
+                <ExerciseContainer
+                  key={currentWorkoutPlan?.planName + "-" + index}
+                  plan={currentWorkoutPlan?.planName || ""}
+                  muscleGroup={item.muscleGroup}
+                  exercise={exercise}
+                  session={currentWorkoutSession}
+                  updateSession={handleUpdateSession}
+                />
+              ))}
+            </View>
+          </Animated.View>
+        )}
+        ListFooterComponent={
+          <WorkoutTips tips={data?.tips} openTips={openTips} setOpenTips={setOpenTips} />
+        }
+        contentContainerStyle={styles.workoutContainer}
+      />
+    </>
   );
 };
 
@@ -192,7 +218,6 @@ const styles = StyleSheet.create({
     height: 250,
   },
   container: {
-    zIndex: 10,
     width: "100%",
     alignItems: "flex-end",
   },
@@ -203,7 +228,6 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   workoutContainer: {
-    zIndex: 1,
     gap: 12,
   },
   muscleGroupText: {

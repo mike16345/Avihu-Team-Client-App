@@ -64,11 +64,12 @@ export default function Login({ onLogin }: ILoginProps) {
   const [isShowingOtpInputs, setIsShowingOtpInputs] = useState(false);
   const [showConfirmButton, setShowConfirmButton] = useState(true);
 
-  const showAlert = (type: ToastType, message: string) => {
+  const showAlert = (type: ToastType, message: string, visibility?: number) => {
     Toast.show({
       text1: message,
       autoHide: true,
       type: type,
+      visibilityTime: visibility,
       swipeable: true,
       text1Style: { textAlign: `center` },
     });
@@ -98,7 +99,7 @@ export default function Login({ onLogin }: ILoginProps) {
       setLoading(true);
       checkEmailAccess(formattedEmail)
         .then((res) => {
-          showAlert("success", res.message);
+          showAlert("success", res.message, 1000);
           setEmailchecked(true);
           if (res.data.hasPassword) {
             setUserRegistered(true);
@@ -107,7 +108,7 @@ export default function Login({ onLogin }: ILoginProps) {
           }
         })
         .catch((err) => {
-          showAlert("error", err.response?.data.message);
+          showAlert("error", err.response?.data.message, 2000);
         })
         .finally(() => setLoading(false));
     }
@@ -117,7 +118,7 @@ export default function Login({ onLogin }: ILoginProps) {
       loginUser(formattedEmail, password)
         .then((res) => {
           if (!res.data.data.user.hasAccess) {
-            showAlert("error", NO_ACCESS);
+            showAlert("error", NO_ACCESS, 2000);
             setEmailchecked(false);
             return;
           }
@@ -229,7 +230,7 @@ export default function Login({ onLogin }: ILoginProps) {
                 left: 0,
                 zIndex: 10,
                 opacity: 0.7,
-                height: height,
+                height: height + 100,
                 width: width,
               },
             ]}

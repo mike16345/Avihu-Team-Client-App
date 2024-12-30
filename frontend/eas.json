@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": "13.4.2"
+    "version": "14.2.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -9,6 +10,7 @@
       "channel": "development",
       "environment": "development"
     },
+
     "preview": {
       "distribution": "internal",
       "channel": "preview"
@@ -18,7 +20,8 @@
         "buildType": "apk"
       },
       "environment": "production",
-      "channel": "production"
+      "channel": "production",
+      "autoIncrement": true
     }
   },
   "submit": {

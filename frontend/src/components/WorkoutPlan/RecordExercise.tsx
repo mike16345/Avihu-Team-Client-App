@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   BackHandler,
 } from "react-native";
-import { Colors } from "@/constants/Colors";
 import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import useStyles from "@/styles/useGlobalStyles";
@@ -83,7 +82,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     key: keyof IRecordedSet,
     value: IRecordedSet[K]
   ) => {
-    setRecordedSet({ ...recordedSet, [key]: value });
+    setRecordedSet((prev) => {
+      return { ...prev, [key]: value };
+    });
   };
 
   const handleSave = async () => {
@@ -123,7 +124,15 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   return (
     <>
       {isSetUploading && <Loader variant="Screen" />}
-      <View style={[layout.sizeFull, layout.flex1, spacing.pdBottomBar]}>
+      <View
+        style={[
+          layout.sizeFull,
+          layout.flex1,
+          spacing.gapLg,
+          spacing.pdBottomBar,
+          colors.background,
+        ]}
+      >
         {exercise.linkToVideo && (
           <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
         )}
@@ -173,9 +182,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
 
           <View style={[layout.flexRow, layout.justifyEvenly, spacing.pdVerticalSm]}>
             <View style={[layout.center, spacing.gapDefault]}>
-              <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
-                חזרות
-              </Text>
+              <Text style={[colors.textOnSecondaryContainer, fonts.default]}>חזרות</Text>
 
               <View
                 style={[
@@ -184,6 +191,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   spacing.pdHorizontalDefault,
                   spacing.pdVerticalMd,
                   common.rounded,
+                  { width: width * 0.25 },
                 ]}
               >
                 <WheelPicker
@@ -198,9 +206,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               </View>
             </View>
             <View style={[layout.center, spacing.gapDefault]}>
-              <Text style={[colors.textOnSecondaryContainer, fonts.default, styles.inputLabel]}>
-                משקל
-              </Text>
+              <Text style={[colors.textOnSecondaryContainer, fonts.default]}>משקל</Text>
 
               <View
                 style={[
@@ -209,6 +215,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   spacing.pdHorizontalDefault,
                   spacing.pdVerticalMd,
                   common.rounded,
+                  { width: width * 0.45 },
                 ]}
               >
                 <WeightWheelPicker
@@ -218,11 +225,12 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   activeItemColor={colors.textOnSurface.color}
                   inactiveItemColor={colors.textOnSurfaceDisabled.color}
                   minWeight={1}
-                  decimalStepSize={2.5}
-                  showZeroDecimal={false}
-                  decimalRange={10}
+                  decimalStepSize={25}
+                  showZeroDecimal={true}
+                  decimalRange={100}
                   maxWeight={200}
                   stepSize={1}
+                  label=""
                   height={height * 0.08}
                   itemHeight={35}
                   selectedWeight={recordedSet.weight}
@@ -284,40 +292,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
 export default RecordExercise;
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: "space-between",
-  },
-  inputLabel: {},
-  inputContainer: {
-    flexDirection: "row-reverse",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "100%",
-  },
-
-  saveBtn: {
-    backgroundColor: Colors.bgPrimary,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    paddingHorizontal: 4,
-    paddingVertical: 12,
-    borderRadius: 4,
-  },
-  saveText: {
-    color: Colors.bgSecondary,
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  errorText: {
-    color: "red",
-    fontSize: 12,
-    textAlign: "right",
-  },
-  textInput: {
-    textAlign: "right",
-  },
   setInfo: {
     fontSize: 14,
     fontWeight: "bold",

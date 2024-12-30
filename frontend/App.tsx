@@ -15,13 +15,14 @@ import {
   DarkTheme as CustomDarkTheme,
   ThemeProvider,
 } from "@/themes/useAppTheme";
-import { Appearance, View } from "react-native";
+import { Appearance } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import { useFonts } from "expo-font";
 import UserDrawer from "@/components/User/UserDrawer";
+import Update from "@/hooks/useUpdates";
 
 // import { I18nManager } from "react-native";
 // Enable RTL
@@ -53,6 +54,7 @@ export default function App() {
                 <StatusBar key={colorScheme} translucent style={"light"} />
                 <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} />
                 <UserDrawer />
+                <Update />
               </NavigationContainer>
             </QueryClientProvider>
           </SafeAreaProvider>

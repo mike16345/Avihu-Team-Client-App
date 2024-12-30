@@ -8,7 +8,14 @@ import {
   Dimensions,
   Modal,
   BackHandler,
+  ImageBackground,
 } from "react-native";
+import { useNavigationState } from "@react-navigation/native";
+import workoutPage from "@assets/avihu/workoutPage.jpeg";
+import dietScreen from "@assets/avihu/dietScreen.jpeg";
+import progressPage from "@assets/avihu/progressPage.jpeg";
+import recordExercisePage from "@assets/avihu/recordExercisePage.jpeg";
+import blogsPage from "@assets/avihu/blogsPage.jpeg";
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,7 +28,15 @@ interface RightDrawerProps {
 const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) => {
   const { colors } = useStyles();
   const slideAnim = useRef(new Animated.Value(width)).current; // Start off-screen to the right
-  const [isVisible, setIsVisible] = useState(open); // Manage modal visibility
+
+  const [isVisible, setIsVisible] = useState(open);
+
+  const activePageIndex = useNavigationState((state) => {
+    const index = state?.routes[0].state?.index;
+    const isRecordSet = state?.routes[0].state?.routes[0].state?.index == 1;
+    if (index !== 0 || !isRecordSet) return index;
+    return 4;
+  });
 
   useEffect(() => {
     if (open) {
@@ -56,8 +71,24 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) =>
   if (!isVisible) return null; // Avoid rendering the modal if not visible
 
   return (
-    <Modal transparent visible={isVisible} animationType="none">
-      <TouchableOpacity style={styles.overlay} onPress={onClose} activeOpacity={1} />
+    <Modal transparent visible={isVisible} animationType="fade">
+      <TouchableOpacity style={[styles.overlay]} onPress={onClose} activeOpacity={1}>
+        <ImageBackground
+          source={
+            activePageIndex == 0
+              ? workoutPage
+              : activePageIndex == 1
+              ? dietScreen
+              : activePageIndex == 2
+              ? progressPage
+              : activePageIndex == 3
+              ? blogsPage
+              : recordExercisePage
+          }
+          style={styles.overlay}
+          blurRadius={50}
+        />
+      </TouchableOpacity>
       <Animated.View
         style={[
           styles.drawerContainer,
@@ -86,8 +117,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0, // Align to the right side of the screen
     width: width * 0.8, // Set the drawer width
-    borderTopLeftRadius: 20,
-    borderBottomLeftRadius: 20,
     shadowColor: "#000",
     shadowOffset: { width: -2, height: 0 }, // Adjust shadow direction
     shadowOpacity: 0.8,
@@ -96,8 +125,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff", // Ensure background color is set
   },
   drawerContent: {
-    flex: 1,
-    padding: 20,
     justifyContent: "center",
   },
 });

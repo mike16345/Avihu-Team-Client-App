@@ -4,7 +4,7 @@ import { View } from "react-native";
 import SkeletonLoader from "./SkeletonLoader";
 
 const ProgressScreenSkeleton = () => {
-  const { layout, spacing } = useStyles();
+  const { layout, spacing, colors } = useStyles();
   return (
     <View
       style={[
@@ -14,6 +14,7 @@ const ProgressScreenSkeleton = () => {
         layout.widthFull,
         spacing.pdMd,
         spacing.gapMd,
+        colors.background,
       ]}
     >
       <SkeletonLoader height={260} />

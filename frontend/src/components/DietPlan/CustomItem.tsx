@@ -17,7 +17,7 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
     <View
       style={[
         layout.flexDirectionByPlatform,
-        colors.backgroundSecondary,
+        colors.backgroundSecondaryContainer,
         common.rounded,
         spacing.pdSm,
         layout.wrap,
@@ -26,7 +26,7 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
         spacing.gapDefault,
       ]}
     >
-      <View style={[colors.background, common.roundedSm, spacing.pdXs, layout.center]}>
+      <View style={[spacing.pdXs, layout.center]}>
         <NativeIcon
           size={25}
           style={colors.textPrimary}
@@ -46,7 +46,7 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
       >
         <Text
           style={[
-            colors.textOnSecondary,
+            colors.textOnBackground,
             text.textBold,
             layout.flex1,
             { textAlign: Platform.OS == `android` ? `right` : `left` },
@@ -55,8 +55,8 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
         >
           {name}
         </Text>
-        <View style={[colors.backgroundPrimary, { width: 3, height: 14 }]} />
-        <Text style={[colors.textOnSecondary, text.textBold, { flexShrink: 1 }]}>
+        <View style={[colors.backgroundSecondary, { width: 3, height: 14 }]} />
+        <Text style={[colors.textOnBackground, text.textBold, { flexShrink: 1 }]}>
           {quantity > 1 ? `${quantity} מנות` : `מנה אחת`}
         </Text>
       </View>
