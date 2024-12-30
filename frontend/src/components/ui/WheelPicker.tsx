@@ -33,6 +33,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     const index = returnIndex(contentOffset.y);
 
     setSelectedIndex(index);
+    onValueChange(data[index].value);
   };
 
   const handleScrollEnd = (event: any) => {
