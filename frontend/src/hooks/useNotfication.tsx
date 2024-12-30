@@ -14,7 +14,6 @@ export const useNotification = () => {
 
   const androidTrigger = {
     seconds: triggerInSeconds,
-    repeats: true,
   };
 
   const iosTrigger = {
@@ -62,7 +61,9 @@ export const useNotification = () => {
   // Check if notifications are already scheduled to prevent duplicates
   const initializeNotifications = async () => {
     try {
-      //Notifications.cancelAllScheduledNotificationsAsync();
+      if (Platform.OS == `android`) {
+        Notifications.cancelAllScheduledNotificationsAsync();
+      }
       const scheduledNotifications = await Notifications.getAllScheduledNotificationsAsync();
 
       if (scheduledNotifications.length === 0) {

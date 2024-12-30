@@ -191,6 +191,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   spacing.pdHorizontalDefault,
                   spacing.pdVerticalMd,
                   common.rounded,
+                  { width: width * 0.25 },
                 ]}
               >
                 <WheelPicker
@@ -214,6 +215,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   spacing.pdHorizontalDefault,
                   spacing.pdVerticalMd,
                   common.rounded,
+                  { width: width * 0.45 },
                 ]}
               >
                 <WeightWheelPicker
@@ -223,9 +225,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   activeItemColor={colors.textOnSurface.color}
                   inactiveItemColor={colors.textOnSurfaceDisabled.color}
                   minWeight={1}
-                  decimalStepSize={2.5}
-                  showZeroDecimal={false}
-                  decimalRange={10}
+                  decimalStepSize={25}
+                  showZeroDecimal={true}
+                  decimalRange={100}
                   maxWeight={200}
                   stepSize={1}
                   label=""

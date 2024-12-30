@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
+  Animated,
 } from "react-native";
 import RenderHTML from "react-native-render-html";
 import useStyles from "@/styles/useGlobalStyles";
@@ -19,6 +20,8 @@ import DateUtils from "@/utils/dateUtils";
 import { Text } from "@/components/ui/Text";
 import Loader from "@/components/ui/loaders/Loader";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
+import useSlideInAnimations from "@/styles/useSlideInAnimations";
+import NoDataScreen from "./NoDataScreen";
 
 interface PostCardProps {
   blog: IBlog;
@@ -67,6 +70,25 @@ const BlogScreen = () => {
   const { getPaginatedPosts } = useBlogsApi();
   const styles = useStyles();
   const { isRefreshing, refresh } = usePullDownToRefresh();
+  const {
+    slideInRightDelay0,
+    slideInRightDelay100,
+    slideInRightDelay200,
+    slideInRightDelay300,
+    slideInRightDelay400,
+    slideInBottomDelay500,
+    slideInBottomDelay600,
+  } = useSlideInAnimations();
+
+  const slideAnimations = [
+    slideInRightDelay0,
+    slideInRightDelay100,
+    slideInRightDelay200,
+    slideInRightDelay300,
+    slideInRightDelay400,
+    slideInBottomDelay500,
+    slideInBottomDelay600,
+  ];
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
     useInfiniteQuery(
@@ -86,28 +108,38 @@ const BlogScreen = () => {
   };
 
   if (isLoading || isFetchingNextPage) return <Loader />;
+  console.log(data?.pages);
 
   return (
-    <FlatList
-      data={data?.pages.flatMap((page) => page.results)} // Flatten paginated results
-      keyExtractor={(item) => item._id} // Use MongoDB `_id` as the key
-      renderItem={({ item }) => <PostCard blog={item} />}
-      onEndReached={loadMore}
-      onEndReachedThreshold={0.5}
-      refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
-      }
-      ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-      ListFooterComponent={
-        isFetchingNextPage ? <ActivityIndicator size="large" color="#FFF" /> : null
-      }
-      contentContainerStyle={[
-        styles.spacing.pdBottomBar,
-        styles.spacing.pdStatusBar,
-        styles.spacing.pdHorizontalDefault,
-        styles.colors.background,
-      ]}
-    />
+    <>
+      {data?.pages[0].totalResults == 0 && <NoDataScreen message="לא נמצאו פוסטים להצגה!" />}
+      {data?.pages[0].totalResults != 0 && (
+        <FlatList
+          data={data?.pages.flatMap((page) => page.results)} // Flatten paginated results
+          keyExtractor={(item) => item._id} // Use MongoDB `_id` as the key
+          renderItem={({ item, index }) => (
+            <Animated.View style={[slideAnimations[index + 1]]}>
+              <PostCard blog={item} />
+            </Animated.View>
+          )}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+          }
+          ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+          ListFooterComponent={
+            isFetchingNextPage ? <ActivityIndicator size="large" color="#FFF" /> : null
+          }
+          contentContainerStyle={[
+            styles.spacing.pdBottomBar,
+            styles.spacing.pdStatusBar,
+            styles.spacing.pdHorizontalDefault,
+            styles.colors.background,
+          ]}
+        />
+      )}
+    </>
   );
 };
 
