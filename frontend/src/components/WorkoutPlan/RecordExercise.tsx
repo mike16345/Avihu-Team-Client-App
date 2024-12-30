@@ -191,6 +191,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   spacing.pdHorizontalDefault,
                   spacing.pdVerticalMd,
                   common.rounded,
+                  { width: width * 0.25 },
                 ]}
               >
                 <WheelPicker
@@ -214,6 +215,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   spacing.pdHorizontalDefault,
                   spacing.pdVerticalMd,
                   common.rounded,
+                  { width: width * 0.45 },
                 ]}
               >
                 <WeightWheelPicker
