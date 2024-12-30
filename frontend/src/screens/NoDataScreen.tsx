@@ -2,7 +2,9 @@ import NativeIcon from "@/components/Icon/NativeIcon";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import { Linking, RefreshControl, ScrollView, View } from "react-native";
+import { Button } from "react-native-paper";
+import Constants from "expo-constants";
 
 interface NoDataScreenProps {
   variant?: "dietPlan" | "workoutPlan";
@@ -17,7 +19,11 @@ const NoDataScreen: React.FC<NoDataScreenProps> = ({
   refreshFunc,
   refreshing = false,
 }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, fonts, common, layout, spacing, text } = useStyles();
+  const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
+  const TRAINER_PHONE_NUMBER = isDevMode
+    ? process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER
+    : Constants?.expoConfig?.extra?.TRAINER_PHONE_NUMBER;
 
   return (
     <ScrollView
@@ -37,6 +43,22 @@ const NoDataScreen: React.FC<NoDataScreenProps> = ({
           ? `טרם בנו לך תפריט תזונה`
           : `טרם בנו לך תוכנית אימון`}
       </Text>
+      {variant && (
+        <Button
+          mode="contained"
+          onPress={() => Linking.openURL(`whatsapp://send?phone=${TRAINER_PHONE_NUMBER}`)}
+          style={[common.rounded, layout.center, spacing.mgDefault]}
+        >
+          <View style={[layout.flexRow, layout.center, spacing.gapDefault, spacing.pdXs]}>
+            <Text style={[text.textBold, colors.textOnBackground]}>צור קשר עם המאמן</Text>
+            <NativeIcon
+              library="FontAwesome"
+              name="whatsapp"
+              style={[fonts.lg, colors.textOnBackground]}
+            />
+          </View>
+        </Button>
+      )}
     </ScrollView>
   );
 };

@@ -21,6 +21,7 @@ import { Text } from "@/components/ui/Text";
 import Loader from "@/components/ui/loaders/Loader";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
+import NoDataScreen from "./NoDataScreen";
 
 interface PostCardProps {
   blog: IBlog;
@@ -107,32 +108,38 @@ const BlogScreen = () => {
   };
 
   if (isLoading || isFetchingNextPage) return <Loader />;
+  console.log(data?.pages);
 
   return (
-    <FlatList
-      data={data?.pages.flatMap((page) => page.results)} // Flatten paginated results
-      keyExtractor={(item) => item._id} // Use MongoDB `_id` as the key
-      renderItem={({ item, index }) => (
-        <Animated.View style={[slideAnimations[index + 1]]}>
-          <PostCard blog={item} />
-        </Animated.View>
+    <>
+      {data?.pages[0].totalResults == 0 && <NoDataScreen message="לא נמצאו פוסטים להצגה!" />}
+      {data?.pages[0].totalResults != 0 && (
+        <FlatList
+          data={data?.pages.flatMap((page) => page.results)} // Flatten paginated results
+          keyExtractor={(item) => item._id} // Use MongoDB `_id` as the key
+          renderItem={({ item, index }) => (
+            <Animated.View style={[slideAnimations[index + 1]]}>
+              <PostCard blog={item} />
+            </Animated.View>
+          )}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+          }
+          ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+          ListFooterComponent={
+            isFetchingNextPage ? <ActivityIndicator size="large" color="#FFF" /> : null
+          }
+          contentContainerStyle={[
+            styles.spacing.pdBottomBar,
+            styles.spacing.pdStatusBar,
+            styles.spacing.pdHorizontalDefault,
+            styles.colors.background,
+          ]}
+        />
       )}
-      onEndReached={loadMore}
-      onEndReachedThreshold={0.5}
-      refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
-      }
-      ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-      ListFooterComponent={
-        isFetchingNextPage ? <ActivityIndicator size="large" color="#FFF" /> : null
-      }
-      contentContainerStyle={[
-        styles.spacing.pdBottomBar,
-        styles.spacing.pdStatusBar,
-        styles.spacing.pdHorizontalDefault,
-        styles.colors.background,
-      ]}
-    />
+    </>
   );
 };
 
