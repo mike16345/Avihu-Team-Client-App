@@ -20,7 +20,10 @@ export const useWeighInPhotosApi = () => {
     try {
       const response = await fetch(url, {
         method: "POST",
-        headers: { "X-Api-Key": process.env.EXPO_PUBLIC_API_AUTH_TOKEN || Constants.API_TOKEN },
+        headers: {
+          "X-Api-Key":
+            process.env.EXPO_PUBLIC_API_AUTH_TOKEN || Constants.expoConfig?.extra?.API_TOKEN,
+        },
       });
       const { data } = await response.json();
       return data;

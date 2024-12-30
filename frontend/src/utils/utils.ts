@@ -58,7 +58,11 @@ export const buildPhotoUrls = (urls: string[]) => {
 };
 
 export const buildPhotoUrl = (url: string) => {
-  const isDev = !!process.env.DEV_MODE || !!Constants?.expoConfig?.extra?.DEV_MODE;
+  const isDev =
+    !!process.env.DEV_MODE ||
+    process.env.EXPO_PUBLIC_MODE == "development" ||
+    !!Constants?.expoConfig?.extra?.DEV_MODE;
+    
   const cloudfrontUrl = isDev
     ? process.env.EXPO_PUBLIC_CLOUDFRONT_URL
     : Constants?.expoConfig?.extra?.CLOUDFRONT_URL;
