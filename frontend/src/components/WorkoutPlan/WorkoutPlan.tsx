@@ -1,4 +1,5 @@
 import {
+  Animated,
   Dimensions,
   FlatList,
   ImageBackground,
@@ -27,6 +28,8 @@ import { Text } from "../ui/Text";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import { useQuery } from "@tanstack/react-query";
 import { ONE_DAY, WORKOUT_PLAN_KEY } from "@/constants/reactQuery";
+import useSlideInAnimations from "@/styles/useSlideInAnimations";
+import useSlideFadeIn from "@/styles/useSlideFadeIn";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
@@ -46,6 +49,25 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
   const { getSession } = useSessionsApi();
   const { isRefreshing, refresh } = usePullDownToRefresh();
+  const {
+    slideInRightDelay0,
+    slideInRightDelay100,
+    slideInRightDelay200,
+    slideInRightDelay300,
+    slideInRightDelay400,
+    slideInBottomDelay500,
+    slideInBottomDelay600,
+  } = useSlideInAnimations();
+
+  const slideAnimations = [
+    slideInRightDelay0,
+    slideInRightDelay100,
+    slideInRightDelay200,
+    slideInRightDelay300,
+    slideInRightDelay400,
+    slideInBottomDelay500,
+    slideInBottomDelay600,
+  ];
 
   const { data, isError, error, refetch } = useQuery({
     queryFn: () => getWorkoutPlanByUserId(currentUser?._id || ``),
@@ -160,8 +182,8 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
         refreshControl={
           <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
         }
-        renderItem={({ item }) => (
-          <View style={[spacing.pdHorizontalSm]}>
+        renderItem={({ item, index }) => (
+          <Animated.View style={[spacing.pdHorizontalSm, slideAnimations[index + 1]]}>
             <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>
               {item.muscleGroup}
             </Text>
@@ -177,7 +199,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
                 />
               ))}
             </View>
-          </View>
+          </Animated.View>
         )}
         ListFooterComponent={
           <WorkoutTips tips={data?.tips} openTips={openTips} setOpenTips={setOpenTips} />

@@ -211,7 +211,7 @@ const ForgotPassword: FC<IForgotPassword> = ({
             textColor={colors.textOnBackground.color}
             onPress={handleConfirmPasswordChange}
           >
-            שנה סיסמה
+            צור סיסמה
           </Button>
         </Animated.View>
       )}
