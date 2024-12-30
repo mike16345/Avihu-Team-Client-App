@@ -14,7 +14,6 @@ export const useNotification = () => {
 
   const androidTrigger = {
     seconds: triggerInSeconds,
-    repeats: true,
   };
 
   const iosTrigger = {
