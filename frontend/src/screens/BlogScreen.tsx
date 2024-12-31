@@ -108,12 +108,11 @@ const BlogScreen = () => {
   };
 
   if (isLoading || isFetchingNextPage) return <Loader />;
-  console.log(data?.pages);
 
   return (
     <>
       {data?.pages[0].totalResults == 0 && <NoDataScreen message="לא נמצאו פוסטים להצגה!" />}
-      {data?.pages[0].totalResults != 0 && (
+      {data?.pages[0].totalResults !== 0 && (
         <FlatList
           data={data?.pages.flatMap((page) => page.results)} // Flatten paginated results
           keyExtractor={(item) => item._id} // Use MongoDB `_id` as the key
@@ -136,6 +135,7 @@ const BlogScreen = () => {
             styles.spacing.pdStatusBar,
             styles.spacing.pdHorizontalDefault,
             styles.colors.background,
+            { minHeight: `100%` },
           ]}
         />
       )}
