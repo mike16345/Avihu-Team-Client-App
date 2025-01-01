@@ -28,7 +28,13 @@ const NoDataScreen: React.FC<NoDataScreenProps> = ({
   return (
     <ScrollView
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refreshFunc} />}
-      contentContainerStyle={[layout.flex1, layout.sizeFull, layout.center, spacing.gapDefault]}
+      contentContainerStyle={[
+        layout.flex1,
+        layout.sizeFull,
+        layout.center,
+        spacing.gapDefault,
+        colors.background,
+      ]}
     >
       <NativeIcon
         library="Ionicons"
