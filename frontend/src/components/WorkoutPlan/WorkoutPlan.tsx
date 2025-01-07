@@ -29,7 +29,6 @@ import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import { useQuery } from "@tanstack/react-query";
 import { ONE_DAY, WORKOUT_PLAN_KEY } from "@/constants/reactQuery";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
-import useSlideFadeIn from "@/styles/useSlideFadeIn";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps

@@ -4,6 +4,7 @@ import MyProgressScreen from "@/screens/MyProgressScreen";
 import { NavigatorTab } from "@/types/navigatorTypes";
 import WorkoutPlanStack from "../WorkoutPlanStack";
 import BlogScreen from "@/screens/BlogScreen";
+import MyWorkoutProgressionScreen from "@/screens/MyWorkoutProgressionScreen";
 
 const BottomScreenNavigatorTabs: NavigatorTab[] = [
   {
@@ -35,7 +36,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
   },
   {
     name: "MyProgressScreen",
-    component: MyProgressScreen,
+    component: MyWorkoutProgressionScreen,
     options: {
       tabBarLabel: "",
 
