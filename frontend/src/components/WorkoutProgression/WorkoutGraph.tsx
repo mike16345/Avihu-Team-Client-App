@@ -6,22 +6,29 @@ import useStyles from "@/styles/useGlobalStyles";
 import NativeIcon from "../Icon/NativeIcon";
 import useGraphTheme from "@/themes/useGraphTheme";
 import Divider from "../ui/Divider";
+import DateUtils from "@/utils/dateUtils";
+
+interface IGraphValues {
+  value: number;
+  date: string;
+}
 
 interface WorkoutGraphProps {
   label: string;
-  values: number[];
-  dates: string[];
+  graphValues: IGraphValues[];
 }
 
-const WorkoutGraph: React.FC<WorkoutGraphProps> = ({ label, values, dates }) => {
+const WorkoutGraph: React.FC<WorkoutGraphProps> = ({ label, graphValues }) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
-  const graphTheme = useGraphTheme([values.length]);
-  const { width, height } = useWindowDimensions();
+  const graphTheme = useGraphTheme([graphValues.length]);
+  const { width } = useWindowDimensions();
+  const data = graphValues.map((item) => item.value);
 
-  const percentage = (((values[values.length - 1] - values[0]) / values[0]) * 100).toFixed(2);
+  const percentage = (
+    ((graphValues[graphValues.length - 1].value - graphValues[0].value) / graphValues[0].value) *
+    100
+  ).toFixed(2);
   const isDeclining = !!(Number(percentage) < 0);
-
-  console.log(isDeclining);
 
   return (
     <View
@@ -58,10 +65,15 @@ const WorkoutGraph: React.FC<WorkoutGraphProps> = ({ label, values, dates }) => 
       <Divider thickness={1} color={colors.textOnBackground.color} style={{ opacity: 0.5 }} />
       <LineChart
         data={{
-          labels: dates,
+          labels: DateUtils.extractLabels({
+            items: graphValues,
+            range: `years`,
+            dateKey: "date",
+            n: 1,
+          }),
           datasets: [
             {
-              data: values,
+              data: data,
               color: (_: number) => colors.textPrimary.color,
             },
           ],
@@ -73,10 +85,9 @@ const WorkoutGraph: React.FC<WorkoutGraphProps> = ({ label, values, dates }) => 
           setSelectedWeight(value);
         }}
         chartConfig={graphTheme} */
-        verticalLabelRotation={30}
         chartConfig={graphTheme}
         width={width - 48}
-        height={280}
+        height={220}
         withInnerLines={false}
         withOuterLines={false}
         style={{
