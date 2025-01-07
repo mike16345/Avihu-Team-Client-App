@@ -36,7 +36,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
   },
   {
     name: "MyProgressScreen",
-    component: MyWorkoutProgressionScreen,
+    component: MyProgressScreen,
     options: {
       tabBarLabel: "",
 

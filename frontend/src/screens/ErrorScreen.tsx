@@ -4,7 +4,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import NativeIcon from "@/components/Icon/NativeIcon";
 import { Text } from "@/components/ui/Text";
 interface ErrorScreenProps {
-  error: any;
+  error?: any;
 }
 
 const ErrorScreen: React.FC<ErrorScreenProps> = ({ error }) => {
@@ -19,7 +19,7 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({ error }) => {
         style={[colors.textDanger]}
       />
       <Text style={[colors.textOnBackground, fonts.xl]}>אירעה שגיאה</Text>
-      <Text style={[colors.textOnBackground, fonts.xl]}>{error.message}</Text>
+      <Text style={[colors.textOnBackground, fonts.xl]}>{error.message || ``}</Text>
     </View>
   );
 };

@@ -10,9 +10,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
 import DropDownPicker, { ValueType } from "react-native-dropdown-picker";
+import ErrorScreen from "./ErrorScreen";
 
 const MyWorkoutProgressionScreen = () => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, layout, spacing, text } = useStyles();
   const { getRecordedSetsByUserId } = useRecordedSetsApi();
   const currentUserId = useUserStore((state) => state.currentUser?._id);
   const { isRefreshing, refresh } = usePullDownToRefresh();
@@ -92,6 +93,7 @@ const MyWorkoutProgressionScreen = () => {
   }, [data]);
 
   if (isLoading) return <Loader />;
+  if (isError) return <ErrorScreen />;
 
   return (
     <View style={[layout.sizeFull, colors.background, spacing.gapDefault, spacing.pdDefault]}>
@@ -117,7 +119,7 @@ const MyWorkoutProgressionScreen = () => {
             />
           ))}
           <ScrollView
-            contentContainerStyle={[spacing.gapDefault]}
+            contentContainerStyle={[spacing.gapDefault, spacing.pdBottomBar]}
             refreshControl={
               <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
             }
