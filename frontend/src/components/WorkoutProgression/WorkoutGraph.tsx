@@ -23,12 +23,13 @@ const WorkoutGraph: React.FC<WorkoutGraphProps> = ({ label, graphValues }) => {
   const graphTheme = useGraphTheme([graphValues.length]);
   const { width } = useWindowDimensions();
   const data = graphValues.map((item) => item.value);
+  const lastWorkoutValue = graphValues[graphValues.length - 1].value;
+  const firstWorkoutValue = graphValues[0].value;
 
-  const percentage = (
-    ((graphValues[graphValues.length - 1].value - graphValues[0].value) / graphValues[0].value) *
-    100
-  ).toFixed(2);
-  const isDeclining = !!(Number(percentage) < 0);
+  const percentage = (((lastWorkoutValue - firstWorkoutValue) / firstWorkoutValue) * 100).toFixed(
+    2
+  );
+  const isDeclining = Number(percentage) < 0;
 
   return (
     <View
@@ -40,13 +41,7 @@ const WorkoutGraph: React.FC<WorkoutGraphProps> = ({ label, graphValues }) => {
         spacing.gapDefault,
       ]}
     >
-      <View
-        style={[
-          Platform.OS == `android` ? layout.flexRow : layout.flexRowReverse,
-          layout.justifyBetween,
-          layout.itemsCenter,
-        ]}
-      >
+      <View style={[layout.flexRowReverse, layout.justifyBetween, layout.itemsCenter]}>
         <Text style={[text.textRight, colors.textOnBackground, text.textBold, spacing.pdDefault]}>
           {label}
         </Text>

@@ -6,7 +6,7 @@ import { useUserStore } from "@/store/userStore";
 import useStyles from "@/styles/useGlobalStyles";
 import { extractExercises } from "@/utils/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Animated, RefreshControl, ScrollView, View } from "react-native";
 import DropDownPicker, { ValueType } from "react-native-dropdown-picker";
 import ErrorScreen from "./ErrorScreen";
@@ -30,48 +30,72 @@ const MyWorkoutProgressionScreen = () => {
     queryKey: [RECORDED_SETS_BY_USER_KEY + currentUserId],
     staleTime: ONE_DAY,
     retry: 2,
+    onSuccess: (data) => {
+      setSelectedMuscleGroup(data[0]?.muscleGroup);
+      setSelectedExercise(extractExercises(data[0].recordedSets)[0]);
+    },
   });
 
   const [openMuscleGroupDropdown, setOpenMuscleGroupDropdown] = useState(false);
   const [openExerciseDropdown, setOpenExerciseDropdown] = useState(false);
-  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<ValueType | null>(null);
-  const [selectedExercise, setSelectedExercise] = useState<ValueType | null>(null);
+  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<ValueType | null>(
+    data ? data[0]?.muscleGroup : null
+  );
+  const [selectedExercise, setSelectedExercise] = useState<ValueType | null>(
+    data ? extractExercises(data[0].recordedSets)[0] : null
+  );
 
   const muscleGroupOptions = data?.map(({ muscleGroup }) => ({
     label: muscleGroup,
     value: muscleGroup,
   }));
 
-  const muscleGroupContainsExercise = data?.some(
-    (item) =>
-      item.muscleGroup === selectedMuscleGroup &&
-      Object.keys(item.recordedSets).includes(selectedExercise)
+  const muscleGroupContainsExercise = useMemo(
+    () =>
+      data?.some(
+        (item) =>
+          item.muscleGroup === selectedMuscleGroup &&
+          Object.keys(item.recordedSets).includes(selectedExercise)
+      ),
+    [selectedMuscleGroup, data, selectedExercise]
   );
 
-  const exerciseOptions = data
-    ?.filter((item) => item.muscleGroup === selectedMuscleGroup) // Filter by muscleGroup
-    .flatMap((item) => extractExercises(item.recordedSets))
-    .map((item) => ({ label: item, value: item }));
+  const exerciseOptions = useMemo(
+    () =>
+      data
+        ?.filter((item) => item.muscleGroup === selectedMuscleGroup) // Filter by muscleGroup
+        .flatMap((item) => extractExercises(item.recordedSets))
+        .map((item) => ({ label: item, value: item })),
+    [selectedMuscleGroup, data]
+  );
 
-  const repValues = data
-    ?.filter((item) => item.muscleGroup === selectedMuscleGroup)
-    .flatMap(
-      (item) =>
-        item.recordedSets[
-          muscleGroupContainsExercise ? selectedExercise : Object.keys(item.recordedSets)[0]
-        ]
-    )
-    .flatMap((item) => ({ value: item.repsDone, date: new Date(item.date).toDateString() }));
+  const repValues = useMemo(
+    () =>
+      data
+        ?.filter((item) => item.muscleGroup === selectedMuscleGroup)
+        .flatMap(
+          (item) =>
+            item.recordedSets[
+              muscleGroupContainsExercise ? selectedExercise : Object.keys(item.recordedSets)[0]
+            ]
+        )
+        .flatMap((item) => ({ value: item.repsDone, date: new Date(item.date).toDateString() })),
+    [data, muscleGroupContainsExercise, selectedExercise]
+  );
 
-  const weightValues = data
-    ?.filter((item) => item.muscleGroup === selectedMuscleGroup)
-    .flatMap(
-      (item) =>
-        item.recordedSets[
-          muscleGroupContainsExercise ? selectedExercise : Object.keys(item.recordedSets)[0]
-        ]
-    )
-    .flatMap((item) => ({ value: item.weight, date: new Date(item.date).toDateString() }));
+  const weightValues = useMemo(
+    () =>
+      data
+        ?.filter((item) => item.muscleGroup === selectedMuscleGroup)
+        .flatMap(
+          (item) =>
+            item.recordedSets[
+              muscleGroupContainsExercise ? selectedExercise : Object.keys(item.recordedSets)[0]
+            ]
+        )
+        .flatMap((item) => ({ value: item.weight, date: new Date(item.date).toDateString() })),
+    [data, muscleGroupContainsExercise, selectedExercise]
+  );
 
   const dropDownsArr = [
     {
@@ -91,13 +115,6 @@ const MyWorkoutProgressionScreen = () => {
       items: exerciseOptions,
     },
   ];
-
-  useEffect(() => {
-    if (!data) return;
-
-    setSelectedMuscleGroup(data[0]?.muscleGroup);
-    setSelectedExercise(extractExercises(data[0].recordedSets)[0]);
-  }, [data]);
 
   if (isLoading) return <WorkoutProgressScreenSkeleton />;
 

@@ -41,7 +41,8 @@ const WeeklyScoreCard: React.FC<WeeklyScoreCardProps> = ({ weights, range }) => 
 
   const isLosingWeight = lastWeighIn < firstWeighIn;
   const operator = weightLoss == `0.00` ? `` : isLosingWeight ? `-` : `+`;
-  const positiveProgress = determinePositiveProgression(isLosingWeight);
+  const isCutting = currentUserPlatType == "חיטוב";
+  const positiveProgress = isCutting ? isLosingWeight : !isLosingWeight;
 
   return (
     <WeightCard
