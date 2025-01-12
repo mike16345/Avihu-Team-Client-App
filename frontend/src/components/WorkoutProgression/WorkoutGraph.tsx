@@ -26,9 +26,7 @@ const WorkoutGraph: React.FC<WorkoutGraphProps> = ({ label, graphValues }) => {
   const lastWorkoutValue = graphValues[graphValues.length - 1].value;
   const firstWorkoutValue = graphValues[0].value;
 
-  const percentage = (((lastWorkoutValue - firstWorkoutValue) / firstWorkoutValue) * 100).toFixed(
-    2
-  );
+  const percentage = ((lastWorkoutValue - firstWorkoutValue) / firstWorkoutValue) * 100;
   const isDeclining = Number(percentage) < 0;
 
   return (
@@ -54,7 +52,7 @@ const WorkoutGraph: React.FC<WorkoutGraphProps> = ({ label, graphValues }) => {
               isDeclining ? colors.textDanger : colors.textSuccess,
             ]}
           >
-            {percentage}%
+            {percentage.toFixed(2)}%
           </Text>
           <NativeIcon
             library="MaterialIcons"
