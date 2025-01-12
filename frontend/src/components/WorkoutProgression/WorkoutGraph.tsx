@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform, useWindowDimensions, View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";

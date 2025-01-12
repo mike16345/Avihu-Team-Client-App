@@ -6,7 +6,7 @@ import { useUserStore } from "@/store/userStore";
 import useStyles from "@/styles/useGlobalStyles";
 import { extractExercises } from "@/utils/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Animated, RefreshControl, ScrollView, View } from "react-native";
 import DropDownPicker, { ValueType } from "react-native-dropdown-picker";
 import ErrorScreen from "./ErrorScreen";
