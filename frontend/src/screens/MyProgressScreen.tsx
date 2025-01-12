@@ -6,23 +6,31 @@ import MyWeightProgressScreen from "./MyWeightProgressScreen";
 import MyWorkoutProgressionScreen from "./MyWorkoutProgressionScreen";
 
 const MyProgressScreen = () => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, common, layout, spacing } = useStyles();
   const [selectedScreen, setSelectedScreen] = useState<string>(`weight`);
 
   return (
     <View style={[layout.sizeFull, layout.itemsCenter, spacing.pdVerticalMd, spacing.gapDefault]}>
       <SegmentedButtons
-        style={[{ width: `40%` }]}
+        style={[spacing.pdHorizontalXxl]}
         value={selectedScreen}
         onValueChange={(val) => setSelectedScreen(val)}
         buttons={[
           {
             value: "weight",
             label: "משקל",
+            style: [
+              common.rounded,
+              selectedScreen == `weight` ? colors.backgroundPrimary : colors.background,
+            ],
           },
           {
             value: "workout",
             label: "אימונים",
+            style: [
+              common.rounded,
+              selectedScreen == `workout` ? colors.backgroundPrimary : colors.background,
+            ],
           },
         ]}
       />

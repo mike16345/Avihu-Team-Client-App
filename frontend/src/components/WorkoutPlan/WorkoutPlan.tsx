@@ -134,7 +134,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       />
     );
   if (isError && error.response.status)
-    return <ErrorScreen error={error.response.data.message || ``} />;
+    return <ErrorScreen error={error.response.data.message || ``} refetchFunc={refetch} />;
 
   const Header = () => (
     <>

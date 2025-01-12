@@ -9,17 +9,25 @@ interface CardProps {
   value: string | number;
   unit: string;
   operator?: string;
+  isProgressing?: boolean;
 }
 
-const WeightCard: React.FC<CardProps> = ({ title, value, unit, operator }) => {
+const WeightCard: React.FC<CardProps> = ({ title, value, unit, operator, isProgressing }) => {
   const { text, fonts, layout, spacing, colors } = useStyles();
   const { weightCard } = useCardStyles();
+
+  const textColor =
+    isProgressing == undefined
+      ? colors.textOnBackground
+      : isProgressing
+      ? colors.textSuccess
+      : colors.textDanger;
 
   return (
     <View style={weightCard}>
       <Text style={[text.textBold, text.textRight, colors.textOnSecondaryContainer]}>{title}</Text>
       <View style={[layout.itemsCenter, layout.wrap, layout.flexRowReverse, spacing.gapSm]}>
-        <Text style={[colors.textOnSecondaryContainer, text.textBold, fonts.xl]}>
+        <Text style={[textColor, text.textBold, fonts.xl]}>
           {operator} {value}
         </Text>
         <Text style={[colors.textOnSecondaryContainer, fonts.default]}>{unit}</Text>

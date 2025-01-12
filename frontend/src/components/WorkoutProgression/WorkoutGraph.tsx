@@ -1,5 +1,5 @@
 import React from "react";
-import { useWindowDimensions, View } from "react-native";
+import { Platform, useWindowDimensions, View } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
@@ -40,7 +40,16 @@ const WorkoutGraph: React.FC<WorkoutGraphProps> = ({ label, graphValues }) => {
         spacing.gapDefault,
       ]}
     >
-      <View style={[layout.flexDirectionByPlatform, layout.justifyBetween, layout.itemsCenter]}>
+      <View
+        style={[
+          Platform.OS == `android` ? layout.flexRow : layout.flexRowReverse,
+          layout.justifyBetween,
+          layout.itemsCenter,
+        ]}
+      >
+        <Text style={[text.textRight, colors.textOnBackground, text.textBold, spacing.pdDefault]}>
+          {label}
+        </Text>
         <View style={[layout.flexRow, layout.center, spacing.pdDefault]}>
           <Text
             style={[
@@ -58,9 +67,6 @@ const WorkoutGraph: React.FC<WorkoutGraphProps> = ({ label, graphValues }) => {
             style={[fonts.xl, isDeclining ? colors.textDanger : colors.textSuccess]}
           />
         </View>
-        <Text style={[text.textRight, colors.textOnBackground, text.textBold, spacing.pdDefault]}>
-          {label}
-        </Text>
       </View>
       <Divider thickness={1} color={colors.textOnBackground.color} style={{ opacity: 0.5 }} />
       <LineChart
@@ -78,13 +84,6 @@ const WorkoutGraph: React.FC<WorkoutGraphProps> = ({ label, graphValues }) => {
             },
           ],
         }}
-        /* 
-        width={width - 20}
-        height={220}
-        onDataPointClick={({ value }) => {
-          setSelectedWeight(value);
-        }}
-        chartConfig={graphTheme} */
         chartConfig={graphTheme}
         width={width - 48}
         height={220}
