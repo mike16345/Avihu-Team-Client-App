@@ -62,7 +62,7 @@ export const buildPhotoUrl = (url: string) => {
     !!process.env.DEV_MODE ||
     process.env.EXPO_PUBLIC_MODE == "development" ||
     !!Constants?.expoConfig?.extra?.DEV_MODE;
-    
+
   const cloudfrontUrl = isDev
     ? process.env.EXPO_PUBLIC_CLOUDFRONT_URL
     : Constants?.expoConfig?.extra?.CLOUDFRONT_URL;
@@ -89,4 +89,10 @@ export const showAlert = (type: ToastType, message: string) => {
     type: type,
     swipeable: true,
   });
+};
+
+export const extractExercises = (exercises: any) => {
+  if (!exercises) return [];
+
+  return Object.keys(exercises);
 };

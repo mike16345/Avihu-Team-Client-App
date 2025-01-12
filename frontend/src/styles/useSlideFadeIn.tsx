@@ -10,7 +10,7 @@ const useSlideFadeIn = (direction: string, delay = 0) => {
     const startAnimation = () => {
       Animated.timing(animatedValue, {
         toValue: 1,
-        duration: 800,
+        duration: 400,
         delay: delay, // Set the delay here
         useNativeDriver: false,
       }).start();

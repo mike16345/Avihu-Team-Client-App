@@ -3,12 +3,14 @@ import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import NativeIcon from "@/components/Icon/NativeIcon";
 import { Text } from "@/components/ui/Text";
+import { Button } from "react-native-paper";
 interface ErrorScreenProps {
-  error: any;
+  error?: any;
+  refetchFunc?: () => void;
 }
 
-const ErrorScreen: React.FC<ErrorScreenProps> = ({ error }) => {
-  const { colors, fonts, layout, spacing } = useStyles();
+const ErrorScreen: React.FC<ErrorScreenProps> = ({ error, refetchFunc }) => {
+  const { colors, fonts, layout, spacing, common } = useStyles();
 
   return (
     <View style={[layout.flex1, layout.center, spacing.gapDefault]}>
@@ -19,7 +21,20 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({ error }) => {
         style={[colors.textDanger]}
       />
       <Text style={[colors.textOnBackground, fonts.xl]}>אירעה שגיאה</Text>
-      <Text style={[colors.textOnBackground, fonts.xl]}>{error.message}</Text>
+      {error && <Text style={[colors.textOnBackground, fonts.xl]}>{error.message}</Text>}
+      {refetchFunc && (
+        <Button
+          mode="contained"
+          onPress={refetchFunc}
+          icon={() => (
+            <NativeIcon library="AntDesign" name="reload1" style={colors.textOnBackground} />
+          )}
+          style={[common.rounded, spacing.mgVerticalDefault]}
+          textColor={colors.textOnBackground.color}
+        >
+          רענן
+        </Button>
+      )}
     </View>
   );
 };
