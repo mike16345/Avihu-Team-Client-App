@@ -1,5 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
-import React, { useState } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import { SegmentedButtons } from "react-native-paper";
 import MyWeightProgressScreen from "./MyWeightProgressScreen";
@@ -10,7 +10,15 @@ const MyProgressScreen = () => {
   const [selectedScreen, setSelectedScreen] = useState<string>(`weight`);
 
   return (
-    <View style={[layout.sizeFull, layout.itemsCenter, spacing.pdVerticalMd, spacing.gapDefault]}>
+    <View
+      style={[
+        layout.sizeFull,
+        colors.background,
+        layout.itemsCenter,
+        spacing.pdVerticalMd,
+        spacing.gapDefault,
+      ]}
+    >
       <SegmentedButtons
         style={[spacing.pdHorizontalXxl]}
         value={selectedScreen}
