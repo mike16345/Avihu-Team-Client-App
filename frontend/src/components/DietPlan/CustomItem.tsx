@@ -3,15 +3,22 @@ import { Platform, View } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
+import { ICustomItem } from "@/interfaces/DietPlan";
 
 interface CustomItemProps {
-  name: string;
-  quantity: number;
   foodGroup: string;
+  item: ICustomItem;
+  unit: string;
+  quantity: number;
 }
 
-const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) => {
+const CustomItem: React.FC<CustomItemProps> = ({ item, unit, quantity, foodGroup }) => {
   const { layout, spacing, colors, text, common } = useStyles();
+  const isGrams = unit == "grams";
+  const unitName = isGrams ? "גרם" : "כפות";
+  const totalQuantity = isGrams
+    ? item.oneServing.grams * quantity
+    : item.oneServing.spoons * quantity;
 
   return (
     <View
@@ -53,15 +60,15 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
           ]}
           numberOfLines={1}
         >
-          {name}
+          {item.name}
         </Text>
         <View style={[colors.backgroundSecondary, { width: 3, height: 14 }]} />
         <Text style={[colors.textOnBackground, text.textBold, { flexShrink: 1 }]}>
-          {quantity > 1 ? `${quantity} מנות` : `מנה אחת`}
+          {`${totalQuantity} ${unitName}`}
         </Text>
       </View>
     </View>
-  );
+  );  
 };
 
 export default CustomItem;

@@ -41,20 +41,25 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
         spacing.pdDefault,
       ]}
     >
-      {mealItems.map((mealItem, i) => (
-        <React.Fragment key={mealItem[1]._id + i}>
-          {mealItem[1].customItems && mealItem[1].customItems.length > 0 && (
-            <CustomInstructionsContainer
-              customInstructions={mealItem[1].customItems}
-              foodGroup={getName(mealItem[0])}
-            />
-          )}
+      {mealItems.map((mealItem, i) => {
+        console.log("mealItem", mealItem);
+        return (
+          <React.Fragment key={mealItem[1]._id + i}>
+            {mealItem[1].customItems && mealItem[1].customItems.length > 0 && (
+              <CustomInstructionsContainer
+                unit={mealItem[1].unit}
+                quantity={mealItem[1].quantity}
+                customInstructions={mealItem[1].customItems}
+                foodGroup={getName(mealItem[0])}
+              />
+            )}
 
-          {mealItem[1].quantity > 0 && mealItem[1].customItems.length == 0 && (
-            <MenuItemTicket foodGroup={getName(mealItem[0])} quantity={mealItem[1].quantity} />
-          )}
-        </React.Fragment>
-      ))}
+            {mealItem[1].quantity > 0 && mealItem[1].customItems.length == 0 && (
+              <MenuItemTicket foodGroup={getName(mealItem[0])} quantity={mealItem[1].quantity} />
+            )}
+          </React.Fragment>
+        );
+      })}
     </View>
   );
 };
