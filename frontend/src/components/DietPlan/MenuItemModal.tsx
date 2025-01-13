@@ -20,7 +20,7 @@ interface MenuItemModalProps {
 
 const MenuItemModal: React.FC<MenuItemModalProps> = ({ foodGroup, dismiss }) => {
   const { xl } = useFontSize();
-  const { colors, layout, spacing, text, fonts } = useStyles();
+  const { colors, layout, spacing, text } = useStyles();
   const { getMenuItems } = useMenuItemApi();
   const currentUser = useUserStore((store) => store.currentUser);
 

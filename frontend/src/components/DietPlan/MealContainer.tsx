@@ -42,7 +42,6 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
       ]}
     >
       {mealItems.map((mealItem, i) => {
-        console.log("mealItem", mealItem);
         return (
           <React.Fragment key={mealItem[1]._id + i}>
             {mealItem[1].customItems && mealItem[1].customItems.length > 0 && (

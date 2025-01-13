@@ -23,10 +23,14 @@ const MenuItem: React.FC<MenuItemProps> = ({ menuItem }) => {
           {menuItem.name}
         </Text>
       </View>
-      <View style={[layout.flexRow, layout.justifyBetween, spacing.gapSm, spacing.pdXs]}>
-        <Text style={[colors.textOnBackground, md]}>גרם: {menuItem.oneServing.grams}</Text>
+      <View style={[layout.flexRow, layout.justifyAround, spacing.gapSm, spacing.pdXs]}>
+        <Text style={[colors.textOnBackground, text.textRight, md]}>
+          גרם: {menuItem.oneServing.grams}
+        </Text>
         <View style={[colors.borderPrimary, { borderLeftWidth: 1 }]}></View>
-        <Text style={[colors.textOnBackground, md]}>כפות: {menuItem.oneServing.spoons}</Text>
+        <Text style={[colors.textOnBackground, text.textRight, md]}>
+          כפות: {menuItem.oneServing.spoons}
+        </Text>
       </View>
     </View>
   );
