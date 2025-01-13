@@ -40,7 +40,7 @@ const ExtraInfoContainer: React.FC<ExtraInfoContainerProps> = ({
         )}
 
         {fatsPerDay && (
-          <AmountContainer title="כמות שומנים ליום" variant="מנות" amount={fatsPerDay} />
+          <AmountContainer title="מנות שומן יומי" variant="מנות" amount={fatsPerDay} />
         )}
 
         {veggiesPerDay && (
