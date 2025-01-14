@@ -7,18 +7,23 @@ import { ICustomItem } from "@/interfaces/DietPlan";
 
 interface CustomItemProps {
   foodGroup: string;
-  item: ICustomItem;
+  item: string | ICustomItem;
   unit: string;
   quantity: number;
 }
 
 const CustomItem: React.FC<CustomItemProps> = ({ item, unit, quantity, foodGroup }) => {
   const { layout, spacing, colors, text, common } = useStyles();
-  const isGrams = unit == "grams";
+  const isGrams = unit === "grams";
   const unitName = isGrams ? "גרם" : "כפות";
-  const totalQuantity = isGrams
-    ? item.oneServing.grams * quantity
-    : item.oneServing.spoons * quantity;
+
+  const isCustomItem = typeof item !== "string";
+
+  const totalQuantity = isCustomItem
+    ? isGrams
+      ? item.oneServing.grams * quantity
+      : item.oneServing.spoons * quantity
+    : null;
 
   return (
     <View
@@ -56,19 +61,23 @@ const CustomItem: React.FC<CustomItemProps> = ({ item, unit, quantity, foodGroup
             colors.textOnBackground,
             text.textBold,
             layout.flex1,
-            { textAlign: Platform.OS == `android` ? `right` : `left` },
+            { textAlign: Platform.OS === `android` ? `right` : `left` },
           ]}
           numberOfLines={1}
         >
-          {item.name}
+          {isCustomItem ? item.name : item}
         </Text>
-        <View style={[colors.backgroundSecondary, { width: 3, height: 14 }]} />
-        <Text style={[colors.textOnBackground, text.textBold, { flexShrink: 1 }]}>
-          {`${totalQuantity} ${unitName}`}
-        </Text>
+        {isCustomItem && (
+          <>
+            <View style={[colors.backgroundSecondary, { width: 3, height: 14 }]} />
+            <Text style={[colors.textOnBackground, text.textBold, { flexShrink: 1 }]}>
+              {`${totalQuantity} ${unitName}`}
+            </Text>
+          </>
+        )}
       </View>
     </View>
-  );  
+  );
 };
 
 export default CustomItem;

@@ -45,12 +45,7 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
         return (
           <React.Fragment key={mealItem[1]._id + i}>
             {mealItem[1].customItems && mealItem[1].customItems.length > 0 && (
-              <CustomInstructionsContainer
-                unit={mealItem[1].unit}
-                quantity={mealItem[1].quantity}
-                customInstructions={mealItem[1].customItems}
-                foodGroup={getName(mealItem[0])}
-              />
+              <CustomInstructionsContainer item={mealItem[1]} foodGroup={getName(mealItem[0])} />
             )}
 
             {mealItem[1].quantity > 0 && mealItem[1].customItems.length == 0 && (

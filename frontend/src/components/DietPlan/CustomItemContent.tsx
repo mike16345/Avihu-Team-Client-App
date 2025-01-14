@@ -1,12 +1,13 @@
 import { ICustomItem } from "@/interfaces/DietPlan";
 import useStyles from "@/styles/useGlobalStyles";
-import React from "react";
+import React, { useMemo } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import CustomItem from "./CustomItem";
 import { Text } from "../ui/Text";
 
 interface CustomItemContentProps {
   customInstructions: ICustomItem[];
+  extraItems: string[];
   foodGroup?: string;
   quantity: number;
   unit: string;
@@ -19,10 +20,15 @@ const CustomItemContent: React.FC<CustomItemContentProps> = ({
   foodGroup,
   unit,
   quantity,
+  extraItems,
 }) => {
   const { layout, spacing, colors, text, common, fonts } = useStyles();
 
-  console.log("custom items", customInstructions);
+  const items = useMemo<(string | ICustomItem)[]>(() => {
+    const combinedItems = [...customInstructions, ...extraItems];
+    return combinedItems;
+  }, [extraItems, customInstructions]);
+
   return (
     <View
       style={[
@@ -39,7 +45,7 @@ const CustomItemContent: React.FC<CustomItemContentProps> = ({
       </Text>
       <ScrollView contentContainerStyle={[layout.center, spacing.pdBottomBar]}>
         <View style={[layout.flexRow, layout.center, layout.wrap, spacing.gapDefault]}>
-          {customInstructions.map((item, i) => (
+          {items.map((item, i) => (
             <CustomItem
               key={i}
               foodGroup={foodGroup || ``}
