@@ -17,6 +17,7 @@ export interface IDietItem {
   quantity: number;
   unit: DietItemUnit;
   customItems?: ICustomItem[];
+  extraItems: string[];
 }
 
 export interface IMeal {

@@ -1,13 +1,16 @@
-import { ICustomMenuItem } from "@/interfaces/DietPlan";
+import { ICustomItem } from "@/interfaces/DietPlan";
 import useStyles from "@/styles/useGlobalStyles";
-import React from "react";
+import React, { useMemo } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import CustomItem from "./CustomItem";
 import { Text } from "../ui/Text";
 
 interface CustomItemContentProps {
-  customInstructions: ICustomMenuItem[];
+  customInstructions: ICustomItem[];
+  extraItems: string[];
   foodGroup?: string;
+  quantity: number;
+  unit: string;
   close: () => void;
 }
 
@@ -15,8 +18,16 @@ const CustomItemContent: React.FC<CustomItemContentProps> = ({
   customInstructions,
   close,
   foodGroup,
+  unit,
+  quantity,
+  extraItems,
 }) => {
   const { layout, spacing, colors, text, common, fonts } = useStyles();
+
+  const items = useMemo<(string | ICustomItem)[]>(() => {
+    const combinedItems = [...customInstructions, ...extraItems];
+    return combinedItems;
+  }, [extraItems, customInstructions]);
 
   return (
     <View
@@ -34,8 +45,14 @@ const CustomItemContent: React.FC<CustomItemContentProps> = ({
       </Text>
       <ScrollView contentContainerStyle={[layout.center, spacing.pdBottomBar]}>
         <View style={[layout.flexRow, layout.center, layout.wrap, spacing.gapDefault]}>
-          {customInstructions.map(({ item, quantity }, i) => (
-            <CustomItem key={i} foodGroup={foodGroup || ``} name={item} quantity={quantity} />
+          {items.map((item, i) => (
+            <CustomItem
+              key={i}
+              foodGroup={foodGroup || ``}
+              item={item}
+              quantity={quantity}
+              unit={unit}
+            />
           ))}
         </View>
       </ScrollView>

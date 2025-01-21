@@ -30,12 +30,14 @@ export const useDietPlanApi = () => {
     );
 
   const getDietPlanByUserId = (userID: string) =>
-    fetchData<ApiResponse<IDietPlan>>(`${DIET_PLAN_ENDPOINT}/user?userId=${userID}`).then(
-      (res) => res.data
-    );
+    fetchData<ApiResponse<IDietPlan>>(
+      `${DIET_PLAN_ENDPOINT}/user?userId=${userID}&populate=true`
+    ).then((res) => res.data);
 
   const getDietPlan = (id: string) =>
-    fetchData<ApiResponse<IDietPlan>>(`${DIET_PLAN_ENDPOINT}/one?id=${id}`).then((res) => res.data);
+    fetchData<ApiResponse<IDietPlan>>(`${DIET_PLAN_ENDPOINT}/one?id=${id}&populate=true`).then(
+      (res) => res.data
+    );
 
   return {
     addDietPlan,

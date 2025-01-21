@@ -6,13 +6,12 @@ import { Text } from "../ui/Text";
 interface AmountContainerProps {
   amount?: number;
   title: string;
-  variant?: `kg` | "cal" | `gr` | `unit`;
+  variant?: string;
 }
 
-const AmountContainer: React.FC<AmountContainerProps> = ({ amount, title, variant }) => {
+const AmountContainer: React.FC<AmountContainerProps> = ({ amount, title, variant = `יח'` }) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
-  const label =
-    variant == `gr` ? `גרם` : variant == "kg" ? `ק"ג` : variant === `unit` ? `יח'` : "קל";
+
   return (
     <View
       style={[
@@ -39,7 +38,7 @@ const AmountContainer: React.FC<AmountContainerProps> = ({ amount, title, varian
           {amount}
         </Text>
         {variant && (
-          <Text style={[colors.textOnBackground, text.textBold, { opacity: 0.8 }]}>{label}</Text>
+          <Text style={[colors.textOnBackground, text.textBold, { opacity: 0.8 }]}>{variant}</Text>
         )}
       </View>
     </View>

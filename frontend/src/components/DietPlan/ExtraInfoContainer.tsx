@@ -36,15 +36,15 @@ const ExtraInfoContainer: React.FC<ExtraInfoContainerProps> = ({
         {customInstructions && customInstructions?.length > 0 && <Tips tips={customInstructions} />}
 
         {Boolean(freeCalories) && (
-          <AmountContainer title="קלוריות חופשיות" variant="cal" amount={freeCalories} />
+          <AmountContainer title="קלוריות חופשיות" variant="קל" amount={freeCalories} />
         )}
 
         {fatsPerDay && (
-          <AmountContainer title="כמות שומנים ליום" variant="gr" amount={fatsPerDay} />
+          <AmountContainer title="מנות שומן יומי" variant="מנות" amount={fatsPerDay} />
         )}
 
         {veggiesPerDay && (
-          <AmountContainer title="כמות ירקות ליום" variant="unit" amount={veggiesPerDay} />
+          <AmountContainer title="כמות ירקות ליום" variant="יח '" amount={veggiesPerDay} />
         )}
       </Animated.View>
     </ScrollView>

@@ -3,15 +3,27 @@ import { Platform, View } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
+import { ICustomItem } from "@/interfaces/DietPlan";
 
 interface CustomItemProps {
-  name: string;
-  quantity: number;
   foodGroup: string;
+  item: string | ICustomItem;
+  unit: string;
+  quantity: number;
 }
 
-const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) => {
+const CustomItem: React.FC<CustomItemProps> = ({ item, unit, quantity, foodGroup }) => {
   const { layout, spacing, colors, text, common } = useStyles();
+  const isGrams = unit === "grams";
+  const unitName = isGrams ? "גרם" : "כפות";
+
+  const isCustomItem = typeof item !== "string";
+
+  const totalQuantity = isCustomItem
+    ? isGrams
+      ? item.oneServing.grams * quantity
+      : item.oneServing.spoons * quantity
+    : null;
 
   return (
     <View
@@ -49,16 +61,20 @@ const CustomItem: React.FC<CustomItemProps> = ({ name, quantity, foodGroup }) =>
             colors.textOnBackground,
             text.textBold,
             layout.flex1,
-            { textAlign: Platform.OS == `android` ? `right` : `left` },
+            { textAlign: Platform.OS === `android` ? `right` : `left` },
           ]}
           numberOfLines={1}
         >
-          {name}
+          {isCustomItem ? item.name : item}
         </Text>
-        <View style={[colors.backgroundSecondary, { width: 3, height: 14 }]} />
-        <Text style={[colors.textOnBackground, text.textBold, { flexShrink: 1 }]}>
-          {quantity > 1 ? `${quantity} מנות` : `מנה אחת`}
-        </Text>
+        {isCustomItem && (
+          <>
+            <View style={[colors.backgroundSecondary, { width: 3, height: 14 }]} />
+            <Text style={[colors.textOnBackground, text.textBold, { flexShrink: 1 }]}>
+              {`${totalQuantity} ${unitName}`}
+            </Text>
+          </>
+        )}
       </View>
     </View>
   );
