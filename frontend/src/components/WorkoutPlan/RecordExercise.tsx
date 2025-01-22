@@ -49,6 +49,7 @@ const findLatestRecordedSetByNumber = (
 const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const repsOptions = useMemo(() => generateWheelPickerData(1, 100), []);
   const { handleRecordSet, exercise, muscleGroup, setNumber } = route!.params;
+  console.log("exercise", exercise);
 
   const { height, width } = useWindowDimensions();
   const customStyles = useStyles();

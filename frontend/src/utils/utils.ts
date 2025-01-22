@@ -20,8 +20,19 @@ export const hexToRgba = (hex: string, opacity: number) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-export const extractVideoId = (url: string) => {
-  return url.split("v=")[1].split("&")[0];
+export const extractVideoId = (url: string): string => {
+  let videoId: string = "";
+
+  // Check if URL contains ?v=
+  if (url.includes("?v=")) {
+    videoId = url.split("?v=")[1]?.split("&")[0];
+  }
+  // Check if it's a short YouTube URL
+  else if (url.startsWith("https://youtu.be/")) {
+    videoId = url.split("https://youtu.be/")[1]?.split("?")[0];
+  }
+
+  return videoId;
 };
 
 export const getYouTubeThumbnail = (id: string) => {

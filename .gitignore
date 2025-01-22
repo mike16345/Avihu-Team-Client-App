@@ -47,3 +47,5 @@ yarn-error.*
 
 # Apple csr
 *.csr
+
+.npmrc
