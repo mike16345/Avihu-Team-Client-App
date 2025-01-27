@@ -43,9 +43,12 @@ export const useUserApi = () => {
     sendData<ApiResponse<ISession>>(USER_ENDPOINT + `/user/login`, { email, password });
 
   const checkUserSessionToken = (token: ISession) => {
-    return sendData<ApiResponse<{ isValid: boolean }>>(USER_ENDPOINT + `/user/session`, {
-      token,
-    }).then((res) => res.data);
+    return sendData<ApiResponse<{ isValid: boolean; hasAccess: boolean }>>(
+      USER_ENDPOINT + `/user/session`,
+      {
+        token,
+      }
+    ).then((res) => res.data);
   };
 
   return {
