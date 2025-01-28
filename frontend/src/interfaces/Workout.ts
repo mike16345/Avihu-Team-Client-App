@@ -4,6 +4,7 @@ export interface IWorkout {
   id: string;
   tipFromTrainer?: string;
   linkToVideo?: string;
+  exerciseMethod?: string;
   name: string;
   sets: ISet[];
 }
@@ -81,6 +82,7 @@ export interface IExercise {
   tipFromTrainer?: string;
   linkToVideo?: string;
   name: string;
+  exerciseMethod?: string;
   sets: ISet[];
 }
 

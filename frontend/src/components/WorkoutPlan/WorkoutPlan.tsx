@@ -159,7 +159,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
 
             {data?.tips && data.tips.length > 0 && (
               <TouchableOpacity onPress={() => setOpenTips(true)}>
-                <Text style={[styles.tipsText, colors.textPrimary]}>דגשים</Text>
+                <Text style={[styles.tipsText, colors.textPrimary]}>דגשים לאימון</Text>
               </TouchableOpacity>
             )}
           </>
