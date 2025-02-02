@@ -21,7 +21,33 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
 
   const [status, requestPermission] = ImagePicker.useCameraPermissions();
 
+  const checkPermissions = async () => {
+    const { status } = await ImagePicker.getCameraPermissionsAsync();
+
+    if (status !== "granted") {
+      const { status: newStatus } = await ImagePicker.requestCameraPermissionsAsync();
+
+      if (newStatus !== "granted") {
+        alert(
+          "יש לאפשר גישה למצלמה כדי לצלם תמונות. אם לא אפשרת גישה, ניתן לשנות את ההגדה בהגדרות האפליקציה."
+        );
+      }
+    }
+  };
+
+  const checkGalleryPermission = async () => {
+    const { status } = await ImagePicker.getMediaLibraryPermissionsAsync();
+
+    if (status !== "granted") {
+      alert(
+        "יש לאפשר גישה לגלריה כדי לבחור תמונות. אם לא אפשרת גישה, ניתן לשנות את ההגדרה בהגדרות האפליקציה."
+      );
+      throw new Error("Gallery access denied");
+    }
+  };
+
   const pickImage = async () => {
+    await checkGalleryPermission();
     // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync(imagePickerOptions);
 
@@ -33,6 +59,8 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
   };
 
   const takePhoto = async () => {
+    checkPermissions();
+
     let result = await ImagePicker.launchCameraAsync(imagePickerOptions);
 
     if (result.canceled) return;
