@@ -21,7 +21,7 @@ const CardioExerciseContainer: React.FC<CardioExerciseContainerProps> = ({
           Platform.OS == `ios` ? layout.flexRowReverse : layout.flexRow,
           layout.itemsStart,
           spacing.gapDefault,
-          spacing.pdDefault,
+          spacing.pdVerticalDefault,
         ]}
       >
         {warmUpAmount && (
