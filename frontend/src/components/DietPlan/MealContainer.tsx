@@ -4,6 +4,7 @@ import { View } from "react-native";
 import CustomInstructionsContainer from "./CustomInstructionsContainer";
 import useStyles from "@/styles/useGlobalStyles";
 import MenuItemTicket from "./MenuItemTicket";
+import { foodGroupToName } from "@/utils/utils";
 
 interface MealContainerProps {
   meal: IMeal;
@@ -13,22 +14,6 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
   const { layout, spacing } = useStyles();
 
   const mealItems = Object.entries(meal);
-
-  const getName = (key: string) => {
-    switch (key) {
-      case `totalProtein`:
-        return `חלבונים`;
-
-      case `totalCarbs`:
-        return `פחמימות`;
-
-      case `totalFats`:
-        return `שומנים`;
-
-      case `totalVeggies`:
-        return `ירקות`;
-    }
-  };
 
   return (
     <View
@@ -47,11 +32,14 @@ const MealContainer: React.FC<MealContainerProps> = ({ meal }) => {
         return (
           <React.Fragment key={mealItem[1]._id + i}>
             {isCustomItems && (
-              <CustomInstructionsContainer item={mealItem[1]} foodGroup={getName(mealItem[0])} />
+              <CustomInstructionsContainer
+                item={mealItem[1]}
+                foodGroup={foodGroupToName(mealItem[0])}
+              />
             )}
 
             {mealItem[1].quantity > 0 && !isCustomItems && (
-              <MenuItemTicket foodGroup={getName(mealItem[0])} quantity={mealItem[1].quantity} />
+              <MenuItemTicket foodGroup={mealItem[0]} quantity={mealItem[1].quantity} />
             )}
           </React.Fragment>
         );
