@@ -8,10 +8,9 @@ import { useFoodGroupStore } from "@/store/foodgroupStore";
 interface MenuItemTicketProps {
   quantity: number;
   foodGroup?: string;
-  name?: string;
 }
 
-const MenuItemTicket: React.FC<MenuItemTicketProps> = ({ quantity, foodGroup, name }) => {
+const MenuItemTicket: React.FC<MenuItemTicketProps> = ({ quantity, foodGroup }) => {
   const { colors, common, layout, spacing } = useStyles();
   const { setFoodGroupToDisplay } = useFoodGroupStore();
 
@@ -34,7 +33,7 @@ const MenuItemTicket: React.FC<MenuItemTicketProps> = ({ quantity, foodGroup, na
         name={foodGroup == `חלבונים` ? `fish` : `baguette`}
       />
       <Text style={[colors.textOnBackground]}>{quantity}</Text>
-      <Text style={[colors.textOnBackground]}>{name || foodGroup}</Text>
+      <Text style={[colors.textOnBackground]}>{foodGroup}</Text>
     </TouchableOpacity>
   );
 };

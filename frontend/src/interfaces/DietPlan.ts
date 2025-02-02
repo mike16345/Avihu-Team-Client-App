@@ -3,8 +3,12 @@ export interface ICustomItem {
   dietaryType: string[];
   foodGroup: string;
   oneServing: {
-    grams: number;
-    spoons: number;
+    grams?: number;
+    spoons?: number;
+    scoops?: number;
+    cups?: number;
+    teaSpoons?: number;
+    pieces?: number;
   };
 }
 

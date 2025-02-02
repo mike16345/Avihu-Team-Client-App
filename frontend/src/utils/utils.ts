@@ -107,3 +107,22 @@ export const extractExercises = (exercises: any) => {
 
   return Object.keys(exercises);
 };
+
+export const servingTypeToString = (type: string) => {
+  switch (type) {
+    case "spoons":
+      return "כפות";
+    case "grams":
+      return "גרם";
+    case "pieces":
+      return "חתיכות";
+    case "scoops":
+      return "סקופים";
+    case "cups":
+      return "כוסות";
+    case "teaSpoons":
+      return "כפיות";
+    default:
+      return type;
+  }
+};
