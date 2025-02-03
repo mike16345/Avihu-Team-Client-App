@@ -10,15 +10,11 @@ interface CustomItemContentProps {
   extraItems: string[];
   foodGroup?: string;
   quantity: number;
-  unit: string;
-  close: () => void;
 }
 
 const CustomItemContent: React.FC<CustomItemContentProps> = ({
   customInstructions,
-  close,
   foodGroup,
-  unit,
   quantity,
   extraItems,
 }) => {
@@ -40,34 +36,18 @@ const CustomItemContent: React.FC<CustomItemContentProps> = ({
         common.rounded,
       ]}
     >
-      <Text style={[text.textCenter, colors.textOnBackground, fonts.xl, text.textBold]}>
+      <Text style={[text.textCenter, colors.textOnBackground, fonts.lg, text.textBold]}>
         בחר אחת מהאפשרויות הבאות
       </Text>
       <ScrollView contentContainerStyle={[layout.center, spacing.pdBottomBar]}>
         <View style={[layout.flexRow, layout.center, layout.wrap, spacing.gapDefault]}>
           {items.map((item, i) => (
-            <CustomItem
-              key={i}
-              foodGroup={foodGroup || ``}
-              item={item}
-              quantity={quantity}
-              unit={unit}
-            />
+            <View style={{ width: "48%" }}>
+              <CustomItem key={i} foodGroup={foodGroup || ``} item={item} quantity={quantity} />
+            </View>
           ))}
         </View>
       </ScrollView>
-      <TouchableOpacity
-        style={[
-          layout.widthFull,
-          layout.center,
-          colors.backgroundPrimary,
-          common.rounded,
-          spacing.pdVerticalDefault,
-        ]}
-        onPress={close}
-      >
-        <Text style={[colors.textOnBackground, fonts.lg, text.textBold]}>חזרה</Text>
-      </TouchableOpacity>
     </View>
   );
 };
