@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { useState, useEffect, FC } from "react";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
-import DropDownPicker, { ValueType } from "react-native-dropdown-picker";
 import { IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
 import { Colors } from "@/constants/Colors";
@@ -31,15 +30,15 @@ import { useQuery } from "@tanstack/react-query";
 import { ONE_DAY, WORKOUT_PLAN_KEY } from "@/constants/reactQuery";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import CardioWrapper from "./cardio/CardioWrapper";
+import WorkoutDropdownSelector from "./WorkoutDropdownSelector";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "WorkoutPlanPage"> {}
 
 const WorkoutPlan: FC<WorkoutPlanProps> = () => {
-  const [open, setOpen] = useState(false);
   const [plans, setPlans] = useState<any[] | null>(null);
-  const [value, setValue] = useState<ValueType>();
+  const [value, setValue] = useState<string>("");
   const [openTips, setOpenTips] = useState(false);
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
   const [displayCardioPlan, setDisplayCardioPlan] = useState(false);
@@ -78,7 +77,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     staleTime: ONE_DAY,
   });
 
-  const selectNewWorkoutPlan = (planName: string) => {
+  const onSelectWorkout = (planName: string) => {
     if (planName == `cardio`) {
       return setDisplayCardioPlan(true);
     }
@@ -150,19 +149,11 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       <View style={[spacing.gapLg, spacing.pdHorizontalDefault, colors.background]}>
         {value && plans && (
           <>
-            <DropDownPicker
-              rtl
-              open={open}
-              value={value}
+            <WorkoutDropdownSelector
               items={plans}
-              style={[colors.backgroundSecondaryContainer]}
-              listItemContainerStyle={[colors.backgroundSecondaryContainer]}
-              theme="DARK"
-              setOpen={setOpen}
+              onSelect={onSelectWorkout}
+              value={value}
               setValue={setValue}
-              labelStyle={text.textRight}
-              listItemLabelStyle={text.textRight}
-              onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
             />
 
             {data?.tips && data.tips.length > 0 && !displayCardioPlan && (
