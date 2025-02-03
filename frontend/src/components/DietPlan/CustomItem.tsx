@@ -18,6 +18,8 @@ const CustomItem: React.FC<CustomItemProps> = ({ item, quantity }) => {
   const units = isCustomItem ? Object.keys(item.oneServing).filter((i) => i !== "_id") : [];
 
   const measurements = useMemo(() => {
+    if (!isCustomItem) return;
+
     return (
       <View
         style={[
@@ -30,7 +32,6 @@ const CustomItem: React.FC<CustomItemProps> = ({ item, quantity }) => {
         ]}
       >
         {units.map((unit, i) => {
-          if (unit == "_id") return;
           const typedKey = unit as keyof IServingItem;
           const totalQuantity = isCustomItem ? item.oneServing[typedKey]! * quantity : null;
 
@@ -39,8 +40,8 @@ const CustomItem: React.FC<CustomItemProps> = ({ item, quantity }) => {
               <Text key={unit} style={[colors.textOnBackground, text.textRight, fonts.md]}>
                 {servingTypeToString(unit)}: {totalQuantity}
               </Text>
-              {i !== units.length - 1 && isCustomItem && (
-                <View style={[colors.borderPrimary, { borderLeftWidth: 1 }]}></View>
+              {i !== units.length - 1 && (
+                <View style={[colors.borderPrimary, { borderLeftWidth: 2 }]}></View>
               )}
             </View>
           );
@@ -51,11 +52,15 @@ const CustomItem: React.FC<CustomItemProps> = ({ item, quantity }) => {
 
   return (
     <View
-      style={[spacing.pdXs, spacing.gapXs, common.rounded, colors.backgroundSecondaryContainer]}
+      style={[
+        spacing.pdXs,
+        spacing.gapXs,
+        common.rounded,
+        colors.backgroundSecondaryContainer,
+        { minHeight: 70 },
+      ]}
     >
-      <View
-        style={[colors.borderPrimary, isCustomItem && { borderBottomWidth: 2 }, layout.widthFull]}
-      >
+      <View style={[colors.borderPrimary, { borderBottomWidth: 2 }, layout.widthFull]}>
         <Text style={[colors.textOnBackground, text.textRight, spacing.pdXs, text.textBold]}>
           {isCustomItem ? item.name : item}
         </Text>
