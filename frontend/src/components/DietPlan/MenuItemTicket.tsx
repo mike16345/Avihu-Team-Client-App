@@ -22,7 +22,6 @@ const MenuItemTicket: React.FC<MenuItemTicketProps> = ({ quantity, foodGroup }) 
   const { getMenuItems } = useMenuItemApi();
   const currentUser = useUserStore((store) => store.currentUser);
 
-  console.log(!!(foodGroup && currentUser));
   const name = foodGroupToName(foodGroup);
   const group = name == `חלבונים` ? `protein` : `carbs`;
 
