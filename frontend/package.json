@@ -9,6 +9,7 @@
     "web": "expo start -c --web",
     "build:android:dev": "eas build --platform android --profile development",
     "build:android:prod": "eas build --platform android --profile production",
+    "update:prod": "eas update --branch production --environment production --message",
     "build:ios:dev": "eas build --platform ios --profile development",
     "build:ios:prod": "eas build --platform ios --profile production"
   },
