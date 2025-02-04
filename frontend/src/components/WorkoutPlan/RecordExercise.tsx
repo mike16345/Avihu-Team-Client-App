@@ -198,19 +198,14 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   layout.justifyStart,
                 ]}
               >
-                <View>
-                  <View
-                    style={[
-                      layout.flexDirectionByPlatform,
-                      layout.widthFull,
-                      layout.justifyBetween,
-                    ]}
-                  >
+                <View style={[spacing.gapSm]}>
+                  <View style={[layout.flexRowReverse, layout.widthFull, layout.justifyBetween]}>
                     <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
                       {exercise.exerciseMethod}
                     </Text>
                     <NativeIcon
-                      style={[colors.textOnBackground, fonts.xl]}
+                      size={24}
+                      style={[colors.textOnBackground]}
                       library="MaterialCommunityIcons"
                       name="dumbbell"
                     />
