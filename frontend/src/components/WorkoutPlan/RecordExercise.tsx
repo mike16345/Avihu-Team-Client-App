@@ -198,15 +198,23 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   layout.justifyStart,
                 ]}
               >
-                <NativeIcon
-                  style={[colors.textOnBackground, fonts.xl]}
-                  library="MaterialCommunityIcons"
-                  name="dumbbell"
-                />
                 <View>
-                  <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
-                    {exercise.exerciseMethod}
-                  </Text>
+                  <View
+                    style={[
+                      layout.flexDirectionByPlatform,
+                      layout.widthFull,
+                      layout.justifyBetween,
+                    ]}
+                  >
+                    <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
+                      {exercise.exerciseMethod}
+                    </Text>
+                    <NativeIcon
+                      style={[colors.textOnBackground, fonts.xl]}
+                      library="MaterialCommunityIcons"
+                      name="dumbbell"
+                    />
+                  </View>
                   <Text style={[colors.textOnBackground, text.textRight]}>
                     {exerciseMethods[exercise.exerciseMethod].description}
                   </Text>
