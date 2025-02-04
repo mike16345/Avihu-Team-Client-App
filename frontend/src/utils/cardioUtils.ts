@@ -3,8 +3,8 @@ import { ISimpleCardioType } from "@/interfaces/Workout";
 export function translateWorkoutKeys(obj: ISimpleCardioType) {
   return [
     { title: "דקות אירובי בשבוע", value: obj.minsPerWeek },
-    { title: "דקות לאימון", value: obj.minsPerWorkout },
     { title: "פעמים בשבוע", value: obj.timesPerWeek },
+    { title: "דקות לאימון", value: obj.minsPerWorkout },
   ];
 }
 

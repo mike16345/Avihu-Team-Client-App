@@ -1,4 +1,4 @@
-import { Platform, ScrollView, View } from "react-native";
+import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { ISimpleCardioType } from "@/interfaces/Workout";
 import useStyles from "@/styles/useGlobalStyles";
@@ -22,23 +22,16 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
   }, [plan]);
 
   return (
-    <View
-      style={[
-        colors.backgroundSecondaryContainer,
-        common.rounded,
-        spacing.pdDefault,
-        spacing.gapLg,
-      ]}
-    >
-      <Text
-        style={[colors.textOnBackground, fonts.lg, text.textBold, text.textBold, text.textRight]}
-      >
-        אירובי
-      </Text>
-      <View style={[layout.flexRow, layout.center, spacing.gapDefault]}>
+    <View style={[common.rounded, spacing.pdDefault, spacing.gapLg]}>
+      <View style={[spacing.gapDefault]}>
         {values?.map((val, i) => (
           <View
-            style={[layout.itemsCenter, spacing.pdDefault, colors.background, common.rounded]}
+            style={[
+              layout.itemsCenter,
+              spacing.pdDefault,
+              colors.backgroundSecondaryContainer,
+              common.rounded,
+            ]}
             key={i}
           >
             <Text style={[colors.textOnBackground, colors.textPrimary, text.textBold]}>
@@ -47,41 +40,45 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
             <Text style={[colors.textOnBackground, fonts.xl, text.textBold]}>{val.value}</Text>
           </View>
         ))}
-      </View>
-      <View style={[colors.background, common.rounded, spacing.pdDefault]}>
-        <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>אופן ביצוע:</Text>
-        <View
-          style={[
-            Platform.OS == `ios` ? layout.flexRowReverse : layout.flexRow,
-            layout.justifyCenter,
-            layout.wrap,
-            spacing.gapDefault,
-            spacing.pdDefault,
-          ]}
-        >
-          {aerobicActivities.map((activity, i) => (
-            <View
-              key={i}
-              style={[
-                colors.backgroundSecondaryContainer,
-                spacing.pdHorizontalSm,
-                spacing.pdVerticalXs,
-                common.rounded,
-              ]}
+        <View style={[colors.backgroundSecondaryContainer, common.rounded, spacing.pdDefault]}>
+          <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>רשימת התרגילים:</Text>
+          <View
+            style={[
+              Platform.OS == `ios` ? layout.flexRowReverse : layout.flexRow,
+              layout.justifyCenter,
+              layout.wrap,
+              spacing.gapDefault,
+              spacing.pdDefault,
+            ]}
+          >
+            {aerobicActivities.map((activity, i) => (
+              <View
+                key={i}
+                style={[
+                  colors.background,
+                  spacing.pdHorizontalSm,
+                  spacing.pdVerticalXs,
+                  common.rounded,
+                ]}
+              >
+                <Text style={[colors.textOnBackground]}>{activity}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+        {plan?.tips && (
+          <View style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}>
+            <Text
+              style={[colors.textOnBackground, colors.textPrimary, text.textCenter, text.textBold]}
             >
-              <Text style={[colors.textOnBackground]}>{activity}</Text>
-            </View>
-          ))}
-        </View>
+              דגשים
+            </Text>
+            <Text style={[colors.textOnBackground, text.textRight, spacing.pdDefault]}>
+              {plan.tips}
+            </Text>
+          </View>
+        )}
       </View>
-      {plan?.tips && (
-        <View style={[colors.background, spacing.pdDefault, common.rounded]}>
-          <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>דגשים:</Text>
-          <Text style={[colors.textOnBackground, text.textRight, spacing.pdDefault]}>
-            {plan.tips}
-          </Text>
-        </View>
-      )}
     </View>
   );
 };

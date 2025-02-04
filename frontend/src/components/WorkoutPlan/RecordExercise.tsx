@@ -151,30 +151,40 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
         <View
           style={[layout.flexGrow, !lastRecordedSet && layout.justifyEvenly, spacing.pdDefault]}
         >
-          <View style={[layout.itemsEnd, spacing.gapSm]}>
+          <View style={[layout.itemsEnd, spacing.gapMd]}>
             <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
             <View
               style={[
                 Platform.OS == `ios` ? layout.flexRowReverse : layout.flexRow,
-                spacing.gapDefault,
+                layout.itemsCenter,
+                layout.justifyBetween,
+                layout.widthFull,
               ]}
             >
-              <Text style={styles.setInfo}>סט: {setNumber}</Text>
-              {exercise.sets[setNumber - 1] && (
-                <Text style={styles.setInfo}>
-                  חזרות: {exercise.sets[setNumber - 1].minReps}
-                  {exercise.sets[setNumber - 1].maxReps &&
-                    `-${exercise.sets[setNumber - 1].maxReps}`}
-                </Text>
+              <View
+                style={[
+                  Platform.OS == `ios` ? layout.flexRowReverse : layout.flexRow,
+                  spacing.gapDefault,
+                ]}
+              >
+                <Text style={styles.setInfo}>סט: {setNumber}</Text>
+                {exercise.sets[setNumber - 1] && (
+                  <Text style={styles.setInfo}>
+                    חזרות: {exercise.sets[setNumber - 1].minReps}
+                    {exercise.sets[setNumber - 1].maxReps &&
+                      `-${exercise.sets[setNumber - 1].maxReps}`}
+                  </Text>
+                )}
+              </View>
+              {strippedTips && strippedTips.length && (
+                <Pressable onPress={() => setOpenTrainerTips(true)}>
+                  <Text style={[fonts.lg, colors.textPrimary, text.textUnderline, text.textBold]}>
+                    דגשים לתרגיל
+                  </Text>
+                </Pressable>
               )}
             </View>
-            {strippedTips && strippedTips.length && (
-              <Pressable onPress={() => setOpenTrainerTips(true)}>
-                <Text style={[fonts.lg, colors.textPrimary, text.textUnderline, text.textBold]}>
-                  דגשים לתרגיל
-                </Text>
-              </Pressable>
-            )}
+
             <WorkoutTips
               tips={[exercise.tipFromTrainer!]}
               openTips={openTrainerTips}
@@ -325,7 +335,7 @@ export default RecordExercise;
 
 const styles = StyleSheet.create({
   setInfo: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "bold",
     color: "white",
   },
