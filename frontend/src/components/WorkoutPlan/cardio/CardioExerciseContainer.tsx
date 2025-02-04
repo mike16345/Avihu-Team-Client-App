@@ -26,20 +26,8 @@ const CardioExerciseContainer: React.FC<CardioExerciseContainerProps> = ({
           {cardioExercise}
         </Text>
 
-        <View
-          style={[
-            Platform.OS == `ios` ? layout.flexRowReverse : layout.flexRow,
-            layout.justifyBetween,
-            layout.widthFull,
-          ]}
-        >
-          <View
-            style={[
-              Platform.OS == `ios` ? layout.flexRowReverse : layout.flexRow,
-              spacing.gapDefault,
-              layout.itemsCenter,
-            ]}
-          >
+        <View style={[layout.flexRowReverse, layout.justifyBetween, layout.widthFull]}>
+          <View style={[layout.flexRowReverse, spacing.gapDefault, layout.itemsCenter]}>
             {warmUpAmount && (
               <>
                 <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
