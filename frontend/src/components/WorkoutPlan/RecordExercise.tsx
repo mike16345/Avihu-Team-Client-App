@@ -155,18 +155,13 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
             <View
               style={[
-                Platform.OS == `ios` ? layout.flexRowReverse : layout.flexRow,
+                layout.flexRowReverse,
                 layout.itemsCenter,
                 layout.justifyBetween,
                 layout.widthFull,
               ]}
             >
-              <View
-                style={[
-                  Platform.OS == `ios` ? layout.flexRowReverse : layout.flexRow,
-                  spacing.gapDefault,
-                ]}
-              >
+              <View style={[layout.flexRowReverse, spacing.gapDefault]}>
                 <Text style={styles.setInfo}>סט: {setNumber}</Text>
                 {exercise.sets[setNumber - 1] && (
                   <Text style={styles.setInfo}>
