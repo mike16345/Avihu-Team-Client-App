@@ -15,14 +15,6 @@ export const exerciseMethods = {
     title: "אימון פוקוס על כוח שיא (Max Effort)",
     description: "עבודה עם 1-3 חזרות במשקלים כבדים מאוד.",
   },
-  "פאוזות (Pause Training)": {
-    title: "פאוזות (Pause Training)",
-    description: "עצירה בנקודה החלשה בתנועה (למשל, תחתית הסקוואט).",
-  },
-  "אימון Cluster": {
-    title: "אימון Cluster",
-    description: "חלוקת סט כבד למקטעים קצרים עם מנוחה של 10-20 שניות ביניהם.",
-  },
   "אימון כוח מתפרץ (Dynamic Effort)": {
     title: "אימון כוח מתפרץ (Dynamic Effort)",
     description: "תנועות מהירות עם משקל בינוני (50-70% מהמקסימום).",
