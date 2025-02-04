@@ -1,4 +1,4 @@
-import { ICustomItem, IDietItem, IMeal } from "@/interfaces/DietPlan";
+import { IDietItem } from "@/interfaces/DietPlan";
 import React, { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
@@ -16,7 +16,7 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
   foodGroup,
   item,
 }) => {
-  const { layout, spacing, colors, common, fonts } = useStyles();
+  const { layout, spacing, colors, common } = useStyles();
   const [openModal, setOpenModal] = useState(false);
 
   return (
@@ -38,7 +38,8 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
           library="MaterialCommunityIcons"
           name={foodGroup == `חלבונים` ? `fish` : `baguette`}
         />
-        <Text style={[colors.textOnBackground, fonts.md]}>צפה ב{foodGroup}</Text>
+        <Text style={[colors.textOnBackground]}>{item.quantity}</Text>
+        <Text style={[colors.textOnBackground]}>{foodGroup}</Text>
       </TouchableOpacity>
 
       <BottomDrawer
@@ -46,12 +47,10 @@ const CustomInstructionsContainer: React.FC<CustomInstructionsContainerProps> = 
         open={openModal}
         children={
           <CustomItemContent
-            unit={item.unit}
             extraItems={item.extraItems || []}
             customInstructions={item.customItems || []}
             quantity={item.quantity}
             foodGroup={foodGroup}
-            close={() => setOpenModal(false)}
           />
         }
       />
