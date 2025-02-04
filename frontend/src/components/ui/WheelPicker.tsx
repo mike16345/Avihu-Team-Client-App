@@ -19,6 +19,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   );
 
   const flatListRef = useRef<FlatList>(null);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   /*  const handleItemPress = (index: number) => {
     flatListRef.current?.scrollToOffset({
@@ -34,6 +35,16 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
     if (index == selectedIndex) return;
+    if (scrollTimeout.current) {
+      clearTimeout(scrollTimeout.current);
+    }
+
+    scrollTimeout.current = setTimeout(() => {
+      flatListRef.current?.scrollToOffset({
+        offset: index * itemHeight,
+        animated: true,
+      });
+    }, 2000); // Triggers after 2 seconds of no scroll
 
     setSelectedIndex(index);
     onValueChange(data[index].value);
@@ -43,11 +54,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
     if (index == selectedIndex) return;
-
-    flatListRef.current?.scrollToOffset({
-      offset: index * itemHeight,
-      animated: true,
-    });
 
     onValueChange(data[index].value);
     setSelectedIndex(selectedIndex);
