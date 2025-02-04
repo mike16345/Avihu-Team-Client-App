@@ -275,7 +275,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   label=""
                   height={height * 0.08}
                   itemHeight={35}
-                  selectedWeight={recordedSet.weight || data[data?.length - 1].weight}
+                  selectedWeight={recordedSet.weight || data[data?.length - 1].weight || null}
                 />
               </View>
             </View>
