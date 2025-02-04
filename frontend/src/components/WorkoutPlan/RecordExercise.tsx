@@ -192,10 +192,10 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   colors.backgroundPrimary,
                   spacing.pdDefault,
                   layout.widthFull,
-                  Platform.OS == `ios` ? layout.flexRowReverse : layout.flexRow,
+                  layout.flexRowReverse,
                   layout.itemsCenter,
                   spacing.gapDefault,
-                  Platform.OS == `ios` ? layout.justifyStart : layout.justifyEnd,
+                  layout.justifyStart,
                 ]}
               >
                 <NativeIcon
