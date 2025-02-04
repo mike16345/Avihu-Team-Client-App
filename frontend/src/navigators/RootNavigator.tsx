@@ -8,6 +8,8 @@ import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
 import Loader from "@/components/ui/loaders/Loader";
 import useNotification from "@/hooks/useNotfication";
+import { showAlert } from "@/utils/utils";
+import { NO_ACCESS } from "@/constants/Constants";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,9 +33,15 @@ const RootNavigator = () => {
     setIsLoading(true);
 
     try {
-      const isValidSession = (await checkUserSessionToken(tokenData)).isValid;
+      const { isValid, hasAccess } = await checkUserSessionToken(tokenData);
 
-      if (!isValidSession) {
+      if (!hasAccess) {
+        showAlert("error", NO_ACCESS);
+        setIsLoading(false);
+        return;
+      }
+
+      if (!isValid) {
         sessionStorage.removeItem();
         return;
       }
