@@ -240,7 +240,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   inactiveItemColor={colors.textOnSurfaceDisabled.color}
                   data={repsOptions}
                   onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
-                  selectedValue={recordedSet.repsDone || data[data?.length - 1]?.repsDone}
+                  selectedValue={recordedSet.repsDone || lastRecordedSet?.repsDone || 0}
                   height={height * 0.08}
                   itemHeight={35}
                 />
@@ -275,7 +275,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   label=""
                   height={height * 0.08}
                   itemHeight={35}
-                  selectedWeight={recordedSet.weight || data[data?.length - 1].weight || null}
+                  selectedWeight={recordedSet.weight || lastRecordedSet?.weight || 0}
                 />
               </View>
             </View>
