@@ -126,7 +126,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
           onScroll={handleScroll}
           onMomentumScrollEnd={handleScrollEnd}
           scrollEventThrottle={16}
-          initialNumToRender={100}
+          initialNumToRender={50}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: (height - itemHeight) / 2 }}
         />
