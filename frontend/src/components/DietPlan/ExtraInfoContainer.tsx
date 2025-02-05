@@ -5,6 +5,7 @@ import { Animated } from "react-native";
 import AmountContainer from "./AmountContainer";
 import Tips from "./Tips";
 import { ScrollView } from "react-native-gesture-handler";
+import { ConditionalRender } from "../ui/ConditionalRender";
 
 interface ExtraInfoContainerProps {
   veggiesPerDay?: number;
@@ -33,19 +34,21 @@ const ExtraInfoContainer: React.FC<ExtraInfoContainerProps> = ({
           { direction: `ltr` },
         ]}
       >
-        {customInstructions && customInstructions?.length > 0 && <Tips tips={customInstructions} />}
+        <ConditionalRender condition={customInstructions && customInstructions?.length > 0}>
+          <Tips tips={customInstructions!} />
+        </ConditionalRender>
 
-        {Boolean(freeCalories) && (
+        <ConditionalRender condition={!!freeCalories}>
           <AmountContainer title="קלוריות חופשיות" variant="קל" amount={freeCalories} />
-        )}
+        </ConditionalRender>
 
-        {fatsPerDay && (
+        <ConditionalRender condition={!!fatsPerDay}>
           <AmountContainer title="מנות שומן יומי" variant="מנות" amount={fatsPerDay} />
-        )}
+        </ConditionalRender>
 
-        {veggiesPerDay && (
+        <ConditionalRender condition={!!veggiesPerDay}>
           <AmountContainer title="כמות ירקות ליום" variant="יח '" amount={veggiesPerDay} />
-        )}
+        </ConditionalRender>
       </Animated.View>
     </ScrollView>
   );
