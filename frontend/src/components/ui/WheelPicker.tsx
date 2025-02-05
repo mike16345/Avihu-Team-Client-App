@@ -36,6 +36,13 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     const index = returnIndex(contentOffset.y);
     if (index == selectedIndex) return;
 
+    scrollTimeout.current = setTimeout(() => {
+      flatListRef.current?.scrollToOffset({
+        offset: index * itemHeight,
+        animated: true,
+      });
+    }, 800);
+
     setSelectedIndex(index);
     onValueChange(data[index].value);
   };
@@ -43,16 +50,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   const handleScrollEnd = (event: any) => {
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
-    if (scrollTimeout.current) {
-      clearTimeout(scrollTimeout.current);
-    }
-    
-    scrollTimeout.current = setTimeout(() => {
-      flatListRef.current?.scrollToOffset({
-        offset: index * itemHeight,
-        animated: true,
-      });
-    }, 100);
+    if (index == selectedIndex) return;
 
     onValueChange(data[index].value);
     setSelectedIndex(index);
