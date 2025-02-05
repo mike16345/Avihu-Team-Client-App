@@ -6,6 +6,7 @@ import {
   Pressable,
   TouchableOpacity,
   BackHandler,
+  Platform,
 } from "react-native";
 import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
@@ -25,6 +26,7 @@ import RecordedSetInfo from "./RecordedSetInfo";
 import { ONE_DAY } from "@/constants/reactQuery";
 import { Text } from "../ui/Text";
 import Toast from "react-native-toast-message";
+import { exerciseMethods } from "@/constants/exerciseMethods";
 
 type InputTypes = "reps" | "weight";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
@@ -49,7 +51,6 @@ const findLatestRecordedSetByNumber = (
 const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const repsOptions = useMemo(() => generateWheelPickerData(1, 100), []);
   const { handleRecordSet, exercise, muscleGroup, setNumber } = route!.params;
-  console.log("exercise", exercise);
 
   const { height, width } = useWindowDimensions();
   const customStyles = useStyles();
@@ -150,27 +151,71 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
         <View
           style={[layout.flexGrow, !lastRecordedSet && layout.justifyEvenly, spacing.pdDefault]}
         >
-          <View style={[layout.itemsEnd, spacing.gapSm]}>
+          <View style={[layout.itemsEnd, spacing.gapMd]}>
             <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
-            <Text style={styles.setInfo}>סט: {setNumber}</Text>
-            {exercise.sets[setNumber - 1] && (
-              <Text style={styles.setInfo}>
-                חזרות: {exercise.sets[setNumber - 1].minReps}
-                {exercise.sets[setNumber - 1].maxReps && `-${exercise.sets[setNumber - 1].maxReps}`}
-              </Text>
-            )}
-            {strippedTips && strippedTips.length && (
-              <Pressable onPress={() => setOpenTrainerTips(true)}>
-                <Text style={[fonts.lg, colors.textPrimary, text.textUnderline, text.textBold]}>
-                  דגשים
-                </Text>
-              </Pressable>
-            )}
+            <View
+              style={[
+                layout.flexRowReverse,
+                layout.itemsCenter,
+                layout.justifyBetween,
+                layout.widthFull,
+              ]}
+            >
+              <View style={[layout.flexRowReverse, spacing.gapDefault]}>
+                <Text style={styles.setInfo}>סט: {setNumber}</Text>
+                {exercise.sets[setNumber - 1] && (
+                  <Text style={styles.setInfo}>
+                    חזרות: {exercise.sets[setNumber - 1].minReps}
+                    {exercise.sets[setNumber - 1].maxReps &&
+                      `-${exercise.sets[setNumber - 1].maxReps}`}
+                  </Text>
+                )}
+              </View>
+              {strippedTips && strippedTips.length && (
+                <Pressable onPress={() => setOpenTrainerTips(true)}>
+                  <Text style={[fonts.lg, colors.textPrimary, text.textUnderline, text.textBold]}>
+                    דגשים לתרגיל
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+
             <WorkoutTips
               tips={[exercise.tipFromTrainer!]}
               openTips={openTrainerTips}
               setOpenTips={setOpenTrainerTips}
             />
+            {exercise.exerciseMethod && (
+              <View
+                style={[
+                  common.rounded,
+                  colors.backgroundPrimary,
+                  spacing.pdDefault,
+                  layout.widthFull,
+                  layout.flexRowReverse,
+                  layout.itemsCenter,
+                  spacing.gapDefault,
+                  layout.justifyStart,
+                ]}
+              >
+                <View style={[spacing.gapSm]}>
+                  <View style={[layout.flexRowReverse, layout.widthFull, layout.justifyBetween]}>
+                    <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
+                      {exercise.exerciseMethod}
+                    </Text>
+                    <NativeIcon
+                      size={24}
+                      style={[colors.textOnBackground]}
+                      library="MaterialCommunityIcons"
+                      name="dumbbell"
+                    />
+                  </View>
+                  <Text style={[colors.textOnBackground, text.textRight]}>
+                    {exerciseMethods[exercise.exerciseMethod].description}
+                  </Text>
+                </View>
+              </View>
+            )}
           </View>
 
           <View style={[layout.flexRow, layout.justifyEvenly, spacing.pdVerticalSm]}>
@@ -185,7 +230,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   spacing.pdVerticalMd,
                   common.rounded,
                   colors.backdrop,
-                  { width: width * 0.25 },
+                  { width: width * 0.3 },
                 ]}
               >
                 <WheelPicker
@@ -193,7 +238,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   inactiveItemColor={colors.textOnSurfaceDisabled.color}
                   data={repsOptions}
                   onValueChange={(val) => handleUpdateRecordedSet("repsDone", val)}
-                  selectedValue={recordedSet.repsDone}
+                  selectedValue={recordedSet.repsDone || lastRecordedSet?.repsDone || 0}
                   height={height * 0.08}
                   itemHeight={35}
                 />
@@ -228,7 +273,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   label=""
                   height={height * 0.08}
                   itemHeight={35}
-                  selectedWeight={recordedSet.weight}
+                  selectedWeight={recordedSet.weight || lastRecordedSet?.weight || 0}
                 />
               </View>
             </View>
@@ -288,7 +333,7 @@ export default RecordExercise;
 
 const styles = StyleSheet.create({
   setInfo: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: "bold",
     color: "white",
   },

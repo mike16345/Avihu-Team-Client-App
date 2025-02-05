@@ -4,13 +4,13 @@ import {
   FlatList,
   ImageBackground,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useState, useEffect, FC } from "react";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
-import DropDownPicker, { ValueType } from "react-native-dropdown-picker";
 import { IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
 import { Colors } from "@/constants/Colors";
@@ -29,17 +29,19 @@ import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import { useQuery } from "@tanstack/react-query";
 import { ONE_DAY, WORKOUT_PLAN_KEY } from "@/constants/reactQuery";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
+import CardioWrapper from "./cardio/CardioWrapper";
+import WorkoutDropdownSelector from "./WorkoutDropdownSelector";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "WorkoutPlanPage"> {}
 
 const WorkoutPlan: FC<WorkoutPlanProps> = () => {
-  const [open, setOpen] = useState(false);
   const [plans, setPlans] = useState<any[] | null>(null);
-  const [value, setValue] = useState<ValueType>();
+  const [value, setValue] = useState<string>("");
   const [openTips, setOpenTips] = useState(false);
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
+  const [displayCardioPlan, setDisplayCardioPlan] = useState(false);
   const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
 
   const { fonts, text, spacing, colors } = useStyles();
@@ -75,7 +77,12 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     staleTime: ONE_DAY,
   });
 
-  const selectNewWorkoutPlan = (planName: string) => {
+  const onSelectWorkout = (planName: string) => {
+    if (planName == `cardio`) {
+      return setDisplayCardioPlan(true);
+    }
+    setDisplayCardioPlan(false);
+
     const selectedWorkoutPlan = data?.workoutPlans.find((plan) => plan.planName === planName);
 
     if (!selectedWorkoutPlan) return;
@@ -118,7 +125,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       return { label: workout.planName, value: workout.planName };
     });
 
-    setPlans(plans);
+    setPlans([...plans, { label: "אירובי", value: "cardio" }]);
     setValue(plans[0].label);
     setCurrentWorkoutPlan(data.workoutPlans[0]);
 
@@ -142,24 +149,16 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       <View style={[spacing.gapLg, spacing.pdHorizontalDefault, colors.background]}>
         {value && plans && (
           <>
-            <DropDownPicker
-              rtl
-              open={open}
-              value={value}
+            <WorkoutDropdownSelector
               items={plans}
-              style={[colors.backgroundSecondaryContainer]}
-              listItemContainerStyle={[colors.backgroundSecondaryContainer]}
-              theme="DARK"
-              setOpen={setOpen}
+              onSelect={onSelectWorkout}
+              value={value}
               setValue={setValue}
-              labelStyle={text.textRight}
-              listItemLabelStyle={text.textRight}
-              onSelectItem={(val) => selectNewWorkoutPlan(val.value as string)}
             />
 
-            {data?.tips && data.tips.length > 0 && (
+            {data?.tips && data.tips.length > 0 && !displayCardioPlan && (
               <TouchableOpacity onPress={() => setOpenTips(true)}>
-                <Text style={[styles.tipsText, colors.textPrimary]}>דגשים</Text>
+                <Text style={[styles.tipsText, colors.textPrimary]}>דגשים לאימון</Text>
               </TouchableOpacity>
             )}
           </>
@@ -173,38 +172,51 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       <View style={{ zIndex: 100 }}>
         <Header />
       </View>
-      <FlatList
-        data={currentWorkoutPlan?.muscleGroups || []}
-        ListEmptyComponent={() => <WorkoutPlanSkeleton />}
-        keyExtractor={(item) => item.muscleGroup}
-        style={colors.background}
-        refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
-        }
-        renderItem={({ item, index }) => (
-          <Animated.View style={[spacing.pdHorizontalSm, slideAnimations[index + 1]]}>
-            <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>
-              {item.muscleGroup}
-            </Text>
-            <View style={[spacing.gapLg]}>
-              {item.exercises.map((exercise, index) => (
-                <ExerciseContainer
-                  key={currentWorkoutPlan?.planName + "-" + index}
-                  plan={currentWorkoutPlan?.planName || ""}
-                  muscleGroup={item.muscleGroup}
-                  exercise={exercise}
-                  session={currentWorkoutSession}
-                  updateSession={handleUpdateSession}
-                />
-              ))}
-            </View>
-          </Animated.View>
-        )}
-        ListFooterComponent={
-          <WorkoutTips tips={data?.tips} openTips={openTips} setOpenTips={setOpenTips} />
-        }
-        contentContainerStyle={styles.workoutContainer}
-      />
+      {!displayCardioPlan && (
+        <FlatList
+          data={currentWorkoutPlan?.muscleGroups || []}
+          ListEmptyComponent={() => <WorkoutPlanSkeleton />}
+          keyExtractor={(item) => item.muscleGroup}
+          style={colors.background}
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+          }
+          renderItem={({ item, index }) => (
+            <Animated.View style={[spacing.pdHorizontalSm, slideAnimations[index + 1]]}>
+              <Text style={[styles.muscleGroupText, text.textRight, fonts.xl]}>
+                {item.muscleGroup}
+              </Text>
+              <View style={[spacing.gapLg]}>
+                {item.exercises.map((exercise, index) => (
+                  <ExerciseContainer
+                    key={currentWorkoutPlan?.planName + "-" + index}
+                    plan={currentWorkoutPlan?.planName || ""}
+                    muscleGroup={item.muscleGroup}
+                    exercise={exercise}
+                    session={currentWorkoutSession}
+                    updateSession={handleUpdateSession}
+                  />
+                ))}
+              </View>
+            </Animated.View>
+          )}
+          ListFooterComponent={
+            <WorkoutTips tips={data?.tips} openTips={openTips} setOpenTips={setOpenTips} />
+          }
+          contentContainerStyle={styles.workoutContainer}
+        />
+      )}
+      {displayCardioPlan && (
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+          }
+          style={colors.background}
+          contentContainerStyle={{ minHeight: `110%` }}
+        >
+          <CardioWrapper cardioPlan={data?.cardio} />
+        </ScrollView>
+      )}
     </>
   );
 };

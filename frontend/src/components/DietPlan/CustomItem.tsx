@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
 import { ICustomItem, IServingItem } from "@/interfaces/DietPlan";
@@ -61,7 +61,14 @@ const CustomItem: React.FC<CustomItemProps> = ({ item, quantity }) => {
       ]}
     >
       <View style={[colors.borderPrimary, { borderBottomWidth: 2 }, layout.widthFull]}>
-        <Text style={[colors.textOnBackground, text.textRight, spacing.pdXs, text.textBold]}>
+        <Text
+          style={[
+            colors.textOnBackground,
+            Platform.OS == `ios` ? text.textLeft : text.textRight,
+            spacing.pdXs,
+            text.textBold,
+          ]}
+        >
           {isCustomItem ? item.name : item}
         </Text>
       </View>

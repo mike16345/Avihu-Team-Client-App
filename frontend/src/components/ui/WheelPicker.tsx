@@ -2,6 +2,7 @@ import { WheelPickerProps } from "@/types/wheelPickerTypes";
 import React, { useState, useRef, useEffect } from "react";
 import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
 import { Text } from "./Text";
+import Loader from "./loaders/Loader";
 
 const WheelPicker: React.FC<WheelPickerProps> = ({
   data,
@@ -16,7 +17,9 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   const [selectedIndex, setSelectedIndex] = useState(
     data.findIndex((item) => String(item.value) == String(selectedValue))
   );
+
   const flatListRef = useRef<FlatList>(null);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   /*  const handleItemPress = (index: number) => {
     flatListRef.current?.scrollToOffset({
@@ -31,6 +34,17 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   const handleScroll = (event: any) => {
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
+    if (index == selectedIndex) return;
+    if (scrollTimeout.current) {
+      clearTimeout(scrollTimeout.current);
+    }
+
+    scrollTimeout.current = setTimeout(() => {
+      flatListRef.current?.scrollToOffset({
+        offset: index * itemHeight,
+        animated: true,
+      });
+    }, 2000); // Triggers after 2 seconds of no scroll
 
     setSelectedIndex(index);
     onValueChange(data[index].value);
@@ -39,11 +53,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   const handleScrollEnd = (event: any) => {
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
-
-    flatListRef.current?.scrollToOffset({
-      offset: index * itemHeight,
-      animated: true,
-    });
+    if (index == selectedIndex) return;
 
     onValueChange(data[index].value);
     setSelectedIndex(selectedIndex);
@@ -52,16 +62,32 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   const returnIndex = (contentYOffset: any) => {
     let index = Math.round(contentYOffset / itemHeight);
 
+    /* if(index>=maxIndex){
+      index=maxIndex
+    }else if(index=<minIndex){
+      index=minIndex;
+    }else{
+      index=index
+    } */
+
     index = index >= data.length - 1 ? data.length - 1 : index < 0 ? 0 : index;
 
     return index;
   };
 
   useEffect(() => {
-    const selectedIndex = data.findIndex((item) => String(item.value) == String(selectedValue));
-    if (selectedIndex == -1) return;
+    setTimeout(() => {
+      const isDecimal = selectedValue.toString().includes(`.`);
+      let value = selectedValue;
+      if (isDecimal) {
+        value = selectedValue.toString().slice(1, selectedValue.length);
+      }
 
-    flatListRef.current?.scrollToIndex({ index: selectedIndex });
+      const selectedIndex = data.findIndex((item) => String(item.value) == String(value));
+      if (selectedIndex == -1) return;
+
+      flatListRef.current?.scrollToIndex({ index: selectedIndex });
+    }, 100);
   }, []);
 
   return (
@@ -77,7 +103,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
           data={data}
           keyExtractor={(_, index) => index.toString()}
           renderItem={({ item, index }) => (
-            <TouchableOpacity
+            <View
               style={[
                 styles.item,
                 index === selectedIndex ? [styles.selectedItem] : null,
@@ -95,11 +121,12 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
               >
                 {item.value}
               </Text>
-            </TouchableOpacity>
+            </View>
           )}
           onScroll={handleScroll}
           onMomentumScrollEnd={handleScrollEnd}
           scrollEventThrottle={16}
+          initialNumToRender={50}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: (height - itemHeight) / 2 }}
         />
