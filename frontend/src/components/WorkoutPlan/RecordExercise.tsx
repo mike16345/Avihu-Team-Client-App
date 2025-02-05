@@ -230,7 +230,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   spacing.pdVerticalMd,
                   common.rounded,
                   colors.backdrop,
-                  { width: width * 0.25 },
+                  { width: width * 0.3 },
                 ]}
               >
                 <WheelPicker

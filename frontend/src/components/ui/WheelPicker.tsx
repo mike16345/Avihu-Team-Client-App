@@ -35,16 +35,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
     if (index == selectedIndex) return;
-    if (scrollTimeout.current) {
-      clearTimeout(scrollTimeout.current);
-    }
-
-    scrollTimeout.current = setTimeout(() => {
-      flatListRef.current?.scrollToOffset({
-        offset: index * itemHeight,
-        animated: true,
-      });
-    }, 2000); // Triggers after 2 seconds of no scroll
 
     setSelectedIndex(index);
     onValueChange(data[index].value);
@@ -53,24 +43,31 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   const handleScrollEnd = (event: any) => {
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
-    if (index == selectedIndex) return;
+    if (scrollTimeout.current) {
+      clearTimeout(scrollTimeout.current);
+    }
+    
+    scrollTimeout.current = setTimeout(() => {
+      flatListRef.current?.scrollToOffset({
+        offset: index * itemHeight,
+        animated: true,
+      });
+    }, 100);
 
     onValueChange(data[index].value);
-    setSelectedIndex(selectedIndex);
+    setSelectedIndex(index);
   };
 
   const returnIndex = (contentYOffset: any) => {
     let index = Math.round(contentYOffset / itemHeight);
+    const maxIndex = data.length - 1;
+    const minIndex = 0;
 
-    /* if(index>=maxIndex){
-      index=maxIndex
-    }else if(index=<minIndex){
-      index=minIndex;
-    }else{
-      index=index
-    } */
-
-    index = index >= data.length - 1 ? data.length - 1 : index < 0 ? 0 : index;
+    if (index >= maxIndex) {
+      index = maxIndex;
+    } else if (index < minIndex) {
+      index = minIndex;
+    }
 
     return index;
   };
