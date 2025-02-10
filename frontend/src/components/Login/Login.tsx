@@ -20,7 +20,6 @@ import { moderateScale } from "react-native-size-matters";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import Toast, { ToastType } from "react-native-toast-message";
 import Loader from "../ui/loaders/Loader";
-import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
 import { Text } from "../ui/Text";
 import ForgotPassword from "./ForgotPassword";
@@ -46,7 +45,6 @@ interface ILoginProps {
 export default function Login({ onLogin }: ILoginProps) {
   const { text, colors, fonts, layout, spacing, common } = useStyles();
   const { checkEmailAccess, loginUser } = useUserApi();
-  const setCurrentUser = useUserStore((state) => state.setCurrentUser);
 
   const { height, width } = useWindowDimensions();
 
@@ -125,11 +123,10 @@ export default function Login({ onLogin }: ILoginProps) {
           }
           showAlert("success", res.message);
           onLogin(res.data.data.user);
-          setCurrentUser(res?.data.data.user);
           setItem(JSON.stringify(res.data));
         })
         .catch((err) => {
-          showAlert("error", err.response.data.message);
+          showAlert("error", err?.response?.data?.message);
         })
         .finally(() => setLoading(false));
     }
