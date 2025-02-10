@@ -25,6 +25,7 @@ import { IUser } from "@/interfaces/User";
 import { Text } from "../ui/Text";
 import ForgotPassword from "./ForgotPassword";
 import { EMAIL_ERROR, NO_ACCESS, NO_PASSWORD } from "@/constants/Constants";
+import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 
 interface IUserCredentials {
   email: string;
@@ -49,7 +50,7 @@ export default function Login({ onLogin }: ILoginProps) {
 
   const { height, width } = useWindowDimensions();
 
-  const { setItem } = useAsyncStorage("sessionToken");
+  const { setItem } = useAsyncStorage(SESSION_TOKEN_KEY);
 
   const [inputtedCrendentials, setInputtedCredentials] = useState<IUserCredentials>({
     email: ``,

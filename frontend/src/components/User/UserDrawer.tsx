@@ -8,12 +8,13 @@ import { useUserStore } from "@/store/userStore";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import NativeIcon from "../Icon/NativeIcon";
 import UserDetailContainer from "./UserDetailContainer";
+import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 
 const UserDrawer = () => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
   const { openUserDrawer, setOpenUserDrawer } = useUserDrawer();
   const { currentUser, setCurrentUser } = useUserStore();
-  const sessionStorage = useAsyncStorage("sessionToken");
+  const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
 
   const logUserOut = () => {
     setOpenUserDrawer(false);
