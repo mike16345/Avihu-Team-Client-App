@@ -5,10 +5,31 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const Update = () => {
   const [updateMessageVisible, setUpdateMessageVisible] = useState(false);
+  const queryClient = useQueryClient();
+
+  const installUpdate = async () => {
+    try {
+      await Updates.fetchUpdateAsync();
+      await Updates.reloadAsync();
+
+      queryClient.clear();
+    } catch (error) {
+      console.error("Error installing the update:", error);
+    }
+  };
+
+  const closeModal = () => {
+    setUpdateMessageVisible(false);
+  };
 
   useEffect(() => {
     const checkForUpdates = async () => {
       try {
+        if (!Updates.isEmbeddedLaunch) {
+          console.log("Running in Expo Go, skipping update check.");
+          return;
+        }
+
         const update = await Updates.checkForUpdateAsync();
         if (update.isAvailable) {
           setUpdateMessageVisible(true);
@@ -20,21 +41,6 @@ const Update = () => {
 
     checkForUpdates();
   }, []);
-
-  const installUpdate = async () => {
-    try {
-      await Updates.fetchUpdateAsync();
-      await Updates.reloadAsync();
-      
-      useQueryClient().clear(); // Remove persisted data across updates
-    } catch (error) {
-      console.error("Error installing the update:", error);
-    }
-  };
-
-  const closeModal = () => {
-    setUpdateMessageVisible(false);
-  };
 
   return (
     <>
