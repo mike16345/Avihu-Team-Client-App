@@ -5,21 +5,19 @@ import { Text } from "../ui/Text";
 import { Button } from "react-native-paper";
 import { useUserDrawer } from "@/store/userDrawerStore";
 import { useUserStore } from "@/store/userStore";
-import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import NativeIcon from "../Icon/NativeIcon";
 import UserDetailContainer from "./UserDetailContainer";
-import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
+import useLogout from "@/hooks/useLogout";
 
 const UserDrawer = () => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
   const { openUserDrawer, setOpenUserDrawer } = useUserDrawer();
-  const { currentUser, setCurrentUser } = useUserStore();
-  const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
+  const { currentUser } = useUserStore();
+  const { handleLogout } = useLogout();
 
   const logUserOut = () => {
     setOpenUserDrawer(false);
-    setCurrentUser(null);
-    sessionStorage.removeItem();
+    handleLogout();
   };
 
   return (
