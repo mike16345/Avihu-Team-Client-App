@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as Updates from "expo-updates";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Update = () => {
   const [updateMessageVisible, setUpdateMessageVisible] = useState(false);
@@ -24,6 +25,8 @@ const Update = () => {
     try {
       await Updates.fetchUpdateAsync();
       await Updates.reloadAsync();
+      
+      useQueryClient().clear(); // Remove persisted data across updates
     } catch (error) {
       console.error("Error installing the update:", error);
     }
