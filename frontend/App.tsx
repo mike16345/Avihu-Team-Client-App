@@ -6,49 +6,43 @@ import {
   DefaultTheme as NavigationDefaultTheme,
   NavigationContainer,
 } from "@react-navigation/native";
-
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
-import {
-  LightTheme as CustomLightTheme,
-  DarkTheme as CustomDarkTheme,
-  ThemeProvider,
-} from "@/themes/useAppTheme";
+import { DarkTheme as CustomDarkTheme, ThemeProvider } from "@/themes/useAppTheme";
 import { Appearance } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import Toast from "react-native-toast-message";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import { useFonts } from "expo-font";
 import UserDrawer from "@/components/User/UserDrawer";
 import Update from "@/hooks/useUpdates";
+import persister from "@/QueryClient/queryPersister";
+import queryClient from "@/QueryClient/queryClient";
 
-// import { I18nManager } from "react-native";
-// Enable RTL
-// I18nManager.forceRTL(true);
-
-const { LightTheme, DarkTheme } = adaptNavigationTheme({
+const { DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
   reactNavigationDark: NavigationDarkTheme,
 });
 
-const queryClient = new QueryClient();
 export default function App() {
   const colorScheme = Appearance.getColorScheme();
-  const [loaded, error] = useFonts({
+  const [loaded] = useFonts({
     Assistant: require("./assets/fonts/Assistant-VariableFont_wght.ttf"),
   });
+
   if (!loaded) return;
 
   return (
-    <PaperProvider
-      theme={/* colorScheme == "dark" ? CustomDarkTheme : CustomLightTheme */ CustomDarkTheme}
-    >
+    <PaperProvider theme={CustomDarkTheme}>
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <QueryClientProvider client={queryClient}>
+            <PersistQueryClientProvider
+              client={queryClient}
+              persistOptions={{ persister: persister }}
+            >
               <NavigationContainer theme={DarkTheme}>
                 <RootNavigator />
                 <StatusBar key={colorScheme} translucent style={"light"} />
@@ -56,7 +50,7 @@ export default function App() {
                 <UserDrawer />
                 <Update />
               </NavigationContainer>
-            </QueryClientProvider>
+            </PersistQueryClientProvider>
           </SafeAreaProvider>
         </GestureHandlerRootView>
       </ThemeProvider>
