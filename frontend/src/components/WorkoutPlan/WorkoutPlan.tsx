@@ -29,6 +29,7 @@ import { ONE_DAY, WORKOUT_PLAN_KEY } from "@/constants/reactQuery";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import CardioWrapper from "./cardio/CardioWrapper";
 import WorkoutDropdownSelector from "./WorkoutDropdownSelector";
+import WorkoutPlanSkeletonLoader from "../ui/loaders/skeletons/WorkoutPlanSkeletonLoader";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
@@ -193,6 +194,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       {!displayCardioPlan && (
         <FlatList
           data={currentWorkoutPlan?.muscleGroups || []}
+          ListEmptyComponent={() => <WorkoutPlanSkeletonLoader />}
           keyExtractor={(item) => item.muscleGroup}
           style={colors.background}
           refreshControl={
