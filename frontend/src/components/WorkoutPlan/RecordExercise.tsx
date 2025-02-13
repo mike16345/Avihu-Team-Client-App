@@ -26,7 +26,7 @@ import RecordedSetInfo from "./RecordedSetInfo";
 import { ONE_DAY } from "@/constants/reactQuery";
 import { Text } from "../ui/Text";
 import Toast from "react-native-toast-message";
-import { exerciseMethods } from "@/constants/exerciseMethods";
+import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
 
 type InputTypes = "reps" | "weight";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
@@ -57,6 +57,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const { colors, fonts, layout, spacing, text, common } = customStyles;
   const currentUser = useUserStore((state) => state.currentUser);
   const { getUserRecordedSetsByExercise } = useRecordedSetsApi();
+  const {getExerciseMethodByName}=useExerciseMethodApi()
 
   const { data, isLoading } = useQuery(
     ["recordedSets", exercise],
@@ -67,6 +68,12 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
 
     { enabled: !!exercise, retry: createRetryFunction(404), staleTime: ONE_DAY }
   );
+
+  const exerciseMethodResponse=useQuery(
+    [exercise.exerciseMethod],
+    ()=>getExerciseMethodByName(exercise?.exerciseMethod||``).then(res=>res.data),
+    {enabled:!!exercise.exerciseMethod}
+  )
 
   const lastRecordedSet = findLatestRecordedSetByNumber(data || [], setNumber);
   const strippedTips = exercise.tipFromTrainer?.replace(" ", "");
@@ -121,7 +128,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     };
   }, []);
 
-  if (isLoading) return <Loader variant="Standard" />;
+  if (isLoading||exerciseMethodResponse.isLoading) return <Loader variant="Standard" />;
 
   return (
     <>
@@ -185,7 +192,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               openTips={openTrainerTips}
               setOpenTips={setOpenTrainerTips}
             />
-            {exercise.exerciseMethod && (
+            {exerciseMethodResponse && (
               <View
                 style={[
                   common.rounded,
@@ -201,7 +208,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 <View style={[spacing.gapSm]}>
                   <View style={[layout.flexRowReverse, layout.widthFull, layout.justifyBetween]}>
                     <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
-                      {exercise.exerciseMethod}
+                      {exerciseMethodResponse.data?.title}
                     </Text>
                     <NativeIcon
                       size={24}
@@ -211,7 +218,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                     />
                   </View>
                   <Text style={[colors.textOnBackground, text.textRight]}>
-                    {exerciseMethods[exercise.exerciseMethod].description}
+                    {exerciseMethodResponse.data?.description}
                   </Text>
                 </View>
               </View>
