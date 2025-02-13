@@ -128,7 +128,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     };
   }, []);
 
-  if (isLoading||exerciseMethodResponse.isLoading) return <Loader variant="Standard" />;
+  if (isLoading) return <Loader variant="Standard" />;
 
   return (
     <>
@@ -192,7 +192,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               openTips={openTrainerTips}
               setOpenTips={setOpenTrainerTips}
             />
-            {exerciseMethodResponse && (
+            {exerciseMethodResponse.data && (
               <View
                 style={[
                   common.rounded,
