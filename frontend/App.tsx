@@ -10,7 +10,7 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
 import { DarkTheme as CustomDarkTheme, ThemeProvider } from "@/themes/useAppTheme";
-import { Appearance } from "react-native";
+import { Appearance, I18nManager } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import Toast from "react-native-toast-message";
@@ -25,6 +25,9 @@ const { DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
   reactNavigationDark: NavigationDarkTheme,
 });
+
+I18nManager.forceRTL(false);
+I18nManager.allowRTL(false);
 
 export default function App() {
   const colorScheme = Appearance.getColorScheme();
