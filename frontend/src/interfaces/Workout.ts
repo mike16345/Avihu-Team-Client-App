@@ -19,6 +19,11 @@ export interface WeightWorkout extends IWorkout {
   sets: ISet[];
 }
 
+export interface IExerciseMethod{
+  title:string,
+  description:string
+}
+
 export interface CardioWorkout extends IWorkout {
   cardioType: "run" | "walk" | "stairmaster" | string;
 }

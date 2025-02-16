@@ -7,4 +7,6 @@ export const WEIGH_INS_KEY = `weigh-ins-user-`;
 
 export const WORKOUT_PLAN_KEY = `workout-plan-user-`;
 
+export const EXERCISE_METHOD = `exercise-method-`;
+
 export const RECORDED_SETS_BY_USER_KEY = `recorded-sets-user-`;
