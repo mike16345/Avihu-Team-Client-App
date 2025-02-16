@@ -2,7 +2,7 @@ import { View, BackHandler, TouchableOpacity, useAnimatedValue, Animated } from 
 import { FC, useEffect, useState } from "react";
 import { useOTPApi } from "@/hooks/api/useOTPApi";
 import useStyles from "@/styles/useGlobalStyles";
-import { Button, TextInput } from "react-native-paper";
+import { Button } from "react-native-paper";
 import { testEmail, testPassword } from "@/utils/utils";
 import {
   EMAIL_ERROR,
@@ -16,6 +16,7 @@ import { ICredentialsErrors } from "./Login";
 import { Text } from "../ui/Text";
 import Loader from "../ui/loaders/Loader";
 import { useUserApi } from "@/hooks/api/useUserApi";
+import TextInput from "../ui/TextInput";
 
 interface IForgotPassword {
   email: string;
@@ -34,7 +35,7 @@ const ForgotPassword: FC<IForgotPassword> = ({
   const { changePassword } = usePasswordsApi();
   const { registerUser } = useUserApi();
 
-  const { colors, spacing, text, common } = useStyles();
+  const { layout, colors, spacing, text, common } = useStyles();
 
   const [formErrors, setFormErrors] = useState<ICredentialsErrors & { otp?: string }>({});
   const [otp, setOtp] = useState("");
@@ -130,11 +131,20 @@ const ForgotPassword: FC<IForgotPassword> = ({
     }
   }, [showOtpInput]);
 
+  const handleBackPress = () => {
+    console.log("handleBack");
+    setShowOtpInput(false);
+    setIsOtpConfirmed(false);
+    setFormErrors({});
+    return true;
+  };
+
   useEffect(() => {
-    BackHandler.addEventListener("hardwareBackPress", () => {
-      console.log("Back button pressed");
-      return true;
-    });
+    BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
+    };
   }, []);
 
   if (isLoading) return <Loader />;
@@ -154,17 +164,16 @@ const ForgotPassword: FC<IForgotPassword> = ({
         </>
       )}
       {showOtpInput && !isOtpConfirmed && (
-        <Animated.View style={{ opacity: fadeValue }}>
+        <Animated.View style={[{ opacity: fadeValue }, spacing.gapSm]}>
           <Text
             style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground, text.textBold]}
           >
             קוד אימות
           </Text>
           <View style={[spacing.gapLg]}>
-            <View>
+            <View style={[spacing.gapSm]}>
               <TextInput
-                style={[{ width: "100%" }, text.textCenter, colors.background]}
-                mode="outlined"
+                style={[{ height: 45 }, text.textCenter]}
                 activeOutlineColor={colors.borderSecondary.borderColor}
                 placeholder="קוד אימות בעל 6 ספרות"
                 error={!!formErrors["otp"]}
@@ -185,15 +194,16 @@ const ForgotPassword: FC<IForgotPassword> = ({
                 </Text>
               </TouchableOpacity>
             </View>
-
-            <Button
-              mode="contained"
-              style={[common.rounded]}
-              textColor={colors.textOnBackground.color}
-              onPress={handleValidateOtp}
-            >
-              אישור
-            </Button>
+            <View style={[layout.center]}>
+              <Button
+                mode="contained"
+                style={[common.rounded, { width: 250 }]}
+                textColor={colors.textOnBackground.color}
+                onPress={handleValidateOtp}
+              >
+                צור סיסמה חדשה
+              </Button>
+            </View>
           </View>
         </Animated.View>
       )}
@@ -207,11 +217,11 @@ const ForgotPassword: FC<IForgotPassword> = ({
           />
           <Button
             mode="contained"
-            style={common.rounded}
+            style={[common.rounded, spacing.mgHorizontalDefault]}
             textColor={colors.textOnBackground.color}
             onPress={handleConfirmPasswordChange}
           >
-            צור סיסמה
+            <Text style={[text.textBold]}>מאשר סיסמה חדשה</Text>
           </Button>
         </Animated.View>
       )}

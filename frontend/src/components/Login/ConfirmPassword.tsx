@@ -1,10 +1,11 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useState } from "react";
 import { View } from "react-native";
-import { TextInput } from "react-native-paper";
 import { ICredentialsErrors } from "./Login";
 import { Text } from "../ui/Text";
 import PasswordIndicator from "./PasswordIndicator";
+import TextInput from "../ui/TextInput";
+import { TextInput as RNPTextInput } from "react-native-paper";
 
 interface ConfirmPasswordProps {
   handlePasswordChange: (val: string) => void;
@@ -25,39 +26,46 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
   const [showConfirmPassword, setShowconfirmPassword] = useState(false);
 
   return (
-    <View>
+    <View style={[spacing.gapXl]}>
+      <View style={[spacing.pdHorizontalLg]}>
+        <PasswordIndicator password={value || ""} />
+      </View>
       <View>
-        <Text style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground]}>סיסמה</Text>
+        <Text
+          style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground, text.textBold]}
+        >
+          סיסמה
+        </Text>
         <TextInput
           style={[text.textRight, { width: "100%" }]}
-          mode="outlined"
           activeOutlineColor={colors.borderSecondary.borderColor}
+          placeholder="הכנס סיסמה חדשה"
           error={!!(errors.password || errors.validPassword)}
           secureTextEntry={!showPassword}
           onChangeText={(val) => handlePasswordChange(val)}
           left={
-            <TextInput.Icon
+            <RNPTextInput.Icon
               onPress={() => setShowPassword((show) => !show)}
               icon={showPassword ? "eye-off" : "eye"}
             />
           }
         />
-
-        <PasswordIndicator password={value || ``} />
       </View>
       <View>
-        <Text style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground]}>
+        <Text
+          style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground, text.textBold]}
+        >
           אישור סיסמה
         </Text>
         <TextInput
-          style={[text.textRight, { width: "100%" }]}
-          mode="outlined"
+          style={[text.textRight]}
           activeOutlineColor={colors.borderSecondary.borderColor}
           error={Boolean(errors.confirmPassword)}
+          placeholder="אמת סיסמה חדשה"
           secureTextEntry={!showConfirmPassword}
           onChangeText={(val) => handlePasswordConfirmChange(val)}
           left={
-            <TextInput.Icon
+            <RNPTextInput.Icon
               onPress={() => setShowconfirmPassword((show) => !show)}
               icon={showConfirmPassword ? "eye-off" : "eye"}
             />
