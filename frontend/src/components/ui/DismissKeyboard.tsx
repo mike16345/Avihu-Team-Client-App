@@ -11,11 +11,11 @@ const DismissKeyboard = () => {
         style={[
           colors.background,
           {
-            position: `absolute`,
+            position: "absolute",
             top: 0,
             left: 0,
-            zIndex: 10,
             opacity: 0.1,
+            zIndex: 5,
             height: height + 100,
             width: width,
           },

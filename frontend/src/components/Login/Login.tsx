@@ -163,7 +163,11 @@ export default function Login({ onLogin }: ILoginProps) {
 
   return (
     <>
-      <View style={[layout.justifyEnd, layout.itemsCenter, { height: height, width: width }]}>
+      <View
+        style={[layout.justifyEnd, layout.itemsCenter, { height: height * 0.95, width: width }]}
+      >
+        <DismissKeyboard />
+
         {loading && <Loader variant="Screen" />}
         <ImageBackground
           source={avihuFlyTrap}
@@ -178,9 +182,14 @@ export default function Login({ onLogin }: ILoginProps) {
           ]}
         />
         <KeyboardAvoidingView
-          behavior="padding"
+          behavior="position"
           style={[
-            { zIndex: 30, position: `absolute`, bottom: 80, width: width * 0.9 },
+            {
+              zIndex: 30,
+              position: `absolute`,
+              bottom: 80,
+              width: width * 0.9,
+            },
             spacing.gapXxl,
             spacing.pdSm,
           ]}
@@ -305,7 +314,12 @@ export default function Login({ onLogin }: ILoginProps) {
             <View style={[layout.center]}>
               <Button
                 mode="contained-tonal"
-                style={[{ width: 250, height: 40 }, common.rounded, colors.backgroundPrimary]}
+                style={[
+                  { width: 250, height: 40 },
+                  common.rounded,
+                  colors.backgroundPrimary,
+                  spacing.mgVerticalDefault,
+                ]}
                 onPress={handleSubmit}
               >
                 <Text style={[text.textBold]}>תכניס אותי</Text>
@@ -322,7 +336,6 @@ export default function Login({ onLogin }: ILoginProps) {
           <Text style={[colors.textOnSecondaryContainer, text.textBold]}>{registerText}</Text>
         </View>
       </View>
-      <DismissKeyboard />
     </>
   );
 }
