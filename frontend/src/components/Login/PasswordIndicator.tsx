@@ -8,7 +8,7 @@ interface PasswordIndicatorProps {
 }
 
 const PasswordIndicator: React.FC<PasswordIndicatorProps> = ({ password }) => {
-  const { layout, text, spacing, colors, common } = useStyles();
+  const { text, spacing, colors, common } = useStyles();
 
   const DIGIT_REGEX = /\d/;
   const SPECIAL_CHAR_REGEX = /[!@#$%]/;

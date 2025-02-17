@@ -11,6 +11,7 @@ interface UserDetailContainerProps {
 
 const UserDetailContainer: React.FC<UserDetailContainerProps> = ({ label, value }) => {
   const { colors, spacing, text, fonts } = useStyles();
+  
   return (
     <View style={[spacing.pdSm, spacing.gapDefault]}>
       <Text style={[text.textRight, text.textBold, colors.textOnBackground]}>{label}</Text>

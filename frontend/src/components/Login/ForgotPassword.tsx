@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from "react";
 import { useOTPApi } from "@/hooks/api/useOTPApi";
 import useStyles from "@/styles/useGlobalStyles";
 import { Button } from "react-native-paper";
-import { testEmail, testPassword } from "@/utils/utils";
+import { showAlert, testEmail, testPassword } from "@/utils/utils";
 import {
   EMAIL_ERROR,
   INVALID_PASSWORD,
@@ -17,23 +17,29 @@ import { Text } from "../ui/Text";
 import Loader from "../ui/loaders/Loader";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import TextInput from "../ui/TextInput";
+import { ApiResponse } from "@/types/ApiTypes";
+import { IUser } from "@/interfaces/User";
 
 interface IForgotPassword {
   email: string;
   onConfirmChangePasswordSuccess: () => void;
   onShowingOtpInputs?: () => void;
+  onOTPConfirmed: () => void;
   isRegistering?: boolean;
+  onBackPress: () => void;
 }
 
 const ForgotPassword: FC<IForgotPassword> = ({
   email,
   onConfirmChangePasswordSuccess,
   onShowingOtpInputs,
+  onOTPConfirmed,
   isRegistering = false,
+  onBackPress,
 }) => {
   const { getOTP, validateOTP } = useOTPApi();
   const { changePassword } = usePasswordsApi();
-  const { registerUser } = useUserApi();
+  const { registerUser, checkEmailAccess } = useUserApi();
 
   const { layout, colors, spacing, text, common } = useStyles();
 
@@ -74,20 +80,42 @@ const ForgotPassword: FC<IForgotPassword> = ({
     }
   };
 
+  const checkUserAccess = async () => {
+    try {
+      const res = await checkEmailAccess(email);
+
+      return res;
+    } catch (error: any) {
+      if (error?.response?.data?.message) {
+        showAlert("error", error.response.data.message);
+      }
+      return false;
+    }
+  };
+
   const handleGetOtp = async () => {
     if (!testEmail(email)) {
       setFormErrors({ ...formErrors, ["email"]: EMAIL_ERROR });
       return;
     }
 
+    let response: boolean | ApiResponse<{ user: IUser; hasPassword: boolean }> = true;
+
     try {
       setIsLoading(true);
-      const res = await getOTP(email!);
-      console.log(JSON.stringify(res, undefined, 2));
-      setShowOtpInput(true);
+      if (isRegistering) {
+        response = await checkUserAccess();
+      }
 
-      if (!onShowingOtpInputs) return;
-      onShowingOtpInputs();
+      if (typeof response !== "boolean" && response.data.hasPassword) {
+        showAlert("info", "משתמש כבר קיים במערכת!");
+        handleBackPress();
+        return;
+      }
+
+      await getOTP(email!);
+      setShowOtpInput(true);
+      onShowingOtpInputs?.();
     } catch (error: any) {
       setFormErrors({ ...formErrors, ["otp"]: error?.response?.data?.message });
     } finally {
@@ -106,6 +134,7 @@ const ForgotPassword: FC<IForgotPassword> = ({
       const sessionId = (await validateOTP(email, otp))?.data?.changePasswordSessionId || "";
       setSessionId(sessionId);
       setIsOtpConfirmed(true);
+      onOTPConfirmed();
     } catch (error: any) {
       setFormErrors({ ...formErrors, ["otp"]: "קוד שגוי" });
     } finally {
@@ -114,6 +143,22 @@ const ForgotPassword: FC<IForgotPassword> = ({
   };
 
   const fadeValue = useAnimatedValue(0);
+
+  const handleBackPress = () => {
+    onBackPress();
+    setShowOtpInput(false);
+    setIsOtpConfirmed(false);
+    setFormErrors({});
+    return true;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
+    };
+  }, []);
 
   useEffect(() => {
     if (showOtpInput) {
@@ -131,37 +176,21 @@ const ForgotPassword: FC<IForgotPassword> = ({
     }
   }, [showOtpInput]);
 
-  const handleBackPress = () => {
-    console.log("handleBack");
-    setShowOtpInput(false);
-    setIsOtpConfirmed(false);
-    setFormErrors({});
-    return true;
-  };
-
-  useEffect(() => {
-    BackHandler.addEventListener("hardwareBackPress", handleBackPress);
-
-    return () => {
-      BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
-    };
-  }, []);
-
   if (isLoading) return <Loader />;
 
   return (
     <View>
       {!showOtpInput && (
-        <>
+        <View style={[layout.center, layout.widthFull]}>
           <Button
             mode="contained"
-            style={[common.rounded]}
+            style={[common.rounded, { width: 250 }]}
             textColor={colors.textOnBackground.color}
             onPress={handleGetOtp}
           >
-            שלח קוד אימות
+            <Text style={[text.textBold]}>שלח קוד אימות</Text>
           </Button>
-        </>
+        </View>
       )}
       {showOtpInput && !isOtpConfirmed && (
         <Animated.View style={[{ opacity: fadeValue }, spacing.gapSm]}>
@@ -215,14 +244,16 @@ const ForgotPassword: FC<IForgotPassword> = ({
             handlePasswordChange={(val) => setPassword(val)}
             handlePasswordConfirmChange={(val) => setConfirmPassword(val)}
           />
-          <Button
-            mode="contained"
-            style={[common.rounded, spacing.mgHorizontalDefault]}
-            textColor={colors.textOnBackground.color}
-            onPress={handleConfirmPasswordChange}
-          >
-            <Text style={[text.textBold]}>מאשר סיסמה חדשה</Text>
-          </Button>
+          <View style={[layout.center]}>
+            <Button
+              mode="contained"
+              style={[common.rounded, { width: 250 }]}
+              textColor={colors.textOnBackground.color}
+              onPress={handleConfirmPasswordChange}
+            >
+              <Text style={[text.textBold]}>מאשר סיסמה חדשה</Text>
+            </Button>
+          </View>
         </Animated.View>
       )}
     </View>

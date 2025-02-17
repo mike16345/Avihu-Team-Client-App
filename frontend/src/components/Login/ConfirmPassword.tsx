@@ -30,14 +30,14 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
       <View style={[spacing.pdHorizontalLg]}>
         <PasswordIndicator password={value || ""} />
       </View>
-      <View>
+      <View style={[spacing.gapSm]}>
         <Text
           style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground, text.textBold]}
         >
           סיסמה
         </Text>
         <TextInput
-          style={[text.textRight, { width: "100%" }]}
+          style={[text.textRight]}
           activeOutlineColor={colors.borderSecondary.borderColor}
           placeholder="הכנס סיסמה חדשה"
           error={!!(errors.password || errors.validPassword)}
@@ -51,7 +51,7 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
           }
         />
       </View>
-      <View>
+      <View style={[spacing.gapSm]}>
         <Text
           style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground, text.textBold]}
         >
