@@ -102,7 +102,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
       await handleRecordSet(recordedSet);
     } catch (err: any) {
       Toast.show({
-        text1: "אופס, נתקלנו בבעיה",
+        text1: "הסט שהוקלד אינו תקין",
         text2: err.message,
         autoHide: true,
         type: "error",
@@ -179,8 +179,11 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 )}
               </View>
               {strippedTips && strippedTips.length && (
-                <Pressable onPress={() => setOpenTrainerTips(true)}>
-                  <Text style={[fonts.lg, colors.textPrimary, text.textUnderline, text.textBold]}>
+                <Pressable
+                  onPress={() => setOpenTrainerTips(true)}
+                  style={[colors.backgroundPrimary, common.roundedSm, spacing.pdXs]}
+                >
+                  <Text style={[fonts.md, colors.textOnBackground, text.textBold]}>
                     דגשים לתרגיל
                   </Text>
                 </Pressable>
@@ -190,13 +193,14 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             <WorkoutTips
               tips={[exercise.tipFromTrainer!]}
               openTips={openTrainerTips}
+              title="דגשים לתרגיל"
               setOpenTips={setOpenTrainerTips}
             />
             {exerciseMethodQuery.data && (
               <View
                 style={[
                   common.rounded,
-                  colors.backgroundPrimary,
+                  colors.backgroundSecondaryContainer,
                   spacing.pdDefault,
                   layout.widthFull,
                   layout.flexRowReverse,
@@ -320,15 +324,15 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             spacing.pdHorizontalDefault,
           ]}
         >
+          <Button mode="contained" onPress={handleSave} style={[common.rounded, { width: `48%` }]}>
+            <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
+          </Button>
           <Button
             mode="contained-tonal"
             onPress={() => navigation?.goBack()}
             style={[common.rounded, { width: `48%` }]}
           >
             בטל
-          </Button>
-          <Button mode="contained" onPress={handleSave} style={[common.rounded, { width: `48%` }]}>
-            <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
           </Button>
         </View>
       </View>
