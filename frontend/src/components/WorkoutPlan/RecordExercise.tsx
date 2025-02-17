@@ -27,6 +27,7 @@ import { EXERCISE_METHOD, ONE_DAY } from "@/constants/reactQuery";
 import { Text } from "../ui/Text";
 import Toast from "react-native-toast-message";
 import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
+import Divider from "../ui/Divider";
 
 type InputTypes = "reps" | "weight";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
@@ -168,8 +169,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 layout.widthFull,
               ]}
             >
-              <View style={[layout.flexRowReverse, spacing.gapDefault]}>
+              <View style={[layout.flexColumn, layout.itemsEnd, spacing.gapXs]}>
                 <Text style={styles.setInfo}>סט: {setNumber}</Text>
+                <Divider color={colors.textPrimary.color} thickness={0.5} />
                 {exercise.sets[setNumber - 1] && (
                   <Text style={styles.setInfo}>
                     חזרות: {exercise.sets[setNumber - 1].minReps}
@@ -181,11 +183,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               {strippedTips && strippedTips.length && (
                 <Pressable
                   onPress={() => setOpenTrainerTips(true)}
-                  style={[colors.backgroundPrimary, common.roundedSm, spacing.pdXs]}
+                  style={[colors.backgroundSecondaryContainer, common.roundedSm, spacing.pdSm]}
                 >
-                  <Text style={[fonts.md, colors.textOnBackground, text.textBold]}>
-                    דגשים לתרגיל
-                  </Text>
+                  <Text style={[fonts.md, colors.textOnBackground]}>דגשים לתרגיל</Text>
                 </Pressable>
               )}
             </View>
@@ -200,7 +200,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               <View
                 style={[
                   common.rounded,
-                  colors.backgroundSecondaryContainer,
+                  colors.backgroundPrimary,
                   spacing.pdDefault,
                   layout.widthFull,
                   layout.flexRowReverse,
