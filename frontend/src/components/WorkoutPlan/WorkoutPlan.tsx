@@ -212,7 +212,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
             <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
           }
           style={colors.background}
-          contentContainerStyle={{ minHeight: `110%` }}
+          contentContainerStyle={spacing.pdBottomBar}
         >
           <CardioWrapper cardioPlan={data?.cardio} />
         </ScrollView>
