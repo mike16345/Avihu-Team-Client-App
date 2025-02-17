@@ -10,7 +10,7 @@ import {
   Platform,
 } from "react-native";
 import { useEffect, useState } from "react";
-import avihuFlyTrap from "@assets/avihu/avihuFlyTrap.jpeg";
+import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
 import { showAlert, testEmail } from "@/utils/utils";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { Button } from "react-native-paper";
@@ -169,8 +169,6 @@ export default function Login({ onLogin }: ILoginProps) {
           source={avihuFlyTrap}
           style={[
             {
-              position: "absolute",
-              top: 2,
               width: moderateScale(350, 2),
               height: moderateScale(700, 2),
               zIndex: 0,
@@ -300,7 +298,6 @@ export default function Login({ onLogin }: ILoginProps) {
               />
             </ConditionalRender>
           </View>
-          {/* Login button*/}
           <ConditionalRender condition={showConfirmButton}>
             <View style={[layout.center]}>
               <Button
