@@ -72,7 +72,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const exerciseMethodQuery = useQuery(
     [EXERCISE_METHOD + exercise.exerciseMethod],
     () => getExerciseMethodByName(exercise?.exerciseMethod || ``).then((res) => res.data),
-    { enabled: !!exercise.exerciseMethod }
+    { enabled: !!exercise.exerciseMethod, staleTime: ONE_DAY / 2 }
   );
 
   const lastRecordedSet = findLatestRecordedSetByNumber(data || [], setNumber);

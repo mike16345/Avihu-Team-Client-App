@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import Login from "@/components/Login/Login";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import BottomTabNavigator from "./BottomTabNavigator";
@@ -6,54 +6,65 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
-import Loader from "@/components/ui/loaders/Loader";
 import useNotification from "@/hooks/useNotfication";
 import { showAlert } from "@/utils/utils";
-import { NO_ACCESS } from "@/constants/Constants";
+import { NO_ACCESS, SESSION_EXPIRED } from "@/constants/Constants";
+import { useQueryClient } from "@tanstack/react-query";
+import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
+import useLogout from "@/hooks/useLogout";
 
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
-  const sessionStorage = useAsyncStorage("sessionToken");
+  const queryClient = useQueryClient();
+  const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
 
-  const { checkUserSessionToken, getUserById } = useUserApi();
+  const { checkUserSessionToken } = useUserApi();
   const { currentUser, setCurrentUser } = useUserStore();
   const { initializeNotifications, requestPermissions } = useNotification();
-
-  const [isLoading, setIsLoading] = useState(false);
+  const { handleLogout } = useLogout();
 
   const onLogin = (user: IUser) => {
+    queryClient.setQueryData(["user-", user._id], user);
     setCurrentUser(user);
+  };
+
+  const getUserFromLocalStorage = async () => {
+    const token = await sessionStorage.getItem();
+    const tokenData = JSON.parse(token || "{}");
+
+    if (!token || !tokenData) return;
+    setCurrentUser(tokenData.data.user);
   };
 
   const checkLoginStatus = async () => {
     const token = await sessionStorage.getItem();
     const tokenData = JSON.parse(token || "{}");
+
     if (!token || !tokenData) return;
-    setIsLoading(true);
 
     try {
       const { isValid, hasAccess } = await checkUserSessionToken(tokenData);
 
       if (!hasAccess) {
         showAlert("error", NO_ACCESS);
-        setIsLoading(false);
+        handleLogout();
         return;
       }
 
       if (!isValid) {
-        sessionStorage.removeItem();
+        showAlert("error", SESSION_EXPIRED);
+        handleLogout();
         return;
       }
-      const user = await getUserById(tokenData.userId);
-
-      setCurrentUser(user);
-      setIsLoading(false);
     } catch (error) {
-      setIsLoading(false);
-      sessionStorage.removeItem();
+      return;
     }
   };
+
+  useLayoutEffect(() => {
+    getUserFromLocalStorage();
+  }, []);
 
   useEffect(() => {
     checkLoginStatus();
@@ -62,10 +73,6 @@ const RootNavigator = () => {
         initializeNotifications();
       })
       .catch((err) => console.log(err));
-
-    return () => {
-      sessionStorage.removeItem();
-    };
   }, []);
 
   return (
@@ -79,7 +86,6 @@ const RootNavigator = () => {
           </>
         )}
       </Stack.Navigator>
-      {isLoading && <Loader variant="Screen" />}
     </>
   );
 };
