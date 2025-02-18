@@ -8,9 +8,10 @@ import {
   useAnimatedValue,
   TouchableOpacity,
   Platform,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useEffect, useState } from "react";
-import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
+import avihuFlyTrap from "@assets/avihu/avihuFlyTrap.jpeg";
 import { showAlert, testEmail } from "@/utils/utils";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { Button } from "react-native-paper";
@@ -23,7 +24,6 @@ import { IUser } from "@/interfaces/User";
 import { Text } from "../ui/Text";
 import ForgotPassword from "./ForgotPassword";
 import { EMAIL_ERROR, NO_ACCESS, NO_PASSWORD } from "@/constants/Constants";
-import DismissKeyboard from "../ui/DismissKeyboard";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import TextInput from "../ui/TextInput";
 import { TextInput as RNTextInput } from "react-native-paper";
@@ -133,6 +133,7 @@ export default function Login({ onLogin }: ILoginProps) {
 
   const handleBackPress = () => {
     setIsRegistering(false);
+    setIsForgotPassword(false);
     setIsChangingPassword(false);
     showPasswordInputs(false);
   };
@@ -162,17 +163,28 @@ export default function Login({ onLogin }: ILoginProps) {
   }, [isForgotPassword, isShowingOtpInputs]);
 
   return (
-    <>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
       <View
-        style={[layout.justifyEnd, layout.itemsCenter, { height: height * 0.95, width: width }]}
+        style={[
+          layout.justifyEnd,
+          layout.itemsCenter,
+          spacing.gapXl,
+          { height: height, width: width },
+        ]}
       >
-        <DismissKeyboard />
-
         {loading && <Loader variant="Screen" />}
         <ImageBackground
           source={avihuFlyTrap}
           style={[
             {
+              position: "absolute",
+              backgroundColor: "black",
+              opacity: 0.7,
+              top: 1,
               width: moderateScale(350, 2),
               height: moderateScale(700, 2),
               zIndex: 0,
@@ -180,30 +192,15 @@ export default function Login({ onLogin }: ILoginProps) {
           ]}
         />
         <KeyboardAvoidingView
-          behavior="position"
-          style={[
-            {
-              zIndex: 30,
-              position: `absolute`,
-              bottom: 80,
-              width: width * 0.9,
-            },
-            spacing.gapXxl,
-            spacing.pdSm,
-          ]}
+          behavior="padding"
+          style={[{ zIndex: 30, width: width * 0.9 }, spacing.gapXxl, spacing.pdSm]}
         >
-          <View style={[layout.widthFull, spacing.gapXxl]}>
+          <View style={[layout.widthFull, spacing.gapXl]}>
             <Animated.View style={[{ transform: [{ translateY: emailInputY }] }, spacing.gapSm]}>
               <ConditionalRender condition={!isChangingPassword}>
                 <Text style={[text.textRight, colors.textOnBackground, text.textBold]}>אימייל</Text>
 
                 <TextInput
-                  style={[
-                    text.textRight,
-                    {
-                      height: 45,
-                    },
-                  ]}
                   activeOutlineColor={colors.borderSecondary.borderColor}
                   placeholder="הכנס אימייל"
                   keyboardType={"email-address"}
@@ -265,16 +262,6 @@ export default function Login({ onLogin }: ILoginProps) {
                 </View>
 
                 <TextInput
-                  theme={{ colors: { primary: "transparent" } }}
-                  underlineColor="transparent"
-                  style={[
-                    {
-                      width: "100%",
-                      height: 45,
-                    },
-
-                    text.textRight,
-                  ]}
                   placeholder="הכנס סיסמה"
                   activeOutlineColor={colors.borderSecondary.borderColor}
                   secureTextEntry={!showPassword}
@@ -333,6 +320,6 @@ export default function Login({ onLogin }: ILoginProps) {
           <Text style={[colors.textOnSecondaryContainer, text.textBold]}>{registerText}</Text>
         </View>
       </View>
-    </>
+    </TouchableWithoutFeedback>
   );
 }

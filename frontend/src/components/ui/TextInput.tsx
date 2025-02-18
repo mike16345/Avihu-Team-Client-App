@@ -4,13 +4,14 @@ import { TextInput as RNPTextInput, TextInputProps } from "react-native-paper";
 const TextInput: FC<TextInputProps> = ({ style, ...props }) => {
   return (
     <RNPTextInput
-      theme={{ colors: { primary: "transparent" } }}
       underlineColor="transparent"
+      underlineStyle={{ width: 0 }}
       style={[
         {
+          borderWidth: 0,
           textAlign: "right",
           borderRadius: 9,
-          height: 44,
+          height: 38,
           borderTopLeftRadius: 9,
           borderTopRightRadius: 9,
           backgroundColor: "rgba(256, 256, 256, 0.3)",
