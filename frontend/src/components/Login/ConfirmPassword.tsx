@@ -37,7 +37,6 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
           סיסמה
         </Text>
         <TextInput
-          style={[text.textRight]}
           activeOutlineColor={colors.borderSecondary.borderColor}
           placeholder="הכנס סיסמה חדשה"
           error={!!(errors.password || errors.validPassword)}
@@ -55,13 +54,12 @@ const ConfirmPassword: React.FC<ConfirmPasswordProps> = ({
         <Text
           style={[text.textRight, spacing.pdHorizontalXs, colors.textOnBackground, text.textBold]}
         >
-          אישור סיסמה
+          אמת/י סיסמה
         </Text>
         <TextInput
-          style={[text.textRight]}
           activeOutlineColor={colors.borderSecondary.borderColor}
           error={Boolean(errors.confirmPassword)}
-          placeholder="אמת סיסמה חדשה"
+          placeholder="אמת/י סיסמה חדשה"
           secureTextEntry={!showConfirmPassword}
           onChangeText={(val) => handlePasswordConfirmChange(val)}
           left={

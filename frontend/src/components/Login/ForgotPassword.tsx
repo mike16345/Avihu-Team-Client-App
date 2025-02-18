@@ -97,6 +97,8 @@ const ForgotPassword: FC<IForgotPassword> = ({
     if (!testEmail(email)) {
       setFormErrors({ ...formErrors, ["email"]: EMAIL_ERROR });
       return;
+    } else {
+      setFormErrors({ ...formErrors, ["email"]: "" });
     }
 
     let response: boolean | ApiResponse<{ user: IUser; hasPassword: boolean }> = true;
@@ -176,6 +178,12 @@ const ForgotPassword: FC<IForgotPassword> = ({
     }
   }, [showOtpInput]);
 
+  useEffect(() => {
+    if (!isRegistering) return;
+    setShowOtpInput(false);
+    setIsOtpConfirmed(false);
+  }, [isRegistering]);
+
   if (isLoading) return <Loader />;
 
   return (
@@ -202,7 +210,7 @@ const ForgotPassword: FC<IForgotPassword> = ({
           <View style={[spacing.gapLg]}>
             <View style={[spacing.gapSm]}>
               <TextInput
-                style={[{ height: 45 }, text.textCenter]}
+                style={[text.textCenter]}
                 activeOutlineColor={colors.borderSecondary.borderColor}
                 placeholder="קוד אימות בעל 6 ספרות"
                 error={!!formErrors["otp"]}

@@ -78,6 +78,8 @@ export default function Login({ onLogin }: ILoginProps) {
 
     if (!testEmail(formattedEmail)) {
       errors[`email`] = EMAIL_ERROR;
+    } else {
+      errors[`email`] = "";
     }
 
     if (!password) {
@@ -118,6 +120,8 @@ export default function Login({ onLogin }: ILoginProps) {
 
   const handleClickRegister = () => {
     setIsRegistering(true);
+    setIsChangingPassword(false);
+    setIsForgotPassword(false);
     setShowConfirmButton(false);
   };
 
@@ -217,16 +221,17 @@ export default function Login({ onLogin }: ILoginProps) {
                   }
                   value={inputtedCrendentials.email}
                 />
-              </ConditionalRender>
 
-              <ConditionalRender condition={!!formErrors.email}>
-                <Text style={[text.textDanger, text.textRight, text.textBold]}>
-                  {formErrors.email}
-                </Text>
+                <ConditionalRender condition={!!formErrors.email}>
+                  <Text style={[text.textDanger, text.textRight, text.textBold]}>
+                    {formErrors.email}
+                  </Text>
+                </ConditionalRender>
               </ConditionalRender>
 
               <ConditionalRender condition={isForgotPassword}>
-                <TouchableOpacity
+                <Button
+                  mode="text"
                   onPress={() => {
                     handleBackPress();
                     showPasswordInputs(false);
@@ -235,7 +240,7 @@ export default function Login({ onLogin }: ILoginProps) {
                   <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>
                     לא חשוב, נזכרתי
                   </Text>
-                </TouchableOpacity>
+                </Button>
               </ConditionalRender>
             </Animated.View>
 
