@@ -79,11 +79,13 @@ export default function Login({ onLogin }: ILoginProps) {
     if (!testEmail(formattedEmail)) {
       errors[`email`] = EMAIL_ERROR;
     } else {
-      errors[`email`] = "";
+      delete errors[`email`];
     }
 
     if (!password) {
       errors[`password`] = NO_PASSWORD;
+    } else {
+      delete errors[`password`];
     }
 
     if (Object.keys(errors).length > 0) {
@@ -177,6 +179,7 @@ export default function Login({ onLogin }: ILoginProps) {
           layout.justifyEnd,
           layout.itemsCenter,
           spacing.gapXl,
+          Platform.OS == "ios" && spacing.pdBottomBar,
           { height: height, width: width },
         ]}
       >
@@ -186,8 +189,8 @@ export default function Login({ onLogin }: ILoginProps) {
           style={[
             {
               position: "absolute",
-              backgroundColor: "black",
-              opacity: 0.7,
+              // backgroundColor: "black",
+              // opacity: 0.7,
               top: 1,
               width: moderateScale(350, 2),
               height: moderateScale(700, 2),
@@ -290,6 +293,11 @@ export default function Login({ onLogin }: ILoginProps) {
             </ConditionalRender>
             <ConditionalRender condition={isForgotPassword || isRegistering}>
               <ForgotPassword
+                onEmailFail={() =>
+                  setFormErrors((prev) => {
+                    return { ...prev, ["email"]: EMAIL_ERROR };
+                  })
+                }
                 isRegistering={isRegistering}
                 onBackPress={handleBackPress}
                 email={inputtedCrendentials.email}

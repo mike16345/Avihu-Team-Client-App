@@ -4,12 +4,7 @@ import { useOTPApi } from "@/hooks/api/useOTPApi";
 import useStyles from "@/styles/useGlobalStyles";
 import { Button } from "react-native-paper";
 import { showAlert, testEmail, testPassword } from "@/utils/utils";
-import {
-  EMAIL_ERROR,
-  INVALID_PASSWORD,
-  INVALID_PASSWORD_MATCH,
-  NO_PASSWORD,
-} from "@/constants/Constants";
+import { INVALID_PASSWORD, INVALID_PASSWORD_MATCH, NO_PASSWORD } from "@/constants/Constants";
 import ConfirmPassword from "./ConfirmPassword";
 import { usePasswordsApi } from "@/hooks/api/usePasswordsApi";
 import { ICredentialsErrors } from "./Login";
@@ -27,6 +22,7 @@ interface IForgotPassword {
   onOTPConfirmed: () => void;
   isRegistering?: boolean;
   onBackPress: () => void;
+  onEmailFail: () => void;
 }
 
 const ForgotPassword: FC<IForgotPassword> = ({
@@ -34,6 +30,7 @@ const ForgotPassword: FC<IForgotPassword> = ({
   onConfirmChangePasswordSuccess,
   onShowingOtpInputs,
   onOTPConfirmed,
+  onEmailFail,
   isRegistering = false,
   onBackPress,
 }) => {
@@ -94,11 +91,11 @@ const ForgotPassword: FC<IForgotPassword> = ({
   };
 
   const handleGetOtp = async () => {
-    if (!testEmail(email)) {
-      setFormErrors({ ...formErrors, ["email"]: EMAIL_ERROR });
+    const formattedEmail = email.toLowerCase().trim();
+
+    if (!testEmail(formattedEmail)) {
+      onEmailFail();
       return;
-    } else {
-      setFormErrors({ ...formErrors, ["email"]: "" });
     }
 
     let response: boolean | ApiResponse<{ user: IUser; hasPassword: boolean }> = true;
@@ -115,7 +112,7 @@ const ForgotPassword: FC<IForgotPassword> = ({
         return;
       }
 
-      await getOTP(email!);
+      await getOTP(formattedEmail);
       setShowOtpInput(true);
       onShowingOtpInputs?.();
     } catch (error: any) {
