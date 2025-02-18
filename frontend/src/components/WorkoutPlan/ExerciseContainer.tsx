@@ -7,7 +7,6 @@ import { ISession } from "@/interfaces/ISession";
 import useStyles from "@/styles/useGlobalStyles";
 import { useRecordedSetsApi } from "@/hooks/api/useRecordedSetsApi";
 import { useUserStore } from "@/store/userStore";
-import { Colors } from "@/constants/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";

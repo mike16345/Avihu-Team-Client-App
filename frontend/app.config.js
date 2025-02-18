@@ -68,6 +68,6 @@ export default ({ config }) => {
       url: "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2",
     },
     sdkVersion: "51.0.0",
-    platforms: ["ios", "android", "web"],
+    platforms: ["ios", "android"],
   };
 };
