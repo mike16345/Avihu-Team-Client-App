@@ -133,7 +133,8 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     };
   }, []);
 
-  if (isLoading) return <Loader variant="Standard" />;
+  if (isLoading || (exerciseMethodQuery.isLoading && exercise.exerciseMethod))
+    return <Loader variant="Standard" />;
 
   return (
     <>
