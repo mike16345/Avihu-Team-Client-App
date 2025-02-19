@@ -178,13 +178,15 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 { paddingBottom: 12 },
               ]}
             >
-              <View
-                style={[
-                  Platform.OS == `android` ? layout.flexRow : layout.flexRowReverse,
-                  spacing.gapDefault,
-                ]}
-              >
-                <View style={[layout.center, spacing.pdDefault, common.rounded, colors.backdrop]}>
+              <View style={[layout.flexRowReverse, spacing.gapDefault]}>
+                <View
+                  style={[
+                    layout.center,
+                    spacing.pdDefault,
+                    common.rounded,
+                    colors.backgroundSecondaryContainer,
+                  ]}
+                >
                   <Text style={styles.setInfo}>סט: {setNumber}</Text>
                 </View>
                 {/* <Divider color={colors.textPrimary.color} thickness={0.5} /> */}
