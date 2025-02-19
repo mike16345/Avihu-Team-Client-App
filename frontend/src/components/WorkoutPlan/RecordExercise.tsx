@@ -62,6 +62,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const currentUser = useUserStore((state) => state.currentUser);
   const { getUserRecordedSetsByExercise } = useRecordedSetsApi();
   const { getExerciseMethodByName } = useExerciseMethodApi();
+  const [currentSetNumber, setCurrentSetNumber] = useState(setNumber);
 
   const { data, isLoading } = useQuery(
     ["recordedSets", exercise],
@@ -79,7 +80,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     { enabled: !!exercise.exerciseMethod }
   );
 
-  const lastRecordedSet = findLatestRecordedSetByNumber(data || [], setNumber);
+  const lastRecordedSet = findLatestRecordedSetByNumber(data || [], currentSetNumber);
   const strippedTips = exercise.tipFromTrainer?.replace(" ", "");
 
   /* const [recordedSet, setRecordedSet] = useState<Omit<IRecordedSet, "plan">>({
@@ -101,11 +102,12 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     });
   }; */
 
-  const handleSave = async (set) => {
+  const handleSave = async (set: any) => {
     try {
       setIsSetUploading(true);
       setOpenRecordSet(false);
       await handleRecordSet(set);
+      setCurrentSetNumber((prev) => prev + 1);
     } catch (err: any) {
       Toast.show({
         text1: "הסט שהוקלד אינו תקין",
@@ -186,11 +188,11 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                     colors.backgroundSecondaryContainer,
                   ]}
                 >
-                  <Text style={styles.setInfo}>סט: {setNumber}</Text>
+                  <Text style={styles.setInfo}>סט: {currentSetNumber}</Text>
                 </View>
                 {/* <Divider color={colors.textPrimary.color} thickness={0.5} /> */}
 
-                {exercise.sets[setNumber - 1] && (
+                {exercise.sets[currentSetNumber - 1] && (
                   <View
                     style={[
                       layout.center,
@@ -200,9 +202,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                     ]}
                   >
                     <Text style={styles.setInfo}>
-                      חזרות: {exercise.sets[setNumber - 1].minReps}
-                      {exercise.sets[setNumber - 1].maxReps &&
-                        `-${exercise.sets[setNumber - 1].maxReps}`}
+                      חזרות: {exercise.sets[currentSetNumber - 1].minReps}
+                      {exercise.sets[currentSetNumber - 1].maxReps &&
+                        `-${exercise.sets[currentSetNumber - 1].maxReps}`}
                     </Text>
                   </View>
                 )}
@@ -409,7 +411,7 @@ export default RecordExercise;
 
 const styles = StyleSheet.create({
   setInfo: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "white",
   },

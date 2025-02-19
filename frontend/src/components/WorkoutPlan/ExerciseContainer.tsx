@@ -7,7 +7,6 @@ import { ISession } from "@/interfaces/ISession";
 import useStyles from "@/styles/useGlobalStyles";
 import { useRecordedSetsApi } from "@/hooks/api/useRecordedSetsApi";
 import { useUserStore } from "@/store/userStore";
-import { Colors } from "@/constants/Colors";
 import { useNavigation } from "@react-navigation/native";
 import { WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -75,13 +74,10 @@ const ExerciseContainer: FC<WorkoutProps> = ({
             text1Style: { textAlign: `center` },
             text2Style: { textAlign: `center` },
           });
-          navigation?.goBack();
-
-          resolve(); // Resolve the promise after successful completion
+          resolve();
         })
         .catch((err) => {
-          console.error(err);
-          reject(err); // Reject the promise if there's an error
+          reject(err);
         });
     });
   };
@@ -148,7 +144,6 @@ const ExerciseContainer: FC<WorkoutProps> = ({
               handleViewSet={(setNumber) => {
                 if (setNumber >= currentSetNumber) return;
                 console.log("viewSet", setNumber);
-                navigation.setOptions({ title: exercise.name });
                 navigation.navigate("RecordSet", {
                   recordedSet: {},
                   exercise: exercise,
