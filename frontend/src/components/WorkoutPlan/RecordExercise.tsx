@@ -170,22 +170,40 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
             <View
               style={[
-                layout.flexRowReverse,
+                /* layout.flexRowReverse,
                 layout.itemsCenter,
-                layout.justifyBetween,
+                layout.justifyBetween, */
+                layout.center,
                 layout.widthFull,
                 { paddingBottom: 12 },
               ]}
             >
-              <View style={[layout.flexColumn, layout.itemsEnd, spacing.gapXs]}>
-                <Text style={styles.setInfo}>סט: {setNumber}</Text>
-                <Divider color={colors.textPrimary.color} thickness={0.5} />
+              <View
+                style={[
+                  Platform.OS == `android` ? layout.flexRow : layout.flexRowReverse,
+                  spacing.gapDefault,
+                ]}
+              >
+                <View style={[layout.center, spacing.pdDefault, common.rounded, colors.backdrop]}>
+                  <Text style={styles.setInfo}>סט: {setNumber}</Text>
+                </View>
+                {/* <Divider color={colors.textPrimary.color} thickness={0.5} /> */}
+
                 {exercise.sets[setNumber - 1] && (
-                  <Text style={styles.setInfo}>
-                    חזרות: {exercise.sets[setNumber - 1].minReps}
-                    {exercise.sets[setNumber - 1].maxReps &&
-                      `-${exercise.sets[setNumber - 1].maxReps}`}
-                  </Text>
+                  <View
+                    style={[
+                      layout.center,
+                      spacing.pdDefault,
+                      common.rounded,
+                      colors.backgroundSecondaryContainer,
+                    ]}
+                  >
+                    <Text style={styles.setInfo}>
+                      חזרות: {exercise.sets[setNumber - 1].minReps}
+                      {exercise.sets[setNumber - 1].maxReps &&
+                        `-${exercise.sets[setNumber - 1].maxReps}`}
+                    </Text>
+                  </View>
                 )}
               </View>
               {/*  {strippedTips && strippedTips.length && (
