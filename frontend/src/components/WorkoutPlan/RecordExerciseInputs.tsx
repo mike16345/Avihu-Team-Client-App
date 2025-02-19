@@ -147,7 +147,7 @@ const RecordExerciseInputs: React.FC<RecordExerciseInputsProps> = ({
       </View>
       <View
         style={[
-          layout.flexDirectionByPlatform,
+          layout.flexRowReverse,
           layout.center,
           layout.widthFull,
           spacing.gapLg,
@@ -155,18 +155,18 @@ const RecordExerciseInputs: React.FC<RecordExerciseInputsProps> = ({
         ]}
       >
         <Button
-          mode="contained"
-          onPress={() => saveSet(recordedSet)}
-          style={[common.rounded, { width: `48%` }]}
-        >
-          <Text style={[text.textBold, colors.textOnBackground]}>שמור</Text>
-        </Button>
-        <Button
           mode="contained-tonal"
           onPress={handleClose}
           style={[common.rounded, { width: `48%` }]}
         >
           בטל
+        </Button>
+        <Button
+          mode="contained"
+          onPress={() => saveSet(recordedSet)}
+          style={[common.rounded, { width: `48%` }]}
+        >
+          <Text style={[text.textBold, colors.textOnBackground]}>שמור</Text>
         </Button>
       </View>
     </View>

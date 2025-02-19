@@ -170,10 +170,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
             <View
               style={[
-                /* layout.flexRowReverse,
+                layout.flexRowReverse,
                 layout.itemsCenter,
-                layout.justifyBetween, */
-                layout.center,
+                layout.justifyBetween,
                 layout.widthFull,
                 { paddingBottom: 12 },
               ]}
