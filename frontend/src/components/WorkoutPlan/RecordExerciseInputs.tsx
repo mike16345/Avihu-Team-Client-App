@@ -67,6 +67,7 @@ const RecordExerciseInputs: React.FC<RecordExerciseInputsProps> = ({
           spacing.pdVerticalXl,
           colors.backdrop,
           common.rounded,
+          spacing.pdBottomBar,
         ]}
       >
         <View style={[layout.center, spacing.gapDefault]}>
