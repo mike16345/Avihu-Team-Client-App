@@ -28,6 +28,8 @@ import { Text } from "../ui/Text";
 import Toast from "react-native-toast-message";
 import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
 import Divider from "../ui/Divider";
+import BottomDrawer from "../ui/BottomDrawer";
+import RecordExerciseInputs from "./RecordExerciseInputs";
 
 type InputTypes = "reps" | "weight";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
@@ -50,10 +52,10 @@ const findLatestRecordedSetByNumber = (
 };
 
 const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
-  const repsOptions = useMemo(() => generateWheelPickerData(1, 100), []);
+  /* const repsOptions = useMemo(() => generateWheelPickerData(1, 100), []); */
   const { handleRecordSet, exercise, muscleGroup, setNumber } = route!.params;
 
-  const { height, width } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const customStyles = useStyles();
   const { colors, fonts, layout, spacing, text, common } = customStyles;
   const currentUser = useUserStore((state) => state.currentUser);
@@ -79,28 +81,30 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const lastRecordedSet = findLatestRecordedSetByNumber(data || [], setNumber);
   const strippedTips = exercise.tipFromTrainer?.replace(" ", "");
 
-  const [recordedSet, setRecordedSet] = useState<Omit<IRecordedSet, "plan">>({
+  /* const [recordedSet, setRecordedSet] = useState<Omit<IRecordedSet, "plan">>({
     weight: 0,
     repsDone: 0,
     note: "",
-  });
+  }); */
 
   const [openTrainerTips, setOpenTrainerTips] = useState(false);
+  const [openRecordSet, setOpenRecordSet] = useState(false);
   const [isSetUploading, setIsSetUploading] = useState(false);
 
-  const handleUpdateRecordedSet = <K extends keyof IRecordedSet>(
+  /*  const handleUpdateRecordedSet = <K extends keyof IRecordedSet>(
     key: keyof IRecordedSet,
     value: IRecordedSet[K]
   ) => {
     setRecordedSet((prev) => {
       return { ...prev, [key]: value };
     });
-  };
+  }; */
 
-  const handleSave = async () => {
+  const handleSave = async (set) => {
     try {
       setIsSetUploading(true);
-      await handleRecordSet(recordedSet);
+      setOpenRecordSet(false);
+      await handleRecordSet(set);
     } catch (err: any) {
       Toast.show({
         text1: "הסט שהוקלד אינו תקין",
@@ -134,7 +138,15 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   return (
     <>
       {isSetUploading && <Loader variant="Screen" />}
-      <View style={[layout.sizeFull, layout.flex1, spacing.pdBottomBar, colors.background]}>
+      <View
+        style={[
+          layout.sizeFull,
+          layout.flex1,
+          spacing.pdBottomBar,
+          colors.background,
+          spacing.gapDefault,
+        ]}
+      >
         {exercise.linkToVideo && (
           <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
         )}
@@ -156,9 +168,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             <Text style={[colors.textOnSecondaryContainer]}>סרטון לא נמצא</Text>
           </View>
         )}
-        <View
-          style={[layout.flexGrow, !lastRecordedSet && layout.justifyEvenly, spacing.pdDefault]}
-        >
+        <View style={[layout.flexGrow, layout.justifyStart, spacing.pdDefault, spacing.gapLg]}>
           <View style={[layout.itemsEnd, spacing.gapMd]}>
             <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
             <View
@@ -167,6 +177,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 layout.itemsCenter,
                 layout.justifyBetween,
                 layout.widthFull,
+                { paddingBottom: 12 },
               ]}
             >
               <View style={[layout.flexColumn, layout.itemsEnd, spacing.gapXs]}>
@@ -229,7 +240,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             )}
           </View>
 
-          <View style={[layout.flexRow, layout.justifyEvenly, spacing.pdVerticalSm]}>
+          {/*  <View style={[layout.flexRow, layout.justifyEvenly, spacing.pdVerticalSm]}>
             <View style={[layout.center, spacing.gapDefault]}>
               <Text style={[colors.textOnSecondaryContainer, fonts.default]}>חזרות</Text>
 
@@ -288,7 +299,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 />
               </View>
             </View>
-          </View>
+          </View> */}
           {lastRecordedSet && (
             <TouchableOpacity
               onPress={() => {
@@ -315,7 +326,14 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             </TouchableOpacity>
           )}
         </View>
-        <View
+        <Button
+          mode="contained"
+          onPress={() => setOpenRecordSet(true)}
+          style={[common.rounded, spacing.mgHorizontalDefault]}
+        >
+          <Text style={[colors.textOnBackground, text.textBold]}>הקלט סט</Text>
+        </Button>
+        {/* <View
           style={[
             layout.flexDirectionByPlatform,
             layout.center,
@@ -334,8 +352,21 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
           >
             בטל
           </Button>
-        </View>
+        </View> */}
       </View>
+      <BottomDrawer
+        onClose={() => setOpenRecordSet(false)}
+        open={openRecordSet}
+        heightVariant="auto"
+        children={
+          <RecordExerciseInputs
+            isLoading={isSetUploading}
+            handleClose={() => setOpenRecordSet(false)}
+            lastRecordedSet={lastRecordedSet}
+            saveSet={(set) => handleSave(set)}
+          />
+        }
+      />
     </>
   );
 };
