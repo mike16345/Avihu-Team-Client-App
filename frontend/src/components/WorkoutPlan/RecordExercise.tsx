@@ -364,7 +364,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
         <Button
           mode="contained"
           onPress={() => setOpenRecordSet(true)}
-          style={[common.rounded, spacing.mgHorizontalDefault, spacing.pdSm]}
+          style={[common.rounded, spacing.mgDefault, spacing.pdVerticalXs]}
         >
           <Text style={[colors.textOnBackground, text.textBold, fonts.lg]}>הקלט סט</Text>
         </Button>
