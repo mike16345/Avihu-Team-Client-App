@@ -9,6 +9,7 @@ import {
   Modal,
   BackHandler,
   ImageBackground,
+  NativeEventSubscription,
 } from "react-native";
 import { useNavigationState } from "@react-navigation/native";
 import workoutPage from "@assets/avihu/workoutPage.jpeg";
@@ -17,7 +18,7 @@ import progressPage from "@assets/avihu/progressPage.jpeg";
 import recordExercisePage from "@assets/avihu/recordExercisePage.jpeg";
 import blogsPage from "@assets/avihu/blogsPage.jpeg";
 
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 interface RightDrawerProps {
   open: boolean;
@@ -55,23 +56,10 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) =>
     }
   }, [open]);
 
-  useEffect(() => {
-    const onBackPress = () => {
-      if (open) {
-        onClose();
-        return true;
-      }
-      return false;
-    };
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", onBackPress);
-
-    return () => backHandler.remove();
-  }, [open]);
-
   if (!isVisible) return null; // Avoid rendering the modal if not visible
 
   return (
-    <Modal transparent visible={isVisible} animationType="fade">
+    <Modal onRequestClose={onClose} transparent visible={isVisible} animationType="fade">
       <TouchableOpacity style={[styles.overlay]} onPress={onClose} activeOpacity={1}>
         <ImageBackground
           source={

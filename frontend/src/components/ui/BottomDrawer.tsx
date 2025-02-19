@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Dimensions,
   Modal,
-  BackHandler,
   ImageBackground,
 } from "react-native";
 import { useNavigationState } from "@react-navigation/native";
@@ -32,6 +31,7 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
   heightVariant = `fixed`,
 }) => {
   const { colors } = useStyles();
+
   const activePageIndex = useNavigationState((state) => {
     const index = state.index;
     const isRecordSet = state?.routes[1]?.name == `RecordSet`;
@@ -62,18 +62,8 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
     }
   }, [open]);
 
-  useEffect(() => {
-    const onBackPress = () => {
-      onClose();
-      return true;
-    };
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", onBackPress);
-
-    return () => backHandler.remove();
-  }, []);
-
   return (
-    <Modal transparent visible={isVisible} animationType="fade">
+    <Modal onRequestClose={onClose} transparent visible={isVisible} animationType="fade">
       <TouchableOpacity style={[styles.overlay]} onPress={onClose} activeOpacity={1}>
         <ImageBackground
           source={

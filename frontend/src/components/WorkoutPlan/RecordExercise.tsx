@@ -129,10 +129,10 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    BackHandler.addEventListener("hardwareBackPress", handlePressBack);
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", handlePressBack);
 
     return () => {
-      BackHandler.removeEventListener("hardwareBackPress", handlePressBack);
+      backHandler.remove();
     };
   }, []);
 
