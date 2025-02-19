@@ -48,7 +48,7 @@ const RecordedSets: React.FC<RecordedSetsProps> = ({ route }) => {
   }, []);
 
   return (
-    <View style={[spacing.pdDefault]}>
+    <View style={[spacing.pdDefault, colors.background]}>
       {sections.length ? (
         <SectionList
           sections={sections}
