@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   BackHandler,
   Platform,
+  ScrollView,
 } from "react-native";
 import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
@@ -139,14 +140,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   return (
     <>
       {isSetUploading && <Loader variant="Screen" />}
-      <View
-        style={[
-          layout.sizeFull,
-          layout.flex1,
-          spacing.pdBottomBar,
-          colors.background,
-          spacing.gapDefault,
-        ]}
+      <ScrollView
+        style={[layout.sizeFull, layout.flex1, spacing.pdBottomBar, colors.background]}
+        contentContainerStyle={[spacing.pdBottomBar]}
       >
         {exercise.linkToVideo && (
           <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
@@ -192,14 +188,14 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   </Text>
                 )}
               </View>
-              {strippedTips && strippedTips.length && (
+              {/*  {strippedTips && strippedTips.length && (
                 <Pressable
                   onPress={() => setOpenTrainerTips(true)}
                   style={[colors.backgroundSecondaryContainer, common.roundedSm, spacing.pdSm]}
                 >
                   <Text style={[fonts.md, colors.textOnBackground]}>דגשים לתרגיל</Text>
                 </Pressable>
-              )}
+              )} */}
             </View>
 
             <WorkoutTips
@@ -301,38 +297,56 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               </View>
             </View>
           </View> */}
-          {lastRecordedSet && (
-            <TouchableOpacity
-              onPress={() => {
-                navigation?.navigate("RecordedSets", {
-                  recordedSets: data || [],
-                });
-              }}
-              style={[spacing.mgVerticalDefault, spacing.gapSm]}
-            >
-              <Text style={[text.textRight, text.textBold, colors.textOnSecondaryContainer]}>
-                אימון קודם - {new Date(lastRecordedSet.date).toLocaleDateString()}
+          {/* {lastRecordedSet && ( */}
+          <TouchableOpacity
+            onPress={() => {
+              navigation?.navigate("RecordedSets", {
+                recordedSets: data || [],
+              });
+            }}
+            disabled={!lastRecordedSet}
+            style={[spacing.mgVerticalDefault, spacing.gapSm]}
+          >
+            <Text style={[text.textRight, text.textBold, colors.textOnSecondaryContainer]}>
+              אימון קודם
+              {lastRecordedSet && "-" + new Date(lastRecordedSet.date).toLocaleDateString()}
+            </Text>
+            <RecordedSetInfo
+              actionButton={
+                <NativeIcon
+                  color={colors.textOnSecondaryContainer.color}
+                  library="MaterialCommunityIcons"
+                  name="chevron-left"
+                  size={28}
+                />
+              }
+              recordedSet={lastRecordedSet}
+            />
+          </TouchableOpacity>
+
+          <View style={[spacing.mgVerticalDefault, spacing.gapSm]}>
+            <Text style={[text.textRight, text.textBold, colors.textOnSecondaryContainer]}>
+              דגשים לתרגיל
+            </Text>
+            <View style={[spacing.pdDefault, common.rounded, colors.backgroundSecondaryContainer]}>
+              <Text
+                style={[
+                  colors.textOnBackground,
+                  exercise.tipFromTrainer ? text.textRight : text.textCenter,
+                  spacing.pdDefault,
+                ]}
+              >
+                {exercise.tipFromTrainer || `אין דגשים ספציפיים לאימון זה`}
               </Text>
-              <RecordedSetInfo
-                actionButton={
-                  <NativeIcon
-                    color={colors.textOnSecondaryContainer.color}
-                    library="MaterialCommunityIcons"
-                    name="chevron-left"
-                    size={28}
-                  />
-                }
-                recordedSet={lastRecordedSet}
-              />
-            </TouchableOpacity>
-          )}
+            </View>
+          </View>
         </View>
         <Button
           mode="contained"
           onPress={() => setOpenRecordSet(true)}
-          style={[common.rounded, spacing.mgHorizontalDefault]}
+          style={[common.rounded, spacing.mgHorizontalDefault, spacing.pdSm]}
         >
-          <Text style={[colors.textOnBackground, text.textBold]}>הקלט סט</Text>
+          <Text style={[colors.textOnBackground, text.textBold, fonts.lg]}>הקלט סט</Text>
         </Button>
         {/* <View
           style={[
@@ -354,7 +368,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             בטל
           </Button>
         </View> */}
-      </View>
+      </ScrollView>
       <BottomDrawer
         onClose={() => setOpenRecordSet(false)}
         open={openRecordSet}
