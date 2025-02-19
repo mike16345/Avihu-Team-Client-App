@@ -140,6 +140,8 @@ export const servingTypeToString = (type: string) => {
       return "כוסות";
     case "teaSpoons":
       return "כפיות";
+    case "units":
+      return "יחידות";
     default:
       return type;
   }
