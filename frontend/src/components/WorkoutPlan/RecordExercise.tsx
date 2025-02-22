@@ -6,8 +6,6 @@ import {
   Pressable,
   TouchableOpacity,
   BackHandler,
-  Platform,
-  ScrollView,
 } from "react-native";
 import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
@@ -30,9 +28,7 @@ import Toast from "react-native-toast-message";
 import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
 import Divider from "../ui/Divider";
 import BottomDrawer from "../ui/BottomDrawer";
-import RecordExerciseInputs from "./RecordExerciseInputs";
 
-type InputTypes = "reps" | "weight";
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
 
 const findLatestRecordedSetByNumber = (
@@ -181,7 +177,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 {exercise.sets[currentSetNumber - 1] && (
                   <>
                     <Divider color={colors.textPrimary.color} thickness={0.5} />
-
                     <Text style={styles.setInfo}>
                       חזרות: {exercise.sets[currentSetNumber - 1].minReps}
                       {exercise.sets[currentSetNumber - 1].maxReps &&
