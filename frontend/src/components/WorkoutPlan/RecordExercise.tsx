@@ -53,10 +53,10 @@ const findLatestRecordedSetByNumber = (
 };
 
 const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
-  /* const repsOptions = useMemo(() => generateWheelPickerData(1, 100), []); */
+  const repsOptions = useMemo(() => generateWheelPickerData(1, 100), []);
   const { handleRecordSet, exercise, muscleGroup, setNumber } = route!.params;
 
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const customStyles = useStyles();
   const { colors, fonts, layout, spacing, text, common } = customStyles;
   const currentUser = useUserStore((state) => state.currentUser);
@@ -83,30 +83,29 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const lastRecordedSet = findLatestRecordedSetByNumber(data || [], currentSetNumber);
   const strippedTips = exercise.tipFromTrainer?.replace(" ", "");
 
-  /* const [recordedSet, setRecordedSet] = useState<Omit<IRecordedSet, "plan">>({
+  const [recordedSet, setRecordedSet] = useState<Omit<IRecordedSet, "plan">>({
     weight: 0,
     repsDone: 0,
     note: "",
-  }); */
+  });
 
   const [openTrainerTips, setOpenTrainerTips] = useState(false);
-  const [openRecordSet, setOpenRecordSet] = useState(false);
+  const [openExerciseMethod, setOpenExerciseMethod] = useState(false);
   const [isSetUploading, setIsSetUploading] = useState(false);
 
-  /*  const handleUpdateRecordedSet = <K extends keyof IRecordedSet>(
+  const handleUpdateRecordedSet = <K extends keyof IRecordedSet>(
     key: keyof IRecordedSet,
     value: IRecordedSet[K]
   ) => {
     setRecordedSet((prev) => {
       return { ...prev, [key]: value };
     });
-  }; */
+  };
 
-  const handleSave = async (set: any) => {
+  const handleSave = async () => {
     try {
       setIsSetUploading(true);
-      setOpenRecordSet(false);
-      await handleRecordSet(set);
+      await handleRecordSet(recordedSet);
       setCurrentSetNumber((prev) => prev + 1);
     } catch (err: any) {
       Toast.show({
@@ -142,10 +141,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   return (
     <>
       {isSetUploading && <Loader variant="Screen" />}
-      <ScrollView
-        style={[layout.sizeFull, layout.flex1, spacing.pdBottomBar, colors.background]}
-        contentContainerStyle={[spacing.pdBottomBar]}
-      >
+      <View style={[layout.sizeFull, layout.flex1, spacing.pdBottomBar, colors.background]}>
         {exercise.linkToVideo && (
           <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
         )}
@@ -179,44 +175,39 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 { paddingBottom: 12 },
               ]}
             >
-              <View style={[layout.flexRowReverse, spacing.gapDefault]}>
-                <View
-                  style={[
-                    layout.center,
-                    spacing.pdDefault,
-                    common.rounded,
-                    colors.backgroundSecondaryContainer,
-                  ]}
-                >
-                  <Text style={styles.setInfo}>סט: {currentSetNumber}</Text>
-                </View>
-                {/* <Divider color={colors.textPrimary.color} thickness={0.5} /> */}
+              <View style={[layout.flexColumn, layout.itemsEnd, spacing.gapDefault]}>
+                <Text style={styles.setInfo}>סט: {currentSetNumber}</Text>
 
                 {exercise.sets[currentSetNumber - 1] && (
-                  <View
-                    style={[
-                      layout.center,
-                      spacing.pdDefault,
-                      common.rounded,
-                      colors.backgroundSecondaryContainer,
-                    ]}
-                  >
+                  <>
+                    <Divider color={colors.textPrimary.color} thickness={0.5} />
+
                     <Text style={styles.setInfo}>
                       חזרות: {exercise.sets[currentSetNumber - 1].minReps}
                       {exercise.sets[currentSetNumber - 1].maxReps &&
                         `-${exercise.sets[currentSetNumber - 1].maxReps}`}
                     </Text>
-                  </View>
+                  </>
                 )}
               </View>
-              {/*  {strippedTips && strippedTips.length && (
-                <Pressable
-                  onPress={() => setOpenTrainerTips(true)}
-                  style={[colors.backgroundSecondaryContainer, common.roundedSm, spacing.pdSm]}
-                >
-                  <Text style={[fonts.md, colors.textOnBackground]}>דגשים לתרגיל</Text>
-                </Pressable>
-              )} */}
+              <View style={[layout.flexRowReverse, spacing.gapDefault]}>
+                {strippedTips && strippedTips.length && (
+                  <Pressable
+                    onPress={() => setOpenTrainerTips(true)}
+                    style={[colors.backgroundSecondaryContainer, common.roundedSm, spacing.pdSm]}
+                  >
+                    <Text style={[fonts.md, colors.textOnBackground]}>דגשים לתרגיל</Text>
+                  </Pressable>
+                )}
+                {exerciseMethodQuery.data && (
+                  <Pressable
+                    onPress={() => setOpenExerciseMethod(true)}
+                    style={[colors.backgroundPrimary, common.roundedSm, spacing.pdSm]}
+                  >
+                    <Text style={[fonts.md, colors.textOnBackground]}>שיטת אימון</Text>
+                  </Pressable>
+                )}
+              </View>
             </View>
 
             <WorkoutTips
@@ -225,40 +216,68 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               title="דגשים לתרגיל"
               setOpenTips={setOpenTrainerTips}
             />
-            {exerciseMethodQuery.data && (
-              <View
-                style={[
-                  common.rounded,
-                  colors.backgroundPrimary,
-                  spacing.pdDefault,
-                  layout.widthFull,
-                  layout.flexRowReverse,
-                  layout.itemsCenter,
-                  spacing.gapDefault,
-                  layout.justifyStart,
-                ]}
-              >
-                <View style={[spacing.gapSm]}>
-                  <View style={[layout.flexRowReverse, layout.widthFull, layout.justifyBetween]}>
-                    <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
-                      {exerciseMethodQuery.data?.title}
-                    </Text>
-                    <NativeIcon
-                      size={24}
-                      style={[colors.textOnBackground]}
-                      library="MaterialCommunityIcons"
-                      name="dumbbell"
-                    />
-                  </View>
-                  <Text style={[colors.textOnBackground, text.textRight]}>
-                    {exerciseMethodQuery.data?.description}
+
+            <BottomDrawer
+              onClose={() => setOpenExerciseMethod(false)}
+              open={openExerciseMethod}
+              heightVariant="auto"
+              children={
+                <View
+                  style={[
+                    layout.itemsEnd,
+                    spacing.gapDefault,
+                    spacing.pdDefault,
+                    spacing.pdBottomBar,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      text.textRight,
+                      fonts.xxl,
+                      text.textBold,
+                      colors.textPrimary,
+                      spacing.pdDefault,
+                    ]}
+                  >
+                    שיטת אימון
                   </Text>
+                  <View
+                    style={[
+                      common.rounded,
+                      colors.backdrop,
+                      spacing.pdDefault,
+                      layout.widthFull,
+                      layout.flexRowReverse,
+                      layout.itemsCenter,
+                      spacing.gapDefault,
+                      layout.justifyStart,
+                    ]}
+                  >
+                    <View style={[spacing.gapSm]}>
+                      <View
+                        style={[layout.flexRowReverse, layout.widthFull, layout.justifyBetween]}
+                      >
+                        <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
+                          {exerciseMethodQuery.data?.title}
+                        </Text>
+                        <NativeIcon
+                          size={24}
+                          style={[colors.textOnBackground]}
+                          library="MaterialCommunityIcons"
+                          name="dumbbell"
+                        />
+                      </View>
+                      <Text style={[colors.textOnBackground, text.textRight]}>
+                        {exerciseMethodQuery.data?.description}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
-              </View>
-            )}
+              }
+            />
           </View>
 
-          {/*  <View style={[layout.flexRow, layout.justifyEvenly, spacing.pdVerticalSm]}>
+          <View style={[layout.flexRow, layout.justifyEvenly, spacing.pdVerticalSm]}>
             <View style={[layout.center, spacing.gapDefault]}>
               <Text style={[colors.textOnSecondaryContainer, fonts.default]}>חזרות</Text>
 
@@ -317,8 +336,8 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 />
               </View>
             </View>
-          </View> */}
-          {/* {lastRecordedSet && ( */}
+          </View>
+
           <TouchableOpacity
             onPress={() => {
               navigation?.navigate("RecordedSets", {
@@ -344,43 +363,16 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               recordedSet={lastRecordedSet}
             />
           </TouchableOpacity>
-
-          <View style={[spacing.mgVerticalDefault, spacing.gapSm]}>
-            <Text style={[text.textRight, text.textBold, colors.textOnSecondaryContainer]}>
-              דגשים לתרגיל
-            </Text>
-            <View style={[spacing.pdDefault, common.rounded, colors.backgroundSecondaryContainer]}>
-              <Text
-                style={[
-                  colors.textOnBackground,
-                  exercise.tipFromTrainer ? text.textRight : text.textCenter,
-                  spacing.pdDefault,
-                ]}
-              >
-                {exercise.tipFromTrainer || `אין דגשים ספציפיים לאימון זה`}
-              </Text>
-            </View>
-          </View>
         </View>
-        <Button
-          mode="contained"
-          onPress={() => setOpenRecordSet(true)}
-          style={[common.rounded, spacing.mgDefault, spacing.pdVerticalXs]}
-        >
-          <Text style={[colors.textOnBackground, text.textBold, fonts.lg]}>הקלט סט</Text>
-        </Button>
-        {/* <View
+        <View
           style={[
-            layout.flexDirectionByPlatform,
+            layout.flexRowReverse,
             layout.center,
             layout.widthFull,
             spacing.gapLg,
             spacing.pdHorizontalDefault,
           ]}
         >
-          <Button mode="contained" onPress={handleSave} style={[common.rounded, { width: `48%` }]}>
-            <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
-          </Button>
           <Button
             mode="contained-tonal"
             onPress={() => navigation?.goBack()}
@@ -388,21 +380,11 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
           >
             בטל
           </Button>
-        </View> */}
-      </ScrollView>
-      <BottomDrawer
-        onClose={() => setOpenRecordSet(false)}
-        open={openRecordSet}
-        heightVariant="auto"
-        children={
-          <RecordExerciseInputs
-            isLoading={isSetUploading}
-            handleClose={() => setOpenRecordSet(false)}
-            lastRecordedSet={lastRecordedSet}
-            saveSet={(set) => handleSave(set)}
-          />
-        }
-      />
+          <Button mode="contained" onPress={handleSave} style={[common.rounded, { width: `48%` }]}>
+            <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
+          </Button>
+        </View>
+      </View>
     </>
   );
 };
