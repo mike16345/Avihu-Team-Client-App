@@ -145,7 +145,8 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
           layout.sizeFull,
           layout.flex1,
           spacing.pdBottomBar,
-          spacing.pdStatusBar,
+          spacing.gapSm,
+          // spacing.pdStatusBar,
           colors.background,
         ]}
       >
@@ -159,7 +160,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               { width: width, height: 200 },
               colors.backgroundSecondaryContainer,
               layout.center,
-              spacing.gapSm,
             ]}
           >
             <NativeIcon
@@ -170,7 +170,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             <Text style={[colors.textOnSecondaryContainer]}>סרטון לא נמצא</Text>
           </View>
         )}
-        <View style={[layout.flexGrow, layout.justifyStart, spacing.pdDefault, spacing.gapSm]}>
+        <View
+          style={[layout.flexGrow, layout.justifyStart, spacing.pdHorizontalDefault, spacing.gapSm]}
+        >
           <View style={[layout.itemsEnd, spacing.gapMd]}>
             <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
             <View
@@ -179,10 +181,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                 layout.itemsCenter,
                 layout.justifyBetween,
                 layout.widthFull,
-                { paddingBottom: 12 },
               ]}
             >
-              <View style={[layout.flexColumn, layout.itemsEnd, spacing.gapDefault]}>
+              <View style={[layout.flexColumn, layout.itemsEnd, spacing.gapXs]}>
                 <Text style={styles.setInfo}>סט: {currentSetNumber}</Text>
 
                 {exercise.sets[currentSetNumber - 1] && (

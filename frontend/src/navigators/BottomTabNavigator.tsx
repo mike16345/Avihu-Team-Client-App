@@ -11,11 +11,10 @@ const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
 const BottomTabNavigator = () => {
   const { layout, colors } = useStyles();
-  const { isTopBarVisible } = useLayoutStore();
 
   return (
     <View style={[layout.flex1, colors.background, layout.justifyEvenly]}>
-      {isTopBarVisible && <TopBar />}
+      {<TopBar />}
       <Tab.Navigator
         barStyle={[
           {
