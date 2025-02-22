@@ -11,7 +11,6 @@ export const useLayoutStore = create<ILayoutStore>((set) => ({
   isNavbarOpen: true,
   isTopBarVisible: true,
   setIsTopBarVisible: (isVisible: boolean) => {
-    console.log("setting is top", isVisible);
     set({ isTopBarVisible: isVisible });
   },
   setIsNavbarOpen: (isOpen: boolean) => set({ isNavbarOpen: isOpen }),
