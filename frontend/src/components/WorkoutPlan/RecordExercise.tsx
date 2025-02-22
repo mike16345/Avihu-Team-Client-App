@@ -146,7 +146,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
           layout.flex1,
           spacing.pdBottomBar,
           spacing.gapSm,
-          // spacing.pdStatusBar,
           colors.background,
         ]}
       >
