@@ -12,6 +12,7 @@ import { WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Toast from "react-native-toast-message";
 import { Text } from "../ui/Text";
+import { useLayoutStore } from "@/store/layoutStore";
 
 interface WorkoutProps {
   plan: string;
@@ -35,6 +36,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
   const { layout, text, fonts, common, colors } = useStyles();
   const { addRecordedSet, getUserRecordedSetsByExercise } = useRecordedSetsApi();
+  const { setIsTopBarVisible } = useLayoutStore();
 
   const [currentSetNumber, setCurrentSetNumber] = useState(1);
 
@@ -107,7 +109,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.setOptions({ title: exercise.name });
+        setIsTopBarVisible(false);
         navigation.navigate("RecordSet", {
           exercise: exercise,
           muscleGroup: muscleGroup,
@@ -143,14 +145,6 @@ const ExerciseContainer: FC<WorkoutProps> = ({
               totalSets={exercise.sets.length}
               handleViewSet={(setNumber) => {
                 if (setNumber >= currentSetNumber) return;
-                console.log("viewSet", setNumber);
-                navigation.navigate("RecordSet", {
-                  recordedSet: {},
-                  exercise: exercise,
-                  muscleGroup: muscleGroup,
-                  handleRecordSet: (recordedSet) => handleRecordSet(recordedSet, true),
-                  setNumber: currentSetNumber,
-                });
               }}
             />
           </View>

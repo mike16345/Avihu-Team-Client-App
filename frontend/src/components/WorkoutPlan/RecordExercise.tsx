@@ -28,6 +28,7 @@ import Toast from "react-native-toast-message";
 import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
 import Divider from "../ui/Divider";
 import BottomDrawer from "../ui/BottomDrawer";
+import { useLayoutStore } from "@/store/layoutStore";
 
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
 
@@ -51,7 +52,7 @@ const findLatestRecordedSetByNumber = (
 const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const repsOptions = useMemo(() => generateWheelPickerData(1, 100), []);
   const { handleRecordSet, exercise, muscleGroup, setNumber } = route!.params;
-
+  const { setIsTopBarVisible } = useLayoutStore();
   const { width, height } = useWindowDimensions();
   const customStyles = useStyles();
   const { colors, fonts, layout, spacing, text, common } = customStyles;
@@ -127,6 +128,8 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     const backHandler = BackHandler.addEventListener("hardwareBackPress", handlePressBack);
 
     return () => {
+      setIsTopBarVisible(true);
+
       backHandler.remove();
     };
   }, []);
@@ -137,7 +140,15 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   return (
     <>
       {isSetUploading && <Loader variant="Screen" />}
-      <View style={[layout.sizeFull, layout.flex1, spacing.pdBottomBar, colors.background]}>
+      <View
+        style={[
+          layout.sizeFull,
+          layout.flex1,
+          spacing.pdBottomBar,
+          spacing.pdStatusBar,
+          colors.background,
+        ]}
+      >
         {exercise.linkToVideo && (
           <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
         )}
@@ -148,7 +159,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               { width: width, height: 200 },
               colors.backgroundSecondaryContainer,
               layout.center,
-              spacing.gapDefault,
+              spacing.gapSm,
             ]}
           >
             <NativeIcon
@@ -159,7 +170,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             <Text style={[colors.textOnSecondaryContainer]}>סרטון לא נמצא</Text>
           </View>
         )}
-        <View style={[layout.flexGrow, layout.justifyStart, spacing.pdDefault, spacing.gapLg]}>
+        <View style={[layout.flexGrow, layout.justifyStart, spacing.pdDefault, spacing.gapSm]}>
           <View style={[layout.itemsEnd, spacing.gapMd]}>
             <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
             <View

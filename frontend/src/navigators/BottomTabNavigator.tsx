@@ -5,15 +5,17 @@ import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import TopBar from "./TopBar";
+import { useLayoutStore } from "@/store/layoutStore";
 
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
 const BottomTabNavigator = () => {
   const { layout, colors } = useStyles();
+  const { isTopBarVisible } = useLayoutStore();
 
   return (
     <View style={[layout.flex1, colors.background, layout.justifyEvenly]}>
-      <TopBar />
+      {isTopBarVisible && <TopBar />}
       <Tab.Navigator
         barStyle={[
           {
