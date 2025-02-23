@@ -2,14 +2,13 @@ import useStyles from "@/styles/useGlobalStyles";
 import PasswordIndicatorItem from "./PasswordIndicatorItem";
 import { View } from "react-native";
 import { Text } from "../ui/Text";
-import { useEffect } from "react";
 
 interface PasswordIndicatorProps {
   password: string;
 }
 
 const PasswordIndicator: React.FC<PasswordIndicatorProps> = ({ password }) => {
-  const { layout, spacing } = useStyles();
+  const { text, spacing, colors, common } = useStyles();
 
   const DIGIT_REGEX = /\d/;
   const SPECIAL_CHAR_REGEX = /[!@#$%]/;
@@ -27,7 +26,11 @@ const PasswordIndicator: React.FC<PasswordIndicatorProps> = ({ password }) => {
   ];
 
   return (
-    <View style={[layout.widthFull, spacing.pdVerticalSm, spacing.pdHorizontalXs]}>
+    <View style={[spacing.pdDefault, common.rounded, { backgroundColor: "rgba(77, 77, 77, 0.8)" }]}>
+      <Text style={[colors.textOnSecondaryContainer, text.textCenter, text.textBold]}>
+        דגשים לסיסמה
+      </Text>
+
       {passwordIndicators.map(({ checked, message }, i) => (
         <PasswordIndicatorItem checked={checked} message={message} key={i} />
       ))}

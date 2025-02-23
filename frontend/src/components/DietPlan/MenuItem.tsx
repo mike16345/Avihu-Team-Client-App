@@ -21,7 +21,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ menuItem }) => {
       style={[spacing.pdXs, spacing.gapXs, common.rounded, colors.backgroundSecondaryContainer]}
     >
       <View style={[colors.borderPrimary, { borderBottomWidth: 2 }, layout.widthFull]}>
-        <Text style={[colors.textOnBackground, text.textRight, spacing.pdXs, text.textBold]}>
+        <Text style={[colors.textOnBackground, text.textCenter, spacing.pdXs, text.textBold]}>
           {menuItem.name}
         </Text>
       </View>
