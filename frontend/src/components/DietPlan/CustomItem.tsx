@@ -61,14 +61,7 @@ const CustomItem: React.FC<CustomItemProps> = ({ item, quantity }) => {
       ]}
     >
       <View style={[colors.borderPrimary, { borderBottomWidth: 2 }, layout.widthFull]}>
-        <Text
-          style={[
-            colors.textOnBackground,
-            Platform.OS == `ios` ? text.textLeft : text.textRight,
-            spacing.pdXs,
-            text.textBold,
-          ]}
-        >
+        <Text style={[colors.textOnBackground, text.textCenter, spacing.pdXs, text.textBold]}>
           {isCustomItem ? item.name : item}
         </Text>
       </View>

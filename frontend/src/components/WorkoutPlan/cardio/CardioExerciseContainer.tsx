@@ -36,9 +36,7 @@ const CardioExerciseContainer: React.FC<CardioExerciseContainerProps> = ({
                 <Divider orientation="vertical" color={colors.textPrimary.color} thickness={1.5} />
               </>
             )}
-            <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
-              {distance} ק"מ
-            </Text>
+            <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>{distance}</Text>
           </View>
           {tips && (
             <TouchableOpacity

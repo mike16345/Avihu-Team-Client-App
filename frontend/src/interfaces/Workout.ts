@@ -19,9 +19,9 @@ export interface WeightWorkout extends IWorkout {
   sets: ISet[];
 }
 
-export interface IExerciseMethod{
-  title:string,
-  description:string
+export interface IExerciseMethod {
+  title: string;
+  description: string;
 }
 
 export interface CardioWorkout extends IWorkout {
@@ -81,7 +81,7 @@ export interface ISimpleCardioType {
 export interface ICardioWorkout {
   name: string;
   warmUpAmount?: number;
-  distance: number;
+  distance: string;
   cardioExercise: string;
   tips?: string;
 }

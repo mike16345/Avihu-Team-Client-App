@@ -5,7 +5,7 @@ import { IRecordedSetResponse } from "@/interfaces/Workout";
 import { Text } from "../ui/Text";
 
 interface RecordedSetInfoProps {
-  recordedSet?: IRecordedSetResponse;
+  recordedSet: IRecordedSetResponse | null;
   actionButton?: JSX.Element;
 }
 
@@ -14,29 +14,36 @@ const RecordedSetInfo: FC<RecordedSetInfoProps> = ({ recordedSet, actionButton }
 
   return (
     <View style={[spacing.pdMd, common.rounded, colors.backgroundSecondaryContainer]}>
-      <View style={[layout.flexRowReverse]}>
-        <Text style={[colors.textOnSecondaryContainer, fonts.default, text.textBold]}>
-          סט {recordedSet?.setNumber}
+      {!recordedSet && (
+        <Text style={[colors.textOnBackground, text.textCenter, spacing.pdDefault]}>
+          לא נמצא סט קודם במערכת
         </Text>
-        <View style={[layout.center, layout.flexGrow, layout.flexRow, spacing.gapLg]}>
-          <View style={[layout.center]}>
-            <Text style={[colors.textOnBackground, fonts.md, text.textBold]}>חזרות</Text>
-            <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>
-              <Text style={[fonts.sm]}>x</Text>
-              {recordedSet?.repsDone}
-            </Text>
-          </View>
-          <View style={[layout.center]}>
-            <Text style={[colors.textOnBackground, fonts.md, text.textBold]}>משקל</Text>
+      )}
+      {recordedSet && (
+        <View style={[layout.flexRowReverse]}>
+          <Text style={[colors.textOnSecondaryContainer, fonts.default, text.textBold]}>
+            סט {recordedSet?.setNumber}
+          </Text>
+          <View style={[layout.center, layout.flexGrow, layout.flexRow, spacing.gapLg]}>
+            <View style={[layout.center]}>
+              <Text style={[colors.textOnBackground, fonts.md, text.textBold]}>חזרות</Text>
+              <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>
+                <Text style={[fonts.sm]}>x</Text>
+                {recordedSet?.repsDone}
+              </Text>
+            </View>
+            <View style={[layout.center]}>
+              <Text style={[colors.textOnBackground, fonts.md, text.textBold]}>משקל</Text>
 
-            <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>
-              {recordedSet?.weight}
-              <Text style={[fonts.sm]}>{' ק"ג'}</Text>
-            </Text>
+              <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>
+                {recordedSet?.weight}
+                <Text style={[fonts.sm]}>{' ק"ג'}</Text>
+              </Text>
+            </View>
           </View>
+          <View style={[layout.center]}>{actionButton}</View>
         </View>
-        <View style={[layout.center]}>{actionButton}</View>
-      </View>
+      )}
     </View>
   );
 };

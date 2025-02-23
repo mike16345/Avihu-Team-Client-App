@@ -10,6 +10,7 @@ interface WorkoutTipsProps {
   openTips: boolean;
   tips?: string[];
   setOpenTips: Dispatch<SetStateAction<boolean>>;
+  title?: String;
 }
 
 const generalTips = [
@@ -20,7 +21,12 @@ const generalTips = [
   "מנוחה בין סט לסט 40-60 שניות",
 ];
 
-const WorkoutTips: FC<WorkoutTipsProps> = ({ tips = generalTips, openTips, setOpenTips }) => {
+const WorkoutTips: FC<WorkoutTipsProps> = ({
+  tips = generalTips,
+  openTips,
+  setOpenTips,
+  title = `דגשים לאימון`,
+}) => {
   const { fonts, layout, text, colors, spacing } = useStyles();
 
   return (
@@ -28,7 +34,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({ tips = generalTips, openTips, setOp
       <Text
         style={[text.textRight, fonts.xxl, text.textBold, colors.textPrimary, spacing.pdDefault]}
       >
-        דגשים לאימון
+        {title}
       </Text>
       <FlatList
         keyExtractor={(_, i) => i.toString()}
