@@ -1,6 +1,6 @@
 import { FC, SetStateAction, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
-import DropDownPicker, { ValueType } from "react-native-dropdown-picker";
+import DropDownPicker from "react-native-dropdown-picker";
 
 DropDownPicker.addTranslation("HE", {
   PLACEHOLDER: "בחר אימון",

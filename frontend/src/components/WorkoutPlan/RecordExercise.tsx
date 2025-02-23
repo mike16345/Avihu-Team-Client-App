@@ -250,7 +250,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   <View
                     style={[
                       common.rounded,
-                      colors.backdrop,
+                      colors.backgroundPrimary,
                       spacing.pdDefault,
                       layout.widthFull,
                       layout.flexRowReverse,

@@ -3,13 +3,13 @@ import {
   Dimensions,
   FlatList,
   ImageBackground,
+  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { useState, useEffect, FC } from "react";
+import { useState, useEffect, FC, useMemo } from "react";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
 import { IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
@@ -37,14 +37,13 @@ interface WorkoutPlanProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "WorkoutPlanPage"> {}
 
 const WorkoutPlan: FC<WorkoutPlanProps> = () => {
-  const [plans, setPlans] = useState<any[] | null>(null);
   const [value, setValue] = useState<string>("");
   const [openTips, setOpenTips] = useState(false);
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
   const [displayCardioPlan, setDisplayCardioPlan] = useState(false);
   const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
 
-  const { fonts, text, spacing, colors } = useStyles();
+  const { fonts, layout, text, spacing, colors, common } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
   const { currentUser } = useUserStore();
   const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
@@ -118,17 +117,23 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     await setItem(JSON.stringify(session));
   };
 
+  const plans = useMemo(() => {
+    if (!data) return [];
+    const plans = data.workoutPlans.map((workout) => ({
+      label: workout.planName,
+      value: workout.planName,
+    }));
+
+    plans.push({ label: "אירובי", value: "cardio" });
+    setValue(plans[0].value);
+
+    return plans;
+  }, [data]);
+
   useEffect(() => {
     if (!data) return;
 
-    const plans = data.workoutPlans.map((workout) => {
-      return { label: workout.planName, value: workout.planName };
-    });
-
-    setPlans([...plans, { label: "אירובי", value: "cardio" }]);
-    setValue(plans[0].label);
     setCurrentWorkoutPlan(data.workoutPlans[0]);
-
     loadWorkoutSession();
   }, [data]);
 
@@ -157,9 +162,14 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
             />
 
             {data?.tips && data.tips.length > 0 && !displayCardioPlan && (
-              <TouchableOpacity onPress={() => setOpenTips(true)}>
-                <Text style={[styles.tipsText, colors.textPrimary]}>דגשים לאימון</Text>
-              </TouchableOpacity>
+              <View style={[layout.flexRow, layout.justifyEnd]}>
+                <Pressable
+                  style={[colors.backgroundPrimary, common.roundedSm, spacing.pdSm]}
+                  onPress={() => setOpenTips(true)}
+                >
+                  <Text style={[fonts.md, colors.textOnBackground]}>דגשים לאימון</Text>
+                </Pressable>
+              </View>
             )}
           </>
         )}
