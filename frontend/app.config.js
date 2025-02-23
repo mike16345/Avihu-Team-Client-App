@@ -12,7 +12,7 @@ export default ({ config }) => {
     icon: "./assets/app-icon.png",
     userInterfaceStyle: "dark",
     splash: {
-      image: "./assets/avihu/avihu-logo-black.png",
+      image: "./assets/avihu/avihuFlyTrapWithLogo.jpeg",
       backgroundColor: "#000000",
       plugins: [
         [
@@ -39,7 +39,7 @@ export default ({ config }) => {
         : "com.avihuteam.avihuteam", // Production
       supportsTablet: true,
       splash: {
-        image: "./assets/avihu/avihu-logo-black.png",
+        image: "./assets/avihu/avihuFlyTrapWithLogo.jpeg",
         backgroundColor: "#000000",
       },
     },

@@ -93,12 +93,14 @@ export const checkIfDatesMatch = (date1: Date, date2: Date) => {
   }
 };
 
-export const showAlert = (type: ToastType, message: string) => {
+export const showAlert = (type: ToastType, message: string, visibilityTime: number = 4000) => {
   Toast.show({
     text1: message,
     autoHide: true,
+    text1Style: { textAlign: `center` },
     type: type,
     swipeable: true,
+    visibilityTime,
   });
 };
 
