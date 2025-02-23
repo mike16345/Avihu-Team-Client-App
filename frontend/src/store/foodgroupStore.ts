@@ -1,11 +1,12 @@
+import { FoodGroup } from "@/types/foodTypes";
 import { create } from "zustand";
 
 interface IFoodGroupStore {
-  foodGroupToDisplay: string | null;
-  setFoodGroupToDisplay: (foodgroup: string | null) => void;
+  foodGroupToDisplay: FoodGroup | null;
+  setFoodGroupToDisplay: (foodgroup: FoodGroup | null) => void;
 }
 
 export const useFoodGroupStore = create<IFoodGroupStore>((set) => ({
   foodGroupToDisplay: null,
-  setFoodGroupToDisplay: (foodgroup: string | null) => set({ foodGroupToDisplay: foodgroup }),
+  setFoodGroupToDisplay: (foodgroup: FoodGroup | null) => set({ foodGroupToDisplay: foodgroup }),
 }));

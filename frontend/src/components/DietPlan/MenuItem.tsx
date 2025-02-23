@@ -29,8 +29,8 @@ const MenuItem: React.FC<MenuItemProps> = ({ menuItem }) => {
         {servingItemKeys.map((key, i) => {
           const typedKey = key as keyof IServingItem;
           return (
-            <View style={[layout.flexRow, spacing.gapDefault]}>
-              <Text key={key} style={[colors.textOnBackground, text.textRight, md]}>
+            <View key={key} style={[layout.flexRow, spacing.gapDefault]}>
+              <Text style={[colors.textOnBackground, text.textRight, md]}>
                 {servingTypeToString(key)}: {menuItem.oneServing[typedKey]}
               </Text>
               {i !== servingItemKeys.length - 1 && (

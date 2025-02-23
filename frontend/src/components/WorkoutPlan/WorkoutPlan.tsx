@@ -17,19 +17,19 @@ import { useWorkoutPlanApi } from "@/hooks/api/useWorkoutPlanApi";
 import ExerciseContainer from "./ExerciseContainer";
 import useStyles from "@/styles/useGlobalStyles";
 import { useUserStore } from "@/store/userStore";
-import { useSessionsApi } from "@/hooks/api/useSessionsApi";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import NoDataScreen from "@/screens/NoDataScreen";
 import ErrorScreen from "@/screens/ErrorScreen";
 import { Text } from "../ui/Text";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
-import { useQuery } from "@tanstack/react-query";
-import { ONE_DAY, WORKOUT_PLAN_KEY } from "@/constants/reactQuery";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ONE_DAY, WORKOUT_PLAN_KEY, WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import CardioWrapper from "./cardio/CardioWrapper";
 import WorkoutDropdownSelector from "./WorkoutDropdownSelector";
 import WorkoutPlanSkeletonLoader from "../ui/loaders/skeletons/WorkoutPlanSkeletonLoader";
+import useWorkoutSessionQuery from "@/hooks/queries/useWorkoutSessionQuery";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
@@ -45,9 +45,11 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const { fonts, layout, text, spacing, colors, common } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
   const { currentUser } = useUserStore();
-  const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
-  const { getSession } = useSessionsApi();
+  const { setItem } = useAsyncStorage(WORKOUT_SESSION_KEY);
   const { isRefreshing, refresh } = usePullDownToRefresh();
+
+  const queryClient = useQueryClient();
+
   const {
     slideInRightDelay0,
     slideInRightDelay100,
@@ -85,6 +87,8 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     staleTime: ONE_DAY,
   });
 
+  const { data: workoutSessionData, refetch: refetchSession } = useWorkoutSessionQuery();
+
   const onSelectWorkout = (planName: string) => {
     if (planName == `cardio`) {
       return setDisplayCardioPlan(true);
@@ -97,33 +101,14 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     setCurrentWorkoutPlan({ ...selectedWorkoutPlan });
   };
 
-  const loadWorkoutSession = async () => {
-    const session = await getItem();
-    if (!session) return;
-
-    try {
-      const sessionJSON = JSON.parse(session);
-      const sessionId = sessionJSON?._id || "";
-      const currentWorkoutSession = await getSession(sessionId || "");
-
-      if (!currentWorkoutSession) {
-        removeItem();
-      } else {
-        setCurrentWorkoutSession(currentWorkoutSession.data);
-      }
-    } catch (e) {
-      handleSessionNotFound();
-    }
-  };
-
-  const handleSessionNotFound = () => {
-    removeItem();
-    setCurrentWorkoutSession(null);
-  };
-
   const handleUpdateSession = async (session: any) => {
     setCurrentWorkoutSession(session);
     await setItem(JSON.stringify(session));
+    queryClient.invalidateQueries([WORKOUT_SESSION_KEY]);
+  };
+
+  const handleRefreshPage = async () => {
+    return await Promise.allSettled([refetch(), refetchSession()]);
   };
 
   const plans = useMemo(() => {
@@ -143,19 +128,26 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     if (!data) return;
 
     setCurrentWorkoutPlan(data.workoutPlans[0]);
-    loadWorkoutSession();
   }, [data]);
+
+  useEffect(() => {
+    if (!workoutSessionData) return;
+
+    setCurrentWorkoutSession(workoutSessionData.data);
+  }, [workoutSessionData]);
 
   if (isError && error.response.status == 404)
     return (
       <NoDataScreen
         variant="workoutPlan"
-        refreshFunc={() => refresh(refetch)}
+        refreshFunc={() => refresh(handleRefreshPage)}
         refreshing={isRefreshing}
       />
     );
   if (isError && error.response.status)
-    return <ErrorScreen error={error.response.data.message || ``} refetchFunc={refetch} />;
+    return (
+      <ErrorScreen error={error.response.data.message || ``} refetchFunc={handleRefreshPage} />
+    );
 
   const Header = () => (
     <>
@@ -198,7 +190,10 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
           keyExtractor={(item) => item.muscleGroup}
           style={colors.background}
           refreshControl={
-            <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={() => refresh(handleRefreshPage)}
+            />
           }
           renderItem={({ item, index }) => (
             <Animated.View style={[spacing.pdHorizontalSm, slideAnimations[index + 1]]}>
