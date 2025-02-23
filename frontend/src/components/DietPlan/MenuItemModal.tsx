@@ -9,9 +9,10 @@ import { Text } from "../ui/Text";
 import NoDataScreen from "@/screens/NoDataScreen";
 import ErrorScreen from "@/screens/ErrorScreen";
 import useFoodGroupQuery from "@/hooks/queries/useMenuItemsQuery";
+import { FoodGroup } from "@/types/foodTypes";
 
 interface MenuItemModalProps {
-  foodGroup: string | null;
+  foodGroup: FoodGroup | null;
   dismiss: () => void;
 }
 
@@ -32,7 +33,7 @@ const MenuItemModal: React.FC<MenuItemModalProps> = ({ foodGroup, dismiss }) => 
     }
   };
 
-  const { data, isError, error, isLoading } = useFoodGroupQuery(foodGroup || "");
+  const { data, isError, error, isLoading } = useFoodGroupQuery(foodGroup);
 
   if (isError) return <ErrorScreen error={error.message} />;
 

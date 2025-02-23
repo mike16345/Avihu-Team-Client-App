@@ -36,8 +36,8 @@ const CustomItem: React.FC<CustomItemProps> = ({ item, quantity }) => {
           const totalQuantity = isCustomItem ? item.oneServing[typedKey]! * quantity : null;
 
           return (
-            <View style={[layout.flexRow, spacing.gapDefault]}>
-              <Text key={unit} style={[colors.textOnBackground, text.textRight, fonts.md]}>
+            <View key={unit} style={[layout.flexRow, spacing.gapDefault]}>
+              <Text style={[colors.textOnBackground, text.textRight, fonts.md]}>
                 {servingTypeToString(unit)}: {totalQuantity}
               </Text>
               {i !== units.length - 1 && (

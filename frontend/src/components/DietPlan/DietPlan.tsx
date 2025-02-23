@@ -29,6 +29,7 @@ import { createRetryFunction } from "@/utils/utils";
 import { Text } from "../ui/Text";
 import { useFoodGroupStore } from "@/store/foodgroupStore";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
+import useFoodGroupQuery from "@/hooks/queries/useMenuItemsQuery";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
@@ -66,6 +67,11 @@ export default function DietPlan() {
     retry: createRetryFunction(404, 2),
   });
 
+  const carbsQuery = useFoodGroupQuery("carbs");
+  const proteinsQuery = useFoodGroupQuery("protein");
+  const fatsQuery = useFoodGroupQuery("fats");
+  const vegetablesQuery = useFoodGroupQuery("vegetables");
+
   const displayMenuItems = (foodGroup: string) => {
     setIsFabOpen(false);
     setFoodGroupToDisplay(foodGroup);
@@ -73,6 +79,24 @@ export default function DietPlan() {
 
   const closeMenuItemsModal = () => {
     setFoodGroupToDisplay(null);
+  };
+
+  const refetchDietPlan = async () => {
+    const results = await Promise.allSettled([
+      refetch(),
+      carbsQuery.refetch(),
+      proteinsQuery.refetch(),
+      fatsQuery.refetch(),
+      vegetablesQuery.refetch(),
+    ]);
+
+    results.forEach((result, index) => {
+      if (result.status === "rejected") {
+        console.error(`Refetch ${index} failed:`, result.reason);
+      }
+    });
+
+    return results;
   };
 
   if (error && error.response.status == 404)
@@ -90,7 +114,7 @@ export default function DietPlan() {
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+          <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetchDietPlan)} />
         }
         contentContainerStyle={[
           layout.flexGrow,
