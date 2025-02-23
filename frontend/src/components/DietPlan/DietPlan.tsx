@@ -105,10 +105,10 @@ export default function DietPlan() {
       <NoDataScreen
         variant="dietPlan"
         refreshing={isRefreshing}
-        refreshFunc={() => refresh(refetch)}
+        refreshFunc={() => refresh(refetchDietPlan)}
       />
     );
-  if (isError) return <ErrorScreen error={error} refetchFunc={refetch} />;
+  if (isError) return <ErrorScreen error={error} refetchFunc={refetchDietPlan} />;
 
   return (
     <Portal.Host>
