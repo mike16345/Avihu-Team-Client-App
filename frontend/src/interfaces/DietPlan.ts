@@ -9,6 +9,7 @@ export interface ICustomItem {
     cups?: number;
     teaSpoons?: number;
     pieces?: number;
+    units?: number;
   };
 }
 

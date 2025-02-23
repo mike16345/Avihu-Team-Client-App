@@ -9,11 +9,10 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { useState, useEffect, FC, useMemo } from "react";
+import { useState, useEffect, FC, useMemo, useCallback } from "react";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
-import { IWorkoutPlan } from "@/interfaces/Workout";
+import { ICompleteWorkoutPlan, IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
-import { Colors } from "@/constants/Colors";
 import { useWorkoutPlanApi } from "@/hooks/api/useWorkoutPlanApi";
 import ExerciseContainer from "./ExerciseContainer";
 import useStyles from "@/styles/useGlobalStyles";
@@ -21,7 +20,6 @@ import { useUserStore } from "@/store/userStore";
 import { useSessionsApi } from "@/hooks/api/useSessionsApi";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
-import WorkoutPlanSkeleton from "../ui/loaders/skeletons/WorkoutPlanSkeletonLoader";
 import NoDataScreen from "@/screens/NoDataScreen";
 import ErrorScreen from "@/screens/ErrorScreen";
 import { Text } from "../ui/Text";
@@ -31,6 +29,7 @@ import { ONE_DAY, WORKOUT_PLAN_KEY } from "@/constants/reactQuery";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import CardioWrapper from "./cardio/CardioWrapper";
 import WorkoutDropdownSelector from "./WorkoutDropdownSelector";
+import WorkoutPlanSkeletonLoader from "../ui/loaders/skeletons/WorkoutPlanSkeletonLoader";
 
 const width = Dimensions.get("window").width;
 interface WorkoutPlanProps
@@ -69,9 +68,19 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     slideInBottomDelay600,
   ];
 
+  const handleGetWorkoutPlan = async () => {
+    try {
+      const workoutPlan = await getWorkoutPlanByUserId(currentUser!._id);
+
+      return workoutPlan;
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
   const { data, isError, error, refetch } = useQuery({
-    queryFn: () => getWorkoutPlanByUserId(currentUser?._id || ``),
-    enabled: !!currentUser?._id,
+    queryFn: handleGetWorkoutPlan,
+    enabled: !!currentUser,
     queryKey: [WORKOUT_PLAN_KEY + currentUser?._id],
     staleTime: ONE_DAY,
   });
@@ -185,7 +194,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
       {!displayCardioPlan && (
         <FlatList
           data={currentWorkoutPlan?.muscleGroups || []}
-          ListEmptyComponent={() => <WorkoutPlanSkeleton />}
+          ListEmptyComponent={() => <WorkoutPlanSkeletonLoader />}
           keyExtractor={(item) => item.muscleGroup}
           style={colors.background}
           refreshControl={
@@ -252,7 +261,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   muscleGroupText: {
-    color: Colors.light,
+    color: "#f8f9fa",
     textAlign: "left",
     fontWeight: "bold",
     padding: 10,

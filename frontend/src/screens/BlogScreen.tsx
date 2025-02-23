@@ -22,6 +22,7 @@ import Loader from "@/components/ui/loaders/Loader";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import NoDataScreen from "./NoDataScreen";
+import { ONE_DAY } from "@/constants/reactQuery";
 
 interface PostCardProps {
   blog: IBlog;
@@ -93,11 +94,13 @@ const BlogScreen = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
     useInfiniteQuery(
       ["posts"],
+
       ({ pageParam = 1 }) => getPaginatedPosts({ page: pageParam, limit: 5 }),
       {
         getNextPageParam: (lastPage) => {
           return lastPage.hasNextPage ? lastPage.currentPage + 1 : undefined;
         },
+        staleTime: ONE_DAY / 2,
       }
     );
 
