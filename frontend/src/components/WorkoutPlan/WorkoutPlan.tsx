@@ -9,9 +9,9 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { useState, useEffect, FC, useMemo, useCallback } from "react";
+import { useState, useEffect, FC, useMemo } from "react";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
-import { ICompleteWorkoutPlan, IWorkoutPlan } from "@/interfaces/Workout";
+import { IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
 import { useWorkoutPlanApi } from "@/hooks/api/useWorkoutPlanApi";
 import ExerciseContainer from "./ExerciseContainer";
@@ -160,7 +160,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const Header = () => (
     <>
       <ImageBackground source={logoBlack} style={{ height: Dimensions.get("screen").height / 4 }} />
-      <View style={[spacing.gapLg, spacing.pdHorizontalDefault, colors.background]}>
+      <View style={[spacing.gapDefault, spacing.pdHorizontalDefault, colors.background]}>
         {value && plans && (
           <>
             <WorkoutDropdownSelector
@@ -171,7 +171,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
             />
 
             {data?.tips && data.tips.length > 0 && !displayCardioPlan && (
-              <View style={[layout.flexRow, layout.justifyEnd]}>
+              <View style={[layout.flexRow, layout.justifyEnd, spacing.pdVerticalSm]}>
                 <Pressable
                   style={[colors.backgroundPrimary, common.roundedSm, spacing.pdSm]}
                   onPress={() => setOpenTips(true)}
