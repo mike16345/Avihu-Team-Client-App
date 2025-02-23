@@ -30,6 +30,7 @@ import { Text } from "../ui/Text";
 import { useFoodGroupStore } from "@/store/foodgroupStore";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import useFoodGroupQuery from "@/hooks/queries/useMenuItemsQuery";
+import { FoodGroup } from "@/types/foodTypes";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
@@ -72,7 +73,7 @@ export default function DietPlan() {
   const fatsQuery = useFoodGroupQuery("fats");
   const vegetablesQuery = useFoodGroupQuery("vegetables");
 
-  const displayMenuItems = (foodGroup: string) => {
+  const displayMenuItems = (foodGroup: FoodGroup) => {
     setIsFabOpen(false);
     setFoodGroupToDisplay(foodGroup);
   };
