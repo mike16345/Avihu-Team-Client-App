@@ -35,7 +35,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
   const currentUser = useUserStore((state) => state.currentUser);
 
   const { layout, text, fonts, common, colors } = useStyles();
-  const { addRecordedSet, getUserRecordedSetsByExercise } = useRecordedSetsApi();
+  const { addRecordedSet } = useRecordedSetsApi();
   const { setIsTopBarVisible } = useLayoutStore();
 
   const [currentSetNumber, setCurrentSetNumber] = useState(1);
