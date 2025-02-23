@@ -3,15 +3,15 @@ import {
   Dimensions,
   FlatList,
   ImageBackground,
+  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { useState, useEffect, FC, useCallback } from "react";
+import { useState, useEffect, FC, useMemo } from "react";
 import logoBlack from "@assets/avihu/avihu-logo-black.png";
-import { ICompleteWorkoutPlan, IWorkoutPlan } from "@/interfaces/Workout";
+import { IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
 import { useWorkoutPlanApi } from "@/hooks/api/useWorkoutPlanApi";
 import ExerciseContainer from "./ExerciseContainer";
@@ -36,14 +36,13 @@ interface WorkoutPlanProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "WorkoutPlanPage"> {}
 
 const WorkoutPlan: FC<WorkoutPlanProps> = () => {
-  const [plans, setPlans] = useState<any[] | null>(null);
   const [value, setValue] = useState<string>("");
   const [openTips, setOpenTips] = useState(false);
   const [currentWorkoutPlan, setCurrentWorkoutPlan] = useState<IWorkoutPlan | null>(null);
   const [displayCardioPlan, setDisplayCardioPlan] = useState(false);
   const [currentWorkoutSession, setCurrentWorkoutSession] = useState<any>(null);
 
-  const { fonts, text, spacing, colors } = useStyles();
+  const { fonts, layout, text, spacing, colors, common } = useStyles();
   const { getWorkoutPlanByUserId } = useWorkoutPlanApi();
   const { currentUser } = useUserStore();
   const { getItem, setItem, removeItem } = useAsyncStorage("workout-session");
@@ -72,8 +71,6 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const handleGetWorkoutPlan = async () => {
     try {
       const workoutPlan = await getWorkoutPlanByUserId(currentUser!._id);
-
-      handleInitData(workoutPlan);
 
       return workoutPlan;
     } catch (err: any) {
@@ -129,27 +126,25 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
     await setItem(JSON.stringify(session));
   };
 
-  const handleInitData = useCallback(
-    (plan?: ICompleteWorkoutPlan) => {
-      let workoutPlan = plan ?? data;
-      if (!workoutPlan) return;
+  const plans = useMemo(() => {
+    if (!data) return [];
+    const plans = data.workoutPlans.map((workout) => ({
+      label: workout.planName,
+      value: workout.planName,
+    }));
 
-      const plans = workoutPlan.workoutPlans.map((workout) => {
-        return { label: workout.planName, value: workout.planName };
-      });
+    plans.push({ label: "אירובי", value: "cardio" });
+    setValue(plans[0].value);
 
-      setPlans([...plans, { label: "אירובי", value: "cardio" }]);
-      setValue(plans[0].label);
-      setCurrentWorkoutPlan(workoutPlan.workoutPlans[0]);
-
-      loadWorkoutSession();
-    },
-    [data]
-  );
+    return plans;
+  }, [data]);
 
   useEffect(() => {
-    handleInitData();
-  }, []);
+    if (!data) return;
+
+    setCurrentWorkoutPlan(data.workoutPlans[0]);
+    loadWorkoutSession();
+  }, [data]);
 
   if (isError && error.response.status == 404)
     return (
@@ -165,7 +160,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
   const Header = () => (
     <>
       <ImageBackground source={logoBlack} style={{ height: Dimensions.get("screen").height / 4 }} />
-      <View style={[spacing.gapLg, spacing.pdHorizontalDefault, colors.background]}>
+      <View style={[spacing.gapDefault, spacing.pdHorizontalDefault, colors.background]}>
         {value && plans && (
           <>
             <WorkoutDropdownSelector
@@ -176,9 +171,14 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
             />
 
             {data?.tips && data.tips.length > 0 && !displayCardioPlan && (
-              <TouchableOpacity onPress={() => setOpenTips(true)}>
-                <Text style={[styles.tipsText, colors.textPrimary]}>דגשים לאימון</Text>
-              </TouchableOpacity>
+              <View style={[layout.flexRow, layout.justifyEnd, spacing.pdVerticalSm]}>
+                <Pressable
+                  style={[colors.backgroundPrimary, common.roundedSm, spacing.pdSm]}
+                  onPress={() => setOpenTips(true)}
+                >
+                  <Text style={[fonts.md, colors.textOnBackground]}>דגשים לאימון</Text>
+                </Pressable>
+              </View>
             )}
           </>
         )}
@@ -231,7 +231,7 @@ const WorkoutPlan: FC<WorkoutPlanProps> = () => {
             <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
           }
           style={colors.background}
-          contentContainerStyle={{ minHeight: `110%` }}
+          contentContainerStyle={spacing.pdBottomBar}
         >
           <CardioWrapper cardioPlan={data?.cardio} />
         </ScrollView>
