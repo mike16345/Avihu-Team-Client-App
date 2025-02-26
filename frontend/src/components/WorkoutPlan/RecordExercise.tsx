@@ -29,6 +29,7 @@ import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
 import Divider from "../ui/Divider";
 import BottomDrawer from "../ui/BottomDrawer";
 import { useLayoutStore } from "@/store/layoutStore";
+import ExerciseMethodDrawer from "./ExerciseMethodDrawer";
 
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
 
@@ -58,7 +59,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const { colors, fonts, layout, spacing, text, common } = customStyles;
   const currentUser = useUserStore((state) => state.currentUser);
   const { getUserRecordedSetsByExercise } = useRecordedSetsApi();
-  const { getExerciseMethodByName } = useExerciseMethodApi();
   const [currentSetNumber, setCurrentSetNumber] = useState(setNumber);
 
   const { data, isLoading } = useQuery(
@@ -69,12 +69,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
       ),
 
     { enabled: !!exercise, retry: createRetryFunction(404), staleTime: ONE_DAY }
-  );
-
-  const exerciseMethodQuery = useQuery(
-    [EXERCISE_METHOD + exercise.exerciseMethod],
-    () => getExerciseMethodByName(exercise?.exerciseMethod || ``).then((res) => res.data),
-    { enabled: !!exercise.exerciseMethod, staleTime: ONE_DAY / 2 }
   );
 
   const lastRecordedSet = findLatestRecordedSetByNumber(data || [], currentSetNumber);
@@ -134,8 +128,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
     };
   }, []);
 
-  if (isLoading || (exerciseMethodQuery.isLoading && exercise.exerciseMethod))
-    return <Loader variant="Standard" />;
+  if (isLoading) return <Loader variant="Standard" />;
 
   return (
     <>
@@ -205,7 +198,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                     <Text style={[fonts.md, colors.textOnBackground]}>דגשים לתרגיל</Text>
                   </Pressable>
                 )}
-                {exerciseMethodQuery.data && (
+                {exercise.exerciseMethod && (
                   <Pressable
                     onPress={() => setOpenExerciseMethod(true)}
                     style={[colors.backgroundPrimary, common.roundedSm, spacing.pdSm]}
@@ -223,63 +216,10 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               setOpenTips={setOpenTrainerTips}
             />
 
-            <BottomDrawer
-              onClose={() => setOpenExerciseMethod(false)}
+            <ExerciseMethodDrawer
+              close={() => setOpenExerciseMethod(false)}
+              exerciseMethodBName={exercise.exerciseMethod || ``}
               open={openExerciseMethod}
-              heightVariant="auto"
-              children={
-                <View
-                  style={[
-                    layout.itemsEnd,
-                    spacing.gapDefault,
-                    spacing.pdDefault,
-                    spacing.pdBottomBar,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      text.textRight,
-                      fonts.xxl,
-                      text.textBold,
-                      colors.textPrimary,
-                      spacing.pdDefault,
-                    ]}
-                  >
-                    שיטת אימון
-                  </Text>
-                  <View
-                    style={[
-                      common.rounded,
-                      colors.backgroundPrimary,
-                      spacing.pdDefault,
-                      layout.widthFull,
-                      layout.flexRowReverse,
-                      layout.itemsCenter,
-                      spacing.gapDefault,
-                      layout.justifyStart,
-                    ]}
-                  >
-                    <View style={[spacing.gapSm]}>
-                      <View
-                        style={[layout.flexRowReverse, layout.widthFull, layout.justifyBetween]}
-                      >
-                        <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
-                          {exerciseMethodQuery.data?.title}
-                        </Text>
-                        <NativeIcon
-                          size={24}
-                          style={[colors.textOnBackground]}
-                          library="MaterialCommunityIcons"
-                          name="dumbbell"
-                        />
-                      </View>
-                      <Text style={[colors.textOnBackground, text.textRight]}>
-                        {exerciseMethodQuery.data?.description}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              }
             />
           </View>
 
