@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import Login from "@/components/Login/Login";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import BottomTabNavigator from "./BottomTabNavigator";
@@ -12,13 +12,16 @@ import { NO_ACCESS, SESSION_EXPIRED } from "@/constants/Constants";
 import { useQueryClient } from "@tanstack/react-query";
 import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 import useLogout from "@/hooks/useLogout";
+import useUserQuery from "@/hooks/queries/useUserQuery";
 
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
   const queryClient = useQueryClient();
   const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
+  const [userId, setUserId] = useState<string | undefined>();
 
+  const { data } = useUserQuery(userId);
   const { checkUserSessionToken } = useUserApi();
   const { currentUser, setCurrentUser } = useUserStore();
   const { initializeNotifications, requestPermissions } = useNotification();
@@ -34,7 +37,9 @@ const RootNavigator = () => {
     const tokenData = JSON.parse(token || "{}");
 
     if (!token || !tokenData) return;
-    setCurrentUser(tokenData.data.user);
+    const user = tokenData.data.user;
+    setCurrentUser(user);
+    setUserId(user._id);
   };
 
   const checkLoginStatus = async () => {
@@ -74,6 +79,11 @@ const RootNavigator = () => {
       })
       .catch((err) => console.log(err));
   }, []);
+
+  useEffect(() => {
+    if (!data) return;
+    setCurrentUser(data);
+  }, [data]);
 
   return (
     <>

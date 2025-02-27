@@ -21,6 +21,7 @@ const useWorkoutSessionQuery = () => {
       return currentWorkoutSession;
     } catch (e) {
       removeItem();
+      return null;
     }
   };
 

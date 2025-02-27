@@ -34,14 +34,13 @@ const MyWeightProgressScreen = () => {
 
   const { colors, spacing, layout } = useStyles();
   const { slideInLeftDelay0, slideInRightDelay100 } = useSlideInAnimations();
-  const { calculateImageUploadTitle } = useImageUploadStatus();
+  const { title } = useImageUploadStatus();
 
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [openWeightModal, setOpenWeightModal] = useState(false);
   const [openUploadModal, setOpenUploadModal] = useState(false);
   const [lastWeighIn, setLastWeighIn] = useState<IWeighIn | null>(null);
   const [todaysWeighInExists, setTodaysWeighInExists] = useState(false);
-  const [disabledTitle, setDisabledTitle] = useState<string | undefined>();
 
   const handleGetWeighInsByUserId = async () => {
     if (!currentUser) return [];
@@ -131,11 +130,6 @@ const MyWeightProgressScreen = () => {
     setTodaysWeighInExists(weighInExists);
   }, [data]);
 
-  useEffect(() => {
-    const title = calculateImageUploadTitle(currentUser?.checkInAt || 0);
-    setDisabledTitle(title);
-  }, []);
-
   if (isLoading) return <ProgressScreenSkeleton />;
 
   return (
@@ -183,7 +177,7 @@ const MyWeightProgressScreen = () => {
               onPress: currentUser?.imagesUploaded
                 ? () => console.log(`no`)
                 : () => setOpenUploadModal(true),
-              label: currentUser?.imagesUploaded ? disabledTitle : "שלח/י תמונת מעקב",
+              label: currentUser?.imagesUploaded ? title : "שלח/י תמונת מעקב",
               color: currentUser?.imagesUploaded ? "grey" : colors.textOnPrimaryContainer.color,
             },
             {
