@@ -190,8 +190,6 @@ export default function Login({ onLogin }: ILoginProps) {
           style={[
             {
               position: "absolute",
-              // backgroundColor: "black",
-              // opacity: 0.7,
               top: 1,
               width: moderateScale(350, 2),
               height: moderateScale(700, 2),

@@ -1,10 +1,11 @@
 import { View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ICardioWeek } from "@/interfaces/Workout";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import CardioExerciseContainer from "./CardioExerciseContainer";
-import BottomDrawer from "@/components/ui/BottomDrawer";
+import WorkoutTips from "../WorkoutTips";
+import ExerciseMethodDrawer from "../ExerciseMethodDrawer";
 
 interface ComplexCardioWrapperProps {
   plan: ICardioWeek[];
@@ -13,6 +14,7 @@ interface ComplexCardioWrapperProps {
 const ComplexCardioWrapper: React.FC<ComplexCardioWrapperProps> = ({ plan }) => {
   const { colors, fonts, spacing, text } = useStyles();
   const [tipsToDisplay, setTipsToDisplay] = useState<string | null>(null);
+  const [exerciseMethodToDisplay, setExerciseMethodToDisplay] = useState<string | null>(null);
 
   return (
     <View style={[spacing.gapLg]}>
@@ -27,32 +29,21 @@ const ComplexCardioWrapper: React.FC<ComplexCardioWrapperProps> = ({ plan }) => 
                 key={i}
                 exercise={workout}
                 displayTip={(tip) => setTipsToDisplay(tip)}
+                displayExerciseMethod={(name) => setExerciseMethodToDisplay(name)}
               />
             ))}
           </View>
         </View>
       ))}
-      <BottomDrawer
-        open={!!tipsToDisplay}
-        children={
-          <View style={[spacing.pdHorizontalDefault, spacing.gapXl]}>
-            <Text style={[colors.textPrimary, text.textBold, text.textRight, fonts.xl]}>
-              דגשים לאימון
-            </Text>
-            <Text
-              style={[
-                colors.textOnBackground,
-                spacing.pdHorizontalDefault,
-                spacing.pdVerticalXl,
-                text.textRight,
-              ]}
-            >
-              {tipsToDisplay}
-            </Text>
-          </View>
-        }
-        onClose={() => setTipsToDisplay(null)}
-        heightVariant="auto"
+      <WorkoutTips
+        openTips={!!tipsToDisplay}
+        setOpenTips={() => setTipsToDisplay(null)}
+        tips={[tipsToDisplay || ``]}
+      />
+      <ExerciseMethodDrawer
+        open={!!exerciseMethodToDisplay}
+        exerciseMethodBName={exerciseMethodToDisplay}
+        close={() => setExerciseMethodToDisplay(null)}
       />
     </View>
   );
