@@ -5,7 +5,6 @@ import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import CardioExerciseContainer from "./CardioExerciseContainer";
 import WorkoutTips from "../WorkoutTips";
-import ExerciseMethodDrawer from "../ExerciseMethodDrawer";
 
 interface ComplexCardioWrapperProps {
   plan: ICardioWeek[];
@@ -14,7 +13,6 @@ interface ComplexCardioWrapperProps {
 const ComplexCardioWrapper: React.FC<ComplexCardioWrapperProps> = ({ plan }) => {
   const { colors, fonts, spacing, text } = useStyles();
   const [tipsToDisplay, setTipsToDisplay] = useState<string | null>(null);
-  const [exerciseMethodToDisplay, setExerciseMethodToDisplay] = useState<string | null>(null);
 
   return (
     <View style={[spacing.gapLg]}>
@@ -29,7 +27,6 @@ const ComplexCardioWrapper: React.FC<ComplexCardioWrapperProps> = ({ plan }) => 
                 key={i}
                 exercise={workout}
                 displayTip={(tip) => setTipsToDisplay(tip)}
-                displayExerciseMethod={(name) => setExerciseMethodToDisplay(name)}
               />
             ))}
           </View>
@@ -39,11 +36,6 @@ const ComplexCardioWrapper: React.FC<ComplexCardioWrapperProps> = ({ plan }) => 
         openTips={!!tipsToDisplay}
         setOpenTips={() => setTipsToDisplay(null)}
         tips={[tipsToDisplay || ``]}
-      />
-      <ExerciseMethodDrawer
-        open={!!exerciseMethodToDisplay}
-        exerciseMethodBName={exerciseMethodToDisplay}
-        close={() => setExerciseMethodToDisplay(null)}
       />
     </View>
   );

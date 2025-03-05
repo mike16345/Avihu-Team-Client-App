@@ -4,6 +4,9 @@ import { ISimpleCardioType } from "@/interfaces/Workout";
 import useStyles from "@/styles/useGlobalStyles";
 import { aerobicActivities, translateWorkoutKeys } from "@/utils/cardioUtils";
 import { Text } from "@/components/ui/Text";
+import useCardioWorkoutQuery from "@/hooks/queries/useCardioWorkoutQuery";
+import Loader from "@/components/ui/loaders/Loader";
+import ErrorScreen from "@/screens/ErrorScreen";
 
 interface SimpleCardioContainerProps {
   plan?: ISimpleCardioType;
@@ -13,6 +16,8 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
   const { colors, common, fonts, layout, spacing, text } = useStyles();
   const [values, setValues] = useState<any[] | null>(null);
 
+  const { data: cardioWorkouts, isError, isLoading } = useCardioWorkoutQuery();
+
   useEffect(() => {
     if (!plan) return;
 
@@ -21,8 +26,10 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
     setValues(translatedData);
   }, [plan]);
 
+  if (isError) return <ErrorScreen />;
+
   return (
-    <View style={[common.rounded, spacing.pdDefault, spacing.gapLg]}>
+    <View style={[common.rounded, , spacing.gapLg]}>
       <View style={[spacing.gapDefault]}>
         {values?.map((val, i) => (
           <View
@@ -51,19 +58,25 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
               spacing.pdDefault,
             ]}
           >
-            {aerobicActivities.map((activity, i) => (
-              <View
-                key={i}
-                style={[
-                  colors.background,
-                  spacing.pdHorizontalSm,
-                  spacing.pdVerticalXs,
-                  common.rounded,
-                ]}
-              >
-                <Text style={[colors.textOnBackground]}>{activity}</Text>
+            {isLoading && (
+              <View style={spacing.pdDefault}>
+                <Loader />
               </View>
-            ))}
+            )}
+            {!isLoading &&
+              cardioWorkouts?.data.map((activity, i) => (
+                <View
+                  key={i}
+                  style={[
+                    colors.background,
+                    spacing.pdHorizontalSm,
+                    spacing.pdVerticalXs,
+                    common.rounded,
+                  ]}
+                >
+                  <Text style={[colors.textOnBackground]}>{activity.name}</Text>
+                </View>
+              ))}
           </View>
         </View>
         {plan?.tips && (

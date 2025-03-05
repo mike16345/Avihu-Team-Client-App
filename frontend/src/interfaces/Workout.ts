@@ -84,7 +84,6 @@ export interface ICardioWorkout {
   distance: string;
   cardioExercise: string;
   tips?: string;
-  exerciseMethod?: string;
 }
 
 export interface ICardioWeek {
@@ -134,6 +133,10 @@ export interface IRecordedSet {
   setNumber: number;
   date: Date;
   note: string;
+}
+
+export interface ICardioExerciseItem {
+  name: string;
 }
 
 export interface IExerciseRecordedSets {

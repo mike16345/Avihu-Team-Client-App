@@ -8,13 +8,11 @@ import Divider from "@/components/ui/Divider";
 interface CardioExerciseContainerProps {
   exercise: ICardioWorkout;
   displayTip: (tip: string) => void;
-  displayExerciseMethod: (name: string) => void;
 }
 
 const CardioExerciseContainer: React.FC<CardioExerciseContainerProps> = ({
   exercise: { cardioExercise, distance, name, tips, warmUpAmount, exerciseMethod },
   displayTip,
-  displayExerciseMethod,
 }) => {
   const { colors, common, layout, spacing, text, fonts } = useStyles();
 
@@ -39,16 +37,6 @@ const CardioExerciseContainer: React.FC<CardioExerciseContainerProps> = ({
             )}
             <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>{distance}</Text>
           </View>
-        </View>
-        <View style={[layout.flexRow, spacing.gapDefault, spacing.pdVerticalSm]}>
-          {exerciseMethod && (
-            <TouchableOpacity
-              onPress={() => displayExerciseMethod(exerciseMethod)}
-              style={[colors.backgroundPrimary, common.roundedSm, spacing.pdXs]}
-            >
-              <Text style={[colors.textOnBackground]}>שיטת אימון</Text>
-            </TouchableOpacity>
-          )}
           {tips && (
             <TouchableOpacity
               onPress={() => displayTip(tips)}
