@@ -182,10 +182,7 @@ const MyWeightProgressScreen = () => {
             },
             {
               icon: "whatsapp",
-              onPress: () =>
-                Linking.openURL(
-                  `whatsapp://send?phone=${TRAINER_PHONE_NUMBER}&text=${DEFAULT_MESSAGE_TO_TRAINER}`
-                ),
+              onPress: () => Linking.openURL(`whatsapp://send?phone=${TRAINER_PHONE_NUMBER}`),
               label: "הודעה למאמן",
             },
           ]}

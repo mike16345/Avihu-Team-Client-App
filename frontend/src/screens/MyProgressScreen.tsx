@@ -1,3 +1,4 @@
+
 import useStyles from "@/styles/useGlobalStyles";
 import { useState } from "react";
 import { View } from "react-native";
