@@ -7,7 +7,7 @@ import {
   RefreshControl,
 } from "react-native";
 import { useState } from "react";
-import logoBlack from "../../../assets/avihu/avihu-logo-black.png";
+import logoBlack from "../../../assets/avihu/avihuLogoBlack.jpeg";
 import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
 import { useUserStore } from "@/store/userStore";
 import MealContainer from "./MealContainer";

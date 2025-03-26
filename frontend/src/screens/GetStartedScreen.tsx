@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, ImageBackground, TouchableOpacity, useWindowDimensions } from "react-native";
-import avihuFlyTrap from "@assets/avihuFlyTrap.jpeg";
+import avihuFlyTrap from "@assets/avihu/avihuFlyTrap.jpeg";
 import { moderateScale } from "react-native-size-matters";
 import { RootStackParamList, StackNavigatorProps } from "../types/navigatorTypes";
 import { StatusBar } from "expo-status-bar";

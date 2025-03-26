@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { useState, useEffect, FC, useMemo } from "react";
-import logoBlack from "@assets/avihu/avihu-logo-black.png";
+import logoBlack from "@assets/avihu/avihuLogoBlack.jpeg";
 import { IWorkoutPlan } from "@/interfaces/Workout";
 import WorkoutTips from "./WorkoutTips";
 import { useWorkoutPlanApi } from "@/hooks/api/useWorkoutPlanApi";
