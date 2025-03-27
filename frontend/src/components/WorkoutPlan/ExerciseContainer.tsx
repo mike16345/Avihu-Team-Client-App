@@ -42,7 +42,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
   const handleRecordSet = (
     recordedSet: Omit<IRecordedSet, "plan">,
-    isEdit = false
+    sessionId = ""
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (!currentUser) {
@@ -60,7 +60,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
         muscleGroup,
       };
 
-      addRecordedSet(setToRecord, session?._id || "")
+      addRecordedSet(setToRecord, sessionId)
         .then((response) => {
           const updatedSession = response.session;
 
@@ -83,6 +83,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
         });
     });
   };
+
   const handleSetCurrentSetInfo = (updatedSession: ISession) => {
     if (!updatedSession) return;
     const data = updatedSession.data;
@@ -95,11 +96,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
     const setNumber = exerciseData?.setNumber + 1 || 1;
 
-    if (setNumber - 1 <= exercise.sets?.length - 1) {
-      setCurrentSetNumber(setNumber);
-    } else {
-      setCurrentSetNumber(setNumber);
-    }
+    setCurrentSetNumber(setNumber);
   };
 
   useEffect(() => {
@@ -113,7 +110,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
         navigation.navigate("RecordSet", {
           exercise: exercise,
           muscleGroup: muscleGroup,
-          handleRecordSet: (recordedSet) => handleRecordSet(recordedSet),
+          handleRecordSet: handleRecordSet,
           setNumber: currentSetNumber,
         });
       }}

@@ -22,14 +22,13 @@ import { useUserStore } from "@/store/userStore";
 import { useQuery } from "@tanstack/react-query";
 import Loader from "../ui/loaders/Loader";
 import RecordedSetInfo from "./RecordedSetInfo";
-import { EXERCISE_METHOD, ONE_DAY } from "@/constants/reactQuery";
+import { ONE_DAY, WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 import { Text } from "../ui/Text";
 import Toast from "react-native-toast-message";
-import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
 import Divider from "../ui/Divider";
-import BottomDrawer from "../ui/BottomDrawer";
 import { useLayoutStore } from "@/store/layoutStore";
 import ExerciseMethodDrawer from "./ExerciseMethodDrawer";
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
 
@@ -60,6 +59,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const currentUser = useUserStore((state) => state.currentUser);
   const { getUserRecordedSetsByExercise } = useRecordedSetsApi();
   const [currentSetNumber, setCurrentSetNumber] = useState(setNumber);
+  const workoutSession = useAsyncStorage(WORKOUT_SESSION_KEY);
 
   const { data, isLoading } = useQuery(
     ["recordedSets", exercise],
@@ -94,9 +94,12 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   };
 
   const handleSave = async () => {
+    const workoutSessionString = await workoutSession.getItem();
+    const workoutSessionData = JSON.parse(workoutSessionString || "{}");
+
     try {
       setIsSetUploading(true);
-      await handleRecordSet(recordedSet);
+      await handleRecordSet(recordedSet, workoutSessionData?._id);
       setCurrentSetNumber((prev) => prev + 1);
     } catch (err: any) {
       Toast.show({
