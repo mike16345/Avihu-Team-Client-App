@@ -14,8 +14,14 @@ const CardioWrapper: React.FC<CardioWrapperProps> = ({ cardioPlan }) => {
   const { colors, layout, spacing } = useStyles();
 
   return (
-    <View style={[colors.background, layout.heightFull, spacing.pdHorizontalDefault]}>
-      <Text>CardioWrapper</Text>
+    <View
+      style={[
+        colors.background,
+        layout.heightFull,
+        spacing.pdHorizontalDefault,
+        spacing.pdVerticalDefault,
+      ]}
+    >
       <ConditionalRender condition={cardioPlan?.type == `simple`}>
         <SimpleCardioContainer plan={cardioPlan?.plan} />
       </ConditionalRender>

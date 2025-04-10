@@ -1,9 +1,10 @@
-import { Platform, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Text } from "@/components/ui/Text";
 import { ICardioWorkout } from "@/interfaces/Workout";
 import useStyles from "@/styles/useGlobalStyles";
 import Divider from "@/components/ui/Divider";
+import { ConditionalRender } from "@/components/ui/ConditionalRender";
 
 interface CardioExerciseContainerProps {
   exercise: ICardioWorkout;
@@ -27,19 +28,17 @@ const CardioExerciseContainer: React.FC<CardioExerciseContainerProps> = ({
         </Text>
         <View style={[layout.flexRowReverse, layout.justifyBetween, layout.widthFull]}>
           <View style={[layout.flexRowReverse, spacing.gapDefault, layout.itemsCenter]}>
-            {warmUpAmount && (
-              <>
-                <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
-                  {warmUpAmount} דק' חימום
-                </Text>
-                <Divider orientation="vertical" color={colors.textPrimary.color} thickness={1.5} />
-              </>
-            )}
+            <ConditionalRender condition={warmUpAmount >= 0}>
+              <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
+                {warmUpAmount} דק' חימום
+              </Text>
+              <Divider orientation="vertical" color={colors.textPrimary.color} thickness={1.5} />
+            </ConditionalRender>
             <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>{distance}</Text>
           </View>
-          {tips && (
+          <ConditionalRender condition={!!tips}>
             <TouchableOpacity
-              onPress={() => displayTip(tips)}
+              onPress={() => displayTip(tips!)}
               style={[
                 exerciseMethod ? colors.backgroundSurfaceVariant : colors.backgroundPrimary,
                 common.roundedSm,
@@ -48,7 +47,7 @@ const CardioExerciseContainer: React.FC<CardioExerciseContainerProps> = ({
             >
               <Text style={[colors.textOnBackground]}>צפה בדגשים</Text>
             </TouchableOpacity>
-          )}
+          </ConditionalRender>
         </View>
       </View>
     </View>
