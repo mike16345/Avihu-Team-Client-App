@@ -1,12 +1,13 @@
-import { Platform, ScrollView, TouchableOpacity, View } from "react-native";
+import { Platform, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { ISimpleCardioType } from "@/interfaces/Workout";
 import useStyles from "@/styles/useGlobalStyles";
-import { aerobicActivities, translateWorkoutKeys } from "@/utils/cardioUtils";
+import { translateWorkoutKeys } from "@/utils/cardioUtils";
 import { Text } from "@/components/ui/Text";
 import useCardioWorkoutQuery from "@/hooks/queries/useCardioWorkoutQuery";
 import Loader from "@/components/ui/loaders/Loader";
 import ErrorScreen from "@/screens/ErrorScreen";
+import { ConditionalRender } from "@/components/ui/ConditionalRender";
 
 interface SimpleCardioContainerProps {
   plan?: ISimpleCardioType;
@@ -58,13 +59,13 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
               spacing.pdDefault,
             ]}
           >
-            {isLoading && (
+            <ConditionalRender condition={isLoading}>
               <View style={spacing.pdDefault}>
                 <Loader />
               </View>
-            )}
-            {!isLoading &&
-              cardioWorkouts?.data.map((activity, i) => (
+            </ConditionalRender>
+            <ConditionalRender condition={!isLoading}>
+              {cardioWorkouts?.data.map((activity, i) => (
                 <View
                   key={i}
                   style={[
@@ -77,9 +78,10 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
                   <Text style={[colors.textOnBackground]}>{activity.name}</Text>
                 </View>
               ))}
+            </ConditionalRender>
           </View>
         </View>
-        {plan?.tips && (
+        <ConditionalRender condition={!!plan?.tips}>
           <View style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}>
             <Text
               style={[colors.textOnBackground, colors.textPrimary, text.textCenter, text.textBold]}
@@ -87,10 +89,10 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
               דגשים
             </Text>
             <Text style={[colors.textOnBackground, text.textRight, spacing.pdDefault]}>
-              {plan.tips}
+              {plan!.tips}
             </Text>
           </View>
-        )}
+        </ConditionalRender>
       </View>
     </View>
   );

@@ -27,7 +27,7 @@ const WorkoutTips: FC<WorkoutTipsProps> = ({
   setOpenTips,
   title = `דגשים לאימון`,
 }) => {
-  const { fonts, layout, text, colors, spacing } = useStyles();
+  const { fonts, text, colors, spacing } = useStyles();
 
   return (
     <BottomDrawer heightVariant="auto" open={openTips} onClose={() => setOpenTips(false)}>
