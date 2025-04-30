@@ -49,3 +49,5 @@ yarn-error.*
 *.csr
 
 .npmrc
+
+credentials.json
