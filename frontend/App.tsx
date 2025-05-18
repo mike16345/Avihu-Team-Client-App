@@ -20,6 +20,7 @@ import UserDrawer from "@/components/User/UserDrawer";
 import Update from "@/hooks/useUpdates";
 import persister from "@/QueryClient/queryPersister";
 import queryClient from "@/QueryClient/queryClient";
+import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
 import * as Haptic from "expo-haptics";
 
 const { DarkTheme } = adaptNavigationTheme({
@@ -31,6 +32,7 @@ I18nManager.forceRTL(false);
 I18nManager.allowRTL(false);
 
 export default function App() {
+  const ready = useOneTimeRTLFix();
   const colorScheme = Appearance.getColorScheme();
   const [loaded] = useFonts({
     Assistant: require("./assets/fonts/Assistant-VariableFont_wght.ttf"),
@@ -47,7 +49,7 @@ export default function App() {
     },
   };
 
-  if (!loaded) return;
+  if (!loaded || !ready) return;
 
   return (
     <PaperProvider theme={CustomDarkTheme}>
