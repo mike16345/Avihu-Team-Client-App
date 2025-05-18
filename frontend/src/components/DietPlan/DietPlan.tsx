@@ -31,6 +31,7 @@ import { useFoodGroupStore } from "@/store/foodgroupStore";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import useFoodGroupQuery from "@/hooks/queries/useMenuItemsQuery";
 import { FoodGroup } from "@/types/foodTypes";
+import * as Haptic from "expo-haptics";
 
 export default function DietPlan() {
   const currentUser = useUserStore((state) => state.currentUser);
@@ -181,7 +182,10 @@ export default function DietPlan() {
           color={colors.textOnBackground.color}
           fabStyle={[colors.backgroundPrimary]}
           icon={isFabOpen ? `close` : `food-outline`}
-          onStateChange={({ open }) => setIsFabOpen(open)}
+          onStateChange={({ open }) => {
+            Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Soft);
+            setIsFabOpen(open);
+          }}
           actions={[
             {
               icon: "fish",

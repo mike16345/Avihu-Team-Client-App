@@ -5,8 +5,11 @@ import { SegmentedButtons } from "react-native-paper";
 import useColors from "@/styles/useColors";
 import { useSpacingStyles } from "@/styles/useSpacingStyles";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
+import * as Haptic from "expo-haptics";
 
 const selectedRangeToRange = (selectedRange: string) => {
+  Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Soft);
+
   switch (selectedRange) {
     case "1W":
       return "weeks";
