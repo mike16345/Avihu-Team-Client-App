@@ -5,6 +5,7 @@ import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import TopBar from "./TopBar";
+import * as Haptic from "expo-haptics";
 
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
@@ -15,6 +16,8 @@ const BottomTabNavigator = () => {
     <View style={[layout.flex1, colors.background, layout.justifyEvenly]}>
       <TopBar />
       <Tab.Navigator
+        shifting
+        sceneAnimationType="shifting"
         barStyle={[
           {
             height: BOTTOM_BAR_HEIGHT,
@@ -39,6 +42,7 @@ const BottomTabNavigator = () => {
             <Tab.Screen
               key={tab.name}
               name={tab.name}
+              listeners={{ tabPress: () => Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Soft) }}
               component={tab.component}
               options={{ ...tab.options }}
             />
