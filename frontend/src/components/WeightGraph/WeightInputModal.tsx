@@ -92,18 +92,18 @@ const WeightInputModal: FC<WeightInputModalProps> = ({
         >
           <View style={[layout.flexRow, spacing.gapDefault]}>
             <Button
-              mode="contained-tonal"
-              onPress={handleDismiss}
-              style={[common.rounded, { width: `50%` }]}
-            >
-              <Text style={[text.textBold, fonts.default]}>בטל</Text>
-            </Button>
-            <Button
               mode="contained"
               onPress={handleClickSave}
               style={[common.rounded, { width: `50%` }]}
             >
               <Text style={[text.textBold, fonts.default, colors.textOnBackground]}>שמור</Text>
+            </Button>
+            <Button
+              mode="contained-tonal"
+              onPress={handleDismiss}
+              style={[common.rounded, { width: `50%` }]}
+            >
+              <Text style={[text.textBold, fonts.default]}>בטל</Text>
             </Button>
           </View>
         </View>
