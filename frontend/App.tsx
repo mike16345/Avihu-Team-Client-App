@@ -13,13 +13,14 @@ import { DarkTheme as CustomDarkTheme, ThemeProvider } from "@/themes/useAppThem
 import { Appearance, I18nManager } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import Toast from "react-native-toast-message";
+import Toast, { BaseToast, ErrorToast, ToastProps } from "react-native-toast-message";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import { useFonts } from "expo-font";
 import UserDrawer from "@/components/User/UserDrawer";
 import Update from "@/hooks/useUpdates";
 import persister from "@/QueryClient/queryPersister";
 import queryClient from "@/QueryClient/queryClient";
+import * as Haptic from "expo-haptics";
 
 const { DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -35,6 +36,17 @@ export default function App() {
     Assistant: require("./assets/fonts/Assistant-VariableFont_wght.ttf"),
   });
 
+  const toastConfig = {
+    success: (props: ToastProps) => {
+      Haptic.notificationAsync(Haptic.NotificationFeedbackType.Success);
+      return <BaseToast {...props} />;
+    },
+    error: (props: ToastProps) => {
+      Haptic.notificationAsync(Haptic.NotificationFeedbackType.Error);
+      return <ErrorToast {...props} />;
+    },
+  };
+
   if (!loaded) return;
 
   return (
@@ -49,7 +61,7 @@ export default function App() {
               <NavigationContainer theme={DarkTheme}>
                 <RootNavigator />
                 <StatusBar key={colorScheme} translucent style={"light"} />
-                <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} />
+                <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} config={toastConfig} />
                 <UserDrawer />
                 <Update />
               </NavigationContainer>
