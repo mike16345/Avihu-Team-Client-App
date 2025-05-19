@@ -29,6 +29,10 @@ import Divider from "../ui/Divider";
 import { useLayoutStore } from "@/store/layoutStore";
 import ExerciseMethodDrawer from "./ExerciseMethodDrawer";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import { ConditionalRender } from "../ui/ConditionalRender";
+import RestTimer from "./RestTimer";
+import Draggable from "../ui/Draggable";
+import { useTimerStore } from "@/store/timerStore";
 
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
 
@@ -60,6 +64,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const { getUserRecordedSetsByExercise } = useRecordedSetsApi();
   const [currentSetNumber, setCurrentSetNumber] = useState(setNumber);
   const workoutSession = useAsyncStorage(WORKOUT_SESSION_KEY);
+  const { setCountdown } = useTimerStore();
 
   const { data, isLoading } = useQuery(
     ["recordedSets", exercise],
@@ -101,6 +106,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
       setIsSetUploading(true);
       await handleRecordSet(recordedSet, workoutSessionData?._id);
       setCurrentSetNumber((prev) => prev + 1);
+      setCountdown(exercise.restTime);
     } catch (err: any) {
       Toast.show({
         text1: "הסט שהוקלד אינו תקין",
