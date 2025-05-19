@@ -16,7 +16,6 @@ const BottomTabNavigator = () => {
     <View style={[layout.flex1, colors.background, layout.justifyEvenly]}>
       <TopBar />
       <Tab.Navigator
-        shifting
         sceneAnimationType="shifting"
         barStyle={[
           {
