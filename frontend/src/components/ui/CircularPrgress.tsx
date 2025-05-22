@@ -17,6 +17,7 @@ interface ICircularProgressProps {
   maxValue: number;
   isTimer?: boolean;
   labelSize?: number;
+  prefil?: "from-start" | "from-end" | "current-value";
 }
 
 const CircularPrgress: React.FC<ICircularProgressProps> = ({
@@ -31,6 +32,7 @@ const CircularPrgress: React.FC<ICircularProgressProps> = ({
   textColor = "white",
   isTimer = false,
   labelSize,
+  prefil = "from-start",
 }) => {
   const { text } = useStyles();
 
@@ -45,6 +47,7 @@ const CircularPrgress: React.FC<ICircularProgressProps> = ({
       onAnimationComplete={() => onFinish()}
       backgroundColor={secondaryColor}
       lineCap="round"
+      prefill={prefil == "from-start" ? 100 : prefil == "from-end" ? 0 : (value / maxValue) * 100}
     >
       {() => (
         <Text style={[{ color: textColor }, text.textBold, { fontSize: labelSize }]}>

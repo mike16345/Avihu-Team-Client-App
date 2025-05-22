@@ -9,7 +9,7 @@ import { useTimerStore } from "@/store/timerStore";
 import { ConditionalRender } from "./ConditionalRender";
 
 const MIN_HEIGHT = 90;
-const MAX_HEIGHT = 220;
+const MAX_HEIGHT = 170;
 
 const TimerDrawer = () => {
   const { countdown, initialCountdown, stopCountdown } = useTimerStore();
@@ -118,7 +118,7 @@ const TimerDrawer = () => {
             style={[
               layout.widthFull,
               layout.flexRow,
-              layout.justifyAround,
+              layout.justifyBetween,
               layout.itemsCenter,
               spacing.pdXl,
               spacing.pdVerticalXxl,
@@ -153,13 +153,14 @@ const TimerDrawer = () => {
               <CircularPrgress
                 type="full"
                 value={countdown || 0}
-                size={120}
+                size={90}
                 width={10}
                 maxValue={initialCountdown}
                 color={colors.textPrimary.color}
                 secondaryColor={colors.backdrop.backgroundColor}
                 isTimer
                 labelSize={fonts.lg.fontSize}
+                prefil="from-start"
               />
             </View>
           </View>
