@@ -1,6 +1,6 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useRef, useState } from "react";
-import { Animated, PanResponder, StyleSheet, View, Text, Dimensions } from "react-native";
+import { Animated, PanResponder, StyleSheet, View, Dimensions } from "react-native";
 import NativeIcon from "../Icon/NativeIcon";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");

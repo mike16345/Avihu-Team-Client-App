@@ -16,6 +16,7 @@ interface ICircularProgressProps {
   value: number;
   maxValue: number;
   isTimer?: boolean;
+  labelSize?: number;
 }
 
 const CircularPrgress: React.FC<ICircularProgressProps> = ({
@@ -29,6 +30,7 @@ const CircularPrgress: React.FC<ICircularProgressProps> = ({
   maxValue,
   textColor = "white",
   isTimer = false,
+  labelSize,
 }) => {
   const { text } = useStyles();
 
@@ -42,9 +44,10 @@ const CircularPrgress: React.FC<ICircularProgressProps> = ({
       tintColor={color}
       onAnimationComplete={() => onFinish()}
       backgroundColor={secondaryColor}
+      lineCap="round"
     >
       {() => (
-        <Text style={[{ color: textColor }, text.textBold]}>
+        <Text style={[{ color: textColor }, text.textBold, { fontSize: labelSize }]}>
           {isTimer ? formatTime(value) : value}
         </Text>
       )}

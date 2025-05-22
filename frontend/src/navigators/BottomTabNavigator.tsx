@@ -6,11 +6,10 @@ import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import TopBar from "./TopBar";
 import * as Haptic from "expo-haptics";
-import Draggable from "@/components/ui/Draggable";
-import RestTimer from "@/components/WorkoutPlan/RestTimer";
-import { useTimerStore } from "@/store/timerStore";
+
+import TimerDrawer from "@/components/ui/TimerDrawer";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
-import TimerDraggable from "@/components/ui/TimerDraggable";
+import { useTimerStore } from "@/store/timerStore";
 
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
@@ -54,7 +53,7 @@ const BottomTabNavigator = () => {
           );
         })}
       </Tab.Navigator>
-      <TimerDraggable />
+      <ConditionalRender condition={!!countdown} children={<TimerDrawer />} />
     </View>
   );
 };
