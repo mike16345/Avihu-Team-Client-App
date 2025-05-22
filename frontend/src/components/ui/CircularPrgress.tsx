@@ -4,6 +4,7 @@ import { AnimatedCircularProgress } from "react-native-circular-progress";
 import useStyles from "@/styles/useGlobalStyles";
 import { useTimerStore } from "@/store/timerStore";
 import { formatTime } from "@/utils/timer";
+import { ConditionalRender } from "./ConditionalRender";
 
 interface ICircularProgressProps {
   size?: number;
@@ -18,6 +19,7 @@ interface ICircularProgressProps {
   isTimer?: boolean;
   labelSize?: number;
   prefil?: "from-start" | "from-end" | "current-value";
+  showValue?: boolean;
 }
 
 const CircularPrgress: React.FC<ICircularProgressProps> = ({
@@ -33,6 +35,7 @@ const CircularPrgress: React.FC<ICircularProgressProps> = ({
   isTimer = false,
   labelSize,
   prefil = "from-start",
+  showValue = true,
 }) => {
   const { text } = useStyles();
 
@@ -50,9 +53,14 @@ const CircularPrgress: React.FC<ICircularProgressProps> = ({
       prefill={prefil == "from-start" ? 100 : prefil == "from-end" ? 0 : (value / maxValue) * 100}
     >
       {() => (
-        <Text style={[{ color: textColor }, text.textBold, { fontSize: labelSize }]}>
-          {isTimer ? formatTime(value) : value}
-        </Text>
+        <ConditionalRender
+          condition={showValue}
+          children={
+            <Text style={[{ color: textColor }, text.textBold, { fontSize: labelSize }]}>
+              {isTimer ? formatTime(value) : value}
+            </Text>
+          }
+        />
       )}
     </AnimatedCircularProgress>
   );
