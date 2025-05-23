@@ -23,24 +23,24 @@ const ExpandedTimer = () => {
     >
       <View style={[layout.itemsEnd, spacing.gapDefault]}>
         <Text style={[colors.textOnBackground, text.textCenter, text.textBold]}>
-          זמן מנוחה עד לסט הבא
+          זמן מנוחה לסט הזה
         </Text>
-        <View style={[layout.flexRow, layout.itemsCenter, spacing.gapXxl]}>
+        <View style={[layout.flexRow, layout.itemsCenter, spacing.gapLg]}>
           <TouchableOpacity onPress={stopCountdown}>
-            <Text style={[colors.textOnBackground, text.textUnderline, text.textBold, fonts.lg]}>
+            <Text style={[colors.textOnBackground, text.textUnderline, text.textBold, fonts.md]}>
               דלג
             </Text>
           </TouchableOpacity>
           <View style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
+            <Text style={[colors.textOnBackground, text.textBold, fonts.md]}>
+              {initialCountdown} שניות
+            </Text>
             <NativeIcon
               color={colors.textOnBackground.color}
               library="AntDesign"
               name="clockcircleo"
-              style={[text.textBold, fonts.default]}
+              style={[text.textBold, fonts.md]}
             />
-            <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>
-              {formatTime(initialCountdown)}
-            </Text>
           </View>
         </View>
       </View>
@@ -51,7 +51,7 @@ const ExpandedTimer = () => {
           size={90}
           width={10}
           maxValue={initialCountdown}
-          color={colors.textPrimary.color}
+          color={colors.backgroundInversePrimary.backgroundColor}
           secondaryColor={colors.backdrop.backgroundColor}
           labelSize={fonts.lg.fontSize}
           prefil="from-start"
