@@ -29,9 +29,6 @@ import Divider from "../ui/Divider";
 import { useLayoutStore } from "@/store/layoutStore";
 import ExerciseMethodDrawer from "./ExerciseMethodDrawer";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { ConditionalRender } from "../ui/ConditionalRender";
-import RestTimer from "./RestTimer";
-import Draggable from "../ui/Draggable";
 import { useTimerStore } from "@/store/timerStore";
 
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}

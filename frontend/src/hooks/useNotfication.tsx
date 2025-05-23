@@ -58,14 +58,18 @@ export const useNotification = () => {
     }
   };
 
-  const showNotification = async (body: string) => {
+  const showNotification = async (body: string, triggerAt?: number) => {
     try {
       await Notifications.scheduleNotificationAsync({
         content: {
           title: "Avihu Team",
           body,
         },
-        trigger: null,
+        trigger: triggerAt
+          ? {
+              seconds: triggerAt, // fires in 5 seconds
+            }
+          : {},
       });
     } catch (error) {
       console.log(error);
