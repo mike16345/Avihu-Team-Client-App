@@ -48,7 +48,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
       Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Light);
     }, 2000); // Triggers after 2 seconds of no scroll
 
-    Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Light);
+    Haptic.selectionAsync();
     setSelectedIndex(index);
     onValueChange(data[index].value);
   };
@@ -64,14 +64,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 
   const returnIndex = (contentYOffset: any) => {
     let index = Math.round(contentYOffset / itemHeight);
-
-    /* if(index>=maxIndex){
-      index=maxIndex
-    }else if(index=<minIndex){
-      index=minIndex;
-    }else{
-      index=index
-    } */
 
     index = index >= data.length - 1 ? data.length - 1 : index < 0 ? 0 : index;
 
