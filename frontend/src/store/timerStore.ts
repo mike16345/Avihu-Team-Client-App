@@ -7,24 +7,28 @@ interface ITimerStore {
   initialCountdown: number;
   intervalId: NodeJS.Timeout | null;
   startTime: number | null;
+  notificationIdentifier: string | null;
   startCountdown: (seconds: number) => void;
   stopCountdown: () => void;
   setCountdown: (seconds: number | null) => void;
 }
 
-const { showNotification } = useNotification();
+const { showNotification, cancelNotification } = useNotification();
 
 export const useTimerStore = create<ITimerStore>((set, get) => ({
   countdown: null,
   initialCountdown: 0,
   intervalId: null,
   startTime: null,
+  notificationIdentifier: null,
 
-  startCountdown: (seconds: number) => {
+  startCountdown: async (seconds: number) => {
     const startTime = Date.now();
     set({ countdown: seconds, initialCountdown: seconds, startTime });
 
-    showNotification(`זמן מנוחה נגמר – מתחילים את הסט הבא!`, seconds);
+    const identifier = await showNotification(`זמן מנוחה נגמר – מתחילים את הסט הבא!`, seconds);
+
+    set({ notificationIdentifier: identifier });
 
     const interval = setInterval(() => {
       const state = get();
@@ -54,9 +58,19 @@ export const useTimerStore = create<ITimerStore>((set, get) => ({
   },
 
   stopCountdown: () => {
-    const { intervalId } = get();
+    const { intervalId, notificationIdentifier } = get();
+
     if (intervalId) clearInterval(intervalId);
-    set({ countdown: null, intervalId: null, initialCountdown: 0, startTime: null });
+
+    if (notificationIdentifier) cancelNotification(notificationIdentifier);
+
+    set({
+      countdown: null,
+      intervalId: null,
+      initialCountdown: 0,
+      startTime: null,
+      notificationIdentifier: null,
+    });
   },
 
   setCountdown: (seconds: number | null) => {
