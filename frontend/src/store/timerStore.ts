@@ -26,7 +26,7 @@ export const useTimerStore = create<ITimerStore>((set, get) => ({
     const startTime = Date.now();
     set({ countdown: seconds, initialCountdown: seconds, startTime });
 
-    const identifier = await showNotification(`זמן מנוחה נגמר – מתחילים את הסט הבא!`, seconds);
+    const identifier = await showNotification(`זמן מנוחה נגמר, מתחילים סט הבא!`, seconds);
 
     set({ notificationIdentifier: identifier });
 
