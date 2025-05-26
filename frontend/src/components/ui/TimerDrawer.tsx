@@ -11,7 +11,7 @@ const MAX_HEIGHT = 170;
 const TimerDrawer = () => {
   const { colors, common } = useStyles();
 
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const isExpandedRef = useRef(isExpanded);
 
@@ -20,8 +20,8 @@ const TimerDrawer = () => {
     isExpandedRef.current = isExpanded;
   }, [isExpanded]);
 
-  const animatedHeight = useRef(new Animated.Value(MIN_HEIGHT)).current;
-  const lastHeight = useRef(MIN_HEIGHT);
+  const animatedHeight = useRef(new Animated.Value(MAX_HEIGHT)).current;
+  const lastHeight = useRef(MAX_HEIGHT);
 
   const panResponder = useRef(
     PanResponder.create({
