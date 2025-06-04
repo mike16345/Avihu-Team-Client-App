@@ -279,7 +279,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   decimalStepSize={25}
                   showZeroDecimal={true}
                   decimalRange={100}
-                  maxWeight={200}
+                  maxWeight={500}
                   stepSize={1}
                   label=""
                   height={height * 0.08}
