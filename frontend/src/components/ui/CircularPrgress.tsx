@@ -1,16 +1,11 @@
 import { Text } from "react-native";
 import React from "react";
-import { AnimatedCircularProgress } from "react-native-circular-progress";
+import { AnimatedCircularProgress ,AnimatedCircularProgressProps} from "react-native-circular-progress";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "./ConditionalRender";
 
-interface ICircularProgressProps {
-  size?: number;
-  width?: number;
-  color?: string;
-  secondaryColor?: string;
+interface ICircularProgressProps extends AnimatedCircularProgressProps{
   textColor?: string;
-  onFinish?: () => void;
   type?: "full" | "arc";
   value: number;
   maxValue: number;
@@ -22,9 +17,6 @@ interface ICircularProgressProps {
 
 const CircularPrgress: React.FC<ICircularProgressProps> = ({
   type = "full",
-  color = "white",
-  secondaryColor = "black",
-  onFinish = () => {},
   size = 120,
   width = 15,
   value,
@@ -34,6 +26,7 @@ const CircularPrgress: React.FC<ICircularProgressProps> = ({
   prefil = "from-start",
   showValue = true,
   valueFormatter,
+  ...rest
 }) => {
   const { text } = useStyles();
 
@@ -44,11 +37,9 @@ const CircularPrgress: React.FC<ICircularProgressProps> = ({
       fill={(value / maxValue) * 100}
       arcSweepAngle={type == `arc` ? 260 : 360}
       rotation={type == `arc` ? 232 : 360}
-      tintColor={color}
-      onAnimationComplete={() => onFinish()}
-      backgroundColor={secondaryColor}
       lineCap="round"
       prefill={prefil == "from-start" ? 100 : prefil == "from-end" ? 0 : (value / maxValue) * 100}
+      {...rest}
     >
       {() => (
         <ConditionalRender

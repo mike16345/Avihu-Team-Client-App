@@ -33,8 +33,8 @@ const ShrunkenTimer = () => {
           size={19}
           width={2}
           showValue={false}
-          color={colors.backgroundInversePrimary.backgroundColor}
-          secondaryColor={colors.backdrop.backgroundColor}
+          tintColor={colors.backgroundInversePrimary.backgroundColor}
+          backgroundColor={colors.backdrop.backgroundColor}
         />
         <Text
           style={[

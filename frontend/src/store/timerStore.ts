@@ -75,9 +75,12 @@ export const useTimerStore = create<ITimerStore>((set, get) => ({
 
   setCountdown: (seconds: number | null) => {
     const { stopCountdown, startCountdown } = get();
+
     stopCountdown();
+    
     if (seconds !== null) {
       startCountdown(seconds);
     }
+  
   },
 }));

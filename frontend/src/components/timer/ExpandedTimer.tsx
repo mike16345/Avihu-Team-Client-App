@@ -51,8 +51,8 @@ const ExpandedTimer = () => {
           size={90}
           width={10}
           maxValue={initialCountdown}
-          color={colors.backgroundInversePrimary.backgroundColor}
-          secondaryColor={colors.backdrop.backgroundColor}
+          tintColor={colors.backgroundInversePrimary.backgroundColor}
+          backgroundColor={colors.backdrop.backgroundColor}
           labelSize={fonts.lg.fontSize}
           prefil="from-start"
           valueFormatter={formatTime}
