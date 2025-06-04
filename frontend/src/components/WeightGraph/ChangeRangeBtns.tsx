@@ -1,14 +1,14 @@
-import { Animated, View } from "react-native";
+import { Animated } from "react-native";
 import { FC, useState } from "react";
 import { DateRanges } from "@/types/dateTypes";
 import { SegmentedButtons } from "react-native-paper";
 import useColors from "@/styles/useColors";
 import { useSpacingStyles } from "@/styles/useSpacingStyles";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
-import * as Haptic from "expo-haptics";
+import { selectionHaptic } from "@/utils/haptics";
 
 const selectedRangeToRange = (selectedRange: string) => {
-  Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Soft);
+  selectionHaptic()
 
   switch (selectedRange) {
     case "1W":

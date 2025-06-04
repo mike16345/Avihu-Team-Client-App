@@ -28,7 +28,7 @@ import TextInput from "../ui/TextInput";
 import { TextInput as RNTextInput } from "react-native-paper";
 import { useUserStore } from "@/store/userStore";
 import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
-import * as Haptic from "expo-haptics";
+import { errorNotificationHaptic } from "@/utils/haptics";
 
 interface IUserCredentials {
   email: string;
@@ -92,7 +92,7 @@ export default function Login({ onLogin }: ILoginProps) {
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
-      Haptic.notificationAsync(Haptic.NotificationFeedbackType.Error);
+      errorNotificationHaptic()
       return;
     }
 

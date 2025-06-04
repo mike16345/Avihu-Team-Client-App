@@ -1,13 +1,13 @@
-import * as Haptic from "expo-haptics";
+import { errorNotificationHaptic, successNotificationHaptic } from "@/utils/haptics";
 import { ErrorToast, SuccessToast, ToastProps } from "react-native-toast-message";
 
 export const toastConfig = {
   success: (props: ToastProps) => {
-    Haptic.notificationAsync(Haptic.NotificationFeedbackType.Success);
+    successNotificationHaptic()
     return <SuccessToast {...props} />;
   },
   error: (props: ToastProps) => {
-    Haptic.notificationAsync(Haptic.NotificationFeedbackType.Error);
+    errorNotificationHaptic()
     return <ErrorToast {...props} />;
   },
 };

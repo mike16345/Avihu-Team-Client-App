@@ -2,7 +2,7 @@ import { WheelPickerProps } from "@/types/wheelPickerTypes";
 import React, { useState, useRef, useEffect } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import { Text } from "./Text";
-import * as Haptic from "expo-haptics";
+import { selectionHaptic, softHaptic } from "@/utils/haptics";
 
 const WheelPicker: React.FC<WheelPickerProps> = ({
   data,
@@ -45,10 +45,10 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
         animated: true,
       });
 
-      Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Light);
+      softHaptic()
     }, 2000); // Triggers after 2 seconds of no scroll
 
-    Haptic.selectionAsync();
+    selectionHaptic()
     setSelectedIndex(index);
     onValueChange(data[index].value);
   };

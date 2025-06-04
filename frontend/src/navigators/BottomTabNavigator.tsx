@@ -5,11 +5,11 @@ import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import TopBar from "./TopBar";
-import * as Haptic from "expo-haptics";
 
 import TimerDrawer from "@/components/ui/TimerDrawer";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import { useTimerStore } from "@/store/timerStore";
+import { selectionHaptic } from "@/utils/haptics";
 
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
@@ -46,7 +46,7 @@ const BottomTabNavigator = () => {
             <Tab.Screen
               key={tab.name}
               name={tab.name}
-              listeners={{ tabPress: () => Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Soft) }}
+              listeners={{ tabPress: () => selectionHaptic() }}
               component={tab.component}
               options={{ ...tab.options }}
             />

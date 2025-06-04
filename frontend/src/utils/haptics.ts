@@ -9,7 +9,7 @@ import {
 const {Heavy,Light,Medium,Rigid,Soft}=ImpactFeedbackStyle;
 const {Error,Success,Warning}=NotificationFeedbackType
 
-export const successNotificationHapit=()=>notificationAsync(Success);
+export const successNotificationHaptic=()=>notificationAsync(Success);
 
 export const errorNotificationHaptic=()=>notificationAsync(Error)
 

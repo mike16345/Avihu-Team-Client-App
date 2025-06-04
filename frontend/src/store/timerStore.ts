@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import * as Haptic from "expo-haptics";
 import useNotification from "@/hooks/useNotfication";
+import { heavyHaptic, lightHaptic, mediumHaptic, warningNotificationHaptic } from "@/utils/haptics";
 
 interface ITimerStore {
   countdown: number | null;
@@ -36,15 +36,15 @@ export const useTimerStore = create<ITimerStore>((set, get) => ({
       const remaining = Math.max(state.initialCountdown! - elapsedSeconds, 0);
 
       if (remaining >= 8 && remaining <= 10) {
-        Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Light);
+        lightHaptic()
       } else if (remaining >= 5 && remaining <= 7) {
-        Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Medium);
+        mediumHaptic()
       } else if (remaining >= 1 && remaining <= 4) {
-        Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Heavy);
+        heavyHaptic()
       }
 
       if (remaining === 0) {
-        Haptic.notificationAsync(Haptic.NotificationFeedbackType.Error);
+        warningNotificationHaptic()
 
         clearInterval(state.intervalId!);
 

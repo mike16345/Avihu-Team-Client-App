@@ -21,7 +21,7 @@ import BottomDrawer from "@/components/ui/BottomDrawer";
 import ImagePreview from "@/components/WeightGraph/ImagePreview";
 import Constants from "expo-constants";
 import useImageUploadStatus from "@/hooks/useImageUploadStatus";
-import * as Haptic from "expo-haptics";
+import { softHaptic } from "@/utils/haptics";
 
 const MyWeightProgressScreen = () => {
   const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
@@ -161,7 +161,7 @@ const MyWeightProgressScreen = () => {
           icon={isFabOpen ? "close" : "plus"}
           visible
           onStateChange={({ open }) => {
-            Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Soft);
+            softHaptic()
             setIsFabOpen(open);
           }}
           color={colors.textOnBackground.color}

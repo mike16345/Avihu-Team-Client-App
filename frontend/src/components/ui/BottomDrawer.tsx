@@ -14,7 +14,7 @@ import workoutPage from "@assets/avihu/workoutPage.jpeg";
 import dietScreen from "@assets/avihu/dietScreen.jpeg";
 import progressPage from "@assets/avihu/progressPage.jpeg";
 import recordExercisePage from "@assets/avihu/recordExercisePage.jpeg";
-import * as Haptic from "expo-haptics";
+import {  softHaptic } from "@/utils/haptics";
 
 const { height } = Dimensions.get("window");
 
@@ -48,7 +48,7 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
 
   useEffect(() => {
     if (open) {
-      Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Medium);
+      softHaptic()
       setIsVisible(true); // Show the modal when open is true
       Animated.timing(slideAnim, {
         toValue: 0,
@@ -56,7 +56,7 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
         useNativeDriver: true,
       }).start();
     } else {
-      Haptic.impactAsync(Haptic.ImpactFeedbackStyle.Light);
+      softHaptic()
       Animated.timing(slideAnim, {
         toValue: height, // Slide out to the right
         duration: 300,
