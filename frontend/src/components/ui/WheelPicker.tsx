@@ -2,7 +2,7 @@ import { WheelPickerProps } from "@/types/wheelPickerTypes";
 import React, { useState, useRef, useEffect } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import { Text } from "./Text";
-import { selectionHaptic, softHaptic } from "@/utils/haptics";
+import { softHaptic } from "@/utils/haptics";
 
 const WheelPicker: React.FC<WheelPickerProps> = ({
   data,
@@ -21,16 +21,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   const flatListRef = useRef<FlatList>(null);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  /*  const handleItemPress = (index: number) => {
-    flatListRef.current?.scrollToOffset({
-      offset: index * itemHeight,
-      animated: true,
-    });
-
-    setSelectedIndex(index);
-    onValueChange(data[index].value);
-  }; */
-
   const handleScroll = (event: any) => {
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
@@ -45,10 +35,10 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
         animated: true,
       });
 
-      softHaptic()
+      softHaptic();
     }, 2000); // Triggers after 2 seconds of no scroll
 
-    selectionHaptic()
+    softHaptic();
     setSelectedIndex(index);
     onValueChange(data[index].value);
   };
@@ -104,7 +94,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
                 index === selectedIndex ? [styles.selectedItem] : null,
                 { height: itemHeight, paddingHorizontal: 20 },
               ]}
-              //onPress={() => handleItemPress(index)}
             >
               <Text
                 style={[
