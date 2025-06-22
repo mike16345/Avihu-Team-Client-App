@@ -96,6 +96,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   };
 
   const handleSave = async () => {
+    if (currentSetNumber > exercise.sets.length)
+      return Toast.show({ type: "error", text1: "נראה שכבר השלמת את כל הסטים" });
+
     const workoutSessionString = await workoutSession.getItem();
     const workoutSessionData = JSON.parse(workoutSessionString || "{}");
 
