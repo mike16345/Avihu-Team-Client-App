@@ -22,7 +22,10 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({ error, refetchFunc }) => {
         style={[colors.textDanger]}
       />
       <Text style={[colors.textOnBackground, fonts.xl]}>אירעה שגיאה</Text>
-      <ConditionalRender condition={error} children={<Text style={[colors.textOnBackground, fonts.xl]}>{error?.message||''}</Text>}/>
+      <ConditionalRender
+        condition={error}
+        children={<Text style={[colors.textOnBackground, fonts.xl]}>{error?.message || ""}</Text>}
+      />
       {refetchFunc && (
         <Button
           mode="contained"

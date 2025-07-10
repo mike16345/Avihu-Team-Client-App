@@ -108,7 +108,7 @@ export default function DietPlan() {
         refreshFunc={() => refresh(refetchDietPlan)}
       />
     );
-  if (isError||!data) return <ErrorScreen error={error} refetchFunc={refetchDietPlan} />;
+  if (isError || !data) return <ErrorScreen error={error} refetchFunc={refetchDietPlan} />;
 
   return (
     <Portal.Host>
@@ -141,34 +141,35 @@ export default function DietPlan() {
                 veggiesPerDay={data?.veggiesPerDay}
               />
             </View>
-            {data?.meals && data?.meals.map((meal, i) => (
-              <Animated.View
-                key={meal._id}
-                style={[
-                  layout.flexRowReverse,
-                  layout.itemsCenter,
-                  spacing.pdDefault,
-                  colors.backgroundSecondaryContainer,
-                  common.rounded,
-                  slideAnimations[i + 1],
-                  { overflow: "hidden" },
-                ]}
-              >
-                <View
-                  style={[layout.itemsCenter, spacing.pdXs, spacing.gapSm, { paddingLeft: 10 }]}
+            {data?.meals &&
+              data?.meals.map((meal, i) => (
+                <Animated.View
+                  key={meal._id}
+                  style={[
+                    layout.flexRowReverse,
+                    layout.itemsCenter,
+                    spacing.pdDefault,
+                    colors.backgroundSecondaryContainer,
+                    common.rounded,
+                    slideAnimations[i + 1],
+                    { overflow: "hidden" },
+                  ]}
                 >
-                  <NativeIcon
-                    library="MaterialCommunityIcons"
-                    name="food-outline"
-                    color={colors.textOnBackground.color}
-                    size={20}
-                  />
-                  <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
-                </View>
-                <Divider orientation="vertical" color="white" thickness={0.8} />
-                <MealContainer meal={meal} />
-              </Animated.View>
-            ))}
+                  <View
+                    style={[layout.itemsCenter, spacing.pdXs, spacing.gapSm, { paddingLeft: 10 }]}
+                  >
+                    <NativeIcon
+                      library="MaterialCommunityIcons"
+                      name="food-outline"
+                      color={colors.textOnBackground.color}
+                      size={20}
+                    />
+                    <Text style={[text.textBold, colors.textOnBackground]}>ארוחה {i + 1}</Text>
+                  </View>
+                  <Divider orientation="vertical" color="white" thickness={0.8} />
+                  <MealContainer meal={meal} />
+                </Animated.View>
+              ))}
           </View>
         )}
 
