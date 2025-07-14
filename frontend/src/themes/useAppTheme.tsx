@@ -37,6 +37,7 @@ export const defaultTheme = {
     errorContainer: "#F8F8F8",
     background: "#F8F8F8",
     shadow: "#072723",
+    surface: "#ffffffff",
     primaryContainer: "#065f46",
     onPrimaryContainer: "#a7f3d0",
      secondaryContainer: "#25262A",
@@ -58,7 +59,7 @@ export const defaultTheme = {
     onError: "#F8F8F8",
    onErrorContainer: "#ffd6d6",
     onBackground: "#f8f9fa",
-    surface: "#1f2937",
+    
     onSurface: "#e5e7eb",
     surfaceVariant: "#4b5563",
     onSurfaceVariant: "#d1d5db",
