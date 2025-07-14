@@ -1,18 +1,30 @@
 export interface IUser {
-  id: string;
-  name: string;
+  _id: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  password: string; // just for demo
-  dietPlan: string;
-  workoutPlan: string;
-  weighIns: string[];
-  workoutProgress: string[];
-  mealsProgress: string[];
+  phone: string;
+  dietaryType: string[];
+  dateJoined: Date;
+  dateFinished: Date;
+  planType: string;
+  remindIn: number;
+  checkInAt: number;
+  imagesUploaded: boolean;
+  password?: string;
+  hasAccess: boolean;
 }
 
 // WeighIn interface
+export interface IWeighInPost extends Partial<IWeighIn> {}
 export interface IWeighIn {
-  id: string;
-  dateOfWeighIn: Date;
+  _id: string;
+  date: string;
   weight: number;
+}
+
+export interface IWeighInResponse {
+  _id: string;
+  userId: string;
+  weighIns: IWeighIn[];
 }

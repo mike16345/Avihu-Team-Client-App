@@ -1,15 +1,65 @@
+import "react-native-reanimated";
+import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
-import { Text, View } from "react-native";
-import "./global.css";
+import {
+  DarkTheme as NavigationDarkTheme,
+  DefaultTheme as NavigationDefaultTheme,
+  NavigationContainer,
+} from "@react-navigation/native";
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
+import { DarkTheme as CustomDarkTheme, ThemeProvider } from "@/themes/useAppTheme";
+import { Appearance, I18nManager } from "react-native";
+import RootNavigator from "@/navigators/RootNavigator";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import Toast from "react-native-toast-message";
+import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
+import { useFonts } from "expo-font";
+import UserDrawer from "@/components/User/UserDrawer";
+import Update from "@/hooks/useUpdates";
+import persister from "@/QueryClient/queryPersister";
+import queryClient from "@/QueryClient/queryClient";
+import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
+import { toastConfig } from "@/config/toastConfig";
+
+const { DarkTheme } = adaptNavigationTheme({
+  reactNavigationLight: NavigationDefaultTheme,
+  reactNavigationDark: NavigationDarkTheme,
+});
+
+I18nManager.forceRTL(false);
+I18nManager.allowRTL(false);
 
 export default function App() {
-  return (
-    <View className="flex-1 justify-center items-center bg-red-500 ">
-      <Text className="text-black text-xl ">It doesnt works!</Text>
-      <Text className="text-black text-xl ">It doesnt works!</Text>
+  const ready = useOneTimeRTLFix();
+  const colorScheme = Appearance.getColorScheme();
+  const [loaded] = useFonts({
+    Assistant: require("./assets/fonts/Assistant-VariableFont_wght.ttf"),
+  });
 
-      <StatusBar style="auto" />
-      <Text>Fuck your login page. We accepting this shit.</Text>
-    </View>
+  if (!loaded || !ready) return;
+
+  return (
+    <PaperProvider theme={CustomDarkTheme}>
+      <ThemeProvider>
+        <GestureHandlerRootView>
+          <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+            <PersistQueryClientProvider
+              client={queryClient}
+              persistOptions={{ persister: persister }}
+            >
+              <NavigationContainer theme={DarkTheme}>
+                <RootNavigator />
+                <StatusBar key={colorScheme} translucent style={"light"} />
+                <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} config={toastConfig} />
+                <UserDrawer />
+                <Update />
+              </NavigationContainer>
+            </PersistQueryClientProvider>
+          </SafeAreaProvider>
+        </GestureHandlerRootView>
+      </ThemeProvider>
+    </PaperProvider>
   );
 }

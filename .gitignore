@@ -32,4 +32,22 @@ yarn-error.*
 .env*.local
 
 # typescript
+
 *.tsbuildinfo
+
+
+# ip 
+**/ip.ts
+
+# test 
+**/test.tsx
+
+# JavaScript Inspector thing
+**/%PROGRAMDATA%/*
+
+# Apple csr
+*.csr
+
+.npmrc
+
+credentials.json
