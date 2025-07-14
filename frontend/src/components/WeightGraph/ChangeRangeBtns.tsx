@@ -1,12 +1,15 @@
-import { Animated, View } from "react-native";
+import { Animated } from "react-native";
 import { FC, useState } from "react";
 import { DateRanges } from "@/types/dateTypes";
 import { SegmentedButtons } from "react-native-paper";
 import useColors from "@/styles/useColors";
 import { useSpacingStyles } from "@/styles/useSpacingStyles";
 import useSlideInAnimations from "@/styles/useSlideInAnimations";
+import { selectionHaptic } from "@/utils/haptics";
 
 const selectedRangeToRange = (selectedRange: string) => {
+  selectionHaptic()
+
   switch (selectedRange) {
     case "1W":
       return "weeks";

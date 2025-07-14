@@ -2,6 +2,9 @@ import { Platform, StyleSheet } from "react-native";
 
 export const useLayoutStyles = () => {
   const layoutStyles = StyleSheet.create({
+    absolute: {
+      position: "absolute",
+    },
     container: {
       flex: 1,
       padding: 16,

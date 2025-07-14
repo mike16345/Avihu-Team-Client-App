@@ -29,6 +29,7 @@ import Divider from "../ui/Divider";
 import { useLayoutStore } from "@/store/layoutStore";
 import ExerciseMethodDrawer from "./ExerciseMethodDrawer";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import { useTimerStore } from "@/store/timerStore";
 
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
 
@@ -60,6 +61,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const { getUserRecordedSetsByExercise } = useRecordedSetsApi();
   const [currentSetNumber, setCurrentSetNumber] = useState(setNumber);
   const workoutSession = useAsyncStorage(WORKOUT_SESSION_KEY);
+  const { setCountdown } = useTimerStore();
 
   const { data, isLoading } = useQuery(
     ["recordedSets", exercise],
@@ -94,6 +96,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   };
 
   const handleSave = async () => {
+    if (currentSetNumber > exercise.sets.length)
+      return Toast.show({ type: "error", text1: "נראה שכבר השלמת את כל הסטים" });
+
     const workoutSessionString = await workoutSession.getItem();
     const workoutSessionData = JSON.parse(workoutSessionString || "{}");
 
@@ -101,6 +106,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
       setIsSetUploading(true);
       await handleRecordSet(recordedSet, workoutSessionData?._id);
       setCurrentSetNumber((prev) => prev + 1);
+      setCountdown(exercise.restTime);
     } catch (err: any) {
       Toast.show({
         text1: "הסט שהוקלד אינו תקין",
@@ -276,7 +282,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                   decimalStepSize={25}
                   showZeroDecimal={true}
                   decimalRange={100}
-                  maxWeight={200}
+                  maxWeight={500}
                   stepSize={1}
                   label=""
                   height={height * 0.08}
