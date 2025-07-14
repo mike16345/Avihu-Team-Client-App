@@ -12,6 +12,7 @@ const useLogout = () => {
     setCurrentUser(null);
     await sessionStorage.removeItem();
     queryClient.clear();
+    queryClient.invalidateQueries();
   };
 
   return { handleLogout };
