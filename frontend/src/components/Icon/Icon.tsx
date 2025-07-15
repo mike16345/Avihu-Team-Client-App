@@ -1,9 +1,8 @@
-import { View, Text } from "react-native";
 import icons, { IconName } from "../../constants/iconMap";
 import React from "react";
 
 interface IconProps {
-  name: IconName;
+  name?: IconName;
   width?: number;
   height?: number;
   variant?: "solid" | "outline";
@@ -19,6 +18,8 @@ const Icon: React.FC<IconProps> = ({
   variant = "outline",
   rotation,
 }) => {
+  if (!name) return null;
+
   const SvgIcon = icons[name];
 
   if (!SvgIcon) return null;

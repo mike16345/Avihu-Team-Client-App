@@ -9,6 +9,11 @@ const SpinningIcon: React.FC<{ mode: "dark" | "light" }> = ({ mode = "dark" }) =
 
   const { textPrimary, textOnPrimary } = useColors();
 
+  const spin = spinAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "720deg"],
+  });
+
   useEffect(() => {
     Animated.loop(
       Animated.timing(spinAnim, {
@@ -19,11 +24,6 @@ const SpinningIcon: React.FC<{ mode: "dark" | "light" }> = ({ mode = "dark" }) =
       })
     ).start();
   }, [spinAnim]);
-
-  const spin = spinAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "720deg"],
-  });
 
   return (
     <Animated.View style={{ transform: [{ rotate: spin }] }}>

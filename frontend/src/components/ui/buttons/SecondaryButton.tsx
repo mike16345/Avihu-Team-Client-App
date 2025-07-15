@@ -1,29 +1,34 @@
-import { Text, TouchableOpacity } from "react-native";
-import React from "react";
+import { TouchableOpacity } from "react-native";
+import React, { ReactNode } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ConditionalRender";
 import ButtonShadow from "../ButtonShadow";
 import { IconName } from "@/constants/iconMap";
 import Icon from "@/components/Icon/Icon";
+import { Text } from "../Text";
 
 interface secondaryButtonProps {
-  label: string;
-  leadingIcon?: IconName;
-  trailingIcon?: IconName;
+  children: ReactNode;
+  rightIcon?: IconName;
+  leftIcon?: IconName;
   size?: "sm" | "md";
   shadow?: boolean;
   onPress?: () => void;
 }
 
 const SecondaryButton: React.FC<secondaryButtonProps> = ({
-  label,
-  leadingIcon,
-  trailingIcon,
+  children,
+  rightIcon,
+  leftIcon,
   size = "md",
   shadow = true,
   onPress,
 }) => {
   const { colors, common, fonts, layout, spacing } = useStyles();
+
+  const padding = size == "md" ? spacing.pdSm : spacing.pdXs;
+
+  const sizing = size === "sm" ? fonts.sm.fontSize : undefined;
 
   return (
     <ButtonShadow shadow={shadow}>
@@ -34,34 +39,26 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
           common.rounded,
           common.borderXsm,
           colors.outline,
-          { alignSelf: "flex-start" },
+          layout.alignSelfStart,
           layout.flexRow,
           layout.center,
           spacing.gapDefault,
-          size == "md" ? spacing.pdSm : spacing.pdXs,
+          padding,
         ]}
       >
-        <ConditionalRender
-          condition={leadingIcon}
-          children={
-            <Icon
-              name={leadingIcon || "arrowLeft"}
-              height={size === "sm" ? fonts.sm.fontSize : undefined}
-              width={size === "sm" ? fonts.sm.fontSize : undefined}
-            />
-          }
-        />
-        <Text style={[size == "sm" ? fonts.sm : fonts.md]}>{label}</Text>
-        <ConditionalRender
-          condition={trailingIcon}
-          children={
-            <Icon
-              name={trailingIcon || "arrowLeft"}
-              height={size === "sm" ? fonts.sm.fontSize : undefined}
-              width={size === "sm" ? fonts.sm.fontSize : undefined}
-            />
-          }
-        />
+        <ConditionalRender condition={rightIcon}>
+          <Icon name={rightIcon} height={sizing} width={sizing} />
+        </ConditionalRender>
+
+        <ConditionalRender condition={typeof children === "string"}>
+          <Text style={[size == "sm" ? fonts.sm : fonts.md]}>{children}</Text>
+        </ConditionalRender>
+
+        <ConditionalRender condition={typeof children !== "string"}>{children}</ConditionalRender>
+
+        <ConditionalRender condition={leftIcon}>
+          <Icon name={leftIcon} height={sizing} width={sizing} />
+        </ConditionalRender>
       </TouchableOpacity>
     </ButtonShadow>
   );

@@ -20,25 +20,30 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <PrimaryButton mode="dark" label="התחברות" block icon="like" loading />
-      <PrimaryButton mode="light" label="התחברות" block icon="like" loading />
+      <PrimaryButton mode="dark" children="התחברות" block icon="like" loading />
+      <PrimaryButton mode="light" children="התחברות" block icon="like" loading />
       <PrimaryButton
         mode="dark"
-        label="התחברות"
+        children="התחברות"
         block
         icon="like"
         onPress={() => console.log("pressed")}
       />
-      <PrimaryButton mode="light" label="התחברות" block icon="like" />
+      <PrimaryButton
+        mode="light"
+        children={<Text style={{ color: "red" }}>kaka batacha</Text>}
+        block
+        icon="like"
+      />
 
       <View style={[layout.flexRow, layout.wrap, spacing.gapDefault]}>
-        <PrimaryButton mode="dark" label="התחברות" />
+        <PrimaryButton mode="dark" children="התחברות" />
 
-        <SecondaryButton label="הסטוריית משקל וחזרות" trailingIcon="documentText" />
-        <SecondaryButton label="דגשים" trailingIcon="info" />
-        <SecondaryButton label="הצגת תחליף לארוחה בחלבון" trailingIcon="info" />
-        <SecondaryButton label="הסטוריית משקל וחזרות" leadingIcon="arrowLeft" size="sm" />
-        <SecondaryButton label="לצפייה" leadingIcon="arrowLeft" size="sm" shadow={false} />
+        <SecondaryButton children="הסטוריית משקל וחזרות" leftIcon="documentText" />
+        <SecondaryButton children="דגשים" leftIcon="info" />
+        <SecondaryButton children="הצגת תחליף לארוחה בחלבון" leftIcon="info" />
+        <SecondaryButton children={<Text>aaaaaaabbbaa</Text>} rightIcon="arrowLeft" size="sm" />
+        <SecondaryButton children="לצפייה" rightIcon="arrowLeft" size="sm" shadow={false} />
       </View>
 
       <View style={[layout.flexRow, layout.wrap, spacing.gapDefault]}>
