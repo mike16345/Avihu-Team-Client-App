@@ -76,7 +76,6 @@ export const useShadowStyles = () => {
 
     // Button Shadow Layers
     buttonLayer1: {
-      backgroundColor: "#fff",
       borderRadius: 12,
       ...Platform.select({
         ios: {
@@ -88,6 +87,7 @@ export const useShadowStyles = () => {
         android: {
           elevation: 10,
           shadowColor: "#072723",
+          backgroundColor: "#fff",
         },
       }),
     },
@@ -103,10 +103,7 @@ export const useShadowStyles = () => {
           shadowOpacity: 0.01,
           shadowRadius: 12,
         },
-        android: {
-          elevation: 8,
-          shadowColor: "#072723",
-        },
+        android: {},
       }),
     },
 
@@ -121,10 +118,7 @@ export const useShadowStyles = () => {
           shadowOpacity: 0.05,
           shadowRadius: 10,
         },
-        android: {
-          elevation: 6,
-          shadowColor: "#072723",
-        },
+        android: {},
       }),
     },
 
@@ -139,15 +133,11 @@ export const useShadowStyles = () => {
           shadowOpacity: 0.09,
           shadowRadius: 7,
         },
-        android: {
-          elevation: 4,
-          shadowColor: "#072723",
-        },
+        android: {},
       }),
     },
 
     buttonLayer5: {
-      backgroundColor: "#fff",
       borderRadius: 12,
 
       ...Platform.select({
@@ -159,6 +149,8 @@ export const useShadowStyles = () => {
         },
         android: {
           elevation: 2,
+          backgroundColor: "#fff",
+
           shadowColor: "#072723",
         },
       }),

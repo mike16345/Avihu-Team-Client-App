@@ -16,7 +16,13 @@ const ButtonShadow: React.FC<buttonShadowProps> = ({ children, style, shadow = t
     <>
       <ConditionalRender condition={shadow}>
         <View style={[buttonLayer1, style]}>
-          <View style={buttonLayer5}>{children}</View>
+          <View style={buttonLayer2}>
+            <View style={buttonLayer3}>
+              <View style={buttonLayer4}>
+                <View style={buttonLayer5}>{children}</View>
+              </View>
+            </View>
+          </View>
         </View>
       </ConditionalRender>
 
