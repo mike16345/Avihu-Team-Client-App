@@ -1,9 +1,5 @@
 import { createContext, ReactNode, useContext, useState } from "react";
-import {
-  MD3DarkTheme as DefaultDarkTheme,
-} from "react-native-paper";
-
-
+import { MD3DarkTheme as DefaultDarkTheme } from "react-native-paper";
 
 export const defaultTheme = {
   ...DefaultDarkTheme,
@@ -37,32 +33,33 @@ export const defaultTheme = {
     errorContainer: "#F8F8F8",
     background: "#F8F8F8",
     shadow: "#072723",
+    surface: "#ffffffff",
     primaryContainer: "#065f46",
     onPrimaryContainer: "#a7f3d0",
-     secondaryContainer: "#25262A",
-    onSecondaryContainer: "#e5e7eb", 
-     tertiary: "#ffa4a8",
+    secondaryContainer: "#25262A",
+    onSecondaryContainer: "#e5e7eb",
+    tertiary: "#ffa4a8",
     onTertiary: "#7f1d1d",
     tertiaryContainer: "#7f1d1d",
-    onTertiaryContainer: "#ffccd2", 
-   info: "#17a2b8",
+    onTertiaryContainer: "#ffccd2",
+    info: "#17a2b8",
     onInfo: "#0c5460",
     infoContainer: "#0c5460",
-    onInfoContainer: "#d1ecf1", 
-     onSuccess: "#155724", 
-     onSuccessContainer: "#d4edda", 
-     warning: "#ffc107",
+    onInfoContainer: "#d1ecf1",
+    onSuccess: "#155724",
+    onSuccessContainer: "#d4edda",
+    warning: "#ffc107",
     onWarning: "#856404",
     warningContainer: "#F8F8F8",
-    onWarningContainer: "#fff3cd", 
+    onWarningContainer: "#fff3cd",
     onError: "#F8F8F8",
-   onErrorContainer: "#ffd6d6",
+    onErrorContainer: "#ffd6d6",
     onBackground: "#f8f9fa",
-    surface: "#1f2937",
+
     onSurface: "#e5e7eb",
     surfaceVariant: "#4b5563",
     onSurfaceVariant: "#d1d5db",
-    outline: "#e5e7eb",
+    outline: "#D0D5DD",
     outlineVariant: "#4b5563",
     scrim: "#000000",
     inverseSurface: "#e5e7eb",
@@ -80,7 +77,7 @@ export const defaultTheme = {
     onSurfaceDisabled: "rgba(229, 231, 235, 0.38)",
     backdrop: "rgba(31, 41, 55, 0.4)",
   },
-}; 
+};
 
 type ThemeContextType = {
   theme: typeof defaultTheme;

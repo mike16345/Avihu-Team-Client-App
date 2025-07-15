@@ -21,6 +21,7 @@ import Update from "@/hooks/useUpdates";
 import persister from "@/QueryClient/queryPersister";
 import queryClient from "@/QueryClient/queryClient";
 import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
+import Sandbox from "@/screens/Sandbox";
 import { toastConfig } from "@/config/toastConfig";
 
 const { DarkTheme } = adaptNavigationTheme({
@@ -45,7 +46,7 @@ export default function App() {
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <PersistQueryClientProvider
+            {/*  <PersistQueryClientProvider
               client={queryClient}
               persistOptions={{ persister: persister }}
             >
@@ -56,7 +57,8 @@ export default function App() {
                 <UserDrawer />
                 <Update />
               </NavigationContainer>
-            </PersistQueryClientProvider>
+            </PersistQueryClientProvider> */}
+            <Sandbox />
           </SafeAreaProvider>
         </GestureHandlerRootView>
       </ThemeProvider>
