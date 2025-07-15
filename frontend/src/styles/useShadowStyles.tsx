@@ -1,6 +1,9 @@
 import { Platform, StyleSheet } from "react-native";
+import useColors from "./useColors";
 
 export const useShadowStyles = () => {
+  const { background } = useColors();
+
   const shadowStyles = StyleSheet.create({
     // Button Shadows (All Buttons With Shadow)
     // Using the most visually impactful layer (layer 3 with 5% opacity and 10 blur)
@@ -87,7 +90,7 @@ export const useShadowStyles = () => {
         android: {
           elevation: 10,
           shadowColor: "#072723",
-          backgroundColor: "#fff",
+          backgroundColor: background.backgroundColor,
         },
       }),
     },
@@ -149,7 +152,7 @@ export const useShadowStyles = () => {
         },
         android: {
           elevation: 2,
-          backgroundColor: "#fff",
+          backgroundColor: background.backgroundColor,
 
           shadowColor: "#072723",
         },
