@@ -12,6 +12,7 @@ interface secondaryButtonProps {
   trailingIcon?: IconName;
   size?: "sm" | "md";
   shadow?: boolean;
+  onPress?: () => void;
 }
 
 const SecondaryButton: React.FC<secondaryButtonProps> = ({
@@ -20,12 +21,14 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
   trailingIcon,
   size = "md",
   shadow = true,
+  onPress,
 }) => {
   const { colors, common, fonts, layout, spacing } = useStyles();
 
   return (
     <ButtonShadow shadow={shadow}>
       <TouchableOpacity
+        onPress={onPress}
         style={[
           colors.backgroundSurface,
           common.rounded,

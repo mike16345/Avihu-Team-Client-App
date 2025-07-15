@@ -22,7 +22,13 @@ const Sandbox = () => {
 
       <PrimaryButton mode="dark" label="התחברות" block icon="like" loading />
       <PrimaryButton mode="light" label="התחברות" block icon="like" loading />
-      <PrimaryButton mode="dark" label="התחברות" block icon="like" />
+      <PrimaryButton
+        mode="dark"
+        label="התחברות"
+        block
+        icon="like"
+        onPress={() => console.log("pressed")}
+      />
       <PrimaryButton mode="light" label="התחברות" block icon="like" />
 
       <View style={[layout.flexRow, layout.wrap, spacing.gapDefault]}>
