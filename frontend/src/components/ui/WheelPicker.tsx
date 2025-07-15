@@ -1,8 +1,8 @@
 import { WheelPickerProps } from "@/types/wheelPickerTypes";
 import React, { useState, useRef, useEffect } from "react";
-import { View, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { View, StyleSheet, FlatList } from "react-native";
 import { Text } from "./Text";
-import Loader from "./loaders/Loader";
+import { softHaptic } from "@/utils/haptics";
 
 const WheelPicker: React.FC<WheelPickerProps> = ({
   data,
@@ -21,16 +21,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   const flatListRef = useRef<FlatList>(null);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  /*  const handleItemPress = (index: number) => {
-    flatListRef.current?.scrollToOffset({
-      offset: index * itemHeight,
-      animated: true,
-    });
-
-    setSelectedIndex(index);
-    onValueChange(data[index].value);
-  }; */
-
   const handleScroll = (event: any) => {
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
@@ -44,8 +34,11 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
         offset: index * itemHeight,
         animated: true,
       });
+
+      softHaptic();
     }, 2000); // Triggers after 2 seconds of no scroll
 
+    softHaptic();
     setSelectedIndex(index);
     onValueChange(data[index].value);
   };
@@ -61,14 +54,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 
   const returnIndex = (contentYOffset: any) => {
     let index = Math.round(contentYOffset / itemHeight);
-
-    /* if(index>=maxIndex){
-      index=maxIndex
-    }else if(index=<minIndex){
-      index=minIndex;
-    }else{
-      index=index
-    } */
 
     index = index >= data.length - 1 ? data.length - 1 : index < 0 ? 0 : index;
 
@@ -109,7 +94,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
                 index === selectedIndex ? [styles.selectedItem] : null,
                 { height: itemHeight, paddingHorizontal: 20 },
               ]}
-              //onPress={() => handleItemPress(index)}
             >
               <Text
                 style={[

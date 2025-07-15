@@ -22,6 +22,7 @@ import persister from "@/QueryClient/queryPersister";
 import queryClient from "@/QueryClient/queryClient";
 import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
 import Sandbox from "@/screens/Sandbox";
+import { toastConfig } from "@/config/toastConfig";
 
 const { DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -45,19 +46,19 @@ export default function App() {
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-           {/*  <PersistQueryClientProvider
+            {/*  <PersistQueryClientProvider
               client={queryClient}
               persistOptions={{ persister: persister }}
             >
               <NavigationContainer theme={DarkTheme}>
                 <RootNavigator />
                 <StatusBar key={colorScheme} translucent style={"light"} />
-                <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} />
+                <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} config={toastConfig} />
                 <UserDrawer />
                 <Update />
               </NavigationContainer>
             </PersistQueryClientProvider> */}
-            <Sandbox/>
+            <Sandbox />
           </SafeAreaProvider>
         </GestureHandlerRootView>
       </ThemeProvider>

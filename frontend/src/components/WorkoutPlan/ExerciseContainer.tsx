@@ -44,7 +44,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
     recordedSet: Omit<IRecordedSet, "plan">,
     sessionId = ""
   ): Promise<void> => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       if (!currentUser) {
         reject(new Error("No current user available"));
         return;
@@ -60,27 +60,26 @@ const ExerciseContainer: FC<WorkoutProps> = ({
         muscleGroup,
       };
 
-      addRecordedSet(setToRecord, sessionId)
-        .then((response) => {
-          const updatedSession = response.session;
+      try {
+        const response = await addRecordedSet(setToRecord, sessionId);
+        const updatedSession = response.session;
 
-          updateSession(updatedSession);
-          handleSetCurrentSetInfo(updatedSession);
-
-          Toast.show({
-            text1: "סט הוקלט בהצלחה",
-            text2: "כל הכבוד!",
-            autoHide: true,
-            type: "success",
-            swipeable: true,
-            text1Style: { textAlign: `center` },
-            text2Style: { textAlign: `center` },
-          });
-          resolve();
-        })
-        .catch((err) => {
-          reject(err);
+        updateSession(updatedSession);
+        handleSetCurrentSetInfo(updatedSession);
+        Toast.show({
+          text1: "סט הוקלט בהצלחה",
+          text2: "כל הכבוד!",
+          autoHide: true,
+          type: "success",
+          swipeable: true,
+          text1Style: { textAlign: `center` },
+          text2Style: { textAlign: `center` },
         });
+
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
     });
   };
 

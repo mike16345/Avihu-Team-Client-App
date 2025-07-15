@@ -58,6 +58,26 @@ export const useNotification = () => {
     }
   };
 
+  const showNotification = async (body: string, triggerAt?: number) => {
+    try {
+      const identifier = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Avihu Team",
+          body,
+        },
+        trigger: triggerAt
+          ? {
+              seconds: triggerAt, // fires in 5 seconds
+            }
+          : {},
+      });
+
+      return identifier;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // Check if notifications are already scheduled to prevent duplicates
   const initializeNotifications = async () => {
     try {
@@ -74,11 +94,21 @@ export const useNotification = () => {
     }
   };
 
+  const cancelNotification = async (identifier: string) => {
+    try {
+      await Notifications.cancelScheduledNotificationAsync(identifier);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // Execute functions
 
   return {
     requestPermissions,
     initializeNotifications,
+    showNotification,
+    cancelNotification,
   };
 };
 

@@ -7,9 +7,7 @@ import {
   StyleSheet,
   Dimensions,
   Modal,
-  BackHandler,
   ImageBackground,
-  NativeEventSubscription,
 } from "react-native";
 import { useNavigationState } from "@react-navigation/native";
 import workoutPage from "@assets/avihu/workoutPage.jpeg";
@@ -17,6 +15,7 @@ import dietScreen from "@assets/avihu/dietScreen.jpeg";
 import progressPage from "@assets/avihu/progressPage.jpeg";
 import recordExercisePage from "@assets/avihu/recordExercisePage.jpeg";
 import blogsPage from "@assets/avihu/blogsPage.jpeg";
+import { softHaptic } from "@/utils/haptics";
 
 const { width } = Dimensions.get("window");
 
@@ -41,6 +40,7 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) =>
 
   useEffect(() => {
     if (open) {
+      softHaptic()
       setIsVisible(true); // Show the modal when open is true
       Animated.timing(slideAnim, {
         toValue: 0,
@@ -48,6 +48,8 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) =>
         useNativeDriver: true,
       }).start();
     } else {
+      softHaptic()
+
       Animated.timing(slideAnim, {
         toValue: width, // Slide out to the right
         duration: 300,

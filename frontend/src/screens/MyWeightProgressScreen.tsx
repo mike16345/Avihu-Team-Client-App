@@ -4,7 +4,7 @@ import Loader from "@/components/ui/loaders/Loader";
 import ProgressScreenSkeleton from "@/components/ui/loaders/skeletons/ProgressScreenSkeleton";
 import { WeightGraph } from "@/components/WeightGraph/WeightGraph";
 import WeightInputModal from "@/components/WeightGraph/WeightInputModal";
-import { DEFAULT_INITIAL_WEIGHT, DEFAULT_MESSAGE_TO_TRAINER } from "@/constants/Constants";
+import { DEFAULT_INITIAL_WEIGHT } from "@/constants/Constants";
 import { useWeighInApi } from "@/hooks/api/useWeighInApi";
 import { IWeighIn, IWeighInPost } from "@/interfaces/User";
 import { ONE_DAY, WEIGH_INS_KEY } from "@/constants/reactQuery";
@@ -21,6 +21,7 @@ import BottomDrawer from "@/components/ui/BottomDrawer";
 import ImagePreview from "@/components/WeightGraph/ImagePreview";
 import Constants from "expo-constants";
 import useImageUploadStatus from "@/hooks/useImageUploadStatus";
+import { softHaptic } from "@/utils/haptics";
 
 const MyWeightProgressScreen = () => {
   const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
@@ -160,6 +161,7 @@ const MyWeightProgressScreen = () => {
           icon={isFabOpen ? "close" : "plus"}
           visible
           onStateChange={({ open }) => {
+            softHaptic()
             setIsFabOpen(open);
           }}
           color={colors.textOnBackground.color}
