@@ -6,15 +6,21 @@ import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import TopBar from "./TopBar";
 
+import TimerDrawer from "@/components/ui/TimerDrawer";
+import { ConditionalRender } from "@/components/ui/ConditionalRender";
+import { useTimerStore } from "@/store/timerStore";
+
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
 const BottomTabNavigator = () => {
   const { layout, colors } = useStyles();
+  const { countdown } = useTimerStore();
 
   return (
     <View style={[layout.flex1, colors.background, layout.justifyEvenly]}>
       <TopBar />
       <Tab.Navigator
+        sceneAnimationType="shifting"
         barStyle={[
           {
             height: BOTTOM_BAR_HEIGHT,
@@ -45,6 +51,7 @@ const BottomTabNavigator = () => {
           );
         })}
       </Tab.Navigator>
+      <ConditionalRender condition={!!countdown} children={<TimerDrawer />} />
     </View>
   );
 };

@@ -4,6 +4,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import NativeIcon from "@/components/Icon/NativeIcon";
 import { Text } from "@/components/ui/Text";
 import { Button } from "react-native-paper";
+import { ConditionalRender } from "@/components/ui/ConditionalRender";
 interface ErrorScreenProps {
   error?: any;
   refetchFunc?: () => void;
@@ -21,7 +22,10 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({ error, refetchFunc }) => {
         style={[colors.textDanger]}
       />
       <Text style={[colors.textOnBackground, fonts.xl]}>אירעה שגיאה</Text>
-      {error && <Text style={[colors.textOnBackground, fonts.xl]}>{error.message}</Text>}
+      <ConditionalRender
+        condition={error}
+        children={<Text style={[colors.textOnBackground, fonts.xl]}>{error?.message || ""}</Text>}
+      />
       {refetchFunc && (
         <Button
           mode="contained"

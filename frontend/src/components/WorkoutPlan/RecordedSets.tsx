@@ -19,7 +19,7 @@ const formatDate = (dateString: string) => {
 };
 
 const RecordedSets: React.FC<RecordedSetsProps> = ({ route }) => {
-  const { spacing, text, fonts, colors } = useStyles();
+  const { layout, spacing, text, fonts, colors } = useStyles();
   const { recordedSets } = route.params;
   const navigator = useNavigation();
 
@@ -48,7 +48,7 @@ const RecordedSets: React.FC<RecordedSetsProps> = ({ route }) => {
   }, []);
 
   return (
-    <View style={[spacing.pdDefault, colors.background]}>
+    <View style={[layout.flex1, spacing.pdDefault, colors.background]}>
       {sections.length ? (
         <SectionList
           sections={sections}

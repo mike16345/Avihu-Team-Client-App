@@ -20,8 +20,11 @@ import UserDrawer from "@/components/User/UserDrawer";
 import Update from "@/hooks/useUpdates";
 import persister from "@/QueryClient/queryPersister";
 import queryClient from "@/QueryClient/queryClient";
-import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
+import { useOneTimeRTLFix } from "@/hooks/useEnsu
 import Sandbox from "@/screens/Sandbox";
+
+import { toastConfig } from "@/config/toastConfig";
+
 
 const { DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -52,7 +55,7 @@ export default function App() {
               <NavigationContainer theme={DarkTheme}>
                 <RootNavigator />
                 <StatusBar key={colorScheme} translucent style={"light"} />
-                <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} />
+                <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} config={toastConfig} />
                 <UserDrawer />
                 <Update />
               </NavigationContainer>
