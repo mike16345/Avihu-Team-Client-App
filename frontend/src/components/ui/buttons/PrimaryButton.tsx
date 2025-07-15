@@ -1,7 +1,6 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
-import NativeIcon from "../../Icon/NativeIcon";
 import { ConditionalRender } from "../ConditionalRender";
 import SpinningIcon from "../loaders/SpinningIcon";
 import { IconName } from "@/constants/iconMap";
