@@ -22,9 +22,9 @@ export const useToastStore = create<IToastStore>((set, get) => ({
   },
   removeToast: (id, duration = 5000) => {
     setTimeout(() => {
-      const currentToasts = get().toasts;
-
-      set({ toasts: currentToasts.filter((toast) => toast.id !== id) });
+      set((state) => ({
+        toasts: state.toasts.filter((toast) => toast.id !== id),
+      }));
     }, duration);
   },
 }));

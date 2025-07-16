@@ -1,24 +1,57 @@
-import { View } from "react-native";
-import React from "react";
+import { Animated, View, Easing, Dimensions } from "react-native";
+import React, { useEffect, useRef } from "react";
 import { Text } from "../Text";
 import { IToast } from "@/interfaces/toast";
 import useStyles from "@/styles/useGlobalStyles";
 
-const Toast: React.FC<{ toast: IToast }> = ({ toast: { message, title, type } }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 
-  const successContainer = [colors.backgroundSuccessContainer, colors.borderSuccess];
-  const errorContainer = [colors.backgroundErrorContainer, colors.borderError];
-  const successTitle = [colors.backgroundSuccess];
-  const errorTitle = [colors.backgroundError];
+const Toast: React.FC<{ toast: IToast }> = ({ toast: { message, title, type, duration } }) => {
+  const { colors, common, layout, spacing, text } = useStyles();
 
-  const titleContainer = type == "error" ? errorTitle : successTitle;
-  const container = type == "error" ? errorContainer : successContainer;
-  const messageStyle = type == "error" ? colors.textDanger : colors.textSuccess;
+  const stylesByType = {
+    success: {
+      container: [colors.backgroundSuccessContainer, colors.borderSuccess],
+      title: [colors.backgroundSuccess],
+      message: colors.textSuccess,
+    },
+    error: {
+      container: [colors.backgroundErrorContainer, colors.borderError],
+      title: [colors.backgroundError],
+      message: colors.textDanger,
+    },
+  };
+
+  const { container, title: titleContainer, message: messageStyle } = stylesByType[type];
+
+  const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+
+  useEffect(() => {
+    // Slide in
+    Animated.timing(translateY, {
+      toValue: 0,
+      duration: 500,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+
+    // Slide out after toast.duration or default 4000ms
+    const timeout = setTimeout(() => {
+      Animated.timing(translateY, {
+        toValue: SCREEN_HEIGHT,
+        duration: 500,
+        easing: Easing.in(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    }, duration || 4000);
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   return (
-    <View
+    <Animated.View
       style={[
+        { transform: [{ translateY }] },
         common.borderXsm,
         common.roundedFull,
         spacing.pdXs,
@@ -35,7 +68,7 @@ const Toast: React.FC<{ toast: IToast }> = ({ toast: { message, title, type } })
       </View>
 
       <Text style={messageStyle}>{message}</Text>
-    </View>
+    </Animated.View>
   );
 };
 

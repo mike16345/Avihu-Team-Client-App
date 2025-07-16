@@ -3,9 +3,13 @@ import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 import IconButton from "@/components/ui/buttons/IconButton";
+import { useToast } from "@/hooks/useToast";
+import Toast from "@/components/ui/toast/Toast";
+import ToastContainer from "@/components/ui/toast/ToastContainer";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
+  const { triggerErrorToast, triggerSuccessToast } = useToast();
 
   return (
     <View
@@ -16,40 +20,32 @@ const Sandbox = () => {
         colors.background,
         layout.sizeFull,
         spacing.gapDefault,
+        { direction: "rtl" },
       ]}
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <PrimaryButton mode="dark" children="התחברות" block icon="like" loading />
-      <PrimaryButton mode="light" children="התחברות" block icon="like" loading />
       <PrimaryButton
         mode="dark"
-        children="התחברות"
+        children="success"
         block
         icon="like"
-        onPress={() => console.log("pressed")}
+        onPress={() =>
+          triggerSuccessToast({
+            message: "היקפים נשמרו בהצלחה",
+            title: "הועלה בהצלחה",
+          })
+        }
       />
       <PrimaryButton
         mode="light"
-        children={<Text style={{ color: "red" }}>kaka batacha</Text>}
+        children="error"
         block
         icon="like"
+        onPress={() => triggerErrorToast({ message: "הסיסמה אינה תואמת", title: "שגיאה" })}
       />
 
-      <View style={[layout.flexRow, layout.wrap, spacing.gapDefault]}>
-        <PrimaryButton mode="dark" children="התחברות" />
-
-        <SecondaryButton children="הסטוריית משקל וחזרות" leftIcon="documentText" />
-        <SecondaryButton children="דגשים" leftIcon="info" />
-        <SecondaryButton children="הצגת תחליף לארוחה בחלבון" leftIcon="info" />
-        <SecondaryButton children={<Text>aaaaaaabbbaa</Text>} rightIcon="arrowLeft" size="sm" />
-        <SecondaryButton children="לצפייה" rightIcon="arrowLeft" size="sm" shadow={false} />
-      </View>
-
-      <View style={[layout.flexRow, layout.wrap, spacing.gapDefault]}>
-        <IconButton icon="gallery" />
-        <IconButton icon="camera" />
-      </View>
+      <ToastContainer />
     </View>
   );
 };
