@@ -1,23 +1,29 @@
 import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
-import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
-import IconButton from "@/components/ui/buttons/IconButton";
 import { useToast } from "@/hooks/useToast";
-import Toast from "@/components/ui/toast/Toast";
 import ToastContainer from "@/components/ui/toast/ToastContainer";
 import AsyncWrapper from "@/components/ui/AsyncWrapper";
-import { useAsyncWrapper } from "@/hooks/useAsyncWrapper";
 import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
+import { useState } from "react";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
   const { triggerErrorToast, triggerSuccessToast } = useToast();
   const { getExerciseMethodByName } = useExerciseMethodApi();
 
-  const { loading, run, visible } = useAsyncWrapper();
+  const [loading, setLoading] = useState(false);
 
-  const call = () => run(() => getExerciseMethodByName("גקסונים"), "retrieved");
+  const get = async () => {
+    setLoading(true);
+    try {
+      await getExerciseMethodByName("אימון פוקוס על כוח שיא (Max Effort)");
+    } catch (error) {
+      throw error; //throwing error is important for internal try catch to work in asyncWrapper
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View
@@ -53,17 +59,9 @@ const Sandbox = () => {
         onPress={() => triggerErrorToast({ message: "הסיסמה אינה תואמת", title: "שגיאה" })}
       />
 
-      <View style={[{ height: 600 }, colors.backgroundError]}></View>
-
-      <AsyncWrapper visible={visible}>
-        <PrimaryButton
-          mode="light"
-          children="async"
-          block
-          icon="like"
-          loading={loading}
-          onPress={call}
-        />
+      {/*AsyncWrapper can accept any child. if its button the button must be passed the disabled prop. i didnt find many ways to do this automatically in the component that werent verbose and ugly */}
+      <AsyncWrapper messages={{ success: { message: "yayayayay" } }} onPress={get}>
+        <PrimaryButton mode="light" children="async" block icon="like" loading={loading} disabled />
       </AsyncWrapper>
 
       <ToastContainer />
