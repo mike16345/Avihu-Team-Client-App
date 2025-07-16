@@ -1,12 +1,11 @@
-import { View, Text } from "react-native";
-import React from "react";
+import { View } from "react-native";
 import { useToastStore } from "@/store/toastStore";
 import Toast from "./Toast";
 import useStyles from "@/styles/useGlobalStyles";
 
 const ToastContainer = () => {
   const { toasts } = useToastStore();
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { layout, spacing } = useStyles();
 
   return (
     <View
