@@ -148,3 +148,5 @@ export const servingTypeToString = (type: string) => {
       return type;
   }
 };
+
+export const generateUniqueId = () => Math.random().toString(36).substring(2, 9);
