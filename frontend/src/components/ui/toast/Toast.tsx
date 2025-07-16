@@ -6,7 +6,10 @@ import useStyles from "@/styles/useGlobalStyles";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
-const Toast: React.FC<{ toast: IToast }> = ({ toast: { message, title, type, duration } }) => {
+const Toast: React.FC<{ toast: IToast; externalTranslateY?: Animated.Value }> = ({
+  toast: { message, title, type, duration },
+  externalTranslateY,
+}) => {
   const { colors, common, layout, spacing, text } = useStyles();
 
   const stylesByType = {
@@ -27,6 +30,7 @@ const Toast: React.FC<{ toast: IToast }> = ({ toast: { message, title, type, dur
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
   useEffect(() => {
+    if (externalTranslateY) return;
     // Slide in
     Animated.timing(translateY, {
       toValue: 0,
@@ -51,7 +55,7 @@ const Toast: React.FC<{ toast: IToast }> = ({ toast: { message, title, type, dur
   return (
     <Animated.View
       style={[
-        { transform: [{ translateY }] },
+        { transform: [{ translateY: externalTranslateY || translateY }] },
         common.borderXsm,
         common.roundedFull,
         spacing.pdXs,
