@@ -1,7 +1,7 @@
 import { IToast } from "@/interfaces/toast";
 import { useToastStore } from "@/store/toastStore";
 
-type ToastInput = Partial<Omit<IToast, "type">> & { message: string };
+export type ToastInput = Partial<Omit<IToast, "type">> & { message: string };
 
 export const useToast = () => {
   const { showToast } = useToastStore();
