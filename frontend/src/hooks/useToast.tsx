@@ -1,10 +1,12 @@
 import { IToast } from "@/interfaces/toast";
 import { useToastStore } from "@/store/toastStore";
 
+type ToastInput = Partial<Omit<IToast, "type">> & { message: string };
+
 export const useToast = () => {
   const { showToast } = useToastStore();
 
-  const triggerSuccessToast = ({ title, message, duration }: Omit<IToast, "type">) => {
+  const triggerSuccessToast = ({ title, message, duration }: ToastInput) => {
     showToast({
       title: title || "הצלחה",
       message,
@@ -13,7 +15,7 @@ export const useToast = () => {
     });
   };
 
-  const triggerErrorToast = ({ title, message, duration }: Omit<IToast, "type">) => {
+  const triggerErrorToast = ({ title, message, duration }: ToastInput) => {
     showToast({
       title: title || "שגיאה",
       message,

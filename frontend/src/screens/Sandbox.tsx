@@ -6,10 +6,18 @@ import IconButton from "@/components/ui/buttons/IconButton";
 import { useToast } from "@/hooks/useToast";
 import Toast from "@/components/ui/toast/Toast";
 import ToastContainer from "@/components/ui/toast/ToastContainer";
+import AsyncWrapper from "@/components/ui/AsyncWrapper";
+import { useAsyncWrapper } from "@/hooks/useAsyncWrapper";
+import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
   const { triggerErrorToast, triggerSuccessToast } = useToast();
+  const { getExerciseMethodByName } = useExerciseMethodApi();
+
+  const { loading, run, visible } = useAsyncWrapper();
+
+  const call = () => run(() => getExerciseMethodByName("גקסונים"), "retrieved");
 
   return (
     <View
@@ -44,6 +52,19 @@ const Sandbox = () => {
         icon="like"
         onPress={() => triggerErrorToast({ message: "הסיסמה אינה תואמת", title: "שגיאה" })}
       />
+
+      <View style={[{ height: 600 }, colors.backgroundError]}></View>
+
+      <AsyncWrapper visible={visible}>
+        <PrimaryButton
+          mode="light"
+          children="async"
+          block
+          icon="like"
+          loading={loading}
+          onPress={call}
+        />
+      </AsyncWrapper>
 
       <ToastContainer />
     </View>
