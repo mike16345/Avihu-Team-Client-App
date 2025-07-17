@@ -1,11 +1,29 @@
 import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
-import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
-import IconButton from "@/components/ui/buttons/IconButton";
+import { useToast } from "@/hooks/useToast";
+import ToastContainer from "@/components/ui/toast/ToastContainer";
+import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
+import { useState } from "react";
+import AsyncToastWrapper from "@/components/ui/AsyncToastWrapper";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
+  const { triggerErrorToast, triggerSuccessToast } = useToast();
+  const { getExerciseMethodByName } = useExerciseMethodApi();
+
+  const [loading, setLoading] = useState(false);
+
+  const get = async () => {
+    setLoading(true);
+    try {
+      await getExerciseMethodByName("אימון פוקוס על כוח שיא (Max Effort)");
+    } catch (error) {
+      throw error; //throwing error is important for internal try catch to work in asyncWrapper
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View
@@ -16,40 +34,37 @@ const Sandbox = () => {
         colors.background,
         layout.sizeFull,
         spacing.gapDefault,
+        { direction: "rtl" },
       ]}
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <PrimaryButton mode="dark" children="התחברות" block icon="like" loading />
-      <PrimaryButton mode="light" children="התחברות" block icon="like" loading />
       <PrimaryButton
         mode="dark"
-        children="התחברות"
+        children="success"
         block
         icon="like"
-        onPress={() => console.log("pressed")}
+        onPress={() =>
+          triggerSuccessToast({
+            message: "היקפים נשמרו בהצלחה",
+            title: "הועלה בהצלחה",
+          })
+        }
       />
       <PrimaryButton
         mode="light"
-        children={<Text style={{ color: "red" }}>kaka batacha</Text>}
+        children="error"
         block
         icon="like"
+        onPress={() => triggerErrorToast({ message: "הסיסמה אינה תואמת", title: "שגיאה" })}
       />
 
-      <View style={[layout.flexRow, layout.wrap, spacing.gapDefault]}>
-        <PrimaryButton mode="dark" children="התחברות" />
+      {/*AsyncToastWrapper can accept any child. if its button the button must be passed the disabled prop. i didnt find many ways to do this automatically in the component that werent verbose and ugly */}
+      <AsyncToastWrapper onPress={get}>
+        <PrimaryButton mode="light" children="async" block icon="like" loading={loading} disabled />
+      </AsyncToastWrapper>
 
-        <SecondaryButton children="הסטוריית משקל וחזרות" leftIcon="documentText" />
-        <SecondaryButton children="דגשים" leftIcon="info" />
-        <SecondaryButton children="הצגת תחליף לארוחה בחלבון" leftIcon="info" />
-        <SecondaryButton children={<Text>aaaaaaabbbaa</Text>} rightIcon="arrowLeft" size="sm" />
-        <SecondaryButton children="לצפייה" rightIcon="arrowLeft" size="sm" shadow={false} />
-      </View>
-
-      <View style={[layout.flexRow, layout.wrap, spacing.gapDefault]}>
-        <IconButton icon="gallery" />
-        <IconButton icon="camera" />
-      </View>
+      <ToastContainer />
     </View>
   );
 };

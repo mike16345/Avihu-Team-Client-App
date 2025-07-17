@@ -14,6 +14,7 @@ interface PrimaryButtonProps {
   icon?: IconName;
   loading?: boolean;
   onPress?: () => void;
+  disabled?: boolean;
 }
 
 const PrimaryButton: React.FC<PrimaryButtonProps> = ({
@@ -23,6 +24,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   icon,
   loading,
   onPress,
+  disabled,
 }) => {
   const { colors, common, layout, spacing, text } = useStyles();
 
@@ -36,7 +38,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   return (
     <TouchableOpacity
       onPress={onPress}
-      disabled={loading}
+      disabled={disabled || loading}
       style={[
         layout.center,
         spacing.pdDefault,
