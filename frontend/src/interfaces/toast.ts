@@ -1,7 +1,7 @@
 export interface IToast {
-  id: string;
-  title: string;
-  message: string;
+  id?: string;
+  title?: string;
+  message?: string;
   type: "success" | "error";
   duration?: number;
 }

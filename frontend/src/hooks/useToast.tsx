@@ -1,23 +1,31 @@
 import { IToast } from "@/interfaces/toast";
 import { useToastStore } from "@/store/toastStore";
 
-export type ToastInput = Partial<Omit<IToast, "type">> & { message: string };
+export type ToastInput = Omit<IToast, "type">;
 
 export const useToast = () => {
   const { showToast } = useToastStore();
 
-  const triggerSuccessToast = ({ title, message, duration }: ToastInput) => {
+  const triggerSuccessToast = ({
+    title = "הצלחה",
+    message = "פעולה בוצעה בהצלחה",
+    duration,
+  }: ToastInput) => {
     showToast({
-      title: title || "הצלחה",
+      title,
       message,
       duration,
       type: "success",
     });
   };
 
-  const triggerErrorToast = ({ title, message, duration }: ToastInput) => {
+  const triggerErrorToast = ({
+    title = "שגיאה",
+    message = "פעולה נכשלה",
+    duration,
+  }: ToastInput) => {
     showToast({
-      title: title || "שגיאה",
+      title,
       message,
       duration,
       type: "error",

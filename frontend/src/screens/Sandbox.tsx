@@ -3,9 +3,9 @@ import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import { useToast } from "@/hooks/useToast";
 import ToastContainer from "@/components/ui/toast/ToastContainer";
-import AsyncWrapper from "@/components/ui/AsyncWrapper";
 import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
 import { useState } from "react";
+import AsyncToastWrapper from "@/components/ui/AsyncToastWrapper";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
@@ -59,10 +59,10 @@ const Sandbox = () => {
         onPress={() => triggerErrorToast({ message: "הסיסמה אינה תואמת", title: "שגיאה" })}
       />
 
-      {/*AsyncWrapper can accept any child. if its button the button must be passed the disabled prop. i didnt find many ways to do this automatically in the component that werent verbose and ugly */}
-      <AsyncWrapper messages={{ success: { message: "yayayayay" } }} onPress={get}>
+      {/*AsyncToastWrapper can accept any child. if its button the button must be passed the disabled prop. i didnt find many ways to do this automatically in the component that werent verbose and ugly */}
+      <AsyncToastWrapper onPress={get}>
         <PrimaryButton mode="light" children="async" block icon="like" loading={loading} disabled />
-      </AsyncWrapper>
+      </AsyncToastWrapper>
 
       <ToastContainer />
     </View>

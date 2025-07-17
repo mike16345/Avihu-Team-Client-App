@@ -1,4 +1,4 @@
-import { Animated, View, Easing, Dimensions } from "react-native";
+import { Animated, View, Easing, Dimensions, PanResponder } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { Text } from "../Text";
 import { IToast } from "@/interfaces/toast";
@@ -29,6 +29,39 @@ const Toast: React.FC<{ toast: IToast; externalTranslateY?: Animated.Value }> = 
 
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
+  const pan = useRef(new Animated.Value(0)).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+
+      onPanResponderMove: (_, gestureState) => {
+        if (gestureState.dy > 0) {
+          pan.setValue(gestureState.dy);
+        }
+      },
+
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dy > 20) {
+          // Dismiss if dragged down far enough
+          Animated.timing(pan, {
+            toValue: SCREEN_HEIGHT,
+            duration: 300,
+            easing: Easing.in(Easing.ease),
+            useNativeDriver: true,
+          }).start();
+        } else {
+          // Snap back
+          Animated.spring(pan, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
+
   useEffect(() => {
     if (externalTranslateY) return;
     // Slide in
@@ -54,8 +87,9 @@ const Toast: React.FC<{ toast: IToast; externalTranslateY?: Animated.Value }> = 
 
   return (
     <Animated.View
+      {...panResponder.panHandlers}
       style={[
-        { transform: [{ translateY: externalTranslateY || translateY }] },
+        { transform: [{ translateY: Animated.add(externalTranslateY || translateY, pan) }] },
         common.borderXsm,
         common.roundedFull,
         spacing.pdXs,

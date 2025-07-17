@@ -3,25 +3,28 @@ import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { Animated, StyleProp, TouchableOpacity, View, ViewStyle } from "react-native";
 import { ConditionalRender } from "./ConditionalRender";
 import Toast from "./toast/Toast";
+import { useToast } from "@/hooks/useToast";
 
-interface AsyncWrapperProps {
+interface AsyncToastWrapperProps {
   children: ReactNode;
   onPress: () => Promise<void>;
   toastDuration?: number;
-  messages: {
-    success: { title?: string; message: string };
+  messages?: {
+    success?: { title?: string; message?: string };
     error?: { title?: string; message?: string };
   };
   style?: StyleProp<ViewStyle>;
 }
 
-const AsyncWrapper: React.FC<AsyncWrapperProps> = ({
+const AsyncToastWrapper: React.FC<AsyncToastWrapperProps> = ({
   children,
   onPress,
   toastDuration = 5000,
   messages,
   style,
 }) => {
+  const { triggerErrorToast } = useToast();
+
   const [toast, setToast] = useState<Partial<IToast> | undefined>();
   const [contentHeight, setContentHeight] = useState(0);
 
@@ -62,14 +65,12 @@ const AsyncWrapper: React.FC<AsyncWrapperProps> = ({
     message,
     duration,
     title,
-    type,
   }: {
-    message: string;
+    message?: string;
     duration?: number;
     title?: string;
-    type: "success" | "error";
   }) => {
-    setToast({ message, duration, title, type });
+    setToast({ message, duration, title, type: "success" });
 
     animateInToast();
 
@@ -83,19 +84,17 @@ const AsyncWrapper: React.FC<AsyncWrapperProps> = ({
       await onPress();
 
       showLocalToast({
-        message: messages.success.message,
-        title: messages.success.title || "הצלחה",
-        type: "success",
+        message: messages?.success?.message || "פעולה בוצעה בהצלחה",
+        title: messages?.success?.title || "הצלחה",
         duration: toastDuration,
       });
     } catch (error: any) {
       console.error(error);
-      showLocalToast({
+      triggerErrorToast({
         message: messages?.error?.message || error.message,
-        title: messages?.error?.title || "שגיאה",
-        type: "error",
+        title: messages?.error?.title,
         duration: toastDuration,
-      });
+      }); //Making the user waut 5 X toast duration until they can try again after an error seems bad in terms of UX. I swapped this to the global toast instead.
     }
   };
 
@@ -123,4 +122,4 @@ const AsyncWrapper: React.FC<AsyncWrapperProps> = ({
   );
 };
 
-export default AsyncWrapper;
+export default AsyncToastWrapper;

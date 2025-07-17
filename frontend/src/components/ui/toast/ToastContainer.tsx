@@ -14,12 +14,11 @@ const ToastContainer = () => {
         layout.flexColumn,
         layout.justifyEnd,
         spacing.gapDefault,
-        spacing.pdBottomBar,
-        { position: "absolute", bottom: 0, left: 0 },
+        { position: "absolute", bottom: 0, left: 0, paddingBottom: 100 },
       ]}
     >
-      {toasts.map((toast, i) => (
-        <Toast key={i} toast={toast} />
+      {toasts.slice(-3).map((toast) => (
+        <Toast key={toast.id} toast={toast} />
       ))}
     </View>
   );
