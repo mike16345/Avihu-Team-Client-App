@@ -5,18 +5,19 @@ import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 import IconButton from "@/components/ui/buttons/IconButton";
 import DropdownMenu from "@/components/ui/DropdownMenu";
 import { useState } from "react";
+import CustomDropdown from "@/components/ui/CustomDropdown";
 
 const testItems = [
-  { label: "Apple", value: "apple" },
-  { label: "Banana", value: "banana" },
-  { label: "Cherry", value: "cherry" },
-  { label: "Date", value: "date" },
-  { label: "Elderberry", value: "elderberry" },
-  { label: "Fig", value: "fig" },
-  { label: "Grape", value: "grape" },
-  { label: "Honeydew", value: "honeydew" },
-  { label: "Kiwi", value: "kiwi" },
-  { label: "Lemon", value: "lemon" },
+  { label: "תפוח", value: "תפוח" },
+  { label: "בננה", value: "בננה" },
+  { label: "דובדבן", value: "דובדבן" },
+  { label: "תמר", value: "תמר" },
+  { label: "סמבוק", value: "סמבוק" },
+  { label: "תאנה", value: "תאנה" },
+  { label: "ענב", value: "ענב" },
+  { label: "מלון דבש", value: "מלון דבש" },
+  { label: "קיווי", value: "קיווי" },
+  { label: "לימון", value: "לימון" },
 ];
 
 const Sandbox = () => {
@@ -38,39 +39,8 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <PrimaryButton mode="dark" children="התחברות" block icon="like" loading />
-      <PrimaryButton mode="light" children="התחברות" block icon="like" loading />
-      <PrimaryButton
-        mode="dark"
-        children="התחברות"
-        block
-        icon="like"
-        onPress={() => console.log("pressed")}
-      />
-      <PrimaryButton
-        mode="light"
-        children={<Text style={{ color: "red" }}>kaka batacha</Text>}
-        block
-        icon="like"
-      />
-
-      <View style={[layout.flexRow, layout.wrap, spacing.gapDefault]}>
-        <PrimaryButton mode="dark" children="התחברות" />
-
-        <SecondaryButton children="הסטוריית משקל וחזרות" leftIcon="documentText" />
-        <SecondaryButton children="דגשים" leftIcon="info" />
-        <SecondaryButton children="הצגת תחליף לארוחה בחלבון" leftIcon="info" />
-        <SecondaryButton children={<Text>aaaaaaabbbaa</Text>} rightIcon="arrowLeft" size="sm" />
-        <SecondaryButton children="לצפייה" rightIcon="arrowLeft" size="sm" shadow={false} />
-      </View>
-
-      <View style={[layout.flexRow, layout.wrap, spacing.gapDefault]}>
-        <IconButton icon="gallery" />
-        <IconButton icon="camera" />
-      </View>
-
       <Text>{value || "select to change me"}</Text>
-      <DropdownMenu
+      <CustomDropdown
         items={testItems}
         selectedValue={value}
         onSelect={(selected) => setValue(selected)}
