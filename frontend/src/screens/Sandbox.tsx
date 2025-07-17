@@ -5,6 +5,7 @@ import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 import IconButton from "@/components/ui/buttons/IconButton";
 import TextInput from "@/components/ui/TextInput";
 import { useState } from "react";
+import ChatInput from "@/components/ui/chat/ChatInput";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
@@ -25,6 +26,8 @@ const Sandbox = () => {
       <Text style={[colors.textPrimary]}>{value || "type to change me"}</Text>
 
       <TextInput onChangeText={(val) => setValue(val)} placeholder="Michael touch me" />
+
+      <ChatInput placeholder="im the chat bot fam" onChangeText={(val) => setValue(val)} />
     </View>
   );
 };
