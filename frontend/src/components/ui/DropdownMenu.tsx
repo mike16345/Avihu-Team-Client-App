@@ -33,6 +33,7 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
           closeOnBackPressed
           items={items}
           listMode="FLATLIST"
+          bottomOffset={10}
           placeholder={selectedItemLabel}
           placeholderStyle={[text.textLeft, spacing.pdHorizontalLg]}
           style={[
@@ -56,6 +57,7 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
               borderBottomEndRadius: 10,
               borderBottomStartRadius: 10,
               zIndex: 3,
+              maxHeight: 200,
             },
           ]}
           renderListItem={({ label, value }) => (
@@ -85,21 +87,19 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
         />
       </FrameShadow>
 
-      <ConditionalRender condition={!open}>
-        <View
-          style={[
-            {
-              height: 8,
-              width: 8,
-              position: "absolute",
-              left: 15,
-              top: 21,
-            },
-            colors.backgroundSuccess,
-            common.roundedFull,
-          ]}
-        />
-      </ConditionalRender>
+      <View
+        style={[
+          {
+            height: 8,
+            width: 8,
+            position: "absolute",
+            left: 15,
+            top: 21,
+          },
+          colors.backgroundSuccess,
+          common.roundedFull,
+        ]}
+      />
     </View>
   );
 };
