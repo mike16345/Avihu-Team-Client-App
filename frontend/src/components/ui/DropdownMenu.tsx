@@ -32,18 +32,16 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
           setOpen={setOpen}
           closeOnBackPressed
           items={items}
-          listMode="SCROLLVIEW"
+          listMode="FLATLIST"
           placeholder={selectedItemLabel}
           placeholderStyle={[text.textLeft, spacing.pdHorizontalLg]}
           style={[
             colors.outline,
             {
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              zIndex: open ? 0 : 2,
-              opacity: open ? 0 : 1,
+              borderBottomEndRadius: 8,
+              borderBottomStartRadius: 8,
+              borderTopEndRadius: 8,
+              borderTopStartRadius: 8,
             },
           ]}
           dropDownContainerStyle={[
@@ -51,13 +49,12 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
             colors.borderOnPrimary,
             common.rounded,
             common.borderSm,
+            spacing.mgVerticalDefault,
             {
               borderTopEndRadius: 10,
               borderTopStartRadius: 10,
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
+              borderBottomEndRadius: 10,
+              borderBottomStartRadius: 10,
               zIndex: 3,
             },
           ]}
