@@ -3,7 +3,7 @@ import { TextInput, TextInputProps } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 
 const ChatInput: React.FC<TextInputProps> = ({ style, ...props }) => {
-  const { common, colors } = useStyles();
+  const { common, colors, text } = useStyles();
 
   return (
     <TextInput
@@ -12,6 +12,7 @@ const ChatInput: React.FC<TextInputProps> = ({ style, ...props }) => {
         common.borderXsm,
         colors.outline,
         common.roundedLg,
+        text.textRight,
         {
           paddingHorizontal: 16,
           paddingVertical: 10,

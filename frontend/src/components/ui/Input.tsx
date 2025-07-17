@@ -1,12 +1,15 @@
 import useStyles from "@/styles/useGlobalStyles";
 import { FC, useState } from "react";
-import { View } from "react-native";
-import { TextInput as RNPTextInput, TextInputProps } from "react-native-paper";
+import { View, TextInput, TextInputProps } from "react-native";
 import { ConditionalRender } from "./ConditionalRender";
 import Icon from "../Icon/Icon";
 
-const TextInput: FC<TextInputProps> = ({ style, error, ...props }) => {
-  const { colors, common } = useStyles();
+interface InputProps extends TextInputProps {
+  error?: boolean;
+}
+
+const Input: FC<InputProps> = ({ style, error, ...props }) => {
+  const { colors, common, spacing } = useStyles();
 
   const [focused, setFocused] = useState(false);
 
@@ -15,17 +18,14 @@ const TextInput: FC<TextInputProps> = ({ style, error, ...props }) => {
 
   return (
     <View style={{ position: "relative" }}>
-      <RNPTextInput
-        underlineColor="transparent"
-        underlineStyle={{ width: 0 }}
+      <TextInput
         cursorColor={colors.textPrimary.color}
-        textColor={colors.textPrimary.color}
         selectionColor={colors.textPrimary.color}
         placeholderTextColor="grey"
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        contentStyle={{ paddingRight: error ? 30 : 8 }}
         style={[
+          error ? spacing.pdHorizontalXl : spacing.pdHorizontalSm,
           {
             borderWidth: 0,
             textAlign: "right",
@@ -51,4 +51,4 @@ const TextInput: FC<TextInputProps> = ({ style, error, ...props }) => {
   );
 };
 
-export default TextInput;
+export default Input;
