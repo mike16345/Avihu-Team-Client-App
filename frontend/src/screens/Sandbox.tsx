@@ -1,52 +1,57 @@
 import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
-
-import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
-import IconButton from "@/components/ui/buttons/IconButton";
-
-import TextInput from "@/components/ui/Input";
+import ToastContainer from "@/components/ui/toast/ToastContainer";
 import { useState } from "react";
-import ChatInput from "@/components/ui/chat/ChatInput";
-import Input from "@/components/ui/Input";
+import Tabs from "@/components/ui/Tabs";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
 
-  const { getExerciseMethodByName } = useExerciseMethodApi();
+  const [active1, setActive1] = useState("carbs");
+  const [active2, setActive2] = useState("day");
+  const [active3, setActive3] = useState("login");
 
-  const [loading, setLoading] = useState(false);
+  const tabs1 = [
+    { value: "protein", label: "חלבונים" },
+    { value: "carbs", label: "פחמימות" },
+    { value: "fats", label: "שומנים" },
+    { value: "vegetable", label: "ירקות" },
+  ];
 
-  const get = async () => {
-    setLoading(true);
-    try {
-      await getExerciseMethodByName("אימון פוקוס על כוח שיא (Max Effort)");
-    } catch (error) {
-      throw error; //throwing error is important for internal try catch to work in asyncWrapper
-    } finally {
-      setLoading(false);
-    }
-  };
+  const tabs2 = [
+    { value: "day", label: "יומי" },
+    { value: "week", label: "שבועי" },
+    { value: "month", label: "חודשי" },
+  ];
 
-  const [value, setValue] = useState(undefined);
+  const tabs3 = [
+    { value: "login", label: "התחברות" },
+    { value: "register", label: "חשבון חדש" },
+  ];
 
   return (
     <View
       style={[
         spacing.pdBottomBar,
         spacing.pdStatusBar,
-        spacing.pdDefault,
+        spacing.pdXl,
         colors.background,
         layout.sizeFull,
         spacing.gapDefault,
         { direction: "rtl" },
       ]}
     >
-      <Text style={[colors.textPrimary]}>{value || "type to change me"}</Text>
+      <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <Input onChangeText={(val) => setValue(val)} placeholder="Michael touch me" />
+      <Tabs items={tabs1} value={active1} setValue={(val) => setActive1(val)} />
+      <Tabs items={tabs2} value={active2} setValue={(val) => setActive2(val)} />
+      <Tabs items={tabs3} value={active3} setValue={(val) => setActive3(val)} />
 
-      <ChatInput placeholder="im the chat bot fam" onChangeText={(val) => setValue(val)} />
+      <Text>active1-{active1}</Text>
+      <Text>active2-{active2}</Text>
+      <Text>active3-{active3}</Text>
+
+      <ToastContainer />
     </View>
   );
 };
