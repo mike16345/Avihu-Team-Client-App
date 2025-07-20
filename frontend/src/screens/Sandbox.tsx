@@ -1,11 +1,25 @@
 import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
-import { useToast } from "@/hooks/useToast";
-import ToastContainer from "@/components/ui/toast/ToastContainer";
-import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
+
+import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
+import IconButton from "@/components/ui/buttons/IconButton";
+import DropdownMenu from "@/components/ui/DropdownMenu";
 import { useState } from "react";
-import AsyncToastWrapper from "@/components/ui/AsyncToastWrapper";
+import CustomDropdown from "@/components/ui/CustomDropdown";
+
+const testItems = [
+  { label: "תפוח", value: "תפוח" },
+  { label: "בננה", value: "בננה" },
+  { label: "דובדבן", value: "דובדבן" },
+  { label: "תמר", value: "תמר" },
+  { label: "סמבוק", value: "סמבוק" },
+  { label: "תאנה", value: "תאנה" },
+  { label: "ענב", value: "ענב" },
+  { label: "מלון דבש", value: "מלון דבש" },
+  { label: "קיווי", value: "קיווי" },
+  { label: "לימון", value: "לימון" },
+];
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
@@ -25,6 +39,8 @@ const Sandbox = () => {
     }
   };
 
+  const [value, setValue] = useState<string>();
+
   return (
     <View
       style={[
@@ -39,32 +55,12 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <PrimaryButton
-        mode="dark"
-        children="success"
-        block
-        icon="like"
-        onPress={() =>
-          triggerSuccessToast({
-            message: "היקפים נשמרו בהצלחה",
-            title: "הועלה בהצלחה",
-          })
-        }
+      <Text>{value || "select to change me"}</Text>
+      <CustomDropdown
+        items={testItems}
+        selectedValue={value}
+        onSelect={(selected) => setValue(selected)}
       />
-      <PrimaryButton
-        mode="light"
-        children="error"
-        block
-        icon="like"
-        onPress={() => triggerErrorToast({ message: "הסיסמה אינה תואמת", title: "שגיאה" })}
-      />
-
-      {/*AsyncToastWrapper can accept any child. if its button the button must be passed the disabled prop. i didnt find many ways to do this automatically in the component that werent verbose and ugly */}
-      <AsyncToastWrapper onPress={get}>
-        <PrimaryButton mode="light" children="async" block icon="like" loading={loading} disabled />
-      </AsyncToastWrapper>
-
-      <ToastContainer />
     </View>
   );
 };
