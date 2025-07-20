@@ -13,6 +13,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Toast from "react-native-toast-message";
 import { Text } from "../ui/Text";
 import { useLayoutStore } from "@/store/layoutStore";
+import queryClient from "@/QueryClient/queryClient";
+import { RECORDED_SETS_BY_USER_KEY } from "@/constants/reactQuery";
 
 interface WorkoutProps {
   plan: string;
@@ -66,6 +68,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
         updateSession(updatedSession);
         handleSetCurrentSetInfo(updatedSession);
+        queryClient.invalidateQueries({ queryKey: [RECORDED_SETS_BY_USER_KEY + currentUser._id] });
         Toast.show({
           text1: "סט הוקלט בהצלחה",
           text2: "כל הכבוד!",

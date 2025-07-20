@@ -32,7 +32,7 @@ const MyWorkoutProgressionScreen = () => {
     retry: 2,
     onSuccess: (data) => {
       setSelectedMuscleGroup(data[0]?.muscleGroup);
-      setSelectedExercise(extractExercises(data[0].recordedSets)[0]);
+      setSelectedExercise(extractExercises(data[0]?.recordedSets)[0]);
     },
   });
 
@@ -42,7 +42,7 @@ const MyWorkoutProgressionScreen = () => {
     data ? data[0]?.muscleGroup : null
   );
   const [selectedExercise, setSelectedExercise] = useState<ValueType | null>(
-    data ? extractExercises(data[0].recordedSets)[0] : null
+    data ? extractExercises(data[0]?.recordedSets)[0] : null
   );
 
   const muscleGroupOptions = data?.map(({ muscleGroup }) => ({
@@ -54,14 +54,14 @@ const MyWorkoutProgressionScreen = () => {
     return data?.some(
       (item) =>
         item.muscleGroup === selectedMuscleGroup &&
-        Object.keys(item.recordedSets).includes(selectedExercise)
+        Object.keys(item?.recordedSets).includes(selectedExercise)
     );
   }, [selectedMuscleGroup, data, selectedExercise]);
 
   const exerciseOptions = useMemo(() => {
     return data
       ?.filter((item) => item.muscleGroup === selectedMuscleGroup) // Filter by muscleGroup
-      .flatMap((item) => extractExercises(item.recordedSets))
+      .flatMap((item) => extractExercises(item?.recordedSets))
       .map((item) => ({ label: item, value: item }));
   }, [selectedMuscleGroup, data]);
 
@@ -70,8 +70,8 @@ const MyWorkoutProgressionScreen = () => {
       ?.filter((item) => item.muscleGroup === selectedMuscleGroup)
       .flatMap(
         (item) =>
-          item.recordedSets[
-            muscleGroupContainsExercise ? selectedExercise : Object.keys(item.recordedSets)[0]
+          item?.recordedSets[
+            muscleGroupContainsExercise ? selectedExercise : Object.keys(item?.recordedSets)[0]
           ]
       )
       .flatMap((item) => ({ value: item.repsDone, date: new Date(item.date).toDateString() }));
@@ -82,8 +82,8 @@ const MyWorkoutProgressionScreen = () => {
       ?.filter((item) => item.muscleGroup === selectedMuscleGroup)
       .flatMap(
         (item) =>
-          item.recordedSets[
-            muscleGroupContainsExercise ? selectedExercise : Object.keys(item.recordedSets)[0]
+          item?.recordedSets[
+            muscleGroupContainsExercise ? selectedExercise : Object.keys(item?.recordedSets)[0]
           ]
       )
       .flatMap((item) => ({ value: item.weight, date: new Date(item.date).toDateString() }));
