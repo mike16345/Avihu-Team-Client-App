@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import Login from "@/components/Login/Login";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import BottomTabNavigator from "./BottomTabNavigator";
@@ -19,11 +19,10 @@ const Stack = createNativeStackNavigator();
 const RootNavigator = () => {
   const queryClient = useQueryClient();
   const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
-  const [userId, setUserId] = useState<string | undefined>();
 
-  const { data } = useUserQuery(userId);
-  const { checkUserSessionToken } = useUserApi();
   const { currentUser, setCurrentUser } = useUserStore();
+  const { data } = useUserQuery(currentUser?._id);
+  const { checkUserSessionToken } = useUserApi();
   const { initializeNotifications, requestPermissions } = useNotification();
   const { handleLogout } = useLogout();
 
@@ -39,7 +38,6 @@ const RootNavigator = () => {
     if (!token || !tokenData) return;
     const user = tokenData.data.user;
     setCurrentUser(user);
-    setUserId(user._id);
   };
 
   const checkLoginStatus = async () => {
