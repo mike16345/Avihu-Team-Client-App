@@ -28,7 +28,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ text, variant = "prompt" }) => 
         { maxWidth: width * 0.75 },
       ]}
     >
-      <Text style={[textStyles.textLeft]}>{text}</Text>
+      <Text style={[textStyles.textLeft, colors.textPrimary]}>{text}</Text>
     </View>
   );
 };

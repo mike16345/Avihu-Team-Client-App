@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 
 import ChatBubble from "@/components/ui/chat/ChatBubble";
-import ChatButton from "@/components/ui/chat/ChatButton";
+import SendButton from "@/components/ui/chat/SendButton";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
@@ -30,7 +30,7 @@ const Sandbox = () => {
         variant="response"
       />
 
-      <ChatButton onPress={() => console.log("pressed")} />
+      <SendButton onPress={() => console.log("pressed")} />
     </View>
   );
 };

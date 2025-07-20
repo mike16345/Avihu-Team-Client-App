@@ -2,12 +2,12 @@ import { TouchableOpacity } from "react-native";
 import Icon from "@/components/Icon/Icon";
 import useStyles from "@/styles/useGlobalStyles";
 
-interface ChatButtonProps {
+interface SendButtonProps {
   onPress: () => void;
   disabled?: boolean;
 }
 
-const ChatButton: React.FC<ChatButtonProps> = ({ onPress, disabled }) => {
+const SendButton: React.FC<SendButtonProps> = ({ onPress, disabled }) => {
   const { colors, common, layout, spacing } = useStyles();
 
   return (
@@ -26,4 +26,4 @@ const ChatButton: React.FC<ChatButtonProps> = ({ onPress, disabled }) => {
   );
 };
 
-export default ChatButton;
+export default SendButton;
