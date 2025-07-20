@@ -9,7 +9,6 @@ import { useState } from "react";
 import ChatInput from "@/components/ui/chat/ChatInput";
 import Input from "@/components/ui/Input";
 
-
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
   const { triggerErrorToast, triggerSuccessToast } = useToast();
@@ -42,13 +41,11 @@ const Sandbox = () => {
         { direction: "rtl" },
       ]}
     >
-
       <Text style={[colors.textPrimary]}>{value || "type to change me"}</Text>
 
       <Input onChangeText={(val) => setValue(val)} placeholder="Michael touch me" />
 
       <ChatInput placeholder="im the chat bot fam" onChangeText={(val) => setValue(val)} />
-
     </View>
   );
 };
