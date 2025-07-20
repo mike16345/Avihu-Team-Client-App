@@ -1,5 +1,5 @@
 import React from "react";
-import { TextInput, TextInputProps } from "react-native";
+import { StyleSheet, TextInput, TextInputProps } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 
 const ChatInput: React.FC<TextInputProps> = ({ style, ...props }) => {
@@ -13,13 +13,7 @@ const ChatInput: React.FC<TextInputProps> = ({ style, ...props }) => {
         colors.outline,
         common.roundedLg,
         text.textRight,
-        {
-          paddingHorizontal: 16,
-          paddingVertical: 10,
-          writingDirection: "rtl",
-          maxHeight: 80,
-          overflow: "hidden",
-        },
+        styles.input,
         style,
       ]}
       multiline
@@ -29,5 +23,15 @@ const ChatInput: React.FC<TextInputProps> = ({ style, ...props }) => {
     />
   );
 };
+
+const styles = StyleSheet.create({
+  input: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    writingDirection: "rtl",
+    maxHeight: 80,
+    overflow: "hidden",
+  },
+});
 
 export default ChatInput;

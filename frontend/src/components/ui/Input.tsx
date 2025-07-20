@@ -1,6 +1,6 @@
 import useStyles from "@/styles/useGlobalStyles";
 import { FC, useState } from "react";
-import { View, TextInput, TextInputProps } from "react-native";
+import { View, TextInput, TextInputProps, StyleSheet } from "react-native";
 import { ConditionalRender } from "./ConditionalRender";
 import Icon from "../Icon/Icon";
 
@@ -26,14 +26,7 @@ const Input: FC<InputProps> = ({ style, error, ...props }) => {
         onBlur={() => setFocused(false)}
         style={[
           error ? spacing.pdHorizontalXl : spacing.pdHorizontalSm,
-          {
-            borderWidth: 0,
-            textAlign: "right",
-            borderRadius: 9,
-            height: 38,
-            borderTopLeftRadius: 9,
-            borderTopRightRadius: 9,
-          },
+          styles.input,
           common.roundedSm,
           borderColor,
           borderwidth,
@@ -43,7 +36,7 @@ const Input: FC<InputProps> = ({ style, error, ...props }) => {
         {...props}
       />
       <ConditionalRender condition={error}>
-        <View style={[{ position: "absolute", right: 10, top: 12 }]}>
+        <View style={styles.errorIcon}>
           <Icon name="info" height={18} width={18} color={colors.textDanger.color} />
         </View>
       </ConditionalRender>
@@ -51,4 +44,15 @@ const Input: FC<InputProps> = ({ style, error, ...props }) => {
   );
 };
 
+const styles = StyleSheet.create({
+  input: {
+    borderWidth: 0,
+    textAlign: "right",
+    borderRadius: 9,
+    height: 38,
+    borderTopLeftRadius: 9,
+    borderTopRightRadius: 9,
+  },
+  errorIcon: { position: "absolute", right: 10, top: 12 },
+});
 export default Input;
