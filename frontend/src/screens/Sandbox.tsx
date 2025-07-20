@@ -4,26 +4,15 @@ import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 
 import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 import IconButton from "@/components/ui/buttons/IconButton";
-import DropdownMenu from "@/components/ui/DropdownMenu";
-import { useState } from "react";
-import CustomDropdown from "@/components/ui/CustomDropdown";
 
-const testItems = [
-  { label: "תפוח", value: "תפוח" },
-  { label: "בננה", value: "בננה" },
-  { label: "דובדבן", value: "דובדבן" },
-  { label: "תמר", value: "תמר" },
-  { label: "סמבוק", value: "סמבוק" },
-  { label: "תאנה", value: "תאנה" },
-  { label: "ענב", value: "ענב" },
-  { label: "מלון דבש", value: "מלון דבש" },
-  { label: "קיווי", value: "קיווי" },
-  { label: "לימון", value: "לימון" },
-];
+import TextInput from "@/components/ui/Input";
+import { useState } from "react";
+import ChatInput from "@/components/ui/chat/ChatInput";
+import Input from "@/components/ui/Input";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
-  const { triggerErrorToast, triggerSuccessToast } = useToast();
+
   const { getExerciseMethodByName } = useExerciseMethodApi();
 
   const [loading, setLoading] = useState(false);
@@ -39,7 +28,7 @@ const Sandbox = () => {
     }
   };
 
-  const [value, setValue] = useState<string>();
+  const [value, setValue] = useState(undefined);
 
   return (
     <View
@@ -53,14 +42,11 @@ const Sandbox = () => {
         { direction: "rtl" },
       ]}
     >
-      <Text style={[colors.textPrimary]}>Sandbox</Text>
+      <Text style={[colors.textPrimary]}>{value || "type to change me"}</Text>
 
-      <Text>{value || "select to change me"}</Text>
-      <CustomDropdown
-        items={testItems}
-        selectedValue={value}
-        onSelect={(selected) => setValue(selected)}
-      />
+      <Input onChangeText={(val) => setValue(val)} placeholder="Michael touch me" />
+
+      <ChatInput placeholder="im the chat bot fam" onChangeText={(val) => setValue(val)} />
     </View>
   );
 };
