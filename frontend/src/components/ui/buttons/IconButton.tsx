@@ -8,15 +8,17 @@ import Icon from "@/components/Icon/Icon";
 interface IconButtonProps {
   icon: IconName;
   onPress?: () => void;
+  disabled?: boolean;
 }
 
-const IconButton: React.FC<IconButtonProps> = ({ icon, onPress }) => {
+const IconButton: React.FC<IconButtonProps> = ({ icon, onPress, disabled }) => {
   const { colors, common, spacing } = useStyles();
 
   return (
     <ButtonShadow>
       <TouchableOpacity
         onPress={onPress}
+        disabled={disabled}
         style={[
           colors.backgroundSurface,
           spacing.pdLg,

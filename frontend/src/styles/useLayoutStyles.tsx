@@ -89,6 +89,12 @@ export const useLayoutStyles = () => {
     alignSelfStart: {
       alignSelf: "flex-start",
     },
+    alignSelfCenter: {
+      alignSelf: "center",
+    },
+    alignSelfEnd: {
+      alignSelf: "flex-end",
+    },
   });
 
   return layoutStyles;

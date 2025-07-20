@@ -14,6 +14,7 @@ interface secondaryButtonProps {
   size?: "sm" | "md";
   shadow?: boolean;
   onPress?: () => void;
+  disabled?: boolean;
 }
 
 const SecondaryButton: React.FC<secondaryButtonProps> = ({
@@ -23,6 +24,7 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
   size = "md",
   shadow = true,
   onPress,
+  disabled,
 }) => {
   const { colors, common, fonts, layout, spacing } = useStyles();
 
@@ -33,6 +35,7 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
   return (
     <ButtonShadow shadow={shadow}>
       <TouchableOpacity
+        disabled={disabled}
         onPress={onPress}
         style={[
           colors.backgroundSurface,
