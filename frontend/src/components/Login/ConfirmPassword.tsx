@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { ICredentialsErrors } from "./Login";
 import { Text } from "../ui/Text";
 import PasswordIndicator from "./PasswordIndicator";
-import TextInput from "../ui/TextInput";
+import TextInput from "../ui/Input";
 import { TextInput as RNPTextInput } from "react-native-paper";
 
 interface ConfirmPasswordProps {
