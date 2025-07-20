@@ -7,6 +7,7 @@ import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
 import { useState } from "react";
 import AsyncToastWrapper from "@/components/ui/AsyncToastWrapper";
 import ChatBubble from "@/components/ui/chat/ChatBubble";
+import ChatButton from "@/components/ui/chat/ChatButton";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
@@ -33,6 +34,8 @@ const Sandbox = () => {
 הכי חשוב לשמור על עקביות, להקשיב לגוף ולעבוד בצורה שמתאימה לכם.  אימון טוב נמדד לא רק בכמות, אלא גם באיכות."
         variant="response"
       />
+
+      <ChatButton onPress={() => console.log("pressed")} />
     </View>
   );
 };
