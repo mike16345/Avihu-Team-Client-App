@@ -7,9 +7,9 @@ import Tabs from "@/components/ui/Tabs";
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
 
-  const [active1, setActive1] = useState("פחמימות");
-  const [active2, setActive2] = useState("פחמימות");
-  const [active3, setActive3] = useState("פחמימות");
+  const [active1, setActive1] = useState("carbs");
+  const [active2, setActive2] = useState("day");
+  const [active3, setActive3] = useState("login");
 
   const tabs1 = [
     { value: "protein", label: "חלבונים" },

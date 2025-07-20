@@ -1,4 +1,11 @@
-import { View, TouchableOpacity, Animated, LayoutChangeEvent, Dimensions } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Animated,
+  LayoutChangeEvent,
+  Dimensions,
+  Platform,
+} from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "./Text";
@@ -24,7 +31,7 @@ const Tabs: React.FC<TabsProps> = ({ items, setValue, value }) => {
 
   const [containerWidth, setContainerWidth] = useState(screenWidth);
 
-  const tabWidth = containerWidth / items.length;
+  const tabWidth = containerWidth / items.length - 0.5;
   const translateX = useRef(new Animated.Value(0)).current;
 
   const onLayout = (e: LayoutChangeEvent) => {
@@ -37,8 +44,10 @@ const Tabs: React.FC<TabsProps> = ({ items, setValue, value }) => {
   useEffect(() => {
     const activeIndex = items.findIndex((item) => item.value === value);
 
+    const index = Platform.OS == "android" ? activeIndex : -activeIndex;
+
     Animated.spring(translateX, {
-      toValue: -activeIndex * tabWidth,
+      toValue: index * tabWidth,
       useNativeDriver: true,
     }).start();
   }, [value, tabWidth]);
@@ -78,20 +87,22 @@ const Tabs: React.FC<TabsProps> = ({ items, setValue, value }) => {
               common.rounded,
             ]}
           >
-            <Text style={text.textCenter}>{items.find((item) => item.value === value)?.label}</Text>
+            <Text style={[text.textCenter, colors.textPrimary]}>
+              {items.find((item) => item.value === value)?.label}
+            </Text>
           </View>
         </ButtonShadow>
       </Animated.View>
 
-      {items.map((t) => (
+      {items.map((tab) => (
         <TouchableOpacity
-          key={t.label}
+          key={tab.label}
           style={[layout.flex1, layout.heightFull]}
-          onPress={() => setValue(t.value)}
+          onPress={() => setValue(tab.value)}
         >
-          <ConditionalRender condition={t.value !== value}>
+          <ConditionalRender condition={tab.value !== value}>
             <View style={[layout.center, layout.heightFull]}>
-              <Text style={text.textCenter}>{t.label}</Text>
+              <Text style={[text.textCenter, colors.textPrimary]}>{tab.label}</Text>
             </View>
           </ConditionalRender>
         </TouchableOpacity>
