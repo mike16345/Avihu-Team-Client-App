@@ -6,24 +6,10 @@ import ToastContainer from "@/components/ui/toast/ToastContainer";
 import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
 import { useState } from "react";
 import AsyncToastWrapper from "@/components/ui/AsyncToastWrapper";
+import ChatBubble from "@/components/ui/chat/ChatBubble";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
-  const { triggerErrorToast, triggerSuccessToast } = useToast();
-  const { getExerciseMethodByName } = useExerciseMethodApi();
-
-  const [loading, setLoading] = useState(false);
-
-  const get = async () => {
-    setLoading(true);
-    try {
-      await getExerciseMethodByName("אימון פוקוס על כוח שיא (Max Effort)");
-    } catch (error) {
-      throw error; //throwing error is important for internal try catch to work in asyncWrapper
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <View
@@ -38,33 +24,15 @@ const Sandbox = () => {
       ]}
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
-
-      <PrimaryButton
-        mode="dark"
-        children="success"
-        block
-        icon="like"
-        onPress={() =>
-          triggerSuccessToast({
-            message: "היקפים נשמרו בהצלחה",
-            title: "הועלה בהצלחה",
-          })
-        }
+      <ChatBubble text="היי, אני אכלתי אוכל היי, אני אכלתי אוכל היי, אני אכלתי אוכל" />
+      <ChatBubble
+        text="בשמחה, הנה הגרסה המעודכנת והמתונה – ללא אייקונים:
+מספר האימונים המומלץ בשבוע תלוי במטרה האישית שלכם,
+ רמת הכושר והזמן הפנוי.  באופן כללי:
+לשיפור כללי או שמירה – 3 עד 4 אימונים בשבוע יכולים להספיק.  להרזיה או חיטוב – 4 עד 5 אימונים בשילוב תזונה מתאימה.  לבניית מסת שריר – 4 עד 6 אימונים בשבוע, עם חלוקה לפי קבוצות שרירים ומנוחה מסודרת.
+הכי חשוב לשמור על עקביות, להקשיב לגוף ולעבוד בצורה שמתאימה לכם.  אימון טוב נמדד לא רק בכמות, אלא גם באיכות."
+        variant="response"
       />
-      <PrimaryButton
-        mode="light"
-        children="error"
-        block
-        icon="like"
-        onPress={() => triggerErrorToast({ message: "הסיסמה אינה תואמת", title: "שגיאה" })}
-      />
-
-      {/*AsyncToastWrapper can accept any child. if its button the button must be passed the disabled prop. i didnt find many ways to do this automatically in the component that werent verbose and ugly */}
-      <AsyncToastWrapper onPress={get}>
-        <PrimaryButton mode="light" children="async" block icon="like" loading={loading} disabled />
-      </AsyncToastWrapper>
-
-      <ToastContainer />
     </View>
   );
 };
