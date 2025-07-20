@@ -24,7 +24,7 @@ import { Text } from "../ui/Text";
 import ForgotPassword from "./ForgotPassword";
 import { EMAIL_ERROR, NO_ACCESS, NO_PASSWORD } from "@/constants/Constants";
 import { ConditionalRender } from "../ui/ConditionalRender";
-import TextInput from "../ui/TextInput";
+import TextInput from "../ui/Input";
 import { TextInput as RNTextInput } from "react-native-paper";
 import { useUserStore } from "@/store/userStore";
 import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
@@ -92,7 +92,7 @@ export default function Login({ onLogin }: ILoginProps) {
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
-      errorNotificationHaptic()
+      errorNotificationHaptic();
       return;
     }
 
