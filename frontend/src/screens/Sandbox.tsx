@@ -1,8 +1,11 @@
 import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import ToastContainer from "@/components/ui/toast/ToastContainer";
 import { useState } from "react";
 import Tabs from "@/components/ui/Tabs";
+import ChatBubble from "@/components/ui/chat/ChatBubble";
+import SendButton from "@/components/ui/chat/SendButton";
+
+
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
@@ -29,6 +32,7 @@ const Sandbox = () => {
     { value: "register", label: "חשבון חדש" },
   ];
 
+
   return (
     <View
       style={[
@@ -43,6 +47,19 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
+      <ChatBubble text="היי, אני אכלתי אוכל היי, אני אכלתי אוכל היי, אני אכלתי אוכל" />
+      <ChatBubble
+        text="בשמחה, הנה הגרסה המעודכנת והמתונה – ללא אייקונים:
+מספר האימונים המומלץ בשבוע תלוי במטרה האישית שלכם,
+ רמת הכושר והזמן הפנוי. באופן כללי:
+לשיפור כללי או שמירה – 3 עד 4 אימונים בשבוע יכולים להספיק. להרזיה או חיטוב – 4 עד 5 אימונים בשילוב תזונה מתאימה. לבניית מסת שריר – 4 עד 6 אימונים בשבוע, עם חלוקה לפי קבוצות שרירים ומנוחה מסודרת.
+הכי חשוב לשמור על עקביות, להקשיב לגוף ולעבוד בצורה שמתאימה לכם. אימון טוב נמדד לא רק בכמות, אלא גם באיכות."
+        variant="response"
+      />
+
+      <SendButton onPress={() => console.log("pressed")} />
+
+
       <Tabs items={tabs1} value={active1} setValue={(val) => setActive1(val)} />
       <Tabs items={tabs2} value={active2} setValue={(val) => setActive2(val)} />
       <Tabs items={tabs3} value={active3} setValue={(val) => setActive3(val)} />
@@ -52,6 +69,7 @@ const Sandbox = () => {
       <Text>active3-{active3}</Text>
 
       <ToastContainer />
+
     </View>
   );
 };

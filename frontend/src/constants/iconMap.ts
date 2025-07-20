@@ -33,7 +33,9 @@ import loader from "@assets/icons/loader.svg";
 import sideBar from "@assets/icons/sideBar.svg";
 import twinkle from "@assets/icons/twinkle.svg";
 import upload from "@assets/icons/upload.svg";
+import send from "@assets/icons/send.svg";
 import check from "@assets/icons/check.svg";
+
 
 const icons = {
   arrowLeft,
@@ -71,6 +73,7 @@ const icons = {
   sideBar,
   twinkle,
   upload,
+  send,
   check,
 } as const;
 
