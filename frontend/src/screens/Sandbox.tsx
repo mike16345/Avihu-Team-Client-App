@@ -1,36 +1,40 @@
 import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
-import { useToast } from "@/hooks/useToast";
 import ToastContainer from "@/components/ui/toast/ToastContainer";
-import useExerciseMethodApi from "@/hooks/api/useExerciseMethodsApi";
 import { useState } from "react";
-import AsyncToastWrapper from "@/components/ui/AsyncToastWrapper";
+import Tabs from "@/components/ui/Tabs";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
-  const { triggerErrorToast, triggerSuccessToast } = useToast();
-  const { getExerciseMethodByName } = useExerciseMethodApi();
 
-  const [loading, setLoading] = useState(false);
+  const [active1, setActive1] = useState("פחמימות");
+  const [active2, setActive2] = useState("פחמימות");
+  const [active3, setActive3] = useState("פחמימות");
 
-  const get = async () => {
-    setLoading(true);
-    try {
-      await getExerciseMethodByName("אימון פוקוס על כוח שיא (Max Effort)");
-    } catch (error) {
-      throw error; //throwing error is important for internal try catch to work in asyncWrapper
-    } finally {
-      setLoading(false);
-    }
-  };
+  const tabs1 = [
+    { value: "protein", label: "חלבונים" },
+    { value: "carbs", label: "פחמימות" },
+    { value: "fats", label: "שומנים" },
+    { value: "vegetable", label: "ירקות" },
+  ];
+
+  const tabs2 = [
+    { value: "day", label: "יומי" },
+    { value: "week", label: "שבועי" },
+    { value: "month", label: "חודשי" },
+  ];
+
+  const tabs3 = [
+    { value: "login", label: "התחברות" },
+    { value: "register", label: "חשבון חדש" },
+  ];
 
   return (
     <View
       style={[
         spacing.pdBottomBar,
         spacing.pdStatusBar,
-        spacing.pdDefault,
+        spacing.pdXl,
         colors.background,
         layout.sizeFull,
         spacing.gapDefault,
@@ -39,30 +43,13 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <PrimaryButton
-        mode="dark"
-        children="success"
-        block
-        icon="like"
-        onPress={() =>
-          triggerSuccessToast({
-            message: "היקפים נשמרו בהצלחה",
-            title: "הועלה בהצלחה",
-          })
-        }
-      />
-      <PrimaryButton
-        mode="light"
-        children="error"
-        block
-        icon="like"
-        onPress={() => triggerErrorToast({ message: "הסיסמה אינה תואמת", title: "שגיאה" })}
-      />
+      <Tabs items={tabs1} value={active1} setValue={(val) => setActive1(val)} />
+      <Tabs items={tabs2} value={active2} setValue={(val) => setActive2(val)} />
+      <Tabs items={tabs3} value={active3} setValue={(val) => setActive3(val)} />
 
-      {/*AsyncToastWrapper can accept any child. if its button the button must be passed the disabled prop. i didnt find many ways to do this automatically in the component that werent verbose and ugly */}
-      <AsyncToastWrapper onPress={get}>
-        <PrimaryButton mode="light" children="async" block icon="like" loading={loading} disabled />
-      </AsyncToastWrapper>
+      <Text>active1-{active1}</Text>
+      <Text>active2-{active2}</Text>
+      <Text>active3-{active3}</Text>
 
       <ToastContainer />
     </View>
