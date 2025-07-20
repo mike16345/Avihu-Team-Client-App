@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
+
 import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 import IconButton from "@/components/ui/buttons/IconButton";
 import DropdownMenu from "@/components/ui/DropdownMenu";
@@ -20,8 +21,24 @@ const testItems = [
   { label: "לימון", value: "לימון" },
 ];
 
+
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
+  const { triggerErrorToast, triggerSuccessToast } = useToast();
+  const { getExerciseMethodByName } = useExerciseMethodApi();
+
+  const [loading, setLoading] = useState(false);
+
+  const get = async () => {
+    setLoading(true);
+    try {
+      await getExerciseMethodByName("אימון פוקוס על כוח שיא (Max Effort)");
+    } catch (error) {
+      throw error; //throwing error is important for internal try catch to work in asyncWrapper
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [value, setValue] = useState<string>();
 
@@ -39,12 +56,14 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
+
       <Text>{value || "select to change me"}</Text>
       <CustomDropdown
         items={testItems}
         selectedValue={value}
         onSelect={(selected) => setValue(selected)}
       />
+
     </View>
   );
 };
