@@ -28,9 +28,7 @@ const Sandbox = () => {
     }
   };
 
-
   const [value, setValue] = useState(undefined);
-
 
   return (
     <View
@@ -44,13 +42,11 @@ const Sandbox = () => {
         { direction: "rtl" },
       ]}
     >
-
       <Text style={[colors.textPrimary]}>{value || "type to change me"}</Text>
 
       <Input onChangeText={(val) => setValue(val)} placeholder="Michael touch me" />
 
       <ChatInput placeholder="im the chat bot fam" onChangeText={(val) => setValue(val)} />
-
     </View>
   );
 };
