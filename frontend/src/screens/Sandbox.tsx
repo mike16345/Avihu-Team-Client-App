@@ -21,7 +21,6 @@ const testItems = [
   { label: "לימון", value: "לימון" },
 ];
 
-
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
   const { triggerErrorToast, triggerSuccessToast } = useToast();
@@ -56,14 +55,12 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-
       <Text>{value || "select to change me"}</Text>
       <CustomDropdown
         items={testItems}
         selectedValue={value}
         onSelect={(selected) => setValue(selected)}
       />
-
     </View>
   );
 };
