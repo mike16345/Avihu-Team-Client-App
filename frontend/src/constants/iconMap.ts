@@ -33,6 +33,7 @@ import loader from "@assets/icons/loader.svg";
 import sideBar from "@assets/icons/sideBar.svg";
 import twinkle from "@assets/icons/twinkle.svg";
 import upload from "@assets/icons/upload.svg";
+import send from "@assets/icons/send.svg";
 
 const icons = {
   arrowLeft,
@@ -70,6 +71,7 @@ const icons = {
   sideBar,
   twinkle,
   upload,
+  send,
 } as const;
 
 export type IconName = keyof typeof icons;
