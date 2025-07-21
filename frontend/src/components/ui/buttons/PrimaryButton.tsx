@@ -9,7 +9,7 @@ import { Text } from "../Text";
 
 interface PrimaryButtonProps {
   children: ReactNode;
-  mode: "dark" | "light";
+  mode?: "dark" | "light";
   block?: boolean;
   icon?: IconName;
   loading?: boolean;
