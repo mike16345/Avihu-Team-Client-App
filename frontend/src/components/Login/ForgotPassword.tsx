@@ -11,7 +11,7 @@ import { ICredentialsErrors } from "./Login";
 import { Text } from "../ui/Text";
 import Loader from "../ui/loaders/Loader";
 import { useUserApi } from "@/hooks/api/useUserApi";
-import TextInput from "../ui/TextInput";
+import TextInput from "../ui/Input";
 import { ApiResponse } from "@/types/ApiTypes";
 import { IUser } from "@/interfaces/User";
 
