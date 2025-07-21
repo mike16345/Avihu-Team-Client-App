@@ -1,34 +1,18 @@
 import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { useState } from "react";
-import Tabs from "@/components/ui/Tabs";
-import ChatBubble from "@/components/ui/chat/ChatBubble";
-import SendButton from "@/components/ui/chat/SendButton";
+
+import Checkbox from "@/components/ui/Checkbox";
+import ProgressBar from "@/components/ui/ProgressBar";
+import Input from "@/components/ui/Input";
+import Badge from "@/components/ui/Badge";
+import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
 
-  const [active1, setActive1] = useState("carbs");
-  const [active2, setActive2] = useState("day");
-  const [active3, setActive3] = useState("login");
-
-  const tabs1 = [
-    { value: "protein", label: "חלבונים" },
-    { value: "carbs", label: "פחמימות" },
-    { value: "fats", label: "שומנים" },
-    { value: "vegetable", label: "ירקות" },
-  ];
-
-  const tabs2 = [
-    { value: "day", label: "יומי" },
-    { value: "week", label: "שבועי" },
-    { value: "month", label: "חודשי" },
-  ];
-
-  const tabs3 = [
-    { value: "login", label: "התחברות" },
-    { value: "register", label: "חשבון חדש" },
-  ];
+  const [checked, setChecked] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   return (
     <View
@@ -44,25 +28,64 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <ChatBubble text="היי, אני אכלתי אוכל היי, אני אכלתי אוכל היי, אני אכלתי אוכל" />
-      <ChatBubble
-        text="בשמחה, הנה הגרסה המעודכנת והמתונה – ללא אייקונים:
-מספר האימונים המומלץ בשבוע תלוי במטרה האישית שלכם,
- רמת הכושר והזמן הפנוי. באופן כללי:
-לשיפור כללי או שמירה – 3 עד 4 אימונים בשבוע יכולים להספיק. להרזיה או חיטוב – 4 עד 5 אימונים בשילוב תזונה מתאימה. לבניית מסת שריר – 4 עד 6 אימונים בשבוע, עם חלוקה לפי קבוצות שרירים ומנוחה מסודרת.
-הכי חשוב לשמור על עקביות, להקשיב לגוף ולעבוד בצורה שמתאימה לכם. אימון טוב נמדד לא רק בכמות, אלא גם באיכות."
-        variant="response"
+      <Checkbox value={checked} onCheck={(val) => setChecked(val)} label="תלחץ עליי" />
+      <Checkbox
+        value={checked}
+        onCheck={(val) => setChecked(val)}
+        label="My label is on the other side"
+        direction="ltr"
       />
 
-      <SendButton onPress={() => console.log("pressed")} />
+      <ProgressBar value={progress} maxValue={100} />
 
-      <Tabs items={tabs1} value={active1} setValue={(val) => setActive1(val)} />
-      <Tabs items={tabs2} value={active2} setValue={(val) => setActive2(val)} />
-      <Tabs items={tabs3} value={active3} setValue={(val) => setActive3(val)} />
+      <Input
+        placeholder="enter progress number to test bar"
+        inputMode="numeric"
+        onChangeText={(val) => setProgress(val)}
+      />
+      <Text>Max is 100</Text>
 
-      <Text>active1-{active1}</Text>
-      <Text>active2-{active2}</Text>
-      <Text>active3-{active3}</Text>
+      <Badge children="just text" disabled />
+      <Badge
+        showDot
+        children={
+          <View style={[, layout.flexRow, layout.itemsCenter, layout.widthFull]}>
+            <Text>Rendering custom children</Text>
+
+            <View style={layout.alignSelfEnd}>
+              <SecondaryButton
+                size="sm"
+                shadow={false}
+                disabled
+                leftIcon="arrowLeft"
+                children="לצפיה"
+              />
+            </View>
+          </View>
+        }
+        disabled
+      />
+      <Badge children="with dot" disabled showDot />
+      <Badge
+        children="with button | and dot | and pressable "
+        onPress={() => console.log("i have been pressed")}
+        showDot
+        showButton
+      />
+      <Badge
+        children="with custom button label "
+        onPress={() => console.log("i have been pressed")}
+        showDot
+        showButton
+        buttonLabel="press me father"
+      />
+      <Badge
+        children="with custom button icon "
+        onPress={() => console.log("i have been pressed")}
+        showDot
+        showButton
+        buttonIcon="bell"
+      />
     </View>
   );
 };
