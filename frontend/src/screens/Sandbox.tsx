@@ -67,10 +67,24 @@ const Sandbox = () => {
       />
       <Badge children="with dot" disabled showDot />
       <Badge
-        children="with button | and balls | and me "
+        children="with button | and dot | and pressable "
         onPress={() => console.log("i have been pressed")}
         showDot
         showButton
+      />
+      <Badge
+        children="with custom button label "
+        onPress={() => console.log("i have been pressed")}
+        showDot
+        showButton
+        buttonLabel="press me father"
+      />
+      <Badge
+        children="with custom button icon "
+        onPress={() => console.log("i have been pressed")}
+        showDot
+        showButton
+        buttonIcon="bell"
       />
     </View>
   );
