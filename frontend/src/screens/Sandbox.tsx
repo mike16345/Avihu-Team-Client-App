@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import Card from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import Icon from "@/components/Icon/Icon";
 
 const Sandbox = () => {
@@ -20,39 +20,55 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <Card body={<Text>white</Text>} />
-      <Card body={<Text>grey</Text>} variant="gray" />
+      <Card>
+        <Card.content>
+          <Text>white</Text>
+        </Card.content>
+      </Card>
 
-      <Card
-        body={
+      <Card variant="gray">
+        <Card.content>
+          <Text>grey</Text>
+        </Card.content>
+      </Card>
+
+      <Card>
+        <Card.header>
+          <Text>Heading</Text>
+        </Card.header>
+
+        <Card.content>
           <View style={[{ height: 100 }, colors.backgroundSuccessContainer]}>
             <Text>Act like im an image</Text>
           </View>
-        }
-        header={<Text>Heading</Text>}
-        footer={
+        </Card.content>
+
+        <Card.footer>
           <View style={[layout.flexRow, spacing.gapDefault]}>
             <Icon name="bell" />
             <Icon name="camera" />
           </View>
-        }
-      />
-      <Card
-        style={[spacing.gapXxl, colors.backdrop]}
-        variant="gray"
-        body={
+        </Card.footer>
+      </Card>
+
+      <Card style={[colors.backgroundError, spacing.gapXxl]}>
+        <Card.header>
+          <Text style={{ textAlign: "left" }}>Heading</Text>
+        </Card.header>
+
+        <Card.content>
           <View style={[{ height: 100 }, colors.backgroundSuccessContainer]}>
             <Text>Act like im an image</Text>
           </View>
-        }
-        header={<Text style={{ textAlign: "left" }}>Heading</Text>}
-        footer={
+        </Card.content>
+
+        <Card.footer>
           <View style={[layout.flexRow, spacing.gapDefault]}>
             <Icon name="bell" />
             <Icon name="camera" />
           </View>
-        }
-      />
+        </Card.footer>
+      </Card>
     </View>
   );
 };

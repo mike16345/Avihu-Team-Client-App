@@ -1,31 +1,36 @@
 import { StyleProp, View, ViewStyle } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import { ReactNode } from "react";
 import FrameShadow from "./FrameShadow";
-import { ConditionalRender } from "./ConditionalRender";
+import { ChildrenProp } from "@/interfaces";
 
-interface Cardprops {
+interface Cardprops extends ChildrenProp {
   variant?: "gray" | "white";
-  header?: ReactNode;
-  body: ReactNode;
-  // Internal debate wether to call this children or body. children isnt as clear as to what is section of the card im passing to, but it allows you to pass the items in between the tags as opposed to in the props.
-  footer?: ReactNode;
   style?: StyleProp<ViewStyle>;
 }
 
-const Card: React.FC<Cardprops> = ({ body, variant = "white", footer, header, style }) => {
+interface CardSubComponent {
+  ({ children }: ChildrenProp): JSX.Element;
+}
+
+interface CompoundCard extends React.FC<Cardprops> {
+  header: CardSubComponent;
+  content: CardSubComponent;
+  footer: CardSubComponent;
+}
+
+export const Card: CompoundCard = ({ children, variant = "white", style }) => {
   const { colors, common, spacing } = useStyles();
 
-  const variantStyles =
-    variant == "white"
-      ? [colors.backgroundSurface, colors.outline]
-      : [colors.backgroundSecondary, colors.borderSurface];
+  const variantStyles = {
+    white: [colors.backgroundSurface, colors.outline],
+    gray: [colors.backgroundSecondary, colors.borderSurface],
+  };
 
   return (
     <FrameShadow>
       <View
         style={[
-          variantStyles,
+          variantStyles[variant],
           common.borderSm,
           spacing.pdDefault,
           common.roundedSm,
@@ -33,14 +38,12 @@ const Card: React.FC<Cardprops> = ({ body, variant = "white", footer, header, st
           style,
         ]}
       >
-        <ConditionalRender condition={header}>{header}</ConditionalRender>
-
-        {body}
-
-        <ConditionalRender condition={footer}>{footer}</ConditionalRender>
+        {children}
       </View>
     </FrameShadow>
   );
 };
 
-export default Card;
+Card.header = ({ children }: ChildrenProp) => <View>{children}</View>;
+Card.content = ({ children }: ChildrenProp) => <View>{children}</View>;
+Card.footer = ({ children }: ChildrenProp) => <View>{children}</View>;
