@@ -15,6 +15,8 @@ interface CustomModalProps extends Props {
 
 export const CustomModal: FC<CustomModalProps> = ({
   style,
+  dismissable = false,
+  dismissableBackButton = true,
   onDismiss,
   title,
   dismissIcon = "close",
@@ -35,11 +37,11 @@ export const CustomModal: FC<CustomModalProps> = ({
           spacing.pdStatusBar,
           spacing.gapDefault,
         ]}
+        dismissable={dismissable}
+        dismissableBackButton={dismissableBackButton}
         {...props}
       >
-        <View
-          style={[layout.sizeFull, spacing.gapDefault, spacing.pdStatusBar, spacing.pdBottomBar]}
-        >
+        <View style={[layout.sizeFull, spacing.gapDefault, spacing.pdStatusBar]}>
           <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
             <TouchableOpacity onPress={onDismiss}>
               <Icon name={dismissIcon} />
@@ -70,5 +72,8 @@ export const CustomModal: FC<CustomModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-  modal: { direction: "rtl", marginTop: -1 }, // For until we figure out the directions
+  modal: {
+    direction: "rtl", // For until we figure out the directions
+    marginTop: -1, // Ensures the portal starts at top of screen
+  },
 });

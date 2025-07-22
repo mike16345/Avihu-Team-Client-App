@@ -28,8 +28,6 @@ const Sandbox = () => {
       <CustomModal
         visible={visible}
         onDismiss={() => setVisible(false)}
-        dismissableBackButton
-        dismissable={false}
         dismissIcon="chevronRightBig"
         title={
           <View
