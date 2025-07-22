@@ -28,7 +28,7 @@ const Card: React.FC<Cardprops> = ({ body, variant = "white", footer, header, st
           variantStyles,
           common.borderSm,
           spacing.pdDefault,
-          common.rounded,
+          common.roundedSm,
           spacing.gapDefault,
           style,
         ]}
