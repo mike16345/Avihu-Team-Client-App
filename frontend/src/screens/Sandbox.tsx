@@ -4,11 +4,13 @@ import { useState } from "react";
 
 import { CustomModal } from "@/components/ui/Modal";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
+import Tabs from "@/components/ui/Tabs";
 
 const Sandbox = () => {
   const { colors, spacing, layout, common } = useStyles();
 
   const [visible, setVisible] = useState(false);
+  const [tab, setTab] = useState(`1`);
 
   return (
     <View
@@ -19,11 +21,19 @@ const Sandbox = () => {
         colors.background,
         layout.sizeFull,
         spacing.gapDefault,
-        { direction: "rtl" },
       ]}
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
       <PrimaryButton children="Open Modal" block onPress={() => setVisible(true)} />
+
+      <Tabs
+        items={[
+          { label: `1`, value: `1` },
+          { label: `2`, value: `2` },
+        ]}
+        value={tab}
+        setValue={(v) => setTab(v)}
+      />
 
       <CustomModal visible={visible} onDismiss={() => setVisible(false)}>
         <CustomModal.Header dismissIcon="chevronRightBig">

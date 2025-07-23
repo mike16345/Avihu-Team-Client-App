@@ -4,6 +4,7 @@ import * as Updates from "expo-updates";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const RTL_FIX_KEY = "rtl_restarted_once";
+const isDevMode = process.env.EXPO_PUBLIC_MODE;
 
 export const useOneTimeRTLFix = () => {
   const [ready, setReady] = useState(false);
@@ -13,9 +14,14 @@ export const useOneTimeRTLFix = () => {
       try {
         const alreadyApplied = await AsyncStorage.getItem(RTL_FIX_KEY);
 
-        if (!alreadyApplied && I18nManager.isRTL) {
-          I18nManager.allowRTL(false);
-          I18nManager.forceRTL(false);
+        console.log(`already applied`, alreadyApplied);
+
+        if (!alreadyApplied && !I18nManager.isRTL) {
+          console.log(`calling this block`);
+
+          I18nManager.allowRTL(true);
+          I18nManager.forceRTL(true);
+
           await AsyncStorage.setItem(RTL_FIX_KEY, "true");
 
           await Updates.reloadAsync(); // Trigger one-time reload
@@ -31,6 +37,12 @@ export const useOneTimeRTLFix = () => {
     };
 
     applyRTLFix();
+
+    return () => {
+      if (isDevMode) {
+        AsyncStorage.removeItem(RTL_FIX_KEY);
+      }
+    };
   }, []);
 
   return ready;
