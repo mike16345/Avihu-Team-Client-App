@@ -1,5 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   TouchableOpacity,
   View,
@@ -10,49 +10,50 @@ import {
   ViewProps,
   ViewStyle,
   StyleProp,
+  Animated,
 } from "react-native";
 import Icon from "../Icon/Icon";
 import { Text } from "./Text";
 import { IconName } from "@/constants/iconMap";
 import { ConditionalRender } from "./ConditionalRender";
-import FrameShadow from "./FrameShadow";
+import { Card } from "./Card";
+import { ModalContextProvider, useModalContext } from "@/context/useModal";
 
-interface CustomModalProps extends Omit<ModalProps, "onDismiss"> {
+interface CustomModalProps extends ModalProps {
   style?: StyleProp<ViewStyle>;
 }
 
-type HeaderProps = ViewProps & { onDismiss?: () => void; dismissIcon?: IconName };
+type HeaderProps = ViewProps & { dismissIcon?: IconName };
 
 interface CompoundModal extends React.FC<CustomModalProps> {
   Header: React.FC<HeaderProps>;
   Content: React.FC<ViewProps>;
 }
 
-export const CustomModal: CompoundModal = ({ children, ...props }) => {
+export const CustomModal: CompoundModal = ({ children, onDismiss, visible, ...props }) => {
   const { colors, layout, spacing } = useStyles();
 
-  return (
-    <Modal {...props}>
-      <View
-        style={[
-          colors.background,
-          layout.sizeFull,
-          spacing.gapDefault,
-          spacing.pdStatusBar,
-          spacing.pdBottomBar,
-          spacing.pdLg,
-          spacing.gapDefault,
-          { paddingTop: spacing?.pdStatusBar?.paddingTop * 2 },
-        ]}
-      >
-        {children}
-      </View>
-    </Modal>
-  );
-};
+  const opcaity = useRef(new Animated.Value(0)).current;
 
-CustomModal.Header = ({ children, style, onDismiss, dismissIcon = "close", ...props }) => {
-  const { layout, spacing, colors, fonts } = useStyles();
+  const handleDismiss = () => {
+    if (!onDismiss) return;
+
+    Animated.timing(opcaity, {
+      toValue: 0,
+      useNativeDriver: true,
+      duration: 300,
+    }).start(() => onDismiss());
+  };
+
+  useEffect(() => {
+    if (!visible) return;
+
+    Animated.timing(opcaity, {
+      toValue: 1,
+      useNativeDriver: true,
+      duration: 300,
+    }).start();
+  }, [visible]);
 
   useEffect(() => {
     if (Platform.OS !== "android") return;
@@ -71,6 +72,34 @@ CustomModal.Header = ({ children, style, onDismiss, dismissIcon = "close", ...pr
   }, [onDismiss]);
 
   return (
+    <Modal visible={visible} {...props}>
+      <Animated.View
+        style={[
+          colors.background,
+          layout.sizeFull,
+          spacing.gapDefault,
+          spacing.pdStatusBar,
+          spacing.pdBottomBar,
+          spacing.pdLg,
+          spacing.gapDefault,
+          {
+            opacity: opcaity,
+            paddingTop: spacing?.pdStatusBar?.paddingTop * 2,
+            paddingBottom: spacing.pdBottomBar.paddingBottom * 2,
+          },
+        ]}
+      >
+        <ModalContextProvider onDismiss={handleDismiss}>{children}</ModalContextProvider>
+      </Animated.View>
+    </Modal>
+  );
+};
+
+CustomModal.Header = ({ children, style, dismissIcon = "close", ...props }) => {
+  const { layout, spacing, colors, fonts } = useStyles();
+  const { onDismiss } = useModalContext();
+
+  return (
     <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter, style]} {...props}>
       <TouchableOpacity onPress={onDismiss}>
         <Icon name={dismissIcon} />
@@ -85,24 +114,10 @@ CustomModal.Header = ({ children, style, onDismiss, dismissIcon = "close", ...pr
   );
 };
 
-CustomModal.Content = ({ children, style, ...props }) => {
-  const { spacing, colors, common } = useStyles();
-
+CustomModal.Content = ({ children, style }) => {
   return (
-    <FrameShadow>
-      <View
-        style={[
-          colors.backgroundSecondary,
-          common.borderSm,
-          colors.borderSurface,
-          common.rounded,
-          spacing.pdDefault,
-          style,
-        ]}
-        {...props}
-      >
-        {children}
-      </View>
-    </FrameShadow>
+    <Card style={style} variant="gray">
+      {children}
+    </Card>
   );
 };

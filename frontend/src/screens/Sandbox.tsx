@@ -25,8 +25,8 @@ const Sandbox = () => {
       <Text style={[colors.textPrimary]}>Sandbox</Text>
       <PrimaryButton children="Open Modal" block onPress={() => setVisible(true)} />
 
-      <CustomModal visible={visible}>
-        <CustomModal.Header onDismiss={() => setVisible(false)} dismissIcon="chevronRightBig">
+      <CustomModal visible={visible} onDismiss={() => setVisible(false)}>
+        <CustomModal.Header dismissIcon="chevronRightBig">
           <View
             style={[
               colors.backgroundSurface,
