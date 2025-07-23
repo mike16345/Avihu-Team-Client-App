@@ -10,7 +10,7 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
 import { DarkTheme as CustomDarkTheme, ThemeProvider } from "@/themes/useAppTheme";
-import { Appearance, I18nManager } from "react-native";
+import { Appearance, I18nManager, Platform, View } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import Toast from "react-native-toast-message";
@@ -29,8 +29,8 @@ const { DarkTheme } = adaptNavigationTheme({
   reactNavigationDark: NavigationDarkTheme,
 });
 
-I18nManager.forceRTL(false);
-I18nManager.allowRTL(false);
+/* I18nManager.forceRTL(false);
+I18nManager.allowRTL(false); */
 
 export default function App() {
   const ready = useOneTimeRTLFix();
@@ -39,6 +39,8 @@ export default function App() {
     Assistant: require("./assets/fonts/Assistant-VariableFont_wght.ttf"),
   });
 
+  const direction = Platform.OS == "ios" ? { direction: "rtl" } : {};
+
   if (!loaded || !ready) return;
 
   return (
@@ -46,7 +48,8 @@ export default function App() {
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            {/*  <PersistQueryClientProvider
+            <View style={[direction]}>
+              {/*  <PersistQueryClientProvider
               client={queryClient}
               persistOptions={{ persister: persister }}
             >
@@ -58,7 +61,8 @@ export default function App() {
                 <Update />
               </NavigationContainer>
             </PersistQueryClientProvider> */}
-            <Sandbox />
+              <Sandbox />
+            </View>
           </SafeAreaProvider>
         </GestureHandlerRootView>
       </ThemeProvider>
