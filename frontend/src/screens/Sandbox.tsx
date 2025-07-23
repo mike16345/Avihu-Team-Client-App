@@ -25,16 +25,31 @@ const Sandbox = () => {
       <Text style={[colors.textPrimary]}>Sandbox</Text>
       <PrimaryButton children="Open Modal" block onPress={() => setVisible(true)} />
 
-      <CustomModal
-        visible={visible}
-        onDismiss={() => setVisible(false)}
-        dismissIcon="chevronRightBig"
-      >
-        <ScrollView contentContainerStyle={spacing.gapDefault}>
-          {Array.from({ length: 50 }).map((_, i) => (
-            <Text key={i}>I am index number {i}</Text>
-          ))}
-        </ScrollView>
+      <CustomModal visible={visible}>
+        <CustomModal.Header onDismiss={() => setVisible(false)} dismissIcon="chevronRightBig">
+          <View
+            style={[
+              colors.backgroundSurface,
+              common.borderXsm,
+              colors.outline,
+              layout.center,
+              spacing.gapDefault,
+              common.rounded,
+              layout.flex1,
+              { height: 35 },
+            ]}
+          >
+            <Text>חלבונים</Text>
+          </View>
+        </CustomModal.Header>
+
+        <CustomModal.Content>
+          <ScrollView contentContainerStyle={spacing.gapDefault}>
+            {Array.from({ length: 50 }).map((_, i) => (
+              <Text key={i}>I am index number {i}</Text>
+            ))}
+          </ScrollView>
+        </CustomModal.Content>
       </CustomModal>
     </View>
   );
