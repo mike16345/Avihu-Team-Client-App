@@ -1,25 +1,26 @@
-import { StyleProp, View, ViewStyle } from "react-native";
+import { StyleProp, View, ViewProps, ViewStyle } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import FrameShadow from "./FrameShadow";
-import { ChildrenProp } from "@/interfaces";
+import { PropsWithChildren } from "react";
 
-interface Cardprops extends ChildrenProp {
+interface CardProps extends PropsWithChildren {
   variant?: "gray" | "white";
   style?: StyleProp<ViewStyle>;
 }
 
-interface CardSubComponent {
-  ({ children }: ChildrenProp): JSX.Element;
-}
+type CardSubComponentProps = ViewProps;
 
-interface CompoundCard extends React.FC<Cardprops> {
-  header: CardSubComponent;
-  content: CardSubComponent;
-  footer: CardSubComponent;
+interface CompoundCard extends React.FC<CardProps> {
+  Header: React.FC<CardSubComponentProps>;
+  Content: React.FC<CardSubComponentProps>;
+  Footer: React.FC<CardSubComponentProps>;
 }
 
 export const Card: CompoundCard = ({ children, variant = "white", style }) => {
-  const { colors, common, spacing } = useStyles();
+  const { colors, common, spacing, fonts } = useStyles();
+
+  spacing.pdDefault.padding;
+  fonts.lg;
 
   const variantStyles = {
     white: [colors.backgroundSurface, colors.outline],
@@ -44,6 +45,18 @@ export const Card: CompoundCard = ({ children, variant = "white", style }) => {
   );
 };
 
-Card.header = ({ children }: ChildrenProp) => <View>{children}</View>;
-Card.content = ({ children }: ChildrenProp) => <View>{children}</View>;
-Card.footer = ({ children }: ChildrenProp) => <View>{children}</View>;
+Card.Header = ({ children, style, ...props }: CardSubComponentProps) => (
+  <View style={style} {...props}>
+    {children}
+  </View>
+);
+Card.Content = ({ children, style, ...props }: CardSubComponentProps) => (
+  <View style={style} {...props}>
+    {children}
+  </View>
+);
+Card.Footer = ({ children, style, ...props }: CardSubComponentProps) => (
+  <View style={style} {...props}>
+    {children}
+  </View>
+);

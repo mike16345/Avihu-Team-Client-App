@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 
-const baseFontSize = 16;
+export const baseFontSize = 16;
 
 const useFontSize = () => {
   const { fontScale } = useWindowDimensions();

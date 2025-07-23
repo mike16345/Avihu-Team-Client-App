@@ -21,53 +21,51 @@ const Sandbox = () => {
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
       <Card>
-        <Card.content>
+        <Card.Content>
           <Text>white</Text>
-        </Card.content>
+        </Card.Content>
       </Card>
 
       <Card variant="gray">
-        <Card.content>
+        <Card.Content>
           <Text>grey</Text>
-        </Card.content>
+        </Card.Content>
       </Card>
 
       <Card>
-        <Card.header>
+        <Card.Header>
           <Text>Heading</Text>
-        </Card.header>
+        </Card.Header>
 
-        <Card.content>
+        <Card.Content>
           <View style={[{ height: 100 }, colors.backgroundSuccessContainer]}>
             <Text>Act like im an image</Text>
           </View>
-        </Card.content>
+        </Card.Content>
 
-        <Card.footer>
+        <Card.Footer>
           <View style={[layout.flexRow, spacing.gapDefault]}>
             <Icon name="bell" />
             <Icon name="camera" />
           </View>
-        </Card.footer>
+        </Card.Footer>
       </Card>
 
       <Card style={[colors.backgroundError, spacing.gapXxl]}>
-        <Card.header>
+        <Card.Header>
           <Text style={{ textAlign: "left" }}>Heading</Text>
-        </Card.header>
+        </Card.Header>
 
-        <Card.content>
+        <Card.Content>
           <View style={[{ height: 100 }, colors.backgroundSuccessContainer]}>
             <Text>Act like im an image</Text>
           </View>
-        </Card.content>
+        </Card.Content>
 
-        <Card.footer>
-          <View style={[layout.flexRow, spacing.gapDefault]}>
-            <Icon name="bell" />
-            <Icon name="camera" />
-          </View>
-        </Card.footer>
+        <Card.Footer style={[colors.backdrop]}>
+          <Icon name="bell" />
+          <Icon name="camera" />
+        </Card.Footer>
       </Card>
     </View>
   );
