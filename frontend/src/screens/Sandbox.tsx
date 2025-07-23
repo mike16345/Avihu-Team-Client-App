@@ -29,21 +29,6 @@ const Sandbox = () => {
         visible={visible}
         onDismiss={() => setVisible(false)}
         dismissIcon="chevronRightBig"
-        title={
-          <View
-            style={[
-              colors.backgroundSurface,
-              layout.center,
-              spacing.pdDefault,
-              common.rounded,
-              colors.outline,
-              ,
-              common.borderXsm,
-            ]}
-          >
-            <Text>חלבונים</Text>
-          </View>
-        }
       >
         <ScrollView contentContainerStyle={spacing.gapDefault}>
           {Array.from({ length: 50 }).map((_, i) => (

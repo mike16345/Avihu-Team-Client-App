@@ -1,79 +1,91 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { FC, ReactNode } from "react";
-import { StyleSheet, TouchableOpacity, useWindowDimensions, View } from "react-native";
-import { Modal, Portal } from "react-native-paper";
-import { Props } from "react-native-paper/lib/typescript/components/Modal";
+import { FC, ReactNode, useEffect } from "react";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+  Modal,
+  ModalProps,
+  Platform,
+  BackHandler,
+} from "react-native";
 import Icon from "../Icon/Icon";
 import { Text } from "./Text";
 import { IconName } from "@/constants/iconMap";
 import { ConditionalRender } from "./ConditionalRender";
+import FrameShadow from "./FrameShadow";
 
-interface CustomModalProps extends Props {
+interface CustomModalProps extends ModalProps {
   title?: ReactNode;
   dismissIcon?: IconName;
 }
 
 export const CustomModal: FC<CustomModalProps> = ({
-  style,
-  dismissable = false,
-  dismissableBackButton = true,
   onDismiss,
   title,
   dismissIcon = "close",
   ...props
 }) => {
-  const { colors, common, layout, spacing } = useStyles();
+  const { colors, common, layout, spacing, fonts } = useStyles();
   const { height } = useWindowDimensions();
 
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+
+    const onBackPress = () => {
+      if (onDismiss) {
+        onDismiss();
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+    return () => backHandler.remove();
+  }, [onDismiss]);
+
   return (
-    <Portal>
-      <Modal
+    <Modal {...props}>
+      <View
         style={[
           colors.background,
-          { height },
-          styles.modal,
-          spacing.pdLg,
-          spacing.pdBottomBar,
-          spacing.pdStatusBar,
+          layout.sizeFull,
           spacing.gapDefault,
+          spacing.pdStatusBar,
+          spacing.pdBottomBar,
+          spacing.pdLg,
+          spacing.gapDefault,
+          { paddingTop: spacing?.pdStatusBar?.paddingTop * 2 },
         ]}
-        dismissable={dismissable}
-        dismissableBackButton={dismissableBackButton}
-        {...props}
       >
-        <View style={[layout.sizeFull, spacing.gapDefault, spacing.pdStatusBar]}>
-          <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
-            <TouchableOpacity onPress={onDismiss}>
-              <Icon name={dismissIcon} />
-            </TouchableOpacity>
+        <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
+          <TouchableOpacity onPress={onDismiss}>
+            <Icon name={dismissIcon} />
+          </TouchableOpacity>
 
-            <ConditionalRender condition={typeof title === "string"}>
-              <Text style={colors.textPrimary}>{title}</Text>
-            </ConditionalRender>
+          <ConditionalRender condition={typeof title === "string"}>
+            <Text style={[colors.textPrimary, fonts.lg]}>{title}</Text>
+          </ConditionalRender>
 
-            <ConditionalRender condition={typeof title !== "string"}>{title}</ConditionalRender>
-          </View>
+          <ConditionalRender condition={typeof title !== "string"}>{title}</ConditionalRender>
+        </View>
+        <FrameShadow>
           <View
             style={[
               colors.backgroundSecondary,
               common.borderSm,
               colors.borderSurface,
-              layout.flex1,
+              { height: height * 0.8 },
               common.rounded,
               spacing.pdDefault,
             ]}
           >
             {props.children}
           </View>
-        </View>
-      </Modal>
-    </Portal>
+        </FrameShadow>
+      </View>
+    </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  modal: {
-    direction: "rtl", // For until we figure out the directions
-    marginTop: -1, // Ensures the portal starts at top of screen
-  },
-});
