@@ -5,8 +5,6 @@ import {
   View,
   Modal,
   ModalProps,
-  Platform,
-  BackHandler,
   ViewProps,
   ViewStyle,
   StyleProp,
@@ -18,16 +16,18 @@ import { IconName } from "@/constants/iconMap";
 import { ConditionalRender } from "./ConditionalRender";
 import { Card } from "./Card";
 import { ModalContextProvider, useModalContext } from "@/context/useModal";
+import useCommonStyles from "@/styles/useCommonStyles";
 
 interface CustomModalProps extends ModalProps {
   style?: StyleProp<ViewStyle>;
 }
 
 type HeaderProps = ViewProps & { dismissIcon?: IconName };
+type ContentProps = ViewProps & { variant?: "gray" | "white" };
 
 interface CompoundModal extends React.FC<CustomModalProps> {
   Header: React.FC<HeaderProps>;
-  Content: React.FC<ViewProps>;
+  Content: React.FC<ContentProps>;
 }
 
 export const CustomModal: CompoundModal = ({ children, onDismiss, visible, ...props }) => {
@@ -55,24 +55,8 @@ export const CustomModal: CompoundModal = ({ children, onDismiss, visible, ...pr
     }).start();
   }, [visible]);
 
-  useEffect(() => {
-    if (Platform.OS !== "android") return;
-
-    const onBackPress = () => {
-      if (onDismiss) {
-        onDismiss();
-        return true;
-      }
-      return false;
-    };
-
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", onBackPress);
-
-    return () => backHandler.remove();
-  }, [onDismiss]);
-
   return (
-    <Modal visible={visible} {...props}>
+    <Modal visible={visible} onRequestClose={handleDismiss} {...props}>
       <Animated.View
         style={[
           colors.background,
@@ -114,9 +98,11 @@ CustomModal.Header = ({ children, style, dismissIcon = "close", ...props }) => {
   );
 };
 
-CustomModal.Content = ({ children, style }) => {
+CustomModal.Content = ({ children, variant = "gray", style }) => {
+  const { roundedMd } = useCommonStyles();
+
   return (
-    <Card style={style} variant="gray">
+    <Card style={[roundedMd, style]} variant={variant}>
       {children}
     </Card>
   );

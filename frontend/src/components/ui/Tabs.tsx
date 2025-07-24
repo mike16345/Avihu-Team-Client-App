@@ -56,7 +56,7 @@ const Tabs: React.FC<TabsProps> = ({ items, setValue, value }) => {
         common.rounded,
         colors.outline,
         common.borderXsm,
-        { height: 35, position: "relative" },
+        { height: 35, position: "relative", zIndex: 1 },
       ]}
     >
       <Animated.View

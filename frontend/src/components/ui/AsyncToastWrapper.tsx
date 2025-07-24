@@ -39,7 +39,7 @@ const AsyncToastWrapper: React.FC<AsyncToastWrapperProps> = ({
         useNativeDriver: true,
       }),
       Animated.timing(toastTranslateY, {
-        toValue: -50,
+        toValue: -contentHeight / 1.5,
         duration: 300,
         useNativeDriver: true,
       }),

@@ -29,9 +29,6 @@ const { DarkTheme } = adaptNavigationTheme({
   reactNavigationDark: NavigationDarkTheme,
 });
 
-/* I18nManager.forceRTL(false);
-I18nManager.allowRTL(false); */
-
 export default function App() {
   const ready = useOneTimeRTLFix();
   const colorScheme = Appearance.getColorScheme();

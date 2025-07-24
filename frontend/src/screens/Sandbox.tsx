@@ -1,10 +1,17 @@
 import { View, Text, ScrollView } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { useState } from "react";
-
 import { CustomModal } from "@/components/ui/Modal";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import Tabs from "@/components/ui/Tabs";
+import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
+import IconButton from "@/components/ui/buttons/IconButton";
+import SendButton from "@/components/ui/chat/SendButton";
+import ProgressBar from "@/components/ui/ProgressBar";
+import Input from "@/components/ui/Input";
+import ChatInput from "@/components/ui/chat/ChatInput";
+import ChatBubble from "@/components/ui/chat/ChatBubble";
+import AsyncToastWrapper from "@/components/ui/AsyncToastWrapper";
 
 const Sandbox = () => {
   const { colors, spacing, layout, common } = useStyles();
@@ -24,7 +31,29 @@ const Sandbox = () => {
       ]}
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
-      <PrimaryButton children="Open Modal" block onPress={() => setVisible(true)} />
+      <PrimaryButton children="Open Modal" icon="like" block onPress={() => setVisible(true)} />
+      <SecondaryButton
+        children="היסטוררית דיווחים"
+        leftIcon="like"
+        rightIcon="arrowLeft"
+        onPress={() => setVisible(true)}
+      />
+      <IconButton icon="arrowRoundRightSmall" />
+      <SendButton onPress={() => console.log("pressed")} />
+      <ProgressBar maxValue={100} value={20} />
+      <Input placeholder="type" />
+      <ChatInput placeholder="type me" />
+      <ChatBubble
+        text="kaka djcjk ckjndjcn cndsjkndsj dcjkndcjnds jnjkdcndscnjkds cjnsdjkcnsd"
+        variant="prompt"
+      />
+      <ChatBubble
+        text="kaka djcjk ckjndjcn cndsjkndsj dcjkndcjnds jnjkdcndscnjkds cjnsdjkcnsd"
+        variant="response"
+      />
+      <AsyncToastWrapper onPress={() => console.log("success")}>
+        <PrimaryButton children={"hello"} block disabled />
+      </AsyncToastWrapper>
 
       <Tabs
         items={[

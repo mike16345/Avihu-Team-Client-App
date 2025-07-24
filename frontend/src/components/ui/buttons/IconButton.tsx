@@ -12,10 +12,10 @@ interface IconButtonProps {
 }
 
 const IconButton: React.FC<IconButtonProps> = ({ icon, onPress, disabled }) => {
-  const { colors, common, spacing } = useStyles();
+  const { colors, common, spacing, layout } = useStyles();
 
   return (
-    <ButtonShadow>
+    <ButtonShadow style={layout.alignSelfStart}>
       <TouchableOpacity
         onPress={onPress}
         disabled={disabled}
@@ -25,6 +25,7 @@ const IconButton: React.FC<IconButtonProps> = ({ icon, onPress, disabled }) => {
           common.rounded,
           common.borderXsm,
           colors.outline,
+          layout.alignSelfStart,
         ]}
       >
         <Icon name={icon} />
