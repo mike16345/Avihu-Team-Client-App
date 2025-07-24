@@ -14,11 +14,7 @@ export const useOneTimeRTLFix = () => {
       try {
         const alreadyApplied = await AsyncStorage.getItem(RTL_FIX_KEY);
 
-        console.log(`already applied`, alreadyApplied);
-
         if (!alreadyApplied && !I18nManager.isRTL) {
-          console.log(`calling this block`);
-
           I18nManager.allowRTL(true);
           I18nManager.forceRTL(true);
 
