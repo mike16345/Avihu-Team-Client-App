@@ -1,23 +1,25 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
+import Collapsible from "@/components/ui/Collapsible";
 import { useState } from "react";
-import { CustomModal } from "@/components/ui/Modal";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
-import Tabs from "@/components/ui/Tabs";
-import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
-import IconButton from "@/components/ui/buttons/IconButton";
-import SendButton from "@/components/ui/chat/SendButton";
-import ProgressBar from "@/components/ui/ProgressBar";
-import Input from "@/components/ui/Input";
-import ChatInput from "@/components/ui/chat/ChatInput";
-import ChatBubble from "@/components/ui/chat/ChatBubble";
-import AsyncToastWrapper from "@/components/ui/AsyncToastWrapper";
+import Icon from "@/components/Icon/Icon";
 
 const Sandbox = () => {
   const { colors, spacing, layout, common } = useStyles();
 
-  const [visible, setVisible] = useState(false);
-  const [tab, setTab] = useState("1");
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
+  const [open3, setOpen3] = useState(false);
+
+  const handleOpenChange = (value: boolean, state: "open" | "open2") => {
+    if (state == "open") {
+      setOpen(value);
+      setOpen2(!value);
+    } else {
+      setOpen2(value);
+      setOpen(!value);
+    }
+  };
 
   return (
     <View
@@ -31,66 +33,42 @@ const Sandbox = () => {
       ]}
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
-      <PrimaryButton children="Open Modal" icon="like" block onPress={() => setVisible(true)} />
-      <SecondaryButton
-        children="היסטוררית דיווחים"
-        leftIcon="like"
-        rightIcon="arrowLeft"
-        onPress={() => setVisible(true)}
-      />
-      <IconButton icon="arrowRoundRightSmall" />
-      <SendButton onPress={() => console.log("pressed")} />
-      <ProgressBar maxValue={100} value={20} />
-      <Input placeholder="type" />
-      <ChatInput placeholder="type me" />
-      <ChatBubble
-        text="kaka djcjk ckjndjcn cndsjkndsj dcjkndcjnds jnjkdcndscnjkds cjnsdjkcnsd"
-        variant="prompt"
-      />
-      <ChatBubble
-        text="kaka djcjk ckjndjcn cndsjkndsj dcjkndcjnds jnjkdcndscnjkds cjnsdjkcnsd"
-        variant="response"
-      />
-      <AsyncToastWrapper onPress={() => console.log("success")}>
-        <PrimaryButton children={"hello"} block disabled />
-      </AsyncToastWrapper>
 
-      <Tabs
-        items={[
-          { label: `1`, value: "1" },
-          { label: `2`, value: "2" },
-          { label: `3`, value: "3" },
-        ]}
-        value={tab}
-        setValue={(v) => setTab(v)}
-      />
-
-      <CustomModal visible={visible} onDismiss={() => setVisible(false)}>
-        <CustomModal.Header dismissIcon="chevronRightBig">
-          <View
-            style={[
-              colors.backgroundSurface,
-              common.borderXsm,
-              colors.outline,
-              layout.center,
-              spacing.gapDefault,
-              common.rounded,
-              layout.flex1,
-              { height: 35 },
-            ]}
-          >
-            <Text>חלבונים</Text>
+      <Collapsible
+        isCollapsed={open}
+        onCollapseChange={(val) => handleOpenChange(val, "open")}
+        trigger="ארוחה 1"
+      >
+        {Array.from({ length: 10 }).map((_, i) => (
+          <Text key={i}>מספר {i}</Text>
+        ))}
+      </Collapsible>
+      <Collapsible
+        isCollapsed={open2}
+        onCollapseChange={(val) => handleOpenChange(val, "open2")}
+        trigger={
+          <View style={[layout.flexRow, layout.justifyBetween]}>
+            <Text>ideal for custom icons (due to rotation)</Text>
+            <Icon name="bell" rotation={open2 ? 12 : 0} />
           </View>
-        </CustomModal.Header>
+        }
+      >
+        {Array.from({ length: 25 }).map((_, i) => (
+          <Text key={i}>מספר {i}</Text>
+        ))}
+      </Collapsible>
 
-        <CustomModal.Content>
-          <ScrollView contentContainerStyle={spacing.gapDefault}>
-            {Array.from({ length: 50 }).map((_, i) => (
-              <Text key={i}>I am index number {i}</Text>
-            ))}
-          </ScrollView>
-        </CustomModal.Content>
-      </CustomModal>
+      <Collapsible
+        variant="white"
+        style={[open3 ? colors.backgroundSuccessContainer : {}, common.borderDefault]}
+        isCollapsed={open3}
+        onCollapseChange={(val) => setOpen3(val)}
+        trigger="ארוחה 2"
+      >
+        {Array.from({ length: 15 }).map((_, i) => (
+          <Text key={i}>מספר {i}</Text>
+        ))}
+      </Collapsible>
     </View>
   );
 };
