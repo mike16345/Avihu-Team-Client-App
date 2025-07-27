@@ -4,6 +4,7 @@ import NativeIcon from "../Icon/NativeIcon";
 import useStyles from "@/styles/useGlobalStyles";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
+import { openSettings } from "expo-linking";
 import { Text } from "../ui/Text";
 import IconButton from "../ui/buttons/IconButton";
 interface SelectUploadTypeProps {
@@ -41,7 +42,7 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
         Alert.alert(
           "דרושה הרשאה",
           "כדי לגשת לתמונות שלך, יש לאפשר הרשאה לספריית המדיה/מצלמה בהגדרות המכשיר.",
-          [{ text: "פתח הגדרות" }, { text: "בטל" }]
+          [{ text: "פתח הגדרות", onPress: () => openSettings() }, { text: "בטל" }]
         );
       }
     }
