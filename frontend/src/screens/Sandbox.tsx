@@ -1,13 +1,12 @@
 import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import Collapsible from "@/components/ui/Collapsible";
 import { useState } from "react";
-import Icon from "@/components/Icon/Icon";
 import CustomCalendar from "@/components/Calendar/CustomCalendar";
 
 const Sandbox = () => {
   const { colors, spacing, layout, common } = useStyles();
 
+  const [date, setDate] = useState<string | undefined>();
   return (
     <View
       style={[
@@ -21,7 +20,9 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <CustomCalendar />
+      <CustomCalendar onSelect={(date) => setDate(date)} />
+
+      <Text>{date}</Text>
     </View>
   );
 };
