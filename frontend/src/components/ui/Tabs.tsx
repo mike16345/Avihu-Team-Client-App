@@ -1,11 +1,4 @@
-import {
-  View,
-  TouchableOpacity,
-  Animated,
-  LayoutChangeEvent,
-  Dimensions,
-  Platform,
-} from "react-native";
+import { View, TouchableOpacity, Animated, LayoutChangeEvent, Dimensions } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "./Text";
@@ -44,10 +37,9 @@ const Tabs: React.FC<TabsProps> = ({ items, setValue, value }) => {
   useEffect(() => {
     const activeIndex = items.findIndex((item) => item.value === value);
 
-    const index = Platform.OS == "android" ? activeIndex : -activeIndex;
-
     Animated.spring(translateX, {
-      toValue: index * tabWidth,
+      toValue: -activeIndex * tabWidth,
+
       useNativeDriver: true,
     }).start();
   }, [value, tabWidth]);
@@ -57,20 +49,19 @@ const Tabs: React.FC<TabsProps> = ({ items, setValue, value }) => {
       onLayout={onLayout}
       style={[
         layout.flexRow,
-        layout.justifyBetween,
+        layout.justifyEvenly,
         layout.itemsCenter,
         spacing.gapDefault,
         colors.backgroundSecondary,
         common.rounded,
         colors.outline,
         common.borderXsm,
-        { height: 35, position: "relative" },
+        { height: 35, position: "relative", zIndex: 1 },
       ]}
     >
       <Animated.View
         style={{
           position: "absolute",
-          left: 0,
           height: "100%",
           width: tabWidth,
           transform: [{ translateX }],
@@ -94,19 +85,21 @@ const Tabs: React.FC<TabsProps> = ({ items, setValue, value }) => {
         </ButtonShadow>
       </Animated.View>
 
-      {items.map((tab) => (
-        <TouchableOpacity
-          key={tab.label}
-          style={[layout.flex1, layout.heightFull]}
-          onPress={() => setValue(tab.value)}
-        >
-          <ConditionalRender condition={tab.value !== value}>
-            <View style={[layout.center, layout.heightFull]}>
-              <Text style={[text.textCenter, colors.textPrimary]}>{tab.label}</Text>
-            </View>
-          </ConditionalRender>
-        </TouchableOpacity>
-      ))}
+      {items.map((tab) => {
+        return (
+          <TouchableOpacity
+            key={tab.label}
+            style={[layout.flex1, layout.heightFull]}
+            onPress={() => setValue(tab.value)}
+          >
+            <ConditionalRender condition={tab.value !== value}>
+              <View style={[layout.center, layout.heightFull]}>
+                <Text style={[text.textCenter, colors.textPrimary]}>{tab.label}</Text>
+              </View>
+            </ConditionalRender>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };

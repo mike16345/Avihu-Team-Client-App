@@ -13,9 +13,10 @@ export const useOneTimeRTLFix = () => {
       try {
         const alreadyApplied = await AsyncStorage.getItem(RTL_FIX_KEY);
 
-        if (!alreadyApplied && I18nManager.isRTL) {
-          I18nManager.allowRTL(false);
-          I18nManager.forceRTL(false);
+        if (!alreadyApplied && !I18nManager.isRTL) {
+          I18nManager.allowRTL(true);
+          I18nManager.forceRTL(true);
+
           await AsyncStorage.setItem(RTL_FIX_KEY, "true");
 
           await Updates.reloadAsync(); // Trigger one-time reload

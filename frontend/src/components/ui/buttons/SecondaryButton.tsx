@@ -33,7 +33,7 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
   const sizing = size === "sm" ? fonts.sm.fontSize : undefined;
 
   return (
-    <ButtonShadow shadow={shadow}>
+    <ButtonShadow style={layout.alignSelfStart} shadow={shadow}>
       <TouchableOpacity
         disabled={disabled}
         onPress={onPress}

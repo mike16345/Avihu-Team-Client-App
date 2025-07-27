@@ -1,20 +1,21 @@
-import { View } from "react-native";
+import { StyleProp, View, ViewStyle } from "react-native";
 import { useShadowStyles } from "@/styles/useShadowStyles";
 import { ConditionalRender } from "./ConditionalRender";
 
 interface buttonShadowProps {
   children: any;
   shadow?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
-const ButtonShadow: React.FC<buttonShadowProps> = ({ children, shadow = true }) => {
+const ButtonShadow: React.FC<buttonShadowProps> = ({ children, style, shadow = true }) => {
   const { buttonLayer1, buttonLayer2, buttonLayer3, buttonLayer4, buttonLayer5 } =
     useShadowStyles();
 
   return (
     <>
       <ConditionalRender condition={shadow}>
-        <View style={[buttonLayer1]}>
+        <View style={[buttonLayer1, style]}>
           <View style={buttonLayer2}>
             <View style={buttonLayer3}>
               <View style={buttonLayer4}>

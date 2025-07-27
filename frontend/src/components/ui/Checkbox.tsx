@@ -6,21 +6,21 @@ import Icon from "../Icon/Icon";
 import { ConditionalRender } from "./ConditionalRender";
 
 interface CheckboxProps {
-  value?: boolean;
+  isChecked?: boolean;
   onCheck: (val: boolean) => void;
   label?: string;
   direction?: "rtl" | "ltr";
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({ onCheck, value, label, direction = "rtl" }) => {
+const Checkbox: React.FC<CheckboxProps> = ({ onCheck, isChecked, label, direction = "rtl" }) => {
   const { colors, common, layout, spacing } = useStyles();
 
-  const background = value ? colors.backgroundPrimary : {};
+  const background = isChecked ? colors.backgroundPrimary : {};
   const flexDirection = direction == "rtl" ? layout.flexRow : layout.flexRowReverse;
 
   return (
     <TouchableOpacity
-      onPress={() => onCheck(!value)}
+      onPress={() => onCheck(!isChecked)}
       style={[flexDirection, layout.itemsCenter, spacing.gapDefault, layout.alignSelfStart]}
     >
       <View

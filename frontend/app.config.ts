@@ -58,8 +58,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       eas: {
         projectId: "bbbbb60d-eb47-48fb-a278-517aba8dcea2",
       },
-      supportsRtl: false,
-      forcesRTL: false,
+      supportsRtl: true,
+      forcesRTL: true,
 
       API_URL: process.env.API_URL,
       API_TOKEN: process.env.API_KEY,
