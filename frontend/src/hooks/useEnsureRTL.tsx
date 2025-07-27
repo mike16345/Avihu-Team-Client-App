@@ -4,7 +4,6 @@ import * as Updates from "expo-updates";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const RTL_FIX_KEY = "rtl_restarted_once";
-const isDevMode = process.env.EXPO_PUBLIC_MODE;
 
 export const useOneTimeRTLFix = () => {
   const [ready, setReady] = useState(false);
@@ -33,12 +32,6 @@ export const useOneTimeRTLFix = () => {
     };
 
     applyRTLFix();
-
-    return () => {
-      if (isDevMode) {
-        AsyncStorage.removeItem(RTL_FIX_KEY);
-      }
-    };
   }, []);
 
   return ready;
