@@ -46,7 +46,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
   };
 
   return (
-    <View style={[spacing.gapLg, spacing.pdSm]}>
+    <View style={[spacing.gapSm, spacing.pdSm]}>
       <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונה</Text>
 
       <SelectUploadType returnImage={(image: string) => addImage(image)} />

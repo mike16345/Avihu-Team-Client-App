@@ -1,17 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import BottomDrawer from "./BottomDrawer";
 import ImagePreview from "../WeightGraph/ImagePreview";
+import TriggerWrapper, { TriggerProps } from "./TriggerWrapper";
 
 interface UploadDrawerProps {
-  open: boolean;
-  onClose: () => void;
+  trigger: TriggerProps;
 }
 
-const UploadDrawer: React.FC<UploadDrawerProps> = ({ onClose, open }) => {
+const UploadDrawer: React.FC<UploadDrawerProps> = ({ trigger }) => {
+  const [open, setOpen] = useState(false);
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  console.log("open", open);
+
   return (
-    <BottomDrawer open={open} onClose={onClose}>
-      <ImagePreview handleClose={onClose} />
-    </BottomDrawer>
+    <>
+      <TriggerWrapper trigger={trigger} setOpen={() => setOpen(true)} />
+
+      <BottomDrawer key={open.valueOf()} open={open} onClose={onClose}>
+        <ImagePreview handleClose={onClose} />
+      </BottomDrawer>
+    </>
   );
 };
 

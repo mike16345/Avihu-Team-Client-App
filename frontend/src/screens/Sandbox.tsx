@@ -21,9 +21,8 @@ const Sandbox = () => {
       ]}
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
-      <PrimaryButton children="Open Modal" icon="like" block onPress={() => setVisible(true)} />
 
-      <UploadDrawer open={visible} onClose={() => setVisible(false)} />
+      <UploadDrawer trigger={<PrimaryButton children="Open Modal" icon="like" block />} />
     </View>
   );
 };
