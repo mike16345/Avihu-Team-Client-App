@@ -1,6 +1,12 @@
 import useStyles from "@/styles/useGlobalStyles";
-import React from "react";
-import { Image, View, TouchableOpacity, useWindowDimensions } from "react-native";
+import React, { useState } from "react";
+import {
+  Image,
+  View,
+  TouchableOpacity,
+  useWindowDimensions,
+  LayoutChangeEvent,
+} from "react-native";
 import Icon from "../Icon/Icon";
 import { ConditionalRender } from "../ui/ConditionalRender";
 
@@ -11,16 +17,25 @@ interface DisplayImageProps {
 
 const DisplayImage: React.FC<DisplayImageProps> = ({ images, removeImage }) => {
   const { common, layout, spacing } = useStyles();
-  const { height, width } = useWindowDimensions();
+  const { width } = useWindowDimensions();
+  const [height, setHeight] = useState(0);
+
+  const onLayout = (e: LayoutChangeEvent) => {
+    const currentHeight = e.nativeEvent.layout.height;
+
+    if (currentHeight !== height) {
+      setHeight(currentHeight);
+    }
+  };
 
   return (
-    <View style={{ height: height * 0.35 }}>
+    <View style={[layout.flex1]} onLayout={onLayout}>
       <ConditionalRender condition={images?.length !== 0}>
-        <View style={[layout.flexRow, spacing.gapXl]}>
+        <View style={[layout.flexRow, spacing.gapXl, layout.flex1, spacing.pdDefault]}>
           {images?.map((image, i) => (
             <View
               key={i}
-              style={[spacing.gapDefault, layout.center, { height: height * 0.3, margin: "auto" }]}
+              style={[spacing.gapDefault, layout.center, layout.flex1, { margin: "auto" }]}
             >
               <Image
                 source={{ uri: image }}

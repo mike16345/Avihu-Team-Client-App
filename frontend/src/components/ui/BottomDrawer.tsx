@@ -24,12 +24,9 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
   const slideAnim = useRef(new Animated.Value(height)).current;
 
   const [isVisible, setIsVisible] = useState(open);
-  console.log("is visible", isVisible);
-  console.log("open", open);
 
   useEffect(() => {
     if (open) {
-      console.log("setting isVisible to true");
       setIsVisible(true); // Show the modal when open is true
       Animated.timing(slideAnim, {
         toValue: 0,
@@ -58,7 +55,7 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
         style={[
           styles.drawerContainer,
           colors.backgroundSurface,
-          
+
           {
             height: heightVariant === `fixed` ? height * 0.6 : `auto`,
           },

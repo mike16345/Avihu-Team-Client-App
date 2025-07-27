@@ -14,13 +14,12 @@ interface ImagePreviewProps {
 }
 
 const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
-  const { spacing, text } = useStyles();
+  const { spacing, text, layout } = useStyles();
   const { handleUpload, uploading } = useWeighInPhotosApi();
   const { triggerSuccessToast } = useToast();
   const currentUserId = useUserStore((state) => state.currentUser?._id);
 
   const [images, setImages] = useState<string[]>([]);
-
   const addImage = (image: string) => {
     const newImagesArr = [...images];
 
@@ -46,12 +45,14 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
   };
 
   return (
-    <View style={[spacing.gapSm, spacing.pdSm]}>
+    <View style={[spacing.gapSm, spacing.pdSm, layout.flex1]}>
       <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונה</Text>
 
       <SelectUploadType returnImage={(image: string) => addImage(image)} />
 
-      <DisplayImage images={images} removeImage={(index) => deleteImageByIndex(index)} />
+      <View style={[layout.flex1]}>
+        <DisplayImage images={images} removeImage={(index) => deleteImageByIndex(index)} />
+      </View>
 
       <View style={[spacing.gapLg]}>
         <PrimaryButton

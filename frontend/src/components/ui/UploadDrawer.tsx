@@ -14,8 +14,6 @@ const UploadDrawer: React.FC<UploadDrawerProps> = ({ trigger }) => {
     setOpen(false);
   };
 
-  console.log("open", open);
-
   return (
     <>
       <TriggerWrapper trigger={trigger} setOpen={() => setOpen(true)} />
