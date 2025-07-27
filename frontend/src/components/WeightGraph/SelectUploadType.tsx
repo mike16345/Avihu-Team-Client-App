@@ -1,11 +1,9 @@
 import React, { useEffect } from "react";
-import { Alert, TouchableOpacity, View } from "react-native";
-import NativeIcon from "../Icon/NativeIcon";
+import { Alert, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { openSettings } from "expo-linking";
-import { Text } from "../ui/Text";
 import IconButton from "../ui/buttons/IconButton";
 interface SelectUploadTypeProps {
   returnImage: (image: string) => void;
@@ -19,7 +17,7 @@ const imagePickerOptions: ImagePicker.ImagePickerOptions = {
 };
 
 const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { layout, spacing } = useStyles();
 
   const [status, requestPermission] = ImagePicker.useCameraPermissions();
 

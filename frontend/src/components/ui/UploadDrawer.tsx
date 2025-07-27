@@ -1,4 +1,3 @@
-import { View, Text } from "react-native";
 import React from "react";
 import BottomDrawer from "./BottomDrawer";
 import ImagePreview from "../WeightGraph/ImagePreview";
