@@ -9,6 +9,9 @@ import { useUserStore } from "@/store/userStore";
 import Loader from "../ui/loaders/Loader";
 import Toast from "react-native-toast-message";
 import { Text } from "../ui/Text";
+import IconButton from "../ui/buttons/IconButton";
+import PrimaryButton from "../ui/buttons/PrimaryButton";
+import SelectUploadType from "./SelectUploadType";
 
 interface ImagePreviewProps {
   handleClose: () => void;
@@ -56,13 +59,17 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
     <View style={[spacing.gapLg, spacing.pdSm]}>
       {uploading && <Loader variant="Screen" positionTop={`-90%`} positionLeft={`-5%`} />}
 
+      <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונה</Text>
+
+      <SelectUploadType returnImage={(image: string) => setImageByIndex(selectedImage, image)} />
+
       <DisplayImage
         image={images[selectedImage] ? images[selectedImage] : undefined}
         removeImage={() => deleteimageByIndex(selectedImage)}
         handleImageSelected={(image: string) => setImageByIndex(selectedImage, image)}
       />
       <View style={[spacing.gapLg]}>
-        <View style={[layout.flexRowReverse, layout.center, spacing.gapLg]}>
+        {/*   <View style={[layout.flexRowReverse, layout.center, spacing.gapLg]}>
           <ImagePreviewOption
             handleImageSelect={() => setSelectedImage(0)}
             selected={selectedImage == 0}
@@ -73,24 +80,8 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
             selected={selectedImage == 1}
             image={images[1]}
           />
-        </View>
-        <View style={[layout.flexDirectionByPlatform, layout.center, spacing.gapDefault]}>
-          <Button
-            style={[spacing.pdXs, common.roundedSm, { width: `50%` }]}
-            onPress={handleClose}
-            mode="contained-tonal"
-          >
-            <Text style={[text.textBold, fonts.default]}>בטל</Text>
-          </Button>
-          <Button
-            mode="contained"
-            style={[spacing.pdXs, common.roundedSm, { width: `50%` }]}
-            onPress={uploadImage}
-            disabled={!!(images.length == 0)}
-          >
-            <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>שלח</Text>
-          </Button>
-        </View>
+        </View> */}
+        <PrimaryButton children="שליחה" block disabled={images.length == 0} />
       </View>
     </View>
   );

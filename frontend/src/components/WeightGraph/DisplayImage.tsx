@@ -60,7 +60,6 @@ const DisplayImage: React.FC<DisplayImageProps> = ({ image, removeImage, handleI
           />
           <Text style={colors.textOnBackground}>אין תמונה להצגה!</Text>
           <Text style={colors.textOnBackground}>בחרו אופן העלאת תמונה</Text>
-          <SelectUploadType returnImage={(image: string) => handleImageSelected(image)} />
         </View>
       )}
     </View>
