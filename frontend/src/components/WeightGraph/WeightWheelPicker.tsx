@@ -74,17 +74,6 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
 
   const wheelPickerPropsArray: WheelPickerProps[] = [
     {
-      data: wholeWeightOptions,
-      selectedValue: wholePart,
-      onValueChange: (value) => {
-        handleValueChange([value, decimalPart.toFixed(2)]);
-      },
-      height,
-      itemHeight,
-      activeItemColor,
-      inactiveItemColor,
-    },
-    {
       data: decimalWeightOptions,
       selectedValue: decimalPart.toFixed(2),
       onValueChange: (value) => {
@@ -95,6 +84,19 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       activeItemColor,
       inactiveItemColor,
       label: label,
+      padding: { paddingStart: 12, paddingEnd: 0 },
+    },
+    {
+      data: wholeWeightOptions,
+      selectedValue: wholePart,
+      onValueChange: (value) => {
+        handleValueChange([value, decimalPart.toFixed(2)]);
+      },
+      height,
+      itemHeight,
+      activeItemColor,
+      inactiveItemColor,
+      padding: { paddingEnd: 12, paddingStart: 0 },
     },
   ];
 

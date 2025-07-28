@@ -17,7 +17,7 @@ const SectionWheelPicker: React.FC<SectionWheelPickerProps> = ({
   return (
     <View style={styles.container}>
       {data.map((item, index) => (
-        <View key={index}>
+        <View key={index} style={[item.padding]}>
           <WheelPicker
             {...item}
             selectedValue={selectedValues[index]}
@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
   },
 });
 
