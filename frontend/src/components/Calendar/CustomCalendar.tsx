@@ -88,7 +88,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
           onDayPress={handleSelect}
           markingType="custom"
           markedDates={{
-            [today]: {
+            [selected]: {
               customStyles: {
                 container: {
                   backgroundColor: colors.backgroundSuccessContainer.backgroundColor,
@@ -98,17 +98,19 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
                   color: colors.textPrimary.color,
                 },
               },
+              disableTouchEvent: true,
+              selected: true,
             },
-            [selected]: {
+            [today]: {
               customStyles: {
                 container: {
                   backgroundColor: colors.backgroundPrimary.backgroundColor,
                   borderRadius: common.rounded.borderRadius,
                 },
+                text: {
+                  color: colors.textOnPrimary.color,
+                },
               },
-              selected: true,
-              disableTouchEvent: true,
-              selectedColor: colors.backgroundPrimary.backgroundColor,
             },
           }}
           renderHeader={() => (
