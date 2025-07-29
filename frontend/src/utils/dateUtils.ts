@@ -105,11 +105,11 @@ class DateUtils {
   static extractLabels<T>(data: ItemsInDateRangeParams<T>) {
     try {
       switch (data.range) {
-        case "weeks":
+        case "days":
           return this.extractDayLabels(data);
+        case "weeks":
+          return this.extractWeekLabels(data);
         case "months":
-          return this.extractMonthLabels(data);
-        case "years":
           return this.extractYearLabels(data);
         default:
           throw new Error("Invalid range. Use  'days','months', or 'years'.");
@@ -125,15 +125,15 @@ class DateUtils {
     const labelsSet: Set<string> = new Set();
 
     const currentDate = new Date();
-    const endDate = new Date(currentDate.getTime() - n * this.getMillisecondsFromRange(range));
+    /*  const endDate = new Date(currentDate.getTime() - n * this.getMillisecondsFromRange(range)); */
 
     for (const item of items) {
       const itemDate = new Date(item[dateKey] as any); // Assuming dateKey is of type Date
 
-      if (itemDate >= endDate && itemDate <= currentDate) {
-        const label = this.formatDate(itemDate, "DD/MM");
-        labelsSet.add(label);
-      }
+      /*  if (itemDate >= endDate && itemDate <= currentDate) { */
+      const label = this.formatDate(itemDate, "DD.MM");
+      labelsSet.add(label);
+      /*   } */
     }
     return Array.from(labelsSet);
   }
@@ -155,26 +155,36 @@ class DateUtils {
     }
   }
 
-  private static extractMonthLabels<T>(data: ItemsInDateRangeParams<T>): string[] {
+  private static extractWeekLabels<T>(params: ItemsInDateRangeParams<T>): string[] {
+    const { items, dateKey } = params;
+
+    if (!items.length) return [];
+
+    // Step 1: Extract and sort dates from the items
+    const sortedDates = items
+      .map((item) => new Date((item as any)[dateKey]))
+      .sort((a, b) => a.getTime() - b.getTime());
+
     const labels: string[] = [];
 
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
+    // Step 2: Group dates by week
+    const MS_IN_WEEK = 7 * 24 * 60 * 60 * 1000;
+    let currentWeekStart = new Date(sortedDates[0]);
 
-    // Find the first date of the current month
-    const firstDateOfMonth = new Date(currentYear, currentMonth, 1);
+    while (currentWeekStart <= sortedDates[sortedDates.length - 1]) {
+      const currentWeekEnd = new Date(currentWeekStart.getTime() + MS_IN_WEEK - 1);
 
-    for (let i = 0; i < 5; i++) {
-      const weekStartDate = new Date(
-        firstDateOfMonth.getTime() + i * this.getMillisecondsFromRange("weeks")
-      );
-      const label = this.formatDate(weekStartDate, "DD/MM");
-      labels.push(label);
+      const formattedStart = this.formatDate(currentWeekStart, "DD.MM");
+      const formattedEnd = this.formatDate(currentWeekEnd, "DD.MM");
+
+      labels.push(`${formattedStart} - ${formattedEnd}`);
+
+      currentWeekStart = new Date(currentWeekStart.getTime() + MS_IN_WEEK);
     }
 
     return labels;
   }
+
   private static extractYearLabels<T>(data: ItemsInDateRangeParams<T>): string[] {
     const currentYear = new Date().getFullYear();
     const { items, dateKey, n } = data;
@@ -183,7 +193,7 @@ class DateUtils {
 
     for (let month = 0; month < 12; month++) {
       const monthDate = new Date(currentYear, month, 1);
-      const monthName = this.formatDate(monthDate, "MMMM");
+      const monthName = this.formatDate(monthDate, "MMM");
       labels.push(monthName);
     }
 
@@ -191,7 +201,7 @@ class DateUtils {
       let found = false;
 
       for (const item of items) {
-        if (this.formatDate(item[dateKey] as Date, "MMMM") === month) {
+        if (this.formatDate(item[dateKey] as Date, "MMM") === month) {
           found = true;
           break;
         }

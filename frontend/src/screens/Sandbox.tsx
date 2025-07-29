@@ -1,25 +1,20 @@
-import { View, Text } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import Collapsible from "@/components/ui/Collapsible";
-import { useState } from "react";
 import Icon from "@/components/Icon/Icon";
+import Graph from "@/components/ui/Graph";
+import DateUtils from "@/utils/dateUtils";
 
 const Sandbox = () => {
-  const { colors, spacing, layout, common } = useStyles();
+  const { colors, spacing, layout, common, fonts } = useStyles();
 
-  const [open, setOpen] = useState(false);
-  const [open2, setOpen2] = useState(false);
-  const [open3, setOpen3] = useState(false);
-
-  const handleOpenChange = (value: boolean, state: "open" | "open2") => {
-    if (state == "open") {
-      setOpen(value);
-      setOpen2(!value);
-    } else {
-      setOpen2(value);
-      setOpen(!value);
-    }
-  };
+  const data = [
+    Math.random() * 100,
+    Math.random() * 100,
+    Math.random() * 100,
+    Math.random() * 100,
+    Math.random() * 100,
+    Math.random() * 100,
+  ];
 
   return (
     <View
@@ -34,41 +29,51 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <Collapsible
-        isCollapsed={open}
-        onCollapseChange={(val) => handleOpenChange(val, "open")}
-        trigger="ארוחה 1"
-      >
-        {Array.from({ length: 10 }).map((_, i) => (
-          <Text key={i}>מספר {i}</Text>
-        ))}
-      </Collapsible>
-      <Collapsible
-        isCollapsed={open2}
-        onCollapseChange={(val) => handleOpenChange(val, "open2")}
-        trigger={
-          <View style={[layout.flexRow, layout.justifyBetween]}>
-            <Text>ideal for custom icons (due to rotation)</Text>
-            <Icon name="bell" rotation={open2 ? 12 : 0} />
+      <Graph
+        header={
+          <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
+            <Icon name="clock" />
+            <Text style={[fonts.lg]}>משקלים</Text>
           </View>
         }
-      >
-        {Array.from({ length: 25 }).map((_, i) => (
-          <Text key={i}>מספר {i}</Text>
-        ))}
-      </Collapsible>
-
-      <Collapsible
-        variant="white"
-        style={[open3 ? colors.backgroundSuccessContainer : {}, common.borderDefault]}
-        isCollapsed={open3}
-        onCollapseChange={(val) => setOpen3(val)}
-        trigger="ארוחה 2"
-      >
-        {Array.from({ length: 15 }).map((_, i) => (
-          <Text key={i}>מספר {i}</Text>
-        ))}
-      </Collapsible>
+        labels={DateUtils.extractLabels({
+          range: "weeks",
+          items: [
+            { date: "2025-07-28T10:00:00Z" },
+            { date: "2025-07-29T10:00:00Z" },
+            { date: "2025-07-30T10:00:00Z" },
+            { date: "2025-07-31T10:00:00Z" },
+            { date: "2025-08-01T10:00:00Z" },
+            { date: "2025-08-02T10:00:00Z" },
+            { date: "2025-08-03T10:00:00Z" },
+          ],
+          dateKey: "date",
+          n: 1,
+        })}
+        data={data}
+      />
+      <Graph
+        header={
+          <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
+            <Icon name="clock" />
+            <Text style={[fonts.lg]}>משקלים</Text>
+          </View>
+        }
+        labels={DateUtils.extractLabels({
+          range: "days",
+          items: [
+            { date: "2025-07-28T10:00:00Z" },
+            { date: "2025-07-29T10:00:00Z" },
+            { date: "2025-07-30T10:00:00Z" },
+            { date: "2025-07-31T10:00:00Z" },
+            { date: "2025-08-01T10:00:00Z" },
+            { date: "2025-08-02T10:00:00Z" },
+          ],
+          dateKey: "date",
+          n: 1,
+        })}
+        data={data}
+      />
     </View>
   );
 };
