@@ -34,6 +34,7 @@ export default function App() {
   const colorScheme = Appearance.getColorScheme();
   const [loaded] = useFonts({
     Assistant: require("./assets/fonts/Assistant-VariableFont_wght.ttf"),
+    Brutalist: require("./assets/fonts/TelAviv-BrutalistLight.ttf"),
   });
 
   const direction = Platform.OS == "ios" ? { direction: "rtl" } : {};
