@@ -1,6 +1,10 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import SectionWheelPicker from "../ui/SectionWheelPicker";
 import { WheelPickerProps, WheelPickerOption } from "@/types/wheelPickerTypes";
+import useStyles from "@/styles/useGlobalStyles";
+import { StyleProp, View, ViewStyle } from "react-native";
+import { ConditionalRender } from "../ui/ConditionalRender";
+import { Text } from "../ui/Text";
 
 interface WeightWheelPickerProps {
   minWeight: number;
@@ -15,7 +19,8 @@ interface WeightWheelPickerProps {
   itemHeight?: number;
   activeItemColor: string;
   inactiveItemColor: string;
-  label?: string;
+  label?: ReactNode;
+  style?: StyleProp<ViewStyle>;
 }
 
 const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
@@ -24,7 +29,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
   stepSize = 1,
   decimalStepSize = 1,
   decimalRange = 100,
-  label = "",
+  label = "משקל",
   showZeroDecimal = true,
   selectedWeight,
   onValueChange,
@@ -32,7 +37,10 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
   itemHeight,
   activeItemColor,
   inactiveItemColor,
+  style,
 }) => {
+  const { common, fonts, layout, spacing, text } = useStyles();
+
   const dividend = 10;
   const wholePart = Math.floor(selectedWeight);
 
@@ -83,8 +91,6 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       itemHeight,
       activeItemColor,
       inactiveItemColor,
-      label: label,
-      padding: { paddingStart: 12, paddingEnd: 0 },
     },
     {
       data: wholeWeightOptions,
@@ -96,16 +102,34 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       itemHeight,
       activeItemColor,
       inactiveItemColor,
-      padding: { paddingEnd: 12, paddingStart: 0 },
     },
   ];
 
   return (
-    <SectionWheelPicker
-      data={wheelPickerPropsArray}
-      selectedValues={[wholePart, decimalPart.toFixed(2)]}
-      onValueChange={handleValueChange}
-    />
+    <View style={spacing.gapXl}>
+      <ConditionalRender condition={typeof label == "string"}>
+        <Text style={[text.textCenter, fonts.lg, text.textBold]}>{label}</Text>
+      </ConditionalRender>
+
+      <ConditionalRender condition={typeof label !== "string"}>{label}</ConditionalRender>
+
+      <View
+        style={[
+          common.borderXsm,
+          spacing.pdHorizontalDefault,
+          spacing.pdVerticalXs,
+          common.rounded,
+          layout.alignSelfStart,
+          style,
+        ]}
+      >
+        <SectionWheelPicker
+          data={wheelPickerPropsArray}
+          selectedValues={[wholePart, decimalPart.toFixed(2)]}
+          onValueChange={handleValueChange}
+        />
+      </View>
+    </View>
   );
 };
 
