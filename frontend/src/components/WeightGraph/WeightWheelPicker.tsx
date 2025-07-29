@@ -119,7 +119,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
           spacing.pdHorizontalDefault,
           spacing.pdVerticalXs,
           common.rounded,
-          layout.alignSelfStart,
+          layout.center,
           style,
         ]}
       >
