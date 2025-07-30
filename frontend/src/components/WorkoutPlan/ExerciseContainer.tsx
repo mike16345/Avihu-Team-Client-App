@@ -54,7 +54,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
       const setToRecord: IRecordedSetPost = {
         userId: currentUser._id,
-        exercise: exercise.name,
+        exercise: exercise.exerciseId.name,
         recordedSet: {
           ...recordedSet,
           plan,
@@ -93,7 +93,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
 
     const planData = data?.[plan];
     if (planData) {
-      exerciseData = planData[exercise.name];
+      exerciseData = planData[exercise.exerciseId.name];
     }
 
     const setNumber = exerciseData?.setNumber + 1 || 1;
@@ -128,7 +128,7 @@ const ExerciseContainer: FC<WorkoutProps> = ({
                 text.textRight,
               ]}
             >
-              {exercise.name}
+              {exercise.exerciseId.name}
             </Text>
           </View>
           <View style={styles.workoutInfoContainer}>
