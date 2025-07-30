@@ -10,27 +10,31 @@ import {
   Platform,
 } from "react-native";
 import React, { ReactNode, useEffect, useRef, useState } from "react";
-import { Card } from "./Card";
 import { LineChart } from "react-native-chart-kit";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "./ConditionalRender";
 import { Text } from "./Text";
 import Icon from "../Icon/Icon";
+import { returnIconName, returnIconRotation } from "@/utils/graph";
 
 interface GraphProps {
   header?: ReactNode;
   style?: StyleProp<ViewStyle>;
   data: number[];
   labels: string[];
+  mounted?: boolean;
 }
 
-const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
-  const { colors, common, layout, fonts, spacing, text } = useStyles();
+const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = true }) => {
+  const { colors, common, layout, fonts, spacing } = useStyles();
 
   const [selected, setSelected] = useState<number | undefined>(undefined);
   const [selectedLabel, setSelectedLabel] = useState(0);
   const [atScrollEnd, setAtScrollEnd] = useState(false);
   const [atScrollStart, setAtScrollStart] = useState(true);
+  const [readyToScroll, setReadyToScroll] = useState(false);
+
+  const scrollRef = useRef<ScrollView>(null);
 
   const labelCount = labels.length;
   const labelWidth = 80;
@@ -58,22 +62,28 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
     }
   };
 
-  const scrollRef = useRef<ScrollView>(null);
+  const handleLayout = () => {
+    if (readyToScroll) {
+      scrollRef.current?.scrollTo({ x: 0, animated: false });
+      setReadyToScroll(false); // prevent infinite loop
+    }
+  };
 
   useEffect(() => {
-    if (Platform.OS === "android") {
-      scrollRef.current?.scrollToEnd({ animated: false });
+    if (Platform.OS === "android" && mounted) {
+      setReadyToScroll(true);
     }
-  }, []);
+  }, [mounted]);
 
   return (
-    <Card variant="gray" style={[{ padding: 0 }, common.roundedMd, style]}>
-      <Card.Header style={styles.header}>{header}</Card.Header>
+    <View style={[{ padding: 0 }, style]}>
+      <View style={styles.header}>{header}</View>
       <ScrollView
         ref={scrollRef}
         style={{ direction: "ltr" }}
         horizontal
         onScroll={handleScroll}
+        onLayout={handleLayout}
         showsHorizontalScrollIndicator={false}
       >
         <View style={[layout.alignSelfStart, { position: "relative" }]}>
@@ -96,7 +106,7 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
                       styles.selectedDot,
                       Platform.OS == "ios"
                         ? { top: y - 9, left: x - 9 }
-                        : { top: y - 9, left: x - 9 },
+                        : { top: y - 9, right: x - 9 }, //android is flipped
                     ]}
                   />
                 );
@@ -131,13 +141,14 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
           />
           <View
             style={[
-              layout.flexRow,
+              layout.flexDirectionByPlatform, //adnroid is flipped
               spacing.gapDefault,
               layout.alignSelfEnd,
               layout.justifyBetween,
               layout.itemsCenter,
-              { width: (labelCount - 0.5) * labelWidth },
               styles.labels,
+              { width: (labelCount - 0.5) * labelWidth },
+              Platform.OS == "ios" ? { left: 60 } : { right: 60 }, //adnroid is flipped
             ]}
           >
             {labels.map((label, i) => (
@@ -164,14 +175,14 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
       </ScrollView>
       <View style={[layout.flexRow, styles.indicators, spacing.gapDefault]}>
         <Icon
-          name={atScrollEnd ? "arrowRoundLeftSoftSmall" : "arrowRoundRightSmall"}
-          rotation={atScrollEnd ? 180 : 0}
+          name={returnIconName(atScrollEnd)}
+          rotation={returnIconRotation(atScrollEnd, "end")}
           height={18}
           width={18}
         />
         <Icon
-          name={atScrollStart ? "arrowRoundLeftSoftSmall" : "arrowRoundRightSmall"}
-          rotation={atScrollStart ? 0 : 180}
+          name={returnIconName(atScrollStart)}
+          rotation={returnIconRotation(atScrollStart, "start")}
           height={18}
           width={18}
         />
@@ -195,7 +206,7 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
           </View>
         </View>
       </ConditionalRender>
-    </Card>
+    </View>
   );
 };
 
@@ -220,7 +231,6 @@ const styles = StyleSheet.create({
     minWidth: 100,
     position: "absolute",
     bottom: 15,
-    left: 60,
   },
   header: {
     paddingHorizontal: 12,
