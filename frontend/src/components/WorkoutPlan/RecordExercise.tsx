@@ -66,9 +66,11 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   const { data, isLoading } = useQuery(
     ["recordedSets", exercise],
     () =>
-      getUserRecordedSetsByExercise(exercise.name, muscleGroup, currentUser?._id || "").then(
-        (res) => res.data
-      ),
+      getUserRecordedSetsByExercise(
+        exercise.exerciseId.name,
+        muscleGroup,
+        currentUser?._id || ""
+      ).then((res) => res.data),
 
     { enabled: !!exercise, retry: createRetryFunction(404), staleTime: ONE_DAY }
   );
@@ -151,11 +153,14 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
           colors.background,
         ]}
       >
-        {exercise.linkToVideo && (
-          <WorkoutVideoPopup width={width} videoId={extractVideoId(exercise.linkToVideo || "")} />
+        {exercise.exerciseId.linkToVideo && (
+          <WorkoutVideoPopup
+            width={width}
+            videoId={extractVideoId(exercise.exerciseId.linkToVideo || "")}
+          />
         )}
 
-        {!exercise.linkToVideo && (
+        {!exercise.exerciseId.linkToVideo && (
           <View
             style={[
               { width: width, height: 200 },
@@ -175,7 +180,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
           style={[layout.flexGrow, layout.justifyStart, spacing.pdHorizontalDefault, spacing.gapSm]}
         >
           <View style={[layout.itemsEnd, spacing.gapMd]}>
-            <Text style={[styles.setInfo, fonts.lg]}>{exercise.name}</Text>
+            <Text style={[styles.setInfo, fonts.lg]}>{exercise.exerciseId.name}</Text>
             <View
               style={[
                 layout.flexRowReverse,
