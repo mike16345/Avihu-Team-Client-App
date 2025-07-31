@@ -24,11 +24,11 @@ import { Text } from "../ui/Text";
 import ForgotPassword from "./ForgotPassword";
 import { EMAIL_ERROR, NO_ACCESS, NO_PASSWORD } from "@/constants/Constants";
 import { ConditionalRender } from "../ui/ConditionalRender";
-import TextInput from "../ui/Input";
-import { TextInput as RNTextInput } from "react-native-paper";
+
 import { useUserStore } from "@/store/userStore";
 import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 import { errorNotificationHaptic } from "@/utils/haptics";
+import Input from "../ui/Input";
 
 interface IUserCredentials {
   email: string;
@@ -208,8 +208,7 @@ export default function Login({ onLogin }: ILoginProps) {
               <ConditionalRender condition={!isChangingPassword}>
                 <Text style={[text.textRight, colors.textOnBackground, text.textBold]}>אימייל</Text>
 
-                <TextInput
-                  activeOutlineColor={colors.borderSecondary.borderColor}
+                <Input
                   placeholder="הכנס אימייל"
                   keyboardType={"email-address"}
                   autoCorrect={false}
@@ -270,19 +269,12 @@ export default function Login({ onLogin }: ILoginProps) {
                   </Text>
                 </View>
 
-                <TextInput
+                <Input
                   placeholder="הכנס סיסמה"
-                  activeOutlineColor={colors.borderSecondary.borderColor}
                   secureTextEntry={!showPassword}
                   error={Boolean(formErrors.password)}
                   onChangeText={(val) =>
                     setInputtedCredentials({ ...inputtedCrendentials, password: val })
-                  }
-                  left={
-                    <RNTextInput.Icon
-                      onPress={() => setShowPassword((show) => !show)}
-                      icon={showPassword ? "eye-off" : "eye"}
-                    />
                   }
                 />
                 {formErrors.password && (

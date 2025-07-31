@@ -9,7 +9,7 @@ import {
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
-import { DarkTheme as CustomDarkTheme, ThemeProvider } from "@/themes/useAppTheme";
+import { defaultTheme as CustomDarkTheme, ThemeProvider } from "@/themes/useAppTheme";
 import { Appearance, I18nManager, Platform, View } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
@@ -34,9 +34,8 @@ export default function App() {
   const colorScheme = Appearance.getColorScheme();
   const [loaded] = useFonts({
     Assistant: require("./assets/fonts/Assistant-VariableFont_wght.ttf"),
+    Brutalist: require("./assets/fonts/TelAviv-BrutalistLight.ttf"),
   });
-
-  const direction = Platform.OS == "ios" ? { direction: "rtl" } : {};
 
   if (!loaded || !ready) return;
 
@@ -45,20 +44,20 @@ export default function App() {
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <View style={[direction]}>
-              {/*  <PersistQueryClientProvider
-              client={queryClient}
-              persistOptions={{ persister: persister }}
-            >
-              <NavigationContainer theme={DarkTheme}>
-                <RootNavigator />
-                <StatusBar key={colorScheme} translucent style={"light"} />
-                <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} config={toastConfig} />
-                <UserDrawer />
-                <Update />
-              </NavigationContainer>
-            </PersistQueryClientProvider> */}
-              <Sandbox />
+            <View style={[Platform.OS == "ios" && { direction: "rtl" }, { flex: 1 }]}>
+              <PersistQueryClientProvider
+                client={queryClient}
+                persistOptions={{ persister: persister }}
+              >
+                <NavigationContainer>
+                  <RootNavigator />
+                  <StatusBar key={colorScheme} translucent style={"light"} />
+                  <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} config={toastConfig} />
+                  <UserDrawer />
+                  <Update />
+                </NavigationContainer>
+              </PersistQueryClientProvider>
+              {/*   <Sandbox /> */}
             </View>
           </SafeAreaProvider>
         </GestureHandlerRootView>
