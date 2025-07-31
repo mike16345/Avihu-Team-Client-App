@@ -1,25 +1,16 @@
-import { View, Text } from "react-native";
+import { View, useWindowDimensions } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import Collapsible from "@/components/ui/Collapsible";
 import { useState } from "react";
-import Icon from "@/components/Icon/Icon";
+import { generateWheelPickerData } from "@/utils/utils";
+import WeightWheelPicker from "@/components/WeightGraph/WeightWheelPicker";
+import RepWheelPicker from "@/components/ui/RepWheelPicker";
 
 const Sandbox = () => {
-  const { colors, spacing, layout, common } = useStyles();
+  const { colors, spacing, layout } = useStyles();
+  const { width } = useWindowDimensions();
 
-  const [open, setOpen] = useState(false);
-  const [open2, setOpen2] = useState(false);
-  const [open3, setOpen3] = useState(false);
-
-  const handleOpenChange = (value: boolean, state: "open" | "open2") => {
-    if (state == "open") {
-      setOpen(value);
-      setOpen2(!value);
-    } else {
-      setOpen2(value);
-      setOpen(!value);
-    }
-  };
+  const [wheelVal, setWheelVal] = useState(12);
+  const [weightVal, setWeightVal] = useState(12);
 
   return (
     <View
@@ -30,45 +21,38 @@ const Sandbox = () => {
         colors.background,
         layout.sizeFull,
         spacing.gapDefault,
+        layout.flexRow,
+        layout.center,
       ]}
     >
-      <Text style={[colors.textPrimary]}>Sandbox</Text>
+      <View>
+        <WeightWheelPicker
+          style={{ width: width * 0.4 }}
+          onValueChange={(val) => {
+            setWeightVal(val);
+          }}
+          activeItemColor={colors.textPrimary.color}
+          inactiveItemColor={colors.textPrimary.color}
+          minWeight={0}
+          decimalStepSize={25}
+          showZeroDecimal={true}
+          decimalRange={100}
+          maxWeight={500}
+          stepSize={1}
+          height={50}
+          itemHeight={35}
+          selectedWeight={weightVal}
+        />
+      </View>
 
-      <Collapsible
-        isCollapsed={open}
-        onCollapseChange={(val) => handleOpenChange(val, "open")}
-        trigger="ארוחה 1"
-      >
-        {Array.from({ length: 10 }).map((_, i) => (
-          <Text key={i}>מספר {i}</Text>
-        ))}
-      </Collapsible>
-      <Collapsible
-        isCollapsed={open2}
-        onCollapseChange={(val) => handleOpenChange(val, "open2")}
-        trigger={
-          <View style={[layout.flexRow, layout.justifyBetween]}>
-            <Text>ideal for custom icons (due to rotation)</Text>
-            <Icon name="bell" rotation={open2 ? 12 : 0} />
-          </View>
-        }
-      >
-        {Array.from({ length: 25 }).map((_, i) => (
-          <Text key={i}>מספר {i}</Text>
-        ))}
-      </Collapsible>
-
-      <Collapsible
-        variant="white"
-        style={[open3 ? colors.backgroundSuccessContainer : {}, common.borderDefault]}
-        isCollapsed={open3}
-        onCollapseChange={(val) => setOpen3(val)}
-        trigger="ארוחה 2"
-      >
-        {Array.from({ length: 15 }).map((_, i) => (
-          <Text key={i}>מספר {i}</Text>
-        ))}
-      </Collapsible>
+      <View>
+        <RepWheelPicker
+          style={{ width: width * 0.4 }}
+          data={generateWheelPickerData(0, 100)}
+          onValueChange={(val) => setWheelVal(val)}
+          selectedValue={wheelVal}
+        />
+      </View>
     </View>
   );
 };

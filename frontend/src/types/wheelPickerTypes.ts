@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export type WheelPickerOption = {
   value: any;
   label?: string;
@@ -9,9 +11,9 @@ export type WheelPickerProps = {
   onValueChange: (value: any) => void;
   height?: number;
   itemHeight?: number;
-  activeItemColor: string;
-  inactiveItemColor: string;
-  label?: string;
+  activeItemColor?: string;
+  inactiveItemColor?: string;
+  label?: ReactNode;
 };
 
 export type SectionWheelPickerProps = {
