@@ -1,11 +1,11 @@
-export const returnIconName = (isTrue: boolean) => {
+export const getIconName = (isTrue: boolean) => {
   return isTrue ? "arrowRoundLeftSoftSmall" : "arrowRoundRightSmall";
 };
 
-export const returnIconRotation = (isTrue: boolean, edge: "start" | "end") => {
+export const getIconRotation = (isTrue: boolean, edge: "start" | "end") => {
   if (edge == "start") {
     return isTrue ? 0 : 180;
   } else {
-    isTrue ? 180 : 0;
+    return isTrue ? 180 : 0;
   }
 };

@@ -170,7 +170,7 @@ export const useShadowStyles = () => {
           shadowRadius: 64,
         },
         android: {
-          shadowRadius: 8,
+          shadowRadius: 15,
           elevation: 20,
           backgroundColor: background.backgroundColor,
           shadowColor: "#999999",
@@ -226,7 +226,7 @@ export const useShadowStyles = () => {
         },
         android: {
           backgroundColor: background.backgroundColor,
-          shadowRadius: 8,
+          shadowRadius: 15,
           elevation: 4,
           shadowColor: "#999999",
         },

@@ -12,10 +12,13 @@ import {
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { LineChart } from "react-native-chart-kit";
 import useStyles from "@/styles/useGlobalStyles";
-import { ConditionalRender } from "./ConditionalRender";
-import { Text } from "./Text";
-import Icon from "../Icon/Icon";
-import { returnIconName, returnIconRotation } from "@/utils/graph";
+import { ConditionalRender } from "../ConditionalRender";
+import { Text } from "../Text";
+import Icon from "../../Icon/Icon";
+import { getIconName, getIconRotation } from "@/utils/graph";
+import SelectedDot from "./SelectedDot";
+import useGraphTheme from "@/themes/useGraphTheme";
+import SelectedCard from "./SelectedCard";
 
 interface GraphProps {
   header?: ReactNode;
@@ -27,6 +30,7 @@ interface GraphProps {
 
 const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = true }) => {
   const { colors, common, layout, fonts, spacing } = useStyles();
+  const graphTheme = useGraphTheme();
 
   const [selected, setSelected] = useState<number | undefined>(undefined);
   const [selectedLabel, setSelectedLabel] = useState(0);
@@ -62,9 +66,18 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
     }
   };
 
+  const scrollToEnd = () => {
+    scrollRef.current?.scrollToEnd();
+  };
+  const scrollToStart = (animated = true) => {
+    scrollRef.current?.scrollTo({ x: 0, animated });
+  };
+
   const handleLayout = () => {
     if (readyToScroll) {
-      scrollRef.current?.scrollTo({ x: 0, animated: false });
+      const SHOULD_ANIMATE = false;
+
+      scrollToStart(SHOULD_ANIMATE);
       setReadyToScroll(false); // prevent infinite loop
     }
   };
@@ -97,42 +110,16 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
                 },
               ],
             }}
-            renderDotContent={({ x, y, index }) => {
-              if (index === selectedLabel) {
-                return (
-                  <View
-                    key={index}
-                    style={[
-                      styles.selectedDot,
-                      Platform.OS == "ios"
-                        ? { top: y - 9, left: x - 9 }
-                        : { top: y - 9, right: x - 9 }, //android is flipped
-                    ]}
-                  />
-                );
-              }
-              return null;
-            }}
+            renderDotContent={(params) => (
+              <SelectedDot key={params.index} selectedLabel={selectedLabel} {...params} />
+            )}
             width={chartWidth}
             height={220}
             withShadow
             withInnerLines={false}
             withOuterLines={false}
             onDataPointClick={({ value }) => setSelected(value)}
-            chartConfig={{
-              backgroundGradientFrom: colors.backgroundSecondary.backgroundColor,
-              backgroundGradientTo: colors.backgroundSecondary.backgroundColor,
-              fillShadowGradientTo: "#9FFFA2",
-              fillShadowGradientFrom: "#79F681",
-              color: () => `rgba(119, 243, 146, 1)`,
-              labelColor: (opacity = 1) => `rgba(69, 68, 89, ${opacity})`,
-              propsForDots: {
-                r: "6",
-                strokeWidth: "2",
-                stroke: "#FFF",
-                fill: "#33B333",
-              },
-            }}
+            chartConfig={graphTheme}
             bezier
             style={{
               marginVertical: 8,
@@ -174,59 +161,33 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
         </View>
       </ScrollView>
       <View style={[layout.flexRow, styles.indicators, spacing.gapDefault]}>
-        <Icon
-          name={returnIconName(atScrollEnd)}
-          rotation={returnIconRotation(atScrollEnd, "end")}
-          height={18}
-          width={18}
-        />
-        <Icon
-          name={returnIconName(atScrollStart)}
-          rotation={returnIconRotation(atScrollStart, "start")}
-          height={18}
-          width={18}
-        />
+        <TouchableOpacity onPress={scrollToEnd}>
+          <Icon
+            name={getIconName(atScrollEnd)}
+            rotation={getIconRotation(atScrollEnd, "end")}
+            height={18}
+            width={18}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => scrollToStart()}>
+          <Icon
+            name={getIconName(atScrollStart)}
+            rotation={getIconRotation(atScrollStart, "start")}
+            height={18}
+            width={18}
+          />
+        </TouchableOpacity>
       </View>
 
       <ConditionalRender condition={typeof selected == "number"}>
-        <View
-          style={[
-            spacing.pdDefault,
-            styles.selectedCard,
-            colors.backgroundSecondary,
-            common.rounded,
-          ]}
-        >
-          <TouchableOpacity onPress={() => setSelected(undefined)}>
-            <Icon name="close" />
-          </TouchableOpacity>
-
-          <View style={[layout.flex1, layout.center]}>
-            <Text style={[fonts.xxxl, colors.textPrimary]}>{selected}</Text>
-          </View>
-        </View>
+        <SelectedCard selected={selected} onClose={() => setSelected(undefined)} />
       </ConditionalRender>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  selectedCard: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    height: "100%",
-    width: "100%",
-  },
-  selectedDot: {
-    position: "absolute",
-    width: 18,
-    height: 18,
-    borderRadius: 12,
-    backgroundColor: "#33B333",
-    borderWidth: 2,
-    borderColor: "#FFF",
-  },
   labels: {
     minWidth: 100,
     position: "absolute",

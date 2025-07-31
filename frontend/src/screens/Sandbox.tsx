@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import Icon from "@/components/Icon/Icon";
-import Graph from "@/components/ui/Graph";
+import Graph from "@/components/ui/graph/Graph";
 import DateUtils from "@/utils/dateUtils";
 import Collapsible from "@/components/ui/Collapsible";
 import { useState } from "react";
@@ -34,7 +34,7 @@ const Sandbox = () => {
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
 
-      <Card variant="gray" style={[common.roundedMd]}>
+      <Card variant="gray">
         <Graph
           header={
             <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
