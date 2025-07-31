@@ -1,47 +1,16 @@
-import { View, TouchableOpacity } from "react-native";
+import { View } from "react-native";
 import React, { useState } from "react";
-import { Calendar, LocaleConfig, DateData } from "react-native-calendars";
+import { Calendar, DateData } from "react-native-calendars";
 import useStyles from "@/styles/useGlobalStyles";
-import Icon from "../Icon/Icon";
-import { Text } from "../ui/Text";
 import moment from "moment";
 import { ConditionalRender } from "../ui/ConditionalRender";
+import useCalendarTheme from "@/themes/useCalendarTheme";
+import { monthNames, setupCalendarLocale } from "@/config/calendarConfig";
+import CalendarHeader from "./CalendarHeader";
+import MonthSelector from "./MonthSelector";
+import DateUtils from "@/utils/dateUtils";
 
-LocaleConfig.locales["il"] = {
-  monthNames: [
-    "ינואר",
-    "פברואר",
-    "מרץ",
-    "אפריל",
-    "מאי",
-    "יוני",
-    "יולי",
-    "אוגוסט",
-    "ספטמבר",
-    "אוקטובר",
-    "נובמבר",
-    "דצמבר",
-  ],
-  monthNamesShort: [
-    "ינו",
-    "פבר",
-    "מרץ",
-    "אפר",
-    "מאי",
-    "יונ",
-    "יול",
-    "אוג",
-    "ספט",
-    "אוק",
-    "נוב",
-    "דצמ",
-  ],
-  dayNames: ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"],
-  dayNamesShort: ["א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ש'"],
-  today: "היום",
-};
-
-LocaleConfig.defaultLocale = "il";
+setupCalendarLocale();
 
 interface CustomCalendarProps {
   selectedDate?: string;
@@ -49,23 +18,32 @@ interface CustomCalendarProps {
 }
 
 const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { common } = useStyles();
 
-  const [currentDate, setCurrentDate] = useState(selectedDate || moment().format("YYYY-MM-DD"));
-  const [selected, setSelected] = useState(selectedDate || moment().format("YYYY-MM-DD"));
+  const today = DateUtils.getCurrentDate("YYYY-MM-DD");
+
+  const [currentDate, setCurrentDate] = useState(selectedDate || today);
+  const [selected, setSelected] = useState(selectedDate || today);
   const [showMonths, setShowMonths] = useState(false);
 
-  const today = moment().format("YYYY-MM-DD");
-  const month = moment(currentDate).month();
-  const year = moment(currentDate).year();
+  const month = DateUtils.extractMonthFromDate(currentDate);
+  const year = DateUtils.extractYearFromDate(currentDate);
 
-  const isActiveMonth = (index: number) => month === index;
+  const { marked } = useCalendarTheme(today, selected);
 
   const handleSelect = (day: DateData) => {
     const date = day.dateString;
 
     setSelected(date);
     onSelect(date);
+  };
+
+  const handleMonthChange = (date: string) => {
+    setCurrentDate(date);
+  };
+
+  const handleMonthSelect = (selectedMonthIndex: number) => {
+    setCurrentDate(moment().year(year).month(selectedMonthIndex).date(1).format("YYYY-MM-DD"));
   };
 
   const goToNextMonth = () => {
@@ -86,107 +64,29 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
           key={currentDate}
           current={currentDate}
           onDayPress={handleSelect}
+          onMonthChange={({ dateString }: DateData) => handleMonthChange(dateString)}
+          enableSwipeMonths
           markingType="custom"
-          markedDates={{
-            [selected]: {
-              customStyles: {
-                container: {
-                  backgroundColor: colors.backgroundSuccessContainer.backgroundColor,
-                  borderRadius: common.rounded.borderRadius,
-                },
-                text: {
-                  color: colors.textPrimary.color,
-                },
-              },
-              disableTouchEvent: true,
-              selected: true,
-            },
-            [today]: {
-              customStyles: {
-                container: {
-                  backgroundColor: colors.backgroundPrimary.backgroundColor,
-                  borderRadius: common.rounded.borderRadius,
-                },
-                text: {
-                  color: colors.textOnPrimary.color,
-                },
-              },
-            },
-          }}
+          markedDates={marked}
           renderHeader={() => (
-            <View
-              style={[
-                layout.flexRow,
-                layout.justifyBetween,
-                layout.itemsCenter,
-                layout.widthFull,
-                spacing.pdVerticalDefault,
-              ]}
-            >
-              <TouchableOpacity
-                style={[layout.flexRow, spacing.gapXs, layout.itemsCenter]}
-                onPress={() => setShowMonths(true)}
-              >
-                <Text style={fonts.lg}>
-                  {LocaleConfig.locales["il"].monthNames[month]} {moment(currentDate).year()}
-                </Text>
-                <Icon name="chevronLeftSoft" height={18} width={25} />
-              </TouchableOpacity>
-
-              <View style={[layout.flexRow, spacing.gapDefault]}>
-                <TouchableOpacity onPress={goToPreviousMonth}>
-                  <Icon name="chevronRightSoft" height={18} width={18} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={goToNextMonth}>
-                  <Icon name="chevronLeftSoft" height={18} width={18} />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <CalendarHeader
+              month={monthNames[month]}
+              year={year}
+              goToNextMonth={goToNextMonth}
+              goToPreviousMonth={goToPreviousMonth}
+              onOpenMonthSelect={() => setShowMonths(true)}
+            />
           )}
           hideArrows
         />
       </ConditionalRender>
 
       <ConditionalRender condition={showMonths}>
-        <View
-          style={[
-            { position: "absolute", top: 0, right: 0 },
-            layout.flex1,
-            colors.backgroundSurface,
-            common.rounded,
-          ]}
-        >
-          <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter, spacing.pdLg]}>
-            <Text>חודשים</Text>
-            <TouchableOpacity onPress={() => setShowMonths(false)}>
-              <Icon name="close" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={[layout.flexRow, layout.wrap, layout.center]}>
-            {LocaleConfig.locales["il"].monthNames.map((month: string, i: number) => (
-              <TouchableOpacity
-                key={i}
-                onPress={() => {
-                  setCurrentDate(moment().year(year).month(i).date(1).format("YYYY-MM-DD"));
-                  setShowMonths(false);
-                }}
-                style={[
-                  spacing.pdDefault,
-                  common.rounded,
-                  { width: 90 },
-                  isActiveMonth(i) && colors.backgroundPrimary,
-                ]}
-              >
-                <Text
-                  style={[text.textBold, text.textCenter, isActiveMonth(i) && colors.textOnPrimary]}
-                >
-                  {month}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
+        <MonthSelector
+          activeMonthIndex={month}
+          onCloseMonthSelect={() => setShowMonths(false)}
+          onMonthSelect={(monthIndex) => handleMonthSelect(monthIndex)}
+        />
       </ConditionalRender>
     </View>
   );
