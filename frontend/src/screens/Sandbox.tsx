@@ -1,16 +1,13 @@
 import { View, useWindowDimensions } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { useState } from "react";
-import { generateWheelPickerData } from "@/utils/utils";
-import WeightWheelPicker from "@/components/WeightGraph/WeightWheelPicker";
-import RepWheelPicker from "@/components/ui/RepWheelPicker";
+import CustomCalendar from "@/components/Calendar/CustomCalendar";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
   const { width } = useWindowDimensions();
 
-  const [wheelVal, setWheelVal] = useState(12);
-  const [weightVal, setWeightVal] = useState(12);
+  const [date, setDate] = useState<string | undefined>();
 
   return (
     <View
@@ -25,34 +22,9 @@ const Sandbox = () => {
         layout.center,
       ]}
     >
-      <View>
-        <WeightWheelPicker
-          style={{ width: width * 0.4 }}
-          onValueChange={(val) => {
-            setWeightVal(val);
-          }}
-          activeItemColor={colors.textPrimary.color}
-          inactiveItemColor={colors.textPrimary.color}
-          minWeight={0}
-          decimalStepSize={25}
-          showZeroDecimal={true}
-          decimalRange={100}
-          maxWeight={500}
-          stepSize={1}
-          height={50}
-          itemHeight={35}
-          selectedWeight={weightVal}
-        />
-      </View>
-
-      <View>
-        <RepWheelPicker
-          style={{ width: width * 0.4 }}
-          data={generateWheelPickerData(0, 100)}
-          onValueChange={(val) => setWheelVal(val)}
-          selectedValue={wheelVal}
-        />
-      </View>
+      <Text style={[colors.textPrimary]}>Sandbox</Text>
+      <CustomCalendar onSelect={(date) => setDate(date)} />
+      <Text>{date}</Text>
     </View>
   );
 };
