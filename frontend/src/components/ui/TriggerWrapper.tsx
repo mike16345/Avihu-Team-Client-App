@@ -11,7 +11,6 @@ interface Props {
 
 const TriggerWrapper: React.FC<Props> = ({ trigger, setOpen }) => {
   const handlePress = () => {
-    console.log("Setting open to true");
     setOpen(true);
   };
 
