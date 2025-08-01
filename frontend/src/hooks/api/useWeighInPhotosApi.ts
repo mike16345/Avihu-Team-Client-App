@@ -1,14 +1,15 @@
 import { sendData } from "@/API/api";
 import { ApiResponse } from "@/types/ApiTypes";
 import { useState } from "react";
-import Toast from "react-native-toast-message";
 import { useUserApi } from "./useUserApi";
 import Constants from "expo-constants";
+import { useToast } from "../useToast";
 
 const USER_IMAGE_URLS_ENDPOINT = "userImageUrls";
 
 export const useWeighInPhotosApi = () => {
   const { updateUserField } = useUserApi();
+  const { triggerErrorToast } = useToast();
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
@@ -52,12 +53,7 @@ export const useWeighInPhotosApi = () => {
         console.error("Failed to upload image:", response.status, await response.text());
       }
     } catch (error) {
-      Toast.show({
-        text1: "אירעה שגיאה בהעלאת הקבצים!",
-        autoHide: true,
-        type: "error",
-        swipeable: true,
-      });
+      triggerErrorToast({ message: "אירעה שגיאה בהעלאת הקבצים!" });
     }
   };
 
@@ -80,12 +76,7 @@ export const useWeighInPhotosApi = () => {
       await addImageUrl(userId, urlToStore);
       await updateUserField(userId, "imagesUploaded", true);
     } catch (error) {
-      Toast.show({
-        text1: "אירעה שגיאה בהעלאת הקבצים!",
-        autoHide: true,
-        type: "error",
-        swipeable: true,
-      });
+      triggerErrorToast({ message: "אירעה שגיאה בהעלאת הקבצים!" });
     } finally {
       setUploading(false);
     }

@@ -1,13 +1,15 @@
-import { View, useWindowDimensions } from "react-native";
+import { View, Text } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { useState } from "react";
-import CustomCalendar from "@/components/Calendar/CustomCalendar";
+import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
+import UploadDrawer from "@/components/ui/UploadDrawer";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
   const { width } = useWindowDimensions();
 
-  const [date, setDate] = useState<string | undefined>();
+  const [visible, setVisible] = useState(false);
+
 
   return (
     <View
@@ -23,8 +25,7 @@ const Sandbox = () => {
       ]}
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
-      <CustomCalendar onSelect={(date) => setDate(date)} />
-      <Text>{date}</Text>
+      <UploadDrawer trigger={<PrimaryButton children="Open Modal" icon="like" block />} />
     </View>
   );
 };

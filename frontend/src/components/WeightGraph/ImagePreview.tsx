@@ -1,37 +1,34 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useState } from "react";
 import { View } from "react-native";
-import { Button } from "react-native-paper";
 import DisplayImage from "./DisplayImage";
-import ImagePreviewOption from "./ImagePreviewOption";
 import { useWeighInPhotosApi } from "@/hooks/api/useWeighInPhotosApi";
 import { useUserStore } from "@/store/userStore";
-import Loader from "../ui/loaders/Loader";
-import Toast from "react-native-toast-message";
 import { Text } from "../ui/Text";
+import PrimaryButton from "../ui/buttons/PrimaryButton";
+import SelectUploadType from "./SelectUploadType";
+import { useToast } from "@/hooks/useToast";
 
 interface ImagePreviewProps {
   handleClose: () => void;
 }
 
 const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { spacing, text, layout } = useStyles();
   const { handleUpload, uploading } = useWeighInPhotosApi();
+  const { triggerSuccessToast } = useToast();
   const currentUserId = useUserStore((state) => state.currentUser?._id);
 
-  const [selectedImage, setSelectedImage] = useState<number>(0);
   const [images, setImages] = useState<string[]>([]);
-
-  const setImageByIndex = (index: number, image: string) => {
+  const addImage = (image: string) => {
     const newImagesArr = [...images];
 
-    newImagesArr[index] = image;
+    newImagesArr.push(image);
 
-    setImages(newImagesArr);
-    setSelectedImage(index);
+    setImages(newImagesArr.slice(-2));
   };
 
-  const deleteimageByIndex = (index: number) => {
+  const deleteImageByIndex = (index: number) => {
     const newImagesArr = images.filter((_, i) => i !== index);
 
     setImages(newImagesArr);
@@ -42,55 +39,29 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
       await handleUpload(images[i], currentUserId || ``, `${i + 1}`);
     }
 
-    Toast.show({
-      text1: "קבצים נשלחו בהצלחה!",
-      autoHide: true,
-      type: "success",
-      swipeable: true,
-      text1Style: { textAlign: `center` },
-    });
+    triggerSuccessToast({ title: "הועלה בהצלחה", message: "המאמן קיבל את התמונות" });
+
     handleClose();
   };
 
   return (
-    <View style={[spacing.gapLg, spacing.pdSm]}>
-      {uploading && <Loader variant="Screen" positionTop={`-90%`} positionLeft={`-5%`} />}
+    <View style={[spacing.gapSm, spacing.pdSm, layout.flex1]}>
+      <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונה</Text>
 
-      <DisplayImage
-        image={images[selectedImage] ? images[selectedImage] : undefined}
-        removeImage={() => deleteimageByIndex(selectedImage)}
-        handleImageSelected={(image: string) => setImageByIndex(selectedImage, image)}
-      />
+      <SelectUploadType returnImage={(image: string) => addImage(image)} />
+
+      <View style={[layout.flex1]}>
+        <DisplayImage images={images} removeImage={(index) => deleteImageByIndex(index)} />
+      </View>
+
       <View style={[spacing.gapLg]}>
-        <View style={[layout.flexRowReverse, layout.center, spacing.gapLg]}>
-          <ImagePreviewOption
-            handleImageSelect={() => setSelectedImage(0)}
-            selected={selectedImage == 0}
-            image={images[0]}
-          />
-          <ImagePreviewOption
-            handleImageSelect={() => setSelectedImage(1)}
-            selected={selectedImage == 1}
-            image={images[1]}
-          />
-        </View>
-        <View style={[layout.flexDirectionByPlatform, layout.center, spacing.gapDefault]}>
-          <Button
-            style={[spacing.pdXs, common.roundedSm, { width: `50%` }]}
-            onPress={handleClose}
-            mode="contained-tonal"
-          >
-            <Text style={[text.textBold, fonts.default]}>בטל</Text>
-          </Button>
-          <Button
-            mode="contained"
-            style={[spacing.pdXs, common.roundedSm, { width: `50%` }]}
-            onPress={uploadImage}
-            disabled={!!(images.length == 0)}
-          >
-            <Text style={[colors.textOnBackground, text.textBold, fonts.default]}>שלח</Text>
-          </Button>
-        </View>
+        <PrimaryButton
+          children="שליחה"
+          block
+          disabled={images.length == 0}
+          onPress={uploadImage}
+          loading={uploading}
+        />
       </View>
     </View>
   );
