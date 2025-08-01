@@ -1,4 +1,4 @@
-import { View, Platform, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import React from "react";
 
 interface SelectedDotProps {
@@ -11,15 +11,7 @@ interface SelectedDotProps {
 const SelectedDot: React.FC<SelectedDotProps> = ({ index, selectedLabel, x, y }) => {
   if (selectedLabel !== index) return null;
 
-  return (
-    <View
-      key={index}
-      style={[
-        styles.selectedDot,
-        Platform.OS == "ios" ? { top: y - 9, left: x - 9 } : { top: y - 9, right: x - 9 }, //android is flipped
-      ]}
-    />
-  );
+  return <View key={index} style={[styles.selectedDot, { top: y - 9, left: x - 9 }]} />;
 };
 
 const styles = StyleSheet.create({

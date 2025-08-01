@@ -29,7 +29,7 @@ interface GraphProps {
 }
 
 const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = true }) => {
-  const { colors, common, layout, fonts, spacing } = useStyles();
+  const { colors, common, layout, spacing } = useStyles();
   const graphTheme = useGraphTheme();
 
   const [selected, setSelected] = useState<number | undefined>(undefined);
@@ -128,7 +128,7 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
           />
           <View
             style={[
-              layout.flexDirectionByPlatform, //adnroid is flipped
+              layout.flexDirectionByPlatform,
               spacing.gapDefault,
               layout.alignSelfEnd,
               layout.justifyBetween,
