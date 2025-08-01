@@ -5,6 +5,7 @@ import { NavigatorTab } from "@/types/navigatorTypes";
 import WorkoutPlanStack from "../WorkoutPlanStack";
 import BlogScreen from "@/screens/BlogScreen";
 import MyWorkoutProgressionScreen from "@/screens/MyWorkoutProgressionScreen";
+import Icon from "@/components/Icon/Icon";
 
 const BottomScreenNavigatorTabs: NavigatorTab[] = [
   {
@@ -14,9 +15,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
       tabBarLabel: "",
       tabBarAccessibilityLabel: "אימונים",
 
-      tabBarIcon: ({ color }) => (
-        <NativeIcon library="MaterialCommunityIcons" color={color} name="weight-lifter" size={28} />
-      ),
+      tabBarIcon: ({ color }) => <Icon color={color} name="dumbbell" height={45} />,
     },
   },
   {
@@ -24,14 +23,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     component: MyDietPlanScreen,
     options: {
       tabBarLabel: "",
-      tabBarIcon: ({ color, focused }) => (
-        <NativeIcon
-          library="MaterialCommunityIcons"
-          color={color}
-          name={focused ? "food" : "food-outline"}
-          size={28}
-        />
-      ),
+      tabBarIcon: ({ color }) => <Icon color={color} name="chat" height={45} />,
     },
   },
   {
@@ -40,9 +32,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     options: {
       tabBarLabel: "",
 
-      tabBarIcon: ({ color }: { color: string }) => (
-        <NativeIcon library="MaterialIcons" name="monitor-heart" color={color} size={28} />
-      ),
+      tabBarIcon: ({ color }: { color: string }) => <Icon color={color} name="home" height={45} />,
     },
   },
   {
@@ -51,7 +41,17 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     options: {
       tabBarLabel: "",
       tabBarIcon: ({ color }: { color: string }) => (
-        <NativeIcon library="MaterialIcons" name="post-add" color={color} size={28} />
+        <Icon color={color} name="chefHat" height={45} />
+      ),
+    },
+  },
+  {
+    name: "EmailScreen",
+    component: BlogScreen,
+    options: {
+      tabBarLabel: "",
+      tabBarIcon: ({ color }: { color: string }) => (
+        <Icon color={color} name="sideBar" height={45} />
       ),
     },
   },
