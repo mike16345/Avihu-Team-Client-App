@@ -34,6 +34,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
 
   const [contentHeight, setContentHeight] = useState(0);
   const [measured, setMeasured] = useState(false);
+  const [renderChildren, setRenderChildren] = useState(false);
 
   const height = useRef(new Animated.Value(0)).current;
 
@@ -53,12 +54,18 @@ const Collapsible: React.FC<CollapsibleProps> = ({
         useNativeDriver: false,
         duration: 500,
       }).start();
+
+      setRenderChildren(true);
     } else {
       Animated.timing(height, {
         toValue: 0,
         useNativeDriver: false,
         duration: 500,
       }).start();
+
+      setTimeout(() => {
+        setRenderChildren(false);
+      }, 500); // stop rendering children after animation ends.
     }
   }, [isCollapsed]);
 
@@ -82,7 +89,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
           <Animated.View onLayout={getContentHeight}>{children}</Animated.View>
         </ConditionalRender>
 
-        <ConditionalRender condition={measured}>
+        <ConditionalRender condition={measured && renderChildren}>
           <Animated.View style={{ height, overflow: "hidden" }}>{children}</Animated.View>
         </ConditionalRender>
       </Card.Content>

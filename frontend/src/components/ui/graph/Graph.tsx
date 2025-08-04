@@ -13,12 +13,12 @@ import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { LineChart } from "react-native-chart-kit";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ConditionalRender";
-import { Text } from "../Text";
 import Icon from "../../Icon/Icon";
 import { getIconName, getIconRotation } from "@/utils/graph";
 import SelectedDot from "./SelectedDot";
 import useGraphTheme from "@/themes/useGraphTheme";
 import SelectedCard from "./SelectedCard";
+import GraphLabels from "./GraphLabels";
 
 interface GraphProps {
   header?: ReactNode;
@@ -29,7 +29,7 @@ interface GraphProps {
 }
 
 const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = true }) => {
-  const { colors, common, layout, spacing } = useStyles();
+  const { layout, spacing } = useStyles();
   const graphTheme = useGraphTheme();
 
   const [selected, setSelected] = useState<number | undefined>(undefined);
@@ -69,24 +69,25 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
   const scrollToEnd = () => {
     scrollRef.current?.scrollToEnd();
   };
+
   const scrollToStart = (animated = true) => {
     scrollRef.current?.scrollTo({ x: 0, animated });
   };
 
   const handleLayout = () => {
-    if (readyToScroll) {
-      const SHOULD_ANIMATE = false;
+    if (!readyToScroll) return;
 
-      scrollToStart(SHOULD_ANIMATE);
-      setReadyToScroll(false); // prevent infinite loop
-    }
+    const SHOULD_ANIMATE = false;
+
+    scrollToStart(SHOULD_ANIMATE);
+    setReadyToScroll(false); // prevent infinite loop
   };
 
   useEffect(() => {
-    if (Platform.OS === "android" && mounted) {
-      setReadyToScroll(true);
-    }
-  }, [mounted]);
+    if (Platform.OS !== "android") return;
+
+    setReadyToScroll(true);
+  }, []);
 
   return (
     <View style={[{ padding: 0 }, style]}>
@@ -126,38 +127,12 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
               borderRadius: 16,
             }}
           />
-          <View
-            style={[
-              layout.flexDirectionByPlatform,
-              spacing.gapDefault,
-              layout.alignSelfEnd,
-              layout.justifyBetween,
-              layout.itemsCenter,
-              styles.labels,
-              { width: (labelCount - 0.5) * labelWidth },
-              Platform.OS == "ios" ? { left: 60 } : { right: 60 }, //adnroid is flipped
-            ]}
-          >
-            {labels.map((label, i) => (
-              <View key={i} style={[]}>
-                <TouchableOpacity
-                  onPress={() => setSelectedLabel(i)}
-                  style={[
-                    selectedLabel == i && [
-                      colors.backgroundPrimary,
-                      common.roundedLg,
-                      spacing.pdXs,
-                      { paddingHorizontal: 5 },
-                    ],
-                    layout.center,
-                    layout.alignSelfEnd,
-                  ]}
-                >
-                  <Text style={selectedLabel == i && [colors.textOnPrimary]}>{label}</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
+          <GraphLabels
+            labels={labels}
+            onSelect={(i) => setSelectedLabel(i)}
+            selectedIndex={selectedLabel}
+            width={(labelCount - 0.5) * labelWidth}
+          />
         </View>
       </ScrollView>
       <View style={[layout.flexRow, styles.indicators, spacing.gapDefault]}>
@@ -188,11 +163,6 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
 };
 
 const styles = StyleSheet.create({
-  labels: {
-    minWidth: 100,
-    position: "absolute",
-    bottom: 15,
-  },
   header: {
     paddingHorizontal: 12,
     paddingTop: 15,
