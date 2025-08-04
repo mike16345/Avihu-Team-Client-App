@@ -19,7 +19,7 @@ import { indicators } from "@/utils/navbar";
 const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
 
 const BottomTabNavigator = () => {
-  const { layout, colors, common, fonts, spacing, text } = useStyles();
+  const { layout, colors, common, fonts, spacing } = useStyles();
   const { countdown } = useTimerStore();
   const { width } = useWindowDimensions();
   const HORIZONTAL_MARGIN = 10;
@@ -79,7 +79,7 @@ const BottomTabNavigator = () => {
           colors.backgroundPrimary,
           layout.flexRow,
           layout.itemsCenter,
-          spacing.pdDefault,
+          spacing.pdSm,
           spacing.gapSm,
           common.roundedFull,
           { transform: [{ translateX }] },
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
     bottom: 60,
-    left: 20,
+    right: 20,
     height: 40,
   },
   navigationBar: {
