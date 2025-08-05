@@ -9,13 +9,9 @@ export type SectionWheelPickerProps = {
   onValueChange: (values: any[], indices: number[]) => void;
 };
 
-const SectionWheelPicker: React.FC<SectionWheelPickerProps> = ({
-  data,
-  selectedValues,
-  onValueChange,
-}) => {
+const SectionWheelPicker: React.FC<SectionWheelPickerProps> = ({ data, selectedValues }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container]}>
       {data.map((item, index) => (
         <View key={index}>
           <WheelPicker
@@ -33,7 +29,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
   },
 });
 

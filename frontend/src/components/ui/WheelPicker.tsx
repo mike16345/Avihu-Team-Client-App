@@ -12,7 +12,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   itemHeight = 40,
   activeItemColor,
   inactiveItemColor,
-  label,
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(
     data.findIndex((item) => String(item.value) == String(selectedValue))
@@ -92,7 +91,9 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
               style={[
                 styles.item,
                 index === selectedIndex ? [styles.selectedItem] : null,
-                { height: itemHeight, paddingHorizontal: 20 },
+                {
+                  height: itemHeight,
+                },
               ]}
             >
               <Text
@@ -114,7 +115,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: (height - itemHeight) / 2 }}
         />
-        {label && <Text style={[styles.labelText, { color: inactiveItemColor }]}>{label}</Text>}
       </View>
     </View>
   );
@@ -136,7 +136,9 @@ const styles = StyleSheet.create({
     // Add your selected item styles here
   },
   itemText: {
-    fontSize: 24,
+    fontSize: 28,
+    fontFamily: "Brutalist",
+    paddingHorizontal: 5,
   },
   labelContainer: {
     alignItems: "center",

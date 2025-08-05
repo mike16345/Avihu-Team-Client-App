@@ -36,6 +36,14 @@ class DateUtils {
     return moment(date).format(dateAspect);
   }
 
+  static extractMonthFromDate(date: Date | string): number {
+    return moment(date).month();
+  }
+
+  static extractYearFromDate(date: Date | string): number {
+    return moment(date).year();
+  }
+
   static addDaysToDate(date: Date, days: number): Date {
     return moment(date).add(days, "days").toDate();
   }

@@ -6,6 +6,8 @@ import DateUtils from "@/utils/dateUtils";
 import Collapsible from "@/components/ui/Collapsible";
 import { useState } from "react";
 import { Card } from "@/components/ui/Card";
+import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
+import UploadDrawer from "@/components/ui/UploadDrawer";
 
 const Sandbox = () => {
   const { colors, spacing, layout, common, fonts } = useStyles();
@@ -21,6 +23,10 @@ const Sandbox = () => {
     Math.random() * 100,
   ];
 
+
+const Sandbox = () => {
+  const { colors, spacing, layout } = useStyles();
+
   return (
     <View
       style={[
@@ -30,6 +36,8 @@ const Sandbox = () => {
         colors.background,
         layout.sizeFull,
         spacing.gapDefault,
+        layout.flexRow,
+        layout.center,
       ]}
     >
       <Text style={[colors.textPrimary]}>Sandbox</Text>
@@ -78,6 +86,7 @@ const Sandbox = () => {
           data={data}
         />
       </Collapsible>
+      <UploadDrawer trigger={<PrimaryButton children="Open Modal" icon="like" block />} />
     </View>
   );
 };
