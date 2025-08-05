@@ -18,7 +18,7 @@ const UploadDrawer: React.FC<UploadDrawerProps> = ({ trigger }) => {
     <>
       <TriggerWrapper trigger={trigger} setOpen={() => setOpen(true)} />
 
-      <BottomDrawer key={open.valueOf()} open={open} onClose={onClose}>
+      <BottomDrawer key={String(open.valueOf())} open={open} onClose={onClose}>
         <ImagePreview handleClose={onClose} />
       </BottomDrawer>
     </>
