@@ -10,21 +10,6 @@ import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import UploadDrawer from "@/components/ui/UploadDrawer";
 
 const Sandbox = () => {
-  const { colors, spacing, layout, common, fonts } = useStyles();
-
-  const [collaps, setCollapse] = useState(false);
-
-  const data = [
-    Math.random() * 100,
-    Math.random() * 100,
-    Math.random() * 100,
-    Math.random() * 100,
-    Math.random() * 100,
-    Math.random() * 100,
-  ];
-
-
-const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
 
   return (
