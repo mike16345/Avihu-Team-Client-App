@@ -7,6 +7,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Image,
+  StyleSheet,
 } from "react-native";
 import { useState } from "react";
 import appIcon from "@assets/app-icon.png";
@@ -19,6 +20,7 @@ import Tabs from "../ui/Tabs";
 import LoginForm from "./LoginForm";
 import { useToast } from "@/hooks/useToast";
 import { returnBottomPromptLabel, returnBottomPropt } from "@/utils/auth";
+import RegisterForm from "./RegisterForm";
 
 export interface IUserCredentials {
   email: string;
@@ -52,7 +54,6 @@ export default function Login({ onLogin }: ILoginProps) {
   ];
 
   const handleChangePasswordSuccess = () => {
-    setIsRegistering(false);
     setIsForgotPassword(false);
     setIsChangingPassword(false);
     triggerSuccessToast({ message: `סיסמה עודכנה בהצלחה` });
@@ -89,7 +90,7 @@ export default function Login({ onLogin }: ILoginProps) {
           { height: height, width: width },
         ]}
       >
-        <Image source={appIcon} style={{ height: 64, width: 60, position: "absolute", top: 80 }} />
+        <Image source={appIcon} style={styles.logo} />
 
         <KeyboardAvoidingView
           behavior="padding"
@@ -103,36 +104,42 @@ export default function Login({ onLogin }: ILoginProps) {
             />
           </ConditionalRender>
 
-          <View style={[layout.widthFull, spacing.gapXl]}>
-            <ConditionalRender condition={!isRegistering && !isForgotPassword}>
-              <LoginForm
-                onForgotPasswordPress={() => {
-                  setIsForgotPassword(true);
-                  setIsChangingPassword(true);
-                }}
-                onLoginSuccess={(user) => onLogin(user)}
-              />
-            </ConditionalRender>
+          <ConditionalRender condition={!isRegistering && !isForgotPassword}>
+            <LoginForm
+              onForgotPasswordPress={() => {
+                setIsForgotPassword(true);
+                setIsChangingPassword(true);
+              }}
+              onLoginSuccess={(user) => onLogin(user)}
+            />
+          </ConditionalRender>
 
-            <ConditionalRender condition={isForgotPassword}>
-              <ForgotPassword
-                onBackPress={handleBackPress}
-                onConfirmChangePasswordSuccess={handleChangePasswordSuccess}
-              />
-            </ConditionalRender>
+          <ConditionalRender condition={isForgotPassword}>
+            <ForgotPassword
+              onBackPress={handleBackPress}
+              onConfirmChangePasswordSuccess={handleChangePasswordSuccess}
+            />
+          </ConditionalRender>
+
+          <ConditionalRender condition={isRegistering}>
+            <RegisterForm />
+          </ConditionalRender>
+
+          <View style={[layout.flexRow, layout.center, spacing.gapSm, { zIndex: 30 }]}>
+            <Text style={[colors.textPrimary]}>{registerText}</Text>
+
+            <TouchableOpacity onPress={bottomPromptHandler}>
+              <Text style={[colors.textPrimary, text.textBold]}>
+                {returnBottomPromptLabel(isRegistering, isChangingPassword)}
+              </Text>
+            </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
-
-        <View style={[layout.flexRow, layout.center, spacing.gapSm, { zIndex: 30 }]}>
-          <Text style={[colors.textPrimary]}>{registerText}</Text>
-
-          <TouchableOpacity onPress={bottomPromptHandler}>
-            <Text style={[colors.textPrimary, text.textBold]}>
-              {returnBottomPromptLabel(isRegistering, isChangingPassword)}
-            </Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </TouchableWithoutFeedback>
   );
 }
+
+const styles = StyleSheet.create({
+  logo: { height: 64, width: 60, position: "absolute", top: 80 },
+});

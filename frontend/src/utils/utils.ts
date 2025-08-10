@@ -7,6 +7,12 @@ export const testEmail = (email: string) => {
   return emailRegex.test(email);
 };
 
+export const testPhone = (phone: string) => {
+  const phoneRegex = /^[A-Za-z0-9]{3,}$/;
+
+  return phoneRegex.test(phone);
+};
+
 export const testPassword = (password: string) => {
   const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%])(?=.*\d).+$/;
 

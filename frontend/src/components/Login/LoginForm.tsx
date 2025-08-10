@@ -84,9 +84,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
       <Input
         label="אימייל"
         placeholder="הכנס אימייל"
-        keyboardType={"email-address"}
-        autoCorrect={false}
-        autoComplete="email"
         error={formErrors.email}
         textContentType="emailAddress"
         onChangeText={(val) =>
