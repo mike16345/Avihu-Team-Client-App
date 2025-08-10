@@ -2,19 +2,19 @@ import { Keyboard, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
-import Input from "../ui/Input";
-import Icon from "../Icon/Icon";
+import Input from "../ui/inputs/Input";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import { ICredentialsErrors, IUserCredentials } from "./Login";
 import { testEmail } from "@/utils/utils";
 import { errorNotificationHaptic } from "@/utils/haptics";
-import { EMAIL_ERROR, NO_ACCESS, NO_PASSWORD } from "@/constants/Constants";
+import { NO_ACCESS } from "@/constants/Constants";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useUserStore } from "@/store/userStore";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 import { useToast } from "@/hooks/useToast";
 import { IUser } from "@/interfaces/User";
+import PasswordInput from "../ui/inputs/PasswordInput";
 
 interface LoginFormProps {
   onLoginSuccess: (user: IUser) => void;
@@ -32,7 +32,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
     email: ``,
     password: ``,
   });
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formErrors, setFormErrors] = useState<ICredentialsErrors>({});
 
@@ -44,13 +43,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
     Keyboard.dismiss();
 
     if (!testEmail(formattedEmail)) {
-      errors[`email`] = EMAIL_ERROR;
+      errors[`email`] = true;
     } else {
       delete errors[`email`];
     }
 
     if (!password) {
-      errors[`password`] = NO_PASSWORD;
+      errors[`password`] = true;
     } else {
       delete errors[`password`];
     }
@@ -82,46 +81,29 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
 
   return (
     <View style={spacing.gapXl}>
-      <View style={spacing.gapSm}>
-        <Text style={[layout.alignSelfStart, colors.textPrimary]}>אימייל</Text>
+      <Input
+        label="אימייל"
+        placeholder="הכנס אימייל"
+        keyboardType={"email-address"}
+        autoCorrect={false}
+        autoComplete="email"
+        error={formErrors.email}
+        textContentType="emailAddress"
+        onChangeText={(val) =>
+          setInputtedCredentials({
+            ...inputtedCrendentials,
+            email: val,
+          })
+        }
+        value={inputtedCrendentials.email}
+      />
 
-        <Input
-          placeholder="הכנס אימייל"
-          keyboardType={"email-address"}
-          autoCorrect={false}
-          autoComplete="email"
-          error={!!formErrors.email}
-          textContentType="emailAddress"
-          onChangeText={(val) =>
-            setInputtedCredentials({
-              ...inputtedCrendentials,
-              email: val,
-            })
-          }
-          value={inputtedCrendentials.email}
-        />
-      </View>
-      <View style={[spacing.gapSm]}>
-        <Text style={[layout.alignSelfStart, colors.textPrimary]}>סיסמה</Text>
-
-        <View style={{ position: "relative" }}>
-          <Input
-            placeholder="הכנס סיסמה"
-            secureTextEntry={!showPassword}
-            error={!!formErrors.password}
-            onChangeText={(val) =>
-              setInputtedCredentials({ ...inputtedCrendentials, password: val })
-            }
-          />
-
-          <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
-            style={{ position: "absolute", end: 10, top: 7 }}
-          >
-            <Icon name={showPassword ? "eyeClose" : "eye"} />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <PasswordInput
+        label="סיסמא"
+        placeholder="הכנס סיסמה"
+        error={formErrors.password}
+        onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, password: val })}
+      />
 
       <TouchableOpacity onPress={onForgotPasswordPress}>
         <Text style={[layout.alignSelfStart, colors.textPrimary, text.textBold]}>שכחתי סיסמה</Text>
