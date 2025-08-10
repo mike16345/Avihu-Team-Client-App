@@ -53,6 +53,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 9,
     borderTopRightRadius: 9,
   },
-  errorIcon: { position: "absolute", right: 10, top: 12 },
+  errorIcon: { position: "absolute", start: 10, top: 10 },
 });
 export default Input;
