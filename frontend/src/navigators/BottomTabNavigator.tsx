@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
     bottom: 60,
-    right: 20,
+    start: 20,
     height: 40,
   },
   navigationBar: {
