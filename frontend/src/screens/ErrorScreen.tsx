@@ -19,7 +19,7 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({ isFetching = false, error, re
   return (
     <>
       {isFetching && <Loader variant="Screen" />}
-      <View style={[layout.flex1, layout.center, spacing.gapDefault]}>
+      <View style={[layout.flex1, layout.center, spacing.gapDefault, colors.background]}>
         <NativeIcon
           library="MaterialIcons"
           name="error-outline"

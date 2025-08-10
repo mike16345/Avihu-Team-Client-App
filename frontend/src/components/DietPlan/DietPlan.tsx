@@ -109,7 +109,7 @@ export default function DietPlan() {
         refreshFunc={() => refresh(refetchDietPlan)}
       />
     );
-  if (isError) return <ErrorScreen error={error} refetchFunc={refetchDietPlan} />;
+  if (isError && error) return <ErrorScreen error={error} refetchFunc={refetchDietPlan} />;
 
   return (
     <Portal.Host>
