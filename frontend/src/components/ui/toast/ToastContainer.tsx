@@ -16,13 +16,12 @@ const ToastContainer = () => {
         layout.flexColumn,
         layout.justifyEnd,
         spacing.gapDefault,
-        { position: "absolute", bottom: 150, left: 0 },
+        { position: "absolute", bottom: 100, left: 0 },
       ]}
     >
       {toasts.slice(-3).map((toast) => (
         <Toast key={toast.id} toast={toast} />
       ))}
-      <Toast toast={{ type: "error", duration: 100000, message: "hello", title: "kdjdnd" }} />
     </View>
   );
 };
