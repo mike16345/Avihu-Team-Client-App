@@ -109,7 +109,7 @@ export default function DietPlan() {
         refreshFunc={() => refresh(refetchDietPlan)}
       />
     );
-  if (isError || !data) return <ErrorScreen error={error} refetchFunc={refetchDietPlan} />;
+  if (isError) return <ErrorScreen error={error} refetchFunc={refetchDietPlan} />;
 
   return (
     <Portal.Host>
@@ -175,7 +175,6 @@ export default function DietPlan() {
         )}
 
         <MenuItemModal foodGroup={foodGroupToDisplay} dismiss={closeMenuItemsModal} />
-
         <FABGroup
           open={isFabOpen}
           visible
