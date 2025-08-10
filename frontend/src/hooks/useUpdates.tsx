@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Modal, StyleSheet, TouchableOpacity, View } from "react-native";
 import * as Updates from "expo-updates";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQueryClient } from "@tanstack/react-query";
+import { Text } from "@/components/ui/Text";
 
 const UPDATE_FLAG_KEY = "pending_update";
 const UPDATE_SKIP_COUNT_KEY = "pending_update_skips";
