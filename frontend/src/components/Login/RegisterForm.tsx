@@ -1,10 +1,11 @@
-import { View } from "react-native";
-import React, { useState } from "react";
-import { Text } from "../ui/Text";
+import { Keyboard, View } from "react-native";
+import { useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import Input from "../ui/inputs/Input";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import { testEmail, testPhone } from "@/utils/utils";
+import { useUserApi } from "@/hooks/api/useUserApi";
+import { useToast } from "@/hooks/useToast";
 
 interface INewUserDetails {
   name: string;
@@ -19,7 +20,9 @@ interface IFormErrors {
 }
 
 const RegisterForm = () => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { spacing } = useStyles();
+  const { submitLead } = useUserApi();
+  const { triggerErrorToast } = useToast();
 
   const [newUserDetails, setNewUserDetails] = useState<INewUserDetails>({
     name: "",
@@ -27,6 +30,7 @@ const RegisterForm = () => {
     phone: "",
   });
   const [formErrors, setFormErrors] = useState<IFormErrors>({});
+  const [loading, setLoading] = useState(false);
 
   const handleTextChange = <K extends keyof INewUserDetails>(key: K, value: INewUserDetails[K]) => {
     setNewUserDetails((prev) => ({
@@ -35,7 +39,7 @@ const RegisterForm = () => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { email, name, phone } = newUserDetails;
 
     const errors: IFormErrors = {};
@@ -44,7 +48,7 @@ const RegisterForm = () => {
       errors["name"] = true;
     }
 
-    if (!testEmail(email)) {
+    if (!testEmail(email.trim())) {
       errors["email"] = true;
     }
 
@@ -56,7 +60,17 @@ const RegisterForm = () => {
 
     if (Object.keys(errors).length !== 0) return;
 
-    console.log("yay no error");
+    Keyboard.dismiss();
+
+    setLoading(true);
+
+    try {
+      await submitLead(email, name, phone);
+    } catch (error) {
+      triggerErrorToast({ message: "שגיאה בשמירת הפרטים" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -82,7 +96,7 @@ const RegisterForm = () => {
         error={formErrors.phone}
       />
 
-      <PrimaryButton block onPress={handleSubmit}>
+      <PrimaryButton block onPress={handleSubmit} loading={loading}>
         שלח
       </PrimaryButton>
     </View>
