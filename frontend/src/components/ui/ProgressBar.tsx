@@ -8,7 +8,7 @@ interface ProgressBarProps {
 }
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ maxValue, value }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, common, layout } = useStyles();
 
   const [containerWidth, setContainerWidth] = useState(0);
   const animatedWidth = useRef(new Animated.Value(0)).current;

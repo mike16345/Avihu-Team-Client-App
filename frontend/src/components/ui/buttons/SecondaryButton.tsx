@@ -2,7 +2,7 @@ import { TouchableOpacity } from "react-native";
 import React, { ReactNode } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ConditionalRender";
-import ButtonShadow from "../ButtonShadow";
+import ButtonShadow from "./ButtonShadow";
 import { IconName } from "@/constants/iconMap";
 import Icon from "@/components/Icon/Icon";
 import { Text } from "../Text";
