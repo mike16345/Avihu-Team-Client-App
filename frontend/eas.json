@@ -21,6 +21,9 @@
       "android": {
         "credentialsSource": "local"
       },
+      "ios": {
+        "image": "macos-sequoia-15.3-xcode-16.2"
+      },
       "environment": "production",
       "channel": "production",
       "autoIncrement": true
