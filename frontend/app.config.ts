@@ -8,7 +8,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...config,
     name: "Avihu Team",
     slug: "avihu-team",
-    version: "1.1.2",
+    version: "1.2.0",
     orientation: "portrait",
     icon: "./assets/appstore.png",
     userInterfaceStyle: "dark",
@@ -18,6 +18,16 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     plugins: [
       ["expo-localization"],
+      // [
+      //   "expo-build-properties",
+      //   {
+      //     android: {
+      //       compileSdkVersion: 35,
+      //       targetSdkVersion: 35,
+      //       buildToolsVersion: "35.0.0",
+      //     },
+      //   },
+      // ],
 
       [
         "expo-image-picker",
