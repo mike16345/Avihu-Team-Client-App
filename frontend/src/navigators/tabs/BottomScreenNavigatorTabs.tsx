@@ -1,10 +1,8 @@
-import NativeIcon from "@/components/Icon/NativeIcon";
 import MyDietPlanScreen from "@/screens/MyDietPlanScreen";
 import MyProgressScreen from "@/screens/MyProgressScreen";
 import { NavigatorTab } from "@/types/navigatorTypes";
 import WorkoutPlanStack from "../WorkoutPlanStack";
 import BlogScreen from "@/screens/BlogScreen";
-import MyWorkoutProgressionScreen from "@/screens/MyWorkoutProgressionScreen";
 import Icon from "@/components/Icon/Icon";
 
 const BottomScreenNavigatorTabs: NavigatorTab[] = [
@@ -19,8 +17,8 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     },
   },
   {
-    name: "MyDietPlanPage",
-    component: MyDietPlanScreen,
+    name: "Chat",
+    component: BlogScreen,
     options: {
       tabBarLabel: "",
       tabBarIcon: ({ color }) => <Icon color={color} name="chat" height={45} />,
@@ -31,13 +29,12 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     component: MyProgressScreen,
     options: {
       tabBarLabel: "",
-
       tabBarIcon: ({ color }: { color: string }) => <Icon color={color} name="home" height={45} />,
     },
   },
   {
-    name: "BlogScreen",
-    component: BlogScreen,
+    name: "MyDietPlanPage",
+    component: MyDietPlanScreen,
     options: {
       tabBarLabel: "",
       tabBarIcon: ({ color }: { color: string }) => (
@@ -46,7 +43,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     },
   },
   {
-    name: "EmailScreen",
+    name: "BlogScreen",
     component: BlogScreen,
     options: {
       tabBarLabel: "",

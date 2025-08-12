@@ -3,8 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "./Text";
 import { ConditionalRender } from "./ConditionalRender";
-
-import ButtonShadow from "./ButtonShadow";
+import ButtonShadow from "./buttons/ButtonShadow";
 
 interface ITabItems {
   label: string;
