@@ -14,6 +14,7 @@ interface Badgeprops {
   buttonIcon?: IconName;
   onPress?: () => void;
   disabled?: boolean;
+  alignStart?: boolean;
 }
 
 const Badge: React.FC<Badgeprops> = ({
@@ -24,6 +25,7 @@ const Badge: React.FC<Badgeprops> = ({
   showButton = false,
   showDot = false,
   disabled = false,
+  alignStart = false,
 }) => {
   const { colors, common, layout, spacing } = useStyles();
 
@@ -49,6 +51,7 @@ const Badge: React.FC<Badgeprops> = ({
         spacing.pdVerticalXs,
         spacing.pdHorizontalDefault,
         layout.flexRow,
+        alignStart && layout.alignSelfStart,
         spacing.gapDefault,
         layout.itemsCenter,
         { position: "relative" },
@@ -59,7 +62,7 @@ const Badge: React.FC<Badgeprops> = ({
       </ConditionalRender>
 
       <ConditionalRender condition={typeof children === "string"}>
-        <Text style={[colors.textPrimary, { maxWidth: badgeLength * 0.8 }]}>{children}</Text>
+        <Text style={[colors.textPrimary, { maxWidth: badgeLength }]}>{children}</Text>
       </ConditionalRender>
 
       <ConditionalRender condition={typeof children !== "string"}>{children}</ConditionalRender>
