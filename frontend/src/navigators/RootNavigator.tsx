@@ -14,8 +14,10 @@ import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 import useLogout from "@/hooks/useLogout";
 import useUserQuery from "@/hooks/queries/useUserQuery";
 import SplashScreen from "@/screens/SplashScreen";
+import SuccessScreen from "@/screens/SuccessScreen";
+import { RootStackParamList } from "@/types/navigatorTypes";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
   const queryClient = useQueryClient();
@@ -41,7 +43,6 @@ const RootNavigator = () => {
     if (!token || !tokenData) return;
     const user = tokenData.data.user;
     setCurrentUser(user);
-    setLoading(false);
   };
 
   const checkLoginStatus = async () => {
@@ -66,8 +67,6 @@ const RootNavigator = () => {
       }
     } catch (error) {
       return;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -76,7 +75,8 @@ const RootNavigator = () => {
   }, []);
 
   useEffect(() => {
-    checkLoginStatus();
+    checkLoginStatus().then(() => setLoading(false));
+
     requestPermissions()
       .then(() => {
         initializeNotifications();
@@ -101,6 +101,8 @@ const RootNavigator = () => {
             <Stack.Screen children={() => <Login onLogin={onLogin} />} name="LoginScreen" />
           </>
         )}
+
+        <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
       </Stack.Navigator>
     </>
   );
