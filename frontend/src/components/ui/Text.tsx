@@ -26,6 +26,9 @@ interface TextProps extends RNTextProps {
 
 export const Text: FC<TextProps> = ({ fontVariant = "regular", style, ...props }) => {
   return (
-    <RNText style={[{ fontFamily: FONT_MAP[fontVariant], fontWeight: 600 }, style]} {...props} />
+    <RNText
+      style={[{ fontFamily: FONT_MAP[fontVariant], writingDirection: "rtl" }, style]}
+      {...props}
+    />
   );
 };
