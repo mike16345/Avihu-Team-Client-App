@@ -74,9 +74,7 @@ export const Tabs = ({ value, onValueChange, children }: TabsRootProps) => {
     <TabsContext.Provider
       value={{ value, setValue: onValueChange, tabWidth, registerTab, translateX }}
     >
-      <View onLayout={onLayout} style={{ position: "relative" }}>
-        {children}
-      </View>
+      <View onLayout={onLayout}>{children}</View>
     </TabsContext.Provider>
   );
 };
@@ -127,7 +125,6 @@ export const TabsList = ({ children }: TabsListProps) => {
   );
 };
 
-// Trigger☺
 export const TabsTrigger = ({ label, value }: TabsTriggerProps) => {
   const { setValue, value: activeValue, registerTab } = React.useContext(TabsContext);
   const { layout, text, colors } = useStyles();
@@ -137,7 +134,7 @@ export const TabsTrigger = ({ label, value }: TabsTriggerProps) => {
   }, []);
 
   return (
-    <TouchableOpacity style={[layout.flex1, layout.heightFull]} onPress={() => setValue(value)}>
+    <TouchableOpacity style={[layout.flex1, layout.widthFull]} onPress={() => setValue(value)}>
       <ConditionalRender condition={value !== activeValue}>
         <View style={[layout.center, layout.heightFull]}>
           <Text fontVariant="semibold" style={[text.textCenter, colors.textPrimary]}>
@@ -151,5 +148,5 @@ export const TabsTrigger = ({ label, value }: TabsTriggerProps) => {
 
 export const TabsContent = ({ value, children }: TabsContentProps) => {
   const { value: activeValue } = React.useContext(TabsContext);
-  return activeValue === value ? <View>{children}</View> : null;
+  return activeValue === value ? children : null;
 };

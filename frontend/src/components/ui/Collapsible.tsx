@@ -22,6 +22,8 @@ interface CollapsibleProps {
   variant?: "gray" | "white";
 }
 
+const ANIMATION_DURATION = 250;
+
 const Collapsible: React.FC<CollapsibleProps> = ({
   children,
   trigger,
@@ -48,24 +50,23 @@ const Collapsible: React.FC<CollapsibleProps> = ({
   };
 
   useEffect(() => {
-    if (isCollapsed) {
+    if (!isCollapsed) {
       Animated.timing(height, {
         toValue: contentHeight,
         useNativeDriver: false,
-        duration: 250,
+        duration: ANIMATION_DURATION,
       }).start();
-
       setRenderChildren(true);
     } else {
       Animated.timing(height, {
         toValue: 0,
         useNativeDriver: false,
-        duration: 250,
+        duration: ANIMATION_DURATION,
       }).start();
 
       setTimeout(() => {
         setRenderChildren(false);
-      }, 500); // stop rendering children after animation ends.
+      }, ANIMATION_DURATION);
     }
   }, [isCollapsed]);
 
@@ -76,7 +77,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
           <ConditionalRender condition={typeof trigger === "string"}>
             <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
               <Text style={text.textBold}>{trigger}</Text>
-              <Icon name="chevronDown" rotation={isCollapsed ? 180 : 0} />
+              <Icon name="chevronDown" rotation={!isCollapsed ? 180 : 0} />
             </View>
           </ConditionalRender>
 

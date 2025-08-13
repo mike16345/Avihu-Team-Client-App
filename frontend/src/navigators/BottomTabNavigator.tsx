@@ -99,7 +99,7 @@ const BottomTabNavigator = () => {
 const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
-    bottom: 60,
+    bottom: BOTTOM_BAR_HEIGHT + 20,
     start: 20,
     height: 40,
   },
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     height: 80,
     alignItems: "center",
     marginTop: 10,
-    marginBottom: 40,
+    marginBottom: BOTTOM_BAR_HEIGHT,
     borderRadius: 60,
     overflow: "hidden",
     zIndex: 9999,
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   shadowContainer: {
     position: "absolute",
     borderRadius: 60,
-    bottom: 39,
+    bottom: BOTTOM_BAR_HEIGHT,
     height: 85,
     alignSelf: "center",
     zIndex: -1,

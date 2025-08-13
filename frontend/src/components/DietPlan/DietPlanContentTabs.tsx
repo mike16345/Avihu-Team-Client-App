@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Text } from "../ui/Text";
 import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
@@ -101,22 +101,25 @@ const DietPlanContentTabs = () => {
     setSelectedTab(value);
   };
 
+  const { list: tabList, content: tabContent } = useMemo(() => {
+    const list = tabs.map((tab) => (
+      <TabsTrigger key={tab.label} label={tab.label} value={tab.label} />
+    ));
+
+    const content = tabs.map((tab) => (
+      <TabsContent key={tab.label} value={tab.label}>
+        {tab.value}
+      </TabsContent>
+    ));
+
+    return { list, content };
+  }, [tabs]);
+
   return (
     <Tabs value={selectedTab} onValueChange={onTabChange}>
       <View style={[spacing.gap20]}>
-        <TabsList>
-          {tabs.map((tab) => (
-            <TabsTrigger key={tab.label} label={tab.label} value={tab.label} />
-          ))}
-        </TabsList>
-
-        {tabs.map((tab) => {
-          return (
-            <TabsContent key={tab.label} value={tab.label}>
-              {tab.value}
-            </TabsContent>
-          );
-        })}
+        <TabsList>{tabList}</TabsList>
+        {tabContent}
       </View>
     </Tabs>
   );
