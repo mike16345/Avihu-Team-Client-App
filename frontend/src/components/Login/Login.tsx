@@ -83,14 +83,16 @@ export default function Login({ onLogin }: ILoginProps) {
     >
       <View
         style={[
-          layout.justifyEnd,
+          layout.justifyBetween,
           layout.itemsCenter,
           spacing.gapXl,
           Platform.OS == "ios" && spacing.pdBottomBar,
           { height: height, width: width },
         ]}
       >
-        <Image source={appIcon} style={styles.logo} />
+        <View style={[layout.flex1, layout.justifyCenter]}>
+          <Image source={appIcon} style={styles.logo} />
+        </View>
 
         <KeyboardAvoidingView
           behavior="padding"
@@ -141,5 +143,5 @@ export default function Login({ onLogin }: ILoginProps) {
 }
 
 const styles = StyleSheet.create({
-  logo: { height: 64, width: 60, position: "absolute", top: 80 },
+  logo: { height: 64, width: 60 },
 });
