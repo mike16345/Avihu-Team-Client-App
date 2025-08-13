@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import Login from "@/components/Login/Login";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import BottomTabNavigator from "./BottomTabNavigator";
@@ -13,6 +13,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 import useLogout from "@/hooks/useLogout";
 import useUserQuery from "@/hooks/queries/useUserQuery";
+import SplashScreen from "@/screens/SplashScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,8 @@ const RootNavigator = () => {
   const { initializeNotifications, requestPermissions } = useNotification();
   const { handleLogout } = useLogout();
 
+  const [loading, setLoading] = useState(true);
+
   const onLogin = (user: IUser) => {
     queryClient.setQueryData(["user-", user._id], user);
     setCurrentUser(user);
@@ -38,6 +41,7 @@ const RootNavigator = () => {
     if (!token || !tokenData) return;
     const user = tokenData.data.user;
     setCurrentUser(user);
+    setLoading(false);
   };
 
   const checkLoginStatus = async () => {
@@ -62,6 +66,8 @@ const RootNavigator = () => {
       }
     } catch (error) {
       return;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,6 +88,8 @@ const RootNavigator = () => {
     if (!data) return;
     setCurrentUser(data);
   }, [data]);
+
+  if (loading) return <SplashScreen />;
 
   return (
     <>
