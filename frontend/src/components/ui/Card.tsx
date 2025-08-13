@@ -1,15 +1,14 @@
 import { StyleProp, View, ViewProps, ViewStyle } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import FrameShadow from "./FrameShadow";
 import { PropsWithChildren } from "react";
 
+export type CardVariants = "gray" | "white" | "success";
 interface CardProps extends PropsWithChildren {
-  variant?: "gray" | "white";
+  variant?: CardVariants;
   style?: StyleProp<ViewStyle>;
 }
 
 type CardSubComponentProps = ViewProps;
-
 interface CompoundCard extends React.FC<CardProps> {
   Header: React.FC<CardSubComponentProps>;
   Content: React.FC<CardSubComponentProps>;
@@ -25,6 +24,7 @@ export const Card: CompoundCard = ({ children, variant = "white", style }) => {
   const variantStyles = {
     white: [colors.backgroundSurface, colors.outline],
     gray: [colors.backgroundSecondary, colors.borderSurface],
+    success: [colors.backgroundSuccessContainer, colors.borderSurface],
   };
 
   return (

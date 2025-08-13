@@ -1,3 +1,4 @@
+import { DietItemUnit, IServingItem } from "@/interfaces/DietPlan";
 import Constants from "expo-constants";
 import Toast, { ToastType } from "react-native-toast-message";
 
@@ -176,3 +177,33 @@ export const servingTypeToString = (type: string) => {
 };
 
 export const generateUniqueId = () => Math.random().toString(36).substring(2, 9);
+
+const unitLabels: Record<DietItemUnit, string> = {
+  grams: "גרם",
+  spoons: "כפות",
+  pieces: "חתיכות",
+  scoops: "סקופים",
+  units: "יחידות",
+  cups: "כוסות",
+};
+
+export function formatServingText<K extends keyof IServingItem>(
+  name: string,
+  oneServing: IServingItem,
+  servingsToShow: 1 | 2 = 2,
+  ignoreKeys: K[] = []
+): string {
+  const units = Object.entries(oneServing)
+    .filter(([key, value]) => {
+      return (
+        value !== undefined && value !== null && key !== "_id" && !ignoreKeys.includes(key as K)
+      );
+    })
+    .slice(0, servingsToShow) // limit to requested number of servings
+    .map(([unitKey, value]) => {
+      const label = unitLabels[unitKey as DietItemUnit];
+      return `${value} ${label}`;
+    });
+
+  return [name, ...units].join(" | ");
+}

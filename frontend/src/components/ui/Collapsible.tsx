@@ -6,7 +6,7 @@ import {
   StyleProp,
   ViewStyle,
 } from "react-native";
-import { Card } from "./Card";
+import { Card, CardVariants } from "./Card";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { ConditionalRender } from "./ConditionalRender";
 import useStyles from "@/styles/useGlobalStyles";
@@ -19,7 +19,7 @@ interface CollapsibleProps {
   children: ReactNode;
   trigger: ReactNode;
   style?: StyleProp<ViewStyle>;
-  variant?: "gray" | "white";
+  variant?: CardVariants;
 }
 
 const ANIMATION_DURATION = 250;

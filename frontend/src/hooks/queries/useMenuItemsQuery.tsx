@@ -12,7 +12,7 @@ const useFoodGroupQuery = (foodGroup: FoodGroup | null) => {
   return useQuery<any, any, IMenuItem[], any>({
     queryFn: () => getMenuItems(foodGroup || ``, currentUser?.dietaryType),
     queryKey: [MENU_ITEMS_KEY + foodGroup],
-    enabled: !!(foodGroup && currentUser),
+    enabled: !!foodGroup,
     staleTime: ONE_DAY,
   });
 };

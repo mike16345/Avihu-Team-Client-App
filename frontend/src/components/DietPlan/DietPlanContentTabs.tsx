@@ -86,15 +86,29 @@ const dietPlan = {
   veggiesPerDay: 5,
 };
 
+const Component1 = () => {
+  console.log("Mounted 1!");
+
+  return <Text>Component 1</Text>;
+};
+const Component2 = () => {
+  console.log("Mounted 2!");
+
+  return <Text>Component 2</Text>;
+};
+
 const tabs = [
-  { label: "הארוחות שלי", value: <MealsList meals={dietPlan.meals as IMeal[]} /> },
-  { label: "מידע תזונתי", value: <Text>Dinner Content</Text> },
-  { label: "תוספים", value: <Text>Snacks Content</Text> },
+  {
+    label: "הארוחות שלי",
+    value: <MealsList meals={dietPlan.meals as IMeal[]} />,
+    forceMount: true,
+  },
+  { label: "מידע תזונתי", value: <Component1 />, forceMount: true },
+  { label: "תוספים", value: <Component2 />, forceMount: true },
 ];
 
 const DietPlanContentTabs = () => {
   const { spacing } = useStyles();
-  // TODO: Replace tabs with actual data fetching logic
   const [selectedTab, setSelectedTab] = useState(tabs[0].label);
 
   const onTabChange = (value: string) => {
@@ -107,7 +121,7 @@ const DietPlanContentTabs = () => {
     ));
 
     const content = tabs.map((tab) => (
-      <TabsContent key={tab.label} value={tab.label}>
+      <TabsContent key={tab.label} value={tab.label} forceMount={tab.forceMount}>
         {tab.value}
       </TabsContent>
     ));
@@ -117,7 +131,7 @@ const DietPlanContentTabs = () => {
 
   return (
     <Tabs value={selectedTab} onValueChange={onTabChange}>
-      <View style={[spacing.gap20]}>
+      <View style={[{ height: "100%" }, spacing.gap20]}>
         <TabsList>{tabList}</TabsList>
         {tabContent}
       </View>
