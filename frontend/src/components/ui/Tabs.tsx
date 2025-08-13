@@ -21,6 +21,7 @@ interface TabsTriggerProps {
 }
 
 interface TabsContentProps {
+  forceMount?: boolean;
   value: string;
   children: React.ReactNode;
 }
@@ -146,7 +147,12 @@ export const TabsTrigger = ({ label, value }: TabsTriggerProps) => {
   );
 };
 
-export const TabsContent = ({ value, children }: TabsContentProps) => {
+export const TabsContent = ({ value, children, forceMount = false }: TabsContentProps) => {
   const { value: activeValue } = React.useContext(TabsContext);
-  return activeValue === value ? children : null;
+
+  if (!forceMount) {
+    return activeValue === value ? <>{children}</> : null;
+  }
+
+  return <View style={[{ display: activeValue == value ? "flex" : "none" }]}>{children}</View>;
 };
