@@ -23,6 +23,12 @@ interface IFormErrors {
   phone?: boolean;
 }
 
+const DEFAULT_FORM_DATA = {
+  name: "",
+  email: "",
+  phone: "",
+};
+
 const RegisterForm = () => {
   const { spacing } = useStyles();
   const { submitLead } = useUserApi();
@@ -30,11 +36,7 @@ const RegisterForm = () => {
   const opacity = useFadeIn();
   const navigation = useNavigation<RootStackParamListNavigationProp>();
 
-  const [newUserDetails, setNewUserDetails] = useState<INewUserDetails>({
-    name: "",
-    email: "",
-    phone: "",
-  });
+  const [newUserDetails, setNewUserDetails] = useState<INewUserDetails>(DEFAULT_FORM_DATA);
   const [formErrors, setFormErrors] = useState<IFormErrors>({});
   const [loading, setLoading] = useState(false);
 
@@ -73,6 +75,8 @@ const RegisterForm = () => {
     try {
       await submitLead(email, name, phone);
 
+      setNewUserDetails(DEFAULT_FORM_DATA);
+
       navigation.navigate("SuccessScreen", {
         title: "הפרטים נשמרו בהצלחה!",
         message: "ניצור איתך קשר בהקדם האפשרי",
@@ -91,6 +95,7 @@ const RegisterForm = () => {
         placeholder="הכנס שם מלא"
         onChangeText={(val) => handleTextChange("name", val)}
         error={formErrors.name}
+        value={newUserDetails.name}
       />
       <Input
         label="אימייל"
@@ -98,6 +103,7 @@ const RegisterForm = () => {
         textContentType="emailAddress"
         onChangeText={(val) => handleTextChange("email", val.toLowerCase())}
         error={formErrors.email}
+        value={newUserDetails.email}
       />
       <Input
         label="מספר טלפון"
@@ -105,6 +111,7 @@ const RegisterForm = () => {
         textContentType="telephoneNumber"
         onChangeText={(val) => handleTextChange("phone", val)}
         error={formErrors.phone}
+        value={newUserDetails.phone}
       />
 
       <PrimaryButton block onPress={handleSubmit} loading={loading}>
