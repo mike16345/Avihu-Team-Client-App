@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { IMeal } from "@/interfaces/DietPlan";
 import CollapsibleMeal from "./CollapsibleMeal";
-import { ScrollView } from "react-native";
+import { ScrollView, useWindowDimensions, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 
 interface MealsListProps {
@@ -9,14 +9,17 @@ interface MealsListProps {
 }
 
 const MealsList: FC<MealsListProps> = ({ meals = [] }) => {
+  const { height } = useWindowDimensions();
   const { spacing } = useStyles();
 
   return (
-    <ScrollView contentContainerStyle={[spacing.gap20]}>
-      {meals.map((meal, i) => {
-        return <CollapsibleMeal key={i} meal={meal} index={i} />;
-      })}
-    </ScrollView>
+    <View style={[{ height: height * 0.5 }]}>
+      <ScrollView style={{ flexGrow: 1 }} contentContainerStyle={[{ flexGrow: 1 }, spacing.gap20]}>
+        {meals.map((meal, i) => {
+          return <CollapsibleMeal key={meal._id ?? i} meal={meal} index={i} />;
+        })}
+      </ScrollView>
+    </View>
   );
 };
 
