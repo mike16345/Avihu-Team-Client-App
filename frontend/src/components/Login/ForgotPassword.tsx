@@ -1,4 +1,4 @@
-import { View, BackHandler, TouchableOpacity } from "react-native";
+import { View, BackHandler, TouchableOpacity, Animated } from "react-native";
 import { FC, useEffect, useState } from "react";
 import { useOTPApi } from "@/hooks/api/useOTPApi";
 import useStyles from "@/styles/useGlobalStyles";
@@ -11,6 +11,7 @@ import Input from "../ui/inputs/Input";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { useToast } from "@/hooks/useToast";
+import { useFadeIn } from "@/styles/useFadeIn";
 
 interface IForgotPassword {
   onConfirmChangePasswordSuccess: () => void;
@@ -23,6 +24,7 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
   const { triggerErrorToast } = useToast();
 
   const { layout, colors, spacing, text } = useStyles();
+  const opacity = useFadeIn();
 
   const [email, setEmail] = useState("");
   const [formErrors, setFormErrors] = useState<ICredentialsErrors & { otp?: boolean }>({});
@@ -116,7 +118,7 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
   /*  if (isLoading) return <Loader />; */
 
   return (
-    <View style={[spacing.gapXl]}>
+    <Animated.View style={[spacing.gapXl, { opacity }]}>
       <ConditionalRender condition={!showOtpInput}>
         <Input
           label="אימייל"
@@ -179,7 +181,7 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
           </PrimaryButton>
         </View>
       </ConditionalRender>
-    </View>
+    </Animated.View>
   );
 };
 

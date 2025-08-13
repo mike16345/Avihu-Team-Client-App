@@ -1,4 +1,4 @@
-import { Keyboard, View } from "react-native";
+import { Animated, Keyboard } from "react-native";
 import { useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import Input from "../ui/inputs/Input";
@@ -6,6 +6,10 @@ import PrimaryButton from "../ui/buttons/PrimaryButton";
 import { testEmail, testPhone } from "@/utils/utils";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useToast } from "@/hooks/useToast";
+import { useFadeIn } from "@/styles/useFadeIn";
+import { errorNotificationHaptic } from "@/utils/haptics";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 
 interface INewUserDetails {
   name: string;
@@ -23,6 +27,8 @@ const RegisterForm = () => {
   const { spacing } = useStyles();
   const { submitLead } = useUserApi();
   const { triggerErrorToast } = useToast();
+  const opacity = useFadeIn();
+  const navigation = useNavigation<RootStackParamListNavigationProp>();
 
   const [newUserDetails, setNewUserDetails] = useState<INewUserDetails>({
     name: "",
@@ -58,7 +64,7 @@ const RegisterForm = () => {
 
     setFormErrors(errors);
 
-    if (Object.keys(errors).length !== 0) return;
+    if (Object.keys(errors).length !== 0) return errorNotificationHaptic();
 
     Keyboard.dismiss();
 
@@ -66,6 +72,11 @@ const RegisterForm = () => {
 
     try {
       await submitLead(email, name, phone);
+
+      navigation.navigate("SuccessScreen", {
+        title: "הפרטים נשמרו בהצלחה!",
+        message: "ניצור איתך קשר בהקדם האפשרי",
+      });
     } catch (error) {
       triggerErrorToast({ message: "שגיאה בשמירת הפרטים" });
     } finally {
@@ -74,7 +85,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <View style={spacing.gapXl}>
+    <Animated.View style={[spacing.gapXl, { opacity }]}>
       <Input
         label="שם מלא"
         placeholder="הכנס שם מלא"
@@ -99,7 +110,7 @@ const RegisterForm = () => {
       <PrimaryButton block onPress={handleSubmit} loading={loading}>
         שלח
       </PrimaryButton>
-    </View>
+    </Animated.View>
   );
 };
 
