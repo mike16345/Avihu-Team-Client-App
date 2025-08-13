@@ -110,6 +110,32 @@ export const extractExercises = (exercises: any) => {
   return Object.keys(exercises);
 };
 
+export const foodGroupToApiFoodGroupName = (key: string = "") => {
+  switch (key) {
+    case `totalProtein`:
+    case `חלבונים`:
+    case "protein":
+      return `protein`;
+
+    case `totalCarbs`:
+    case `פחמימות`:
+    case `carbs`:
+      return `carbs`;
+
+    case `totalFats`:
+    case `שומנים`:
+    case `fats`:
+      return `fats`;
+
+    case `totalVeggies`:
+    case `ירקות`:
+    case `vegetables`:
+      return `vegetables`;
+  }
+
+  return key;
+};
+
 export const foodGroupToName = (key: string = "") => {
   switch (key) {
     case `totalProtein`:

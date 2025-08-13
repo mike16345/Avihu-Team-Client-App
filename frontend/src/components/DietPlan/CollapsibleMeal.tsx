@@ -1,12 +1,11 @@
-import React, { FC } from "react";
+import React, { FC, useMemo } from "react";
 import Collapsible from "../ui/Collapsible";
-import { Text } from "../ui/Text";
-import { IMeal } from "@/interfaces/DietPlan";
+import { IDietItem, IMeal } from "@/interfaces/DietPlan";
 import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import GreenDotGenerator from "../ui/GreenDotGenerator";
-import SecondaryButton from "../ui/buttons/SecondaryButton";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
+import DietItemContent from "./DietItemContent";
+import { foodGroupToName } from "@/utils/utils";
 
 interface CollapsibleMealProps {
   meal: IMeal;
@@ -21,21 +20,26 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
     setIsCollapsed((isCollapsed) => !isCollapsed);
   };
 
+  const dietItems = useMemo(() => {
+    return Object.keys(meal).filter((key) => key !== "_id");
+  }, [meal]);
+
   return (
     <Collapsible
       trigger={`ארוחה ${index + 1}`}
       isCollapsed={isCollapsed}
       onCollapseChange={toggleCollapse}
     >
-      <View style={[spacing.gapDefault]}>
-        <View style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
-          <Text fontVariant="bold">חלבונים</Text>
-          <GreenDotGenerator count={meal.totalProtein.quantity} />
-        </View>
-        <Text>2 ביצים 80 גרם | טונה 200 גרם | עדשים 350 גרם | קינואה 450 גרם | סינטה 150 גרם </Text>
-        <SecondaryButton rightIcon="info">
-          <Text fontVariant="semibold">הצגת תחליף לארוחה בחלבון</Text>
-        </SecondaryButton>
+      <View style={[layout.flex1, layout.flexGrow, spacing.gapLg]}>
+        {dietItems.map((dietItem, i) => {
+          return (
+            <DietItemContent
+              key={`${dietItem}-${i}`}
+              name={foodGroupToName(dietItem)}
+              dietItem={meal[dietItem as keyof IMeal] as IDietItem}
+            />
+          );
+        })}
         <PrimaryButton block>סיום ארוחה</PrimaryButton>
       </View>
     </Collapsible>
