@@ -28,20 +28,18 @@ export const Card: CompoundCard = ({ children, variant = "white", style }) => {
   };
 
   return (
-    <FrameShadow>
-      <View
-        style={[
-          variantStyles[variant],
-          common.borderSm,
-          spacing.pdDefault,
-          common.roundedSm,
-          spacing.gapDefault,
-          style,
-        ]}
-      >
-        {children}
-      </View>
-    </FrameShadow>
+    <View
+      style={[
+        variantStyles[variant],
+        common.borderSm,
+        spacing.pdDefault,
+        common.roundedSm,
+        spacing.gapDefault,
+        style,
+      ]}
+    >
+      {children}
+    </View>
   );
 };
 

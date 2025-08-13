@@ -5,6 +5,7 @@ import { IconName } from "@/constants/iconMap";
 import { ConditionalRender } from "./ConditionalRender";
 import { Text } from "./Text";
 import Icon from "../Icon/Icon";
+import GreenDot from "./GreenDot";
 
 interface Badgeprops {
   showDot?: boolean;
@@ -58,7 +59,7 @@ const Badge: React.FC<Badgeprops> = ({
       ]}
     >
       <ConditionalRender condition={showDot}>
-        <View style={[styles.dot, colors.backgroundSuccess, common.roundedFull]}></View>
+        <GreenDot />
       </ConditionalRender>
 
       <ConditionalRender condition={typeof children === "string"}>

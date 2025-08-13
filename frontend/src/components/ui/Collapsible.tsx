@@ -52,7 +52,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
       Animated.timing(height, {
         toValue: contentHeight,
         useNativeDriver: false,
-        duration: 500,
+        duration: 250,
       }).start();
 
       setRenderChildren(true);
@@ -60,7 +60,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
       Animated.timing(height, {
         toValue: 0,
         useNativeDriver: false,
-        duration: 500,
+        duration: 250,
       }).start();
 
       setTimeout(() => {
