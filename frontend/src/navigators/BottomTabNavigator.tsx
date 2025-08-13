@@ -86,7 +86,9 @@ const BottomTabNavigator = () => {
         ]}
       >
         <Icon name={indicators[activeIndex].icon} color="white" />
-        <Text style={[colors.textOnPrimary, fonts.sm]}>{indicators[activeIndex].name}</Text>
+        <Text fontVariant="semibold" style={[colors.textOnPrimary, fonts.sm]}>
+          {indicators[activeIndex].name}
+        </Text>
       </Animated.View>
       <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 }]}></View>
       <ConditionalRender condition={!!countdown} children={<TimerDrawer />} />

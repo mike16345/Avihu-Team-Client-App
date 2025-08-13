@@ -12,7 +12,6 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     options: {
       tabBarLabel: "",
       tabBarAccessibilityLabel: "אימונים",
-
       tabBarIcon: ({ color }) => <Icon color={color} name="dumbbell" height={45} />,
     },
   },

@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 export type RootStackParamList = {
   Home: undefined;
   Profile: undefined;
+  Chat: undefined;
   Settings: undefined;
   MyWorkoutPlanPage: undefined;
   MyDietPlanPage: undefined;
