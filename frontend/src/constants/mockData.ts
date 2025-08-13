@@ -1,6 +1,6 @@
 export const MOCK_WORKOUT_PLAN = {
-  _id: "6772682a0b6fac6c525d77da",
-  userId: "6772665d66cd0542e69b0d70",
+  _id: "11112222",
+  userId: "11111111",
   tips: [
     "הקפד על חימום לפני תחילת האימון",
     "שתה מספיק מים במהלך היום",
