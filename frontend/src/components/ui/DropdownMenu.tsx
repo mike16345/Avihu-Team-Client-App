@@ -7,8 +7,8 @@ import { ConditionalRender } from "./ConditionalRender";
 
 export interface DropDownMenuProps {
   selectedValue?: string;
-  onSelect: (selected: string) => void;
-  items: ItemType<string>[];
+  onSelect: (selected: any) => void;
+  items: ItemType<any>[];
 }
 
 const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedValue }) => {
@@ -16,7 +16,7 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
 
   const [open, setOpen] = useState(false);
 
-  const handleSelect = (value: string) => {
+  const handleSelect = (value: any) => {
     onSelect(value);
     setOpen(false);
   };
