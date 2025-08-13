@@ -3,7 +3,7 @@ import useSlideInAnimations from "@/styles/useSlideInAnimations";
 import React from "react";
 import { Animated } from "react-native";
 import AmountContainer from "./AmountContainer";
-import Tips from "./Tips";
+
 import { ScrollView } from "react-native-gesture-handler";
 import { ConditionalRender } from "../ui/ConditionalRender";
 
@@ -34,9 +34,8 @@ const ExtraInfoContainer: React.FC<ExtraInfoContainerProps> = ({
           { direction: `ltr` },
         ]}
       >
-        <ConditionalRender condition={customInstructions && customInstructions?.length > 0}>
-          <Tips tips={customInstructions!} />
-        </ConditionalRender>
+        {/*     <ConditionalRender condition={customInstructions && customInstructions?.length > 0}>
+        </ConditionalRender> */}
 
         <ConditionalRender condition={!!freeCalories}>
           <AmountContainer title="קלוריות חופשיות" variant="קל" amount={freeCalories} />

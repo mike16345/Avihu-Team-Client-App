@@ -10,15 +10,16 @@ import {
   StyleProp,
   Animated,
 } from "react-native";
-import Icon from "../Icon/Icon";
-import { Text } from "./Text";
+import Icon from "../../Icon/Icon";
+import { Text } from "../Text";
 import { IconName } from "@/constants/iconMap";
-import { ConditionalRender } from "./ConditionalRender";
-import { Card } from "./Card";
+import { ConditionalRender } from "../ConditionalRender";
+import { Card } from "../Card";
 import { ModalContextProvider, useModalContext } from "@/context/useModal";
 import useCommonStyles from "@/styles/useCommonStyles";
+import { useLayoutStyles } from "@/styles/useLayoutStyles";
 
-interface CustomModalProps extends ModalProps {
+export interface CustomModalProps extends ModalProps {
   style?: StyleProp<ViewStyle>;
 }
 
@@ -60,12 +61,12 @@ export const CustomModal: CompoundModal = ({ children, onDismiss, visible, ...pr
       <Animated.View
         style={[
           colors.background,
-          layout.sizeFull,
           spacing.gapDefault,
           spacing.pdStatusBar,
           spacing.pdBottomBar,
           spacing.pdLg,
           spacing.gapDefault,
+          layout.flex1,
           {
             opacity: opcaity,
             paddingTop: spacing?.pdStatusBar?.paddingTop * 2,
@@ -100,9 +101,10 @@ CustomModal.Header = ({ children, style, dismissIcon = "close", ...props }) => {
 
 CustomModal.Content = ({ children, variant = "gray", style }) => {
   const { roundedMd } = useCommonStyles();
+  const { sizeFull } = useLayoutStyles();
 
   return (
-    <Card style={[roundedMd, style]} variant={variant}>
+    <Card style={[roundedMd, sizeFull, style]} variant={variant}>
       {children}
     </Card>
   );

@@ -1,7 +1,7 @@
 import { Dimensions, FlatList, View } from "react-native";
 import { Dispatch, FC, SetStateAction } from "react";
 import NativeIcon from "@/components/Icon/NativeIcon";
-import { CustomModal } from "../ui/Modal";
+import { CustomModal } from "../ui/modals/Modal";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
 import BottomDrawer from "../ui/BottomDrawer";
