@@ -55,7 +55,7 @@ const BottomTabNavigator = () => {
             ...styles.navigationBar,
           },
         ]}
-        initialRouteName="MyProgressScreen"
+        initialRouteName="MyWorkoutPlanPage"
         activeIndicatorStyle={{
           backgroundColor: "",
         }}
@@ -67,7 +67,7 @@ const BottomTabNavigator = () => {
             <Tab.Screen
               key={tab.name}
               name={tab.name}
-              component={Sandbox}
+              component={tab.component}
               options={{ ...tab.options }}
             />
           );
