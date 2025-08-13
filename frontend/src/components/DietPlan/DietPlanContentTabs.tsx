@@ -1,14 +1,99 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
 import { useState } from "react";
 import { Text } from "../ui/Text";
+import { View } from "react-native";
+import useStyles from "@/styles/useGlobalStyles";
+import MealsList from "./MealsList";
+import { IMeal } from "@/interfaces/DietPlan";
+
+const dietPlan = {
+  _id: "6810ea7b4829230cb4bd680f",
+  userId: "22222",
+  meals: [
+    {
+      totalProtein: {
+        quantity: 1.5,
+        customItems: [],
+        extraItems: [
+          "2 ביצים + 1 לבן",
+          "גביע קוטג 1 אחוז+ביצה",
+          "משקה חלבון יטבתה (הזירו)+ יוגורט גו",
+          "1 וחצי סקופ אבקת חלבון",
+          "200 גרם גבינה לבנה 3 אחוז + ביצה",
+          "4 פרוסות גבנצ 9 אחוז",
+          "2 מעדני גו חלבון",
+          "חטיף חלבון",
+          "קוטג 3 אחוז",
+        ],
+        _id: "6810ea7b4829230cb4bd6811",
+      },
+      totalCarbs: {
+        quantity: 2,
+        customItems: [],
+        extraItems: [],
+        _id: "6810ea7b4829230cb4bd6812",
+      },
+      _id: "6810ea7b4829230cb4bd6810",
+    },
+    {
+      totalProtein: {
+        quantity: 2,
+        customItems: [],
+        extraItems: [],
+        _id: "6810ea7b4829230cb4bd6814",
+      },
+      totalCarbs: {
+        quantity: 2,
+        customItems: [],
+        extraItems: [],
+        _id: "6810ea7b4829230cb4bd6815",
+      },
+      _id: "6810ea7b4829230cb4bd6813",
+    },
+    {
+      totalProtein: {
+        quantity: 1,
+        customItems: [],
+        extraItems: [],
+        _id: "6810ea7b4829230cb4bd6817",
+      },
+      totalCarbs: {
+        quantity: 2,
+        customItems: [],
+        extraItems: [],
+        _id: "6810ea7b4829230cb4bd6818",
+      },
+      _id: "6810ea7b4829230cb4bd6816",
+    },
+    {
+      totalProtein: {
+        quantity: 1.5,
+        customItems: [],
+        extraItems: [],
+        _id: "6810ea7b4829230cb4bd681a",
+      },
+      totalCarbs: {
+        quantity: 0,
+        customItems: [],
+        extraItems: [],
+        _id: "6810ea7b4829230cb4bd681b",
+      },
+      _id: "6810ea7b4829230cb4bd6819",
+    },
+  ],
+  customInstructions: ["כמה שיותר להתייעץ איתי בפרטי!"],
+  freeCalories: 250,
+  veggiesPerDay: 5,
+};
 
 const tabs = [
-  { label: "הארוחות שלי", value: <Text>Breakfast Content</Text> },
+  { label: "הארוחות שלי", value: <MealsList meals={dietPlan.meals as IMeal[]} /> },
   { label: "מידע תזונתי", value: <Text>Dinner Content</Text> },
   { label: "תוספים", value: <Text>Snacks Content</Text> },
 ];
 
 const DietPlanContentTabs = () => {
+  const { spacing } = useStyles();
   // TODO: Replace tabs with actual data fetching logic
   const [selectedTab, setSelectedTab] = useState(tabs[0].label);
 
@@ -18,19 +103,21 @@ const DietPlanContentTabs = () => {
 
   return (
     <Tabs value={selectedTab} onValueChange={onTabChange}>
-      <TabsList>
-        {tabs.map((tab) => (
-          <TabsTrigger key={tab.label} label={tab.label} value={tab.label} />
-        ))}
-      </TabsList>
+      <View style={[spacing.gap20]}>
+        <TabsList>
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab.label} label={tab.label} value={tab.label} />
+          ))}
+        </TabsList>
 
-      {tabs.map((tab) => {
-        return (
-          <TabsContent key={tab.label} value={tab.label}>
-            {tab.value}
-          </TabsContent>
-        );
-      })}
+        {tabs.map((tab) => {
+          return (
+            <TabsContent key={tab.label} value={tab.label}>
+              {tab.value}
+            </TabsContent>
+          );
+        })}
+      </View>
     </Tabs>
   );
 };
