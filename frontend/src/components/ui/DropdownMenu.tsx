@@ -48,7 +48,7 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
           colors.borderOnPrimary,
           common.rounded,
           common.borderSm,
-          spacing.mgVerticalDefault,
+          spacing.mgVerticalLg,
           {
             elevation: 3,
             borderTopEndRadius: 10,
