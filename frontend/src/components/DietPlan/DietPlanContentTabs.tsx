@@ -5,6 +5,7 @@ import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import MealsList from "./MealsList";
 import { IMeal } from "@/interfaces/DietPlan";
+import FoodGroupTabs from "./FoodGroupTabs";
 
 const dietPlan = {
   _id: "6810ea7b4829230cb4bd680f",
@@ -103,7 +104,7 @@ const tabs = [
     value: <MealsList meals={dietPlan.meals as IMeal[]} />,
     forceMount: true,
   },
-  { label: "מידע תזונתי", value: <Component1 />, forceMount: true },
+  { label: "מידע תזונתי", value: <FoodGroupTabs />, forceMount: true },
   { label: "תוספים", value: <Component2 />, forceMount: true },
 ];
 
@@ -130,12 +131,14 @@ const DietPlanContentTabs = () => {
   }, [tabs]);
 
   return (
-    <Tabs value={selectedTab} onValueChange={onTabChange}>
-      <View style={[{ height: "100%" }, spacing.gap20]}>
-        <TabsList>{tabList}</TabsList>
-        {tabContent}
-      </View>
-    </Tabs>
+    <View>
+      <Tabs value={selectedTab} onValueChange={onTabChange}>
+        <View style={[spacing.gap20]}>
+          <TabsList>{tabList}</TabsList>
+          {tabContent}
+        </View>
+      </Tabs>
+    </View>
   );
 };
 

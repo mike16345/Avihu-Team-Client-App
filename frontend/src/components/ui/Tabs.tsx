@@ -69,7 +69,7 @@ export const Tabs = ({ value, onValueChange, children }: TabsRootProps) => {
       toValue: -activeIndex * tabWidth,
       useNativeDriver: true,
     }).start();
-  }, [value, tabWidth, tabs]);
+  }, [value, tabs]);
 
   return (
     <TabsContext.Provider

@@ -140,15 +140,19 @@ export const foodGroupToApiFoodGroupName = (key: string = "") => {
 export const foodGroupToName = (key: string = "") => {
   switch (key) {
     case `totalProtein`:
+    case "protein":
       return `חלבונים`;
 
     case `totalCarbs`:
+    case `carbs`:
       return `פחמימות`;
 
     case `totalFats`:
+    case `fats`:
       return `שומנים`;
 
     case `totalVeggies`:
+    case `vegetables`:
       return `ירקות`;
   }
 
