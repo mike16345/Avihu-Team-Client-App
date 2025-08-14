@@ -10,7 +10,7 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
 import { DarkTheme as CustomDarkTheme, ThemeProvider } from "@/themes/useAppTheme";
-import { Appearance, I18nManager } from "react-native";
+import { Appearance, I18nManager, Platform, View } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import Toast from "react-native-toast-message";
@@ -41,7 +41,7 @@ export default function App() {
   if (!loaded || !ready) return;
 
   return (
-    <PaperProvider theme={CustomDarkTheme}>
+  <PaperProvider theme={CustomDarkTheme}>
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
@@ -49,13 +49,15 @@ export default function App() {
               client={queryClient}
               persistOptions={{ persister: persister }}
             >
-              <NavigationContainer theme={DarkTheme}>
-                <RootNavigator />
-                <StatusBar key={colorScheme} translucent style={"light"} />
-                <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} config={toastConfig} />
-                <UserDrawer />
-                <Update />
-              </NavigationContainer>
+              <View style={{ flex: 1, direction: Platform.OS == "ios" ? "ltr" : undefined }}>
+                <NavigationContainer theme={DarkTheme}>
+                  <RootNavigator />
+                  <StatusBar key={colorScheme} translucent style={"light"} />
+                  <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} config={toastConfig} />
+                  <UserDrawer />
+                  <Update />
+                </NavigationContainer>
+              </View>
             </PersistQueryClientProvider>
           </SafeAreaProvider>
         </GestureHandlerRootView>
