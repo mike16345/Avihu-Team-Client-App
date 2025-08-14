@@ -6,7 +6,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import useExerciseMethodQuery from "@/hooks/queries/useExerciseMethodQuery";
 import NativeIcon from "../Icon/NativeIcon";
 import Loader from "../ui/loaders/Loader";
-import ErrorScreen from "@/screens/ErrorScreen";
+import { ConditionalRender } from "../ui/ConditionalRender";
 
 interface ExerciseMethodDrawerProps {
   open: boolean;
@@ -20,17 +20,14 @@ const ExerciseMethodDrawer: React.FC<ExerciseMethodDrawerProps> = ({
   exerciseMethodBName,
 }) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
-  const { data, isError, isLoading } = useExerciseMethodQuery(exerciseMethodBName);
-
-  if (isLoading && open) return <Loader />;
-  if (isError) return <ErrorScreen />;
+  const { data, isLoading } = useExerciseMethodQuery(exerciseMethodBName);
 
   return (
-    <BottomDrawer
-      onClose={close}
-      open={open}
-      heightVariant="auto"
-      children={
+    <BottomDrawer onClose={close} open={open} heightVariant="auto">
+      <ConditionalRender condition={isLoading}>
+        <Loader />
+      </ConditionalRender>
+      <ConditionalRender condition={!isLoading && data}>
         <View style={[layout.itemsEnd, spacing.gapDefault, spacing.pdDefault, spacing.pdBottomBar]}>
           <Text
             style={[
@@ -73,8 +70,8 @@ const ExerciseMethodDrawer: React.FC<ExerciseMethodDrawerProps> = ({
             </View>
           </View>
         </View>
-      }
-    />
+      </ConditionalRender>
+    </BottomDrawer>
   );
 };
 
