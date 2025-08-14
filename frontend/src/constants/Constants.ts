@@ -9,3 +9,4 @@ export const INVALID_PASSWORD = `סיסמה לא תקינה`;
 export const NO_PASSWORD = `אנא הזינו סיסמה`;
 export const NO_ACCESS = `אין למשתמש גישה!`;
 export const SESSION_EXPIRED = `נא להיכנס שוב`;
+export const CARDIO_VALUE = "אירובי";

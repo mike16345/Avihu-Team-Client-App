@@ -2,12 +2,14 @@ import { Platform, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { ISimpleCardioType } from "@/interfaces/Workout";
 import useStyles from "@/styles/useGlobalStyles";
-import { translateWorkoutKeys } from "@/utils/cardioUtils";
+import { MINS_PER_WEEK, translateWorkoutKeys } from "@/utils/cardioUtils";
 import { Text } from "@/components/ui/Text";
 import useCardioWorkoutQuery from "@/hooks/queries/useCardioWorkoutQuery";
 import Loader from "@/components/ui/loaders/Loader";
 import ErrorScreen from "@/screens/ErrorScreen";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
+import { Card } from "@/components/ui/Card";
+import Icon from "@/components/Icon/Icon";
 
 interface SimpleCardioContainerProps {
   plan?: ISimpleCardioType;
@@ -31,28 +33,34 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
 
   return (
     <View style={[common.rounded, , spacing.gapLg]}>
-      <View style={[spacing.gapDefault]}>
+      <View style={[spacing.gapLg]}>
         {values?.map((val, i) => (
-          <View
-            style={[
-              layout.itemsCenter,
-              spacing.pdDefault,
-              colors.backgroundSecondaryContainer,
-              common.rounded,
-            ]}
-            key={i}
-          >
-            <Text style={[colors.textOnBackground, colors.textPrimary, text.textBold]}>
-              {val.title}
-            </Text>
-            <Text style={[colors.textOnBackground, fonts.xl, text.textBold]}>{val.value}</Text>
-          </View>
+          <Card variant="gray" style={[layout.itemsCenter, spacing.pdDefault]} key={i}>
+            <Text style={colors.textPrimary}>{val.title}</Text>
+
+            <ConditionalRender condition={val.title == MINS_PER_WEEK}>
+              <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
+                <Icon name="clock" />
+                <Text style={[colors.textPrimary, fonts.lg, text.textBold]}>{val.value} דקות</Text>
+              </View>
+            </ConditionalRender>
+
+            <ConditionalRender condition={val.title !== MINS_PER_WEEK}>
+              <Text style={[colors.textPrimary, fonts.lg, text.textBold]}>{val.value}</Text>
+            </ConditionalRender>
+          </Card>
         ))}
-        <View style={[colors.backgroundSecondaryContainer, common.rounded, spacing.pdDefault]}>
-          <Text style={[colors.textPrimary, text.textCenter, text.textBold]}>רשימת התרגילים:</Text>
+
+        <Card variant="gray">
+          <Text style={[colors.textPrimary, text.textCenter]}>רשימת תרגילים:</Text>
+          <ConditionalRender condition={cardioWorkouts}>
+            <Text style={[text.textCenter, fonts.lg, text.textBold]}>
+              {cardioWorkouts?.data.length}
+            </Text>
+          </ConditionalRender>
           <View
             style={[
-              Platform.OS == `ios` ? layout.flexRowReverse : layout.flexRow,
+              layout.flexRow,
               layout.justifyCenter,
               layout.wrap,
               spacing.gapDefault,
@@ -73,14 +81,16 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
                     spacing.pdHorizontalSm,
                     spacing.pdVerticalXs,
                     common.rounded,
+                    common.borderXsm,
+                    colors.outline,
                   ]}
                 >
-                  <Text style={[colors.textOnBackground]}>{activity.name}</Text>
+                  <Text style={[colors.textPrimary]}>{activity.name}</Text>
                 </View>
               ))}
             </ConditionalRender>
           </View>
-        </View>
+        </Card>
         <ConditionalRender condition={!!plan?.tips}>
           <View style={[spacing.pdDefault, colors.backgroundSecondaryContainer, common.rounded]}>
             <Text

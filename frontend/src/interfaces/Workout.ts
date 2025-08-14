@@ -60,7 +60,7 @@ export interface IRecordedSetPost {
 }
 
 export interface IWorkoutPlan {
-  id?: string;
+  _id?: string;
   userId?: string;
   planName: string;
   muscleGroups: IMuscleGroupWorkouts[];

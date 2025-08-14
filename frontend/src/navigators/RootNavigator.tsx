@@ -86,7 +86,7 @@ const RootNavigator = () => {
   return (
     <>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!currentUser ? (
+        {currentUser ? (
           <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
         ) : (
           <>

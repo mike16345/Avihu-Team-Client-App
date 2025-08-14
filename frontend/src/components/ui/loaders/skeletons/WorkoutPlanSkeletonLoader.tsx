@@ -6,11 +6,14 @@ const WorkoutPlanSkeletonLoader = () => {
   const { layout, spacing } = useStyles();
 
   return (
-    <View style={[layout.container, layout.heightFull, spacing.gapLg, layout.itemsEnd]}>
-      <SkeletonLoader height={40} />
-      <SkeletonLoader height={20} width={50} />
+    <View
+      style={[layout.container, layout.heightFull, spacing.gapLg, layout.itemsEnd, spacing.pdLg]}
+    >
+      <SkeletonLoader height={120} style={spacing.mgVerticalLg} />
+      <SkeletonLoader height={30} width={70} style={layout.alignSelfStart} />
       <SkeletonLoader height={80} />
       <SkeletonLoader height={80} />
+      <SkeletonLoader height={30} width={70} style={layout.alignSelfStart} />
       <SkeletonLoader height={80} />
       <SkeletonLoader height={80} />
       <SkeletonLoader height={80} />
