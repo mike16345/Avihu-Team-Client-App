@@ -1,6 +1,6 @@
 import { RefreshControl, ScrollView, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IWorkoutPlan } from "@/interfaces/Workout";
 import MuscleGroupContainer from "@/components/WorkoutPlan/new/MuscleGroupContainer";
 import TipsModal from "@/components/ui/modals/TipsModal";
@@ -23,6 +23,7 @@ const MyWorkoutPlanScreen = () => {
   const [selectedPlan, setSelectedPlan] = useState<IWorkoutPlan>();
   const [showCardio, setShowCardio] = useState(false);
   const [showTips, setShowTips] = useState(false);
+  const [tips, setTips] = useState();
   const [plans, setPlans] = useState<ItemType<string>[]>();
 
   const handleSelect = (val: any) => {
@@ -52,6 +53,7 @@ const MyWorkoutPlanScreen = () => {
 
     setPlans(plans);
     setSelectedPlan(data.workoutPlans[0]);
+    setTips([...data.tips, data.cardio.plan.tips]);
   }, [data]);
 
   if (isError)
@@ -97,7 +99,7 @@ const MyWorkoutPlanScreen = () => {
         </ScrollView>
       </View>
 
-      <TipsModal tips={data?.tips || []} visible={showTips} onDismiss={() => setShowTips(false)} />
+      <TipsModal tips={tips} visible={showTips} onDismiss={() => setShowTips(false)} />
     </>
   );
 };

@@ -6,12 +6,12 @@ import { ConditionalRender } from "../ConditionalRender";
 import { Text } from "../Text";
 
 interface TipsModalProps extends CustomModalProps {
-  tips: string[];
+  tips?: string[];
   noDataMessage?: string;
 }
 
 const TipsModal: React.FC<TipsModalProps> = ({
-  tips,
+  tips = [],
   noDataMessage = "אין דגשים להצגה",
   ...props
 }) => {
