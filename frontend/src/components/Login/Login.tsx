@@ -19,7 +19,7 @@ import { ConditionalRender } from "../ui/ConditionalRender";
 import Tabs from "../ui/Tabs";
 import LoginForm from "./LoginForm";
 import { useToast } from "@/hooks/useToast";
-import { returnBottomPromptLabel, returnBottomPropt } from "@/utils/auth";
+import { getRegisterOrLoginPrompt, getRegisterOrLoginPromptLabel } from "@/utils/auth";
 import RegisterForm from "./RegisterForm";
 
 export interface IUserCredentials {
@@ -46,7 +46,7 @@ export default function Login({ onLogin }: ILoginProps) {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
-  const registerText = returnBottomPropt(isRegistering, isChangingPassword);
+  const registerOrLoginPrompt = getRegisterOrLoginPrompt(isRegistering, isChangingPassword);
 
   const loginTabs = [
     { label: "התחברות", value: false },
@@ -128,11 +128,11 @@ export default function Login({ onLogin }: ILoginProps) {
           </ConditionalRender>
 
           <View style={[layout.flexRow, layout.center, spacing.gapSm, { zIndex: 30 }]}>
-            <Text style={[colors.textPrimary]}>{registerText}</Text>
+            <Text style={[colors.textPrimary]}>{registerOrLoginPrompt}</Text>
 
             <TouchableOpacity onPress={bottomPromptHandler}>
               <Text style={[colors.textPrimary, text.textBold]}>
-                {returnBottomPromptLabel(isRegistering, isChangingPassword)}
+                {getRegisterOrLoginPromptLabel(isRegistering, isChangingPassword)}
               </Text>
             </TouchableOpacity>
           </View>

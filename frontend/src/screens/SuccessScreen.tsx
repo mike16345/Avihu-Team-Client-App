@@ -36,7 +36,7 @@ export const SuccessScreen: React.FC<SuccessScreenProps> = ({ route }) => {
         <Icon name="like" height={80} width={80} />
         <View style={layout.center}>
           <Text style={[text.textBold, fonts.xl]}>{route?.params?.title}</Text>
-          <Text style={[, fonts.lg]}>{route?.params?.message}</Text>
+          <Text style={fonts.lg}>{route?.params?.message}</Text>
         </View>
       </View>
       <PrimaryButton

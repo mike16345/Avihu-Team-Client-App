@@ -115,8 +115,6 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
     };
   }, []);
 
-  /*  if (isLoading) return <Loader />; */
-
   return (
     <Animated.View style={[spacing.gapXl, { opacity }]}>
       <ConditionalRender condition={!showOtpInput}>

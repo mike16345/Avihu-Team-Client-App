@@ -50,13 +50,14 @@ const RegisterForm = () => {
   const handleSubmit = async () => {
     const { email, name, phone } = newUserDetails;
 
+    const formattedEmail = email.toLowerCase().trim();
     const errors: IFormErrors = {};
 
     if (!name) {
       errors["name"] = true;
     }
 
-    if (!testEmail(email.trim())) {
+    if (!testEmail(formattedEmail)) {
       errors["email"] = true;
     }
 
@@ -73,7 +74,7 @@ const RegisterForm = () => {
     setLoading(true);
 
     try {
-      await submitLead(email, name, phone);
+      await submitLead(formattedEmail, name, phone);
 
       setNewUserDetails(DEFAULT_FORM_DATA);
 
@@ -101,7 +102,7 @@ const RegisterForm = () => {
         label="אימייל"
         placeholder="הכנס אימייל"
         textContentType="emailAddress"
-        onChangeText={(val) => handleTextChange("email", val.toLowerCase())}
+        onChangeText={(val) => handleTextChange("email", val)}
         error={formErrors.email}
         value={newUserDetails.email}
       />
