@@ -7,35 +7,43 @@ import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { foodGroupToName, formatServingText } from "@/utils/utils";
 import { Text } from "../ui/Text";
 import { Card } from "../ui/Card";
-import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 
 const FoodGroupTabs = () => {
   const { layout, spacing } = useStyles();
   const { data, isLoading } = useMenuItemsQuery();
 
-  const { tabNames, tabTriggers, tabContent } = useMemo(() => {
+  const [selectedTab, setSelectedTab] = useState<string>("");
+
+  const { tabTriggers, tabContent } = useMemo(() => {
     if (!data) return {};
     const tabTriggers: ReactNode[] = [];
     const tabContent: ReactNode[] = [];
     const tabNames: string[] = [];
 
-    Object.keys(data).forEach((foodGroup) => {
+    (Object.keys(data) as Array<keyof typeof data>).forEach((foodGroup) => {
       const foodGroupTranslated = foodGroupToName(foodGroup);
 
       tabNames.push(foodGroupTranslated);
-      tabTriggers.push(<TabsTrigger label={foodGroupTranslated} value={foodGroupTranslated} />);
+      tabTriggers.push(
+        <TabsTrigger
+          key={foodGroupTranslated}
+          label={foodGroupTranslated}
+          value={foodGroupTranslated}
+        />
+      );
       tabContent.push(
-        <TabsContent value={foodGroupTranslated} forceMount>
-          <Card variant="gray" style={[{ paddingBottom: BOTTOM_BAR_HEIGHT + 80 }]}>
+        <TabsContent key={foodGroupTranslated} value={foodGroupTranslated} forceMount>
+          <Card variant="gray">
             <ScrollView contentContainerStyle={[spacing.gapDefault]}>
               {data[foodGroup].map((item) => {
-                return <Text>{formatServingText(item.name, item.oneServing)}</Text>;
+                return <Text key={item._id}>{formatServingText(item.name, item.oneServing)}</Text>;
               })}
             </ScrollView>
           </Card>
         </TabsContent>
       );
     });
+    setSelectedTab(tabNames[0]);
 
     return {
       tabNames,
@@ -44,16 +52,12 @@ const FoodGroupTabs = () => {
     };
   }, [data]);
 
-  const [selectedTab, setSelectedTab] = useState<string>(tabNames ? tabNames[0] : "");
-
   if (isLoading)
     return (
       <View style={[layout.center]}>
         <SpinningIcon mode="light" />
       </View>
     );
-
-  console.log("selected tab ", selectedTab);
 
   return (
     <Tabs value={selectedTab} onValueChange={setSelectedTab}>

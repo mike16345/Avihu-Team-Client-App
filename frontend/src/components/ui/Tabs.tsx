@@ -65,6 +65,8 @@ export const Tabs = ({ value, onValueChange, children }: TabsRootProps) => {
 
   useEffect(() => {
     const activeIndex = tabs.findIndex((t) => t.label === value);
+    if (activeIndex == -1) return;
+
     Animated.spring(translateX, {
       toValue: -activeIndex * tabWidth,
       useNativeDriver: true,
