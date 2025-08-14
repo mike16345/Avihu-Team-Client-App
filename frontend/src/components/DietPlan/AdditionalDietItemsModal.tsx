@@ -3,7 +3,7 @@ import { CustomModal } from "../ui/Modal";
 import useStyles from "@/styles/useGlobalStyles";
 import { View } from "react-native";
 import { Text } from "../ui/Text";
-import useFoodGroupQuery from "@/hooks/queries/useMenuItemsQuery";
+import useFoodGroupQuery from "@/hooks/queries/MenuItems/useFoodGroupQuery";
 import { FoodGroup } from "@/types/foodTypes";
 import { formatServingText } from "@/utils/utils";
 import SecondaryButton from "../ui/buttons/SecondaryButton";

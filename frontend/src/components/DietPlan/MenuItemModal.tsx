@@ -8,7 +8,7 @@ import BottomDrawer from "../ui/BottomDrawer";
 import { Text } from "../ui/Text";
 import NoDataScreen from "@/screens/NoDataScreen";
 import ErrorScreen from "@/screens/ErrorScreen";
-import useFoodGroupQuery from "@/hooks/queries/useMenuItemsQuery";
+import useFoodGroupQuery from "@/hooks/queries/MenuItems/useFoodGroupQuery";
 import { FoodGroup } from "@/types/foodTypes";
 
 interface MenuItemModalProps {

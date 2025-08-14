@@ -20,7 +20,6 @@ export interface ICustomMenuItem {
 
 export interface IDietItem {
   quantity: number;
-  unit: DietItemUnit;
   customItems?: ICustomItem[];
   extraItems: string[];
 }

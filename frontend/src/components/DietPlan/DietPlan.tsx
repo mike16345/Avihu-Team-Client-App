@@ -29,7 +29,7 @@ import { createRetryFunction } from "@/utils/utils";
 import { Text } from "../ui/Text";
 import { useFoodGroupStore } from "@/store/foodgroupStore";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
-import useFoodGroupQuery from "@/hooks/queries/useMenuItemsQuery";
+import useFoodGroupQuery from "@/hooks/queries/MenuItems/useFoodGroupQuery";
 import { FoodGroup } from "@/types/foodTypes";
 import { softHaptic } from "@/utils/haptics";
 

@@ -1,9 +1,7 @@
-import { View } from "react-native";
 import { FC } from "react";
 import { FoodGroup } from "@/types/foodTypes";
-import useFoodGroupQuery from "@/hooks/queries/useMenuItemsQuery";
+import useFoodGroupQuery from "@/hooks/queries/MenuItems/useFoodGroupQuery";
 import { Text } from "../ui/Text";
-import { DietItemUnit } from "@/interfaces/DietPlan";
 import { formatServingText } from "@/utils/utils";
 
 interface FoodItemSelectionProps {
