@@ -15,7 +15,7 @@ import { CARDIO_VALUE } from "@/constants/Constants";
 import CardioWrapper from "@/components/WorkoutPlan/cardio/CardioWrapper";
 
 const MyWorkoutPlanScreen = () => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, layout, spacing } = useStyles();
   const { refresh } = usePullDownToRefresh();
 
   const { data, isError, isLoading, refetch, isRefetching } = useWorkoutPlanQuery();
@@ -23,7 +23,7 @@ const MyWorkoutPlanScreen = () => {
   const [selectedPlan, setSelectedPlan] = useState<IWorkoutPlan>();
   const [showCardio, setShowCardio] = useState(false);
   const [showTips, setShowTips] = useState(false);
-  const [tips, setTips] = useState();
+  const [tips, setTips] = useState<string[]>([]);
   const [plans, setPlans] = useState<ItemType<string>[]>();
 
   const handleSelect = (val: any) => {
@@ -53,7 +53,9 @@ const MyWorkoutPlanScreen = () => {
 
     setPlans(plans);
     setSelectedPlan(data.workoutPlans[0]);
-    setTips([...data.tips, data.cardio.plan.tips]);
+    const tips = data.tips || [];
+    tips?.push(data.cardio.plan.tips);
+    setTips(tips);
   }, [data]);
 
   if (isError)
@@ -72,16 +74,17 @@ const MyWorkoutPlanScreen = () => {
         ]}
       >
         <ConditionalRender condition={plans && selectedPlan}>
-          <WorkoutPlanSelector
-            plans={plans || []}
-            handleSelect={handleSelect}
-            selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
-            tips={data?.tips || []}
-          />
+          <View style={{ zIndex: 1 }}>
+            <WorkoutPlanSelector
+              plans={plans || []}
+              handleSelect={handleSelect}
+              selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
+              tips={data?.tips || []}
+            />
+          </View>
         </ConditionalRender>
 
         <ScrollView
-          style={[{ zIndex: -1 }, layout.flex1]}
           contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg]}
           refreshControl={
             <RefreshControl refreshing={isRefetching} onRefresh={() => refresh(refetch)} />
