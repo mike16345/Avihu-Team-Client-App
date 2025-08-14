@@ -1,5 +1,6 @@
 import { IToast } from "@/interfaces/toast";
 import { useToastStore } from "@/store/toastStore";
+import { errorNotificationHaptic, successNotificationHaptic } from "@/utils/haptics";
 
 export type ToastInput = Omit<IToast, "type">;
 
@@ -11,6 +12,8 @@ export const useToast = () => {
     message = "פעולה בוצעה בהצלחה",
     duration,
   }: ToastInput) => {
+    successNotificationHaptic();
+
     showToast({
       title,
       message,
@@ -24,6 +27,8 @@ export const useToast = () => {
     message = "פעולה נכשלה",
     duration,
   }: ToastInput) => {
+    errorNotificationHaptic();
+
     showToast({
       title,
       message,

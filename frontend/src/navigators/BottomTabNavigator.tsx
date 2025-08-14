@@ -1,5 +1,5 @@
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
-import { RootStackParamList } from "@/types/navigatorTypes";
+import { BottomStackParamList } from "@/types/navigatorTypes";
 import { Animated, StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
@@ -15,13 +15,15 @@ import { Text } from "@/components/ui/Text";
 import { useEffect, useRef } from "react";
 import Icon from "@/components/Icon/Icon";
 import { indicators } from "@/utils/navbar";
+import { useFadeIn } from "@/styles/useFadeIn";
 
-const Tab = createMaterialBottomTabNavigator<RootStackParamList>();
+const Tab = createMaterialBottomTabNavigator<BottomStackParamList>();
 
 const BottomTabNavigator = () => {
   const { layout, colors, common, fonts, spacing } = useStyles();
   const { countdown } = useTimerStore();
   const { width } = useWindowDimensions();
+  const opacity = useFadeIn();
   const HORIZONTAL_MARGIN = 10;
   const TABS_COUNT = 5;
 
@@ -45,7 +47,7 @@ const BottomTabNavigator = () => {
   });
 
   return (
-    <View style={[layout.flex1, colors.background, layout.justifyEvenly]}>
+    <Animated.View style={[layout.flex1, colors.background, layout.justifyEvenly, { opacity }]}>
       <TopBar />
       <Tab.Navigator
         barStyle={[
@@ -90,7 +92,7 @@ const BottomTabNavigator = () => {
       </Animated.View>
       <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 }]}></View>
       <ConditionalRender condition={!!countdown} children={<TimerDrawer />} />
-    </View>
+    </Animated.View>
   );
 };
 
