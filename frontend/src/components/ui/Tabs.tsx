@@ -13,8 +13,8 @@ interface ITabItems {
 
 interface TabsProps {
   items: ITabItems[];
-  value?: string;
-  setValue: (value: string) => void;
+  value?: any;
+  setValue: (value: any) => void;
 }
 
 const Tabs: React.FC<TabsProps> = ({ items, setValue, value }) => {

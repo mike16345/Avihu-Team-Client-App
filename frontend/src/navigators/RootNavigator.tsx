@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import Login from "@/components/Login/Login";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import BottomTabNavigator from "./BottomTabNavigator";
@@ -13,8 +13,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 import useLogout from "@/hooks/useLogout";
 import useUserQuery from "@/hooks/queries/useUserQuery";
+import SplashScreen from "@/screens/SplashScreen";
+import SuccessScreen from "@/screens/SuccessScreen";
+import { RootStackParamList } from "@/types/navigatorTypes";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
   const queryClient = useQueryClient();
@@ -25,6 +28,8 @@ const RootNavigator = () => {
   const { checkUserSessionToken } = useUserApi();
   const { initializeNotifications, requestPermissions } = useNotification();
   const { handleLogout } = useLogout();
+
+  const [loading, setLoading] = useState(true);
 
   const onLogin = (user: IUser) => {
     queryClient.setQueryData(["user-", user._id], user);
@@ -70,7 +75,8 @@ const RootNavigator = () => {
   }, []);
 
   useEffect(() => {
-    checkLoginStatus();
+    checkLoginStatus().then(() => setLoading(false));
+
     requestPermissions()
       .then(() => {
         initializeNotifications();
@@ -83,16 +89,20 @@ const RootNavigator = () => {
     setCurrentUser(data);
   }, [data]);
 
+  if (loading) return <SplashScreen />;
+
   return (
     <>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!currentUser ? (
+        {currentUser ? (
           <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
         ) : (
           <>
             <Stack.Screen children={() => <Login onLogin={onLogin} />} name="LoginScreen" />
           </>
         )}
+
+        <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
       </Stack.Navigator>
     </>
   );

@@ -89,7 +89,10 @@ const Toast: React.FC<{ toast: IToast; externalTranslateY?: Animated.Value }> = 
     <Animated.View
       {...panResponder.panHandlers}
       style={[
-        { transform: [{ translateY: Animated.add(externalTranslateY || translateY, pan) }] },
+        {
+          transform: [{ translateY: Animated.add(externalTranslateY || translateY, pan) }],
+          zIndex: 100,
+        },
         common.borderXsm,
         common.roundedFull,
         spacing.pdXs,

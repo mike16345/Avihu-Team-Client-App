@@ -2,9 +2,11 @@ import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import UploadDrawer from "@/components/ui/UploadDrawer";
+import useLogout from "@/hooks/useLogout";
 
 const Sandbox = () => {
   const { colors, spacing, layout } = useStyles();
+  const { handleLogout } = useLogout();
 
   return (
     <View
@@ -19,7 +21,9 @@ const Sandbox = () => {
         layout.center,
       ]}
     >
-      <UploadDrawer trigger={<PrimaryButton children="Open Modal" icon="like" block />} />
+      <PrimaryButton onPress={handleLogout} block>
+        Log out
+      </PrimaryButton>
     </View>
   );
 };

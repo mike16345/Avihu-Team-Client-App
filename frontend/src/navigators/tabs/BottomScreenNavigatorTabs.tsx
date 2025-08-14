@@ -1,10 +1,8 @@
-import NativeIcon from "@/components/Icon/NativeIcon";
 import MyDietPlanScreen from "@/screens/MyDietPlanScreen";
 import MyProgressScreen from "@/screens/MyProgressScreen";
 import { NavigatorTab } from "@/types/navigatorTypes";
 import WorkoutPlanStack from "../WorkoutPlanStack";
 import BlogScreen from "@/screens/BlogScreen";
-import MyWorkoutProgressionScreen from "@/screens/MyWorkoutProgressionScreen";
 import Icon from "@/components/Icon/Icon";
 
 const BottomScreenNavigatorTabs: NavigatorTab[] = [

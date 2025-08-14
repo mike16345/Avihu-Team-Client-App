@@ -42,6 +42,9 @@ export const useUserApi = () => {
   const loginUser = (email: string, password: string) =>
     sendData<ApiResponse<ISession>>(USER_ENDPOINT + `/user/login`, { email, password });
 
+  const submitLead = (email: string, name: string, phone: string) =>
+    sendData<ApiResponse<void>>(USER_ENDPOINT + `/user/lead`, { email, name, phone });
+
   const checkUserSessionToken = (token: ISession) => {
     return sendData<ApiResponse<{ isValid: boolean; hasAccess: boolean }>>(
       USER_ENDPOINT + `/user/session`,
@@ -58,5 +61,6 @@ export const useUserApi = () => {
     registerUser,
     loginUser,
     updateUserField,
+    submitLead,
   };
 };
