@@ -1,9 +1,8 @@
 import { RefreshControl, ScrollView, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { IWorkoutPlan } from "@/interfaces/Workout";
 import MuscleGroupContainer from "@/components/WorkoutPlan/new/MuscleGroupContainer";
-import TipsModal from "@/components/ui/modals/TipsModal";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
 import { ItemType } from "react-native-dropdown-picker";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
@@ -22,8 +21,6 @@ const MyWorkoutPlanScreen = () => {
 
   const [selectedPlan, setSelectedPlan] = useState<IWorkoutPlan>();
   const [showCardio, setShowCardio] = useState(false);
-  const [showTips, setShowTips] = useState(false);
-  const [tips, setTips] = useState<string[]>([]);
   const [plans, setPlans] = useState<ItemType<string>[]>();
 
   const handleSelect = (val: any) => {
@@ -53,33 +50,23 @@ const MyWorkoutPlanScreen = () => {
 
     setPlans(plans);
     setSelectedPlan(data.workoutPlans[0]);
-    const tips = data.tips || [];
-    tips?.push(data.cardio.plan.tips);
-    setTips(tips);
   }, [data]);
 
   if (isError)
     return <ErrorScreen refetchFunc={() => refresh(refetch)} isFetching={isRefetching} />;
+
   if (isLoading) return <WorkoutPlanSkeletonLoader />;
 
   return (
     <>
-      <View
-        style={[
-          colors.background,
-          layout.flex1,
-          spacing.pdStatusBar,
-          spacing.pdBottomBar,
-          spacing.gapLg,
-        ]}
-      >
+      <View style={[colors.background, layout.flex1, spacing.pdStatusBar, spacing.gapLg]}>
         <ConditionalRender condition={plans && selectedPlan}>
-          <View style={{ zIndex: 1 }}>
+          <View style={[{ zIndex: 1 }, spacing.pdHorizontalLg]}>
             <WorkoutPlanSelector
               plans={plans || []}
               handleSelect={handleSelect}
               selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
-              tips={data?.tips || []}
+              tips={showCardio ? [data.cardio.plan.tips] : data.tips}
             />
           </View>
         </ConditionalRender>
@@ -101,8 +88,6 @@ const MyWorkoutPlanScreen = () => {
           </ConditionalRender>
         </ScrollView>
       </View>
-
-      <TipsModal tips={tips} visible={showTips} onDismiss={() => setShowTips(false)} />
     </>
   );
 };
