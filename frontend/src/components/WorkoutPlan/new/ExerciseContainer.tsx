@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
 import { IExercise } from "@/interfaces/Workout";
+import { buildPhotoUrl, extractVideoId, getYouTubeThumbnail } from "@/utils/utils";
 
 interface ExerciseContainerProps {
   exercise: IExercise;
@@ -16,6 +17,12 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
 }) => {
   const { common, layout, spacing, text } = useStyles();
 
+  const getExerciseImage = () => {
+    return exerciseId.imageUrl
+      ? buildPhotoUrl(exerciseId.imageUrl)
+      : getYouTubeThumbnail(extractVideoId(exerciseId.linkToVideo));
+  };
+
   return (
     <TouchableOpacity>
       <Card variant="gray">
@@ -27,7 +34,7 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
 
           <Image
             source={{
-              uri: "https://www.mensfitness.com/.image/w_1080,q_auto:good,c_fill,ar_4:3/MjEyMTg3NTY0NjM3OTU1NzEy/chest-workout-home.jpg",
+              uri: getExerciseImage(),
             }}
             height={66}
             width={72}
