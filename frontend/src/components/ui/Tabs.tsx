@@ -64,14 +64,14 @@ export const Tabs = ({ value, onValueChange, children }: TabsRootProps) => {
   };
 
   useEffect(() => {
-    const activeIndex = tabs.findIndex((t) => t.label === value);
-    if (activeIndex == -1) return;
+    let activeIndex = tabs.findIndex((t) => t.label === value);
+    activeIndex = activeIndex == -1 ? 0 : activeIndex;
 
     Animated.spring(translateX, {
       toValue: -activeIndex * tabWidth,
       useNativeDriver: true,
     }).start();
-  }, [value, tabs]);
+  }, [value, tabWidth, tabs]);
 
   return (
     <TabsContext.Provider
