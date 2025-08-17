@@ -224,7 +224,7 @@ export const useShadowStyles = () => {
           shadowRadius: 20,
         },
         android: {
-          backgroundColor: "#0000003D",
+          backgroundColor: "#999999",
           shadowRadius: 15,
           elevation: 4,
           shadowColor: "#999999",

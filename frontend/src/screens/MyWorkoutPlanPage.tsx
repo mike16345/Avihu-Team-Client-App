@@ -61,7 +61,7 @@ const MyWorkoutPlanScreen = () => {
     <>
       <View style={[colors.background, layout.flex1, spacing.pdStatusBar, spacing.gapLg]}>
         <ConditionalRender condition={plans && selectedPlan}>
-          <View style={[{ zIndex: 2 }, spacing.pdHorizontalLg]}>
+          <View style={[{ zIndex: 2, elevation: 5 }, spacing.pdHorizontalLg]}>
             <WorkoutPlanSelector
               plans={plans || []}
               handleSelect={handleSelect}
@@ -72,7 +72,7 @@ const MyWorkoutPlanScreen = () => {
         </ConditionalRender>
 
         <ScrollView
-          style={{ zIndex: 1 }}
+          style={{ zIndex: 1, elevation: 1 }}
           contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg, { zIndex: 1 }]}
           refreshControl={
             <RefreshControl refreshing={isRefetching} onRefresh={() => refresh(refetch)} />

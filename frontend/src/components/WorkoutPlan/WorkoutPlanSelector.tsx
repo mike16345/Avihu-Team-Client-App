@@ -40,7 +40,7 @@ const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({
             </SecondaryButton>
           </View>
         </Card.Header>
-        <Card.Content style={{ zIndex: 2 }}>
+        <Card.Content style={{ zIndex: 2000, elevation: 2000 }}>
           <DropdownMenu onSelect={handleSelect} items={plans || []} selectedValue={selectedPlan} />
         </Card.Content>
       </Card>
