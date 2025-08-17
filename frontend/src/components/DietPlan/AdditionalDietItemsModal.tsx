@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import { CustomModal } from "../ui/Modal";
+import { CustomModal } from "../ui/modals/Modal";
 import useStyles from "@/styles/useGlobalStyles";
 import { View } from "react-native";
 import { Text } from "../ui/Text";
@@ -7,6 +7,8 @@ import useFoodGroupQuery from "@/hooks/queries/MenuItems/useFoodGroupQuery";
 import { FoodGroup } from "@/types/foodTypes";
 import { formatServingText } from "@/utils/utils";
 import SecondaryButton from "../ui/buttons/SecondaryButton";
+import { ConditionalRender } from "../ui/ConditionalRender";
+import SpinningIcon from "../ui/loaders/SpinningIcon";
 
 interface AdditionalDietItemsModalProps {
   foodGroup: FoodGroup;
@@ -15,7 +17,7 @@ interface AdditionalDietItemsModalProps {
 
 const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({ name, foodGroup }) => {
   const { colors, layout, common, spacing } = useStyles();
-  const { data = [] } = useFoodGroupQuery(foodGroup);
+  const { data = [], isLoading } = useFoodGroupQuery(foodGroup);
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -46,6 +48,11 @@ const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({ name, foo
           </View>
         </CustomModal.Header>
         <CustomModal.Content>
+          <ConditionalRender condition={isLoading}>
+            <View style={[layout.center]}>
+              <SpinningIcon mode="light" />
+            </View>
+          </ConditionalRender>
           {data.map((item, i) => {
             return (
               <Text key={item?._id || i} fontVariant="semibold">
