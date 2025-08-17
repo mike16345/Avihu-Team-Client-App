@@ -2,14 +2,14 @@ import { RefreshControl, ScrollView, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { useEffect, useState } from "react";
 import { IWorkoutPlan } from "@/interfaces/Workout";
-import MuscleGroupContainer from "@/components/WorkoutPlan/new/MuscleGroupContainer";
+import MuscleGroupContainer from "@/components/WorkoutPlan/MuscleGroupContainer";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
 import { ItemType } from "react-native-dropdown-picker";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import WorkoutPlanSkeletonLoader from "@/components/ui/loaders/skeletons/WorkoutPlanSkeletonLoader";
 import ErrorScreen from "./ErrorScreen";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
-import WorkoutPlanSelector from "@/components/WorkoutPlan/new/WorkoutPlanSelector";
+import WorkoutPlanSelector from "@/components/WorkoutPlan/WorkoutPlanSelector";
 import { CARDIO_VALUE } from "@/constants/Constants";
 import CardioWrapper from "@/components/WorkoutPlan/cardio/CardioWrapper";
 
