@@ -20,8 +20,8 @@ import { RootStackParamList } from "@/types/navigatorTypes";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
-  // const queryClient = useQueryClient();
-  // const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
+  const queryClient = useQueryClient();
+  const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
 
   const { currentUser, setCurrentUser } = useUserStore();
   const { data } = useUserQuery(currentUser?._id);
@@ -98,7 +98,7 @@ const RootNavigator = () => {
           <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
         ) : (
           <>
-            {/* <Stack.Screen children={() => <Login onLogin={onLogin} />} name="LoginScreen" /> */}
+            <Stack.Screen children={() => <Login onLogin={onLogin} />} name="LoginScreen" />
           </>
         )}
 

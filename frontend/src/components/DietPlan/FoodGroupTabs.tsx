@@ -38,7 +38,11 @@ const FoodGroupTabs = () => {
           <Card style={{ maxHeight: height / 2 - (BOTTOM_BAR_HEIGHT + 20) }} variant="gray">
             <ScrollView contentContainerStyle={[spacing.gapDefault]}>
               {data[foodGroup].map((item) => {
-                return <Text key={item._id}>{formatServingText(item.name, item.oneServing)}</Text>;
+                return (
+                  <Text fontVariant="semibold" key={item._id}>
+                    {formatServingText(item.name, item.oneServing)}
+                  </Text>
+                );
               })}
             </ScrollView>
           </Card>
