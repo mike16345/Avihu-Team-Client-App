@@ -7,6 +7,8 @@ const ToastContainer = () => {
   const { toasts } = useToastStore();
   const { layout, spacing } = useStyles();
 
+  if (toasts.length == 0) return;
+
   return (
     <View
       style={[
@@ -14,7 +16,7 @@ const ToastContainer = () => {
         layout.flexColumn,
         layout.justifyEnd,
         spacing.gapDefault,
-        { position: "absolute", bottom: 0, left: 0, paddingBottom: 100 },
+        { position: "absolute", bottom: 100, left: 0 },
       ]}
     >
       {toasts.slice(-3).map((toast) => (

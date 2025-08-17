@@ -22,6 +22,7 @@ import queryClient from "@/QueryClient/queryClient";
 import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
 import Sandbox from "@/screens/Sandbox";
 import { toastConfig } from "@/config/toastConfig";
+import ToastContainer from "@/components/ui/toast/ToastContainer";
 import useCustomFonts from "@/hooks/useCustomFonts";
 
 const { DarkTheme } = adaptNavigationTheme({
@@ -49,12 +50,11 @@ export default function App() {
                 <NavigationContainer>
                   <RootNavigator />
                   <StatusBar key={colorScheme} translucent style={"dark"} />
-                  <Toast position="bottom" bottomOffset={BOTTOM_BAR_HEIGHT} config={toastConfig} />
+                  <ToastContainer />
                   <UserDrawer />
                   <Update />
                 </NavigationContainer>
               </PersistQueryClientProvider>
-              {/*   <Sandbox /> */}
             </View>
           </SafeAreaProvider>
         </GestureHandlerRootView>
