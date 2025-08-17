@@ -34,25 +34,25 @@ interface CompoundModal extends React.FC<CustomModalProps> {
 export const CustomModal: CompoundModal = ({ children, onDismiss, visible, ...props }) => {
   const { colors, layout, spacing } = useStyles();
 
-  const opcaity = useRef(new Animated.Value(0)).current;
+  const animationValue = useRef(new Animated.Value(0)).current;
 
   const handleDismiss = () => {
     if (!onDismiss) return;
 
-    Animated.timing(opcaity, {
+    Animated.timing(animationValue, {
       toValue: 0,
       useNativeDriver: true,
-      duration: 300,
+      duration: 200,
     }).start(() => onDismiss());
   };
 
   useEffect(() => {
     if (!visible) return;
 
-    Animated.timing(opcaity, {
+    Animated.timing(animationValue, {
       toValue: 1,
       useNativeDriver: true,
-      duration: 300,
+      duration: 200,
     }).start();
   }, [visible]);
 
@@ -68,7 +68,8 @@ export const CustomModal: CompoundModal = ({ children, onDismiss, visible, ...pr
           spacing.gapDefault,
           layout.flex1,
           {
-            opacity: opcaity,
+            transform: [{ scale: animationValue }],
+            opacity: animationValue,
             paddingTop: spacing?.pdStatusBar?.paddingTop * 2,
             paddingBottom: spacing.pdBottomBar.paddingBottom * 2,
           },

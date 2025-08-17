@@ -1,4 +1,4 @@
-import { Image, TouchableOpacity, View } from "react-native";
+import { Image, Platform, Pressable, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
@@ -23,8 +23,16 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
       : getYouTubeThumbnail(extractVideoId(exerciseId.linkToVideo));
   };
 
+  const pressedOpacity = Platform.OS == "ios" ? 0.5 : 0.8;
+
   return (
-    <TouchableOpacity>
+    <Pressable
+      style={({ pressed }) => [
+        {
+          opacity: pressed ? pressedOpacity : 1,
+        },
+      ]}
+    >
       <Card variant="gray">
         <View style={[layout.flexRow, layout.justifyBetween]}>
           <View style={[spacing.gapXl]}>
@@ -42,7 +50,7 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
           />
         </View>
       </Card>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
