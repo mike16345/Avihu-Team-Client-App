@@ -7,29 +7,23 @@ import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { useDietPlanStore } from "@/store/useDietPlanStore";
 
 const DailyCalorieIntake = () => {
+  const { layout, spacing, fonts } = useStyles();
   const totalCaloriesEaten = useDietPlanStore((state) => state.totalCaloriesEaten);
   const { data } = useDietPlanQuery();
   const { totalCalories = 0, freeCalories = 0 } = data || {};
-  // TODO: Change this to useDietPlanQuery and destructure calories
-  const calories = {
-    totalCalories: 1620,
-    freeCalories: 250,
-  };
-
-  const { layout, spacing, fonts } = useStyles();
 
   return (
     <View style={[layout.flexRow, layout.widthFull]}>
       <View style={[layout.widthFull, spacing.gapLg]}>
         <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
           <Text fontVariant="bold" style={[fonts.xl]}>
-            {calories.totalCalories}
+            {totalCalories}
           </Text>
           <Text>קלוריות יומיות</Text>
         </View>
-        <ProgressBar value={totalCaloriesEaten} maxValue={calories.totalCalories} />
+        <ProgressBar value={totalCaloriesEaten} maxValue={totalCalories} />
         <Badge alignStart showDot>
-          <Text fontVariant="medium">{calories.freeCalories} קלוריות חופשיות בנוסף</Text>
+          <Text fontVariant="medium">{freeCalories} קלוריות חופשיות בנוסף</Text>
         </Badge>
       </View>
     </View>
