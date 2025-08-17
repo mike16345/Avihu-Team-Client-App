@@ -90,7 +90,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <Animated.View style={[spacing.gapXl, { opacity }]}>
+    <Animated.View style={[spacing.gap20, { opacity }]}>
       <Input
         label="שם מלא"
         placeholder="הכנס שם מלא"
