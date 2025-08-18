@@ -30,6 +30,7 @@ import { useLayoutStore } from "@/store/layoutStore";
 import ExerciseMethodDrawer from "./ExerciseMethodDrawer";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { useTimerStore } from "@/store/timerStore";
+import { ConditionalRender } from "../ui/ConditionalRender";
 
 interface RecordExerciseProps extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordSet"> {}
 
@@ -197,8 +198,9 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
                     <Divider color={colors.textPrimary.color} thickness={0.5} />
                     <Text style={styles.setInfo}>
                       חזרות: {exercise.sets[currentSetNumber - 1].minReps}
-                      {exercise.sets[currentSetNumber - 1].maxReps &&
-                        `-${exercise.sets[currentSetNumber - 1].maxReps}`}
+                      <ConditionalRender condition={!!exercise.sets[currentSetNumber - 1].maxReps}>
+                        -{exercise.sets[currentSetNumber - 1].maxReps}
+                      </ConditionalRender>
                     </Text>
                   </>
                 )}
