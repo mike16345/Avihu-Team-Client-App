@@ -34,13 +34,8 @@ async function request<T>(
   }
 }
 
-export async function fetchData<T>(
-  endpoint: string,
-  params?: any,
-  headers?: any,
-  body: any = undefined
-): Promise<T> {
-  return request<T>("get", endpoint, body, params, headers);
+export async function fetchData<T>(endpoint: string, params?: any, headers?: any): Promise<T> {
+  return request<T>("get", endpoint, undefined, params, headers);
 }
 
 export async function sendData<T>(endpoint: string, data: any, headers?: any): Promise<T> {
