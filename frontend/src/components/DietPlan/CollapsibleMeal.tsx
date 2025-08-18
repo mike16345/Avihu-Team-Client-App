@@ -21,6 +21,7 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
 
   const isEaten = useMemo(() => {
     if (!session?.meals) return false;
+
     const isEaten = session?.meals.find((m) => m.id == meal._id);
 
     return !!isEaten;

@@ -68,6 +68,7 @@ export function useRecordMeal() {
 
   const getSessionFromStorage = async () => {
     const raw = await AsyncStorage.getItem(SESSION_KEY);
+
     if (!raw) return;
     const parsed: RecordedMealSession = JSON.parse(raw);
 
@@ -92,8 +93,8 @@ export function useRecordMeal() {
 
   const recordMeal = async (meal: IMeal, mealNumber: number) => {
     const session = await getSessionFromStorage();
-    if (!session) return;
 
+    if (!session) return;
     const totalCalories = getTotalCaloriesInMeal(meal);
     const recordedMeal: RecordedMeal = {
       id: meal._id,

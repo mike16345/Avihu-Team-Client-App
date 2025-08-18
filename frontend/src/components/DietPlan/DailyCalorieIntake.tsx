@@ -22,7 +22,7 @@ const DailyCalorieIntake = () => {
           <Text>קלוריות יומיות</Text>
         </View>
         <ProgressBar value={totalCaloriesEaten} maxValue={totalCalories} />
-        <Badge alignStart showDot>
+        <Badge disabled alignStart showDot>
           <Text fontVariant="medium">{freeCalories} קלוריות חופשיות בנוסף</Text>
         </Badge>
       </View>

@@ -18,6 +18,7 @@ const FoodGroupTabs = () => {
 
   const { tabTriggers, tabContent } = useMemo(() => {
     if (!data) return {};
+    
     const tabTriggers: ReactNode[] = [];
     const tabContent: ReactNode[] = [];
     const tabNames: string[] = [];
