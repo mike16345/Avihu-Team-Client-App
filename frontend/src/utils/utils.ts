@@ -195,6 +195,7 @@ const unitLabels: Record<DietItemUnit, string> = {
   scoops: "סקופים",
   units: "יחידות",
   cups: "כוסות",
+  teaSpoons: "כפיות",
 };
 
 export function formatServingText<K extends keyof IServingItem>(
