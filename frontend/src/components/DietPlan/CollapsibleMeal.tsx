@@ -14,11 +14,17 @@ interface CollapsibleMealProps {
 }
 
 const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
-  const { recordMeal, cancelMeal } = useRecordMeal();
+  const { session, recordMeal, cancelMeal } = useRecordMeal();
   const { layout, spacing } = useStyles();
 
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [isEaten, setIsEaten] = useState(false);
+
+  const isEaten = useMemo(() => {
+    if (!session?.meals) return false;
+    const isEaten = session?.meals.find((m) => m.id == meal._id);
+
+    return !!isEaten;
+  }, [session?.meals]);
 
   const handleMealPress = () => {
     if (isEaten) {
@@ -26,8 +32,6 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
     } else {
       recordMeal(meal, index);
     }
-
-    setIsEaten((prev) => !prev);
   };
 
   const toggleCollapse = () => {
@@ -61,7 +65,7 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
           {mealEatenIndicatorText}
         </PrimaryButton>
       </View>
-    </Collapsible> 
+    </Collapsible>
   );
 };
 

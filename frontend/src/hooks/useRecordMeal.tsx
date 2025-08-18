@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IMeal } from "@/interfaces/DietPlan";
 import { generateUniqueId, getTotalCaloriesInMeal } from "@/utils/utils";
@@ -146,6 +146,9 @@ export function useRecordMeal() {
     if (needsPrompt(session.startedAt)) {
       setShowPrompt(true);
     }
+
+    const totalCalories = session.meals.reduce((acc, m) => acc + m.calories, 0);
+    setTotalCaloriesEaten(totalCalories, true);
     setSession(session);
   };
 
@@ -156,6 +159,7 @@ export function useRecordMeal() {
   return {
     session,
     showPrompt,
+    getSessionFromStorage,
     startNewSession,
     expireSession,
     recordMeal,

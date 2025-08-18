@@ -44,7 +44,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
     const height = e.nativeEvent.layout.height;
 
     if (contentHeight !== height) {
-      setContentHeight(height);
+      setContentHeight(height + 10);
       setMeasured(true);
     }
   };
