@@ -50,15 +50,15 @@ export default function Login({ onLogin }: ILoginProps) {
   const registerOrLoginPrompt = getRegisterOrLoginPrompt(isRegistering, isChangingPassword);
 
   const tabList = [
-    <TabsTrigger label="התחברות" value="התחברות" />,
-    <TabsTrigger label="חשבון חדש" value="חשבון חדש" />,
+    <TabsTrigger key={"התחברות"} label="התחברות" value="התחברות" />,
+    <TabsTrigger key={"חשבון חדש"} label="חשבון חדש" value="חשבון חדש" />,
   ];
 
   const tabContent = [
-    <TabsContent value="חשבון חדש" forceMount>
+    <TabsContent key={"חשבון חדש"} value="חשבון חדש">
       <RegisterForm />
     </TabsContent>,
-    <TabsContent value="התחברות" forceMount>
+    <TabsContent key={"התחברות"} value="התחברות">
       <LoginForm
         onForgotPasswordPress={() => {
           setIsForgotPassword(true);
