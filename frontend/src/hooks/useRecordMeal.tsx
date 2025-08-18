@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { v4 as uuidv4 } from "uuid";
+import { IMeal } from "@/interfaces/DietPlan";
+import { generateUniqueId, getTotalCaloriesInMeal } from "@/utils/utils";
+import { useDietPlanStore } from "@/store/useDietPlanStore";
 
-const SESSION_KEY = "mealSession";
+const SESSION_KEY = "RecordedMealSession";
 const SESSION_EXPIRY_HOURS = 36;
 const MODAL_PROMPT_HOURS = 24;
 
-interface Meal {
+interface RecordedMeal {
   id: string;
   name: string;
   calories: number;
@@ -14,10 +16,10 @@ interface Meal {
   synced: boolean;
 }
 
-interface MealSession {
+interface RecordedMealSession {
   sessionId: string;
   startedAt: string;
-  meals: Meal[];
+  meals: RecordedMeal[];
   expiresAt: string;
   active: boolean;
 }
@@ -34,17 +36,19 @@ function needsPrompt(startedAt: string) {
 }
 
 export function useRecordMeal() {
-  const [session, setSession] = useState<MealSession | null>(null);
+  const setTotalCaloriesEaten = useDietPlanStore((state) => state.setTotalCaloriesEaten);
+
+  const [session, setSession] = useState<RecordedMealSession | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
 
-  const persist = async (s: MealSession) => {
+  const persist = async (s: RecordedMealSession) => {
     setSession(s);
     await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(s));
   };
 
   const startNewSession = async () => {
-    const newSession: MealSession = {
-      sessionId: uuidv4(),
+    const newSession: RecordedMealSession = {
+      sessionId: generateUniqueId(),
       startedAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + SESSION_EXPIRY_HOURS * 60 * 60 * 1000).toISOString(),
       meals: [],
@@ -60,6 +64,14 @@ export function useRecordMeal() {
     }
 
     return newSession;
+  };
+
+  const getSessionFromStorage = async () => {
+    const raw = await AsyncStorage.getItem(SESSION_KEY);
+    if (!raw) return;
+    const parsed: RecordedMealSession = JSON.parse(raw);
+
+    return parsed;
   };
 
   const expireSession = async () => {
@@ -78,21 +90,25 @@ export function useRecordMeal() {
     await startNewSession();
   };
 
-  const recordMeal = async (name: string, calories: number) => {
+  const recordMeal = async (meal: IMeal, mealNumber: number) => {
+    const session = await getSessionFromStorage();
     if (!session) return;
-    const meal: Meal = {
-      id: uuidv4(),
-      name,
-      calories,
-      recordedAt: new Date().toISOString(),
+
+    const totalCalories = getTotalCaloriesInMeal(meal);
+    const recordedMeal: RecordedMeal = {
+      id: meal._id,
+      name: `ארוחה ${mealNumber + 1}`,
+      calories: totalCalories,
+      recordedAt: new Date().toLocaleTimeString(),
       synced: false,
     };
 
-    const updated: MealSession = {
+    const updated: RecordedMealSession = {
       ...session,
-      meals: [...session.meals, meal],
+      meals: [...session.meals, recordedMeal],
     };
     await persist(updated);
+    setTotalCaloriesEaten(totalCalories, false);
 
     try {
       // TODO: Post meal to API
@@ -101,18 +117,36 @@ export function useRecordMeal() {
     }
   };
 
+  const cancelMeal = async (mealId: string) => {
+    const session = await getSessionFromStorage();
+    if (!session) return;
+
+    const updatedMeals = session.meals.filter((m) => m.id !== mealId);
+    const updated: RecordedMealSession = { ...session, meals: updatedMeals };
+    const total = updatedMeals.reduce((sum, m) => sum + m.calories, 0);
+    setTotalCaloriesEaten(total);
+
+    await persist(updated);
+
+    try {
+      // TODO: delete meal from API
+    } catch (err) {
+      console.warn("Failed to sync meal deletion", err);
+    }
+  };
+
   const getLocalSession = async () => {
-    const raw = await AsyncStorage.getItem(SESSION_KEY);
+    // return await AsyncStorage.removeItem(SESSION_KEY);
+    const session = await getSessionFromStorage();
 
-    if (!raw) return await startNewSession();
-    const parsed: MealSession = JSON.parse(raw);
+    if (!session) return await startNewSession();
 
-    if (isExpired(parsed.startedAt)) return await startNewSession();
+    if (isExpired(session.startedAt)) return await startNewSession();
 
-    if (needsPrompt(parsed.startedAt)) {
+    if (needsPrompt(session.startedAt)) {
       setShowPrompt(true);
     }
-    setSession(parsed);
+    setSession(session);
   };
 
   useEffect(() => {
@@ -125,5 +159,6 @@ export function useRecordMeal() {
     startNewSession,
     expireSession,
     recordMeal,
+    cancelMeal,
   };
 }

@@ -18,7 +18,7 @@ export interface IDietItem {
 }
 
 export interface IMeal {
-  _id?: string;
+  _id: string;
   totalProtein: IDietItem;
   totalCarbs: IDietItem;
 }

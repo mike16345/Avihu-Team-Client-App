@@ -9,3 +9,7 @@ export const INVALID_PASSWORD = `סיסמה לא תקינה`;
 export const NO_PASSWORD = `אנא הזינו סיסמה`;
 export const NO_ACCESS = `אין למשתמש גישה!`;
 export const SESSION_EXPIRED = `נא להיכנס שוב`;
+
+export const AVG_PROTEIN_CALORIES = 150;
+export const AVG_FAT_CALORIES = 100;
+export const AVG_CARB_CALORIES = 120;

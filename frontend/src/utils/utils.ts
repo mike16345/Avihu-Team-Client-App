@@ -1,4 +1,5 @@
-import { DietItemUnit, IServingItem } from "@/interfaces/DietPlan";
+import { AVG_CARB_CALORIES, AVG_PROTEIN_CALORIES } from "@/constants/Constants";
+import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
 import Constants from "expo-constants";
 import Toast, { ToastType } from "react-native-toast-message";
 
@@ -217,4 +218,11 @@ export function formatServingText<K extends keyof IServingItem>(
     });
 
   return [name, ...units].join(" | ");
+}
+
+export function getTotalCaloriesInMeal(meal: IMeal) {
+  const proteinCalories = meal.totalProtein.quantity * AVG_PROTEIN_CALORIES;
+  const carbCalories = meal.totalCarbs.quantity * AVG_CARB_CALORIES;
+
+  return proteinCalories + carbCalories;
 }

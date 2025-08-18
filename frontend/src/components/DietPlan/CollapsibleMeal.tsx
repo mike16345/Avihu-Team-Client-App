@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from "react";
+import { FC, useMemo, useState } from "react";
 import Collapsible from "../ui/Collapsible";
 import { IDietItem, IMeal } from "@/interfaces/DietPlan";
 import { View } from "react-native";
@@ -6,7 +6,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import DietItemContent from "./DietItemContent";
 import { foodGroupToName } from "@/utils/utils";
-import { useDietPlanStore } from "@/store/useDietPlanStore";
+import { useRecordMeal } from "@/hooks/useRecordMeal";
 
 interface CollapsibleMealProps {
   meal: IMeal;
@@ -14,11 +14,21 @@ interface CollapsibleMealProps {
 }
 
 const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
-  const setTotalCaloriesEaten = useDietPlanStore((state) => state.setTotalCaloriesEaten);
+  const { recordMeal, cancelMeal } = useRecordMeal();
   const { layout, spacing } = useStyles();
 
-  const [isCollapsed, setIsCollapsed] = React.useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [isEaten, setIsEaten] = useState(false);
+
+  const handleMealPress = () => {
+    if (isEaten) {
+      cancelMeal(meal._id);
+    } else {
+      recordMeal(meal, index);
+    }
+
+    setIsEaten((prev) => !prev);
+  };
 
   const toggleCollapse = () => {
     setIsCollapsed((isCollapsed) => !isCollapsed);
@@ -47,18 +57,11 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
             />
           );
         })}
-        <PrimaryButton
-          mode={isEaten ? "light" : "dark"}
-          onPress={() => {
-            setTotalCaloriesEaten(Math.random() * 1620);
-            setIsEaten((isEaten) => !isEaten);
-          }}
-          block
-        >
+        <PrimaryButton mode={isEaten ? "light" : "dark"} onPress={handleMealPress} block>
           {mealEatenIndicatorText}
         </PrimaryButton>
       </View>
-    </Collapsible>
+    </Collapsible> 
   );
 };
 
