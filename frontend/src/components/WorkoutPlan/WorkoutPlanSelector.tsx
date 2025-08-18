@@ -1,49 +1,57 @@
 import { View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
 import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
-import DropdownMenu from "@/components/ui/DropdownMenu";
 import TipsModal from "@/components/ui/modals/TipsModal";
-import { ItemType } from "react-native-dropdown-picker";
 import DateUtils from "@/utils/dateUtils";
+import DropDownContent from "../ui/dropwdown/DropDownContent";
+import { useDropwDownContext } from "@/context/useDropdown";
+import DropDownTrigger from "../ui/dropwdown/DropDownTrigger";
 
 interface WorkoutPlanSelectorProps {
-  plans: ItemType<string>[];
   selectedPlan: string;
   tips: string[];
   handleSelect: (val: string) => void;
 }
 
 const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({
-  plans,
   selectedPlan,
   tips,
   handleSelect,
 }) => {
-  const { layout, spacing, text } = useStyles();
+  const { layout, spacing, text, common } = useStyles();
+  const { selectedValue } = useDropwDownContext();
 
   const [showTips, setShowTips] = useState(false);
 
+  useEffect(() => {
+    handleSelect(selectedValue);
+  }, [selectedValue]);
+
   return (
     <>
-      <Card variant="gray" style={spacing.gapLg}>
-        <Card.Header>
-          <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter]}>
-            <Text style={[text.textBold]}>
-              יום {DateUtils.getDay()} | {selectedPlan}
-            </Text>
+      <View style={spacing.gapDefault}>
+        <Card variant="gray" style={[spacing.gapLg, common.roundedMd]}>
+          <Card.Header>
+            <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter]}>
+              <Text style={[text.textBold]}>
+                יום {DateUtils.getDay()} | {selectedPlan}
+              </Text>
 
-            <SecondaryButton rightIcon="info" onPress={() => setShowTips(true)}>
-              דגשים לאימון
-            </SecondaryButton>
-          </View>
-        </Card.Header>
-        <Card.Content style={{ zIndex: 2000, elevation: 2000 }}>
-          <DropdownMenu onSelect={handleSelect} items={plans || []} selectedValue={selectedPlan} />
-        </Card.Content>
-      </Card>
+              <SecondaryButton rightIcon="info" onPress={() => setShowTips(true)}>
+                דגשים לאימון
+              </SecondaryButton>
+            </View>
+          </Card.Header>
+          <Card.Content style={{ zIndex: 2000, elevation: 2000 }}>
+            <DropDownTrigger />
+          </Card.Content>
+        </Card>
+
+        <DropDownContent />
+      </View>
 
       <TipsModal tips={tips} visible={showTips} onDismiss={() => setShowTips(false)} />
     </>

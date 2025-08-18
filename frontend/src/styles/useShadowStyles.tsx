@@ -174,6 +174,7 @@ export const useShadowStyles = () => {
     },
 
     frameLayer2: {
+      borderRadius: 25,
       ...Platform.select({
         ios: {
           shadowColor: "#999999",
@@ -187,6 +188,7 @@ export const useShadowStyles = () => {
     },
 
     frameLayer3: {
+      borderRadius: 25,
       ...Platform.select({
         ios: {
           shadowColor: "#999999",
@@ -200,6 +202,7 @@ export const useShadowStyles = () => {
     },
 
     frameLayer4: {
+      borderRadius: 25,
       ...Platform.select({
         ios: {
           shadowColor: "#999999",

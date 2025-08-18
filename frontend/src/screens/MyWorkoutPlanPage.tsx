@@ -12,6 +12,7 @@ import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import WorkoutPlanSelector from "@/components/WorkoutPlan/WorkoutPlanSelector";
 import { CARDIO_VALUE } from "@/constants/Constants";
 import CardioWrapper from "@/components/WorkoutPlan/cardio/CardioWrapper";
+import { DropDownContextProvider } from "@/context/useDropdown";
 
 const MyWorkoutPlanScreen = () => {
   const { colors, layout, spacing } = useStyles();
@@ -62,12 +63,13 @@ const MyWorkoutPlanScreen = () => {
       <View style={[colors.background, layout.flex1, spacing.pdStatusBar, spacing.gapLg]}>
         <ConditionalRender condition={plans && selectedPlan}>
           <View style={[{ zIndex: 2, elevation: 5 }, spacing.pdHorizontalLg]}>
-            <WorkoutPlanSelector
-              plans={plans || []}
-              handleSelect={handleSelect}
-              selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
-              tips={showCardio ? [data.cardio.plan.tips] : data.tips}
-            />
+            <DropDownContextProvider items={plans || []}>
+              <WorkoutPlanSelector
+                handleSelect={handleSelect}
+                selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
+                tips={showCardio ? [data.cardio.plan.tips] : data.tips}
+              />
+            </DropDownContextProvider>
           </View>
         </ConditionalRender>
 
