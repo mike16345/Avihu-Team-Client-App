@@ -2,8 +2,8 @@ import { View, Text, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import DropDownPicker, { ItemType } from "react-native-dropdown-picker";
 import useStyles from "@/styles/useGlobalStyles";
-import Icon from "../Icon/Icon";
-import { ConditionalRender } from "./ConditionalRender";
+import { ConditionalRender } from "../ConditionalRender";
+import Icon from "@/components/Icon/Icon";
 
 export interface DropDownMenuProps {
   selectedValue?: string;

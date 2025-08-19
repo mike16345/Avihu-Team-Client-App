@@ -5,7 +5,7 @@ import { useDropwDownContext } from "@/context/useDropdown";
 import Collapsible from "../Collapsible";
 import DropDownList from "./DropDownList";
 
-const ANIMATION_DURATION = 250;
+const ANIMATION_DURATION = 200;
 
 const DropDownContent = () => {
   const { common } = useStyles();
@@ -32,7 +32,10 @@ const DropDownContent = () => {
 
   return (
     <Animated.View style={{ opacity }}>
-      <Collapsible isCollapsed={shouldCollapse} style={common.roundedMd}>
+      <Collapsible
+        isCollapsed={shouldCollapse}
+        style={[common.roundedMd, shouldCollapse && { paddingVertical: 0 }]}
+      >
         <DropDownList />
       </Collapsible>
     </Animated.View>

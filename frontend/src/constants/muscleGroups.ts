@@ -28,6 +28,20 @@ export const MUSCLE_GROUPS = [
   "יד אחורית",
   "בטן",
   "רגליים",
+  "ישבן",
   "תאומים",
   "טרפזים",
 ];
+
+export const MUSCLE_GROUPS_ENGLISH: Record<string, muscleImageName> = {
+  חזה: "chest",
+  כתפיים: "shoulders",
+  גב: "back",
+  "יד קדמית": "bicep",
+  "יד אחורית": "tricep",
+  בטן: "abs",
+  רגליים: "legs",
+  ישבן: "glutes",
+  תאומים: "calves",
+  טרפזים: "trapezoids",
+};

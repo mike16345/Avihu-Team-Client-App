@@ -1,10 +1,18 @@
-import { View, Text, Image } from "react-native";
 import React from "react";
-import { muscleImages } from "@/constants/muscleGroups";
-import torseFront from "@assets/muscles/torso_front.svg";
+import { muscleImageName, muscleImages } from "@/constants/muscleGroups";
 
-const MuscleDisplay = () => {
-  return <Image source={torseFront} height={100} width={100} style={{ width: 100, height: 100 }} />;
+interface MuscleDisplayProps {
+  name?: muscleImageName;
+  width: number;
+  height: number;
+}
+
+const MuscleDisplay: React.FC<MuscleDisplayProps> = ({ height, name, width }) => {
+  const MuscleImage = muscleImages[name];
+
+  if (!muscleImages) return null;
+
+  return <MuscleImage height={height} width={width} />;
 };
 
 export default MuscleDisplay;
