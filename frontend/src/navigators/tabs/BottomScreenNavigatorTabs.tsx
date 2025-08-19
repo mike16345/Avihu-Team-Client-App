@@ -1,9 +1,9 @@
 import MyDietPlanScreen from "@/screens/MyDietPlanScreen";
-import MyProgressScreen from "@/screens/MyProgressScreen";
 import { NavigatorTab } from "@/types/navigatorTypes";
 import WorkoutPlanStack from "../WorkoutPlanStack";
 import BlogScreen from "@/screens/BlogScreen";
 import Icon from "@/components/Icon/Icon";
+import HomeScreen from "@/screens/HomeScreen";
 
 const BottomScreenNavigatorTabs: NavigatorTab[] = [
   {
@@ -24,8 +24,8 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     },
   },
   {
-    name: "MyProgressScreen",
-    component: MyProgressScreen,
+    name: "Home",
+    component: HomeScreen,
     options: {
       tabBarLabel: "",
       tabBarIcon: ({ color }: { color: string }) => <Icon color={color} name="home" height={45} />,

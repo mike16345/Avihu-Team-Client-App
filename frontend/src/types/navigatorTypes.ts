@@ -9,6 +9,7 @@ export type RootStackParamList = {
 };
 
 export type BottomStackParamList = {
+  Home: undefined;
   Profile: undefined;
   MyWorkoutPlanPage: undefined;
   Chat: undefined;
