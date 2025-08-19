@@ -8,6 +8,7 @@ import { foodGroupToName, formatServingText } from "@/utils/utils";
 import { Text } from "../ui/Text";
 import { Card } from "../ui/Card";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
+import { useTabsFromData } from "@/hooks/useTabsFromData";
 
 const FoodGroupTabs = () => {
   const { height } = useWindowDimensions();
@@ -16,48 +17,22 @@ const FoodGroupTabs = () => {
 
   const [selectedTab, setSelectedTab] = useState<string>("");
 
-  const { tabTriggers, tabContent } = useMemo(() => {
-    if (!data) return {};
-    
-    const tabTriggers: ReactNode[] = [];
-    const tabContent: ReactNode[] = [];
-    const tabNames: string[] = [];
-
-    (Object.keys(data) as Array<keyof typeof data>).forEach((foodGroup) => {
-      const foodGroupTranslated = foodGroupToName(foodGroup);
-
-      tabNames.push(foodGroupTranslated);
-      tabTriggers.push(
-        <TabsTrigger
-          key={foodGroupTranslated}
-          label={foodGroupTranslated}
-          value={foodGroupTranslated}
-        />
-      );
-      tabContent.push(
-        <TabsContent key={foodGroupTranslated} value={foodGroupTranslated} forceMount>
-          <Card style={{ maxHeight: height / 2 - (BOTTOM_BAR_HEIGHT + 20) }} variant="gray">
-            <ScrollView contentContainerStyle={[spacing.gapDefault]}>
-              {data[foodGroup].map((item) => {
-                return (
-                  <Text fontVariant="semibold" key={item._id}>
-                    {formatServingText(item.name, item.oneServing)}
-                  </Text>
-                );
-              })}
-            </ScrollView>
-          </Card>
-        </TabsContent>
-      );
-    });
-    setSelectedTab(tabNames[0]);
-
-    return {
-      tabNames,
-      tabTriggers,
-      tabContent,
-    };
-  }, [data]);
+  const { tabTriggers, tabContent, tabNames } = useTabsFromData({
+    data,
+    getLabel: (foodGroup) => foodGroupToName(foodGroup),
+    getContent: (_, items) => (
+      <Card style={{ maxHeight: height / 2 - (BOTTOM_BAR_HEIGHT + 20) }} variant="gray">
+        <ScrollView contentContainerStyle={[spacing.gapDefault]}>
+          {items.map((item) => (
+            <Text fontVariant="semibold" key={item._id}>
+              {formatServingText(item.name, item.oneServing)}
+            </Text>
+          ))}
+        </ScrollView>
+      </Card>
+    ),
+    forceMount: true,
+  });
 
   if (isLoading)
     return (
@@ -67,7 +42,7 @@ const FoodGroupTabs = () => {
     );
 
   return (
-    <Tabs value={selectedTab} onValueChange={setSelectedTab}>
+    <Tabs value={selectedTab || tabNames[0]} onValueChange={setSelectedTab}>
       <View style={[spacing.gap20, { paddingBottom: 100 }]}>
         <TabsList>{tabTriggers}</TabsList>
         {tabContent}

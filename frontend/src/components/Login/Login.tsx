@@ -20,7 +20,8 @@ import LoginForm from "./LoginForm";
 import { useToast } from "@/hooks/useToast";
 import { getRegisterOrLoginPrompt, getRegisterOrLoginPromptLabel } from "@/utils/auth";
 import RegisterForm from "./RegisterForm";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
+import { Tabs, TabsList } from "../ui/Tabs";
+import { useTabs } from "@/hooks/useTabs";
 
 export interface IUserCredentials {
   email: string;
@@ -49,25 +50,26 @@ export default function Login({ onLogin }: ILoginProps) {
   const [selectedTab, setSelectedTab] = useState<string>("התחברות");
   const registerOrLoginPrompt = getRegisterOrLoginPrompt(isRegistering, isChangingPassword);
 
-  const tabList = [
-    <TabsTrigger key={"התחברות"} label="התחברות" value="התחברות" />,
-    <TabsTrigger key={"חשבון חדש"} label="חשבון חדש" value="חשבון חדש" />,
-  ];
-
-  const tabContent = [
-    <TabsContent key={"חשבון חדש"} value="חשבון חדש">
-      <RegisterForm />
-    </TabsContent>,
-    <TabsContent key={"התחברות"} value="התחברות">
-      <LoginForm
-        onForgotPasswordPress={() => {
-          setIsForgotPassword(true);
-          setIsChangingPassword(true);
-        }}
-        onLoginSuccess={(user) => onLogin(user)}
-      />
-    </TabsContent>,
-  ];
+  const { tabTriggers, tabContent } = useTabs([
+    {
+      label: "התחברות",
+      value: "התחברות",
+      content: (
+        <LoginForm
+          onForgotPasswordPress={() => {
+            setIsForgotPassword(true);
+            setIsChangingPassword(true);
+          }}
+          onLoginSuccess={(user) => onLogin(user)}
+        />
+      ),
+    },
+    {
+      label: "חשבון חדש",
+      value: "חשבון חדש",
+      content: <RegisterForm />,
+    },
+  ]);
 
   const handleChangePasswordSuccess = () => {
     setIsForgotPassword(false);
@@ -117,7 +119,7 @@ export default function Login({ onLogin }: ILoginProps) {
           <ConditionalRender condition={!isForgotPassword}>
             <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value)}>
               <View style={[spacing.gapDefault]}>
-                <TabsList>{tabList}</TabsList>
+                <TabsList>{tabTriggers}</TabsList>
                 {tabContent}
               </View>
             </Tabs>
