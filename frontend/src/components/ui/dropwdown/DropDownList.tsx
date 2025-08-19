@@ -5,14 +5,10 @@ import { ConditionalRender } from "../ConditionalRender";
 import { Text } from "../Text";
 import useTextStyles from "@/styles/useTextStyles";
 
-interface DropDownListProps {
-  handleSelect: (val: any) => void;
-}
-
-const DropDownList: React.FC<DropDownListProps> = ({ handleSelect }) => {
+const DropDownList = () => {
   const { textCenter } = useTextStyles();
 
-  const { selectedValue, items } = useDropwDownContext();
+  const { selectedValue, items, handleSelect } = useDropwDownContext();
 
   const itemsAreEmpty = items.length === 0;
 

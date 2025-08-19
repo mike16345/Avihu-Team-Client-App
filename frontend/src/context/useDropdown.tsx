@@ -7,18 +7,21 @@ type DropdownContextType = {
   setSelectedValue: (value: any) => void;
   shouldCollapse: boolean;
   setShouldCollapse: (value: boolean) => void;
+  handleSelect: (value: any) => void;
 };
 
 const DropdownContext = createContext<DropdownContextType | undefined>(undefined);
 
-export const DropDownContextProvider = <T,>({
+export const DropDownContextProvider = ({
   children,
   items,
   initialValue = null,
+  onSelect,
 }: {
   children: ReactNode;
   items: ItemType<any>[];
   initialValue?: any;
+  onSelect: (value: any) => void;
 }) => {
   const [selectedValue, setSelectedValue] = useState<any>(
     initialValue ?? (items.length > 0 ? items[0].value : null)
@@ -26,9 +29,22 @@ export const DropDownContextProvider = <T,>({
 
   const [shouldCollapse, setShouldCollapse] = useState(true);
 
+  const handleSelect = (value: any) => {
+    setSelectedValue(value);
+    setShouldCollapse(true);
+    onSelect(value);
+  };
+
   return (
     <DropdownContext.Provider
-      value={{ items, selectedValue, setSelectedValue, shouldCollapse, setShouldCollapse }}
+      value={{
+        items,
+        selectedValue,
+        setSelectedValue,
+        shouldCollapse,
+        setShouldCollapse,
+        handleSelect,
+      }}
     >
       {children}
     </DropdownContext.Provider>

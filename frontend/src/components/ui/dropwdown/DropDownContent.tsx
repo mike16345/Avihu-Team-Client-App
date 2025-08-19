@@ -5,30 +5,27 @@ import { useDropwDownContext } from "@/context/useDropdown";
 import Collapsible from "../Collapsible";
 import DropDownList from "./DropDownList";
 
+const ANIMATION_DURATION = 250;
+
 const DropDownContent = () => {
   const { common } = useStyles();
 
-  const { setSelectedValue, shouldCollapse, setShouldCollapse } = useDropwDownContext();
+  const { shouldCollapse } = useDropwDownContext();
 
   const opacity = useRef(new Animated.Value(0)).current;
-
-  const handleSelect = (val: any) => {
-    setSelectedValue(val);
-    setShouldCollapse(true);
-  };
 
   useEffect(() => {
     if (!shouldCollapse) {
       Animated.timing(opacity, {
         toValue: 1,
         useNativeDriver: false,
-        duration: 500,
+        duration: ANIMATION_DURATION,
       }).start();
     } else {
       Animated.timing(opacity, {
         toValue: 0,
         useNativeDriver: false,
-        duration: 500,
+        duration: ANIMATION_DURATION,
       }).start();
     }
   }, [shouldCollapse]);
@@ -36,7 +33,7 @@ const DropDownContent = () => {
   return (
     <Animated.View style={{ opacity }}>
       <Collapsible isCollapsed={shouldCollapse} style={common.roundedMd}>
-        <DropDownList handleSelect={handleSelect} />
+        <DropDownList />
       </Collapsible>
     </Animated.View>
   );

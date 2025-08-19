@@ -30,7 +30,6 @@ const MyWorkoutPlanScreen = () => {
     });
 
     plans.push({ label: CARDIO_VALUE, value: CARDIO_VALUE });
-
     setSelectedPlan(data.workoutPlans[0]);
 
     return plans;
@@ -58,9 +57,8 @@ const MyWorkoutPlanScreen = () => {
       <View style={[colors.background, layout.flex1, spacing.pdStatusBar, spacing.gapLg]}>
         <ConditionalRender condition={plans && selectedPlan}>
           <View style={[{ zIndex: 2, elevation: 5 }, spacing.pdHorizontalLg]}>
-            <DropDownContextProvider items={plans || []}>
+            <DropDownContextProvider items={plans || []} onSelect={handleSelect}>
               <WorkoutPlanSelector
-                handleSelect={handleSelect}
                 selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
                 tips={showCardio ? [data.cardio.plan.tips] : data.tips}
               />

@@ -7,28 +7,17 @@ import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 import TipsModal from "@/components/ui/modals/TipsModal";
 import DateUtils from "@/utils/dateUtils";
 import DropDownContent from "../ui/dropwdown/DropDownContent";
-import { useDropwDownContext } from "@/context/useDropdown";
 import DropDownTrigger from "../ui/dropwdown/DropDownTrigger";
 
 interface WorkoutPlanSelectorProps {
   selectedPlan: string;
   tips: string[];
-  handleSelect: (val: string) => void;
 }
 
-const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({
-  selectedPlan,
-  tips,
-  handleSelect,
-}) => {
+const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan, tips }) => {
   const { layout, spacing, text, common } = useStyles();
-  const { selectedValue } = useDropwDownContext();
 
   const [showTips, setShowTips] = useState(false);
-
-  useEffect(() => {
-    handleSelect(selectedValue);
-  }, [selectedValue]);
 
   return (
     <>
