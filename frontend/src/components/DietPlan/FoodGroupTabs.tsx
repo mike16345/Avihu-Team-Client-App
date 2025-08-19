@@ -20,17 +20,19 @@ const FoodGroupTabs = () => {
   const { tabTriggers, tabContent, tabNames } = useTabsFromData({
     data,
     getLabel: (foodGroup) => foodGroupToName(foodGroup),
-    getContent: (_, items) => (
-      <Card style={{ maxHeight: height / 2 - (BOTTOM_BAR_HEIGHT + 20) }} variant="gray">
-        <ScrollView contentContainerStyle={[spacing.gapDefault]}>
-          {items.map((item) => (
-            <Text fontVariant="semibold" key={item._id}>
-              {formatServingText(item.name, item.oneServing)}
-            </Text>
-          ))}
-        </ScrollView>
-      </Card>
-    ),
+    getContent: (_, items) => {
+      return (
+        <Card style={{ maxHeight: height / 2 - (BOTTOM_BAR_HEIGHT + 20) }} variant="gray">
+          <ScrollView contentContainerStyle={[spacing.gapDefault]}>
+            {items.map((item) => (
+              <Text fontVariant="semibold" key={item._id}>
+                {formatServingText(item.name, item.oneServing)}
+              </Text>
+            ))}
+          </ScrollView>
+        </Card>
+      );
+    },
     forceMount: true,
   });
 
