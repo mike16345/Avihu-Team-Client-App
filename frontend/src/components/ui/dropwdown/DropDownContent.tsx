@@ -1,17 +1,14 @@
 import { useEffect, useRef } from "react";
-import { Animated, ScrollView, TouchableOpacity, View } from "react-native";
-import { Text } from "../Text";
+import { Animated } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import { ConditionalRender } from "../ConditionalRender";
-import Icon from "@/components/Icon/Icon";
 import { useDropwDownContext } from "@/context/useDropdown";
 import Collapsible from "../Collapsible";
+import DropDownList from "./DropDownList";
 
 const DropDownContent = () => {
-  const { colors, common, layout, spacing } = useStyles();
+  const { common } = useStyles();
 
-  const { setSelectedValue, selectedValue, items, shouldCollapse, setShouldCollapse } =
-    useDropwDownContext();
+  const { setSelectedValue, shouldCollapse, setShouldCollapse } = useDropwDownContext();
 
   const opacity = useRef(new Animated.Value(0)).current;
 
@@ -39,30 +36,7 @@ const DropDownContent = () => {
   return (
     <Animated.View style={{ opacity }}>
       <Collapsible isCollapsed={shouldCollapse} style={common.roundedMd}>
-        <ScrollView style={{ maxHeight: 200 }}>
-          {items.map(({ label, value }, i) => {
-            const isSelected = selectedValue === value || selectedValue === label;
-
-            return (
-              <TouchableOpacity
-                key={i}
-                onPress={() => handleSelect(value)}
-                style={[{ padding: 10 }, layout.flexRow, layout.justifyBetween]}
-              >
-                <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
-                  <View
-                    style={[{ height: 8, width: 8 }, colors.backgroundSuccess, common.roundedFull]}
-                  />
-                  <Text>{label}</Text>
-                </View>
-
-                <ConditionalRender condition={isSelected}>
-                  <Icon name="check" />
-                </ConditionalRender>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+        <DropDownList handleSelect={handleSelect} />
       </Collapsible>
     </Animated.View>
   );
