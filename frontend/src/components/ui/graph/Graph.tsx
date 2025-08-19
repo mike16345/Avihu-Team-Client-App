@@ -96,6 +96,7 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
         ref={scrollRef}
         style={{ direction: "ltr" }}
         horizontal
+        nestedScrollEnabled
         onScroll={handleScroll}
         onLayout={handleLayout}
         showsHorizontalScrollIndicator={false}
