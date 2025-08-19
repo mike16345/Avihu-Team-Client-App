@@ -1,10 +1,9 @@
 import { RefreshControl, ScrollView, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { IWorkoutPlan } from "@/interfaces/Workout";
 import MuscleGroupContainer from "@/components/WorkoutPlan/MuscleGroupContainer";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
-import { ItemType } from "react-native-dropdown-picker";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import WorkoutPlanSkeletonLoader from "@/components/ui/loaders/skeletons/WorkoutPlanSkeletonLoader";
 import ErrorScreen from "./ErrorScreen";
@@ -22,14 +21,23 @@ const MyWorkoutPlanScreen = () => {
 
   const [selectedPlan, setSelectedPlan] = useState<IWorkoutPlan>();
   const [showCardio, setShowCardio] = useState(false);
-  const [plans, setPlans] = useState<ItemType<string>[]>();
+
+  const plans = useMemo(() => {
+    if (!data) return [];
+
+    const plans = data.workoutPlans.map((p) => {
+      return { label: p.planName, value: p._id };
+    });
+
+    plans.push({ label: CARDIO_VALUE, value: CARDIO_VALUE });
+
+    setSelectedPlan(data.workoutPlans[0]);
+
+    return plans;
+  }, [data]);
 
   const handleSelect = (val: any) => {
-    if (val == CARDIO_VALUE) {
-      setShowCardio(true);
-
-      return;
-    }
+    if (val == CARDIO_VALUE) return setShowCardio(true);
 
     const selected = data?.workoutPlans.find((plan) => plan._id === val);
 
@@ -39,19 +47,6 @@ const MyWorkoutPlanScreen = () => {
 
     setShowCardio(false);
   };
-
-  useEffect(() => {
-    if (!data) return;
-
-    const plans = data.workoutPlans.map((p) => {
-      return { label: p.planName, value: p._id };
-    });
-
-    plans.push({ label: CARDIO_VALUE, value: CARDIO_VALUE });
-
-    setPlans(plans);
-    setSelectedPlan(data.workoutPlans[0]);
-  }, [data]);
 
   if (isError)
     return <ErrorScreen refetchFunc={() => refresh(refetch)} isFetching={isRefetching} />;
