@@ -8,6 +8,7 @@ import useWeighInsQuery from "@/hooks/queries/WeighIns/useWeighInsQuery";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
 import { Card } from "@/components/ui/Card";
+import { Text } from "@/components/ui/Text";
 
 const WeightProgressionWindow = () => {
   const { isLoading, data } = useWeighInsQuery();
@@ -21,7 +22,7 @@ const WeightProgressionWindow = () => {
   }, [data]);
 
   return (
-    <View style={[layout.center, layout.center, spacing.gap20]}>
+    <View style={[layout.center, layout.center, spacing.pdDefault, spacing.gap20]}>
       <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
         <Icon height={24} width={24} name="graph" />
         <Switch onToggleSwitch={(mode) => setfirst(mode)} />
@@ -32,7 +33,11 @@ const WeightProgressionWindow = () => {
           <SpinningIcon mode="light" />
         </View>
       </ConditionalRender>
-      <Card style={[layout.widthFull]}>
+      <Card variant="gray" style={[layout.widthFull]}>
+        <Card.Header style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
+          <Icon name="clock" />
+          <Text>מעקב שקילה</Text>
+        </Card.Header>
         <Card.Content>
           <Graph data={weighIns} labels={["Jan", "Feb", "Mar", "Apr"]} />
         </Card.Content>
