@@ -5,7 +5,11 @@ import WorkoutProgressionWindow from "./Windows/WorkoutProgressionWindow";
 import WeightProgressionWindow from "./Windows/WeightProgressionWindow";
 import MeasurementsWindow from "./Windows/MeasurementsWindow";
 
-const windows = [<WorkoutProgressionWindow />, <WeightProgressionWindow />, <MeasurementsWindow />];
+const windows = [
+  <WorkoutProgressionWindow key={"workout-window"} />,
+  <WeightProgressionWindow key={"weight-progression-window"} />,
+  <MeasurementsWindow key={"measurement-window"} />,
+];
 
 const HomeScreen = () => {
   const { layout } = useStyles();

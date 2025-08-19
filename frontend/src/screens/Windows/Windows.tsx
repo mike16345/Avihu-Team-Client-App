@@ -1,13 +1,14 @@
 import Icon from "@/components/Icon/Icon";
 import useStyles from "@/styles/useGlobalStyles";
-import { ReactNode, useState } from "react";
+import React, { ReactNode, useCallback, useRef, useState } from "react";
 import {
+  FlatList,
   I18nManager,
-  LayoutChangeEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  ScrollView,
+  useWindowDimensions,
   View,
+  ListRenderItem,
 } from "react-native";
 
 interface WindowProps {
@@ -15,50 +16,74 @@ interface WindowProps {
 }
 
 const Windows: React.FC<WindowProps> = ({ windowItems }) => {
+  const { width } = useWindowDimensions();
   const { layout, spacing } = useStyles();
+  const separator = spacing.gapMd.gap ?? 0;
 
-  const [windowWidth, setWindowWidth] = useState(0);
+  const listRef = useRef<FlatList<ReactNode>>(null);
+  const dragStartXRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const onLayout = (e: LayoutChangeEvent) => {
-    const containerWidth = e.nativeEvent.layout.width;
+  const getItemLayout = useCallback(
+    (_: unknown, index: number) => ({
+      length: width,
+      offset: index * (width + separator),
+      index,
+    }),
+    [width, separator]
+  );
 
-    if (containerWidth !== windowWidth) {
-      setWindowWidth(containerWidth);
-    }
+  const snapToIndex = (idx: number) => {
+    listRef.current?.scrollToIndex({ index: idx, animated: true, viewPosition: 0 });
+    setActiveIndex(idx); // update immediately so next swipe is relative
   };
 
-  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetX = e.nativeEvent.contentOffset.x;
-    const interval = windowWidth + spacing.gapMd.gap;
-
-    const rawIndex = Math.round(offsetX / interval);
-    const correctedIndex = I18nManager.isRTL ? (windowItems?.length ?? 0) - 1 - rawIndex : rawIndex;
-
-    setActiveIndex(correctedIndex);
+  const onScrollBeginDrag = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    dragStartXRef.current = e.nativeEvent.contentOffset.x;
   };
+
+  const onScrollEndDrag = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const endX = e.nativeEvent.contentOffset.x;
+    const dx = endX - dragStartXRef.current;
+
+    const dir = dx === 0 ? 0 : dx > 0 ? 1 : -1;
+    const visualDir = I18nManager.isRTL ? -dir : dir;
+
+    const threshold = width * 0.15;
+    const movedEnough = Math.abs(dx) >= threshold;
+
+    const next = movedEnough
+      ? Math.min(Math.max(activeIndex + visualDir, 0), windowItems.length - 1)
+      : activeIndex;
+
+    snapToIndex(next);
+  };
+
+  const renderItem = useCallback<ListRenderItem<ReactNode>>(
+    ({ item }) => <View style={{ width }}>{item}</View>,
+    [width]
+  );
 
   return (
     <>
-      <ScrollView
-        onLayout={onLayout}
-        decelerationRate={0.9}
-        snapToInterval={windowWidth + spacing.gapMd.gap}
-        snapToAlignment="center"
+      <FlatList
+        ref={listRef}
         horizontal
-        contentContainerStyle={[spacing.gapLg]}
-        onScroll={handleScroll}
+        data={windowItems}
+        keyExtractor={(_, i) => String(i)}
+        renderItem={renderItem}
+        ItemSeparatorComponent={() => <View style={{ width: separator }} />}
+        getItemLayout={getItemLayout}
         showsHorizontalScrollIndicator={false}
-      >
-        {windowItems?.map((window, i) => (
-          <View key={i} style={[{ width: windowWidth }, layout.flex1]}>
-            {window}
-          </View>
-        ))}
-      </ScrollView>
+        pagingEnabled={false}
+        decelerationRate="fast"
+        onScrollBeginDrag={onScrollBeginDrag}
+        onScrollEndDrag={onScrollEndDrag}
+      />
+
       <View style={[spacing.gapDefault, layout.flexRow, layout.center]}>
-        {windowItems?.map((_, i) => (
-          <Icon key={i} name={i == activeIndex ? "elipse" : "elipseSoft"} height={10} width={10} />
+        {windowItems.map((_, i) => (
+          <Icon key={i} name={i === activeIndex ? "elipse" : "elipseSoft"} height={10} width={10} />
         ))}
       </View>
     </>
