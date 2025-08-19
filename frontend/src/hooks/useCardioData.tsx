@@ -5,7 +5,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { View } from "react-native";
 
 export const useCardioData = (cardioPlan?: ISimpleCardioType) => {
-  const { colors, fonts, layout, spacing, text } = useStyles();
+  const { colors, fonts, layout, spacing } = useStyles();
 
   if (!cardioPlan) return [];
 
@@ -15,7 +15,7 @@ export const useCardioData = (cardioPlan?: ISimpleCardioType) => {
       value: (
         <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
           <Icon name="clock" />
-          <Text style={[colors.textPrimary, fonts.lg, text.textBold]}>
+          <Text fontVariant="bold" style={[colors.textPrimary, fonts.lg]}>
             {cardioPlan.minsPerWeek} דקות
           </Text>
         </View>
@@ -24,13 +24,15 @@ export const useCardioData = (cardioPlan?: ISimpleCardioType) => {
     {
       title: "פעמים בשבוע",
       value: (
-        <Text style={[colors.textPrimary, fonts.lg, text.textBold]}>{cardioPlan.timesPerWeek}</Text>
+        <Text fontVariant="bold" style={[colors.textPrimary, fonts.lg]}>
+          {cardioPlan.timesPerWeek}
+        </Text>
       ),
     },
     {
       title: "דקות לאימון",
       value: (
-        <Text style={[colors.textPrimary, fonts.lg, text.textBold]}>
+        <Text fontVariant="bold" style={[colors.textPrimary, fonts.lg]}>
           {cardioPlan.minsPerWorkout}
         </Text>
       ),

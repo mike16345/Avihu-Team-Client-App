@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
@@ -15,7 +15,7 @@ interface WorkoutPlanSelectorProps {
 }
 
 const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan, tips }) => {
-  const { layout, spacing, text, common } = useStyles();
+  const { layout, spacing, common } = useStyles();
 
   const [showTips, setShowTips] = useState(false);
 
@@ -25,7 +25,7 @@ const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan,
         <Card variant="gray" style={[spacing.gapLg, common.roundedMd]}>
           <Card.Header>
             <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter]}>
-              <Text style={[text.textBold]}>
+              <Text fontVariant="bold">
                 יום {DateUtils.getDay()} | {selectedPlan}
               </Text>
 

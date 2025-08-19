@@ -1,4 +1,4 @@
-import { Image, Platform, Pressable, TouchableOpacity, View } from "react-native";
+import { Image, Platform, Pressable, View } from "react-native";
 import React from "react";
 import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
@@ -15,7 +15,7 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
   exercise: { exerciseId },
   exerciseCounter,
 }) => {
-  const { common, layout, spacing, text } = useStyles();
+  const { common, layout, spacing } = useStyles();
 
   const getExerciseImage = () => {
     return exerciseId.imageUrl
@@ -37,7 +37,7 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
         <View style={[layout.flexRow, layout.justifyBetween]}>
           <View style={[spacing.gapXl]}>
             <Text>{exerciseId.name}</Text>
-            <Text style={[layout.alignSelfStart, text.textBold]}>{exerciseCounter}</Text>
+            <Text fontVariant="bold">{exerciseCounter}</Text>
           </View>
 
           <Image

@@ -19,7 +19,7 @@ const MuscleGroupContainer: React.FC<MuscleGroupContainerProps> = ({
       <View
         style={[colors.backgroundSurface, common.rounded, spacing.pdDefault, layout.alignSelfStart]}
       >
-        <Text style={text.textBold}>{muscleGroup}</Text>
+        <Text fontVariant="bold">{muscleGroup}</Text>
       </View>
 
       {exercises.map((exercise, i) => (

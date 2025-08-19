@@ -17,7 +17,7 @@ const CardioWorkouts = () => {
       <Text style={[colors.textPrimary, text.textCenter]}>רשימת תרגילים:</Text>
 
       <ConditionalRender condition={cardioWorkouts}>
-        <Text style={[text.textCenter, fonts.lg, text.textBold]}>
+        <Text fontVariant="bold" style={[text.textCenter, fonts.lg]}>
           {cardioWorkouts?.data.length}
         </Text>
       </ConditionalRender>
