@@ -6,7 +6,7 @@ import {
   StyleProp,
   ViewStyle,
 } from "react-native";
-import { Card } from "./Card";
+import { Card, CardVariants } from "./Card";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { ConditionalRender } from "./ConditionalRender";
 import useStyles from "@/styles/useGlobalStyles";
@@ -19,8 +19,10 @@ interface CollapsibleProps {
   children: ReactNode;
   trigger: ReactNode;
   style?: StyleProp<ViewStyle>;
-  variant?: "gray" | "white";
+  variant?: CardVariants;
 }
+
+const ANIMATION_DURATION = 250;
 
 const Collapsible: React.FC<CollapsibleProps> = ({
   children,
@@ -42,30 +44,29 @@ const Collapsible: React.FC<CollapsibleProps> = ({
     const height = e.nativeEvent.layout.height;
 
     if (contentHeight !== height) {
-      setContentHeight(height);
+      setContentHeight(height + 10);
       setMeasured(true);
     }
   };
 
   useEffect(() => {
-    if (isCollapsed) {
+    if (!isCollapsed) {
       Animated.timing(height, {
         toValue: contentHeight,
         useNativeDriver: false,
-        duration: 500,
+        duration: ANIMATION_DURATION,
       }).start();
-
       setRenderChildren(true);
     } else {
       Animated.timing(height, {
         toValue: 0,
         useNativeDriver: false,
-        duration: 500,
+        duration: ANIMATION_DURATION,
       }).start();
 
       setTimeout(() => {
         setRenderChildren(false);
-      }, 500); // stop rendering children after animation ends.
+      }, ANIMATION_DURATION);
     }
   }, [isCollapsed]);
 
@@ -76,7 +77,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
           <ConditionalRender condition={typeof trigger === "string"}>
             <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
               <Text style={text.textBold}>{trigger}</Text>
-              <Icon name="chevronDown" rotation={isCollapsed ? 180 : 0} />
+              <Icon name="chevronDown" rotation={!isCollapsed ? 180 : 0} />
             </View>
           </ConditionalRender>
 

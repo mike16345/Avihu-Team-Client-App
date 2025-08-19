@@ -15,7 +15,6 @@ import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import Toast from "react-native-toast-message";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
-import { useFonts } from "expo-font";
 import UserDrawer from "@/components/User/UserDrawer";
 import Update from "@/hooks/useUpdates";
 import persister from "@/QueryClient/queryPersister";
@@ -24,6 +23,7 @@ import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
 import Sandbox from "@/screens/Sandbox";
 import { toastConfig } from "@/config/toastConfig";
 import ToastContainer from "@/components/ui/toast/ToastContainer";
+import useCustomFonts from "@/hooks/useCustomFonts";
 
 const { DarkTheme } = adaptNavigationTheme({
   reactNavigationLight: NavigationDefaultTheme,
@@ -33,10 +33,7 @@ const { DarkTheme } = adaptNavigationTheme({
 export default function App() {
   const ready = useOneTimeRTLFix();
   const colorScheme = Appearance.getColorScheme();
-  const [loaded] = useFonts({
-    Assistant: require("./assets/fonts/Assistant-VariableFont_wght.ttf"),
-    Brutalist: require("./assets/fonts/TelAviv-BrutalistLight.ttf"),
-  });
+  const [loaded] = useCustomFonts();
 
   if (!loaded || !ready) return;
 
@@ -52,7 +49,7 @@ export default function App() {
               >
                 <NavigationContainer>
                   <RootNavigator />
-                  <StatusBar key={colorScheme} translucent style={"light"} />
+                  <StatusBar key={colorScheme} translucent style={"dark"} />
                   <ToastContainer />
                   <UserDrawer />
                   <Update />

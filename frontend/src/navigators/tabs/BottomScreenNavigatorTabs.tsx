@@ -12,13 +12,12 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     options: {
       tabBarLabel: "",
       tabBarAccessibilityLabel: "אימונים",
-
       tabBarIcon: ({ color }) => <Icon color={color} name="dumbbell" height={45} />,
     },
   },
   {
-    name: "MyDietPlanPage",
-    component: MyDietPlanScreen,
+    name: "Chat",
+    component: BlogScreen,
     options: {
       tabBarLabel: "",
       tabBarIcon: ({ color }) => <Icon color={color} name="chat" height={45} />,
@@ -29,13 +28,12 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     component: MyProgressScreen,
     options: {
       tabBarLabel: "",
-
       tabBarIcon: ({ color }: { color: string }) => <Icon color={color} name="home" height={45} />,
     },
   },
   {
-    name: "BlogScreen",
-    component: BlogScreen,
+    name: "MyDietPlanPage",
+    component: MyDietPlanScreen,
     options: {
       tabBarLabel: "",
       tabBarIcon: ({ color }: { color: string }) => (
@@ -44,7 +42,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     },
   },
   {
-    name: "EmailScreen",
+    name: "BlogScreen",
     component: BlogScreen,
     options: {
       tabBarLabel: "",

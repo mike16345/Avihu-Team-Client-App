@@ -1,7 +1,7 @@
 import { TouchableOpacity } from "react-native";
 import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
-import ButtonShadow from "../ButtonShadow";
+import ButtonShadow from "./ButtonShadow";
 import { IconName } from "@/constants/iconMap";
 import Icon from "@/components/Icon/Icon";
 

@@ -16,11 +16,11 @@ import { IUser } from "@/interfaces/User";
 import { Text } from "../ui/Text";
 import ForgotPassword from "./ForgotPassword";
 import { ConditionalRender } from "../ui/ConditionalRender";
-import Tabs from "../ui/Tabs";
 import LoginForm from "./LoginForm";
 import { useToast } from "@/hooks/useToast";
 import { getRegisterOrLoginPrompt, getRegisterOrLoginPromptLabel } from "@/utils/auth";
 import RegisterForm from "./RegisterForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
 
 export interface IUserCredentials {
   email: string;
@@ -46,11 +46,27 @@ export default function Login({ onLogin }: ILoginProps) {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<string>("התחברות");
   const registerOrLoginPrompt = getRegisterOrLoginPrompt(isRegistering, isChangingPassword);
 
-  const loginTabs = [
-    { label: "התחברות", value: false },
-    { label: "חשבון חדש", value: true },
+  const tabList = [
+    <TabsTrigger key={"התחברות"} label="התחברות" value="התחברות" />,
+    <TabsTrigger key={"חשבון חדש"} label="חשבון חדש" value="חשבון חדש" />,
+  ];
+
+  const tabContent = [
+    <TabsContent key={"חשבון חדש"} value="חשבון חדש">
+      <RegisterForm />
+    </TabsContent>,
+    <TabsContent key={"התחברות"} value="התחברות">
+      <LoginForm
+        onForgotPasswordPress={() => {
+          setIsForgotPassword(true);
+          setIsChangingPassword(true);
+        }}
+        onLoginSuccess={(user) => onLogin(user)}
+      />
+    </TabsContent>,
   ];
 
   const handleChangePasswordSuccess = () => {
@@ -99,21 +115,12 @@ export default function Login({ onLogin }: ILoginProps) {
           style={[{ zIndex: 30, width: width * 0.9 }, spacing.gapXxl, spacing.pdSm]}
         >
           <ConditionalRender condition={!isForgotPassword}>
-            <Tabs
-              items={loginTabs}
-              value={isRegistering}
-              setValue={(val) => setIsRegistering(val)}
-            />
-          </ConditionalRender>
-
-          <ConditionalRender condition={!isRegistering && !isForgotPassword}>
-            <LoginForm
-              onForgotPasswordPress={() => {
-                setIsForgotPassword(true);
-                setIsChangingPassword(true);
-              }}
-              onLoginSuccess={(user) => onLogin(user)}
-            />
+            <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value)}>
+              <View style={[spacing.gapDefault]}>
+                <TabsList>{tabList}</TabsList>
+                {tabContent}
+              </View>
+            </Tabs>
           </ConditionalRender>
 
           <ConditionalRender condition={isForgotPassword}>
@@ -121,10 +128,6 @@ export default function Login({ onLogin }: ILoginProps) {
               onBackPress={handleBackPress}
               onConfirmChangePasswordSuccess={handleChangePasswordSuccess}
             />
-          </ConditionalRender>
-
-          <ConditionalRender condition={isRegistering}>
-            <RegisterForm />
           </ConditionalRender>
 
           <View style={[layout.flexRow, layout.center, spacing.gapSm, { zIndex: 30 }]}>

@@ -1,3 +1,5 @@
+import { AVG_CARB_CALORIES, AVG_PROTEIN_CALORIES } from "@/constants/Constants";
+import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
 import Constants from "expo-constants";
 import Toast, { ToastType } from "react-native-toast-message";
 
@@ -116,18 +118,48 @@ export const extractExercises = (exercises: any) => {
   return Object.keys(exercises);
 };
 
+export const foodGroupToApiFoodGroupName = (key: string = "") => {
+  switch (key) {
+    case `totalProtein`:
+    case `חלבונים`:
+    case "protein":
+      return `protein`;
+
+    case `totalCarbs`:
+    case `פחמימות`:
+    case `carbs`:
+      return `carbs`;
+
+    case `totalFats`:
+    case `שומנים`:
+    case `fats`:
+      return `fats`;
+
+    case `totalVeggies`:
+    case `ירקות`:
+    case `vegetables`:
+      return `vegetables`;
+  }
+
+  return key;
+};
+
 export const foodGroupToName = (key: string = "") => {
   switch (key) {
     case `totalProtein`:
+    case "protein":
       return `חלבונים`;
 
     case `totalCarbs`:
+    case `carbs`:
       return `פחמימות`;
 
     case `totalFats`:
+    case `fats`:
       return `שומנים`;
 
     case `totalVeggies`:
+    case `vegetables`:
       return `ירקות`;
   }
 
@@ -156,3 +188,41 @@ export const servingTypeToString = (type: string) => {
 };
 
 export const generateUniqueId = () => Math.random().toString(36).substring(2, 9);
+
+const unitLabels: Record<DietItemUnit, string> = {
+  grams: "גרם",
+  spoons: "כפות",
+  pieces: "חתיכות",
+  scoops: "סקופים",
+  units: "יחידות",
+  cups: "כוסות",
+  teaSpoons: "כפיות",
+};
+
+export function formatServingText<K extends keyof IServingItem>(
+  name: string,
+  oneServing: IServingItem,
+  servingsToShow: 1 | 2 = 2,
+  ignoreKeys: K[] = []
+): string {
+  const units = Object.entries(oneServing)
+    .filter(([key, value]) => {
+      return (
+        value !== undefined && value !== null && key !== "_id" && !ignoreKeys.includes(key as K)
+      );
+    })
+    .slice(0, servingsToShow) // limit to requested number of servings
+    .map(([unitKey, value]) => {
+      const label = unitLabels[unitKey as DietItemUnit];
+      return `${value} ${label}`;
+    });
+
+  return [name, ...units].join(" | ");
+}
+
+export function getTotalCaloriesInMeal(meal: IMeal) {
+  const proteinCalories = meal.totalProtein.quantity * AVG_PROTEIN_CALORIES;
+  const carbCalories = meal.totalCarbs.quantity * AVG_CARB_CALORIES;
+
+  return proteinCalories + carbCalories;
+}
