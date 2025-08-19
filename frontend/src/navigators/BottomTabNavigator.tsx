@@ -18,7 +18,7 @@ import { useFadeIn } from "@/styles/useFadeIn";
 const Tab = createMaterialBottomTabNavigator<BottomStackParamList>();
 const HORIZONTAL_MARGIN = 10;
 const TABS_COUNT = 5;
-const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "MyDietPlanPage";
+const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "Home";
 
 const BottomTabNavigator = () => {
   const { layout, colors, common, fonts, spacing } = useStyles();
