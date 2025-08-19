@@ -74,7 +74,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
     <Card variant={variant} style={style}>
       <ConditionalRender condition={trigger}>
         <Card.Header>
-          <TouchableOpacity onPress={() => onCollapseChange!(!isCollapsed)}>
+          <TouchableOpacity onPress={() => onCollapseChange?.(!isCollapsed)}>
             <ConditionalRender condition={typeof trigger === "string"}>
               <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
                 <Text style={text.textBold}>{trigger}</Text>
