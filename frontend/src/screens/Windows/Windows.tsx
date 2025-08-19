@@ -58,7 +58,7 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
       </ScrollView>
       <View style={[spacing.gapDefault, layout.flexRow, layout.center]}>
         {windowItems?.map((_, i) => (
-          <Icon name={i == activeIndex ? "elipse" : "elipseSoft"} height={10} width={10} />
+          <Icon key={i} name={i == activeIndex ? "elipse" : "elipseSoft"} height={10} width={10} />
         ))}
       </View>
     </>
