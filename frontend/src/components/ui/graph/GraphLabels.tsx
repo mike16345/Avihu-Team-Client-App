@@ -27,7 +27,7 @@ const GraphLabels: React.FC<GraphLabelsProps> = ({ labels, onSelect, selectedInd
       ]}
     >
       {labels.map((label, i) => (
-        <View key={i} style={[]}>
+        <View key={i}>
           <TouchableOpacity
             onPress={() => onSelect(i)}
             style={[

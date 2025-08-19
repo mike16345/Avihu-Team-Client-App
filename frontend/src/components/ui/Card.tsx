@@ -16,10 +16,7 @@ interface CompoundCard extends React.FC<CardProps> {
 }
 
 export const Card: CompoundCard = ({ children, variant = "white", style }) => {
-  const { colors, common, spacing, fonts } = useStyles();
-
-  spacing.pdDefault.padding;
-  fonts.lg;
+  const { colors, common, spacing } = useStyles();
 
   const variantStyles = {
     white: [colors.backgroundSurface, colors.outline],

@@ -1,26 +1,23 @@
 import { View } from "react-native";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import useWeighInsQuery from "@/hooks/queries/WeighIns/useWeighInsQuery";
 import useStyles from "@/styles/useGlobalStyles";
-import { ConditionalRender } from "../ui/ConditionalRender";
 import Graph from "../ui/graph/Graph";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { Card } from "../ui/Card";
 import Icon from "../Icon/Icon";
 import { Text } from "../ui/Text";
-import { Tabs, TabsList } from "../ui/Tabs";
+import { GraphTab, useGraphWeighIns } from "@/hooks/useGraphWeighIns";
+import { Tabs, TabsList, TabsTrigger } from "../ui/Tabs";
+
+const tabs: GraphTab[] = ["יומי", "שבועי", "חודשי"];
 
 const WeighInsGraph = () => {
   const { isLoading, data } = useWeighInsQuery();
   const { layout, spacing } = useStyles();
+  const [selectedTab, setSelectedTab] = useState<GraphTab>("יומי");
 
-  const weighIns = useMemo(() => {
-    if (!data) return [];
-
-    return data?.map((item) => item.weight);
-  }, [data]);
-
-  
+  const { getWeighInsByTab } = useGraphWeighIns(data);
 
   if (isLoading)
     return (
@@ -29,19 +26,25 @@ const WeighInsGraph = () => {
       </View>
     );
 
+  const { weighIns, labels } = getWeighInsByTab(selectedTab);
+
   return (
-    <View>
-      {/* <Tabs>
-        <TabsList></TabsList>
-        {tabContent}
-      </Tabs> */}
-      <Card variant="gray" style={[layout.widthFull]}>
+    <View style={[spacing.gapLg]}>
+      <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value as GraphTab)}>
+        <TabsList>
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab} value={tab} label={tab} />
+          ))}
+        </TabsList>
+      </Tabs>
+      <Card style={[layout.widthFull]} variant="gray">
         <Card.Header style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
           <Icon name="clock" />
           <Text fontSize={16}>מעקב שקילה</Text>
         </Card.Header>
+
         <Card.Content>
-          <Graph data={weighIns} labels={["Jan", "Feb", "Mar", "Apr"]} />
+          <Graph data={weighIns} labels={labels} />
         </Card.Content>
       </Card>
     </View>

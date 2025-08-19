@@ -28,7 +28,7 @@ interface GraphProps {
   mounted?: boolean;
 }
 
-const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = true }) => {
+const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
   const { layout, spacing } = useStyles();
   const graphTheme = useGraphTheme();
 
@@ -90,7 +90,7 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
   }, []);
 
   return (
-    <View style={[{ padding: 0 }, style]}>
+    <View style={[{ padding: 0 }, spacing.gapDefault, style]}>
       <View style={styles.header}>{header}</View>
       <ScrollView
         ref={scrollRef}
@@ -101,7 +101,7 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
         onLayout={handleLayout}
         showsHorizontalScrollIndicator={false}
       >
-        <View style={[layout.alignSelfStart, { position: "relative" }]}>
+        <View style={[spacing.gapDefault, { position: "relative" }]}>
           <LineChart
             withVerticalLabels={false}
             data={{
@@ -136,6 +136,7 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
           />
         </View>
       </ScrollView>
+
       <View style={[layout.flexRow, styles.indicators, spacing.gapDefault]}>
         <TouchableOpacity onPress={scrollToEnd}>
           <Icon
