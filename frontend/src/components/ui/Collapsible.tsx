@@ -15,9 +15,9 @@ import Icon from "../Icon/Icon";
 
 interface CollapsibleProps {
   isCollapsed: boolean;
-  onCollapseChange: (value: boolean) => void;
+  onCollapseChange?: (value: boolean) => void;
   children: ReactNode;
-  trigger: ReactNode;
+  trigger?: ReactNode;
   style?: StyleProp<ViewStyle>;
   variant?: CardVariants;
 }
@@ -72,18 +72,20 @@ const Collapsible: React.FC<CollapsibleProps> = ({
 
   return (
     <Card variant={variant} style={style}>
-      <Card.Header>
-        <TouchableOpacity onPress={() => onCollapseChange(!isCollapsed)}>
-          <ConditionalRender condition={typeof trigger === "string"}>
-            <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
-              <Text style={text.textBold}>{trigger}</Text>
-              <Icon name="chevronDown" rotation={!isCollapsed ? 180 : 0} />
-            </View>
-          </ConditionalRender>
+      <ConditionalRender condition={trigger}>
+        <Card.Header>
+          <TouchableOpacity onPress={() => onCollapseChange?.(!isCollapsed)}>
+            <ConditionalRender condition={typeof trigger === "string"}>
+              <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
+                <Text style={text.textBold}>{trigger}</Text>
+                <Icon name="chevronDown" rotation={!isCollapsed ? 180 : 0} />
+              </View>
+            </ConditionalRender>
 
-          <ConditionalRender condition={typeof trigger !== "string"}>{trigger}</ConditionalRender>
-        </TouchableOpacity>
-      </Card.Header>
+            <ConditionalRender condition={typeof trigger !== "string"}>{trigger}</ConditionalRender>
+          </TouchableOpacity>
+        </Card.Header>
+      </ConditionalRender>
 
       <Card.Content>
         <ConditionalRender condition={!measured}>

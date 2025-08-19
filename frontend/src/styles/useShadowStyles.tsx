@@ -161,27 +161,24 @@ export const useShadowStyles = () => {
 
     // Frame Shadow Layers
     frameLayer1: {
-      borderRadius: 8,
+      borderRadius: 25,
       ...Platform.select({
         ios: {
           shadowColor: "#999999",
+          backgroundColor: background.backgroundColor,
           shadowOffset: { width: 0, height: 228 },
           shadowOpacity: 0.01, // Made visible
           shadowRadius: 64,
-        },
-        android: {
-          shadowRadius: 15,
-          elevation: 20,
-          backgroundColor: background.backgroundColor,
-          shadowColor: "#999999",
         },
       }),
     },
 
     frameLayer2: {
+      borderRadius: 25,
       ...Platform.select({
         ios: {
           shadowColor: "#999999",
+          backgroundColor: background.backgroundColor,
           shadowOffset: { width: 0, height: 146 },
           shadowOpacity: 0.01,
           shadowRadius: 58,
@@ -191,9 +188,11 @@ export const useShadowStyles = () => {
     },
 
     frameLayer3: {
+      borderRadius: 25,
       ...Platform.select({
         ios: {
           shadowColor: "#999999",
+          backgroundColor: background.backgroundColor,
           shadowOffset: { width: 0, height: 82 },
           shadowOpacity: 0.05,
           shadowRadius: 49,
@@ -203,9 +202,11 @@ export const useShadowStyles = () => {
     },
 
     frameLayer4: {
+      borderRadius: 25,
       ...Platform.select({
         ios: {
           shadowColor: "#999999",
+          backgroundColor: background.backgroundColor,
           shadowOffset: { width: 0, height: 37 },
           shadowOpacity: 0.09,
           shadowRadius: 37,
@@ -215,17 +216,18 @@ export const useShadowStyles = () => {
     },
 
     frameLayer5: {
-      borderRadius: 8,
-
+      borderRadius: 20,
+      opacity: 1,
       ...Platform.select({
         ios: {
           shadowColor: "#999999",
+          backgroundColor: background.backgroundColor,
           shadowOffset: { width: 0, height: 9 },
           shadowOpacity: 0.1,
           shadowRadius: 20,
         },
         android: {
-          backgroundColor: background.backgroundColor,
+          backgroundColor: "#999999",
           shadowRadius: 15,
           elevation: 4,
           shadowColor: "#999999",

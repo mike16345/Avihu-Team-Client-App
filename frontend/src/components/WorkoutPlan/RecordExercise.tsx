@@ -15,7 +15,6 @@ import WorkoutVideoPopup from "./WorkoutVideoPopup";
 import { createRetryFunction, extractVideoId, generateWheelPickerData } from "@/utils/utils";
 import WeightWheelPicker from "../WeightGraph/WeightWheelPicker";
 import WheelPicker from "../ui/WheelPicker";
-import WorkoutTips from "./WorkoutTips";
 import NativeIcon from "../Icon/NativeIcon";
 import { useRecordedSetsApi } from "@/hooks/api/useRecordedSetsApi";
 import { useUserStore } from "@/store/userStore";
@@ -223,12 +222,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
               </View>
             </View>
 
-            <WorkoutTips
-              tips={[exercise.tipFromTrainer!]}
-              openTips={openTrainerTips}
-              title="דגשים לתרגיל"
-              setOpenTips={setOpenTrainerTips}
-            />
+            {/* Remove to avoid bundling errors. this page will be dealt with when we get there */}
 
             <ExerciseMethodDrawer
               close={() => setOpenExerciseMethod(false)}

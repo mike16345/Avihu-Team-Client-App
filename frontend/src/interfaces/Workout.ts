@@ -60,7 +60,7 @@ export interface IRecordedSetPost {
 }
 
 export interface IWorkoutPlan {
-  id?: string;
+  _id?: string;
   userId?: string;
   planName: string;
   muscleGroups: IMuscleGroupWorkouts[];
@@ -115,7 +115,8 @@ export interface IRecordedSetResponse {
 
 export interface IExercise {
   _id?: string;
-  exerciseId: { name: string; linkToVideo: string; _id: string };
+
+  exerciseId: { name: string; linkToVideo: string; _id: string; imageUrl?: string };
   tipFromTrainer?: string;
   exerciseMethod?: string;
   sets: ISet[];

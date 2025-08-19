@@ -7,8 +7,8 @@ import { ConditionalRender } from "./ConditionalRender";
 
 export interface DropDownMenuProps {
   selectedValue?: string;
-  onSelect: (selected: string) => void;
-  items: ItemType<string>[];
+  onSelect: (selected: any) => void;
+  items: ItemType<any>[];
 }
 
 const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedValue }) => {
@@ -16,7 +16,7 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
 
   const [open, setOpen] = useState(false);
 
-  const handleSelect = (value: string) => {
+  const handleSelect = (value: any) => {
     onSelect(value);
     setOpen(false);
   };
@@ -30,7 +30,10 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
         setOpen={setOpen}
         closeOnBackPressed
         items={items}
-        listMode="SCROLLVIEW"
+        listMode="FLATLIST"
+        scrollViewProps={{
+          nestedScrollEnabled: true,
+        }}
         bottomOffset={10}
         placeholder={selectedItemLabel}
         placeholderStyle={[text.textLeft, spacing.pdHorizontalLg]}
@@ -41,6 +44,8 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
             borderBottomStartRadius: 8,
             borderTopEndRadius: 8,
             borderTopStartRadius: 8,
+            zIndex: 2000,
+            elevation: 2000,
           },
         ]}
         dropDownContainerStyle={[
@@ -48,33 +53,39 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
           colors.borderOnPrimary,
           common.rounded,
           common.borderSm,
-          spacing.mgVerticalDefault,
+          spacing.mgVerticalLg,
           {
-            elevation: 3,
+            zIndex: 3000,
+            elevation: 3000,
+            position: "absolute",
             borderTopEndRadius: 10,
             borderTopStartRadius: 10,
             borderBottomEndRadius: 10,
             borderBottomStartRadius: 10,
-            zIndex: 3,
             maxHeight: 200,
           },
         ]}
-        renderListItem={({ label, value }) => (
-          <TouchableOpacity
-            onPress={() => handleSelect(value)}
-            style={[{ padding: 10 }, layout.flexRow, layout.justifyBetween]}
-          >
-            <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
-              <View
-                style={[{ height: 8, width: 8 }, colors.backgroundSuccess, common.roundedFull]}
-              />
-              <Text>{label}</Text>
-            </View>
-            <ConditionalRender condition={value === selectedValue}>
-              <Icon name="check" />
-            </ConditionalRender>
-          </TouchableOpacity>
-        )}
+        renderListItem={({ label, value }) => {
+          const isSelected = selectedValue === value || selectedValue === label;
+
+          return (
+            <TouchableOpacity
+              onPress={() => handleSelect(value)}
+              style={[{ padding: 10 }, layout.flexRow, layout.justifyBetween]}
+            >
+              <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
+                <View
+                  style={[{ height: 8, width: 8 }, colors.backgroundSuccess, common.roundedFull]}
+                />
+                <Text>{label}</Text>
+              </View>
+
+              <ConditionalRender condition={isSelected}>
+                <Icon name="check" />
+              </ConditionalRender>
+            </TouchableOpacity>
+          );
+        }}
         ListEmptyComponent={() => (
           <TouchableOpacity
             style={[spacing.pdDefault, layout.center]}

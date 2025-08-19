@@ -1,3 +1,5 @@
+import Icon from "@/components/Icon/Icon";
+import { ModalContextProvider, useModalContext } from "@/context/useModal";
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useEffect, useRef } from "react";
 import {
@@ -10,13 +12,12 @@ import {
   StyleProp,
   Animated,
 } from "react-native";
-import { IconName } from "@/constants/iconMap";
-import { ModalContextProvider, useModalContext } from "@/context/useModal";
-import useCommonStyles from "@/styles/useCommonStyles";
 import { ConditionalRender } from "../ConditionalRender";
-import Icon from "@/components/Icon/Icon";
 import { Text } from "../Text";
+import useCommonStyles from "@/styles/useCommonStyles";
+import { useLayoutStyles } from "@/styles/useLayoutStyles";
 import { Card } from "../Card";
+import { IconName } from "@/constants/iconMap";
 
 export interface CustomModalProps extends ModalProps {
   style?: StyleProp<ViewStyle>;
@@ -33,25 +34,25 @@ interface CompoundModal extends React.FC<CustomModalProps> {
 export const CustomModal: CompoundModal = ({ children, onDismiss, visible, ...props }) => {
   const { colors, layout, spacing } = useStyles();
 
-  const opcaity = useRef(new Animated.Value(0)).current;
+  const animationValue = useRef(new Animated.Value(0)).current;
 
   const handleDismiss = () => {
     if (!onDismiss) return;
 
-    Animated.timing(opcaity, {
+    Animated.timing(animationValue, {
       toValue: 0,
       useNativeDriver: true,
-      duration: 300,
+      duration: 200,
     }).start(() => onDismiss());
   };
 
   useEffect(() => {
     if (!visible) return;
 
-    Animated.timing(opcaity, {
+    Animated.timing(animationValue, {
       toValue: 1,
       useNativeDriver: true,
-      duration: 300,
+      duration: 200,
     }).start();
   }, [visible]);
 
@@ -60,14 +61,15 @@ export const CustomModal: CompoundModal = ({ children, onDismiss, visible, ...pr
       <Animated.View
         style={[
           colors.background,
-          layout.sizeFull,
           spacing.gapDefault,
           spacing.pdStatusBar,
           spacing.pdBottomBar,
           spacing.pdLg,
           spacing.gapDefault,
+          layout.flex1,
           {
-            opacity: opcaity,
+            transform: [{ scale: animationValue }],
+            opacity: animationValue,
             paddingTop: spacing?.pdStatusBar?.paddingTop * 2,
             paddingBottom: spacing.pdBottomBar.paddingBottom * 2,
           },
@@ -100,9 +102,10 @@ CustomModal.Header = ({ children, style, dismissIcon = "close", ...props }) => {
 
 CustomModal.Content = ({ children, variant = "gray", style }) => {
   const { roundedMd } = useCommonStyles();
+  const { sizeFull } = useLayoutStyles();
 
   return (
-    <Card style={[roundedMd, style]} variant={variant}>
+    <Card style={[roundedMd, sizeFull, style]} variant={variant}>
       {children}
     </Card>
   );

@@ -6,6 +6,8 @@ import { Text } from "@/components/ui/Text";
 import { Button } from "react-native-paper";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import Loader from "@/components/ui/loaders/Loader";
+import Icon from "@/components/Icon/Icon";
+import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 
 interface ErrorScreenProps {
   isFetching?: boolean;
@@ -18,31 +20,29 @@ const ErrorScreen: React.FC<ErrorScreenProps> = ({ isFetching = false, error, re
 
   return (
     <>
-      {isFetching && <Loader variant="Screen" />}
-      <View style={[layout.flex1, layout.center, spacing.gapDefault, colors.background]}>
-        <NativeIcon
-          library="MaterialIcons"
-          name="error-outline"
-          size={150}
-          style={[colors.textDanger]}
-        />
-        <Text style={[colors.textOnBackground, fonts.xl]}>אירעה שגיאה</Text>
-        <ConditionalRender
-          condition={error}
-          children={<Text style={[colors.textOnBackground, fonts.xl]}>{error?.message || ""}</Text>}
-        />
+      <View
+        style={[
+          layout.flex1,
+          layout.center,
+          spacing.gapDefault,
+          colors.background,
+          spacing.pdLg,
+          spacing.pdBottomBar,
+        ]}
+      >
+        <View style={[layout.flex1, layout.center]}>
+          <Icon name="info" color={colors.textDanger.color} height={100} width={100} />
+          <Text style={[colors.textPrimary, fonts.xl]}>אירעה שגיאה</Text>
+          <ConditionalRender
+            condition={error}
+            children={<Text style={[colors.textPrimary, fonts.xl]}>{error?.message || ""}</Text>}
+          />
+        </View>
+
         {refetchFunc && (
-          <Button
-            mode="contained"
-            onPress={refetchFunc}
-            icon={() => (
-              <NativeIcon library="AntDesign" name="reload1" style={colors.textOnBackground} />
-            )}
-            style={[common.rounded, spacing.mgVerticalDefault]}
-            textColor={colors.textOnBackground.color}
-          >
-            רענן
-          </Button>
+          <PrimaryButton onPress={refetchFunc} block loading={isFetching}>
+            נסה שוב
+          </PrimaryButton>
         )}
       </View>
     </>

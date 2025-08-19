@@ -6,6 +6,7 @@ import type {
   ItemsInDateRangeParams,
   Timezone,
 } from "../types/dateTypes";
+import { DAYS_OF_WEEK } from "@/constants/date";
 
 class DateUtils {
   static sortByDate(values: DateAndValue[], order: "asc" | "desc"): { date: Date; value: any }[] {
@@ -30,6 +31,10 @@ class DateUtils {
 
   static getCurrentDate(formatType: DateFormatType, timezone: Timezone = "Asia/Jerusalem"): string {
     return moment().tz(timezone).format(formatType);
+  }
+
+  static getDay() {
+    return DAYS_OF_WEEK[moment().day()];
   }
 
   static get(date: Date, dateAspect: "day" | "month" | "year"): string {
