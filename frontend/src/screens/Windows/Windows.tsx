@@ -2,6 +2,7 @@ import Icon from "@/components/Icon/Icon";
 import useStyles from "@/styles/useGlobalStyles";
 import { ReactNode, useState } from "react";
 import {
+  I18nManager,
   LayoutChangeEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -29,15 +30,19 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetX = e.nativeEvent.contentOffset.x;
-    const index = Math.round(offsetX / (windowWidth + spacing.gapMd.gap));
-    setActiveIndex(index);
+    const interval = windowWidth + spacing.gapMd.gap;
+
+    const rawIndex = Math.round(offsetX / interval);
+    const correctedIndex = I18nManager.isRTL ? (windowItems?.length ?? 0) - 1 - rawIndex : rawIndex;
+
+    setActiveIndex(correctedIndex);
   };
 
   return (
     <>
       <ScrollView
         onLayout={onLayout}
-        decelerationRate={0}
+        decelerationRate={0.9}
         snapToInterval={windowWidth + spacing.gapMd.gap}
         snapToAlignment="center"
         horizontal
