@@ -1,3 +1,5 @@
+import Icon from "@/components/Icon/Icon";
+import { ModalContextProvider, useModalContext } from "@/context/useModal";
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useEffect, useRef } from "react";
 import {
@@ -10,21 +12,12 @@ import {
   StyleProp,
   Animated,
 } from "react-native";
-import Icon from "../../Icon/Icon";
-import { Text } from "../Text";
-import { IconName } from "@/constants/iconMap";
 import { ConditionalRender } from "../ConditionalRender";
-import { Card } from "../Card";
-import { ModalContextProvider, useModalContext } from "@/context/useModal";
+import { Text } from "../Text";
 import useCommonStyles from "@/styles/useCommonStyles";
 import { useLayoutStyles } from "@/styles/useLayoutStyles";
-import { IconName } from "@/constants/iconMap";
-import { ModalContextProvider, useModalContext } from "@/context/useModal";
-import useCommonStyles from "@/styles/useCommonStyles";
-import { ConditionalRender } from "../ConditionalRender";
-import Icon from "@/components/Icon/Icon";
-import { Text } from "../Text";
 import { Card } from "../Card";
+import { IconName } from "@/constants/iconMap";
 
 export interface CustomModalProps extends ModalProps {
   style?: StyleProp<ViewStyle>;

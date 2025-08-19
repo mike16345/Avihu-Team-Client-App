@@ -51,7 +51,6 @@ const Collapsible: React.FC<CollapsibleProps> = ({
 
   useEffect(() => {
     if (!isCollapsed) {
-    if (!isCollapsed) {
       Animated.timing(height, {
         toValue: contentHeight,
         useNativeDriver: false,
@@ -79,7 +78,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
             <ConditionalRender condition={typeof trigger === "string"}>
               <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
                 <Text style={text.textBold}>{trigger}</Text>
-                <Icon name="chevronDown" rotation={isCollapsed ? 180 : 0} />
+                <Icon name="chevronDown" rotation={!isCollapsed ? 180 : 0} />
               </View>
             </ConditionalRender>
 
