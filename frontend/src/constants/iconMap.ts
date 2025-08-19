@@ -36,7 +36,6 @@ import upload from "@assets/icons/upload.svg";
 import send from "@assets/icons/send.svg";
 import check from "@assets/icons/check.svg";
 
-
 const icons = {
   arrowLeft,
   arrowRoundDown,
