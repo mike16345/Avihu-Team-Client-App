@@ -9,27 +9,26 @@ import TopBar from "./TopBar";
 import TimerDrawer from "@/components/ui/TimerDrawer";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import { useTimerStore } from "@/store/timerStore";
-import Sandbox from "@/screens/Sandbox";
-import { useNavigationState } from "@react-navigation/native";
 import { Text } from "@/components/ui/Text";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/Icon/Icon";
 import { indicators } from "@/utils/navbar";
 import { useFadeIn } from "@/styles/useFadeIn";
 
 const Tab = createMaterialBottomTabNavigator<BottomStackParamList>();
+const HORIZONTAL_MARGIN = 10;
+const TABS_COUNT = 5;
+const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "MyDietPlanPage";
 
 const BottomTabNavigator = () => {
   const { layout, colors, common, fonts, spacing } = useStyles();
   const { countdown } = useTimerStore();
   const { width } = useWindowDimensions();
   const opacity = useFadeIn();
-  const HORIZONTAL_MARGIN = 10;
-  const TABS_COUNT = 5;
 
   const indicatorWidth = (width - HORIZONTAL_MARGIN * 4) / TABS_COUNT - 8;
-  const activeIndex = useNavigationState((state) => {
-    return state.routes[state.index].state?.index ?? 0;
+  const [activeIndex, setActiveIndex] = useState(() => {
+    return BottomScreenNavigatorTabs.findIndex((tab) => tab.name == INITIAL_ROUTE_NAME);
   });
 
   const indicatorAnim = useRef(new Animated.Value(0)).current;
@@ -50,14 +49,8 @@ const BottomTabNavigator = () => {
     <Animated.View style={[layout.flex1, colors.background, layout.justifyEvenly, { opacity }]}>
       <TopBar />
       <Tab.Navigator
-        barStyle={[
-          {
-            ...colors.backgroundSurface,
-            marginHorizontal: HORIZONTAL_MARGIN,
-            ...styles.navigationBar,
-          },
-        ]}
-        initialRouteName="MyWorkoutPlanPage"
+        barStyle={[styles.navigationBar, spacing.mgHorizontalDefault, colors.backgroundSurface]}
+        initialRouteName={INITIAL_ROUTE_NAME}
         activeIndicatorStyle={{
           backgroundColor: "",
         }}
@@ -67,6 +60,11 @@ const BottomTabNavigator = () => {
         {BottomScreenNavigatorTabs.map((tab) => {
           return (
             <Tab.Screen
+              listeners={{
+                state: (e) => {
+                  setActiveIndex(e.data.state.index);
+                },
+              }}
               key={tab.name}
               name={tab.name}
               component={tab.component}
@@ -88,7 +86,9 @@ const BottomTabNavigator = () => {
         ]}
       >
         <Icon name={indicators[activeIndex].icon} color="white" />
-        <Text style={[colors.textOnPrimary, fonts.sm]}>{indicators[activeIndex].name}</Text>
+        <Text fontVariant="semibold" style={[colors.textOnPrimary, fonts.sm]}>
+          {indicators[activeIndex].name}
+        </Text>
       </Animated.View>
       <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 }]}></View>
       <ConditionalRender condition={!!countdown} children={<TimerDrawer />} />
@@ -99,7 +99,7 @@ const BottomTabNavigator = () => {
 const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
-    bottom: 60,
+    bottom: BOTTOM_BAR_HEIGHT + 20,
     start: 20,
     height: 40,
   },
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     height: 80,
     alignItems: "center",
     marginTop: 10,
-    marginBottom: 40,
+    marginBottom: BOTTOM_BAR_HEIGHT,
     borderRadius: 60,
     overflow: "hidden",
     zIndex: 9999,
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   shadowContainer: {
     position: "absolute",
     borderRadius: 60,
-    bottom: 39,
+    bottom: BOTTOM_BAR_HEIGHT,
     height: 85,
     alignSelf: "center",
     zIndex: -1,

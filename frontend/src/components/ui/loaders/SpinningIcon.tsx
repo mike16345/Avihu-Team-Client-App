@@ -1,5 +1,4 @@
 import Icon from "@/components/Icon/Icon";
-import NativeIcon from "@/components/Icon/NativeIcon";
 import useColors from "@/styles/useColors";
 import React, { useEffect, useRef } from "react";
 import { Animated, Easing } from "react-native";

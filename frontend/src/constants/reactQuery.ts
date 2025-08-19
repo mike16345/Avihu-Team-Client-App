@@ -12,3 +12,4 @@ export const RECORDED_SETS_BY_USER_KEY = `recorded-sets-user-`;
 export const SESSION_TOKEN_KEY = "session-token";
 export const WORKOUT_SESSION_KEY = "workout-session";
 export const CARDIO_WORKOUT = "cardio-workout";
+export const ALL_MENU_ITEMS = "all-menu-items";

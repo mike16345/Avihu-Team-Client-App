@@ -11,6 +11,7 @@ export type RootStackParamList = {
 export type BottomStackParamList = {
   Profile: undefined;
   MyWorkoutPlanPage: undefined;
+  Chat: undefined;
   MyDietPlanPage: undefined;
   MyProgressScreen: undefined;
   BlogScreen: undefined;

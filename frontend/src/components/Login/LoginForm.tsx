@@ -82,7 +82,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
   };
 
   return (
-    <Animated.View style={[spacing.gapXl, { opacity }]}>
+    <Animated.View style={[spacing.gap20, { opacity }]}>
       <Input
         label="אימייל"
         placeholder="הכנס אימייל"

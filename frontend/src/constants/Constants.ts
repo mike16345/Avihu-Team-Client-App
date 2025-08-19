@@ -1,7 +1,7 @@
 export const DEFAULT_INITIAL_WEIGHT = 60;
 export const DEFAULT_INITIAL_WEIGHT_DECIMAL = 50;
 export const DEFAULT_MESSAGE_TO_TRAINER = "מה קורה אחי?";
-export const BOTTOM_BAR_HEIGHT = 40;
+export const BOTTOM_BAR_HEIGHT = 25;
 export const TOP_BAR_HEIGHT = 40;
 export const EMAIL_ERROR = "אנא הכניסו כתובת מייל תקינה";
 export const INVALID_PASSWORD_MATCH = `סיסמאות לא תואמות`;
@@ -10,3 +10,7 @@ export const NO_PASSWORD = `אנא הזינו סיסמה`;
 export const NO_ACCESS = `אין למשתמש גישה!`;
 export const SESSION_EXPIRED = `נא להיכנס שוב`;
 export const CARDIO_VALUE = "אירובי";
+
+export const AVG_PROTEIN_CALORIES = 150;
+export const AVG_FAT_CALORIES = 100;
+export const AVG_CARB_CALORIES = 120;
