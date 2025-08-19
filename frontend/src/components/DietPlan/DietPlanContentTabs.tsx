@@ -1,19 +1,21 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
-import { useMemo, useState } from "react";
+import { Tabs, TabsList } from "../ui/Tabs";
+import { useState } from "react";
 import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import MealsList from "./MealsList";
 import FoodGroupTabs from "./FoodGroupTabs";
 import Supplements from "./Supplements";
+import { TabItem, useTabs } from "@/hooks/useTabs";
 
-const tabs = [
+const tabs: TabItem[] = [
   {
     label: "הארוחות שלי",
-    value: <MealsList />,
+    value: "הארוחות שלי",
+    content: <MealsList />,
     forceMount: true,
   },
-  { label: "מידע תזונתי", value: <FoodGroupTabs />, forceMount: true },
-  { label: "תוספים", value: <Supplements />, forceMount: true },
+  { label: "מידע תזונתי", value: "מידע תזונתי", content: <FoodGroupTabs />, forceMount: true },
+  { label: "תוספים", value: "תוספים", content: <Supplements />, forceMount: true },
 ];
 
 const DietPlanContentTabs = () => {
@@ -24,25 +26,13 @@ const DietPlanContentTabs = () => {
     setSelectedTab(value);
   };
 
-  const { list: tabList, content: tabContent } = useMemo(() => {
-    const list = tabs.map((tab) => (
-      <TabsTrigger key={tab.label} label={tab.label} value={tab.label} />
-    ));
-
-    const content = tabs.map((tab) => (
-      <TabsContent key={tab.label} value={tab.label} forceMount={tab.forceMount}>
-        {tab.value}
-      </TabsContent>
-    ));
-
-    return { list, content };
-  }, [tabs]);
+  const { tabTriggers, tabContent } = useTabs(tabs);
 
   return (
     <View>
       <Tabs value={selectedTab} onValueChange={onTabChange}>
         <View style={[spacing.gap20]}>
-          <TabsList>{tabList}</TabsList>
+          <TabsList>{tabTriggers}</TabsList>
           {tabContent}
         </View>
       </Tabs>
