@@ -9,7 +9,7 @@ const useMenuItemApi = () => {
   const getAllMenuItems = (dietaryTypes: string[] = []) => {
     let dietaryRestrictions = dietaryTypes.length > 0 ? dietaryTypes : undefined;
 
-    fetchData<ApiResponse<CustomItems>>(MENU_ITEMS_ENDPOINT, {
+    return fetchData<ApiResponse<CustomItems>>(MENU_ITEMS_ENDPOINT, {
       dietaryRestrictions,
     }).then((res) => res.data);
   };
