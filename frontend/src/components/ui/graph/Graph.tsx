@@ -99,6 +99,7 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
         onScroll={handleScroll}
         onLayout={handleLayout}
         showsHorizontalScrollIndicator={false}
+        nestedScrollEnabled
       >
         <View style={[layout.alignSelfStart, { position: "relative" }]}>
           <LineChart
