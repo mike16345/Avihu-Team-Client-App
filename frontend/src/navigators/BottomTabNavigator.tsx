@@ -1,6 +1,6 @@
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import { BottomStackParamList } from "@/types/navigatorTypes";
-import { Animated, StyleSheet, useWindowDimensions, View } from "react-native";
+import { Animated, Keyboard, StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
@@ -30,6 +30,7 @@ const BottomTabNavigator = () => {
   const [activeIndex, setActiveIndex] = useState(() => {
     return BottomScreenNavigatorTabs.findIndex((tab) => tab.name == INITIAL_ROUTE_NAME);
   });
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const indicatorAnim = useRef(new Animated.Value(0)).current;
 
@@ -44,6 +45,16 @@ const BottomTabNavigator = () => {
     inputRange: [0, TABS_COUNT - 1],
     outputRange: [0, (-indicatorWidth - 5) * (TABS_COUNT - 1)],
   });
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   return (
     <Animated.View style={[layout.flex1, colors.background, layout.justifyEvenly, { opacity }]}>
@@ -82,7 +93,7 @@ const BottomTabNavigator = () => {
           spacing.pdSm,
           spacing.gapSm,
           common.roundedFull,
-          { transform: [{ translateX }] },
+          { transform: [{ translateX }], display: keyboardVisible ? "none" : "flex" },
         ]}
       >
         <Icon name={indicators[activeIndex].icon} color="white" />
@@ -90,6 +101,7 @@ const BottomTabNavigator = () => {
           {indicators[activeIndex].name}
         </Text>
       </Animated.View>
+
       <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 }]}></View>
       <ConditionalRender condition={!!countdown} children={<TimerDrawer />} />
     </Animated.View>

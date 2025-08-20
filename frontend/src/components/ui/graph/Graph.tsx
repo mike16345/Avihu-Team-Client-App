@@ -85,7 +85,8 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
 
   useEffect(() => {
     if (Platform.OS !== "android") return;
-
+    
+    scrollToStart();
     setReadyToScroll(true);
   }, []);
 

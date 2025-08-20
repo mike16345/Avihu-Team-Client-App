@@ -1,23 +1,36 @@
 import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import Switch from "@/components/ui/Switch";
-import { useState } from "react";
-import Icon from "@/components/Icon/Icon";
-import WeighInsGraph from "@/components/WeightGraph/WeighInsGraph";
+import { useMemo, useState } from "react";
+import WeightCard from "@/components/WeightGraph/WeightCard";
+import useWeighInsQuery from "@/hooks/queries/WeighIns/useWeighInsQuery";
+import DateUtils from "@/utils/dateUtils";
+import { ScrollView } from "react-native-gesture-handler";
+import Progression from "@/components/WeightProgression/Progression";
+import WeightInput from "@/components/WeightGraph/WeightInput";
 
 const WeightProgressionWindow = () => {
+  const { data } = useWeighInsQuery();
+
   const { layout, spacing } = useStyles();
-  const [first, setfirst] = useState(false);
+
+  const latestWeighIn = useMemo(() => {
+    if (!data) return 0;
+    const weighIn = DateUtils.getLatestItem(data, "date");
+
+    return weighIn?.weight || 0;
+  }, [data]);
 
   return (
-    <View style={[layout.center, layout.center, { paddingHorizontal: 16 }, spacing.gap20]}>
-      <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
-        <Icon name="graph" />
-        <Switch onToggleSwitch={(mode) => setfirst(mode)} />
-        <Icon name="calendar" />
+    <ScrollView
+      contentContainerStyle={[spacing.gapMd, { paddingHorizontal: 16, paddingVertical: 20 }]}
+    >
+      <View style={[layout.flexRow, spacing.gap20]}>
+        <WeightCard title="מגמה חודשית" unit='ק"ג' value={23.19} />
+        <WeightCard title="מגמה חודשית" unit='ק"ג' value={latestWeighIn} />
       </View>
-      <WeighInsGraph />
-    </View>
+      <Progression />
+      <WeightInput />
+    </ScrollView>
   );
 };
 

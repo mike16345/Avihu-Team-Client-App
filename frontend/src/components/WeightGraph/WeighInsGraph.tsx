@@ -37,6 +37,7 @@ const WeighInsGraph = () => {
           ))}
         </TabsList>
       </Tabs>
+
       <Card style={[layout.widthFull]} variant="gray">
         <Card.Header style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
           <Icon name="clock" />

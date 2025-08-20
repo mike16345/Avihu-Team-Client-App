@@ -42,6 +42,7 @@ const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
             borderColor,
             borderwidth,
             colors.background,
+            { fontFamily: "Assistant-Regular", fontSize: 16 },
             style,
           ]}
           {...props}
@@ -67,4 +68,5 @@ const styles = StyleSheet.create({
   },
   errorIcon: { position: "absolute", start: 10, top: 10 },
 });
+
 export default Input;

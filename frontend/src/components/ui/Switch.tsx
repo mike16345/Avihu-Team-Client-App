@@ -1,22 +1,18 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { FC, useRef, useState } from "react";
+import { FC, useRef } from "react";
 import { TouchableOpacity, StyleSheet, Animated } from "react-native";
 
 interface SwitchProps {
-  onToggleSwitch: (mode: boolean) => void;
+  isOn: boolean;
+  setIsOn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Switch: FC<SwitchProps> = ({ onToggleSwitch }) => {
+const Switch: FC<SwitchProps> = ({ isOn, setIsOn }) => {
   const { colors } = useStyles();
-  const [isOn, setIsOn] = useState(false);
   const anim = useRef(new Animated.Value(isOn ? 1 : 0)).current;
 
   const toggleSwitch = () => {
-    setIsOn((prev) => {
-      onToggleSwitch(!prev);
-      
-      return !prev;
-    });
+    setIsOn((prev) => !prev);
 
     Animated.spring(anim, {
       toValue: isOn ? 0 : 1,
