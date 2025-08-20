@@ -1,9 +1,8 @@
-import { View } from "react-native";
-import React, { useState } from "react";
+import { BackHandler, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import { Calendar, DateData } from "react-native-calendars";
 import useStyles from "@/styles/useGlobalStyles";
 import moment from "moment";
-import { ConditionalRender } from "../ui/ConditionalRender";
 import useCalendarTheme from "@/themes/useCalendarTheme";
 import { monthNames, setupCalendarLocale } from "@/config/calendarConfig";
 import CalendarHeader from "./CalendarHeader";
@@ -58,7 +57,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
 
   return (
     <View style={[{ position: "relative" }, common.rounded]}>
-      <ConditionalRender condition={!showMonths}>
+      <View style={{ display: !showMonths ? "flex" : "none" }}>
         <Calendar
           style={[common.rounded]}
           key={currentDate}
@@ -79,15 +78,14 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
           )}
           hideArrows
         />
-      </ConditionalRender>
-
-      <ConditionalRender condition={showMonths}>
+      </View>
+      <View style={{ display: showMonths ? "flex" : "none" }}>
         <MonthSelector
           activeMonthIndex={month}
           onCloseMonthSelect={() => setShowMonths(false)}
           onMonthSelect={(monthIndex) => handleMonthSelect(monthIndex)}
         />
-      </ConditionalRender>
+      </View>
     </View>
   );
 };
