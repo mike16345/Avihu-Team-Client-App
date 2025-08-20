@@ -22,6 +22,7 @@ const MuscleGroupSelector: React.FC<MuscleGroupSelectorProps> = ({
         horizontal
         style={spacing.pdVerticalDefault}
         contentContainerStyle={[spacing.gapDefault, layout.alignSelfStart]}
+        nestedScrollEnabled
       >
         {MUSCLE_GROUPS.map((muscle, i) => {
           const isActive = muscle === selectedMuscleGroup;
