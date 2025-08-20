@@ -1,19 +1,27 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { ScrollView } from "react-native-gesture-handler";
 import Progression from "@/components/WeightProgression/Progression";
 import WeightInput from "@/components/WeightGraph/WeightInput";
 import WeightCardsContainer from "@/components/WeightGraph/WeightCardsContainer";
+import useWeighInsQuery from "@/hooks/queries/WeighIns/useWeighInsQuery";
+import { RefreshControl, ScrollView } from "react-native";
 
 const WeightProgressionWindow = () => {
   const { spacing } = useStyles();
+  const { isRefetching, refetch } = useWeighInsQuery();
 
   return (
     <ScrollView
-      contentContainerStyle={[spacing.gapMd, { paddingHorizontal: 16, paddingVertical: 20 }]}
+      contentContainerStyle={[
+        spacing.gapMd,
+        {
+          paddingVertical: 12,
+          paddingHorizontal: 16,
+        },
+      ]}
+      refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />}
     >
       <WeightCardsContainer />
       <Progression />
-      <WeightInput />
     </ScrollView>
   );
 };

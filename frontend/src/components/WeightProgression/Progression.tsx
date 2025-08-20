@@ -5,6 +5,7 @@ import WeighInsGraph from "../WeightGraph/WeighInsGraph";
 import { Text } from "../ui/Text";
 import Switch from "../ui/Switch";
 import useStyles from "@/styles/useGlobalStyles";
+import WeightInput from "../WeightGraph/WeightInput";
 
 const Progression = () => {
   const { layout, spacing } = useStyles();
@@ -20,8 +21,9 @@ const Progression = () => {
       <View style={{ display: showCalendar ? "flex" : "none" }}>
         <Text>Calendar</Text>
       </View>
-      <View style={{ display: showCalendar ? "none" : "flex" }}>
+      <View style={[spacing.gapMd, { display: showCalendar ? "none" : "flex" }]}>
         <WeighInsGraph />
+        <WeightInput />
       </View>
     </View>
   );

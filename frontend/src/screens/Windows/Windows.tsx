@@ -77,6 +77,7 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
         showsHorizontalScrollIndicator={false}
         pagingEnabled={false}
         decelerationRate="fast"
+        nestedScrollEnabled
         onScrollBeginDrag={onScrollBeginDrag}
         onScrollEndDrag={onScrollEndDrag}
       />
