@@ -1,6 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
 import Progression from "@/components/WeightProgression/Progression";
-import WeightInput from "@/components/WeightGraph/WeightInput";
 import WeightCardsContainer from "@/components/WeightGraph/WeightCardsContainer";
 import useWeighInsQuery from "@/hooks/queries/WeighIns/useWeighInsQuery";
 import { RefreshControl, ScrollView } from "react-native";
@@ -11,10 +10,11 @@ const WeightProgressionWindow = () => {
 
   return (
     <ScrollView
+      keyboardShouldPersistTaps="handled"
       contentContainerStyle={[
         spacing.gapMd,
         {
-          paddingVertical: 12,
+          paddingVertical: 10,
           paddingHorizontal: 16,
         },
       ]}

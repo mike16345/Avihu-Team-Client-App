@@ -70,6 +70,7 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
         ref={listRef}
         horizontal
         data={windowItems}
+        keyboardShouldPersistTaps="handled"
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={() => <View style={{ width: separator }} />}

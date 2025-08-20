@@ -1,5 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { useWindowDimensions, View } from "react-native";
+import { Keyboard, useWindowDimensions, View } from "react-native";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import Input from "../ui/inputs/Input";
 import useAddWeighIn from "@/hooks/mutations/useAddWeighIn";
@@ -22,11 +22,10 @@ const WeightInput = () => {
   const { triggerErrorToast } = useToast();
   const { mutate, isLoading } = useAddWeighIn();
 
-  const [weighIn, setWeighIn] = useState<string>(""); // keep as string
+  const [weighIn, setWeighIn] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = () => {
-    // convert to number only here
     const parsed = Number(weighIn);
 
     const result = weighInSchema.safeParse({
@@ -41,6 +40,7 @@ const WeightInput = () => {
 
       return;
     }
+    Keyboard.dismiss();
 
     setError(null);
     mutate(result.data);
