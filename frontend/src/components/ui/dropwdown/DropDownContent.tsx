@@ -10,7 +10,7 @@ const ANIMATION_DURATION = 200;
 const DropDownContent = () => {
   const { common } = useStyles();
 
-  const { shouldCollapse } = useDropwDownContext();
+  const { shouldCollapse, items } = useDropwDownContext();
 
   const opacity = useRef(new Animated.Value(0)).current;
 
@@ -33,6 +33,7 @@ const DropDownContent = () => {
   return (
     <Animated.View style={{ opacity }}>
       <Collapsible
+        key={items.length}
         isCollapsed={shouldCollapse}
         style={[common.roundedMd, shouldCollapse && { paddingVertical: 0 }]}
       >

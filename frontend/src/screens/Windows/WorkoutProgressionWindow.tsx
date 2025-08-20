@@ -34,7 +34,11 @@ const WorkoutProgressionWindow = () => {
   }, [data]);
 
   const exercises = useMemo(() => {
-    return exercisesByMuscleGroups[activeMuscleGroup] ?? [];
+    if (!exercisesByMuscleGroups[activeMuscleGroup]) return [];
+
+    return exercisesByMuscleGroups[activeMuscleGroup].map((exercise) => {
+      return { label: exercise, value: exercise };
+    });
   }, [exercisesByMuscleGroups, activeMuscleGroup]);
 
   const handleCollapseChange = (open: boolean) => {
@@ -44,7 +48,7 @@ const WorkoutProgressionWindow = () => {
 
   return (
     <View style={[spacing.gapDefault, layout.flex1, spacing.pdMd]}>
-      <DropDownContextProvider items={exercises} onSelect={() => {}}>
+      <DropDownContextProvider key={exercises.length} items={exercises} onSelect={() => {}}>
         <View style={{ zIndex: 10 }}>
           <WorkoutProgressionHeader
             activeMuscleGroup={activeMuscleGroup}
