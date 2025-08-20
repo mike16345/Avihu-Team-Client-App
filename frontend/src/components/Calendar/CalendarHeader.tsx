@@ -19,7 +19,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   year,
   onOpenMonthSelect,
 }) => {
-  const { fonts, layout, spacing } = useStyles();
+  const { layout, spacing } = useStyles();
 
   return (
     <View
@@ -35,7 +35,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         style={[layout.flexRow, spacing.gapXs, layout.itemsCenter]}
         onPress={onOpenMonthSelect}
       >
-        <Text style={fonts.lg}>
+        <Text fontSize={16}>
           {month} {year}
         </Text>
         <Icon name="chevronLeftSoft" height={18} width={25} />

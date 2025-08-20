@@ -29,7 +29,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
   const month = DateUtils.extractMonthFromDate(currentDate);
   const year = DateUtils.extractYearFromDate(currentDate);
 
-  const { marked } = useCalendarTheme(today, selected);
+  const { theme, marked } = useCalendarTheme(today, selected);
 
   const handleSelect = (day: DateData) => {
     const date = day.dateString;
@@ -65,9 +65,9 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
           current={currentDate}
           onDayPress={handleSelect}
           onMonthChange={({ dateString }: DateData) => handleMonthChange(dateString)}
-          enableSwipeMonths
           markingType="custom"
           markedDates={marked}
+          theme={theme}
           renderHeader={() => (
             <CalendarHeader
               month={monthNames[month]}

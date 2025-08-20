@@ -14,36 +14,74 @@ interface MarkedDays {
 const useCalendarTheme = (today: string = "", selected: string = "") => {
   const { colors, common } = useStyles();
 
-  const marked: MarkedDays = useMemo(() => {
+  const { marked, theme }: { marked: MarkedDays; theme: Record<any, any> } = useMemo(() => {
     return {
-      [selected]: {
-        customStyles: {
-          container: {
-            backgroundColor: colors.backgroundSuccessContainer.backgroundColor,
-            borderRadius: common.rounded.borderRadius,
+      theme: {
+        "stylesheet.calendar.header": {
+          dayTextAtIndex0: {
+            color: "#000",
           },
-          text: {
-            color: colors.textPrimary.color,
+          dayTextAtIndex1: {
+            color: "#000",
+          },
+          dayTextAtIndex2: {
+            color: "#000",
+          },
+          dayTextAtIndex3: {
+            color: "#000",
+          },
+          dayTextAtIndex4: {
+            color: "#000",
+          },
+          dayTextAtIndex5: {
+            color: "#000",
+          },
+          dayTextAtIndex6: {
+            color: "#000",
+          },
+          dayTextAtIndex7: {
+            color: "#000",
           },
         },
-        disableTouchEvent: true,
-        selected: true,
+        weekVerticalMargin: 2.5,
+
+        textDayFontFamily: "Assistant-Regular",
+        textMonthFontFamily: "Assistant-Regular",
+        textDayHeaderFontFamily: "Assistant-SemiBold",
+        textDayFontSize: 16,
+        textMonthFontSize: 16,
+        textDayHeaderFontSize: 16,
       },
-      [today]: {
-        customStyles: {
-          container: {
-            backgroundColor: colors.backgroundPrimary.backgroundColor,
-            borderRadius: common.rounded.borderRadius,
+      marked: {
+        [selected]: {
+          customStyles: {
+            container: {
+              backgroundColor: colors.backgroundSuccessContainer.backgroundColor,
+              borderRadius: common.rounded.borderRadius,
+            },
+            text: {
+              color: colors.textPrimary.color,
+            },
           },
-          text: {
-            color: colors.textOnPrimary.color,
+          disableTouchEvent: true,
+          selected: true,
+        },
+        [today]: {
+          customStyles: {
+            container: {
+              backgroundColor: colors.backgroundPrimary.backgroundColor,
+              borderRadius: common.rounded.borderRadius,
+            },
+            text: {
+              color: colors.textOnPrimary.color,
+            },
           },
         },
       },
     };
   }, [selected, today]);
 
-  return { marked };
+  return { marked, theme };
 };
 
 export default useCalendarTheme;

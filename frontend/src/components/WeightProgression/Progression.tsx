@@ -2,14 +2,14 @@ import { View } from "react-native";
 import { useState } from "react";
 import Icon from "../Icon/Icon";
 import WeighInsGraph from "../WeightGraph/WeighInsGraph";
-import { Text } from "../ui/Text";
 import Switch from "../ui/Switch";
 import useStyles from "@/styles/useGlobalStyles";
 import WeightInput from "../WeightGraph/WeightInput";
+import WeighInsCalendar from "../Calendar/WeighInsCalendar";
 
 const Progression = () => {
   const { layout, spacing } = useStyles();
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(true);
 
   return (
     <View style={[spacing.gapMd]}>
@@ -19,7 +19,7 @@ const Progression = () => {
         <Icon name="calendar" />
       </View>
       <View style={{ display: showCalendar ? "flex" : "none" }}>
-        <Text>Calendar</Text>
+        <WeighInsCalendar />
       </View>
       <View style={[spacing.gapMd, { display: showCalendar ? "none" : "flex" }]}>
         <WeighInsGraph />
