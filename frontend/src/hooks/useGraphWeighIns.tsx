@@ -63,14 +63,18 @@ export function useGraphWeighIns(data: IWeighIn[] | undefined) {
 
         weeklyWeighIns.push(avg);
 
-        const start = new Date(weekBuffer[0].date).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-        });
-        const end = new Date(weekBuffer[weekBuffer.length - 1].date).toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-        });
+        const start = new Date(weekBuffer[0].date)
+          .toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+          })
+          .replace("/", ".");
+        const end = new Date(weekBuffer[weekBuffer.length - 1].date)
+          .toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+          })
+          .replace("/", ".");
 
         weeklyLabels.push(`${start} - ${end}`);
         weekBuffer = [];

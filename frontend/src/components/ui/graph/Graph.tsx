@@ -91,7 +91,9 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
 
   return (
     <View style={[{ padding: 0 }, spacing.gapDefault, style]}>
-      <View style={styles.header}>{header}</View>
+      <ConditionalRender condition={!!header}>
+        <View style={styles.header}>{header}</View>
+      </ConditionalRender>
       <ScrollView
         ref={scrollRef}
         style={{ direction: "ltr" }}

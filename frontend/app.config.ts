@@ -75,7 +75,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       API_TOKEN: process.env.API_KEY,
       TRAINER_PHONE_NUMBER: process.env.TRAINER_PHONE_NUMBER,
       CLOUDFRONT_URL: process.env.CLOUDFRONT_URL,
-      DEV_MODE: process.env.DEV_MODE,
     },
     owner: "avihuteam",
     runtimeVersion: "1.0.0",

@@ -10,7 +10,7 @@ const WeightProgressionWindow = () => {
   const [first, setfirst] = useState(false);
 
   return (
-    <View style={[layout.center, layout.center, { paddingHorizontal: 24 }, spacing.gap20]}>
+    <View style={[layout.center, layout.center, { paddingHorizontal: 16 }, spacing.gap20]}>
       <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
         <Icon name="graph" />
         <Switch onToggleSwitch={(mode) => setfirst(mode)} />

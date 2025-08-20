@@ -41,7 +41,12 @@ const GraphLabels: React.FC<GraphLabelsProps> = ({ labels, onSelect, selectedInd
               layout.alignSelfEnd,
             ]}
           >
-            <Text style={selectedIndex == i && [colors.textOnPrimary]}>{label}</Text>
+            <Text
+              fontSize={12}
+              style={[selectedIndex == i ? [colors.textOnPrimary] : [{ opacity: 0.5 }]]}
+            >
+              {label}
+            </Text>
           </TouchableOpacity>
         </View>
       ))}
