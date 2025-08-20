@@ -7,27 +7,16 @@ import DateUtils from "@/utils/dateUtils";
 import { ScrollView } from "react-native-gesture-handler";
 import Progression from "@/components/WeightProgression/Progression";
 import WeightInput from "@/components/WeightGraph/WeightInput";
+import WeightCardsContainer from "@/components/WeightGraph/WeightCardsContainer";
 
 const WeightProgressionWindow = () => {
-  const { data } = useWeighInsQuery();
-
-  const { layout, spacing } = useStyles();
-
-  const latestWeighIn = useMemo(() => {
-    if (!data) return 0;
-    const weighIn = DateUtils.getLatestItem(data, "date");
-
-    return weighIn?.weight || 0;
-  }, [data]);
+  const { spacing } = useStyles();
 
   return (
     <ScrollView
       contentContainerStyle={[spacing.gapMd, { paddingHorizontal: 16, paddingVertical: 20 }]}
     >
-      <View style={[layout.flexRow, spacing.gap20]}>
-        <WeightCard title="מגמה חודשית" unit='ק"ג' value={23.19} />
-        <WeightCard title="מגמה חודשית" unit='ק"ג' value={latestWeighIn} />
-      </View>
+      <WeightCardsContainer />
       <Progression />
       <WeightInput />
     </ScrollView>
