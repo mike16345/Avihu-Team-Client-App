@@ -9,16 +9,24 @@ const WeightCardsContainer = () => {
   const { data } = useWeighInsQuery();
   const { layout, spacing } = useStyles();
 
-  const latestWeighIn = useMemo(() => {
-    if (!data) return 0;
+  const { latestWeighIn, monthlyWeighInAverage } = useMemo(() => {
+    if (!data) return { latestWeighIn: 0, monthlyWeighInAverage: 0 };
 
-    return DateUtils.getLatestItem(data, "date")?.weight || 0;
+    return {
+      latestWeighIn: DateUtils.getLatestItem(data, "date")?.weight || 0,
+      monthlyWeighInAverage: DateUtils.getAverageInLastXDays(data, "date", "weight", 30),
+    };
   }, [data]);
 
   return (
     <View style={[layout.flexRow, spacing.gap20]}>
-      <WeightCard title="מגמה חודשית" unit='ק"ג' value={23.19} operator="+" />
-      <WeightCard title="משקל נוכחי" unit='ק"ג' value={latestWeighIn} />
+      <WeightCard
+        title="מגמה חודשית"
+        unit='ק"ג'
+        value={monthlyWeighInAverage.toFixed(2)}
+        operator="+"
+      />
+      <WeightCard title="משקל נוכחי" unit='ק"ג' value={latestWeighIn.toFixed(2)} />
     </View>
   );
 };
