@@ -31,6 +31,7 @@ const MuscleGroupSelector: React.FC<MuscleGroupSelectorProps> = ({
               key={i}
               mode={isActive ? "dark" : "light"}
               onPress={() => onMuscleGroupSelect(muscle)}
+              style={spacing.pdVerticalSm}
             >
               <View style={[spacing.pdHorizontalDefault]}>
                 <Text style={isActive ? colors.textOnPrimary : colors.textPrimary}>{muscle}</Text>
