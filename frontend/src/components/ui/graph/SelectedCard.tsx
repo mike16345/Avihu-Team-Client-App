@@ -20,7 +20,9 @@ const SelectedCard: React.FC<SelectedCardProps> = ({ onClose, selected }) => {
       </TouchableOpacity>
 
       <View style={[layout.flex1, layout.center]}>
-        <Text style={[fonts.xxxl, colors.textPrimary]}>{selected}</Text>
+        <Text fontSize={36} style={[colors.textPrimary]}>
+          {selected?.toFixed(2)}
+        </Text>
       </View>
     </View>
   );
