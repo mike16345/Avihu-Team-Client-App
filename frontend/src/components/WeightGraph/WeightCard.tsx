@@ -11,7 +11,7 @@ interface CardProps {
   isProgressing?: boolean;
 }
 
-const WeightCard: React.FC<CardProps> = ({ title, value, unit }) => {
+const WeightCard: React.FC<CardProps> = ({ title, value, unit, operator = "" }) => {
   const { layout, spacing } = useStyles();
 
   return (
@@ -25,7 +25,8 @@ const WeightCard: React.FC<CardProps> = ({ title, value, unit }) => {
 
       <Card.Content style={[layout.flexRow, spacing.gapSm]}>
         <Text fontVariant="semibold" fontSize={24}>
-          +{value || 0}
+          {operator}
+          {value || 0}
         </Text>
         <Text fontVariant="semibold" fontSize={24}>
           {unit}

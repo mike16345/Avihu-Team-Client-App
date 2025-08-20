@@ -105,10 +105,10 @@ class DateUtils {
     if (items?.length === 0) return null;
 
     return items.reduce((latestItem, currentItem) => {
-      const latestDate = new Date(latestItem[dateKey] as any);
-      const currentDate = new Date(currentItem[dateKey] as any);
+      const latestDate = new Date(latestItem[dateKey] as any).getTime();
+      const currentDate = new Date(currentItem[dateKey] as any).getTime();
 
-      if (currentDate > latestDate) {
+      if (currentDate >= latestDate) {
         return currentItem;
       }
       return latestItem;

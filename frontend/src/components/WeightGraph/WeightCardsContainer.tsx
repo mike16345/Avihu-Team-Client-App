@@ -17,8 +17,8 @@ const WeightCardsContainer = () => {
 
   return (
     <View style={[layout.flexRow, spacing.gap20]}>
-      <WeightCard title="מגמה חודשית" unit='ק"ג' value={23.19} />
-      <WeightCard title="מגמה חודשית" unit='ק"ג' value={latestWeighIn} />
+      <WeightCard title="מגמה חודשית" unit='ק"ג' value={23.19} operator="+" />
+      <WeightCard title="משקל נוכחי" unit='ק"ג' value={latestWeighIn} />
     </View>
   );
 };
