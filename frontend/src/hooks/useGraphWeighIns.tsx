@@ -12,6 +12,10 @@ type GraphWeighIns = {
 
 export type GraphTab = "יומי" | "שבועי" | "חודשי";
 
+const LARGE_AMOUNT_OF_WEIGH_INS = 75;
+const THIRTY_DAYS_AGO = new Date();
+THIRTY_DAYS_AGO.setDate(THIRTY_DAYS_AGO.getDate() - 30);
+
 export function useGraphWeighIns(data: IWeighIn[] | undefined) {
   const {
     dailyWeighIns,
@@ -51,7 +55,10 @@ export function useGraphWeighIns(data: IWeighIn[] | undefined) {
       });
 
       // ---- Daily ----
-      if (idx % 2 === 0) {
+      if (data.length < LARGE_AMOUNT_OF_WEIGH_INS) {
+        dailyWeighIns.push(item.weight);
+        dailyLabels.push(dayLabel);
+      } else if (idx % 2 == 0 && new Date(item.date) >= THIRTY_DAYS_AGO) {
         dailyWeighIns.push(item.weight);
         dailyLabels.push(dayLabel);
       }
