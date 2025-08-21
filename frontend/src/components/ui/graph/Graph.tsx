@@ -85,7 +85,7 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
 
   useEffect(() => {
     if (Platform.OS !== "android") return;
-    
+
     scrollToStart();
     setReadyToScroll(true);
   }, []);
@@ -103,7 +103,6 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
         onScroll={handleScroll}
         onLayout={handleLayout}
         showsHorizontalScrollIndicator={false}
-        nestedScrollEnabled
       >
         <View style={[spacing.gapDefault, { position: "relative" }]}>
           <LineChart
@@ -146,8 +145,8 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
           <Icon
             name={getIconName(atScrollEnd)}
             rotation={getIconRotation(atScrollEnd, "end")}
-            height={18}
-            width={18}
+            height={20}
+            width={20}
           />
         </TouchableOpacity>
 
@@ -155,8 +154,8 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
           <Icon
             name={getIconName(atScrollStart)}
             rotation={getIconRotation(atScrollStart, "start")}
-            height={18}
-            width={18}
+            height={20}
+            width={20}
           />
         </TouchableOpacity>
       </View>

@@ -70,11 +70,7 @@ const GraphsContainer = () => {
   ];
 
   return (
-    <Animated.ScrollView
-      style={{ opacity }}
-      nestedScrollEnabled
-      contentContainerStyle={spacing.gapDefault}
-    >
+    <Animated.View style={[{ opacity: opacity }, spacing.gapDefault]}>
       <ConditionalRender condition={items.length === 0}>
         <View style={[layout.center]}>
           <Text>לא הוקלטו סטים</Text>
@@ -91,11 +87,11 @@ const GraphsContainer = () => {
               <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
                 <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
                   <Icon name={icon as IconName} />
-                  <Text style={fonts.lg}>{label}</Text>
+                  <Text fontSize={16}>{label}</Text>
                 </View>
 
                 <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
-                  <Text style={fonts.lg}>{trend}%</Text>
+                  <Text fontSize={16}>{trend}%</Text>
                   <Icon
                     width={18}
                     height={18}
@@ -111,7 +107,7 @@ const GraphsContainer = () => {
           </Collapsible>
         ))}
       </ConditionalRender>
-    </Animated.ScrollView>
+    </Animated.View>
   );
 };
 

@@ -3,8 +3,8 @@ import { MUSCLE_GROUPS } from "@/constants/muscleGroups";
 import { DropDownContextProvider } from "@/context/useDropdown";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import useStyles from "@/styles/useGlobalStyles";
-import { useMemo, useRef, useState } from "react";
-import { View } from "react-native";
+import { useMemo, useState } from "react";
+import { ScrollView, View } from "react-native";
 import ErrorScreen from "../ErrorScreen";
 import WorkoutProgressScreenSkeleton from "@/components/ui/loaders/skeletons/WorkoutProgressScreenSkeleton";
 import { mapToDropDownItems } from "@/utils/utils";
@@ -43,7 +43,7 @@ const WorkoutProgressionWindow = () => {
   if (isError) return <ErrorScreen />;
 
   return (
-    <View style={[spacing.gapDefault, layout.flex1, spacing.pdMd]}>
+    <View style={[layout.flex1, spacing.gapSm, spacing.pdMd]}>
       <MuscleGroupSelector
         selectedMuscleGroup={activeMuscleGroup}
         onMuscleGroupSelect={(val) => setActiveMuscleGroup(val)}
@@ -54,9 +54,11 @@ const WorkoutProgressionWindow = () => {
         items={activeExercises}
         onSelect={() => {}}
       >
-        <ExerciseSelector muscleGroup={activeMuscleGroup} />
+        <ScrollView nestedScrollEnabled contentContainerStyle={[spacing.gapSm]}>
+          <ExerciseSelector muscleGroup={activeMuscleGroup} />
 
-        <GraphsContainer />
+          <GraphsContainer />
+        </ScrollView>
       </DropDownContextProvider>
     </View>
   );
