@@ -16,7 +16,6 @@ interface PrimaryButtonProps {
   onPress?: () => void;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
-  style?: StyleProp<ViewStyle>;
 }
 
 const PrimaryButton: React.FC<PrimaryButtonProps> = ({
@@ -51,7 +50,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         layout.itemsCenter,
         width,
         modeSpecificStyles,
-        { opacity: 0.7 },
+        { opacity: disabled ? 0.7 : 1 },
         style,
       ]}
     >
