@@ -20,7 +20,6 @@ const MuscleGroupSelector: React.FC<MuscleGroupSelectorProps> = ({
     <View>
       <ScrollView
         horizontal
-        style={spacing.pdVerticalDefault}
         contentContainerStyle={[spacing.gapDefault, layout.alignSelfStart]}
         nestedScrollEnabled
       >

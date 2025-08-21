@@ -97,6 +97,8 @@ const GraphsContainer = () => {
                 <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
                   <Text style={fonts.lg}>{trend}%</Text>
                   <Icon
+                    width={18}
+                    height={18}
                     name="growthIndicator"
                     color={isTrendPositive ? colors.textSuccess.color : colors.textDanger.color}
                     rotation={isTrendPositive ? 0 : 90}

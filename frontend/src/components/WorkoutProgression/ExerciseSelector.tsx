@@ -27,7 +27,7 @@ const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({ muscleGroup }) => {
               {muscleGroup}
             </Text>
 
-            <MuscleDisplay name={getMuscleNameInEnglish(muscleGroup)} height={80} width={80} />
+            <MuscleDisplay name={getMuscleNameInEnglish(muscleGroup)} height={68} width={68} />
           </View>
         </Card.Header>
         <Card.Content>
