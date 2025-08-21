@@ -1,4 +1,4 @@
-import { TouchableOpacity } from "react-native";
+import { StyleProp, TouchableOpacity, ViewStyle } from "react-native";
 import React, { ReactNode } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ConditionalRender";
@@ -15,6 +15,7 @@ interface PrimaryButtonProps {
   loading?: boolean;
   onPress?: () => void;
   disabled?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
 const PrimaryButton: React.FC<PrimaryButtonProps> = ({
@@ -25,6 +26,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   loading,
   onPress,
   disabled,
+  style,
 }) => {
   const { colors, common, layout, spacing, text } = useStyles();
 
@@ -48,6 +50,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         layout.itemsCenter,
         width,
         modeSpecificStyles,
+        style,
       ]}
     >
       <ConditionalRender condition={!loading}>

@@ -79,6 +79,7 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
         decelerationRate="fast"
         onScrollBeginDrag={onScrollBeginDrag}
         onScrollEndDrag={onScrollEndDrag}
+        nestedScrollEnabled
       />
 
       <View style={[spacing.gapDefault, layout.flexRow, layout.center]}>
