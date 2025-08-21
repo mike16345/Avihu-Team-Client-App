@@ -68,7 +68,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
         setRenderChildren(false);
       }, ANIMATION_DURATION);
     }
-  }, [isCollapsed]);
+  }, [isCollapsed, contentHeight]);
 
   return (
     <Card variant={variant} style={style}>

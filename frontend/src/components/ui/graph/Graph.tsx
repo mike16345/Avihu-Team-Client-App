@@ -103,6 +103,7 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
         onScroll={handleScroll}
         onLayout={handleLayout}
         showsHorizontalScrollIndicator={false}
+        nestedScrollEnabled
       >
         <View style={[spacing.gapDefault, { position: "relative" }]}>
           <LineChart

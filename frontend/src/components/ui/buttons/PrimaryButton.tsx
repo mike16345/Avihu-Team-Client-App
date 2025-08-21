@@ -16,6 +16,7 @@ interface PrimaryButtonProps {
   onPress?: () => void;
   disabled?: boolean;
   style?: StyleProp<ViewStyle>;
+  style?: StyleProp<ViewStyle>;
 }
 
 const PrimaryButton: React.FC<PrimaryButtonProps> = ({
