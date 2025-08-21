@@ -31,9 +31,11 @@ export const MUSCLE_GROUPS = [
   "ישבן",
   "תאומים",
   "טרפזים",
-];
+] as const;
 
-export const MUSCLE_GROUPS_ENGLISH: Record<string, muscleImageName> = {
+export type MuscleGroup = (typeof MUSCLE_GROUPS)[number];
+
+export const MUSCLE_GROUPS_ENGLISH: Record<MuscleGroup, muscleImageName> = {
   חזה: "chest",
   כתפיים: "shoulders",
   גב: "back",

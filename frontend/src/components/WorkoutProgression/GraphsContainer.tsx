@@ -9,18 +9,21 @@ import Icon from "../Icon/Icon";
 import Graph from "../ui/graph/Graph";
 import { getDataAvgPerDate, getGrowthTrend, groupRecordedSetsByDate } from "@/utils/recordedSets";
 import { useFadeIn } from "@/styles/useFadeIn";
+import { IconName } from "@/constants/iconMap";
+
+const ANIMATION_DURATION = 1200;
 
 const GraphsContainer = () => {
   const { colors, fonts, layout, spacing } = useStyles();
   const { items, selectedValue } = useDropwDownContext();
-  const opacity = useFadeIn(1200);
+  const opacity = useFadeIn(ANIMATION_DURATION);
 
-  const [collapseRepsGraph, setcollapseRepsGraph] = useState(false);
-  const [collapsWeightGraph, setcollapsWeightGraph] = useState(true);
+  const [collapseRepsGraph, setCollapseRepsGraph] = useState(false);
+  const [collapseWeightGraph, setCollapseWeightGraph] = useState(true);
 
   const handleCollapseChange = () => {
-    setcollapseRepsGraph(!collapseRepsGraph);
-    setcollapsWeightGraph(!collapsWeightGraph);
+    setCollapseRepsGraph((prev) => !prev);
+    setCollapseWeightGraph((prev) => !prev);
   };
 
   const { labels, reps, repsTrend, weights, weightsTrend } = useMemo(() => {
@@ -50,17 +53,19 @@ const GraphsContainer = () => {
   const recordedSetGraphs = [
     {
       label: "חזרות",
-      trendIsPositive: repsTrend > 0,
+      icon: "clock",
+      isTrendPositive: repsTrend > 0,
       trend: repsTrend,
       data: reps,
       collapseState: collapseRepsGraph,
     },
     {
       label: "משקל",
-      trendIsPositive: weightsTrend > 0,
+      icon: "upload",
+      isTrendPositive: weightsTrend > 0,
       trend: weightsTrend,
       data: weights,
-      collapseState: collapsWeightGraph,
+      collapseState: collapseWeightGraph,
     },
   ];
 
@@ -74,15 +79,15 @@ const GraphsContainer = () => {
 
       <ConditionalRender condition={items.length !== 0}>
         <ScrollView contentContainerStyle={spacing.gapDefault} nestedScrollEnabled>
-          {recordedSetGraphs.map(({ data, label, trend, trendIsPositive, collapseState }, i) => (
+          {recordedSetGraphs.map(({ data, label, icon, trend, isTrendPositive, collapseState }) => (
             <Collapsible
-              key={i}
+              key={label + data.length}
               isCollapsed={collapseState}
               onCollapseChange={handleCollapseChange}
               trigger={
                 <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
                   <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
-                    <Icon name="clock" />
+                    <Icon name={icon as IconName} />
                     <Text style={fonts.lg}>{label}</Text>
                   </View>
 
@@ -90,8 +95,8 @@ const GraphsContainer = () => {
                     <Text style={fonts.lg}>{trend}%</Text>
                     <Icon
                       name="growthIndicator"
-                      color={trendIsPositive ? colors.textSuccess.color : colors.textDanger.color}
-                      rotation={trendIsPositive ? 0 : 90}
+                      color={isTrendPositive ? colors.textSuccess.color : colors.textDanger.color}
+                      rotation={isTrendPositive ? 0 : 90}
                     />
                   </View>
                 </View>
