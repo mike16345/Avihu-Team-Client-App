@@ -9,16 +9,20 @@ interface SelectedCardProps {
 }
 
 const SelectedCard: React.FC<SelectedCardProps> = ({ onClose, selected }) => {
-  const { colors, common, fonts, layout, spacing } = useStyles();
+  const { colors, common, layout, spacing } = useStyles();
 
   return (
     <View
       style={[spacing.pdDefault, styles.selectedCard, colors.backgroundSecondary, common.rounded]}
     >
-      <TouchableOpacity onPress={onClose}>
-        <Icon name="close" />
-      </TouchableOpacity>
-
+      <View style={[layout.flexRow, layout.justifyBetween]}>
+        <TouchableOpacity onPress={onClose}>
+          <Icon name="close" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onClose}>
+          <Icon name="pencil" width={24} height={24} />
+        </TouchableOpacity>
+      </View>
       <View style={[layout.flex1, layout.center]}>
         <Text fontSize={36} style={[colors.textPrimary]}>
           {selected?.toFixed(2)}
