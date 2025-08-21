@@ -226,3 +226,18 @@ export function getTotalCaloriesInMeal(meal: IMeal) {
 
   return proteinCalories + carbCalories;
 }
+
+type mapToDropDownItemOptions<T> = {
+  labelKey: keyof T;
+  valueKey: keyof T;
+};
+
+export function mapToDropDownItems<T extends Record<string, any>>(
+  arr: T[],
+  { labelKey, valueKey }: mapToDropDownItemOptions<T>
+): { label: any; value: any }[] {
+  return arr.map((item) => ({
+    label: item[labelKey],
+    value: item[valueKey],
+  }));
+}

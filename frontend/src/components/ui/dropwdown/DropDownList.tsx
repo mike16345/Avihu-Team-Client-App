@@ -13,7 +13,7 @@ const DropDownList = () => {
   const itemsAreEmpty = items.length === 0;
 
   return (
-    <ScrollView style={{ maxHeight: 200 }}>
+    <ScrollView style={{ maxHeight: 200 }} nestedScrollEnabled>
       <ConditionalRender condition={itemsAreEmpty}>
         <Text style={textCenter}>אין פריטים</Text>
       </ConditionalRender>
