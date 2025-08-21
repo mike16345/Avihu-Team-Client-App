@@ -13,7 +13,7 @@ interface ExerciseSelectorProps {
 }
 
 const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({ muscleGroup }) => {
-  const { common, fonts, layout, spacing } = useStyles();
+  const { common, layout, spacing } = useStyles();
 
   const getMuscleNameInEnglish = (muscleInHebrew: string): muscleImageName =>
     MUSCLE_GROUPS_ENGLISH[muscleInHebrew];
@@ -23,7 +23,7 @@ const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({ muscleGroup }) => {
       <Card variant="gray" style={[spacing.gap20, common.roundedMd]}>
         <Card.Header>
           <View style={[layout.flexRow, layout.justifyBetween, spacing.pdHorizontalDefault]}>
-            <Text fontVariant="bold" style={[fonts.lg]}>
+            <Text fontVariant="bold" fontSize={20}>
               {muscleGroup}
             </Text>
 

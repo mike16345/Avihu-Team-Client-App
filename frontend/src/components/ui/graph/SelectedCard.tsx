@@ -2,6 +2,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import Icon from "@/components/Icon/Icon";
 import { Text } from "../Text";
+import { useState } from "react";
 
 interface SelectedCardProps {
   selected?: number;
@@ -10,25 +11,30 @@ interface SelectedCardProps {
 
 const SelectedCard: React.FC<SelectedCardProps> = ({ onClose, selected }) => {
   const { colors, common, layout, spacing } = useStyles();
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   return (
-    <View
-      style={[spacing.pdDefault, styles.selectedCard, colors.backgroundSecondary, common.rounded]}
-    >
-      <View style={[layout.flexRow, layout.justifyBetween]}>
-        <TouchableOpacity onPress={onClose}>
-          <Icon name="close" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onClose}>
-          <Icon name="pencil" width={24} height={24} />
-        </TouchableOpacity>
+    <>
+      <View
+        style={[spacing.pdDefault, styles.selectedCard, colors.backgroundSecondary, common.rounded]}
+      >
+        <View style={[layout.flexRow, layout.justifyBetween]}>
+          <TouchableOpacity onPress={onClose}>
+            <Icon name="close" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onClose}>
+            <Icon name="pencil" />
+          </TouchableOpacity>
+        </View>
+        <View style={[layout.flex1, layout.center]}>
+          <Text fontSize={36} style={[colors.textPrimary]}>
+            {selected?.toFixed(2)}
+          </Text>
+        </View>
       </View>
-      <View style={[layout.flex1, layout.center]}>
-        <Text fontSize={36} style={[colors.textPrimary]}>
-          {selected?.toFixed(2)}
-        </Text>
-      </View>
-    </View>
+
+      
+    </>
   );
 };
 
