@@ -70,7 +70,11 @@ const GraphsContainer = () => {
   ];
 
   return (
-    <Animated.View style={{ opacity }}>
+    <Animated.ScrollView
+      style={{ opacity }}
+      nestedScrollEnabled
+      contentContainerStyle={spacing.gapDefault}
+    >
       <ConditionalRender condition={items.length === 0}>
         <View style={[layout.center]}>
           <Text>לא הוקלטו סטים</Text>
@@ -78,36 +82,34 @@ const GraphsContainer = () => {
       </ConditionalRender>
 
       <ConditionalRender condition={items.length !== 0}>
-        <ScrollView contentContainerStyle={spacing.gapDefault} nestedScrollEnabled>
-          {recordedSetGraphs.map(({ data, label, icon, trend, isTrendPositive, collapseState }) => (
-            <Collapsible
-              key={label + data.length}
-              isCollapsed={collapseState}
-              onCollapseChange={handleCollapseChange}
-              trigger={
-                <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
-                  <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
-                    <Icon name={icon as IconName} />
-                    <Text style={fonts.lg}>{label}</Text>
-                  </View>
-
-                  <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
-                    <Text style={fonts.lg}>{trend}%</Text>
-                    <Icon
-                      name="growthIndicator"
-                      color={isTrendPositive ? colors.textSuccess.color : colors.textDanger.color}
-                      rotation={isTrendPositive ? 0 : 90}
-                    />
-                  </View>
+        {recordedSetGraphs.map(({ data, label, icon, trend, isTrendPositive, collapseState }) => (
+          <Collapsible
+            key={label + data.length}
+            isCollapsed={collapseState}
+            onCollapseChange={handleCollapseChange}
+            trigger={
+              <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
+                <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
+                  <Icon name={icon as IconName} />
+                  <Text style={fonts.lg}>{label}</Text>
                 </View>
-              }
-            >
-              <Graph data={data} labels={labels} />
-            </Collapsible>
-          ))}
-        </ScrollView>
+
+                <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
+                  <Text style={fonts.lg}>{trend}%</Text>
+                  <Icon
+                    name="growthIndicator"
+                    color={isTrendPositive ? colors.textSuccess.color : colors.textDanger.color}
+                    rotation={isTrendPositive ? 0 : 90}
+                  />
+                </View>
+              </View>
+            }
+          >
+            <Graph data={data} labels={labels} />
+          </Collapsible>
+        ))}
       </ConditionalRender>
-    </Animated.View>
+    </Animated.ScrollView>
   );
 };
 
