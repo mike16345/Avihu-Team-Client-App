@@ -3,9 +3,11 @@ import { Keyboard, useWindowDimensions, View } from "react-native";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import Input from "../ui/inputs/Input";
 import useAddWeighIn from "@/hooks/mutations/useAddWeighIn";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { z } from "zod";
 import { useToast } from "@/hooks/useToast";
+import useWeighInsQuery from "@/hooks/queries/WeighIns/useWeighInsQuery";
+import DateUtils from "@/utils/dateUtils";
 
 const weighInSchema = z.object({
   weight: z
@@ -21,9 +23,30 @@ const WeightInput = () => {
   const { width } = useWindowDimensions();
   const { triggerErrorToast } = useToast();
   const { mutate, isLoading } = useAddWeighIn();
+  const { data } = useWeighInsQuery();
 
   const [weighIn, setWeighIn] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+
+  const isWeighInUploadedToday = useMemo(() => {
+    if (!data || data.length === 0) return false;
+
+    const todayKey = DateUtils.formatDate(new Date(), "YYYY-MM-DD");
+
+    for (let i = data.length - 1; i >= 0; i--) {
+      const dateKey = DateUtils.formatDate(data[i].date, "YYYY-MM-DD");
+
+      if (dateKey === todayKey) {
+        return true;
+      }
+
+      if (dateKey < todayKey) {
+        break;
+      }
+    }
+
+    return false;
+  }, [data]);
 
   const handleSubmit = () => {
     const parsed = Number(weighIn);
@@ -60,7 +83,12 @@ const WeightInput = () => {
         />
       </View>
       <View style={[layout.center]}>
-        <PrimaryButton onPress={handleSubmit} loading={isLoading} style={[{ width: width * 0.6 }]}>
+        <PrimaryButton
+          disabled={isWeighInUploadedToday}
+          onPress={handleSubmit}
+          loading={isLoading}
+          style={[{ width: width * 0.6 }]}
+        >
           שליחה
         </PrimaryButton>
       </View>

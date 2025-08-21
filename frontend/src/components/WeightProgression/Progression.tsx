@@ -9,6 +9,7 @@ import WeighInsCalendar from "../Calendar/WeighInsCalendar";
 
 const Progression = () => {
   const { layout, spacing } = useStyles();
+
   const [showCalendar, setShowCalendar] = useState(true);
 
   return (

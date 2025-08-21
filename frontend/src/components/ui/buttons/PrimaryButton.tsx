@@ -50,6 +50,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         layout.itemsCenter,
         width,
         modeSpecificStyles,
+        { opacity: 0.7 },
         style,
       ]}
     >
