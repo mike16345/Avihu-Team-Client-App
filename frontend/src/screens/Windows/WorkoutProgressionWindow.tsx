@@ -17,39 +17,27 @@ const WorkoutProgressionWindow = () => {
 
   const [activeMuscleGroup, setActiveMuscleGroup] = useState<string>(MUSCLE_GROUPS[0]);
 
-  const mappedExerciseCache = useRef<Record<string, any>>({});
-
   const exercisesByMuscleGroups: Record<string, any> = useMemo(() => {
     if (!data) return [];
 
     return data.reduce<Record<string, any>>((acc, current) => {
       const { muscleGroup, recordedSets } = current;
 
-      const exercisesByNames = Object.entries(recordedSets).map((entry) => {
-        return { name: entry[0], recordedSets: entry[1] };
-      });
+      const mappedExercises = mapToDropDownItems(
+        Object.entries(recordedSets).map(([name, recordedSets]) => ({
+          name,
+          recordedSets,
+        })),
+        { labelKey: "name", valueKey: "recordedSets" }
+      );
 
-      acc[muscleGroup] = exercisesByNames;
+      acc[muscleGroup] = mappedExercises;
 
       return acc;
     }, {});
   }, [data]);
 
-  const exercises = useMemo(() => {
-    if (!exercisesByMuscleGroups[activeMuscleGroup]) return [];
-
-    if (mappedExerciseCache.current[activeMuscleGroup])
-      return mappedExerciseCache.current[activeMuscleGroup];
-
-    const mappedExercises = mapToDropDownItems(exercisesByMuscleGroups[activeMuscleGroup], {
-      labelKey: "name",
-      valueKey: "recordedSets",
-    });
-
-    mappedExerciseCache.current[activeMuscleGroup] = mappedExercises;
-
-    return mappedExercises;
-  }, [exercisesByMuscleGroups, activeMuscleGroup]);
+  const activeExercises = exercisesByMuscleGroups[activeMuscleGroup] || [];
 
   if (isLoading) return <WorkoutProgressScreenSkeleton />;
   if (isError) return <ErrorScreen />;
@@ -61,7 +49,11 @@ const WorkoutProgressionWindow = () => {
         onMuscleGroupSelect={(val) => setActiveMuscleGroup(val)}
       />
 
-      <DropDownContextProvider key={exercises.length} items={exercises} onSelect={() => {}}>
+      <DropDownContextProvider
+        key={activeExercises.length}
+        items={activeExercises}
+        onSelect={() => {}}
+      >
         <ExerciseSelector muscleGroup={activeMuscleGroup} />
 
         <GraphsContainer />
