@@ -15,9 +15,9 @@ interface ExerciseSelectorProps {
 const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({ muscleGroup }) => {
   const { common, fonts, layout, spacing } = useStyles();
 
-  const getMuscleNameInEnglish = (muscleInHebrew: string): muscleImageName => {
-    return MUSCLE_GROUPS_ENGLISH[muscleInHebrew];
-  };
+  const getMuscleNameInEnglish = (muscleInHebrew: string): muscleImageName =>
+    MUSCLE_GROUPS_ENGLISH[muscleInHebrew];
+
   return (
     <View style={spacing.gapDefault}>
       <Card variant="gray" style={[spacing.gap20, common.roundedMd]}>

@@ -1,25 +1,28 @@
 import GraphsContainer from "@/components/WorkoutProgression/GraphsContainer";
-import WorkoutProgressionHeader from "@/components/WorkoutProgression/WorkoutProgressionHeader";
 import { MUSCLE_GROUPS } from "@/constants/muscleGroups";
 import { DropDownContextProvider } from "@/context/useDropdown";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import useStyles from "@/styles/useGlobalStyles";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { View } from "react-native";
 import ErrorScreen from "../ErrorScreen";
 import WorkoutProgressScreenSkeleton from "@/components/ui/loaders/skeletons/WorkoutProgressScreenSkeleton";
+import { mapToDropDownItems } from "@/utils/utils";
+import MuscleGroupSelector from "@/components/WorkoutProgression/MuscleGroupSelector";
+import ExerciseSelector from "@/components/WorkoutProgression/ExerciseSelector";
 
 const WorkoutProgressionWindow = () => {
   const { layout, spacing } = useStyles();
+  const { data, isLoading, isError } = useRecordedSetsQuery();
 
   const [activeMuscleGroup, setActiveMuscleGroup] = useState<string>(MUSCLE_GROUPS[0]);
 
-  const { data, isLoading, isError } = useRecordedSetsQuery();
+  const mappedExerciseCache = useRef<Record<string, any>>({});
 
-  const exercisesByMuscleGroups = useMemo(() => {
+  const exercisesByMuscleGroups: Record<string, any> = useMemo(() => {
     if (!data) return [];
 
-    return data.reduce((acc, current) => {
+    return data.reduce<Record<string, any>>((acc, current) => {
       const { muscleGroup, recordedSets } = current;
 
       const exercisesByNames = Object.entries(recordedSets).map((entry) => {
@@ -35,9 +38,17 @@ const WorkoutProgressionWindow = () => {
   const exercises = useMemo(() => {
     if (!exercisesByMuscleGroups[activeMuscleGroup]) return [];
 
-    return exercisesByMuscleGroups[activeMuscleGroup].map(({ name, recordedSets }) => {
-      return { label: name, value: recordedSets };
+    if (mappedExerciseCache.current[activeMuscleGroup])
+      return mappedExerciseCache.current[activeMuscleGroup];
+
+    const mappedExercises = mapToDropDownItems(exercisesByMuscleGroups[activeMuscleGroup], {
+      labelKey: "name",
+      valueKey: "recordedSets",
     });
+
+    mappedExerciseCache.current[activeMuscleGroup] = mappedExercises;
+
+    return mappedExercises;
   }, [exercisesByMuscleGroups, activeMuscleGroup]);
 
   if (isLoading) return <WorkoutProgressScreenSkeleton />;
@@ -45,13 +56,13 @@ const WorkoutProgressionWindow = () => {
 
   return (
     <View style={[spacing.gapDefault, layout.flex1, spacing.pdMd]}>
+      <MuscleGroupSelector
+        selectedMuscleGroup={activeMuscleGroup}
+        onMuscleGroupSelect={(val) => setActiveMuscleGroup(val)}
+      />
+
       <DropDownContextProvider key={exercises.length} items={exercises} onSelect={() => {}}>
-        <View style={{ zIndex: 10 }}>
-          <WorkoutProgressionHeader
-            activeMuscleGroup={activeMuscleGroup}
-            handleMuscleGroupSelect={(val) => setActiveMuscleGroup(val)}
-          />
-        </View>
+        <ExerciseSelector muscleGroup={activeMuscleGroup} />
 
         <GraphsContainer />
       </DropDownContextProvider>
