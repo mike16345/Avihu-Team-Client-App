@@ -36,6 +36,7 @@ import upload from "@assets/icons/upload.svg";
 import send from "@assets/icons/send.svg";
 import check from "@assets/icons/check.svg";
 import pencil from "@assets/icons/pencil.svg";
+import trash from "@assets/icons/trash.svg";
 
 const icons = {
   arrowLeft,
@@ -76,6 +77,7 @@ const icons = {
   send,
   check,
   pencil,
+  trash,
 } as const;
 
 export type IconName = keyof typeof icons;

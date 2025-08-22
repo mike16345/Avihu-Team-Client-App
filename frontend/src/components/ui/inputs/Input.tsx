@@ -11,7 +11,7 @@ export interface InputProps extends TextInputProps {
 }
 
 const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
-  const { colors, common, spacing, layout, text } = useStyles();
+  const { colors, common, spacing, layout } = useStyles();
 
   const [focused, setFocused] = useState(false);
 
@@ -22,7 +22,9 @@ const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
     <View style={spacing.gapSm}>
       <ConditionalRender condition={label}>
         <Text
-          style={[layout.alignSelfStart, spacing.pdHorizontalXs, colors.textPrimary, text.textBold]}
+          fontSize={16}
+          fontVariant="semibold"
+          style={[layout.alignSelfStart, spacing.pdHorizontalXs, colors.textPrimary]}
         >
           {label}
         </Text>

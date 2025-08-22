@@ -28,14 +28,14 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         layout.justifyBetween,
         layout.itemsCenter,
         layout.widthFull,
-        spacing.pdVerticalDefault,
+        { paddingBottom: 12 },
       ]}
     >
       <TouchableOpacity
         style={[layout.flexRow, spacing.gapXs, layout.itemsCenter]}
         onPress={onOpenMonthSelect}
       >
-        <Text fontSize={16}>
+        <Text fontVariant="semibold" fontSize={16}>
           {month} {year}
         </Text>
         <Icon name="chevronLeftSoft" height={18} width={25} />

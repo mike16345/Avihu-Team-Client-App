@@ -17,7 +17,7 @@ interface CustomCalendarProps {
 }
 
 const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate }) => {
-  const { common } = useStyles();
+  const { common, spacing } = useStyles();
 
   const today = DateUtils.getCurrentDate("YYYY-MM-DD");
 
@@ -58,7 +58,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
     <View style={[{ position: "relative" }, common.rounded]}>
       <View style={{ display: !showMonths ? "flex" : "none" }}>
         <Calendar
-          style={[common.rounded]}
+          style={[common.roundedSm, spacing.pdDefault]}
           key={currentDate}
           current={currentDate}
           onDayPress={handleSelect}
