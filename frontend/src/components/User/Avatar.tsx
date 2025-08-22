@@ -3,10 +3,13 @@ import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { useUserStore } from "@/store/userStore";
 import { ConditionalRender } from "../ui/ConditionalRender";
+import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
+import { useNavigation } from "@react-navigation/native";
 
 const Avatar = () => {
   const { colors, common, fonts, layout } = useStyles();
   const { currentUser } = useUserStore();
+  const navigation = useNavigation<RootStackParamListNavigationProp>();
 
   const firstNameInitial = currentUser?.firstName.charAt(0).toUpperCase();
   const avatarSizeStyle = {
@@ -15,7 +18,7 @@ const Avatar = () => {
   };
 
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
       <ConditionalRender condition={!currentUser?.profileImage}>
         <View
           style={[
@@ -42,12 +45,5 @@ const Avatar = () => {
     </TouchableOpacity>
   );
 };
-
-/* const styles = StyleSheet.create({
-  avatarSize: {
-    height: 30,
-    width: 30,
-  },
-}); */
 
 export default Avatar;

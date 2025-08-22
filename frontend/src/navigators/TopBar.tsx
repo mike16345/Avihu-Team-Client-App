@@ -4,11 +4,14 @@ import { useUserStore } from "@/store/userStore";
 import { Text } from "@/components/ui/Text";
 import Icon from "@/components/Icon/Icon";
 import Avatar from "@/components/User/Avatar";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 
 export default function TopBar() {
-  const { colors, layout, spacing, common, fonts, text } = useStyles();
+  const { colors, layout, spacing, common, fonts } = useStyles();
   const { height } = useWindowDimensions();
   const { currentUser } = useUserStore();
+  const navigation = useNavigation<RootStackParamListNavigationProp>();
 
   return (
     <View
@@ -31,7 +34,10 @@ export default function TopBar() {
         <Text style={fonts.lg}>ברוך הבא {currentUser?.firstName}</Text>
       </View>
 
-      <TouchableOpacity style={{ position: "relative" }}>
+      <TouchableOpacity
+        style={{ position: "relative" }}
+        onPress={() => navigation.navigate("NotificationScreen")}
+      >
         <Icon name="bell" height={30} width={30} />
 
         <View style={[layout.center, common.roundedFull, styles.notificationBadge]}>

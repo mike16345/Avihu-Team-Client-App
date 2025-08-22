@@ -48,6 +48,7 @@ const BottomTabNavigator = () => {
   return (
     <Animated.View style={[layout.flex1, colors.background, layout.justifyEvenly, { opacity }]}>
       <TopBar />
+
       <Tab.Navigator
         barStyle={[styles.navigationBar, spacing.mgHorizontalDefault, colors.backgroundSurface]}
         initialRouteName={INITIAL_ROUTE_NAME}

@@ -6,11 +6,12 @@ export type RootStackParamList = {
   SuccessScreen: { title: string; message: string };
   LoginScreen: undefined;
   BottomTabs: undefined;
+  NotificationScreen: undefined;
+  Profile: undefined;
 };
 
 export type BottomStackParamList = {
   Home: undefined;
-  Profile: undefined;
   MyWorkoutPlanPage: undefined;
   Chat: undefined;
   MyDietPlanPage: undefined;
