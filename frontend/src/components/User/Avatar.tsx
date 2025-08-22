@@ -1,4 +1,4 @@
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image, TouchableOpacity, View } from "react-native";
 import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { useUserStore } from "@/store/userStore";
@@ -9,6 +9,10 @@ const Avatar = () => {
   const { currentUser } = useUserStore();
 
   const firstNameInitial = currentUser?.firstName.charAt(0).toUpperCase();
+  const avatarSizeStyle = {
+    height: fonts.xxl.fontSize,
+    width: fonts.xxl.fontSize,
+  };
 
   return (
     <TouchableOpacity>
@@ -20,31 +24,30 @@ const Avatar = () => {
             common.roundedFull,
             common.borderXsm,
             colors.outline,
-            styles.avatarSize,
+            avatarSizeStyle,
           ]}
         >
           <Text fontVariant="bold" style={fonts.lg}>
             {firstNameInitial}
           </Text>
         </View>
-        <Avatar />
       </ConditionalRender>
 
       <ConditionalRender condition={currentUser?.profileImage}>
         <Image
           src="https://miro.medium.com/v2/resize:fit:2400/1*Mw1Yhy3Z3TiV0mZkF4UInw.jpeg"
-          style={[styles.avatarSize, common.roundedFull]}
+          style={[avatarSizeStyle, common.roundedFull]}
         />
       </ConditionalRender>
     </TouchableOpacity>
   );
 };
 
-const styles = StyleSheet.create({
+/* const styles = StyleSheet.create({
   avatarSize: {
     height: 30,
     width: 30,
   },
-});
+}); */
 
 export default Avatar;
