@@ -31,8 +31,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
 
   const handleSelect = (day: DateData) => {
     const date = day.dateString;
-    console.log("date", date);
-
+    
     onSelect(date);
   };
 

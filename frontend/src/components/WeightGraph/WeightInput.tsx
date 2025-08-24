@@ -2,7 +2,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { Keyboard, useWindowDimensions, View } from "react-native";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import Input from "../ui/inputs/Input";
-import useAddWeighIn from "@/hooks/mutations/useAddWeighIn";
+import useAddWeighIn from "@/hooks/mutations/WeighIns/useAddWeighIn";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { useToast } from "@/hooks/useToast";

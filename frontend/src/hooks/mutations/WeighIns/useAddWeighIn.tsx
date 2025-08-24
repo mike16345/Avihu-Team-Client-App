@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import { useWeighInApi } from "../api/useWeighInApi";
+import { useWeighInApi } from "../../api/useWeighInApi";
 import { useUserStore } from "@/store/userStore";
-import { useToast } from "../useToast";
+import { useToast } from "../../useToast";
 import { IWeighInPost } from "@/interfaces/User";
 import queryClient from "@/QueryClient/queryClient";
 import { WEIGH_INS_KEY } from "@/constants/reactQuery";

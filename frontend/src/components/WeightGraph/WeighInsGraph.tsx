@@ -15,9 +15,10 @@ const tabs: GraphTab[] = ["יומי", "שבועי", "חודשי"];
 const WeighInsGraph = () => {
   const { isLoading, data } = useWeighInsQuery();
   const { layout, spacing } = useStyles();
-  const [selectedTab, setSelectedTab] = useState<GraphTab>("יומי");
 
   const { getWeighInsByTab } = useGraphWeighIns(data);
+
+  const [selectedTab, setSelectedTab] = useState<GraphTab>("יומי");
 
   if (isLoading)
     return (
