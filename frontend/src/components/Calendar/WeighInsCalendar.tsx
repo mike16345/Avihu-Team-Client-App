@@ -1,4 +1,4 @@
-import { Dimensions, TouchableOpacity, useWindowDimensions, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import CustomCalendar from "./CustomCalendar";
 import { useMemo, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
@@ -8,11 +8,10 @@ import DateUtils from "@/utils/dateUtils";
 import { Text } from "../ui/Text";
 import Icon from "../Icon/Icon";
 import { CustomModal } from "../ui/modals/Modal";
-import PrimaryButton from "../ui/buttons/PrimaryButton";
-import Input from "../ui/inputs/Input";
+import { IWeighIn } from "@/interfaces/User";
+import EditWeighIn from "./EditWeighIn";
 
 const WeighInsCalendar = () => {
-  const { width } = useWindowDimensions();
   const { data } = useWeighInsQuery();
   const { spacing, layout } = useStyles();
 
@@ -21,11 +20,11 @@ const WeighInsCalendar = () => {
 
   const weighInMap = useMemo(() => {
     if (!data) return {};
-    const map: Record<string, number> = {};
+    const map: Record<string, IWeighIn> = {};
 
     for (const w of data) {
       const dateKey = DateUtils.formatDate(w.date, "YYYY-MM-DD");
-      map[dateKey] = w.weight;
+      map[dateKey] = w;
     }
 
     return map;
@@ -38,7 +37,7 @@ const WeighInsCalendar = () => {
         <View style={[layout.center, spacing.gapMd]}>
           <Text fontSize={16}>{DateUtils.formatDate(selectedDate!, "DD.MM.YYYY")}</Text>
           <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
-            <Text fontSize={16}>משקל {weighInMap[selectedDate!]}</Text>
+            <Text fontSize={16}>משקל {weighInMap[selectedDate!]?.weight}</Text>
             <TouchableOpacity onPress={() => setIsEditModalOpen(true)}>
               <Icon name="pencil" />
             </TouchableOpacity>
@@ -48,25 +47,11 @@ const WeighInsCalendar = () => {
 
       <CustomModal visible={isEditModalOpen}>
         <CustomModal.Content>
-          <View style={[layout.widthFull, layout.center, spacing.gapMd]}>
-            <Text fontSize={16}>{DateUtils.formatDate(selectedDate!, "DD.MM.YYYY")}</Text>
-
-            <Text fontSize={16}>משקל_</Text>
-            <View style={[spacing.gapLg, layout.center]}>
-              <Input label="משקל" style={[{ width: width * 0.75 }]} placeholder="הכנס משקל" />
-              <View style={[spacing.gapMd, { width: width * 0.5 }]}>
-                <PrimaryButton onPress={() => console.log("update weigh in")} block>
-                  עדכון
-                </PrimaryButton>
-                <PrimaryButton onPress={() => setIsEditModalOpen(false)} mode="light" block>
-                  ביטול
-                </PrimaryButton>
-              </View>
-            </View>
-            <TouchableOpacity onPress={() => console.log("delete weigh in")}>
-              <Icon name="trash" />
-            </TouchableOpacity>
-          </View>
+          <EditWeighIn
+            date={selectedDate || ""}
+            weighInToEdit={weighInMap[selectedDate || ""]}
+            handleDismissModal={() => setIsEditModalOpen(false)}
+          />
         </CustomModal.Content>
       </CustomModal>
     </View>

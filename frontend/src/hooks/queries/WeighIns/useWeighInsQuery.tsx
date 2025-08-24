@@ -4,13 +4,13 @@ import { useUserStore } from "@/store/userStore";
 import { useQuery } from "@tanstack/react-query";
 
 const useWeighInsQuery = () => {
-  const { currentUser } = useUserStore();
+  const id = useUserStore((state) => state.currentUser?._id);
   const { getWeighInsByUserId } = useWeighInApi();
 
   return useQuery({
-    queryFn: () => getWeighInsByUserId(currentUser!._id),
-    queryKey: [WEIGH_INS_KEY + currentUser?._id],
-    enabled: !!currentUser,
+    queryFn: () => getWeighInsByUserId(id!),
+    queryKey: [WEIGH_INS_KEY + id],
+    enabled: !!id,
     staleTime: ONE_DAY * 2,
   });
 };

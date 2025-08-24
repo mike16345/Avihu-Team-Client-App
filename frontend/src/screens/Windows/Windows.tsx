@@ -81,7 +81,6 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
         nestedScrollEnabled
         onScrollBeginDrag={onScrollBeginDrag}
         onScrollEndDrag={onScrollEndDrag}
-        nestedScrollEnabled
       />
 
       <View style={[spacing.gapDefault, layout.flexRow, layout.center]}>
