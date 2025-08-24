@@ -12,7 +12,7 @@ type GraphWeighIns = {
 
 export type GraphTab = "יומי" | "שבועי" | "חודשי";
 
-const LARGE_AMOUNT_OF_WEIGH_INS = 75;
+const LARGE_AMOUNT_OF_WEIGH_INS = 50;
 const THIRTY_DAYS_AGO = new Date();
 THIRTY_DAYS_AGO.setDate(THIRTY_DAYS_AGO.getDate() - 30);
 
@@ -46,19 +46,24 @@ export function useGraphWeighIns(data: IWeighIn[] | undefined) {
     const monthlyMap: Record<string, { total: number; count: number }> = {};
     const monthlyLabels: string[] = [];
     const monthOrder: string[] = [];
+    const isLargeAmountOfWeighIns = data.length >= LARGE_AMOUNT_OF_WEIGH_INS;
 
     data.forEach((item, idx) => {
       const dateObj = new Date(item.date);
-      const dayLabel = dateObj.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-      });
+      const dayLabel = dateObj
+        .toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+        })
+        .replace("/", ".");
+
+      const isRecordedInLastThirtyDays = new Date(item.date) >= THIRTY_DAYS_AGO;
 
       // ---- Daily ----
-      if (data.length < LARGE_AMOUNT_OF_WEIGH_INS) {
+      if (!isLargeAmountOfWeighIns || isRecordedInLastThirtyDays) {
         dailyWeighIns.push(item.weight);
         dailyLabels.push(dayLabel);
-      } else if (idx % 2 == 0 && new Date(item.date) >= THIRTY_DAYS_AGO) {
+      } else if (idx % 2 == 0 && isLargeAmountOfWeighIns) {
         dailyWeighIns.push(item.weight);
         dailyLabels.push(dayLabel);
       }
