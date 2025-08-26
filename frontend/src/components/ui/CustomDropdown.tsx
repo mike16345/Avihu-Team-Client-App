@@ -1,4 +1,4 @@
-import { View, Text, Platform } from "react-native";
+import { Platform } from "react-native";
 import React from "react";
 import { ConditionalRender } from "./ConditionalRender";
 import FrameShadow from "./FrameShadow";
