@@ -1,7 +1,6 @@
 import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
-import UploadDrawer from "@/components/ui/UploadDrawer";
 import useLogout from "@/hooks/useLogout";
 
 const Sandbox = () => {

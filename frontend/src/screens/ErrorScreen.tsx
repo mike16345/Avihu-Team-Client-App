@@ -1,11 +1,8 @@
 import { View } from "react-native";
 import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
-import NativeIcon from "@/components/Icon/NativeIcon";
 import { Text } from "@/components/ui/Text";
-import { Button } from "react-native-paper";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
-import Loader from "@/components/ui/loaders/Loader";
 import Icon from "@/components/Icon/Icon";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 
@@ -16,7 +13,7 @@ interface ErrorScreenProps {
 }
 
 const ErrorScreen: React.FC<ErrorScreenProps> = ({ isFetching = false, error, refetchFunc }) => {
-  const { colors, fonts, layout, spacing, common } = useStyles();
+  const { colors, fonts, layout, spacing } = useStyles();
 
   return (
     <>

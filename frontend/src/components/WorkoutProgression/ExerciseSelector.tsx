@@ -6,7 +6,7 @@ import { Text } from "../ui/Text";
 import MuscleDisplay from "./MuscleDisplay";
 import DropDownTrigger from "../ui/dropwdown/DropDownTrigger";
 import DropDownContent from "../ui/dropwdown/DropDownContent";
-import { MUSCLE_GROUPS_ENGLISH, muscleImageName } from "@/constants/muscleGroups";
+import { MUSCLE_GROUPS_ENGLISH, MuscleGroup, muscleImageName } from "@/constants/muscleGroups";
 
 interface ExerciseSelectorProps {
   muscleGroup: string;
@@ -15,7 +15,7 @@ interface ExerciseSelectorProps {
 const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({ muscleGroup }) => {
   const { common, fonts, layout, spacing } = useStyles();
 
-  const getMuscleNameInEnglish = (muscleInHebrew: string): muscleImageName =>
+  const getMuscleNameInEnglish = (muscleInHebrew: MuscleGroup): muscleImageName =>
     MUSCLE_GROUPS_ENGLISH[muscleInHebrew];
 
   return (
@@ -27,7 +27,7 @@ const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({ muscleGroup }) => {
               {muscleGroup}
             </Text>
 
-            <MuscleDisplay name={getMuscleNameInEnglish(muscleGroup)} height={68} width={68} />
+            <MuscleDisplay name={getMuscleNameInEnglish(muscleGroup as MuscleGroup)} height={68} width={68} />
           </View>
         </Card.Header>
         <Card.Content>

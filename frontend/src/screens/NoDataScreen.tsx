@@ -1,7 +1,7 @@
 import NativeIcon from "@/components/Icon/NativeIcon";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
-import React, { useState } from "react";
+import React from "react";
 import { Linking, RefreshControl, ScrollView, View } from "react-native";
 import { Button } from "react-native-paper";
 import Constants from "expo-constants";

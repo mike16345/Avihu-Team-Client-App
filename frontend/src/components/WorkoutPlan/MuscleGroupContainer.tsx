@@ -12,7 +12,7 @@ interface MuscleGroupContainerProps {
 const MuscleGroupContainer: React.FC<MuscleGroupContainerProps> = ({
   muscleGroup: { exercises, muscleGroup },
 }) => {
-  const { colors, common, layout, spacing, text } = useStyles();
+  const { colors, common, layout, spacing } = useStyles();
 
   return (
     <View style={spacing.gapMd}>

@@ -3,7 +3,7 @@ import { MUSCLE_GROUPS } from "@/constants/muscleGroups";
 import { DropDownContextProvider } from "@/context/useDropdown";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import useStyles from "@/styles/useGlobalStyles";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { View } from "react-native";
 import ErrorScreen from "../ErrorScreen";
 import WorkoutProgressScreenSkeleton from "@/components/ui/loaders/skeletons/WorkoutProgressScreenSkeleton";

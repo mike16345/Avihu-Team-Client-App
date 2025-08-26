@@ -3,7 +3,6 @@ import { useState } from "react";
 import { View } from "react-native";
 import { SegmentedButtons } from "react-native-paper";
 import MyWeightProgressScreen from "./MyWeightProgressScreen";
-import MyWorkoutProgressionScreen from "./MyWorkoutProgressionScreen";
 
 const MyProgressScreen = () => {
   const { colors, common, layout, spacing } = useStyles();
@@ -43,7 +42,6 @@ const MyProgressScreen = () => {
         ]}
       />
       {selectedScreen == `weight` && <MyWeightProgressScreen />}
-      {selectedScreen == `workout` && <MyWorkoutProgressionScreen />}
     </View>
   );
 };

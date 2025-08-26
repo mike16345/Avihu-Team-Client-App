@@ -1,4 +1,4 @@
-import { fetchData, patchItem, sendData, updateItem } from "@/API/api";
+import { fetchData, sendData, updateItem } from "@/API/api";
 import { ISession } from "@/interfaces/ISession";
 import { IUser } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";

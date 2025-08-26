@@ -2,7 +2,6 @@ import moment from "moment-timezone";
 import type {
   DateAndValue,
   DateFormatType,
-  DateRanges,
   ItemsInDateRangeParams,
   Timezone,
 } from "../types/dateTypes";
@@ -134,11 +133,8 @@ class DateUtils {
   }
 
   private static extractDayLabels<T>(data: ItemsInDateRangeParams<T>): string[] {
-    const { items, dateKey, n, range } = data;
+    const { items, dateKey } = data;
     const labelsSet: Set<string> = new Set();
-
-    const currentDate = new Date();
-    /*  const endDate = new Date(currentDate.getTime() - n * this.getMillisecondsFromRange(range)); */
 
     for (const item of items) {
       const itemDate = new Date(item[dateKey] as any); // Assuming dateKey is of type Date
@@ -149,23 +145,6 @@ class DateUtils {
       /*   } */
     }
     return Array.from(labelsSet);
-  }
-
-  private static getMillisecondsFromRange(range: DateRanges): number {
-    switch (range) {
-      case "hours":
-        return 3600 * 1000;
-      case "days":
-        return 24 * 3600 * 1000;
-      case "weeks":
-        return 7 * 24 * 3600 * 1000;
-      case "months":
-        return 30 * 24 * 3600 * 1000; // Approximation for a month
-      case "years":
-        return 365 * 24 * 3600 * 1000; // Approximation for a year
-      default:
-        throw new Error("Invalid range");
-    }
   }
 
   private static extractWeekLabels<T>(params: ItemsInDateRangeParams<T>): string[] {
@@ -200,13 +179,13 @@ class DateUtils {
 
   private static extractYearLabels<T>(data: ItemsInDateRangeParams<T>): string[] {
     const currentYear = new Date().getFullYear();
-    const { items, dateKey, n } = data;
+    const { items, dateKey } = data;
 
     let labels: string[] = [];
 
     for (let month = 0; month < 12; month++) {
       const monthDate = new Date(currentYear, month, 1);
-      const monthName = this.formatDate(monthDate, "MMM");
+      const monthName = this.formatDate(monthDate, "MM");
       labels.push(monthName);
     }
 
@@ -214,7 +193,7 @@ class DateUtils {
       let found = false;
 
       for (const item of items) {
-        if (this.formatDate(item[dateKey] as Date, "MMM") === month) {
+        if (this.formatDate(item[dateKey] as Date, "MM") === month) {
           found = true;
           break;
         }
