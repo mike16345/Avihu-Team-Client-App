@@ -1,34 +1,21 @@
 import "react-native-reanimated";
 import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
-import {
-  DarkTheme as NavigationDarkTheme,
-  DefaultTheme as NavigationDefaultTheme,
-  NavigationContainer,
-} from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
+import { PaperProvider } from "react-native-paper";
 import { defaultTheme as CustomDarkTheme, ThemeProvider } from "@/themes/useAppTheme";
-import { Appearance, I18nManager, Platform, View } from "react-native";
+import { Appearance, Platform, View } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import Toast from "react-native-toast-message";
-import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import UserDrawer from "@/components/User/UserDrawer";
 import Update from "@/hooks/useUpdates";
 import persister from "@/QueryClient/queryPersister";
 import queryClient from "@/QueryClient/queryClient";
 import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
-import Sandbox from "@/screens/Sandbox";
-import { toastConfig } from "@/config/toastConfig";
 import ToastContainer from "@/components/ui/toast/ToastContainer";
 import useCustomFonts from "@/hooks/useCustomFonts";
-
-const { DarkTheme } = adaptNavigationTheme({
-  reactNavigationLight: NavigationDefaultTheme,
-  reactNavigationDark: NavigationDarkTheme,
-});
 
 export default function App() {
   const ready = useOneTimeRTLFix();
