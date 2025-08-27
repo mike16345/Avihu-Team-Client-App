@@ -105,7 +105,6 @@ const RootNavigator = () => {
         )}
 
         <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
-        <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
         <Stack.Screen
           name="Profile"
           component={ProfileScreen}
