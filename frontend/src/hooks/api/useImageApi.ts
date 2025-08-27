@@ -26,8 +26,11 @@ export const useImageApi = () => {
     }
   };
 
-  const handleDeletePhoto = async (photoId: string) =>
-    await deleteItem(USER_IMAGE_URLS_ENDPOINT, { photoId });
+  const handleDeletePhoto = async (photoId?: string) => {
+    if (!photoId) return;
+
+    return await deleteItem(USER_IMAGE_URLS_ENDPOINT, { photoId });
+  };
 
   const uploadImageToS3 = async (fileUri: string, presignedUrl: string) => {
     try {

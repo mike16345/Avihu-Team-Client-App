@@ -3,11 +3,13 @@ import { ISession } from "@/interfaces/ISession";
 import { IUser } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
 import { ApiResponse } from "@/types/ApiTypes";
+import { useImageApi } from "./useImageApi";
 
 const USER_ENDPOINT = "users";
 
 export const useUserApi = () => {
-  const { setCurrentUser } = useUserStore();
+  const { setCurrentUser, currentUser } = useUserStore();
+  const { handleDeletePhoto, handleUploadImageToS3 } = useImageApi();
 
   const getUserById = (id: string) => {
     return fetchData<ApiResponse<IUser>>(USER_ENDPOINT + `/one`, { userId: id }).then(
@@ -24,6 +26,20 @@ export const useUserApi = () => {
       fieldName,
       value,
     }).then((res) => setCurrentUser(res.data));
+  };
+
+  const updateProfilePhoto = async (fileUri: string) => {
+    if (!currentUser) return;
+
+    try {
+      await handleDeletePhoto(currentUser?.profileImage);
+
+      /*  currentUser?.profileImage = */ await handleUploadImageToS3(
+        fileUri,
+        currentUser?._id,
+        "user-profile"
+      );
+    } catch (error) {}
   };
 
   const checkEmailAccess = (email: string) => {
