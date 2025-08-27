@@ -12,6 +12,7 @@ import Icon from "../Icon/Icon";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { useUserStore } from "@/store/userStore";
 import { ProfileScreenProps } from "@/screens/ProfileScreen";
+import UploadDrawer from "../ui/UploadDrawer";
 
 const ICON_SIZE = 30;
 const HALF_OF_ICON_SIZE = 15;
@@ -38,6 +39,8 @@ const ProfileHeading: React.FC<ProfileScreenProps> = ({ navigation, route }) => 
     setProfileHeight(height);
   };
 
+  const onUpload = () => {};
+
   return (
     <View style={[layout.flex1, layout.center, { position: "relative" }]}>
       <TouchableOpacity
@@ -62,11 +65,17 @@ const ProfileHeading: React.FC<ProfileScreenProps> = ({ navigation, route }) => 
           />
         </ConditionalRender>
 
-        <TouchableOpacity
-          style={[{ position: "absolute", end: iconEndPosition, top: iconTopPosition }]}
-        >
-          <Icon name="edit" height={ICON_SIZE} width={ICON_SIZE} />
-        </TouchableOpacity>
+        <UploadDrawer
+          trigger={
+            <TouchableOpacity
+              style={[{ position: "absolute", end: iconEndPosition, top: iconTopPosition }]}
+            >
+              <Icon name="edit" height={ICON_SIZE} width={ICON_SIZE} />
+            </TouchableOpacity>
+          }
+          imageCap={1}
+          handleUpload={onUpload}
+        />
       </View>
     </View>
   );
