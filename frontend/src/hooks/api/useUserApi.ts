@@ -1,4 +1,4 @@
-import { fetchData, patchItem, sendData, updateItem } from "@/API/api";
+import { fetchData, sendData, updateItem } from "@/API/api";
 import { ISession } from "@/interfaces/ISession";
 import { IUser } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
@@ -31,15 +31,25 @@ export const useUserApi = () => {
   const updateProfilePhoto = async (fileUri: string) => {
     if (!currentUser) return;
 
-    try {
-      await handleDeletePhoto(currentUser?.profileImage);
+    const userId = currentUser._id;
+    const hasExistingPhoto = !!currentUser.profileImage;
 
-      /*  currentUser?.profileImage = */ await handleUploadImageToS3(
+    try {
+      if (hasExistingPhoto) {
+        await handleDeletePhoto(currentUser?.profileImage);
+      }
+
+      const { urlToStore } = await handleUploadImageToS3(
         fileUri,
-        currentUser?._id,
-        "user-profile"
+        userId,
+        "user-profile" + Math.random()
       );
-    } catch (error) {}
+
+      await updateUserField(userId, "profileImage", urlToStore);
+    } catch (error) {
+      console.error("error here", error);
+      throw error;
+    }
   };
 
   const checkEmailAccess = (email: string) => {
@@ -78,5 +88,6 @@ export const useUserApi = () => {
     loginUser,
     updateUserField,
     submitLead,
+    updateProfilePhoto,
   };
 };

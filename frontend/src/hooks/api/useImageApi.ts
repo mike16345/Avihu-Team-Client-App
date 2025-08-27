@@ -1,14 +1,9 @@
-import { sendData, deleteItem } from "@/API/api";
-import { ApiResponse } from "@/types/ApiTypes";
+import { deleteItem } from "@/API/api";
 import Constants from "expo-constants";
 
-const USER_IMAGE_URLS_ENDPOINT = "userImageUrls";
+const S3_IMAGES_ENDPOINT = "s3/photos/one";
 
 export const useImageApi = () => {
-  const addImageUrl = (userId: string, imageUrl: string) => {
-    return sendData<ApiResponse<string[]>>(USER_IMAGE_URLS_ENDPOINT, { userId, imageUrl });
-  };
-
   const fetchSignedUrl = async (url: string) => {
     try {
       const response = await fetch(url, {
@@ -26,10 +21,12 @@ export const useImageApi = () => {
     }
   };
 
-  const handleDeletePhoto = async (photoId?: string) => {
-    if (!photoId) return;
+  const handleDeletePhoto = async (photoUrl?: string) => {
+    if (!photoUrl) return Promise.reject("no photo available");
 
-    return await deleteItem(USER_IMAGE_URLS_ENDPOINT, { photoId });
+    const photoId = "images/" + photoUrl;
+
+    return await deleteItem(S3_IMAGES_ENDPOINT, undefined, { photoId });
   };
 
   const uploadImageToS3 = async (fileUri: string, presignedUrl: string) => {
@@ -50,7 +47,7 @@ export const useImageApi = () => {
   };
 
   const handleUploadImageToS3 = async (fileUri: string, userId: string, imageName: string) => {
-    if (!fileUri) return;
+    if (!fileUri) throw new Error("No file provided");
 
     const today = new Date().toISOString().split("T")[0];
     const api = process.env.EXPO_PUBLIC_SERVER || Constants.expoConfig?.extra?.API_URL;
@@ -63,7 +60,8 @@ export const useImageApi = () => {
 
       // Upload the file from the URI using the presigned URL
       await uploadImageToS3(fileUri, presignedUrl);
-      await addImageUrl(userId, urlToStore);
+
+      return { presignedUrl, urlToStore };
     } catch (error) {
       throw error;
     }

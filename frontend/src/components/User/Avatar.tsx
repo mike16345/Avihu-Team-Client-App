@@ -5,6 +5,7 @@ import { useUserStore } from "@/store/userStore";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { RootStackParamList, RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { buildPhotoUrl } from "@/utils/utils";
 
 const Avatar = () => {
   const { colors, common, fonts, layout } = useStyles();
@@ -14,8 +15,8 @@ const Avatar = () => {
 
   const firstNameInitial = currentUser?.firstName.charAt(0).toUpperCase();
   const avatarSizeStyle = {
-    height: fonts.xxl.fontSize,
-    width: fonts.xxl.fontSize,
+    height: fonts.xxxl.fontSize,
+    width: fonts.xxxl.fontSize,
   };
 
   return (
@@ -43,7 +44,7 @@ const Avatar = () => {
 
       <ConditionalRender condition={currentUser?.profileImage}>
         <Image
-          src="https://miro.medium.com/v2/resize:fit:2400/1*Mw1Yhy3Z3TiV0mZkF4UInw.jpeg"
+          src={buildPhotoUrl(currentUser?.profileImage || "")}
           style={[avatarSizeStyle, common.roundedFull]}
         />
       </ConditionalRender>

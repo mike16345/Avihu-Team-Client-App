@@ -14,6 +14,8 @@ import { useUserStore } from "@/store/userStore";
 import { ProfileScreenProps } from "@/screens/ProfileScreen";
 import UploadDrawer from "../ui/UploadDrawer";
 import { useUserApi } from "@/hooks/api/useUserApi";
+import { useToast } from "@/hooks/useToast";
+import { buildPhotoUrl } from "@/utils/utils";
 
 const ICON_SIZE = 30;
 const HALF_OF_ICON_SIZE = 15;
@@ -22,9 +24,11 @@ const ProfileHeading: React.FC<ProfileScreenProps> = ({ navigation, route }) => 
   const { colors, common, layout } = useStyles();
   const { currentUser } = useUserStore();
   const { width } = useWindowDimensions();
-  const {} = useUserApi();
+  const { updateProfilePhoto } = useUserApi();
+  const { triggerErrorToast } = useToast();
 
   const [profileHeight, setProfileHeight] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const { iconEndPosition, iconTopPosition } = useMemo(() => {
     const iconTopPosition = profileHeight / 2 - HALF_OF_ICON_SIZE;
@@ -41,7 +45,21 @@ const ProfileHeading: React.FC<ProfileScreenProps> = ({ navigation, route }) => 
     setProfileHeight(height);
   };
 
-  const onUpload = () => {};
+  const onUpload = async (images: string[]) => {
+    const profileImage = images[0];
+
+    if (!profileImage) return;
+
+    try {
+      setLoading(true);
+
+      await updateProfilePhoto(profileImage);
+    } catch (error: any) {
+      triggerErrorToast({ message: error.response.body.message });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={[layout.flex1, layout.center, { position: "relative" }]}>
@@ -62,7 +80,7 @@ const ProfileHeading: React.FC<ProfileScreenProps> = ({ navigation, route }) => 
       >
         <ConditionalRender condition={currentUser?.profileImage}>
           <Image
-            src="https://miro.medium.com/v2/resize:fit:2400/1*Mw1Yhy3Z3TiV0mZkF4UInw.jpeg" //temporary
+            src={buildPhotoUrl(currentUser?.profileImage || "")}
             style={[layout.sizeFull, common.roundedMd]}
           />
         </ConditionalRender>
@@ -77,6 +95,7 @@ const ProfileHeading: React.FC<ProfileScreenProps> = ({ navigation, route }) => 
           }
           imageCap={1}
           handleUpload={onUpload}
+          loading={loading}
         />
       </View>
     </View>
