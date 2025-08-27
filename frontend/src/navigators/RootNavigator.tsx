@@ -16,7 +16,6 @@ import useUserQuery from "@/hooks/queries/useUserQuery";
 import SplashScreen from "@/screens/SplashScreen";
 import SuccessScreen from "@/screens/SuccessScreen";
 import { RootStackParamList } from "@/types/navigatorTypes";
-import NotificationScreen from "@/screens/NotificationScreen";
 import ProfileScreen from "@/screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

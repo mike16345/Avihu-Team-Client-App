@@ -4,7 +4,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { useUserStore } from "@/store/userStore";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { RootStackParamList, RootStackParamListNavigationProp } from "@/types/navigatorTypes";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useNavigationState, useRoute } from "@react-navigation/native";
 import { buildPhotoUrl } from "@/utils/utils";
 
 const Avatar = () => {
@@ -19,11 +19,17 @@ const Avatar = () => {
     width: fonts.xxxl.fontSize,
   };
 
+  const activeTab = useNavigationState((state) => {
+    const tabState = state.routes.find((r) => r.name === "BottomTabs")?.state;
+    if (tabState && "index" in tabState && tabState.routeNames) {
+      return tabState.routeNames[tabState.index as number];
+    }
+    return undefined;
+  });
+
   return (
     <TouchableOpacity
-      onPress={() =>
-        navigation.navigate("Profile", { navigatedFrom: route.name as keyof RootStackParamList })
-      }
+      onPress={() => navigation.navigate("Profile", { navigatedFrom: activeTab || "" })}
     >
       <ConditionalRender condition={!currentUser?.profileImage}>
         <View

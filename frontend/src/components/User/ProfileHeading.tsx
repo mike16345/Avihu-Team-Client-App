@@ -64,7 +64,9 @@ const ProfileHeading: React.FC<ProfileScreenProps> = ({ navigation, route }) => 
   return (
     <View style={[layout.flex1, layout.center, { position: "relative" }]}>
       <TouchableOpacity
-        onPress={() => navigation?.navigate(route?.params?.navigatedFrom as any)}
+        onPress={() =>
+          navigation?.navigate("BottomTabs", { screen: route?.params.navigatedFrom || "" })
+        }
         style={styles.backButton}
       >
         <Icon name="chevronRightBig" />
