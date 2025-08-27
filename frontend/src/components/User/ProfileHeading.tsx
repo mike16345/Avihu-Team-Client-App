@@ -13,6 +13,7 @@ import { ConditionalRender } from "../ui/ConditionalRender";
 import { useUserStore } from "@/store/userStore";
 import { ProfileScreenProps } from "@/screens/ProfileScreen";
 import UploadDrawer from "../ui/UploadDrawer";
+import { useUserApi } from "@/hooks/api/useUserApi";
 
 const ICON_SIZE = 30;
 const HALF_OF_ICON_SIZE = 15;
@@ -21,6 +22,7 @@ const ProfileHeading: React.FC<ProfileScreenProps> = ({ navigation, route }) => 
   const { colors, common, layout } = useStyles();
   const { currentUser } = useUserStore();
   const { width } = useWindowDimensions();
+  const {} = useUserApi();
 
   const [profileHeight, setProfileHeight] = useState(0);
 
