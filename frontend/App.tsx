@@ -29,7 +29,7 @@ export default function App() {
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <View style={[Platform.OS == "ios" && { direction: "rtl" }, { flex: 1 }]}>
+            <View style={[{ direction: "rtl" }, { flex: 1 }]}>
               <PersistQueryClientProvider
                 client={queryClient}
                 persistOptions={{ persister: persister }}
