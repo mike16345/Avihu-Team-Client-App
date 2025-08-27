@@ -23,7 +23,6 @@ import Loader from "../ui/loaders/Loader";
 import RecordedSetInfo from "./RecordedSetInfo";
 import { ONE_DAY, WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 import { Text } from "../ui/Text";
-import Toast from "react-native-toast-message";
 import Divider from "../ui/Divider";
 import { useLayoutStore } from "@/store/layoutStore";
 import ExerciseMethodDrawer from "./ExerciseMethodDrawer";
@@ -98,8 +97,8 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
   };
 
   const handleSave = async () => {
-    if (currentSetNumber > exercise.sets.length)
-      return Toast.show({ type: "error", text1: "נראה שכבר השלמת את כל הסטים" });
+    // if (currentSetNumber > exercise.sets.length)
+    // return Toast.show({ type: "error", text1: "נראה שכבר השלמת את כל הסטים" });
 
     const workoutSessionString = await workoutSession.getItem();
     const workoutSessionData = JSON.parse(workoutSessionString || "{}");
@@ -110,15 +109,15 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
       setCurrentSetNumber((prev) => prev + 1);
       setCountdown(exercise.restTime);
     } catch (err: any) {
-      Toast.show({
-        text1: "הסט שהוקלד אינו תקין",
-        text2: err.message,
-        autoHide: true,
-        type: "error",
-        swipeable: true,
-        text1Style: { textAlign: `center` },
-        text2Style: { textAlign: `center` },
-      });
+      // Toast.show({
+      //   text1: "הסט שהוקלד אינו תקין",
+      //   text2: err.message,
+      //   autoHide: true,
+      //   type: "error",
+      //   swipeable: true,
+      //   text1Style: { textAlign: `center` },
+      //   text2Style: { textAlign: `center` },
+      // });
     } finally {
       setIsSetUploading(false);
     }
