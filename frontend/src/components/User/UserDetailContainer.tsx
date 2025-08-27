@@ -12,7 +12,7 @@ const UserDetailContainer: React.FC<UserDetailContainerProps> = ({ label, value 
   const { text, common } = useStyles();
 
   return (
-    <Card variant="gray" style={common.roundedLg}>
+    <Card variant="gray" style={common.roundedMd}>
       <Card.Header>
         <Text style={text.textCenter}>{label}</Text>
       </Card.Header>

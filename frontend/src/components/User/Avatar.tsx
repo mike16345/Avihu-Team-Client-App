@@ -3,13 +3,14 @@ import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { useUserStore } from "@/store/userStore";
 import { ConditionalRender } from "../ui/ConditionalRender";
-import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
-import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList, RootStackParamListNavigationProp } from "@/types/navigatorTypes";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const Avatar = () => {
   const { colors, common, fonts, layout } = useStyles();
   const { currentUser } = useUserStore();
   const navigation = useNavigation<RootStackParamListNavigationProp>();
+  const route = useRoute();
 
   const firstNameInitial = currentUser?.firstName.charAt(0).toUpperCase();
   const avatarSizeStyle = {
@@ -18,7 +19,11 @@ const Avatar = () => {
   };
 
   return (
-    <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate("Profile", { navigatedFrom: route.name as keyof RootStackParamList })
+      }
+    >
       <ConditionalRender condition={!currentUser?.profileImage}>
         <View
           style={[

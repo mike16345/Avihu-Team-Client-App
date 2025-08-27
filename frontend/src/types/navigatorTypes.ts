@@ -7,7 +7,7 @@ export type RootStackParamList = {
   LoginScreen: undefined;
   BottomTabs: undefined;
   NotificationScreen: undefined;
-  Profile: undefined;
+  Profile: { navigatedFrom: keyof RootStackParamList };
 };
 
 export type BottomStackParamList = {
