@@ -15,7 +15,6 @@ import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import Toast from "react-native-toast-message";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
-import UserDrawer from "@/components/User/UserDrawer";
 import Update from "@/hooks/useUpdates";
 import persister from "@/QueryClient/queryPersister";
 import queryClient from "@/QueryClient/queryClient";
@@ -51,7 +50,6 @@ export default function App() {
                   <RootNavigator />
                   <StatusBar key={colorScheme} translucent style={"dark"} />
                   <ToastContainer />
-                  <UserDrawer />
                   <Update />
                 </NavigationContainer>
               </PersistQueryClientProvider>
