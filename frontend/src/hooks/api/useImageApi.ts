@@ -1,4 +1,4 @@
-import { sendData } from "@/API/api";
+import { sendData, deleteItem } from "@/API/api";
 import { ApiResponse } from "@/types/ApiTypes";
 import Constants from "expo-constants";
 
@@ -25,6 +25,9 @@ export const useImageApi = () => {
       throw new Error("Failed to fetch signed URL.");
     }
   };
+
+  const handleDeletePhoto = async (photoId: string) =>
+    await deleteItem(USER_IMAGE_URLS_ENDPOINT, { photoId });
 
   const uploadImageToS3 = async (fileUri: string, presignedUrl: string) => {
     try {
@@ -63,5 +66,5 @@ export const useImageApi = () => {
     }
   };
 
-  return { handleUploadImageToS3 };
+  return { handleUploadImageToS3, handleDeletePhoto };
 };
