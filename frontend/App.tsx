@@ -6,7 +6,7 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PaperProvider } from "react-native-paper";
 import { defaultTheme as CustomDarkTheme, ThemeProvider } from "@/themes/useAppTheme";
-import { Appearance, Platform, View } from "react-native";
+import { Appearance, View } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import UserDrawer from "@/components/User/UserDrawer";
