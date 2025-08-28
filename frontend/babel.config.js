@@ -4,7 +4,8 @@ module.exports = function (api) {
     presets: [["babel-preset-expo"]],
     env: {
       production: {
-        plugins: ["react-native-paper/babel", "react-native-reanimated/plugin"],
+        // Make sure to leave reanimated plugin last in the plugins array
+        plugins: ["react-native-reanimated/plugin"],
       },
     },
   };

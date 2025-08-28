@@ -3,7 +3,6 @@ import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import React from "react";
 import { Linking, RefreshControl, ScrollView, View } from "react-native";
-import { Button } from "react-native-paper";
 import Constants from "expo-constants";
 
 interface NoDataScreenProps {
@@ -49,7 +48,7 @@ const NoDataScreen: React.FC<NoDataScreenProps> = ({
           ? `טרם בנו לך תפריט תזונה`
           : `טרם בנו לך תוכנית אימון`}
       </Text>
-      {variant && (
+      {/* {variant && (
         <Button
           mode="contained"
           onPress={() => Linking.openURL(`whatsapp://send?phone=${TRAINER_PHONE_NUMBER}`)}
@@ -64,7 +63,7 @@ const NoDataScreen: React.FC<NoDataScreenProps> = ({
             />
           </View>
         </Button>
-      )}
+      )} */}
     </ScrollView>
   );
 };

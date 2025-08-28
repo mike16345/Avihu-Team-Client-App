@@ -1,10 +1,7 @@
 import { createContext, ReactNode, useContext, useState } from "react";
-import { MD3DarkTheme as DefaultDarkTheme } from "react-native-paper";
 
 export const defaultTheme = {
-  ...DefaultDarkTheme,
   fonts: {
-    ...DefaultDarkTheme.fonts,
     regular: {
       fontFamily: "Assistant",
       fontWeight: "normal",

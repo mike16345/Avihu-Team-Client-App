@@ -10,7 +10,6 @@ import {
 import { IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import useStyles from "@/styles/useGlobalStyles";
-import { Button } from "react-native-paper";
 import WorkoutVideoPopup from "./WorkoutVideoPopup";
 import { createRetryFunction, extractVideoId, generateWheelPickerData } from "@/utils/utils";
 import WeightWheelPicker from "../WeightGraph/WeightWheelPicker";
@@ -23,7 +22,6 @@ import Loader from "../ui/loaders/Loader";
 import RecordedSetInfo from "./RecordedSetInfo";
 import { ONE_DAY, WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 import { Text } from "../ui/Text";
-import Divider from "../ui/Divider";
 import { useLayoutStore } from "@/store/layoutStore";
 import ExerciseMethodDrawer from "./ExerciseMethodDrawer";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
@@ -193,7 +191,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
 
                 {exercise.sets[currentSetNumber - 1] && (
                   <>
-                    <Divider color={colors.textPrimary.color} thickness={0.5} />
                     <Text style={styles.setInfo}>
                       חזרות: {exercise.sets[currentSetNumber - 1].minReps}
                       <ConditionalRender condition={!!exercise.sets[currentSetNumber - 1].maxReps}>
@@ -328,7 +325,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
             spacing.pdHorizontalDefault,
           ]}
         >
-          <Button
+          {/* <Button
             mode="contained-tonal"
             onPress={() => navigation?.goBack()}
             style={[common.rounded, { width: `48%` }]}
@@ -337,7 +334,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route, navigation }) => {
           </Button>
           <Button mode="contained" onPress={handleSave} style={[common.rounded, { width: `48%` }]}>
             <Text style={[customStyles.text.textBold, colors.textOnBackground]}>שמור</Text>
-          </Button>
+          </Button> */}
         </View>
       </View>
     </>

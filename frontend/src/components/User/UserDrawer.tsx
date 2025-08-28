@@ -2,15 +2,13 @@ import useStyles from "@/styles/useGlobalStyles";
 import { View } from "react-native";
 import RightDrawer from "../ui/RightDrawer";
 import { Text } from "../ui/Text";
-import { Button } from "react-native-paper";
 import { useUserDrawer } from "@/store/userDrawerStore";
 import { useUserStore } from "@/store/userStore";
-import NativeIcon from "../Icon/NativeIcon";
 import UserDetailContainer from "./UserDetailContainer";
 import useLogout from "@/hooks/useLogout";
 
 const UserDrawer = () => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, fonts, layout, spacing, text } = useStyles();
   const { openUserDrawer, setOpenUserDrawer } = useUserDrawer();
   const { currentUser } = useUserStore();
   const { handleLogout } = useLogout();
@@ -52,7 +50,7 @@ const UserDrawer = () => {
             value={new Date(currentUser?.dateFinished || ``).toLocaleDateString()}
           />
           {/* <UserInfoContainer /> */}
-          <Button
+          {/* <Button
             mode="contained-tonal"
             style={common.rounded}
             textColor={colors.textOnBackground.color}
@@ -66,7 +64,7 @@ const UserDrawer = () => {
             )}
           >
             התנתק
-          </Button>
+          </Button> */}
         </View>
       }
     />
