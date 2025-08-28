@@ -40,7 +40,7 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
           useNativeDriver: true,
         }),
         Animated.timing(opacity, {
-          toValue: 0.6,
+          toValue: 0.5,
           duration: 700,
           easing: Easing.inOut(Easing.quad),
           useNativeDriver: true,
@@ -62,8 +62,12 @@ const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
       accessibilityRole="progressbar"
       // With Animated + Reanimated types, ensure width/height are Dimension, not generic string
       style={[
-        { width, height, opacity },
-        colors.background,
+        {
+          width,
+          height,
+          opacity,
+        },
+        colors.backgroundInverseSurface,
         common.rounded,
         computedRadius != null ? { borderRadius: computedRadius } : undefined,
         style,
