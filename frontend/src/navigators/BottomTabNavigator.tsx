@@ -1,11 +1,10 @@
-import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import { BottomStackParamList } from "@/types/navigatorTypes";
 import { Animated, StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import TopBar from "./TopBar";
-
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TimerDrawer from "@/components/ui/TimerDrawer";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import { useTimerStore } from "@/store/timerStore";
@@ -15,8 +14,8 @@ import Icon from "@/components/Icon/Icon";
 import { indicators } from "@/utils/navbar";
 import { useFadeIn } from "@/styles/useFadeIn";
 
-const Tab = createMaterialBottomTabNavigator<BottomStackParamList>();
-const HORIZONTAL_MARGIN = 10;
+const Tab = createBottomTabNavigator<BottomStackParamList>();
+const HORIZONTAL_MARGIN = 5;
 const TABS_COUNT = 5;
 const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "Home";
 
@@ -49,21 +48,32 @@ const BottomTabNavigator = () => {
     <Animated.View style={[layout.flex1, colors.background, layout.justifyEvenly, { opacity }]}>
       <TopBar />
       <Tab.Navigator
-        barStyle={[styles.navigationBar, spacing.mgHorizontalDefault, colors.backgroundSurface]}
         initialRouteName={INITIAL_ROUTE_NAME}
-        activeIndicatorStyle={{
-          backgroundColor: "",
+        sceneContainerStyle={{ paddingBottom: BOTTOM_BAR_HEIGHT + 100 }}
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: [
+            styles.navigationBar,
+            spacing.mgHorizontalSm,
+            colors.backgroundSurface,
+            {
+              position: "absolute",
+              left: HORIZONTAL_MARGIN,
+              right: HORIZONTAL_MARGIN,
+              bottom: BOTTOM_BAR_HEIGHT,
+            },
+          ],
+          tabBarActiveTintColor: colors.textPrimary.color,
+          tabBarInactiveTintColor: colors.textPrimary.color,
+          tabBarShowLabel: false,
+          tabBarHideOnKeyboard: true,
         }}
-        inactiveColor={colors.textPrimary.color}
-        activeColor={colors.textPrimary.color}
       >
-        {BottomScreenNavigatorTabs.map((tab) => {
+        {BottomScreenNavigatorTabs.map((tab, index) => {
           return (
             <Tab.Screen
               listeners={{
-                state: (e) => {
-                  setActiveIndex(e.data.state.index);
-                },
+                focus: () => setActiveIndex(index),
               }}
               key={tab.name}
               name={tab.name}
@@ -102,15 +112,14 @@ const styles = StyleSheet.create({
     bottom: BOTTOM_BAR_HEIGHT + 20,
     start: 20,
     height: 40,
+    zIndex: 10000,
   },
   navigationBar: {
     height: 80,
     alignItems: "center",
     marginTop: 10,
-    marginBottom: BOTTOM_BAR_HEIGHT,
     borderRadius: 60,
     overflow: "hidden",
-    zIndex: 9999,
   },
   shadowContainer: {
     position: "absolute",
