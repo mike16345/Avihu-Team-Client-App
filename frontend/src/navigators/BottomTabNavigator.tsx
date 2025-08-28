@@ -32,6 +32,11 @@ const BottomTabNavigator = () => {
 
   const indicatorAnim = useRef(new Animated.Value(0)).current;
 
+  const translateX = indicatorAnim.interpolate({
+    inputRange: [0, TABS_COUNT - 1],
+    outputRange: [0, (-indicatorWidth - 5) * (TABS_COUNT - 1)],
+  });
+
   useEffect(() => {
     Animated.spring(indicatorAnim, {
       toValue: activeIndex,
@@ -39,17 +44,12 @@ const BottomTabNavigator = () => {
     }).start();
   }, [activeIndex]);
 
-  const translateX = indicatorAnim.interpolate({
-    inputRange: [0, TABS_COUNT - 1],
-    outputRange: [0, (-indicatorWidth - 5) * (TABS_COUNT - 1)],
-  });
-
   return (
     <Animated.View style={[layout.flex1, colors.background, layout.justifyEvenly, { opacity }]}>
       <TopBar />
       <Tab.Navigator
         initialRouteName={INITIAL_ROUTE_NAME}
-        sceneContainerStyle={{ paddingBottom: BOTTOM_BAR_HEIGHT + 100 }}
+        sceneContainerStyle={[colors.background, { paddingBottom: BOTTOM_BAR_HEIGHT + 100 }]}
         screenOptions={{
           headerShown: false,
           tabBarStyle: [
@@ -63,6 +63,7 @@ const BottomTabNavigator = () => {
               bottom: BOTTOM_BAR_HEIGHT,
             },
           ],
+
           tabBarActiveTintColor: colors.textPrimary.color,
           tabBarInactiveTintColor: colors.textPrimary.color,
           tabBarShowLabel: false,
