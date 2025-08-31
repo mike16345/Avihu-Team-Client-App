@@ -17,6 +17,7 @@ import { useFadeIn } from "@/styles/useFadeIn";
 const Tab = createBottomTabNavigator<BottomStackParamList>();
 const HORIZONTAL_MARGIN = 5;
 const TABS_COUNT = 5;
+const TAB_BAR_HEIGHT = 80;
 const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "Home";
 
 const BottomTabNavigator = () => {
@@ -63,7 +64,7 @@ const BottomTabNavigator = () => {
               bottom: BOTTOM_BAR_HEIGHT,
             },
           ],
-
+          tabBarItemStyle: { height: TAB_BAR_HEIGHT },
           tabBarActiveTintColor: colors.textPrimary.color,
           tabBarInactiveTintColor: colors.textPrimary.color,
           tabBarShowLabel: false,
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     zIndex: 10000,
   },
   navigationBar: {
-    height: 80,
+    height: TAB_BAR_HEIGHT,
     alignItems: "center",
     marginTop: 10,
     borderRadius: 60,
