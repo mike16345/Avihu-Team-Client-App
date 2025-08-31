@@ -6,7 +6,7 @@ export type RootStackParamList = {
   SuccessScreen: { title: string; message: string };
   LoginScreen: undefined;
   BottomTabs: undefined;
-  Profile: { navigatedFrom: string };
+  Profile: undefined;
 };
 
 export type BottomStackParamList = {

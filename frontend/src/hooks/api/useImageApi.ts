@@ -26,7 +26,7 @@ export const useImageApi = () => {
 
     const photoId = "images/" + photoUrl;
 
-    return await deleteItem(S3_IMAGES_ENDPOINT, undefined, { photoId });
+    return await deleteItem(S3_IMAGES_ENDPOINT, undefined, undefined, { photoId });
   };
 
   const uploadImageToS3 = async (fileUri: string, presignedUrl: string) => {

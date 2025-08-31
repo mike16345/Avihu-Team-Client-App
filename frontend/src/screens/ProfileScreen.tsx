@@ -3,16 +3,21 @@ import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import useLogout from "@/hooks/useLogout";
 import { Text } from "@/components/ui/Text";
-import { RootStackParamList, StackNavigatorProps } from "@/types/navigatorTypes";
+import {
+  RootStackParamList,
+  RootStackParamListNavigationProp,
+  StackNavigatorProps,
+} from "@/types/navigatorTypes";
 import ProfileHeading from "@/components/User/ProfileHeading";
 import UserDetailsWrapper from "@/components/User/UserDetailsWrapper";
 import { ScrollView } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-export type ProfileScreenProps = StackNavigatorProps<RootStackParamList, "Profile">;
-
-const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
+const ProfileScreen = () => {
   const { layout, spacing } = useStyles();
   const { handleLogout } = useLogout();
+
+  const navigation = useNavigation<RootStackParamListNavigationProp>();
 
   const onLogOut = async () => {
     await handleLogout();
@@ -24,10 +29,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ route, navigation }) => {
       style={[spacing.pdBottomBar, spacing.pdStatusBar]}
       contentContainerStyle={[layout.flex1, spacing.gapXl, spacing.pdLg]}
     >
-      <ProfileHeading navigation={navigation} route={route} />
-
+      <ProfileHeading />
       <UserDetailsWrapper />
-
       <PrimaryButton block mode="light" onPress={onLogOut}>
         <Text fontVariant="bold">התנתק</Text>
       </PrimaryButton>

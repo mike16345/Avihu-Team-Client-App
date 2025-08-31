@@ -57,8 +57,8 @@ export async function patchItem<T>(endpoint: string, params?: any, headers?: any
 export async function deleteItem<T>(
   endpoint: string,
   params?: any,
-  data?: any,
-  headers?: any
+  headers?: any,
+  data?: any
 ): Promise<T> {
   return request<T>("delete", `${endpoint}`, data, params, headers);
 }

@@ -6,26 +6,28 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import Icon from "../Icon/Icon";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { useUserStore } from "@/store/userStore";
-import { ProfileScreenProps } from "@/screens/ProfileScreen";
 import UploadDrawer from "../ui/UploadDrawer";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useToast } from "@/hooks/useToast";
 import { buildPhotoUrl } from "@/utils/utils";
+import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
+import { useNavigation } from "@react-navigation/native";
 
 const ICON_SIZE = 30;
-const HALF_OF_ICON_SIZE = 15;
+const HALF_OF_ICON_SIZE = ICON_SIZE / 2;
 
-const ProfileHeading: React.FC<ProfileScreenProps> = ({ navigation, route }) => {
+const ProfileHeading = () => {
   const { colors, common, layout } = useStyles();
   const { currentUser } = useUserStore();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const { updateProfilePhoto } = useUserApi();
   const { triggerErrorToast } = useToast();
+  const navigation = useNavigation<RootStackParamListNavigationProp>();
 
   const [profileHeight, setProfileHeight] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -64,9 +66,7 @@ const ProfileHeading: React.FC<ProfileScreenProps> = ({ navigation, route }) => 
   return (
     <View style={[layout.flex1, layout.center, { position: "relative" }]}>
       <TouchableOpacity
-        onPress={() =>
-          navigation?.navigate("BottomTabs", { screen: route?.params.navigatedFrom || "" })
-        }
+        onPress={() => navigation?.navigate("BottomTabs", { screen: "Home" })}
         style={styles.backButton}
       >
         <Icon name="chevronRightBig" />
@@ -74,9 +74,8 @@ const ProfileHeading: React.FC<ProfileScreenProps> = ({ navigation, route }) => 
       <View
         style={[
           colors.backgroundSurface,
-          layout.flex1,
           common.roundedMd,
-          { width: width * 0.4, position: "relative" },
+          { width: width * 0.4, height: height * 0.2, position: "relative" },
         ]}
         onLayout={handleLayoutChange}
       >
