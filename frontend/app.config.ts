@@ -35,6 +35,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           enableBackgroundRemoteNotifications: false,
         },
       ],
+      [
+        "expo-build-properties",
+        {
+          android: { compileSdkVersion: 35, targetSdkVersion: 35 },
+          ios: { deploymentTarget: "15.1" },
+        },
+      ],
     ],
     ios: {
       bundleIdentifier: isDev ? "com.avihuteam.test" : "com.avihuteam.avihuteam",
@@ -74,7 +81,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       enabled: true,
       url: "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2",
     },
-    sdkVersion: "52.0.0",
+    sdkVersion: "53.0.0",
     platforms: ["ios", "android"],
   };
 };
