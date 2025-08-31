@@ -5,10 +5,10 @@ import { useSpacingStyles } from "@/styles/useSpacingStyles";
 
 const UserDetailsWrapper = () => {
   const { currentUser } = useUserStore();
-  const { gapLg } = useSpacingStyles();
+  const { gapMd } = useSpacingStyles();
 
   return (
-    <View style={gapLg}>
+    <View style={gapMd}>
       <UserDetailContainer
         label="שם מלא"
         value={`${currentUser?.firstName} ${currentUser?.lastName}`}

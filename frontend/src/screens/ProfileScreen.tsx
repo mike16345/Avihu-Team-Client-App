@@ -1,16 +1,11 @@
-import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import useLogout from "@/hooks/useLogout";
 import { Text } from "@/components/ui/Text";
-import {
-  RootStackParamList,
-  RootStackParamListNavigationProp,
-  StackNavigatorProps,
-} from "@/types/navigatorTypes";
+import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 import ProfileHeading from "@/components/User/ProfileHeading";
 import UserDetailsWrapper from "@/components/User/UserDetailsWrapper";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 const ProfileScreen = () => {
@@ -25,16 +20,17 @@ const ProfileScreen = () => {
   };
 
   return (
-    <ScrollView
-      style={[spacing.pdBottomBar, spacing.pdStatusBar]}
-      contentContainerStyle={[layout.flex1, spacing.gapXl, spacing.pdLg]}
-    >
-      <ProfileHeading />
-      <UserDetailsWrapper />
-      <PrimaryButton block mode="light" onPress={onLogOut}>
-        <Text fontVariant="bold">התנתק</Text>
-      </PrimaryButton>
-    </ScrollView>
+    <View style={[layout.flex1, { paddingTop: 48 }, spacing.pdBottomBar, spacing.pdHorizontalLg]}>
+      <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
+        <View style={[{ marginBottom: 30 }]}>
+          <ProfileHeading />
+        </View>
+        <UserDetailsWrapper />
+        <PrimaryButton style={[{ marginTop: 20 }]} block mode="light" onPress={onLogOut}>
+          <Text fontVariant="bold">התנתק</Text>
+        </PrimaryButton>
+      </ScrollView>
+    </View>
   );
 };
 

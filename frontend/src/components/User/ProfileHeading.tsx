@@ -1,11 +1,4 @@
-import {
-  Image,
-  LayoutChangeEvent,
-  StyleSheet,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Image, LayoutChangeEvent, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useMemo, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import Icon from "../Icon/Icon";
@@ -24,7 +17,6 @@ const HALF_OF_ICON_SIZE = ICON_SIZE / 2;
 const ProfileHeading = () => {
   const { colors, common, layout } = useStyles();
   const { currentUser } = useUserStore();
-  const { width, height } = useWindowDimensions();
   const { updateProfilePhoto } = useUserApi();
   const { triggerErrorToast } = useToast();
   const navigation = useNavigation<RootStackParamListNavigationProp>();
@@ -64,7 +56,7 @@ const ProfileHeading = () => {
   };
 
   return (
-    <View style={[layout.flex1, layout.center, { position: "relative" }]}>
+    <View style={[layout.center, { position: "relative" }]}>
       <TouchableOpacity
         onPress={() => navigation?.navigate("BottomTabs", { screen: "Home" })}
         style={styles.backButton}
@@ -75,14 +67,15 @@ const ProfileHeading = () => {
         style={[
           colors.backgroundSurface,
           common.roundedMd,
-          { width: width * 0.4, height: height * 0.2, position: "relative" },
+          { width: 150, height: 150, position: "relative" },
         ]}
         onLayout={handleLayoutChange}
       >
         <ConditionalRender condition={currentUser?.profileImage}>
           <Image
-            src={buildPhotoUrl(currentUser?.profileImage || "")}
+            source={{ uri: buildPhotoUrl(currentUser?.profileImage || "") }}
             style={[layout.sizeFull, common.roundedMd]}
+            resizeMode="cover"
           />
         </ConditionalRender>
 
