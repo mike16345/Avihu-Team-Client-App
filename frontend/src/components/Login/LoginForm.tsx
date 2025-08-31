@@ -84,6 +84,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
   return (
     <Animated.View style={[spacing.gap20, { opacity }]}>
       <Input
+        keyboardType="email-address"
         label="אימייל"
         placeholder="הכנס אימייל"
         error={formErrors.email}
