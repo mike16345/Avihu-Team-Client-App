@@ -3,7 +3,7 @@ import { Animated, StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
-import TopBar from "./TopBar";
+
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TimerDrawer from "@/components/ui/TimerDrawer";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
@@ -33,6 +33,10 @@ const BottomTabNavigator = () => {
 
   const indicatorAnim = useRef(new Animated.Value(0)).current;
 
+  const isHomeScreen = BottomScreenNavigatorTabs[activeIndex].name == "Home";
+  const lastIndex = BottomScreenNavigatorTabs.length - 1;
+  const activeIndicatorStartOffset = activeIndex == 0 ? 20 : activeIndex == lastIndex ? 0 : 10;
+
   const translateX = indicatorAnim.interpolate({
     inputRange: [0, TABS_COUNT - 1],
     outputRange: [0, (-indicatorWidth - 5) * (TABS_COUNT - 1)],
@@ -46,10 +50,13 @@ const BottomTabNavigator = () => {
   }, [activeIndex]);
 
   return (
-    <Animated.View style={[layout.flex1, colors.background, layout.justifyEvenly, { opacity }]}>
+    <Animated.View style={[layout.flex1, colors.background, { opacity }]}>
       <Tab.Navigator
         initialRouteName={INITIAL_ROUTE_NAME}
-        sceneContainerStyle={[colors.background, { paddingBottom: BOTTOM_BAR_HEIGHT + 100 }]}
+        sceneContainerStyle={[
+          colors.background,
+          { paddingBottom: BOTTOM_BAR_HEIGHT + 85, paddingTop: isHomeScreen ? 36 : 36 },
+        ]}
         screenOptions={{
           headerShown: false,
           tabBarStyle: [
@@ -87,11 +94,12 @@ const BottomTabNavigator = () => {
       <Animated.View
         style={[
           styles.activeIndicator,
+          { start: activeIndicatorStartOffset },
           colors.backgroundPrimary,
           layout.flexRow,
           layout.itemsCenter,
           spacing.pdSm,
-          spacing.gapSm,
+          spacing.gapXs,
           common.roundedFull,
           { transform: [{ translateX }] },
         ]}
@@ -111,7 +119,6 @@ const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
     bottom: BOTTOM_BAR_HEIGHT + 20,
-    start: 20,
     height: 40,
     zIndex: 10000,
   },
