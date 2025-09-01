@@ -13,6 +13,7 @@ import queryClient from "@/QueryClient/queryClient";
 import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
 import ToastContainer from "@/components/ui/toast/ToastContainer";
 import useCustomFonts from "@/hooks/useCustomFonts";
+import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function App() {
   const ready = useOneTimeRTLFix();
