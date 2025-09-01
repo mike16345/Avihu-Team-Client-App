@@ -16,6 +16,8 @@ import { useToast } from "@/hooks/useToast";
 import { IUser } from "@/interfaces/User";
 import PasswordInput from "../ui/inputs/PasswordInput";
 import { useFadeIn } from "@/styles/useFadeIn";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 
 interface LoginFormProps {
   onLoginSuccess: (user: IUser) => void;
@@ -28,6 +30,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
   const { loginUser } = useUserApi();
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
   const { setItem } = useAsyncStorage(SESSION_TOKEN_KEY);
+  const navigation = useNavigation<RootStackParamListNavigationProp>();
 
   const opacity = useFadeIn();
   const [inputtedCrendentials, setInputtedCredentials] = useState<IUserCredentials>({
@@ -74,6 +77,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
         onLoginSuccess(res.data.data.user);
         setCurrentUser(res?.data.data.user);
         setItem(JSON.stringify(res.data));
+        navigation.navigate("BottomTabs"); //crucial so user does not end up back in profile screen on log in
       })
       .catch((err) => {
         triggerErrorToast({ message: err.response.data.message });

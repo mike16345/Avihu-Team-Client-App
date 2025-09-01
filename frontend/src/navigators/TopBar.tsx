@@ -1,34 +1,37 @@
 import { View, useWindowDimensions } from "react-native";
-
 import useStyles from "@/styles/useGlobalStyles";
-import NativeIcon from "@/components/Icon/NativeIcon";
-import { useUserDrawer } from "@/store/userDrawerStore";
+import { useUserStore } from "@/store/userStore";
+import { Text } from "@/components/ui/Text";
+import Avatar from "@/components/User/Avatar";
+import NotificationsWrapper from "@/components/notifications/NotificationsWrapper";
 
 export default function TopBar() {
-  const { colors, layout, spacing } = useStyles();
+  const { colors, layout, spacing, fonts } = useStyles();
   const { height } = useWindowDimensions();
-  const { setOpenUserDrawer } = useUserDrawer();
+  const { currentUser } = useUserStore();
 
   return (
     <View
       style={[
-        { paddingTop: spacing.pdStatusBar.paddingTop! + 5 },
-        layout.itemsEnd,
-        spacing.pdHorizontalDefault,
+        layout.itemsCenter,
+        layout.justifyBetween,
+        layout.flexRow,
+        spacing.pdHorizontalLg,
         {
-          height: height * 0.1,
+          height: height * 0.12,
           borderBottomWidth: 0.25,
-          borderBottomColor: colors.borderSecondaryContainer.borderColor,
+          borderBottomColor: colors.borderBackground.borderColor,
+          paddingTop: spacing.pdStatusBar.paddingTop! + 5,
         },
       ]}
     >
-      <NativeIcon
-        library="Feather"
-        name="user"
-        color={colors.textOnBackground.color}
-        size={30}
-        onPress={() => setOpenUserDrawer(true)}
-      />
+      <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
+        <Avatar />
+
+        <Text style={fonts.lg}>ברוך הבא {currentUser?.firstName}</Text>
+      </View>
+
+      <NotificationsWrapper />
     </View>
   );
 }

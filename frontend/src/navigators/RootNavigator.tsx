@@ -16,6 +16,7 @@ import SplashScreen from "@/screens/SplashScreen";
 import SuccessScreen from "@/screens/SuccessScreen";
 import { RootStackParamList } from "@/types/navigatorTypes";
 import { useToast } from "@/hooks/useToast";
+import ProfileScreen from "@/screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -104,6 +105,11 @@ const RootNavigator = () => {
         )}
 
         <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
+        <Stack.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{ animation: "slide_from_left" }}
+        />
       </Stack.Navigator>
     </>
   );

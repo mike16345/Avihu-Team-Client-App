@@ -1,7 +1,7 @@
 import React from "react";
-import { View } from "react-native";
 import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
+import { Card } from "../ui/Card";
 
 interface UserDetailContainerProps {
   label: string;
@@ -9,19 +9,20 @@ interface UserDetailContainerProps {
 }
 
 const UserDetailContainer: React.FC<UserDetailContainerProps> = ({ label, value }) => {
-  const { colors, spacing, text, fonts } = useStyles();
-  
+  const { text, common } = useStyles();
+
   return (
-    <View style={[spacing.pdSm, spacing.gapDefault]}>
-      <Text style={[text.textRight, text.textBold, colors.textOnBackground]}>{label}</Text>
-      {/* <TextInput
-        mode="outlined"
-        value={value}
-        editable={false}
-        style={[text.textCenter, colors.backdrop, fonts.md]}
-        outlineColor={colors.backdrop.backgroundColor}
-      /> */}
-    </View>
+    <Card variant="gray" style={common.roundedMd}>
+      <Card.Header>
+        <Text style={text.textCenter}>{label}</Text>
+      </Card.Header>
+
+      <Card.Content>
+        <Text fontVariant="bold" style={text.textCenter}>
+          {value}
+        </Text>
+      </Card.Content>
+    </Card>
   );
 };
 

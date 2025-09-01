@@ -2,13 +2,11 @@ import "react-native-reanimated";
 import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
-import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider } from "@/themes/useAppTheme";
 import { Appearance, View } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import UserDrawer from "@/components/User/UserDrawer";
 import Update from "@/hooks/useUpdates";
 import persister from "@/QueryClient/queryPersister";
 import queryClient from "@/QueryClient/queryClient";
@@ -36,7 +34,6 @@ export default function App() {
                 <RootNavigator />
                 <StatusBar key={colorScheme} translucent style={"dark"} />
                 <ToastContainer />
-                <UserDrawer />
                 <Update />
               </NavigationContainer>
             </PersistQueryClientProvider>

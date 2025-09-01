@@ -47,7 +47,6 @@ const BottomTabNavigator = () => {
 
   return (
     <Animated.View style={[layout.flex1, colors.background, layout.justifyEvenly, { opacity }]}>
-      <TopBar />
       <Tab.Navigator
         initialRouteName={INITIAL_ROUTE_NAME}
         sceneContainerStyle={[colors.background, { paddingBottom: BOTTOM_BAR_HEIGHT + 100 }]}

@@ -2,22 +2,17 @@ import useStyles from "@/styles/useGlobalStyles";
 import React, { useState } from "react";
 import { View } from "react-native";
 import DisplayImage from "./DisplayImage";
-import { useWeighInPhotosApi } from "@/hooks/api/useWeighInPhotosApi";
-import { useUserStore } from "@/store/userStore";
 import { Text } from "../ui/Text";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import SelectUploadType from "./SelectUploadType";
-import { useToast } from "@/hooks/useToast";
+import { UploadDrawerProps } from "../ui/UploadDrawer";
 
-interface ImagePreviewProps {
-  handleClose: () => void;
-}
-
-const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
+const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
+  handleUpload,
+  loading,
+  imageCap = 2,
+}) => {
   const { spacing, text, layout } = useStyles();
-  const { handleUpload, uploading } = useWeighInPhotosApi();
-  const { triggerSuccessToast } = useToast();
-  const currentUserId = useUserStore((state) => state.currentUser?._id);
 
   const [images, setImages] = useState<string[]>([]);
   const addImage = (image: string) => {
@@ -25,7 +20,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
 
     newImagesArr.push(image);
 
-    setImages(newImagesArr.slice(-2));
+    setImages(newImagesArr.slice(-imageCap));
   };
 
   const deleteImageByIndex = (index: number) => {
@@ -35,17 +30,11 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
   };
 
   const uploadImage = async () => {
-    for (let i = 0; i < 2; i++) {
-      await handleUpload(images[i], currentUserId || ``, `${i + 1}`);
-    }
-
-    triggerSuccessToast({ title: "הועלה בהצלחה", message: "המאמן קיבל את התמונות" });
-
-    handleClose();
+    handleUpload(images);
   };
 
   return (
-    <View style={[spacing.gapSm, spacing.pdSm, layout.flex1]}>
+    <View style={[spacing.gapMd, spacing.pdSm, layout.flex1]}>
       <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונה</Text>
 
       <SelectUploadType returnImage={(image: string) => addImage(image)} />
@@ -60,7 +49,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ handleClose }) => {
           block
           disabled={images.length == 0}
           onPress={uploadImage}
-          loading={uploading}
+          loading={loading}
         />
       </View>
     </View>
