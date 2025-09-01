@@ -7,7 +7,7 @@ const MyDietPlanScreen = () => {
   const { spacing } = useStyles();
 
   return (
-    <View style={[spacing.pdMd, spacing.gapLg]}>
+    <View style={[spacing.pdMd, spacing.gapLg, spacing.pdStatusBar]}>
       <DietPlanScreenHeader />
       <DietPlanContentTabs />
     </View>

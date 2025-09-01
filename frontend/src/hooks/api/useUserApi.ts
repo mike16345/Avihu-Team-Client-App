@@ -1,13 +1,15 @@
-import { fetchData, patchItem, sendData, updateItem } from "@/API/api";
+import { fetchData, sendData, updateItem } from "@/API/api";
 import { ISession } from "@/interfaces/ISession";
 import { IUser } from "@/interfaces/User";
 import { useUserStore } from "@/store/userStore";
 import { ApiResponse } from "@/types/ApiTypes";
+import { useImageApi } from "./useImageApi";
 
 const USER_ENDPOINT = "users";
 
 export const useUserApi = () => {
-  const { setCurrentUser } = useUserStore();
+  const { setCurrentUser, currentUser } = useUserStore();
+  const { handleDeletePhoto, handleUploadImageToS3 } = useImageApi();
 
   const getUserById = (id: string) => {
     return fetchData<ApiResponse<IUser>>(USER_ENDPOINT + `/one`, { userId: id }).then(
@@ -24,6 +26,30 @@ export const useUserApi = () => {
       fieldName,
       value,
     }).then((res) => setCurrentUser(res.data));
+  };
+
+  const updateProfilePhoto = async (fileUri: string) => {
+    if (!currentUser) return;
+
+    const userId = currentUser._id;
+    const hasExistingPhoto = !!currentUser.profileImage;
+
+    try {
+      if (hasExistingPhoto) {
+        await handleDeletePhoto(currentUser?.profileImage);
+      }
+
+      const { urlToStore } = await handleUploadImageToS3(
+        fileUri,
+        userId,
+        "user-profile" + Math.random()
+      );
+
+      await updateUserField(userId, "profileImage", urlToStore);
+    } catch (error) {
+      console.error("error here", error);
+      throw error;
+    }
   };
 
   const checkEmailAccess = (email: string) => {
@@ -62,5 +88,6 @@ export const useUserApi = () => {
     loginUser,
     updateUserField,
     submitLead,
+    updateProfilePhoto,
   };
 };

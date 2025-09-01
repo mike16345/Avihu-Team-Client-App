@@ -18,7 +18,7 @@ const Icon: React.FC<IconProps> = ({
   variant = "outline",
   rotation,
 }) => {
-  const SvgIcon = icons[name];
+  const SvgIcon = icons[name as IconName];
 
   if (!SvgIcon) return null;
 

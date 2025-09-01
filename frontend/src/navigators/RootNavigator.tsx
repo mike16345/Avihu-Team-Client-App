@@ -16,6 +16,7 @@ import useUserQuery from "@/hooks/queries/useUserQuery";
 import SplashScreen from "@/screens/SplashScreen";
 import SuccessScreen from "@/screens/SuccessScreen";
 import { RootStackParamList } from "@/types/navigatorTypes";
+import ProfileScreen from "@/screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -103,6 +104,11 @@ const RootNavigator = () => {
         )}
 
         <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
+        <Stack.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{ animation: "slide_from_left" }}
+        />
       </Stack.Navigator>
     </>
   );
