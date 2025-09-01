@@ -16,8 +16,8 @@ import { useFadeIn } from "@/styles/useFadeIn";
 
 const Tab = createBottomTabNavigator<BottomStackParamList>();
 const HORIZONTAL_MARGIN = 5;
-const TABS_COUNT = 5;
-const TAB_BAR_HEIGHT = 80;
+const TABS_COUNT = BottomScreenNavigatorTabs.length;
+const TAB_BAR_HEIGHT = 70;
 const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "Home";
 
 const BottomTabNavigator = () => {
@@ -118,20 +118,19 @@ const BottomTabNavigator = () => {
 const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
-    bottom: BOTTOM_BAR_HEIGHT + 20,
+    bottom: BOTTOM_BAR_HEIGHT + 15,
     height: 40,
     zIndex: 10000,
   },
   navigationBar: {
     height: TAB_BAR_HEIGHT,
     alignItems: "center",
-    marginTop: 10,
-    borderRadius: 60,
+    borderRadius: 100,
     overflow: "hidden",
   },
   shadowContainer: {
     position: "absolute",
-    borderRadius: 60,
+    borderRadius: 100,
     bottom: BOTTOM_BAR_HEIGHT,
     height: 85,
     alignSelf: "center",
