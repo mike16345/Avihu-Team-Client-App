@@ -1,9 +1,8 @@
 import { StyleProp, View, ViewProps, ViewStyle } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import { PropsWithChildren } from "react";
 
 export type CardVariants = "gray" | "white" | "success";
-interface CardProps extends PropsWithChildren {
+interface CardProps extends ViewProps {
   variant?: CardVariants;
   style?: StyleProp<ViewStyle>;
 }
@@ -15,7 +14,7 @@ interface CompoundCard extends React.FC<CardProps> {
   Footer: React.FC<CardSubComponentProps>;
 }
 
-export const Card: CompoundCard = ({ children, variant = "white", style }) => {
+export const Card: CompoundCard = ({ children, variant = "white", style, ...props }) => {
   const { colors, common, spacing, fonts } = useStyles();
 
   spacing.pdDefault.padding;
@@ -37,6 +36,7 @@ export const Card: CompoundCard = ({ children, variant = "white", style }) => {
         spacing.gapDefault,
         style,
       ]}
+      {...props}
     >
       {children}
     </View>
