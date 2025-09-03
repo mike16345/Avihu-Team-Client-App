@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { View, Image, TouchableOpacity } from "react-native";
-import ImageViewing from "react-native-image-viewing";
 
 const BlogImage = ({ imageUrl }: { imageUrl: string }) => {
   const [isViewerVisible, setIsViewerVisible] = useState(false);

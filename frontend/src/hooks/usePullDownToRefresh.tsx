@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const usePullDownToRefresh = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);

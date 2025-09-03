@@ -10,7 +10,7 @@ interface SelectUploadTypeProps {
 }
 
 const imagePickerOptions: ImagePicker.ImagePickerOptions = {
-  mediaTypes: ImagePicker.MediaTypeOptions.Images,
+  mediaTypes: "images",
   allowsEditing: true,
   cameraType: ImagePicker.CameraType.back,
   quality: 1,
@@ -19,7 +19,7 @@ const imagePickerOptions: ImagePicker.ImagePickerOptions = {
 const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
   const { layout, spacing } = useStyles();
 
-  const [status, requestPermission] = ImagePicker.useCameraPermissions();
+  const [_, requestPermission] = ImagePicker.useCameraPermissions();
 
   const checkPermissions = async (
     getPermissions: () => Promise<

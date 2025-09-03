@@ -1,11 +1,10 @@
-import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import { BottomStackParamList } from "@/types/navigatorTypes";
 import { Animated, Keyboard, StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
-import TopBar from "./TopBar";
 
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TimerDrawer from "@/components/ui/TimerDrawer";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import { useTimerStore } from "@/store/timerStore";
@@ -15,9 +14,10 @@ import Icon from "@/components/Icon/Icon";
 import { indicators } from "@/utils/navbar";
 import { useFadeIn } from "@/styles/useFadeIn";
 
-const Tab = createMaterialBottomTabNavigator<BottomStackParamList>();
-const HORIZONTAL_MARGIN = 10;
-const TABS_COUNT = 5;
+const Tab = createBottomTabNavigator<BottomStackParamList>();
+const HORIZONTAL_MARGIN = 5;
+const TABS_COUNT = BottomScreenNavigatorTabs.length;
+const TAB_BAR_HEIGHT = 70;
 const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "Home";
 
 const BottomTabNavigator = () => {
@@ -34,18 +34,21 @@ const BottomTabNavigator = () => {
 
   const indicatorAnim = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    Animated.spring(indicatorAnim, {
-      toValue: activeIndex,
-      useNativeDriver: true,
-    }).start();
-  }, [activeIndex]);
+  const isHomeScreen = BottomScreenNavigatorTabs[activeIndex].name == "Home";
+  const lastIndex = BottomScreenNavigatorTabs.length - 1;
+  const activeIndicatorStartOffset = activeIndex == 0 ? 20 : activeIndex == lastIndex ? 0 : 10;
 
   const translateX = indicatorAnim.interpolate({
     inputRange: [0, TABS_COUNT - 1],
     outputRange: [0, (-indicatorWidth - 5) * (TABS_COUNT - 1)],
   });
 
+  useEffect(() => {
+    Animated.spring(indicatorAnim, {
+      toValue: activeIndex,
+      useNativeDriver: true,
+    }).start();
+  }, [activeIndex]);
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
     const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
@@ -55,26 +58,39 @@ const BottomTabNavigator = () => {
       hideSub.remove();
     };
   }, []);
-
   return (
-    <Animated.View style={[layout.flex1, colors.background, layout.justifyEvenly, { opacity }]}>
-      <TopBar />
+    <Animated.View style={[layout.flex1, colors.background, { opacity }]}>
       <Tab.Navigator
-        barStyle={[styles.navigationBar, spacing.mgHorizontalDefault, colors.backgroundSurface]}
         initialRouteName={INITIAL_ROUTE_NAME}
-        activeIndicatorStyle={{
-          backgroundColor: "",
+        sceneContainerStyle={[
+          colors.background,
+          { paddingBottom: BOTTOM_BAR_HEIGHT + 85, paddingTop: isHomeScreen ? 36 : 36 },
+        ]}
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: [
+            styles.navigationBar,
+            spacing.mgHorizontalSm,
+            colors.backgroundSurface,
+            {
+              position: "absolute",
+              left: HORIZONTAL_MARGIN,
+              right: HORIZONTAL_MARGIN,
+              bottom: BOTTOM_BAR_HEIGHT,
+            },
+          ],
+          tabBarItemStyle: { height: TAB_BAR_HEIGHT },
+          tabBarActiveTintColor: colors.textPrimary.color,
+          tabBarInactiveTintColor: colors.textPrimary.color,
+          tabBarShowLabel: false,
+          tabBarHideOnKeyboard: true,
         }}
-        inactiveColor={colors.textPrimary.color}
-        activeColor={colors.textPrimary.color}
       >
-        {BottomScreenNavigatorTabs.map((tab) => {
+        {BottomScreenNavigatorTabs.map((tab, index) => {
           return (
             <Tab.Screen
               listeners={{
-                state: (e) => {
-                  setActiveIndex(e.data.state.index);
-                },
+                focus: () => setActiveIndex(index),
               }}
               key={tab.name}
               name={tab.name}
@@ -87,11 +103,12 @@ const BottomTabNavigator = () => {
       <Animated.View
         style={[
           styles.activeIndicator,
+          { start: activeIndicatorStartOffset },
           colors.backgroundPrimary,
           layout.flexRow,
           layout.itemsCenter,
           spacing.pdSm,
-          spacing.gapSm,
+          spacing.gapXs,
           common.roundedFull,
           { transform: [{ translateX }], display: keyboardVisible ? "none" : "flex" },
         ]}
@@ -111,22 +128,19 @@ const BottomTabNavigator = () => {
 const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
-    bottom: BOTTOM_BAR_HEIGHT + 20,
-    start: 20,
+    bottom: BOTTOM_BAR_HEIGHT + 15,
     height: 40,
+    zIndex: 10000,
   },
   navigationBar: {
-    height: 80,
+    height: TAB_BAR_HEIGHT,
     alignItems: "center",
-    marginTop: 10,
-    marginBottom: BOTTOM_BAR_HEIGHT,
-    borderRadius: 60,
+    borderRadius: 100,
     overflow: "hidden",
-    zIndex: 9999,
   },
   shadowContainer: {
     position: "absolute",
-    borderRadius: 60,
+    borderRadius: 100,
     bottom: BOTTOM_BAR_HEIGHT,
     height: 85,
     alignSelf: "center",

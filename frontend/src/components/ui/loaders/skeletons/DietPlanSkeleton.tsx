@@ -1,6 +1,4 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { Skeleton } from "@rneui/base";
-import React from "react";
 import { View, Dimensions } from "react-native";
 import SkeletonLoader from "./SkeletonLoader";
 

@@ -35,6 +35,7 @@ import twinkle from "@assets/icons/twinkle.svg";
 import upload from "@assets/icons/upload.svg";
 import send from "@assets/icons/send.svg";
 import check from "@assets/icons/check.svg";
+import edit from "@assets/icons/edit.svg";
 import pencil from "@assets/icons/pencil.svg";
 import trash from "@assets/icons/trash.svg";
 
@@ -78,6 +79,7 @@ const icons = {
   check,
   pencil,
   trash,
+  edit,
 } as const;
 
 export type IconName = keyof typeof icons;

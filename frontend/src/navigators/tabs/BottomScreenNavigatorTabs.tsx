@@ -4,6 +4,10 @@ import WorkoutPlanStack from "../WorkoutPlanStack";
 import BlogScreen from "@/screens/BlogScreen";
 import Icon from "@/components/Icon/Icon";
 import HomeScreen from "@/screens/HomeScreen";
+import Sandbox from "@/screens/Sandbox";
+
+const ICON_HEIGHT = 24;
+const ICON_WIDTH = 24;
 
 const BottomScreenNavigatorTabs: NavigatorTab[] = [
   {
@@ -12,15 +16,19 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     options: {
       tabBarLabel: "",
       tabBarAccessibilityLabel: "אימונים",
-      tabBarIcon: ({ color }) => <Icon color={color} name="dumbbell" height={45} />,
+      tabBarIcon: ({ color }) => (
+        <Icon color={color} name="dumbbell" height={ICON_HEIGHT} width={ICON_WIDTH} />
+      ),
     },
   },
   {
     name: "Chat",
-    component: BlogScreen,
+    component: Sandbox,
     options: {
       tabBarLabel: "",
-      tabBarIcon: ({ color }) => <Icon color={color} name="chat" height={45} />,
+      tabBarIcon: ({ color }) => (
+        <Icon color={color} name="chat" height={ICON_HEIGHT} width={ICON_WIDTH} />
+      ),
     },
   },
   {
@@ -28,7 +36,9 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     component: HomeScreen,
     options: {
       tabBarLabel: "",
-      tabBarIcon: ({ color }: { color: string }) => <Icon color={color} name="home" height={45} />,
+      tabBarIcon: ({ color }: { color: string }) => (
+        <Icon color={color} name="home" height={ICON_HEIGHT} width={ICON_WIDTH} />
+      ),
     },
   },
   {
@@ -37,7 +47,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     options: {
       tabBarLabel: "",
       tabBarIcon: ({ color }: { color: string }) => (
-        <Icon color={color} name="chefHat" height={45} />
+        <Icon color={color} name="chefHat" height={ICON_HEIGHT} width={ICON_WIDTH} />
       ),
     },
   },
@@ -47,7 +57,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     options: {
       tabBarLabel: "",
       tabBarIcon: ({ color }: { color: string }) => (
-        <Icon color={color} name="sideBar" height={45} />
+        <Icon color={color} name="sideBar" height={ICON_HEIGHT} width={ICON_WIDTH} />
       ),
     },
   },

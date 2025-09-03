@@ -33,11 +33,16 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
         },
       ]}
     >
-      <Card variant="gray">
+      <Card
+        style={[common.rounded, spacing.pdHorizontalMd, spacing.pdVerticalDefault]}
+        variant="gray"
+      >
         <View style={[layout.flexRow, layout.justifyBetween]}>
-          <View style={[spacing.gapXl]}>
+          <View style={[layout.justifyBetween]}>
             <Text>{exerciseId.name}</Text>
-            <Text fontVariant="bold">{exerciseCounter}</Text>
+            <View style={[layout.flexRow]}>
+              <Text fontVariant="semibold">{exerciseCounter}</Text>
+            </View>
           </View>
 
           <Image

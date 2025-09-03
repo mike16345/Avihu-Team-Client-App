@@ -1,12 +1,14 @@
-import { useUserStore } from "@/store/userStore";
 import { View } from "react-native";
 import UserDetailContainer from "./UserDetailContainer";
+import { useUserStore } from "@/store/userStore";
+import { useSpacingStyles } from "@/styles/useSpacingStyles";
 
-const UserInfoContainer = () => {
-  const currentUser = useUserStore((state) => state.currentUser);
+const UserDetailsWrapper = () => {
+  const { currentUser } = useUserStore();
+  const { gapMd } = useSpacingStyles();
 
   return (
-    <View>
+    <View style={gapMd}>
       <UserDetailContainer
         label="שם מלא"
         value={`${currentUser?.firstName} ${currentUser?.lastName}`}
@@ -26,4 +28,4 @@ const UserInfoContainer = () => {
   );
 };
 
-export default UserInfoContainer;
+export default UserDetailsWrapper;

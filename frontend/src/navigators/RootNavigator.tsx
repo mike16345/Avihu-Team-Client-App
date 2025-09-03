@@ -7,7 +7,6 @@ import { useUserApi } from "@/hooks/api/useUserApi";
 import { useUserStore } from "@/store/userStore";
 import { IUser } from "@/interfaces/User";
 import useNotification from "@/hooks/useNotfication";
-import { showAlert } from "@/utils/utils";
 import { NO_ACCESS, SESSION_EXPIRED } from "@/constants/Constants";
 import { useQueryClient } from "@tanstack/react-query";
 import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
@@ -16,12 +15,15 @@ import useUserQuery from "@/hooks/queries/useUserQuery";
 import SplashScreen from "@/screens/SplashScreen";
 import SuccessScreen from "@/screens/SuccessScreen";
 import { RootStackParamList } from "@/types/navigatorTypes";
+import { useToast } from "@/hooks/useToast";
+import ProfileScreen from "@/screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
   const queryClient = useQueryClient();
   const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
+  const { triggerErrorToast } = useToast();
 
   const { currentUser, setCurrentUser } = useUserStore();
   const { data } = useUserQuery(currentUser?._id);
@@ -55,15 +57,15 @@ const RootNavigator = () => {
       const { isValid, hasAccess } = await checkUserSessionToken(tokenData);
 
       if (!hasAccess) {
-        showAlert("error", NO_ACCESS);
-        handleLogout();
-        return;
+        triggerErrorToast({ message: NO_ACCESS });
+
+        return handleLogout();
       }
 
       if (!isValid) {
-        showAlert("error", SESSION_EXPIRED);
-        handleLogout();
-        return;
+        triggerErrorToast({ message: SESSION_EXPIRED });
+
+        return handleLogout();
       }
     } catch (error) {
       return;
@@ -103,6 +105,11 @@ const RootNavigator = () => {
         )}
 
         <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
+        <Stack.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{ animation: "slide_from_left" }}
+        />
       </Stack.Navigator>
     </>
   );

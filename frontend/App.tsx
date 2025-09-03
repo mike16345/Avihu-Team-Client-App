@@ -1,34 +1,19 @@
 import "react-native-reanimated";
 import "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
-import {
-  DarkTheme as NavigationDarkTheme,
-  DefaultTheme as NavigationDefaultTheme,
-  NavigationContainer,
-} from "@react-navigation/native";
-import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
+import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { adaptNavigationTheme, PaperProvider } from "react-native-paper";
-import { defaultTheme as CustomDarkTheme, ThemeProvider } from "@/themes/useAppTheme";
-import { Appearance, I18nManager, Platform, View } from "react-native";
+import { ThemeProvider } from "@/themes/useAppTheme";
+import { Appearance, View } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import Toast from "react-native-toast-message";
-import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
-import UserDrawer from "@/components/User/UserDrawer";
 import Update from "@/hooks/useUpdates";
 import persister from "@/QueryClient/queryPersister";
 import queryClient from "@/QueryClient/queryClient";
 import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
-import Sandbox from "@/screens/Sandbox";
-import { toastConfig } from "@/config/toastConfig";
 import ToastContainer from "@/components/ui/toast/ToastContainer";
 import useCustomFonts from "@/hooks/useCustomFonts";
-
-const { DarkTheme } = adaptNavigationTheme({
-  reactNavigationLight: NavigationDefaultTheme,
-  reactNavigationDark: NavigationDarkTheme,
-});
+import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function App() {
   const ready = useOneTimeRTLFix();
@@ -38,27 +23,24 @@ export default function App() {
   if (!loaded || !ready) return;
 
   return (
-    <PaperProvider theme={CustomDarkTheme}>
-      <ThemeProvider>
-        <GestureHandlerRootView>
-          <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <View style={[Platform.OS == "ios" && { direction: "rtl" }, { flex: 1 }]}>
-              <PersistQueryClientProvider
-                client={queryClient}
-                persistOptions={{ persister: persister }}
-              >
-                <NavigationContainer>
-                  <RootNavigator />
-                  <StatusBar key={colorScheme} translucent style={"dark"} />
-                  <ToastContainer />
-                  <UserDrawer />
-                  <Update />
-                </NavigationContainer>
-              </PersistQueryClientProvider>
-            </View>
-          </SafeAreaProvider>
-        </GestureHandlerRootView>
-      </ThemeProvider>
-    </PaperProvider>
+    <ThemeProvider>
+      <GestureHandlerRootView>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+          <View style={[{ direction: "rtl" }, { flex: 1 }]}>
+            <PersistQueryClientProvider
+              client={queryClient}
+              persistOptions={{ persister: persister }}
+            >
+              <NavigationContainer>
+                <RootNavigator />
+                <StatusBar key={colorScheme} translucent style={"dark"} />
+                <ToastContainer />
+                <Update />
+              </NavigationContainer>
+            </PersistQueryClientProvider>
+          </View>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </ThemeProvider>
   );
 }

@@ -16,14 +16,14 @@ const GraphLabels: React.FC<GraphLabelsProps> = ({ labels, onSelect, selectedInd
   return (
     <View
       style={[
-        layout.flexDirectionByPlatform,
+        layout.flexRow,
         spacing.gapDefault,
         layout.alignSelfEnd,
         layout.justifyBetween,
         layout.itemsCenter,
         styles.labels,
         { width },
-        Platform.OS == "ios" ? { left: 60 } : { right: 60 }, //adnroid is flipped
+        { left: 60 },
       ]}
     >
       {labels.map((label, i) => (

@@ -54,6 +54,11 @@ export async function patchItem<T>(endpoint: string, params?: any, headers?: any
   return request<T>("patch", endpoint, undefined, params, headers);
 }
 
-export async function deleteItem<T>(endpoint: string, params?: any, headers?: any): Promise<T> {
-  return request<T>("delete", `${endpoint}`, undefined, params, headers);
+export async function deleteItem<T>(
+  endpoint: string,
+  params?: any,
+  headers?: any,
+  data?: any
+): Promise<T> {
+  return request<T>("delete", `${endpoint}`, data, params, headers);
 }

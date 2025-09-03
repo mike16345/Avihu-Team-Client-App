@@ -18,20 +18,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     plugins: [
       ["expo-localization"],
-      // [
-      //   "expo-build-properties",
-      //   {
-      //     android: {
-      //       compileSdkVersion: 35,
-      //       targetSdkVersion: 35,
-      //       buildToolsVersion: "35.0.0",
-      //     },
-      //   },
-      // ],
 
       [
         "expo-image-picker",
         {
+          cameraPermission: "Allow $(PRODUCT_NAME) to access the camera.",
           photosPermission: "The app accesses your photos to let you share them with your friends.",
         },
       ],
@@ -77,12 +68,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       CLOUDFRONT_URL: process.env.CLOUDFRONT_URL,
     },
     owner: "avihuteam",
-    runtimeVersion: "1.0.0",
+    runtimeVersion: { policy: "appVersion" },
     updates: {
       enabled: true,
       url: "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2",
     },
-    sdkVersion: "51.0.0",
+    sdkVersion: "53.0.0",
     platforms: ["ios", "android"],
   };
 };
