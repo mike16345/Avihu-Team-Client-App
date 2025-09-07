@@ -1,29 +1,61 @@
+// hooks/useNotification.ts
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
-export const useNotification = () => {
-  const now = new Date();
-  const triggerTime = new Date();
-  triggerTime.setHours(8, 0, 0, 0);
+type TriggerAt = number | Date | null | undefined;
 
-  if (now > triggerTime) {
-    triggerTime.setDate(triggerTime.getDate() + 1);
+const DEFAULT_CHANNEL_ID = "default";
+const DAILY_REMINDER_ID = "daily-8am-reminder";
+
+/** Create (or update) the default Android notification channel */
+async function ensureAndroidChannel() {
+  if (Platform.OS !== "android") return;
+  await Notifications.setNotificationChannelAsync(DEFAULT_CHANNEL_ID, {
+    name: "Default",
+    importance: Notifications.AndroidImportance.DEFAULT,
+  });
+}
+
+/** Helper: convert various "when" inputs to a typed NotificationTriggerInput */
+function toTrigger(
+  triggerAt: TriggerAt,
+  opts: { repeats?: boolean; channelId?: string } = {}
+): Notifications.NotificationTriggerInput {
+  if (triggerAt == null) {
+    // Immediate delivery must be `null` (not {}).
+    return null;
   }
 
-  const triggerInSeconds = Math.round((triggerTime.getTime() - now.getTime()) / 1000);
+  if (triggerAt instanceof Date) {
+    return {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: triggerAt,
+      channelId: opts.channelId,
+    } satisfies Notifications.DateTriggerInput;
+  }
 
-  const androidTrigger = {
-    seconds: triggerInSeconds,
-  };
+  // seconds-from-now; clamp to >= 1s
+  const seconds = Math.max(1, Math.floor(triggerAt));
+  return {
+    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+    seconds,
+    repeats: !!opts.repeats,
+    channelId: opts.channelId,
+  } satisfies Notifications.TimeIntervalTriggerInput;
+}
 
-  const iosTrigger = {
-    hour: 8,
-    minute: 0,
-    timezone: `Asia/Jerusalem`,
-    repeats: true,
-  };
+/** Compute the next local 08:00 from "now" */
+function getNextEightAM(from = new Date()) {
+  const next = new Date(from);
+  next.setHours(8, 0, 0, 0);
+  if (next <= from) {
+    next.setDate(next.getDate() + 1);
+  }
+  return next;
+}
 
-  // Set the global notification handler
+export const useNotification = () => {
+  // Set the global notification handler (keeps your previous behavior)
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,
@@ -32,62 +64,86 @@ export const useNotification = () => {
     }),
   });
 
-  // Request notification permissions
+  /** Ask for permissions (creates Android channel first) */
   const requestPermissions = async () => {
+    if (Platform.OS === "android") {
+      await ensureAndroidChannel();
+    }
     const { status } = await Notifications.getPermissionsAsync();
     if (status !== "granted") {
       const { status: newStatus } = await Notifications.requestPermissionsAsync();
       if (newStatus !== "granted") {
-        alert(`The app will run better with notifcations on!`);
+        alert("The app will run better with notifications on!");
       }
     }
   };
 
-  // Schedule a repeating notification
-  const scheduleNotification = async () => {
-    try {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Avihu Team",
-          body: "לא לשכוח לשלוח את השקילה היומית שלכם!",
-        },
-        trigger: Platform.OS == `ios` ? iosTrigger : androidTrigger,
-      });
-    } catch (error) {
-      console.log(error);
+  /** Schedule the daily reminder at 08:00 (idempotent) */
+  const scheduleDailyReminder = async () => {
+    const next8am = getNextEightAM();
+
+    // iOS: true repeating daily trigger at hh:mm
+    const iosTrigger: Notifications.DailyTriggerInput = {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
+      hour: 8,
+      minute: 0,
+    };
+
+    // Android: schedule a one-off date at next 08:00 (re-schedule later as needed)
+    const androidTrigger: Notifications.DateTriggerInput = {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: next8am,
+      channelId: DEFAULT_CHANNEL_ID,
+    };
+
+    if (Platform.OS === "android") {
+      await ensureAndroidChannel();
     }
+
+    await Notifications.scheduleNotificationAsync({
+      identifier: DAILY_REMINDER_ID,
+      content: {
+        title: "Avihu Team",
+        body: "לא לשכוח לשלוח את השקילה היומית שלכם!",
+      },
+      trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
+    });
   };
 
-  const showNotification = async (body: string, triggerAt?: number) => {
+  /** Show a one-off notification now or in N seconds, or at a Date */
+  const showNotification = async (body: string, triggerAt?: number | Date | null) => {
     try {
+      if (Platform.OS === "android") {
+        await ensureAndroidChannel();
+      }
       const identifier = await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Avihu Team",
-          body,
-        },
-        trigger: triggerAt
-          ? {
-              seconds: triggerAt, // fires in 5 seconds
-            }
-          : {},
+        content: { title: "Avihu Team", body },
+        trigger: toTrigger(triggerAt ?? 1, {
+          channelId: Platform.OS === "android" ? DEFAULT_CHANNEL_ID : undefined,
+        }),
       });
-
       return identifier;
     } catch (error) {
       console.log(error);
     }
   };
 
-  // Check if notifications are already scheduled to prevent duplicates
+  /** Initialize: avoid duplicates (don’t blanket-cancel on Android) */
   const initializeNotifications = async () => {
     try {
-      if (Platform.OS == `android`) {
-        Notifications.cancelAllScheduledNotificationsAsync();
+      if (Platform.OS === "android") {
+        await ensureAndroidChannel();
       }
-      const scheduledNotifications = await Notifications.getAllScheduledNotificationsAsync();
 
-      if (scheduledNotifications.length === 0) {
-        await scheduleNotification();
+      const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+      const alreadyScheduled = scheduled.some((n) => n.identifier === DAILY_REMINDER_ID);
+
+      if (!alreadyScheduled) {
+        await scheduleDailyReminder();
+      } else if (Platform.OS === "android") {
+        // Optional: on Android, if the scheduled time drifted (e.g., across DST),
+        // you could cancel & re-schedule here by checking the trigger.
+        // For now, we leave it as-is to keep behavior predictable.
       }
     } catch (error) {
       console.log(error);
@@ -102,13 +158,12 @@ export const useNotification = () => {
     }
   };
 
-  // Execute functions
-
   return {
     requestPermissions,
     initializeNotifications,
     showNotification,
     cancelNotification,
+    scheduleDailyReminder,
   };
 };
 

@@ -120,7 +120,9 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels, mounted = tr
             withShadow
             withInnerLines={false}
             withOuterLines={false}
-            onDataPointClick={({ value }) => setSelected(value)}
+            onDataPointClick={({ value }) => {
+              setSelected(value);
+            }}
             chartConfig={graphTheme}
             bezier
             style={{

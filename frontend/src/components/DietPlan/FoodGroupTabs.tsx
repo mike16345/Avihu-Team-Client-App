@@ -1,5 +1,5 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/Tabs";
-import { ReactNode, useMemo, useState } from "react";
+import { Tabs, TabsList } from "../ui/Tabs";
+import { useState } from "react";
 import useMenuItemsQuery from "@/hooks/queries/MenuItems/useMenuItemsQuery";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";

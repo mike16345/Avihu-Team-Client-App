@@ -92,17 +92,13 @@ const BlogScreen = () => {
   ];
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } =
-    useInfiniteQuery(
-      ["posts"],
-
-      ({ pageParam = 1 }) => getPaginatedPosts({ page: pageParam, limit: 5 }),
-      {
-        getNextPageParam: (lastPage) => {
-          return lastPage.hasNextPage ? lastPage.currentPage + 1 : undefined;
-        },
-        staleTime: ONE_DAY / 2,
-      }
-    );
+    useInfiniteQuery({
+      queryKey: ["posts"],
+      queryFn: ({ pageParam }) => getPaginatedPosts({ page: pageParam as number, limit: 5 }),
+      initialPageParam: 1, // default for the first call
+      getNextPageParam: (lastPage) => (lastPage.hasNextPage ? lastPage.currentPage + 1 : undefined),
+      staleTime: ONE_DAY / 2,
+    });
 
   const loadMore = () => {
     if (hasNextPage) {

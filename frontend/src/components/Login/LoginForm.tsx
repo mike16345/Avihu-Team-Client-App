@@ -88,6 +88,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
   return (
     <Animated.View style={[spacing.gap20, { opacity }]}>
       <Input
+        keyboardType="email-address"
         label="אימייל"
         placeholder="הכנס אימייל"
         error={formErrors.email}
@@ -109,7 +110,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
       />
 
       <TouchableOpacity onPress={onForgotPasswordPress}>
-        <Text style={[layout.alignSelfStart, colors.textPrimary, text.textBold]}>שכחתי סיסמה</Text>
+        <Text style={[colors.textPrimary, text.textBold]}>שכחתי סיסמה</Text>
       </TouchableOpacity>
 
       <PrimaryButton block mode="dark" onPress={handleSubmit} loading={loading}>

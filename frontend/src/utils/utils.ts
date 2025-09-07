@@ -1,7 +1,6 @@
 import { AVG_CARB_CALORIES, AVG_PROTEIN_CALORIES } from "@/constants/Constants";
 import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
 import Constants from "expo-constants";
-import Toast, { ToastType } from "react-native-toast-message";
 
 export const testEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -99,17 +98,6 @@ export const checkIfDatesMatch = (date1: Date, date2: Date) => {
   } else {
     return false;
   }
-};
-
-export const showAlert = (type: ToastType, message: string, visibilityTime: number = 4000) => {
-  Toast.show({
-    text1: message,
-    autoHide: true,
-    text1Style: { textAlign: `center` },
-    type: type,
-    swipeable: true,
-    visibilityTime,
-  });
 };
 
 export const extractExercises = (exercises: any) => {

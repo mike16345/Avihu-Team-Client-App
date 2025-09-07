@@ -21,7 +21,6 @@ export default function TopBar() {
           height: height * 0.12,
           borderBottomWidth: 0.25,
           borderBottomColor: colors.borderBackground.borderColor,
-          paddingTop: spacing.pdStatusBar.paddingTop! + 5,
         },
       ]}
     >

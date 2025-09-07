@@ -8,9 +8,8 @@ interface MuscleDisplayProps {
 }
 
 const MuscleDisplay: React.FC<MuscleDisplayProps> = ({ height, name, width }) => {
+  if (!name) return null;
   const MuscleImage = muscleImages[name];
-
-  if (!muscleImages) return null;
 
   return <MuscleImage height={height} width={width} />;
 };

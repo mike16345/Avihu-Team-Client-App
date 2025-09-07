@@ -90,7 +90,6 @@ export const TabsList = ({ children }: TabsListProps) => {
     <View
       style={[
         layout.flexRow,
-        layout.justifyEvenly,
         layout.itemsCenter,
         spacing.gapDefault,
         colors.backgroundSecondary,
