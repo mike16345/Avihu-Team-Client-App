@@ -15,7 +15,6 @@ import { Circle, LinearGradient, Paint, useFont, vec } from "@shopify/react-nati
 import { Dimensions, View } from "react-native";
 import { Card } from "@/components/ui/Card";
 import { SharedValue } from "react-native-reanimated";
-import { DATA, yMax } from "./my-data";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import { useRef } from "react";
 
@@ -23,6 +22,13 @@ const AssistantRegular = require("../../assets/fonts/Assistant/Assistant-Regular
 
 const INITIAL_SCALE_X = 1.0;
 const INITIAL_SCALE_Y = 1.0;
+const DATA = Array.from({ length: 31 }, (_, i) => ({
+  day: i,
+  lowTmp: 20 + 10 * Math.random(),
+  highTmp: 40 + 30 * Math.random(),
+}));
+
+const yMax = Math.max(...DATA.map((d) => d.highTmp));
 
 export default function Sandbox() {
   const font = useFont(AssistantRegular, 14);
