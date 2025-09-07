@@ -106,22 +106,24 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
       >
         <View style={[spacing.gapDefault, { position: "relative" }]}>
           <LineChart
-            withVerticalLabels={true}
+            withVerticalLabels={false}
             data={{
-              labels: labels,
+              labels: [],
               datasets: [
                 {
                   data: data.length == 0 ? [0] : data,
                 },
               ],
             }}
+            renderDotContent={(params) => (
+              <SelectedDot key={params.index} selectedLabel={selectedLabel} {...params} />
+            )}
             width={chartWidth}
             height={220}
             withShadow
             withInnerLines={false}
             withOuterLines={false}
             onDataPointClick={({ value }) => {
-              console.log("selecting dot");
               setSelected(value);
             }}
             chartConfig={graphTheme}
@@ -130,6 +132,12 @@ const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
               marginVertical: 8,
               borderRadius: 16,
             }}
+          />
+          <GraphLabels
+            labels={labels}
+            onSelect={(i) => setSelectedLabel(i)}
+            selectedIndex={selectedLabel}
+            width={(labelCount - 0.5) * labelWidth}
           />
         </View>
       </ScrollView>
