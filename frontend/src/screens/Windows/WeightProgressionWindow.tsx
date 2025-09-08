@@ -14,7 +14,7 @@ const WeightProgressionWindow = () => {
       contentContainerStyle={[
         spacing.gapMd,
         {
-          paddingVertical: 14,
+          paddingVertical: 12,
           paddingHorizontal: 20,
         },
       ]}

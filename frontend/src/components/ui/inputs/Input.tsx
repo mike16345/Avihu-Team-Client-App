@@ -64,7 +64,10 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     textAlign: "right",
     borderRadius: 9,
-    height: 38,
+    paddingVertical: 8, // ✅ let content define height
+    lineHeight: 20, // ✅ plays nice with fontSize: 16
+    textAlignVertical: "center", // ✅ Android vertical centering
+    includeFontPadding: false, // ✅ trims extra Android font padding
     borderTopLeftRadius: 9,
     borderTopRightRadius: 9,
   },
