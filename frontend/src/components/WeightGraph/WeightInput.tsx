@@ -22,7 +22,7 @@ const WeightInput = () => {
   const { layout, spacing } = useStyles();
   const { width } = useWindowDimensions();
   const { triggerErrorToast } = useToast();
-  const { mutate, isLoading } = useAddWeighIn();
+  const { mutate, isPending } = useAddWeighIn();
   const { data } = useWeighInsQuery();
 
   const [weighIn, setWeighIn] = useState<string>("");
@@ -86,7 +86,7 @@ const WeightInput = () => {
         <PrimaryButton
           disabled={isWeighInUploadedToday}
           onPress={handleSubmit}
-          loading={isLoading}
+          loading={isPending}
           style={[{ width: width * 0.6 }]}
         >
           שליחה
