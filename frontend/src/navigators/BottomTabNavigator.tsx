@@ -44,12 +44,6 @@ const BottomTabNavigator = () => {
   });
 
   useEffect(() => {
-    Animated.spring(indicatorAnim, {
-      toValue: activeIndex,
-      useNativeDriver: true,
-    }).start();
-  }, [activeIndex]);
-  useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
     const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
 
@@ -58,13 +52,21 @@ const BottomTabNavigator = () => {
       hideSub.remove();
     };
   }, []);
+
+  useEffect(() => {
+    Animated.spring(indicatorAnim, {
+      toValue: activeIndex,
+      useNativeDriver: true,
+    }).start();
+  }, [activeIndex]);
+
   return (
     <Animated.View style={[layout.flex1, colors.background, { opacity }]}>
       <Tab.Navigator
         initialRouteName={INITIAL_ROUTE_NAME}
         sceneContainerStyle={[
           colors.background,
-          { paddingBottom: BOTTOM_BAR_HEIGHT + 85, paddingTop: isHomeScreen ? 36 : 36 },
+          { paddingBottom: BOTTOM_BAR_HEIGHT + 80, paddingTop: isHomeScreen ? 36 : 36 },
         ]}
         screenOptions={{
           headerShown: false,
