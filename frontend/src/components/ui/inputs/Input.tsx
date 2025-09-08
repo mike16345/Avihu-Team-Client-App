@@ -1,5 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { FC, ReactNode, useState } from "react";
+import { FC, ReactNode, useRef } from "react";
 import { View, TextInput, TextInputProps, StyleSheet } from "react-native";
 import { ConditionalRender } from "../ConditionalRender";
 import Icon from "../../Icon/Icon";
@@ -13,10 +13,14 @@ export interface InputProps extends TextInputProps {
 const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
   const { colors, common, spacing, layout } = useStyles();
 
-  const [focused, setFocused] = useState(false);
+  const inputRef = useRef<TextInput>(null);
 
-  const borderColor = error ? colors.borderError : focused ? colors.borderPrimary : colors.outline;
-  const borderwidth = focused ? common.borderSm : common.borderXsm;
+  const borderColor = error
+    ? colors.borderError
+    : inputRef.current?.isFocused()
+    ? colors.borderPrimary
+    : colors.outline;
+  const borderwidth = inputRef.current?.isFocused() ? common.borderSm : common.borderXsm;
 
   return (
     <View style={spacing.gapSm}>
@@ -32,19 +36,28 @@ const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
 
       <View style={{ position: "relative" }}>
         <TextInput
+          ref={inputRef}
           cursorColor={colors.textPrimary.color}
           selectionColor={colors.textPrimary.color}
           placeholderTextColor="grey"
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
+          onFocus={() => {
+            if (!inputRef.current || !props.value) return;
+            inputRef.current.setSelection(props.value?.length, props.value?.length);
+          }}
+          underlineColorAndroid="transparent"
           style={[
             error ? spacing.pdHorizontalXl : spacing.pdHorizontalSm,
             styles.input,
             common.roundedSm,
             borderColor,
             borderwidth,
+
             colors.background,
-            { fontFamily: "Assistant-Regular", fontSize: 16 },
+            {
+              fontFamily: "Assistant-Regular",
+              fontSize: 16,
+              color: colors.textPrimary.color,
+            },
             style,
           ]}
           {...props}

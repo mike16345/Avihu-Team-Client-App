@@ -25,7 +25,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuccess }) => {
-  const { colors, layout, spacing, text } = useStyles();
+  const { colors, spacing, text } = useStyles();
   const { triggerErrorToast, triggerSuccessToast } = useToast();
   const { loginUser } = useUserApi();
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
@@ -85,6 +85,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
       .finally(() => setLoading(false));
   };
 
+  console.log("credentials", inputtedCrendentials);
+
   return (
     <Animated.View style={[spacing.gap20, { opacity }]}>
       <Input
@@ -92,13 +94,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
         label="אימייל"
         placeholder="הכנס אימייל"
         error={formErrors.email}
+        importantForAutofill="yes"
         textContentType="emailAddress"
-        onChangeText={(val) =>
-          setInputtedCredentials({
-            ...inputtedCrendentials,
-            email: val,
-          })
-        }
+        autoComplete="email"
+        autoCorrect={false}
+        onChangeText={(val) => {
+          setInputtedCredentials((prev) => {
+            return {
+              ...prev,
+              email: val,
+            };
+          });
+        }}
         value={inputtedCrendentials.email}
       />
 
@@ -106,7 +113,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
         label="סיסמא"
         placeholder="הכנס סיסמה"
         error={formErrors.password}
-        onChangeText={(val) => setInputtedCredentials({ ...inputtedCrendentials, password: val })}
+        value={inputtedCrendentials.password}
+        onChangeText={(val) =>
+          setInputtedCredentials((prev) => {
+            return {
+              ...prev,
+              password: val,
+            };
+          })
+        }
       />
 
       <TouchableOpacity onPress={onForgotPasswordPress}>

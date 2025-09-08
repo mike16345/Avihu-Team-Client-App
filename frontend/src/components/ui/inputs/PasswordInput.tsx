@@ -13,7 +13,7 @@ const PasswordInput: React.FC<InputProps> = ({ ...props }) => {
       <TouchableOpacity
         onPress={() => setShowPassword(!showPassword)}
         style={[
-          { position: "absolute", top: props.label ? 30 : 7 },
+          { position: "absolute", top: props.label ? "52%" : "25%" },
           I18nManager.isRTL ? { end: 10 } : { start: 10 },
         ]}
       >

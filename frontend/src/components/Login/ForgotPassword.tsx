@@ -141,7 +141,7 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
         <>
           <View style={[spacing.gapXl]}>
             <Input
-              label=" קוד אימות"
+              label="קוד אימות"
               style={[text.textCenter]}
               placeholder="קוד אימות בעל 6 ספרות"
               error={formErrors["otp"]}
