@@ -19,7 +19,7 @@ const WeightCardsContainer = () => {
   }, [data]);
 
   return (
-    <View style={[layout.flexRow, spacing.gap20]}>
+    <View style={[layout.flexRow, layout.center, spacing.gap20]}>
       <WeightCard
         title="מגמה חודשית"
         unit='ק"ג'

@@ -14,8 +14,8 @@ const WeightProgressionWindow = () => {
       contentContainerStyle={[
         spacing.gapMd,
         {
-          paddingVertical: 10,
-          paddingHorizontal: 16,
+          paddingVertical: 14,
+          paddingHorizontal: 20,
         },
       ]}
       refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />}
