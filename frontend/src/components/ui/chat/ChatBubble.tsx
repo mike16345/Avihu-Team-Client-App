@@ -1,14 +1,14 @@
-import { useWindowDimensions, View } from "react-native";
-import React from "react";
+import { Animated, useWindowDimensions, View } from "react-native";
+import React, { ReactNode, useEffect, useRef } from "react";
 import { Text } from "../Text";
 import useStyles from "@/styles/useGlobalStyles";
 
 interface ChatBubbleProps {
   variant?: "prompt" | "response";
-  text: string;
+  children: ReactNode;
 }
 
-const ChatBubble: React.FC<ChatBubbleProps> = ({ text, variant = "prompt" }) => {
+const ChatBubble: React.FC<ChatBubbleProps> = ({ children, variant = "prompt" }) => {
   const { colors, common, layout, spacing, text: textStyles } = useStyles();
   const { width } = useWindowDimensions();
 
@@ -17,19 +17,36 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ text, variant = "prompt" }) => 
       ? [colors.backgroundSuccessContainer, layout.alignSelfStart]
       : [colors.backgroundSurface, layout.alignSelfEnd];
 
+  const translateY = useRef(new Animated.Value(40)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(translateY, {
+      toValue: 0,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   return (
-    <View
+    <Animated.View
       style={[
         common.rounded,
         common.borderXsm,
         colors.outline,
         spacing.pdDefault,
         variantStyles,
-        { maxWidth: width * 0.75 },
+        { maxWidth: width * 0.75, transform: [{ translateY }] },
       ]}
     >
-      <Text style={[textStyles.textLeft, colors.textPrimary]}>{text}</Text>
-    </View>
+      <Text style={[textStyles.textLeft, colors.textPrimary]}>{children}</Text>
+    </Animated.View>
   );
 };
 
