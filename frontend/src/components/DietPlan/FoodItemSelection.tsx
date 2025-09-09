@@ -30,7 +30,7 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup }) => {
     .map((item) => formatServingText(item.name, item.oneServing, 1))
     .join(" | ");
 
-  return <Text>{formatted}</Text>;
+  return <Text fontSize={16}>{formatted}</Text>;
 };
 
 export default FoodItemSelection;
