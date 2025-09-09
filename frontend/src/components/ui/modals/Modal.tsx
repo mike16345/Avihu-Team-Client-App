@@ -57,21 +57,20 @@ export const CustomModal: CompoundModal = ({ children, onDismiss, visible, ...pr
   }, [visible]);
 
   return (
-    <Modal visible={visible} onRequestClose={handleDismiss} {...props}>
+    <Modal statusBarTranslucent visible={visible} onRequestClose={handleDismiss} {...props}>
       <Animated.View
         style={[
           colors.background,
           spacing.gapDefault,
           spacing.pdStatusBar,
-          spacing.pdBottomBar,
           spacing.pdLg,
           spacing.gapDefault,
           layout.flex1,
           {
             transform: [{ scale: animationValue }],
             opacity: animationValue,
-            paddingTop: spacing?.pdStatusBar?.paddingTop * 2,
-            paddingBottom: spacing.pdBottomBar.paddingBottom * 2,
+            paddingBottom: spacing.pdBottomBar.paddingBottom * 3,
+            paddingTop: 48,
           },
         ]}
       >

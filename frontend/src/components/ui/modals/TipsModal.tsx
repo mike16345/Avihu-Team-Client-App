@@ -30,13 +30,13 @@ const TipsModal: React.FC<TipsModalProps> = ({
         </ConditionalRender>
 
         <ConditionalRender condition={tips.length !== 0}>
-          <ScrollView contentContainerStyle={[spacing.gapLg, spacing.pdVerticalLg]}>
+          <ScrollView contentContainerStyle={[spacing.gapLg, spacing.pdVerticalMd]}>
             {tips.map((tip, i) => (
               <View key={tip + i} style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
                 <View
                   style={[colors.backgroundPrimary, common.roundedFull, { height: 5, width: 5 }]}
                 ></View>
-                <Text>{tip}</Text>
+                <Text fontSize={16}>{tip}</Text>
               </View>
             ))}
           </ScrollView>
