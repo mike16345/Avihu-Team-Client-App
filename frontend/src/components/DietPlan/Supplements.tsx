@@ -22,7 +22,7 @@ const Supplements = () => {
         </ConditionalRender>
         {supplements.map((item, i) => {
           return (
-            <Text key={item + i} fontVariant="semibold">
+            <Text key={item + i} style={[layout.alignSelfStart]} fontVariant="semibold">
               {item}
             </Text>
           );
