@@ -4,10 +4,13 @@ import { ParamListBase, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export type RootStackParamList = {
-  SuccessScreen: { title: string; message: string };
-  LoginScreen: undefined;
   BottomTabs: undefined;
   Profile: undefined;
+};
+
+export type AuthStackParamList = {
+  SuccessScreen: { title: string; message: string };
+  LoginScreen: undefined;
 };
 
 export type BottomStackParamList = {
