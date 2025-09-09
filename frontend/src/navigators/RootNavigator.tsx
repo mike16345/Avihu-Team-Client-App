@@ -21,7 +21,6 @@ import ProfileScreen from "@/screens/ProfileScreen";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
-  const queryClient = useQueryClient();
   const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
   const { triggerErrorToast } = useToast();
 
@@ -32,11 +31,6 @@ const RootNavigator = () => {
   const { handleLogout } = useLogout();
 
   const [loading, setLoading] = useState(true);
-
-  const onLogin = (user: IUser) => {
-    queryClient.setQueryData(["user-", user._id], user);
-    setCurrentUser(user);
-  };
 
   const getUserFromLocalStorage = async () => {
     const token = await sessionStorage.getItem();
@@ -93,26 +87,41 @@ const RootNavigator = () => {
 
   if (loading) return <SplashScreen />;
 
-  return (
-    <>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {currentUser ? (
-          <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
-        ) : (
-          <>
-            <Stack.Screen children={() => <Login onLogin={onLogin} />} name="LoginScreen" />
-          </>
-        )}
-
-        <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
-        <Stack.Screen
-          name="Profile"
-          component={ProfileScreen}
-          options={{ animation: "slide_from_left" }}
-        />
-      </Stack.Navigator>
-    </>
-  );
+  return currentUser ? <AppStack /> : <AuthStack />;
 };
+
+function AuthStack() {
+  const queryClient = useQueryClient();
+  const setCurrentUser = useUserStore((state) => state.setCurrentUser);
+
+  const onLogin = (user: IUser) => {
+    queryClient.setQueryData(["user-", user._id], user);
+    setCurrentUser(user);
+  };
+
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen
+        options={{ animation: "slide_from_left" }}
+        children={() => <Login onLogin={onLogin} />}
+        name="LoginScreen"
+      />
+      <Stack.Screen name="SuccessScreen" component={SuccessScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function AppStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
+      <Stack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ animation: "slide_from_left" }}
+      />
+    </Stack.Navigator>
+  );
+}
 
 export default RootNavigator;

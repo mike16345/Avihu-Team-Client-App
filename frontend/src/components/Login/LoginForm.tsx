@@ -77,7 +77,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
         onLoginSuccess(res.data.data.user);
         setCurrentUser(res?.data.data.user);
         setItem(JSON.stringify(res.data));
-        navigation.navigate("BottomTabs"); //crucial so user does not end up back in profile screen on log in
       })
       .catch((err) => {
         triggerErrorToast({ message: err.response.data.message });
