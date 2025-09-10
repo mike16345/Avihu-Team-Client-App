@@ -4,7 +4,6 @@ import WorkoutPlanStack from "../WorkoutPlanStack";
 import BlogScreen from "@/screens/BlogScreen";
 import Icon from "@/components/Icon/Icon";
 import HomeScreen from "@/screens/HomeScreen";
-import Sandbox from "@/screens/Sandbox";
 
 const ICON_HEIGHT = 24;
 const ICON_WIDTH = 24;
@@ -22,14 +21,20 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     },
   },
   {
-    name: "Chat",
-    component: Sandbox,
+    name: "ChatTab",
+    component: HomeScreen,
     options: {
-      tabBarLabel: "",
       tabBarIcon: ({ color }) => (
         <Icon color={color} name="chat" height={ICON_HEIGHT} width={ICON_WIDTH} />
       ),
     },
+    listeners: ({ navigation }) => ({
+      tabPress: (e) => {
+        e.preventDefault();
+
+        navigation.navigate("Chat");
+      },
+    }),
   },
   {
     name: "Home",

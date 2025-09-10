@@ -91,9 +91,10 @@ const BottomTabNavigator = () => {
         {BottomScreenNavigatorTabs.map((tab, index) => {
           return (
             <Tab.Screen
-              listeners={{
+              listeners={(props) => ({
                 focus: () => setActiveIndex(index),
-              }}
+                ...(typeof tab.listeners === "function" ? tab.listeners(props) : tab.listeners),
+              })}
               key={tab.name}
               name={tab.name}
               component={tab.component}

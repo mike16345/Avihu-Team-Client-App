@@ -17,6 +17,8 @@ import SuccessScreen from "@/screens/SuccessScreen";
 import { RootStackParamList } from "@/types/navigatorTypes";
 import { useToast } from "@/hooks/useToast";
 import ProfileScreen from "@/screens/ProfileScreen";
+import ChatScreen from "@/screens/ChatScreen";
+import ChatHeader from "@/components/chat/ChatHeader";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -109,6 +111,11 @@ const RootNavigator = () => {
           name="Profile"
           component={ProfileScreen}
           options={{ animation: "slide_from_left" }}
+        />
+        <Stack.Screen
+          name="Chat"
+          component={ChatScreen}
+          options={{ presentation: "modal", header: () => <ChatHeader />, headerShown: true }}
         />
       </Stack.Navigator>
     </>
