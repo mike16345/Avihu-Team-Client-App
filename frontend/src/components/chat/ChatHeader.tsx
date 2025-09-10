@@ -32,6 +32,7 @@ const ChatHeader = () => {
         spacing.pdDefault,
         spacing.gapDefault,
         colors.outline,
+        spacing.pdStatusBar,
         { borderBottomWidth: 1 },
       ]}
     >
