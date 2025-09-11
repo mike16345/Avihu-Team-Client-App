@@ -13,7 +13,7 @@ const Progression = () => {
   const [showCalendar, setShowCalendar] = useState(false);
 
   return (
-    <View style={[spacing.gapMd]}>
+    <View style={[spacing.gapMd, { flex: 1 }]}>
       <View style={[layout.flexRow, spacing.gapDefault, layout.center]}>
         <Icon name="graph" />
         <Switch isOn={showCalendar} setIsOn={setShowCalendar} />
@@ -22,8 +22,10 @@ const Progression = () => {
       <View style={{ display: showCalendar ? "flex" : "none" }}>
         <WeighInsCalendar />
       </View>
-      <View style={[spacing.gapMd, { display: showCalendar ? "none" : "flex" }]}>
-        <WeighInsGraph />
+      <View style={[spacing.gapMd, { flex: 1, display: showCalendar ? "none" : "flex" }]}>
+        <View style={{ height: 300 }}>
+          <WeighInsGraph />
+        </View>
         <WeightInput />
       </View>
     </View>

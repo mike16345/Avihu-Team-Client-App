@@ -78,8 +78,8 @@
     "react-native-web-webview": "^1.0.2",
     "react-native-webview": "13.13.5",
     "react-native-youtube-iframe": "^2.3.0",
-    "zod": "^3.25.76",
     "victory-native": "^41.19.3",
+    "zod": "^3.25.76",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
