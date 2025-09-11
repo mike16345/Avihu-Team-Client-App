@@ -7,18 +7,28 @@ import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { Card } from "../ui/Card";
 import Icon from "../Icon/Icon";
 import { Text } from "../ui/Text";
-import { GraphTab, useGraphWeighIns } from "@/hooks/useGraphWeighIns";
+import { GraphTab } from "@/hooks/graph/useGraphWeighIns";
 import { Tabs, TabsList, TabsTrigger } from "../ui/Tabs";
+import {
+  GraphData,
+  useVictoryNativeGraphWeighIns,
+} from "@/hooks/graph/useVictoryNativeGraphWeighIns";
 
 const tabs: GraphTab[] = ["יומי", "שבועי", "חודשי"];
+const initialTab: GraphTab = "יומי";
 
 const WeighInsGraph = () => {
   const { isLoading, data } = useWeighInsQuery();
   const { layout, spacing } = useStyles();
 
-  const { getWeighInsByTab } = useGraphWeighIns(data);
+  const { dailyWeighIns, weeklyWeighIns, monthlyWeighIns } = useVictoryNativeGraphWeighIns(data);
 
-  const [selectedTab, setSelectedTab] = useState<GraphTab>("יומי");
+  const [selectedTab, setSelectedTab] = useState<GraphTab>(initialTab);
+  const weighIns: Record<GraphTab, GraphData[]> = {
+    יומי: dailyWeighIns,
+    שבועי: weeklyWeighIns,
+    חודשי: monthlyWeighIns,
+  };
 
   if (isLoading)
     return (
@@ -27,10 +37,8 @@ const WeighInsGraph = () => {
       </View>
     );
 
-  const { weighIns, labels } = getWeighInsByTab(selectedTab);
-
   return (
-    <View style={[spacing.gapLg]}>
+    <View style={[spacing.gapLg, layout.flex1]}>
       <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value as GraphTab)}>
         <TabsList>
           {tabs.map((tab) => (
@@ -38,16 +46,13 @@ const WeighInsGraph = () => {
           ))}
         </TabsList>
       </Tabs>
-
-      <Card style={[layout.widthFull]} variant="gray">
+      <Card variant="gray" style={{ flex: 1 }}>
         <Card.Header style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
           <Icon name="clock" />
           <Text fontSize={16}>מעקב שקילה</Text>
         </Card.Header>
 
-        <Card.Content>
-          <Graph data={weighIns} labels={labels} />
-        </Card.Content>
+        <Graph data={weighIns[selectedTab]} labels={[]} />
       </Card>
     </View>
   );
