@@ -53,7 +53,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
 
   useEffect(() => {
     if (selectedDate) return;
-    
+
     onSelect(today);
   }, []);
 
