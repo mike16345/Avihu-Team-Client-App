@@ -1,7 +1,10 @@
 import { IRecordedSet } from "@/interfaces/Workout";
 import DateUtils from "./dateUtils";
+import { GraphData } from "@/hooks/graph/useVictoryNativeGraphWeighIns";
 
 type SetsSummaryByDate = Record<string, { totalReps: number; totalWeight: number; count: number }>;
+
+type SetsSummaries = Record<string, GraphData[]>;
 
 export const groupRecordedSetsByDate = (recordedSets: IRecordedSet[]): SetsSummaryByDate => {
   return recordedSets.reduce((acc: Record<any, any>, current: IRecordedSet) => {
@@ -20,10 +23,9 @@ export const groupRecordedSetsByDate = (recordedSets: IRecordedSet[]): SetsSumma
   }, {} as SetsSummaryByDate);
 };
 
-export const getDataAvgPerDate = (groupedSetsByDate: SetsSummaryByDate) => {
-  const dataLabels: string[] = [];
-  const repAverages: number[] = [];
-  const weightAverages: number[] = [];
+export const getDataAvgPerDate = (groupedSetsByDate: SetsSummaryByDate): SetsSummaries => {
+  const repAverages: GraphData[] = [];
+  const weightAverages: GraphData[] = [];
 
   const avgByDate = Object.fromEntries(
     Object.entries(groupedSetsByDate).map(([date, { totalReps, totalWeight, count }]) => [
@@ -36,12 +38,11 @@ export const getDataAvgPerDate = (groupedSetsByDate: SetsSummaryByDate) => {
   );
 
   for (const [date, { avgReps, avgWeight }] of Object.entries(avgByDate)) {
-    dataLabels.push(date);
-    repAverages.push(avgReps);
-    weightAverages.push(avgWeight);
+    repAverages.push({ value: avgReps, label: date });
+    weightAverages.push({ value: avgWeight, label: date });
   }
 
-  return { dataLabels, repAverages, weightAverages };
+  return { repAverages, weightAverages };
 };
 
 export const getGrowthTrend = (lastItem: number, firstItem: number) =>

@@ -52,7 +52,7 @@ const WeighInsGraph = () => {
           <Text fontSize={16}>מעקב שקילה</Text>
         </Card.Header>
 
-        <Graph data={weighIns[selectedTab]} labels={[]} />
+        <Graph data={weighIns[selectedTab]} />
       </Card>
     </View>
   );

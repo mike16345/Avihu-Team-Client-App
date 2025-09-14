@@ -54,7 +54,11 @@ const WorkoutProgressionWindow = () => {
         items={activeExercises}
         onSelect={() => {}}
       >
-        <ScrollView nestedScrollEnabled contentContainerStyle={[spacing.gapSm]}>
+        <ScrollView
+          nestedScrollEnabled
+          style={[layout.flex1]}
+          contentContainerStyle={[spacing.gapSm]}
+        >
           <ExerciseSelector muscleGroup={activeMuscleGroup} />
 
           <GraphsContainer />

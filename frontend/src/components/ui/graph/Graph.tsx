@@ -28,35 +28,37 @@ import {
 import AssistantRegular from "@assets/fonts/Assistant/Assistant-Regular.ttf";
 import { ToolTip } from "@/screens/Sandbox";
 import SkiaLine from "./SkiaLine";
+import { GRAPH_HEIGHT } from "@/constants/Constants";
 
 interface GraphProps {
   header?: ReactNode;
   style?: StyleProp<ViewStyle>;
-  labels: string[];
   mounted?: boolean;
   data: GraphData[];
   enableZoom?: boolean;
   enablePan?: boolean;
 }
-
+type AnimationType = "spring" | "decay" | "timing";
 const curveType: CurveType = "natural";
+const animationType: AnimationType = "spring";
+const animationDuration = 300;
+const LARGE_AMOUNT_OF_DOTS = 20;
 
 const Graph: React.FC<GraphProps> = ({
   header,
   style,
   data,
-  labels,
   enableZoom = false,
   enablePan = false,
 }) => {
   const labelColor = "rgba(69, 68, 89, 0.5)";
-  const showDots = data.length < 10;
+  const showDots = data.length < LARGE_AMOUNT_OF_DOTS;
 
   const font = useFont(AssistantRegular, 14);
   const { layout, spacing } = useStyles();
 
   const { state: transformState } = useChartTransformState();
-  const { state, isActive } = useChartPressState({ x: 5, y: { weight: 0 } });
+  const { state, isActive } = useChartPressState({ x: 5, y: { value: 0 } });
 
   const k = useSharedValue(1);
   const tx = useSharedValue(0);
@@ -90,22 +92,22 @@ const Graph: React.FC<GraphProps> = ({
     }
   );
 
-  const value = useDerivedValue(() => state.y.weight.value.value, [state]);
+  const value = useDerivedValue(() => state.y.value.value.value, [state]);
   const radius = useMemo(() => getRadiusSizeBasedOnData(data?.length), [data?.length]);
 
   return (
-    <View style={[layout.flex1, spacing.gap20, style]}>
+    <View style={[layout.flex1, spacing.gap20, { maxHeight: GRAPH_HEIGHT }, style]}>
       <ConditionalRender condition={!!header}>
         <View style={styles.header}>{header}</View>
       </ConditionalRender>
 
       <CartesianChart
         data={data}
-        xKey="date"
-        domainPadding={6}
+        xKey="label"
+        domainPadding={{ top: 40, bottom: 30, left: 8, right: 8 }}
         chartPressState={state}
         transformConfig={{ pan: { enabled: enablePan }, pinch: { enabled: enableZoom } }}
-        yKeys={["weight"]}
+        yKeys={["value"]}
         yAxis={[
           {
             font: font,
@@ -130,8 +132,8 @@ const Graph: React.FC<GraphProps> = ({
           <>
             <Area
               curveType={curveType}
-              animate={{ type: "spring", duration: 500 }}
-              points={points.weight}
+              animate={{ type: animationType, duration: animationDuration }}
+              points={points.value}
               connectMissingData
               y0={chartBounds.bottom}
             >
@@ -143,11 +145,11 @@ const Graph: React.FC<GraphProps> = ({
             </Area>
 
             <Line
-              points={points.weight}
+              points={points.value}
               curveType={curveType}
               strokeWidth={2.5}
               connectMissingData
-              animate={{ type: "spring", duration: 500 }}
+              animate={{ type: animationType, duration: animationDuration }}
             >
               <LinearGradient
                 start={vec(0, 0)}
@@ -157,8 +159,8 @@ const Graph: React.FC<GraphProps> = ({
             </Line>
             {showDots && (
               <Scatter
-                animate={{ type: "spring", duration: 500 }}
-                points={points.weight}
+                animate={{ type: animationType, duration: animationDuration }}
+                points={points.value}
                 radius={radius}
                 color={"#95FDA8"}
               >
@@ -169,7 +171,7 @@ const Graph: React.FC<GraphProps> = ({
               <ToolTip
                 x={state.x.position}
                 font={font}
-                y={state.y.weight.position}
+                y={state.y.value.position}
                 value={value}
                 radius={radius + 1}
                 chartBounds={chartBounds}

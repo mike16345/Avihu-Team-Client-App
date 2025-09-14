@@ -27,7 +27,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ maxValue, value }) => {
 
       Animated.timing(animatedWidth, {
         toValue: targetWidth,
-        duration: 500,
+        duration: 300,
         useNativeDriver: false,
       }).start();
     }

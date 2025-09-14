@@ -247,6 +247,5 @@ export function padXLabel(label: string): string {
   const len = label.length;
   const spacesToAdd = len + (len > 10 ? 12 : 4);
 
-  console.log("spaces to add", spacesToAdd);
   return " ".repeat(spacesToAdd) + label;
 }
