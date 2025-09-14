@@ -45,7 +45,7 @@ const WeighInsCalendar = () => {
         </View>
       </ConditionalRender>
 
-      <CustomModal visible={isEditModalOpen}>
+      <CustomModal withToasts visible={isEditModalOpen}>
         <CustomModal.Content>
           <EditWeighIn
             date={selectedDate || ""}

@@ -5,30 +5,48 @@ import { errorNotificationHaptic, successNotificationHaptic } from "@/utils/hapt
 export type ToastInput = Omit<IToast, "type">;
 
 export const useToast = () => {
-  const { showToast } = useToastStore();
+  const { showToast, showModalToast } = useToastStore();
 
   const triggerSuccessToast = ({
     title = "הצלחה",
     message = "פעולה בוצעה בהצלחה",
     duration,
+    isModalToast,
   }: ToastInput) => {
     successNotificationHaptic();
-
-    showToast({
-      title,
-      message,
-      duration,
-      type: "success",
-    });
+    if (isModalToast) {
+      showToast({
+        title,
+        message,
+        duration,
+        type: "success",
+      });
+    } else {
+      showModalToast({
+        title,
+        message,
+        duration,
+        type: "success",
+      });
+    }
   };
 
   const triggerErrorToast = ({
     title = "שגיאה",
     message = "פעולה נכשלה",
     duration,
+    isModalToast = false,
   }: ToastInput) => {
     errorNotificationHaptic();
-
+    if (isModalToast) {
+      showModalToast({
+        title,
+        message,
+        duration,
+        type: "error",
+      });
+    } else {
+    }
     showToast({
       title,
       message,

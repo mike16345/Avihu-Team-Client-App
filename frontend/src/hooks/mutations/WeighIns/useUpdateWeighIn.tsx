@@ -10,14 +10,13 @@ const useUpdateWeighIn = () => {
   const userId = useUserStore((state) => state.currentUser?._id);
 
   const { updateWeighInById } = useWeighInApi();
-  const { triggerErrorToast, triggerSuccessToast } = useToast();
+  const { triggerErrorToast } = useToast();
 
   const handleUpdateWeighIn = async ({ id, data }: { id: string; data: IWeighInPost }) => {
     try {
       const result = await updateWeighInById(id, data);
 
       queryClient.invalidateQueries({ queryKey: [WEIGH_INS_KEY + userId] });
-      triggerSuccessToast({ message: result.message });
 
       return result;
     } catch (error: any) {

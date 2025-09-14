@@ -4,23 +4,40 @@ import { create } from "zustand";
 
 interface IToastStore {
   toasts: IToast[];
+  modalToasts: IToast[];
   showToast: (toast: Omit<IToast, "id">) => void;
-  removeToast: (id: string, duration?: number) => void;
+  showModalToast: (toast: Omit<IToast, "id">) => void;
+  removeToast: (id: string, duration?: number, isModalToast?: boolean) => void;
 }
 
 export const useToastStore = create<IToastStore>((set, get) => ({
+  modalToasts: [],
   toasts: [],
+  showModalToast: (toast) => {
+    const id = generateUniqueId();
+    const currentToasts = get().modalToasts;
+    const newToasts = [...currentToasts, { ...toast, id }];
+
+    set({ modalToasts: newToasts });
+    get().removeToast(id, toast.duration, true);
+  },
   showToast: (toast) => {
     const id = generateUniqueId();
-
     const currentToasts = get().toasts;
     const newToasts = [...currentToasts, { ...toast, id }];
 
     set({ toasts: newToasts });
-
-    get().removeToast(id, toast.duration);
+    get().removeToast(id, toast.duration, false);
   },
-  removeToast: (id, duration = 5000) => {
+  removeToast: (id, duration = 5000, isModalToast) => {
+    if (isModalToast) {
+      return setTimeout(() => {
+        set((state) => ({
+          modalToasts: state.modalToasts.filter((toast) => toast.id !== id),
+        }));
+      }, duration);
+    }
+
     setTimeout(() => {
       set((state) => ({
         toasts: state.toasts.filter((toast) => toast.id !== id),

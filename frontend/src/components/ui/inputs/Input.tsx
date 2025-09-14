@@ -18,8 +18,8 @@ const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
   const borderColor = error
     ? colors.borderError
     : inputRef.current?.isFocused()
-      ? colors.borderPrimary
-      : colors.outline;
+    ? colors.borderPrimary
+    : colors.outline;
   const borderwidth = inputRef.current?.isFocused() ? common.borderSm : common.borderXsm;
 
   return (
@@ -51,7 +51,6 @@ const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
             common.roundedSm,
             borderColor,
             borderwidth,
-
             colors.background,
             {
               fontFamily: "Assistant-Regular",

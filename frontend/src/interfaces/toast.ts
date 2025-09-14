@@ -4,4 +4,5 @@ export interface IToast {
   message?: string;
   type: "success" | "error";
   duration?: number;
+  isModalToast?: boolean;
 }

@@ -21,7 +21,7 @@ interface EditWeighInProps {
 const EditWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit, handleDismissModal }) => {
   const { width } = useWindowDimensions();
   const { text, spacing, layout } = useStyles();
-  const { triggerErrorToast } = useToast();
+  const { triggerErrorToast, triggerSuccessToast } = useToast();
 
   const { mutate: updateWeighIn, isPending: isUpdating } = useUpdateWeighIn();
   const { mutate: deleteWeighIn, isPending: isDeleting } = useDeleteWeighIn();
@@ -41,7 +41,7 @@ const EditWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit, handleDismissM
     if (!result.success) {
       const message = result.error.errors[0]?.message ?? "שגיאה לא ידועה";
 
-      triggerErrorToast({ message });
+      triggerErrorToast({ message, isModalToast: true });
       setError(message);
 
       return;
