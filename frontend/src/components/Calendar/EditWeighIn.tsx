@@ -1,6 +1,6 @@
 import useStyles from "@/styles/useGlobalStyles";
 import DateUtils from "@/utils/dateUtils";
-import { View, TouchableOpacity, useWindowDimensions } from "react-native";
+import { View, TouchableOpacity, useWindowDimensions, Keyboard } from "react-native";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import { Text } from "../ui/Text";
 import { IWeighIn } from "@/interfaces/User";
@@ -9,6 +9,8 @@ import Icon from "../Icon/Icon";
 import Input from "../ui/inputs/Input";
 import useUpdateWeighIn from "@/hooks/mutations/WeighIns/useUpdateWeighIn";
 import useDeleteWeighIn from "@/hooks/mutations/WeighIns/useDeleteWeighIn";
+import weighInSchema from "@/schemas/weighInSchema";
+import { useToast } from "@/hooks/useToast";
 
 interface EditWeighInProps {
   date: string;
@@ -19,11 +21,37 @@ interface EditWeighInProps {
 const EditWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit, handleDismissModal }) => {
   const { width } = useWindowDimensions();
   const { text, spacing, layout } = useStyles();
+  const { triggerErrorToast } = useToast();
 
-  const { mutate: updateWeighIn } = useUpdateWeighIn();
-  const { mutate: deleteWeighIn } = useDeleteWeighIn();
+  const { mutate: updateWeighIn, isPending: isUpdating } = useUpdateWeighIn();
+  const { mutate: deleteWeighIn, isPending: isDeleting } = useDeleteWeighIn();
 
   const [weighIn, setWeighIn] = useState<string | undefined>(String(weighInToEdit?.weight));
+  const [error, setError] = useState<string | null>(null);
+
+  const isButtonDisabled = isDeleting || isUpdating;
+
+  const handleUpdateWeighIn = () => {
+    const parsed = Number(weighIn);
+
+    const result = weighInSchema.safeParse({
+      weight: parsed,
+    });
+
+    if (!result.success) {
+      const message = result.error.errors[0]?.message ?? "שגיאה לא ידועה";
+
+      triggerErrorToast({ message });
+      setError(message);
+
+      return;
+    }
+    Keyboard.dismiss();
+    updateWeighIn({
+      id: weighInToEdit?._id || "",
+      data: { ...weighInToEdit, weight: Number(weighIn) },
+    });
+  };
 
   return (
     <View style={[layout.widthFull, layout.center, spacing.gapMd]}>
@@ -35,6 +63,7 @@ const EditWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit, handleDismissM
       <View style={[spacing.gapLg, layout.center]}>
         <Input
           value={weighIn}
+          error={!!error}
           onChangeText={setWeighIn}
           keyboardType="number-pad"
           label="משקל"
@@ -43,26 +72,27 @@ const EditWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit, handleDismissM
         />
         <View style={[spacing.gapMd, { width: width * 0.5 }]}>
           <PrimaryButton
-            onPress={() => {
-              updateWeighIn({
-                id: weighInToEdit?._id || "",
-                data: { ...weighInToEdit, weight: Number(weighIn) },
-              });
-              handleDismissModal();
-            }}
+            loading={isUpdating}
+            disabled={isButtonDisabled}
+            onPress={handleUpdateWeighIn}
             block
           >
             עדכון
           </PrimaryButton>
-          <PrimaryButton onPress={() => handleDismissModal()} mode="light" block>
+          <PrimaryButton
+            disabled={isButtonDisabled}
+            onPress={() => handleDismissModal()}
+            mode="light"
+            block
+          >
             ביטול
           </PrimaryButton>
         </View>
       </View>
       <TouchableOpacity
+        disabled={isButtonDisabled}
         onPress={() => {
           deleteWeighIn(weighInToEdit?._id || "");
-          handleDismissModal();
         }}
       >
         <Icon name="trash" />

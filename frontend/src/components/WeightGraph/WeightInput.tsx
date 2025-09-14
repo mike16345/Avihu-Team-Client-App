@@ -4,19 +4,10 @@ import PrimaryButton from "../ui/buttons/PrimaryButton";
 import Input from "../ui/inputs/Input";
 import useAddWeighIn from "@/hooks/mutations/WeighIns/useAddWeighIn";
 import { useMemo, useState } from "react";
-import { z } from "zod";
 import { useToast } from "@/hooks/useToast";
 import useWeighInsQuery from "@/hooks/queries/WeighIns/useWeighInsQuery";
 import DateUtils from "@/utils/dateUtils";
-
-const weighInSchema = z.object({
-  weight: z
-    .number({
-      required_error: "יש להזין מספר",
-      invalid_type_error: "הערך חייב להיות מספר",
-    })
-    .positive("המספר חייב להיות גדול מ-0"),
-});
+import weighInSchema from "@/schemas/weighInSchema";
 
 const WeightInput = () => {
   const { layout, spacing } = useStyles();

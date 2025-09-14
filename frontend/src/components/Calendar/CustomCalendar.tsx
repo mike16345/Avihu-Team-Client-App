@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Calendar, DateData } from "react-native-calendars";
 import useStyles from "@/styles/useGlobalStyles";
 import moment from "moment";
@@ -30,9 +30,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
   const { theme, marked } = useCalendarTheme(today, selectedDate);
 
   const handleSelect = (day: DateData) => {
-    const date = day.dateString;
-    
-    onSelect(date);
+    onSelect(day.dateString);
   };
 
   const handleMonthChange = (date: string) => {
@@ -52,6 +50,12 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
     const prev = moment(currentDate).subtract(1, "month").format("YYYY-MM-DD");
     setCurrentDate(prev);
   };
+
+  useEffect(() => {
+    if (selectedDate) return;
+    
+    onSelect(today);
+  }, []);
 
   return (
     <View style={[{ position: "relative" }, common.rounded]}>
