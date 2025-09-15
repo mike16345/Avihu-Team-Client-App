@@ -23,15 +23,15 @@ const EditWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit, handleDismissM
   const { text, spacing, layout } = useStyles();
   const { triggerErrorToast, triggerSuccessToast } = useToast();
 
-  const { mutate: updateWeighIn, isPending: isUpdating } = useUpdateWeighIn();
-  const { mutate: deleteWeighIn, isPending: isDeleting } = useDeleteWeighIn();
+  const { mutateAsync: updateWeighIn, isPending: isUpdating } = useUpdateWeighIn();
+  const { mutateAsync: deleteWeighIn, isPending: isDeleting } = useDeleteWeighIn();
 
   const [weighIn, setWeighIn] = useState<string | undefined>(String(weighInToEdit?.weight));
   const [error, setError] = useState<string | null>(null);
 
   const isButtonDisabled = isDeleting || isUpdating;
 
-  const handleUpdateWeighIn = () => {
+  const handleUpdateWeighIn = async () => {
     const parsed = Number(weighIn);
 
     const result = weighInSchema.safeParse({
@@ -41,16 +41,29 @@ const EditWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit, handleDismissM
     if (!result.success) {
       const message = result.error.errors[0]?.message ?? "שגיאה לא ידועה";
 
-      triggerErrorToast({ message, isModalToast: true });
+      triggerErrorToast({ message });
       setError(message);
-
+      handleDeleteWeighIn;
       return;
     }
     Keyboard.dismiss();
-    updateWeighIn({
+    await updateWeighIn({
       id: weighInToEdit?._id || "",
       data: { ...weighInToEdit, weight: Number(weighIn) },
     });
+
+    triggerSuccessToast({ title: "הועלה בהצלחה ", message: "ניתן להיות במעקב דרך גרף השקילות" });
+
+    handleDismissModal();
+  };
+
+  const handleDeleteWeighIn = async () => {
+    try {
+      await deleteWeighIn(weighInToEdit?._id || "");
+      handleDismissModal();
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -89,12 +102,7 @@ const EditWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit, handleDismissM
           </PrimaryButton>
         </View>
       </View>
-      <TouchableOpacity
-        disabled={isButtonDisabled}
-        onPress={() => {
-          deleteWeighIn(weighInToEdit?._id || "");
-        }}
-      >
+      <TouchableOpacity disabled={isButtonDisabled} onPress={handleDeleteWeighIn}>
         <Icon name="trash" />
       </TouchableOpacity>
     </View>

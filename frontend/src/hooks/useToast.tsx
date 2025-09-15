@@ -15,14 +15,14 @@ export const useToast = () => {
   }: ToastInput) => {
     successNotificationHaptic();
     if (isModalToast) {
-      showToast({
+      showModalToast({
         title,
         message,
         duration,
         type: "success",
       });
     } else {
-      showModalToast({
+      showToast({
         title,
         message,
         duration,
@@ -46,13 +46,13 @@ export const useToast = () => {
         type: "error",
       });
     } else {
+      showToast({
+        title,
+        message,
+        duration,
+        type: "error",
+      });
     }
-    showToast({
-      title,
-      message,
-      duration,
-      type: "error",
-    });
   };
 
   return { triggerErrorToast, triggerSuccessToast };

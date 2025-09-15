@@ -20,7 +20,6 @@ const useDeleteWeighIn = () => {
 
       return result;
     } catch (error: any) {
-      triggerErrorToast({});
       return Promise.reject(error?.message);
     }
   };

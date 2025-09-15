@@ -13,6 +13,7 @@ import {
   GraphData,
   useVictoryNativeGraphWeighIns,
 } from "@/hooks/graph/useVictoryNativeGraphWeighIns";
+import { ConditionalRender } from "../ui/ConditionalRender";
 
 const tabs: GraphTab[] = ["יומי", "שבועי", "חודשי"];
 const initialTab: GraphTab = "יומי";
@@ -52,7 +53,15 @@ const WeighInsGraph = () => {
           <Text fontSize={16}>מעקב שקילה</Text>
         </Card.Header>
 
-        <Graph data={weighIns[selectedTab]} />
+        <ConditionalRender condition={weighIns[selectedTab].length > 0}>
+          <Graph data={weighIns[selectedTab]} />
+        </ConditionalRender>
+
+        <ConditionalRender condition={weighIns[selectedTab].length == 0}>
+          <View style={[layout.center, layout.flex1]}>
+            <Text fontSize={16}>אין משקל</Text>
+          </View>
+        </ConditionalRender>
       </Card>
     </View>
   );
