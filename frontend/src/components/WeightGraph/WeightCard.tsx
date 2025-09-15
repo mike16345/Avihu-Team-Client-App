@@ -22,7 +22,9 @@ const WeightCard: React.FC<CardProps> = ({ title, value, unit, operator = "" }) 
       style={[spacing.pdHorizontalMd, spacing.pdVerticalDefault, { width: cardWidth }]}
     >
       <Card.Header>
-        <Text fontSize={16}>{title}</Text>
+        <Text style={[layout.alignSelfStart]} fontSize={16}>
+          {title}
+        </Text>
       </Card.Header>
 
       <Card.Content style={[layout.flexRow, spacing.gapSm]}>

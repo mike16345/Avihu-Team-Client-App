@@ -15,7 +15,7 @@ const START_SLICE_INDEX = 0;
 const END_SLICE_INDEX = 5;
 
 const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup }) => {
-  const { center, alignSelfStart } = useLayoutStyles();
+  const { center, alignSelfStart, wrap } = useLayoutStyles();
   const { data: items, isLoading } = useFoodGroupQuery(foodGroup);
 
   if (items == undefined || isLoading)
@@ -31,7 +31,7 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup }) => {
     .join(" | ");
 
   return (
-    <Text style={[alignSelfStart]} fontSize={16}>
+    <Text style={[alignSelfStart, wrap]} fontSize={16}>
       {formatted}
     </Text>
   );

@@ -10,7 +10,7 @@ import { Card, CardVariants } from "./Card";
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { ConditionalRender } from "./ConditionalRender";
 import useStyles from "@/styles/useGlobalStyles";
-import { Text } from "./Text";
+import { Text, TextProps } from "./Text";
 import Icon from "../Icon/Icon";
 import React from "react";
 
@@ -26,6 +26,7 @@ interface CollapsibleProps {
   freezeOnCollapse?: boolean; // stop child re-renders while collapsed
   onExpandEnd?: () => void; // optional hooks if you need them
   onCollapseEnd?: () => void;
+  triggerProps?: TextProps;
 }
 
 const ANIMATION_DURATION = 250;
@@ -42,8 +43,9 @@ const Collapsible: React.FC<CollapsibleProps> = ({
   freezeOnCollapse = true,
   onExpandEnd,
   onCollapseEnd,
+  triggerProps,
 }) => {
-  const { layout, text } = useStyles();
+  const { layout } = useStyles();
 
   const [contentHeight, setContentHeight] = useState(0);
   const [measured, setMeasured] = useState(false);
@@ -112,7 +114,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
           >
             <ConditionalRender condition={typeof trigger === "string"}>
               <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
-                <Text style={text.textBold}>{trigger}</Text>
+                <Text {...triggerProps}>{trigger}</Text>
                 <Icon name="chevronDown" rotation={!isCollapsed ? 180 : 0} />
               </View>
             </ConditionalRender>
@@ -122,7 +124,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
         </Card.Header>
       </ConditionalRender>
 
-      <Card.Content style={[]}>
+      <Card.Content>
         <ConditionalRender condition={!measured}>
           <View
             onLayout={getContentHeight}
