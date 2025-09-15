@@ -7,7 +7,7 @@ import WeightCard from "./WeightCard";
 
 const WeightCardsContainer = () => {
   const { data } = useWeighInsQuery();
-  const { layout, spacing } = useStyles();
+  const { layout } = useStyles();
 
   const { latestWeighIn, monthlyWeighInAverage } = useMemo(() => {
     if (!data) return { latestWeighIn: 0, monthlyWeighInAverage: 0 };
@@ -19,7 +19,7 @@ const WeightCardsContainer = () => {
   }, [data]);
 
   return (
-    <View style={[layout.flexRow, layout.center, spacing.gap20]}>
+    <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter]}>
       <WeightCard
         title="מגמה חודשית"
         unit='ק"ג'

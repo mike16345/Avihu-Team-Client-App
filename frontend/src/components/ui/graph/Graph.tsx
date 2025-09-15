@@ -12,7 +12,6 @@ import {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-
 import {
   Line,
   CartesianChart,

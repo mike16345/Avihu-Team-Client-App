@@ -2,6 +2,7 @@ import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
 import { Card } from "../ui/Card";
+import { useWindowDimensions } from "react-native";
 
 interface CardProps {
   title: string;
@@ -13,11 +14,12 @@ interface CardProps {
 
 const WeightCard: React.FC<CardProps> = ({ title, value, unit, operator = "" }) => {
   const { layout, spacing } = useStyles();
+  const cardWidth = useWindowDimensions().width * 0.4;
 
   return (
     <Card
       variant="gray"
-      style={[spacing.pdHorizontalMd, spacing.pdVerticalDefault, { width: 153.5 }]}
+      style={[spacing.pdHorizontalMd, spacing.pdVerticalDefault, { width: cardWidth }]}
     >
       <Card.Header>
         <Text fontSize={16}>{title}</Text>
