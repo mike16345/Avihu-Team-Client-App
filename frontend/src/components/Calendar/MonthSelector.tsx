@@ -27,9 +27,10 @@ const MonthSelector: React.FC<MonthSelectorProps> = ({
         layout.flex1,
         colors.backgroundSurface,
         common.rounded,
+        spacing.pdDefault,
       ]}
     >
-      <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter, spacing.pdLg]}>
+      <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter]}>
         <Text fontSize={16}>חודשים</Text>
         <TouchableOpacity onPress={onCloseMonthSelect}>
           <Icon name="close" />

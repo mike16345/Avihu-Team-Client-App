@@ -16,6 +16,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       image: "./assets/avihu/avihuFlyTrapWithLogo.jpeg",
       backgroundColor: "#000000",
     },
+
     plugins: [
       ["expo-localization"],
 
@@ -52,7 +53,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         foregroundImage: "./assets/playstore.png",
         backgroundColor: "#000000",
       },
-
+      softwareKeyboardLayoutMode: "resize",
       package: "com.avihuteam.avihuteam",
     },
     extra: {

@@ -13,7 +13,11 @@ import queryClient from "@/QueryClient/queryClient";
 import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
 import ToastContainer from "@/components/ui/toast/ToastContainer";
 import useCustomFonts from "@/hooks/useCustomFonts";
-import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  initialWindowMetrics,
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function App() {
   const ready = useOneTimeRTLFix();
@@ -24,7 +28,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <GestureHandlerRootView>
+      <GestureHandlerRootView style={{ direction: "rtl" }}>
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
           <View style={[{ direction: "rtl" }, { flex: 1 }]}>
             <PersistQueryClientProvider
