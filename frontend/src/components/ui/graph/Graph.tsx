@@ -25,9 +25,9 @@ import {
   CurveType,
 } from "victory-native";
 import AssistantRegular from "@assets/fonts/Assistant/Assistant-Regular.ttf";
-import { ToolTip } from "@/screens/Sandbox";
 import SkiaLine from "./SkiaLine";
 import { GRAPH_HEIGHT } from "@/constants/Constants";
+import { ToolTip } from "./ToolTip";
 
 interface GraphProps {
   header?: ReactNode;
