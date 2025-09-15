@@ -7,12 +7,8 @@ import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { Card } from "../ui/Card";
 import Icon from "../Icon/Icon";
 import { Text } from "../ui/Text";
-import { GraphTab } from "@/hooks/graph/useGraphWeighIns";
+import { GraphData, GraphTab, useGraphWeighIns } from "@/hooks/graph/useGraphWeighIns";
 import { Tabs, TabsList, TabsTrigger } from "../ui/Tabs";
-import {
-  GraphData,
-  useVictoryNativeGraphWeighIns,
-} from "@/hooks/graph/useVictoryNativeGraphWeighIns";
 import { ConditionalRender } from "../ui/ConditionalRender";
 
 const tabs: GraphTab[] = ["יומי", "שבועי", "חודשי"];
@@ -22,7 +18,7 @@ const WeighInsGraph = () => {
   const { isLoading, data } = useWeighInsQuery();
   const { layout, spacing } = useStyles();
 
-  const { dailyWeighIns, weeklyWeighIns, monthlyWeighIns } = useVictoryNativeGraphWeighIns(data);
+  const { dailyWeighIns, weeklyWeighIns, monthlyWeighIns } = useGraphWeighIns(data);
 
   const [selectedTab, setSelectedTab] = useState<GraphTab>(initialTab);
   const weighIns: Record<GraphTab, GraphData[]> = {

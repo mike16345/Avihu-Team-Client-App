@@ -3,8 +3,8 @@ import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import {
-  RootStackParamList,
-  RootStackParamListNavigationProp,
+  AuthStackParamList,
+  AuthStackParamListNavigationProp,
   StackNavigatorProps,
 } from "@/types/navigatorTypes";
 import { successNotificationHaptic } from "@/utils/haptics";
@@ -12,10 +12,10 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 
-type SuccessScreenProps = StackNavigatorProps<RootStackParamList, "SuccessScreen">;
+type SuccessScreenProps = StackNavigatorProps<AuthStackParamList, "SuccessScreen">;
 
 export const SuccessScreen: React.FC<SuccessScreenProps> = ({ route }) => {
-  const navigation = useNavigation<RootStackParamListNavigationProp>();
+  const navigation = useNavigation<AuthStackParamListNavigationProp>();
   const { fonts, layout, spacing, text } = useStyles();
 
   useEffect(() => {

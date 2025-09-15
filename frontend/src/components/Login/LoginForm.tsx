@@ -16,8 +16,6 @@ import { useToast } from "@/hooks/useToast";
 import { IUser } from "@/interfaces/User";
 import PasswordInput from "../ui/inputs/PasswordInput";
 import { useFadeIn } from "@/styles/useFadeIn";
-import { useNavigation } from "@react-navigation/native";
-import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 
 interface LoginFormProps {
   onLoginSuccess: (user: IUser) => void;
@@ -30,7 +28,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
   const { loginUser } = useUserApi();
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
   const { setItem } = useAsyncStorage(SESSION_TOKEN_KEY);
-  const navigation = useNavigation<RootStackParamListNavigationProp>();
 
   const opacity = useFadeIn();
   const [inputtedCrendentials, setInputtedCredentials] = useState<IUserCredentials>({

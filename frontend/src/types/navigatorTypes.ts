@@ -53,3 +53,4 @@ export interface StackNavigatorProps<T extends ParamListBase, S extends keyof T>
 }
 
 export type RootStackParamListNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+export type AuthStackParamListNavigationProp = NativeStackNavigationProp<AuthStackParamList>;

@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/useToast";
 import { useFadeIn } from "@/styles/useFadeIn";
 import { errorNotificationHaptic } from "@/utils/haptics";
 import { useNavigation } from "@react-navigation/native";
-import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
+import { AuthStackParamListNavigationProp } from "@/types/navigatorTypes";
 
 interface INewUserDetails {
   name: string;
@@ -34,7 +34,7 @@ const RegisterForm = () => {
   const { submitLead } = useUserApi();
   const { triggerErrorToast } = useToast();
   const opacity = useFadeIn();
-  const navigation = useNavigation<RootStackParamListNavigationProp>();
+  const navigation = useNavigation<AuthStackParamListNavigationProp>();
 
   const [newUserDetails, setNewUserDetails] = useState<INewUserDetails>(DEFAULT_FORM_DATA);
   const [formErrors, setFormErrors] = useState<IFormErrors>({});

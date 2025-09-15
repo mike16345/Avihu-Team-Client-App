@@ -1,6 +1,6 @@
 import { IRecordedSet } from "@/interfaces/Workout";
 import DateUtils from "./dateUtils";
-import { GraphData } from "@/hooks/graph/useVictoryNativeGraphWeighIns";
+import { GraphData } from "@/hooks/graph/useGraphWeighIns";
 
 type SetsSummaryByDate = Record<string, { totalReps: number; totalWeight: number; count: number }>;
 

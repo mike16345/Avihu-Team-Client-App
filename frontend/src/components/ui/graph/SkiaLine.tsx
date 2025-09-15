@@ -1,4 +1,4 @@
-import { Line, LineProps, vec } from "@shopify/react-native-skia";
+import { Line,  vec } from "@shopify/react-native-skia";
 import { useDerivedValue } from "react-native-reanimated";
 import { ChartBounds } from "victory-native";
 
