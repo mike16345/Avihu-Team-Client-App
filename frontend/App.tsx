@@ -28,8 +28,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <GestureHandlerRootView
-      >
+      <GestureHandlerRootView>
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
           <View style={[{ direction: "rtl" }, { flex: 1 }]}>
             <PersistQueryClientProvider
