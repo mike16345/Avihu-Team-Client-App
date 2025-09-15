@@ -12,6 +12,7 @@ import WorkoutPlanSelector from "@/components/WorkoutPlan/WorkoutPlanSelector";
 import { CARDIO_VALUE } from "@/constants/Constants";
 import CardioWrapper from "@/components/WorkoutPlan/cardio/CardioWrapper";
 import { DropDownContextProvider } from "@/context/useDropdown";
+import { mapToDropDownItems } from "@/utils/utils";
 
 const MyWorkoutPlanScreen = () => {
   const { colors, layout, spacing } = useStyles();
@@ -25,8 +26,9 @@ const MyWorkoutPlanScreen = () => {
   const plans = useMemo(() => {
     if (!data) return [];
 
-    const plans = data.workoutPlans.map((p) => {
-      return { label: p.planName, value: p._id };
+    const plans = mapToDropDownItems(data.workoutPlans, {
+      labelKey: "planName",
+      valueKey: "_id",
     });
 
     plans.push({ label: CARDIO_VALUE, value: CARDIO_VALUE });
@@ -57,7 +59,7 @@ const MyWorkoutPlanScreen = () => {
       <View style={[colors.background, layout.flex1, spacing.pdStatusBar, spacing.gapLg]}>
         <ConditionalRender condition={plans && selectedPlan}>
           <View style={[{ zIndex: 2, elevation: 5 }, spacing.pdHorizontalLg]}>
-            <DropDownContextProvider items={plans || []} onSelect={handleSelect}>
+            <DropDownContextProvider items={plans} onSelect={handleSelect}>
               <WorkoutPlanSelector
                 selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
                 tips={showCardio ? [data.cardio.plan.tips] : data.tips}
