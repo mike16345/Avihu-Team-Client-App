@@ -1,4 +1,4 @@
-import { Animated, useWindowDimensions, View } from "react-native";
+import { Animated, useWindowDimensions } from "react-native";
 import React, { ReactNode, useEffect, useRef } from "react";
 import { Text } from "../Text";
 import useStyles from "@/styles/useGlobalStyles";
@@ -45,7 +45,13 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ children, variant = "prompt" })
         { maxWidth: width * 0.75, transform: [{ translateY }] },
       ]}
     >
-      <Text style={[textStyles.textLeft, colors.textPrimary]}>{children}</Text>
+      <Text
+        fontVariant={variant == "prompt" ? "light" : "regular"}
+        fontSize={16}
+        style={[textStyles.textLeft, colors.textPrimary, { lineHeight: 20 }]}
+      >
+        {children}
+      </Text>
     </Animated.View>
   );
 };
