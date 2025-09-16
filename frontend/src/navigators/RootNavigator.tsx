@@ -11,10 +11,6 @@ import SplashScreen from "@/screens/SplashScreen";
 import { useToast } from "@/hooks/useToast";
 import AuthNavigator from "./AuthNavigator";
 import AppNavigator from "./AppNavigator";
-import ChatScreen from "@/screens/ChatScreen";
-import ChatHeader from "@/components/chat/ChatHeader";
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const RootNavigator = () => {
   const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
