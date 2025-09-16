@@ -66,6 +66,20 @@ const Collapsible: React.FC<CollapsibleProps> = ({
     [contentHeight, customHeight]
   );
 
+  const handleContentLayout = useCallback(
+    (event: LayoutChangeEvent) => {
+      if (customHeight) return;
+
+      const nextHeight = event.nativeEvent.layout.height;
+
+      if (nextHeight > 0 && nextHeight !== contentHeight) {
+        setContentHeight(nextHeight);
+        setMeasured(true);
+      }
+    },
+    [contentHeight, customHeight]
+  );
+
   useEffect(() => {
     animRef.current?.stop();
 
@@ -128,7 +142,16 @@ const Collapsible: React.FC<CollapsibleProps> = ({
         <ConditionalRender condition={!measured}>
           <View
             onLayout={getContentHeight}
-            style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
+            style={[
+              layout.widthFull,
+              {
+                position: "absolute",
+                left: 0,
+                right: 0,
+                opacity: 0,
+                pointerEvents: "none",
+              },
+            ]}
           >
             {children}
           </View>
@@ -137,21 +160,30 @@ const Collapsible: React.FC<CollapsibleProps> = ({
         <Animated.View
           shouldRasterizeIOS={isAnimatingRef.current}
           renderToHardwareTextureAndroid={isAnimatingRef.current}
-          style={[layout.flex1, { height, overflow: "hidden" }]}
+          style={[layout.flex1, layout.widthFull, { height, overflow: "hidden" }]}
           collapsable
           pointerEvents={isCollapsed ? "none" : "auto"}
         >
-          {keepMounted ? (
-            freezeOnCollapse ? (
-              <View style={[layout.flex1]} shouldRasterizeIOS renderToHardwareTextureAndroid>
-                {memoizedChild}
-              </View>
+          <View
+            onLayout={handleContentLayout}
+            style={[layout.widthFull]}
+          >
+            {keepMounted ? (
+              freezeOnCollapse ? (
+                <View
+                  style={[layout.flex1]}
+                  shouldRasterizeIOS
+                  renderToHardwareTextureAndroid
+                >
+                  {memoizedChild}
+                </View>
+              ) : (
+                children
+              )
             ) : (
-              children
-            )
-          ) : (
-            <ConditionalRender condition={measured && renderChildren}>{children}</ConditionalRender>
-          )}
+              <ConditionalRender condition={renderChildren}>{children}</ConditionalRender>
+            )}
+          </View>
         </Animated.View>
       </Card.Content>
     </Card>
