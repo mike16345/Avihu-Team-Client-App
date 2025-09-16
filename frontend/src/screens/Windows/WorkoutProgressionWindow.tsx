@@ -4,7 +4,7 @@ import { DropDownContextProvider } from "@/context/useDropdown";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import useStyles from "@/styles/useGlobalStyles";
 import { useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 import ErrorScreen from "../ErrorScreen";
 import WorkoutProgressScreenSkeleton from "@/components/ui/loaders/skeletons/WorkoutProgressScreenSkeleton";
 import { mapToDropDownItems } from "@/utils/utils";
@@ -13,7 +13,7 @@ import ExerciseSelector from "@/components/WorkoutProgression/ExerciseSelector";
 
 const WorkoutProgressionWindow = () => {
   const { layout, spacing } = useStyles();
-  const { data, isLoading, isError } = useRecordedSetsQuery();
+  const { data, isLoading, isError, isRefetching, refetch } = useRecordedSetsQuery();
 
   const [activeMuscleGroup, setActiveMuscleGroup] = useState<string>(MUSCLE_GROUPS[0]);
 
@@ -54,9 +54,13 @@ const WorkoutProgressionWindow = () => {
         items={activeExercises}
         onSelect={() => {}}
       >
-        <ScrollView nestedScrollEnabled contentContainerStyle={[spacing.gapSm]}>
+        <ScrollView
+          nestedScrollEnabled
+          style={[layout.flex1]}
+          contentContainerStyle={[spacing.gapSm]}
+          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+        >
           <ExerciseSelector muscleGroup={activeMuscleGroup} />
-
           <GraphsContainer />
         </ScrollView>
       </DropDownContextProvider>

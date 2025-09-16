@@ -1,9 +1,8 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { FoodGroup } from "@/types/foodTypes";
 import useFoodGroupQuery from "@/hooks/queries/MenuItems/useFoodGroupQuery";
-import { Text } from "../ui/Text";
 import { formatServingText } from "@/utils/utils";
-import { View } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { useLayoutStyles } from "@/styles/useLayoutStyles";
 
@@ -15,8 +14,17 @@ const START_SLICE_INDEX = 0;
 const END_SLICE_INDEX = 5;
 
 const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup }) => {
-  const { center } = useLayoutStyles();
+  const { center, wrap } = useLayoutStyles();
   const { data: items, isLoading } = useFoodGroupQuery(foodGroup);
+
+  const formatted = useMemo(() => {
+    if (!items) return "";
+
+    return items
+      .slice(START_SLICE_INDEX, END_SLICE_INDEX)
+      .map((item) => formatServingText(item.name, item.oneServing, 1))
+      .join(" | ");
+  }, [items]);
 
   if (items == undefined || isLoading)
     return (
@@ -25,12 +33,15 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup }) => {
       </View>
     );
 
-  const formatted = items
-    .slice(START_SLICE_INDEX, END_SLICE_INDEX)
-    .map((item) => formatServingText(item.name, item.oneServing, 1))
-    .join(" | ");
-
-  return <Text>{formatted}</Text>;
+  return (
+    <TextInput multiline style={[wrap, styles.foodItemSelectionContainr]} editable={false}>
+      {formatted}
+    </TextInput>
+  );
 };
+
+const styles = StyleSheet.create({
+  foodItemSelectionContainr: { fontFamily: "Assistant-Regular", fontSize: 16, textAlign: "right" },
+});
 
 export default FoodItemSelection;

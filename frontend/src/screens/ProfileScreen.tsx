@@ -2,7 +2,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import useLogout from "@/hooks/useLogout";
 import { Text } from "@/components/ui/Text";
-import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
+import { AuthStackParamListNavigationProp } from "@/types/navigatorTypes";
 import ProfileHeading from "@/components/User/ProfileHeading";
 import UserDetailsWrapper from "@/components/User/UserDetailsWrapper";
 import { ScrollView, View } from "react-native";
@@ -12,7 +12,7 @@ const ProfileScreen = () => {
   const { layout, spacing } = useStyles();
   const { handleLogout } = useLogout();
 
-  const navigation = useNavigation<RootStackParamListNavigationProp>();
+  const navigation = useNavigation<AuthStackParamListNavigationProp>();
 
   const onLogOut = async () => {
     await handleLogout();

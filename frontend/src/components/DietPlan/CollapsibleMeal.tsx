@@ -48,6 +48,7 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
   return (
     <Collapsible
       trigger={`ארוחה ${index + 1}`}
+      triggerProps={{ fontSize: 16, fontVariant: "semibold" }}
       variant={isEaten ? "success" : "gray"}
       isCollapsed={isCollapsed}
       onCollapseChange={toggleCollapse}

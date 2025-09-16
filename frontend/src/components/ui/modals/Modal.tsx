@@ -18,9 +18,12 @@ import useCommonStyles from "@/styles/useCommonStyles";
 import { useLayoutStyles } from "@/styles/useLayoutStyles";
 import { Card } from "../Card";
 import { IconName } from "@/constants/iconMap";
+import ToastContainer from "../toast/ToastContainer";
+import { useToastStore } from "@/store/toastStore";
 
 export interface CustomModalProps extends ModalProps {
   style?: StyleProp<ViewStyle>;
+  withToasts?: boolean;
 }
 
 type HeaderProps = ViewProps & { dismissIcon?: IconName };
@@ -31,8 +34,15 @@ interface CompoundModal extends React.FC<CustomModalProps> {
   Content: React.FC<ContentProps>;
 }
 
-export const CustomModal: CompoundModal = ({ children, onDismiss, visible, ...props }) => {
+export const CustomModal: CompoundModal = ({
+  children,
+  onDismiss,
+  visible,
+  withToasts = false,
+  ...props
+}) => {
   const { colors, layout, spacing } = useStyles();
+  const modalToasts = useToastStore((state) => state.modalToasts);
 
   const animationValue = useRef(new Animated.Value(0)).current;
 
@@ -57,25 +67,27 @@ export const CustomModal: CompoundModal = ({ children, onDismiss, visible, ...pr
   }, [visible]);
 
   return (
-    <Modal visible={visible} onRequestClose={handleDismiss} {...props}>
+    <Modal statusBarTranslucent visible={visible} onRequestClose={handleDismiss} {...props}>
       <Animated.View
         style={[
           colors.background,
           spacing.gapDefault,
           spacing.pdStatusBar,
-          spacing.pdBottomBar,
           spacing.pdLg,
           spacing.gapDefault,
           layout.flex1,
           {
             transform: [{ scale: animationValue }],
             opacity: animationValue,
-            paddingTop: spacing?.pdStatusBar?.paddingTop * 2,
-            paddingBottom: spacing.pdBottomBar.paddingBottom * 2,
+            paddingBottom: spacing.pdBottomBar.paddingBottom * 3,
+            paddingTop: 48,
           },
         ]}
       >
-        <ModalContextProvider onDismiss={handleDismiss}>{children}</ModalContextProvider>
+        <ModalContextProvider onDismiss={handleDismiss}>
+          {children}
+          <ToastContainer modalToasts={withToasts ? modalToasts : undefined} />
+        </ModalContextProvider>
       </Animated.View>
     </Modal>
   );

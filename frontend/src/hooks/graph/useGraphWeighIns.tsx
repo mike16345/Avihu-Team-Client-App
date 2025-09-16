@@ -1,18 +1,19 @@
 import { IWeighIn } from "@/interfaces/User";
 import { useMemo } from "react";
 
-type GraphData = {
-  weight: number;
-  date: string;
+export type GraphData = {
+  value: number;
+  label: string;
 };
 
 export type GraphTab = "יומי" | "שבועי" | "חודשי";
 
-const LARGE_AMOUNT_OF_WEIGH_INS = 50;
 const THIRTY_DAYS_AGO = new Date();
 THIRTY_DAYS_AGO.setDate(THIRTY_DAYS_AGO.getDate() - 30);
+const SEVEN_DAYS_AGO = new Date();
+SEVEN_DAYS_AGO.setDate(SEVEN_DAYS_AGO.getDate() - 7);
 
-export function useVictoryNativeGraphWeighIns(data: IWeighIn[] | undefined) {
+export function useGraphWeighIns(data: IWeighIn[] | undefined) {
   const { dailyWeighIns, weeklyWeighIns, monthlyWeighIns } = useMemo(() => {
     if (!data) {
       return {
@@ -29,24 +30,23 @@ export function useVictoryNativeGraphWeighIns(data: IWeighIn[] | undefined) {
     const weeklyWeighIns: GraphData[] = [];
     const monthlyMap: Record<string, { total: number; count: number }> = {};
     const monthOrder: string[] = [];
-    const isLargeAmountOfWeighIns = data.length >= LARGE_AMOUNT_OF_WEIGH_INS;
 
     data.forEach((item, idx) => {
       const dateObj = new Date(item.date);
-      const dayLabel = dateObj
-        .toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-        })
-        .replace("/", ".");
 
-      const isRecordedInLastThirtyDays = new Date(item.date) >= THIRTY_DAYS_AGO;
+      const today = new Date(item.date);
+      const isRecordedInLastSevenDays = today >= SEVEN_DAYS_AGO && today <= new Date();
 
       // ---- Daily ----
-      if (!isLargeAmountOfWeighIns || isRecordedInLastThirtyDays) {
-        dailyWeighIns.push({ weight: item.weight, date: dayLabel });
-      } else if (idx % 2 == 0 && isLargeAmountOfWeighIns) {
-        dailyWeighIns.push({ weight: item.weight, date: dayLabel });
+      if (isRecordedInLastSevenDays) {
+        const dayLabel = dateObj
+          .toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+          })
+          .replace("/", ".");
+
+        dailyWeighIns.push({ value: item.weight, label: dayLabel });
       }
 
       // ---- Weekly ----
@@ -67,7 +67,7 @@ export function useVictoryNativeGraphWeighIns(data: IWeighIn[] | undefined) {
           })
           .replace("/", ".");
 
-        weeklyWeighIns.push({ weight: avg, date: `${start} - ${end}` });
+        weeklyWeighIns.push({ value: avg, label: `${start} - ${end}` });
 
         weekBuffer = [];
       }
@@ -96,7 +96,7 @@ export function useVictoryNativeGraphWeighIns(data: IWeighIn[] | undefined) {
         month: "2-digit",
       });
 
-      weeklyWeighIns.push({ weight: avg, date: `${start}-${end}` });
+      weeklyWeighIns.push({ value: avg, label: `${start}-${end}` });
     }
 
     const monthlyWeighIns: GraphData[] = monthOrder.map((monthKey) => {
@@ -105,7 +105,7 @@ export function useVictoryNativeGraphWeighIns(data: IWeighIn[] | undefined) {
         month: "short",
       });
 
-      return { weight: total / count, date: monthName };
+      return { value: total / count, label: monthName };
     });
 
     return {
@@ -115,17 +115,5 @@ export function useVictoryNativeGraphWeighIns(data: IWeighIn[] | undefined) {
     };
   }, [data]);
 
-  const getWeighInsByTab = (tab: GraphTab): GraphData[] => {
-    switch (tab) {
-      case "שבועי":
-        return weeklyWeighIns;
-      case "חודשי":
-        return monthlyWeighIns;
-      case "יומי":
-      default:
-        return dailyWeighIns;
-    }
-  };
-
-  return { getWeighInsByTab };
+  return { dailyWeighIns, weeklyWeighIns, monthlyWeighIns };
 }

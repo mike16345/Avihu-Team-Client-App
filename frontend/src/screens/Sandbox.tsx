@@ -1,20 +1,11 @@
-import { SafeAreaView, StyleSheet, View } from "react-native";
+import { View, Text } from "react-native";
 
-import useStyles from "@/styles/useGlobalStyles";
-import ChatScreen from "./ChatScreen";
-
-export default function Sandbox() {
-  const { layout, spacing } = useStyles();
-
+const Sandbox = () => {
   return (
-    <SafeAreaView style={styles.safeView}>
-      <ChatScreen />
-    </SafeAreaView>
+    <View>
+      <Text>Sandbox</Text>
+    </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  safeView: {
-    flex: 1,
-  },
-});
+export default Sandbox;

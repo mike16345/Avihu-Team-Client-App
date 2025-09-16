@@ -20,7 +20,7 @@ const FONT_MAP: Record<FontVariant, string> = {
   extrabold: "Assistant-ExtraBold",
 };
 
-interface TextProps extends RNTextProps {
+export interface TextProps extends RNTextProps {
   fontVariant?: FontVariant;
   fontSize?: number;
 }

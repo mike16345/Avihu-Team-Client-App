@@ -29,7 +29,7 @@ const DietPlanScreenHeader = () => {
           </View>
         </View>
       </ScrollView>
-      <TipsModal visible={isOpen} onDismiss={() => setIsOpen(false)} tips={tips} />
+      <TipsModal title={"דגשים"} visible={isOpen} onDismiss={() => setIsOpen(false)} tips={tips} />
     </>
   );
 };

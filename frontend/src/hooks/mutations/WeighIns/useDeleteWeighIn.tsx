@@ -9,7 +9,7 @@ const useDeleteWeighIn = () => {
   const userId = useUserStore((state) => state.currentUser?._id);
   const { deleteWeighIn } = useWeighInApi();
 
-  const { triggerErrorToast, triggerSuccessToast } = useToast();
+  const { triggerSuccessToast } = useToast();
 
   const handleDeleteWeighIn = async (id: string) => {
     try {
@@ -20,7 +20,6 @@ const useDeleteWeighIn = () => {
 
       return result;
     } catch (error: any) {
-      triggerErrorToast({});
       return Promise.reject(error?.message);
     }
   };

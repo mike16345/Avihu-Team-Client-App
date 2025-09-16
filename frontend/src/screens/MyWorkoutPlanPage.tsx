@@ -12,6 +12,7 @@ import WorkoutPlanSelector from "@/components/WorkoutPlan/WorkoutPlanSelector";
 import { CARDIO_VALUE } from "@/constants/Constants";
 import CardioWrapper from "@/components/WorkoutPlan/cardio/CardioWrapper";
 import { DropDownContextProvider } from "@/context/useDropdown";
+import { mapToDropDownItems } from "@/utils/utils";
 
 const MyWorkoutPlanScreen = () => {
   const { colors, layout, spacing } = useStyles();
@@ -21,19 +22,6 @@ const MyWorkoutPlanScreen = () => {
 
   const [selectedPlan, setSelectedPlan] = useState<IWorkoutPlan>();
   const [showCardio, setShowCardio] = useState(false);
-
-  const plans = useMemo(() => {
-    if (!data) return [];
-
-    const plans = data.workoutPlans.map((p) => {
-      return { label: p.planName, value: p._id };
-    });
-
-    plans.push({ label: CARDIO_VALUE, value: CARDIO_VALUE });
-    setSelectedPlan(data.workoutPlans[0]);
-
-    return plans;
-  }, [data]);
 
   const handleSelect = (val: any) => {
     if (val == CARDIO_VALUE) return setShowCardio(true);
@@ -47,44 +35,60 @@ const MyWorkoutPlanScreen = () => {
     setShowCardio(false);
   };
 
+  const plans = useMemo(() => {
+    if (!data) return [];
+
+    const plans = mapToDropDownItems(data.workoutPlans, {
+      labelKey: "planName",
+      valueKey: "_id",
+    });
+
+    plans.push({ label: CARDIO_VALUE, value: CARDIO_VALUE });
+    setSelectedPlan(data.workoutPlans[0]);
+
+    return plans;
+  }, [data]);
+
   if (isError)
     return <ErrorScreen refetchFunc={() => refresh(refetch)} isFetching={isRefetching} />;
 
   if (isLoading) return <WorkoutPlanSkeletonLoader />;
 
   return (
-    <>
-      <View style={[colors.background, layout.flex1, spacing.pdStatusBar, spacing.gapLg]}>
-        <ConditionalRender condition={plans && selectedPlan}>
-          <View style={[{ zIndex: 2, elevation: 5 }, spacing.pdHorizontalLg]}>
-            <DropDownContextProvider items={plans || []} onSelect={handleSelect}>
-              <WorkoutPlanSelector
-                selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
-                tips={showCardio ? [data.cardio.plan.tips] : data.tips}
-              />
-            </DropDownContextProvider>
-          </View>
+    <View style={[layout.flex1, colors.background, spacing.pdStatusBar, spacing.gapLg]}>
+      <View style={[{ zIndex: 2, elevation: 5 }, spacing.pdHorizontalLg]}>
+        <DropDownContextProvider items={plans} onSelect={handleSelect}>
+          <ScrollView
+            nestedScrollEnabled
+            contentContainerStyle={[spacing.gapSm]}
+            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+          >
+            <WorkoutPlanSelector
+              selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
+              isCardio={showCardio}
+            />
+          </ScrollView>
+        </DropDownContextProvider>
+      </View>
+
+      <ScrollView
+        style={{ zIndex: 1, elevation: 1 }}
+        contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg, { zIndex: 1 }]}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={() => refresh(refetch)} />
+        }
+      >
+        <ConditionalRender condition={showCardio}>
+          <CardioWrapper cardioPlan={data?.cardio} />
         </ConditionalRender>
 
-        <ScrollView
-          style={{ zIndex: 1, elevation: 1 }}
-          contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg, { zIndex: 1 }]}
-          refreshControl={
-            <RefreshControl refreshing={isRefetching} onRefresh={() => refresh(refetch)} />
-          }
-        >
-          <ConditionalRender condition={showCardio}>
-            <CardioWrapper cardioPlan={data.cardio} />
-          </ConditionalRender>
-
-          <ConditionalRender condition={!showCardio}>
-            {selectedPlan?.muscleGroups.map((muscleGroup, i) => (
-              <MuscleGroupContainer key={i} muscleGroup={muscleGroup} />
-            ))}
-          </ConditionalRender>
-        </ScrollView>
-      </View>
-    </>
+        <ConditionalRender condition={!showCardio}>
+          {selectedPlan?.muscleGroups.map((muscleGroup, i) => (
+            <MuscleGroupContainer key={i} muscleGroup={muscleGroup} />
+          ))}
+        </ConditionalRender>
+      </ScrollView>
+    </View>
   );
 };
 

@@ -1,170 +1,188 @@
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
-  StyleProp,
-  ViewStyle,
-  Platform,
-} from "react-native";
-import React, { ReactNode, useEffect, useRef, useState } from "react";
-import { LineChart } from "react-native-chart-kit";
+import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
+import React, { ReactNode, useMemo } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ConditionalRender";
 import Icon from "../../Icon/Icon";
-import { getIconName, getIconRotation } from "@/utils/graph";
-import SelectedDot from "./SelectedDot";
-import useGraphTheme from "@/themes/useGraphTheme";
-import SelectedCard from "./SelectedCard";
-import GraphLabels from "./GraphLabels";
+import { type GraphData } from "@/hooks/graph/useGraphWeighIns";
+import { getRadiusSizeBasedOnData, padXLabel } from "@/utils/utils";
+import { LinearGradient, vec, Paint, useFont } from "@shopify/react-native-skia";
+import {
+  useAnimatedReaction,
+  useDerivedValue,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import {
+  Line,
+  CartesianChart,
+  Area,
+  Scatter,
+  getTransformComponents,
+  setScale,
+  setTranslate,
+  useChartPressState,
+  useChartTransformState,
+  CurveType,
+} from "victory-native";
+import AssistantRegular from "@assets/fonts/Assistant/Assistant-Regular.ttf";
+import SkiaLine from "./SkiaLine";
+import { GRAPH_HEIGHT } from "@/constants/Constants";
+import { ToolTip } from "./ToolTip";
 
 interface GraphProps {
   header?: ReactNode;
   style?: StyleProp<ViewStyle>;
-  data: number[];
-  labels: string[];
   mounted?: boolean;
+  data: GraphData[];
+  enableZoom?: boolean;
+  enablePan?: boolean;
 }
+type AnimationType = "spring" | "decay" | "timing";
+const curveType: CurveType = "natural";
+const animationType: AnimationType = "spring";
+const animationDuration = 300;
+const LARGE_AMOUNT_OF_DOTS = 20;
 
-const Graph: React.FC<GraphProps> = ({ header, style, data, labels }) => {
+const Graph: React.FC<GraphProps> = ({
+  header,
+  style,
+  data,
+  enableZoom = false,
+  enablePan = false,
+}) => {
+  const labelColor = "rgba(69, 68, 89, 0.5)";
+  const showDots = data.length < LARGE_AMOUNT_OF_DOTS;
+
+  const font = useFont(AssistantRegular, 14);
   const { layout, spacing } = useStyles();
-  const graphTheme = useGraphTheme();
 
-  const [selected, setSelected] = useState<number | undefined>(undefined);
-  const [selectedLabel, setSelectedLabel] = useState(0);
-  const [atScrollEnd, setAtScrollEnd] = useState(false);
-  const [atScrollStart, setAtScrollStart] = useState(true);
-  const [readyToScroll, setReadyToScroll] = useState(false);
+  const { state: transformState } = useChartTransformState();
+  const { state, isActive } = useChartPressState({ x: 5, y: { value: 0 } });
 
-  const scrollRef = useRef<ScrollView>(null);
+  const k = useSharedValue(1);
+  const tx = useSharedValue(0);
+  const ty = useSharedValue(0);
 
-  const labelCount = labels.length;
-  const labelWidth = 80;
-  const spacingBetween = spacing.gapDefault.gap;
-  const paddingLeft = 60;
+  useAnimatedReaction(
+    () => {
+      return transformState.panActive.value || transformState.zoomActive.value;
+    },
+    (cv, pv) => {
+      if (!cv && pv) {
+        const vals = getTransformComponents(transformState.matrix.value);
+        k.value = vals.scaleX;
+        tx.value = vals.translateX;
+        ty.value = vals.translateY;
 
-  const chartWidth = labelCount * labelWidth + labelCount * spacingBetween + paddingLeft;
-
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
-
-    const buffer = 20;
-    const isAtBottom = layoutMeasurement.width + contentOffset.x >= contentSize.width - buffer;
-    const isAtTop = contentOffset.x <= 0;
-
-    if (isAtBottom && !atScrollEnd) {
-      setAtScrollEnd(true);
-      setAtScrollStart(false);
-    } else if (isAtTop && !atScrollStart) {
-      setAtScrollStart(true);
-      setAtScrollEnd(false);
-    } else if (!isAtTop && !isAtBottom && (atScrollStart || atScrollEnd)) {
-      setAtScrollStart(false);
-      setAtScrollEnd(false);
+        k.value = withTiming(1);
+        tx.value = withTiming(0);
+        ty.value = withTiming(0);
+      }
     }
-  };
+  );
 
-  const scrollToEnd = () => {
-    scrollRef.current?.scrollToEnd();
-  };
+  useAnimatedReaction(
+    () => {
+      return { k: k.value, tx: tx.value, ty: ty.value };
+    },
+    ({ k, tx, ty }) => {
+      const m = setTranslate(transformState.matrix.value, tx, ty);
+      transformState.matrix.value = setScale(m, k);
+    }
+  );
 
-  const scrollToStart = (animated = true) => {
-    scrollRef.current?.scrollTo({ x: 0, animated });
-  };
-
-  const handleLayout = () => {
-    if (!readyToScroll) return;
-
-    const SHOULD_ANIMATE = false;
-
-    scrollToStart(SHOULD_ANIMATE);
-    setReadyToScroll(false); // prevent infinite loop
-  };
-
-  useEffect(() => {
-    if (Platform.OS !== "android") return;
-
-    scrollToStart();
-    setReadyToScroll(true);
-  }, []);
+  const value = useDerivedValue(() => state.y.value.value.value, [state]);
+  const radius = useMemo(() => getRadiusSizeBasedOnData(data?.length), [data?.length]);
 
   return (
-    <View style={[{ padding: 0 }, spacing.gapDefault, style]}>
+    <View style={[layout.flex1, spacing.gap20, { maxHeight: GRAPH_HEIGHT }, style]}>
       <ConditionalRender condition={!!header}>
         <View style={styles.header}>{header}</View>
       </ConditionalRender>
-      <ScrollView
-        ref={scrollRef}
-        style={{ direction: "ltr" }}
-        horizontal
-        nestedScrollEnabled
-        onScroll={handleScroll}
-        onLayout={handleLayout}
-        showsHorizontalScrollIndicator={false}
+
+      <CartesianChart
+        data={data}
+        xKey="label"
+        domainPadding={{ top: 40, bottom: 30, left: 8, right: 8 }}
+        chartPressState={state}
+        transformConfig={{ pan: { enabled: enablePan }, pinch: { enabled: enableZoom } }}
+        yKeys={["value"]}
+        yAxis={[
+          {
+            font: font,
+            enableRescaling: true,
+            labelColor: labelColor,
+            lineWidth: 0,
+          },
+        ]}
+        xAxis={{
+          enableRescaling: true,
+          font: font,
+          labelColor: labelColor,
+          lineWidth: 0,
+          formatXLabel(label) {
+            return padXLabel(label);
+          },
+        }}
+        transformState={transformState}
+        renderOutside={({ chartBounds }) => <SkiaLine chartBounds={chartBounds} />}
       >
-        <View style={[spacing.gapDefault, { position: "relative" }]}>
-          <LineChart
-            withVerticalLabels={false}
-            data={{
-              labels: [],
-              datasets: [
-                {
-                  data: data.length == 0 ? [0] : data,
-                },
-              ],
-            }}
-            renderDotContent={(params) => (
-              <SelectedDot key={params.index} selectedLabel={selectedLabel} {...params} />
+        {({ points, chartBounds }) => (
+          <>
+            <Area
+              curveType={curveType}
+              animate={{ type: animationType, duration: animationDuration }}
+              points={points.value}
+              connectMissingData
+              y0={chartBounds.bottom}
+            >
+              <LinearGradient
+                start={vec(0, chartBounds.top)}
+                end={vec(0, chartBounds.bottom)}
+                colors={["rgba(159, 255, 162, 0.2)", "rgba(121, 246, 129, 0.05)"]}
+              />
+            </Area>
+
+            <Line
+              points={points.value}
+              curveType={curveType}
+              strokeWidth={2.5}
+              connectMissingData
+              animate={{ type: animationType, duration: animationDuration }}
+            >
+              <LinearGradient
+                start={vec(0, 0)}
+                end={vec(chartBounds.right, 0)}
+                colors={["#9FFFA2", "#79F681"]}
+              />
+            </Line>
+            {showDots && (
+              <Scatter
+                animate={{ type: animationType, duration: animationDuration }}
+                points={points.value}
+                radius={radius}
+                color={"#95FDA8"}
+              >
+                <Paint color="#FFF" style="stroke" strokeWidth={2.5} />
+              </Scatter>
             )}
-            width={chartWidth}
-            height={220}
-            withShadow
-            withInnerLines={false}
-            withOuterLines={false}
-            onDataPointClick={({ value }) => {
-              setSelected(value);
-            }}
-            chartConfig={graphTheme}
-            bezier
-            style={{
-              marginVertical: 8,
-              borderRadius: 16,
-            }}
-          />
-          <GraphLabels
-            labels={labels}
-            onSelect={(i) => setSelectedLabel(i)}
-            selectedIndex={selectedLabel}
-            width={(labelCount - 0.5) * labelWidth}
-          />
-        </View>
-      </ScrollView>
-
+            {isActive ? (
+              <ToolTip
+                x={state.x.position}
+                font={font}
+                y={state.y.value.position}
+                value={value}
+                radius={radius + 1}
+                chartBounds={chartBounds}
+              />
+            ) : null}
+          </>
+        )}
+      </CartesianChart>
       <View style={[layout.flexRow, styles.indicators, spacing.gapDefault]}>
-        <TouchableOpacity onPress={scrollToEnd}>
-          <Icon
-            name={getIconName(atScrollEnd)}
-            rotation={getIconRotation(atScrollEnd, "end")}
-            height={20}
-            width={20}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => scrollToStart()}>
-          <Icon
-            name={getIconName(atScrollStart)}
-            rotation={getIconRotation(atScrollStart, "start")}
-            height={20}
-            width={20}
-          />
-        </TouchableOpacity>
+        <Icon name={"arrowRoundRightSmall"} rotation={0} height={20} width={20} />
+        <Icon name={"arrowRoundLeftSoftSmall"} rotation={0} height={20} width={20} />
       </View>
-
-      <ConditionalRender condition={typeof selected == "number"}>
-        <SelectedCard selected={selected} onClose={() => setSelected(undefined)} />
-      </ConditionalRender>
     </View>
   );
 };

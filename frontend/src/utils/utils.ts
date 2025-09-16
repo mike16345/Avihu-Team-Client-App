@@ -229,3 +229,23 @@ export function mapToDropDownItems<T extends Record<string, any>>(
     value: item[valueKey],
   }));
 }
+
+export function getRadiusSizeBasedOnData(dataLength: number) {
+  const LARGE_AMOUNT_OF_DATA = 50;
+  const EXTRA_LARGE_AMOUNT_OF_DATA = 75;
+  const SUPER_LARGE_AMOUNT_OF_DATA = 100;
+
+  if (dataLength < LARGE_AMOUNT_OF_DATA) return 4.5;
+  if (dataLength < EXTRA_LARGE_AMOUNT_OF_DATA) return 3.5;
+  if (dataLength < SUPER_LARGE_AMOUNT_OF_DATA) return 2.5;
+
+  return 2;
+}
+
+export function padXLabel(label: string): string {
+  if (!label) return "";
+  const len = label.length;
+  const spacesToAdd = len + (len > 10 ? 12 : 4);
+
+  return " ".repeat(spacesToAdd) + label;
+}

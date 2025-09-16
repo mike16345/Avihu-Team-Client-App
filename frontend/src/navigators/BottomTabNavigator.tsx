@@ -48,6 +48,7 @@ const BottomTabNavigator = () => {
     const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
 
     return () => {
+      setKeyboardVisible(false);
       showSub.remove();
       hideSub.remove();
     };
@@ -63,10 +64,14 @@ const BottomTabNavigator = () => {
   return (
     <Animated.View style={[layout.flex1, colors.background, { opacity }]}>
       <Tab.Navigator
+        backBehavior="initialRoute"
         initialRouteName={INITIAL_ROUTE_NAME}
         sceneContainerStyle={[
           colors.background,
-          { paddingBottom: BOTTOM_BAR_HEIGHT + 80, paddingTop: isHomeScreen ? 36 : 36 },
+          {
+            paddingBottom: keyboardVisible ? BOTTOM_BAR_HEIGHT : BOTTOM_BAR_HEIGHT + 80,
+            paddingTop: isHomeScreen ? 36 : 36,
+          },
         ]}
         screenOptions={{
           headerShown: false,
@@ -75,6 +80,7 @@ const BottomTabNavigator = () => {
             spacing.mgHorizontalSm,
             colors.backgroundSurface,
             {
+              opacity: keyboardVisible ? 0 : 100,
               position: "absolute",
               left: HORIZONTAL_MARGIN,
               right: HORIZONTAL_MARGIN,
@@ -121,8 +127,9 @@ const BottomTabNavigator = () => {
           {indicators[activeIndex].name}
         </Text>
       </Animated.View>
-
-      <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 }]}></View>
+      {!keyboardVisible && (
+        <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 }]}></View>
+      )}
       <ConditionalRender condition={!!countdown} children={<TimerDrawer />} />
     </Animated.View>
   );
