@@ -39,10 +39,7 @@ const DropDownTestHarness: React.FC<DropDownTestHarnessProps> = ({
   return (
     <DropDownContextProvider items={items} onSelect={() => {}}>
       {wrapInScrollView ? (
-        <ScrollView
-          contentContainerStyle={{ padding: 24, gap: 16 }}
-          nestedScrollEnabled
-        >
+        <ScrollView contentContainerStyle={{ padding: 24, gap: 16 }} nestedScrollEnabled>
           {content}
         </ScrollView>
       ) : (

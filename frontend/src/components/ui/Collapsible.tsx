@@ -164,17 +164,10 @@ const Collapsible: React.FC<CollapsibleProps> = ({
           collapsable
           pointerEvents={isCollapsed ? "none" : "auto"}
         >
-          <View
-            onLayout={handleContentLayout}
-            style={[layout.widthFull]}
-          >
+          <View onLayout={handleContentLayout} style={[layout.widthFull]}>
             {keepMounted ? (
               freezeOnCollapse ? (
-                <View
-                  style={[layout.flex1]}
-                  shouldRasterizeIOS
-                  renderToHardwareTextureAndroid
-                >
+                <View style={[layout.flex1]} shouldRasterizeIOS renderToHardwareTextureAndroid>
                   {memoizedChild}
                 </View>
               ) : (
