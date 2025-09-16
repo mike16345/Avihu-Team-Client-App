@@ -70,6 +70,7 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
         ref={listRef}
         horizontal
         data={windowItems}
+        keyboardShouldPersistTaps="handled"
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
         ItemSeparatorComponent={() => <View style={{ width: separator }} />}
@@ -77,9 +78,9 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
         showsHorizontalScrollIndicator={false}
         pagingEnabled={false}
         decelerationRate="fast"
+        nestedScrollEnabled
         onScrollBeginDrag={onScrollBeginDrag}
         onScrollEndDrag={onScrollEndDrag}
-        nestedScrollEnabled
       />
 
       <View style={[spacing.gapDefault, layout.flexRow, layout.center]}>

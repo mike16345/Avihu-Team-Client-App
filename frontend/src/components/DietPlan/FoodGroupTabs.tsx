@@ -25,7 +25,12 @@ const FoodGroupTabs = () => {
         <Card style={{ maxHeight: height / 2 - (BOTTOM_BAR_HEIGHT + 20) }} variant="gray">
           <ScrollView contentContainerStyle={[spacing.gapDefault]}>
             {items.map((item) => (
-              <Text fontVariant="semibold" key={item._id}>
+              <Text
+                style={[layout.alignSelfStart]}
+                fontSize={14}
+                fontVariant="semibold"
+                key={item._id}
+              >
                 {formatServingText(item.name, item.oneServing)}
               </Text>
             ))}

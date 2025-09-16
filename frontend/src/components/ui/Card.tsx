@@ -33,7 +33,7 @@ export const Card: CompoundCard = ({ children, variant = "white", style, ...prop
         common.borderSm,
         spacing.pdDefault,
         common.roundedSm,
-        spacing.gapDefault,
+        spacing.gapSm,
         style,
       ]}
       {...props}

@@ -5,9 +5,9 @@ import { Text } from "./Text";
 import { ConditionalRender } from "./ConditionalRender";
 import ButtonShadow from "./buttons/ButtonShadow";
 
-interface TabsRootProps {
-  value: string;
-  onValueChange: (value: string) => void;
+interface TabsRootProps<T extends string> {
+  value: T;
+  onValueChange: (value: T) => void;
   children: React.ReactNode;
 }
 
@@ -26,13 +26,15 @@ interface TabsContentProps {
   children: React.ReactNode;
 }
 
-const TabsContext = React.createContext<{
-  value: string;
-  setValue: (val: string) => void;
+type TabsContextValue<T extends string> = {
+  value: T;
+  setValue: (v: T) => void;
   tabWidth: number;
-  registerTab: (value: string, label: string) => void;
+  registerTab: (value: T, label: string) => void;
   translateX: Animated.Value;
-}>({
+};
+
+const TabsContext = React.createContext<TabsContextValue<any>>({
   value: "",
   setValue: () => {},
   tabWidth: 0,
@@ -40,8 +42,8 @@ const TabsContext = React.createContext<{
   translateX: new Animated.Value(0),
 });
 
-export const Tabs = ({ value, onValueChange, children }: TabsRootProps) => {
-  const [tabs, setTabs] = useState<{ value: string; label: string }[]>([]);
+export const Tabs = <T extends string>({ value, onValueChange, children }: TabsRootProps<T>) => {
+  const [tabs, setTabs] = useState<{ value: T; label: string }[]>([]);
   const [containerWidth, setContainerWidth] = useState(Dimensions.get("window").width);
 
   const translateX = useRef(new Animated.Value(0)).current;
@@ -54,7 +56,7 @@ export const Tabs = ({ value, onValueChange, children }: TabsRootProps) => {
     if (width !== containerWidth) setContainerWidth(width);
   };
 
-  const registerTab = (tabValue: string, label: string) => {
+  const registerTab = (tabValue: T, label: string) => {
     setTabs((prev) => {
       if (!prev.some((t) => t.value === tabValue)) {
         return [...prev, { value: tabValue, label }];

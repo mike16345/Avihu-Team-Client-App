@@ -8,6 +8,28 @@ import type {
 import { DAYS_OF_WEEK } from "@/constants/date";
 
 class DateUtils {
+  static getAverageInLastXDays<T>(
+    items: T[],
+    dateKey: keyof T,
+    keyToCalculate: keyof T,
+    days: number
+  ): number {
+    const today = new Date();
+    const xDaysAgo = new Date(today);
+    xDaysAgo.setDate(today.getDate() - days);
+
+    const recentWeighIns = items.filter((w) => {
+      const weighInDate = new Date(w[dateKey] as any);
+      return weighInDate >= xDaysAgo && weighInDate <= today;
+    });
+
+    if (recentWeighIns.length === 0) return 0;
+
+    const totalWeight = recentWeighIns.reduce((sum, w) => sum + (w[keyToCalculate] as number), 0);
+
+    return totalWeight / recentWeighIns.length;
+  }
+
   static sortByDate(values: DateAndValue[], order: "asc" | "desc"): { date: Date; value: any }[] {
     return values.sort((a, b) => {
       if (order === "asc") {
@@ -104,10 +126,10 @@ class DateUtils {
     if (items?.length === 0) return null;
 
     return items.reduce((latestItem, currentItem) => {
-      const latestDate = new Date(latestItem[dateKey] as any);
-      const currentDate = new Date(currentItem[dateKey] as any);
+      const latestDate = new Date(latestItem[dateKey] as any).getTime();
+      const currentDate = new Date(currentItem[dateKey] as any).getTime();
 
-      if (currentDate > latestDate) {
+      if (currentDate >= latestDate) {
         return currentItem;
       }
       return latestItem;

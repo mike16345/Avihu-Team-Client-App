@@ -1,5 +1,5 @@
 import { BottomStackParamList } from "@/types/navigatorTypes";
-import { Animated, StyleSheet, useWindowDimensions, View } from "react-native";
+import { Animated, Keyboard, StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
@@ -30,6 +30,7 @@ const BottomTabNavigator = () => {
   const [activeIndex, setActiveIndex] = useState(() => {
     return BottomScreenNavigatorTabs.findIndex((tab) => tab.name == INITIAL_ROUTE_NAME);
   });
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const indicatorAnim = useRef(new Animated.Value(0)).current;
 
@@ -43,6 +44,17 @@ const BottomTabNavigator = () => {
   });
 
   useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
+
+    return () => {
+      setKeyboardVisible(false);
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  useEffect(() => {
     Animated.spring(indicatorAnim, {
       toValue: activeIndex,
       useNativeDriver: true,
@@ -52,10 +64,14 @@ const BottomTabNavigator = () => {
   return (
     <Animated.View style={[layout.flex1, colors.background, { opacity }]}>
       <Tab.Navigator
+        backBehavior="initialRoute"
         initialRouteName={INITIAL_ROUTE_NAME}
         sceneContainerStyle={[
           colors.background,
-          { paddingBottom: BOTTOM_BAR_HEIGHT + 85, paddingTop: isHomeScreen ? 36 : 36 },
+          {
+            paddingBottom: keyboardVisible ? BOTTOM_BAR_HEIGHT : BOTTOM_BAR_HEIGHT + 80,
+            paddingTop: isHomeScreen ? 36 : 36,
+          },
         ]}
         screenOptions={{
           headerShown: false,
@@ -64,6 +80,7 @@ const BottomTabNavigator = () => {
             spacing.mgHorizontalSm,
             colors.backgroundSurface,
             {
+              opacity: keyboardVisible ? 0 : 100,
               position: "absolute",
               left: HORIZONTAL_MARGIN,
               right: HORIZONTAL_MARGIN,
@@ -101,7 +118,7 @@ const BottomTabNavigator = () => {
           spacing.pdSm,
           spacing.gapXs,
           common.roundedFull,
-          { transform: [{ translateX }] },
+          { transform: [{ translateX }], display: keyboardVisible ? "none" : "flex" },
         ]}
       >
         <Icon name={indicators[activeIndex].icon} color="white" />
@@ -109,7 +126,9 @@ const BottomTabNavigator = () => {
           {indicators[activeIndex].name}
         </Text>
       </Animated.View>
-      <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 }]}></View>
+      {!keyboardVisible && (
+        <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 }]}></View>
+      )}
       <ConditionalRender condition={!!countdown} children={<TimerDrawer />} />
     </Animated.View>
   );

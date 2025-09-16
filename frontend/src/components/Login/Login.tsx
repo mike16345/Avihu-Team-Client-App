@@ -35,6 +35,7 @@ export interface ICredentialsErrors {
   validPassword?: boolean;
 }
 
+type TabNames = "התחברות" | "חשבון חדש";
 interface ILoginProps {
   onLogin: (user: IUser) => void;
 }
@@ -46,8 +47,8 @@ export default function Login({ onLogin }: ILoginProps) {
 
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<string>("התחברות");
+  const [selectedTab, setSelectedTab] = useState<TabNames>("התחברות");
+  const isRegistering = selectedTab == "חשבון חדש";
   const registerOrLoginPrompt = getRegisterOrLoginPrompt(isRegistering, isChangingPassword);
 
   const { tabTriggers, tabContent } = useTabs([
@@ -78,13 +79,13 @@ export default function Login({ onLogin }: ILoginProps) {
   };
 
   const handleClickRegister = () => {
-    setIsRegistering(true);
+    setSelectedTab("חשבון חדש");
     setIsChangingPassword(false);
     setIsForgotPassword(false);
   };
 
   const handleBackPress = () => {
-    setIsRegistering(false);
+    setSelectedTab("התחברות");
     setIsForgotPassword(false);
     setIsChangingPassword(false);
     setIsForgotPassword(false);

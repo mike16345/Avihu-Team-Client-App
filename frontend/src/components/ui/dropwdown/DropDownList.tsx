@@ -24,7 +24,7 @@ const DropDownList = () => {
 
           return (
             <DropDownItem
-              key={i}
+              key={label ? label + i : i}
               item={{ label, value }}
               isSelected={isSelected}
               handlePress={handleSelect}

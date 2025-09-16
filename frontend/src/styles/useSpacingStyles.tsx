@@ -132,6 +132,9 @@ export const useSpacingStyles = () => {
     pdVerticalMd: {
       paddingVertical: 16,
     },
+    pdVertical20: {
+      paddingVertical: 20,
+    },
     pdVerticalLg: {
       paddingVertical: 24,
     },

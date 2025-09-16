@@ -30,7 +30,7 @@ export const monthNamesShort = [
   "דצ",
 ];
 export const dayNames = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-export const dayNamesShort = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
+export const dayNamesShort = ["א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ש'"];
 export const today = "היום";
 
 export const setupCalendarLocale = () => {

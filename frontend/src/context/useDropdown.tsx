@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 import { ItemType } from "react-native-dropdown-picker";
 
 type DropdownContextType = {
@@ -6,7 +6,7 @@ type DropdownContextType = {
   selectedValue: any;
   setSelectedValue: (value: any) => void;
   shouldCollapse: boolean;
-  setShouldCollapse: (value: boolean) => void;
+  setShouldCollapse: Dispatch<SetStateAction<boolean>>;
   handleSelect: (value: any) => void;
 };
 

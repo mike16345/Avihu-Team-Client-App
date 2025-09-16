@@ -1,8 +1,8 @@
-import { View } from "react-native";
 import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
-import useCardStyles from "@/styles/useCardStyles";
 import { Text } from "../ui/Text";
+import { Card } from "../ui/Card";
+import { useWindowDimensions } from "react-native";
 
 interface CardProps {
   title: string;
@@ -12,26 +12,31 @@ interface CardProps {
   isProgressing?: boolean;
 }
 
-const WeightCard: React.FC<CardProps> = ({ title, value, unit, operator, isProgressing }) => {
-  const { text, fonts, layout, spacing, colors } = useStyles();
-  const { weightCard } = useCardStyles();
-
-  const textColorOptions = {
-    [`undefined`]: colors.textOnBackground,
-    [`true`]: colors.textSuccess,
-    [`false`]: colors.textDanger,
-  };
+const WeightCard: React.FC<CardProps> = ({ title, value, unit, operator = "" }) => {
+  const { layout, spacing } = useStyles();
+  const cardWidth = useWindowDimensions().width * 0.4;
 
   return (
-    <View style={weightCard}>
-      <Text style={[text.textBold, text.textRight, colors.textOnSecondaryContainer]}>{title}</Text>
-      <View style={[layout.itemsCenter, layout.wrap, layout.flexRowReverse, spacing.gapSm]}>
-        <Text style={[textColorOptions[isProgressing], text.textBold, fonts.xl]}>
-          {operator} {value}
+    <Card
+      variant="gray"
+      style={[spacing.pdHorizontalMd, spacing.pdVerticalDefault, { width: cardWidth }]}
+    >
+      <Card.Header>
+        <Text style={[layout.alignSelfStart]} fontSize={16}>
+          {title}
         </Text>
-        <Text style={[colors.textOnSecondaryContainer, fonts.default]}>{unit}</Text>
-      </View>
-    </View>
+      </Card.Header>
+
+      <Card.Content style={[layout.flexRow, spacing.gapSm]}>
+        <Text fontVariant="semibold" fontSize={24}>
+          {operator}
+          {value || 0}
+        </Text>
+        <Text fontVariant="semibold" fontSize={24}>
+          {unit}
+        </Text>
+      </Card.Content>
+    </Card>
   );
 };
 

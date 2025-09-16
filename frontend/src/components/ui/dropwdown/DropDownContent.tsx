@@ -13,21 +13,26 @@ const DropDownContent = () => {
   const { shouldCollapse, items } = useDropwDownContext();
 
   const opacity = useRef(new Animated.Value(0)).current;
+  const fadeRef = useRef<Animated.CompositeAnimation | null>(null);
 
   useEffect(() => {
-    if (!shouldCollapse) {
-      Animated.timing(opacity, {
-        toValue: 1,
-        useNativeDriver: false,
-        duration: ANIMATION_DURATION,
-      }).start();
-    } else {
-      Animated.timing(opacity, {
-        toValue: 0,
-        useNativeDriver: false,
-        duration: ANIMATION_DURATION,
-      }).start();
-    }
+    fadeRef.current?.stop();
+    const toValue = shouldCollapse ? 0 : 1;
+
+    fadeRef.current = Animated.timing(opacity, {
+      toValue,
+      duration: ANIMATION_DURATION,
+      useNativeDriver: true,
+    });
+
+    fadeRef.current.start(() => {
+      fadeRef.current = null;
+    });
+
+    return () => {
+      fadeRef.current?.stop();
+      fadeRef.current = null;
+    };
   }, [shouldCollapse]);
 
   return (

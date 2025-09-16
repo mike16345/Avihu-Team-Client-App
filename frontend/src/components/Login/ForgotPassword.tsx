@@ -108,10 +108,10 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
   };
 
   useEffect(() => {
-    BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
 
     return () => {
-      BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
+      backHandler.remove();
     };
   }, []);
 
@@ -141,7 +141,7 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
         <>
           <View style={[spacing.gapXl]}>
             <Input
-              label=" קוד אימות"
+              label="קוד אימות"
               style={[text.textCenter]}
               placeholder="קוד אימות בעל 6 ספרות"
               error={formErrors["otp"]}

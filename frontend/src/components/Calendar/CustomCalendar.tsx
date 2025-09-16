@@ -1,9 +1,8 @@
 import { View } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Calendar, DateData } from "react-native-calendars";
 import useStyles from "@/styles/useGlobalStyles";
 import moment from "moment";
-import { ConditionalRender } from "../ui/ConditionalRender";
 import useCalendarTheme from "@/themes/useCalendarTheme";
 import { monthNames, setupCalendarLocale } from "@/config/calendarConfig";
 import CalendarHeader from "./CalendarHeader";
@@ -18,24 +17,20 @@ interface CustomCalendarProps {
 }
 
 const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate }) => {
-  const { common } = useStyles();
+  const { common, spacing } = useStyles();
 
   const today = DateUtils.getCurrentDate("YYYY-MM-DD");
 
   const [currentDate, setCurrentDate] = useState(selectedDate || today);
-  const [selected, setSelected] = useState(selectedDate || today);
   const [showMonths, setShowMonths] = useState(false);
 
   const month = DateUtils.extractMonthFromDate(currentDate);
   const year = DateUtils.extractYearFromDate(currentDate);
 
-  const { marked } = useCalendarTheme(today, selected);
+  const { theme, marked } = useCalendarTheme(today, selectedDate);
 
   const handleSelect = (day: DateData) => {
-    const date = day.dateString;
-
-    setSelected(date);
-    onSelect(date);
+    onSelect(day.dateString);
   };
 
   const handleMonthChange = (date: string) => {
@@ -56,18 +51,24 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
     setCurrentDate(prev);
   };
 
+  useEffect(() => {
+    if (selectedDate) return;
+
+    onSelect(today);
+  }, []);
+
   return (
     <View style={[{ position: "relative" }, common.rounded]}>
-      <ConditionalRender condition={!showMonths}>
+      <View style={{ display: !showMonths ? "flex" : "none" }}>
         <Calendar
-          style={[common.rounded]}
+          style={[common.roundedSm, spacing.pdDefault]}
           key={currentDate}
           current={currentDate}
           onDayPress={handleSelect}
           onMonthChange={({ dateString }: DateData) => handleMonthChange(dateString)}
-          enableSwipeMonths
           markingType="custom"
           markedDates={marked}
+          theme={theme}
           renderHeader={() => (
             <CalendarHeader
               month={monthNames[month]}
@@ -79,15 +80,14 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
           )}
           hideArrows
         />
-      </ConditionalRender>
-
-      <ConditionalRender condition={showMonths}>
+      </View>
+      <View style={{ display: showMonths ? "flex" : "none" }}>
         <MonthSelector
           activeMonthIndex={month}
           onCloseMonthSelect={() => setShowMonths(false)}
           onMonthSelect={(monthIndex) => handleMonthSelect(monthIndex)}
         />
-      </ConditionalRender>
+      </View>
     </View>
   );
 };

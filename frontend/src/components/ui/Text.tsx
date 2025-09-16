@@ -20,14 +20,18 @@ const FONT_MAP: Record<FontVariant, string> = {
   extrabold: "Assistant-ExtraBold",
 };
 
-interface TextProps extends RNTextProps {
+export interface TextProps extends RNTextProps {
   fontVariant?: FontVariant;
+  fontSize?: number;
 }
 
-export const Text: FC<TextProps> = ({ fontVariant = "regular", style, ...props }) => {
+export const Text: FC<TextProps> = ({ fontVariant = "regular", fontSize, style, ...props }) => {
   return (
     <RNText
-      style={[{ fontFamily: FONT_MAP[fontVariant], writingDirection: "rtl" }, style]}
+      style={[
+        { fontFamily: FONT_MAP[fontVariant], fontSize: fontSize, writingDirection: "rtl" },
+        style,
+      ]}
       {...props}
     />
   );

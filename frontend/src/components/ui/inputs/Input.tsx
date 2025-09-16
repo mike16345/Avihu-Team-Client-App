@@ -1,5 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { FC, ReactNode, useState } from "react";
+import { FC, ReactNode, useRef } from "react";
 import { View, TextInput, TextInputProps, StyleSheet } from "react-native";
 import { ConditionalRender } from "../ConditionalRender";
 import Icon from "../../Icon/Icon";
@@ -11,26 +11,40 @@ export interface InputProps extends TextInputProps {
 }
 
 const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
-  const { colors, common, spacing, text } = useStyles();
+  const { colors, common, spacing, layout } = useStyles();
 
-  const [focused, setFocused] = useState(false);
+  const inputRef = useRef<TextInput>(null);
 
-  const borderColor = error ? colors.borderError : focused ? colors.borderPrimary : colors.outline;
-  const borderwidth = focused ? common.borderSm : common.borderXsm;
+  const borderColor = error
+    ? colors.borderError
+    : inputRef.current?.isFocused()
+    ? colors.borderPrimary
+    : colors.outline;
+  const borderwidth = inputRef.current?.isFocused() ? common.borderSm : common.borderXsm;
 
   return (
     <View style={spacing.gapSm}>
       <ConditionalRender condition={label}>
-        <Text style={[spacing.pdHorizontalXs, colors.textPrimary, text.textBold]}>{label}</Text>
+        <Text
+          fontSize={16}
+          fontVariant="semibold"
+          style={[layout.alignSelfStart, spacing.pdHorizontalXs, colors.textPrimary]}
+        >
+          {label}
+        </Text>
       </ConditionalRender>
 
       <View style={{ position: "relative" }}>
         <TextInput
+          ref={inputRef}
           cursorColor={colors.textPrimary.color}
           selectionColor={colors.textPrimary.color}
           placeholderTextColor="grey"
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
+          onFocus={() => {
+            if (!inputRef.current || !props.value) return;
+            inputRef.current.setSelection(props.value?.length, props.value?.length);
+          }}
+          underlineColorAndroid="transparent"
           style={[
             error ? spacing.pdHorizontalXl : spacing.pdHorizontalSm,
             styles.input,
@@ -38,6 +52,11 @@ const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
             borderColor,
             borderwidth,
             colors.background,
+            {
+              fontFamily: "Assistant-Regular",
+              fontSize: 16,
+              color: colors.textPrimary.color,
+            },
             style,
           ]}
           {...props}
@@ -57,10 +76,14 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     textAlign: "right",
     borderRadius: 9,
-    height: 38,
+    paddingVertical: 8, // ✅ let content define height
+    lineHeight: 20, // ✅ plays nice with fontSize: 16
+    textAlignVertical: "center", // ✅ Android vertical centering
+    includeFontPadding: false, // ✅ trims extra Android font padding
     borderTopLeftRadius: 9,
     borderTopRightRadius: 9,
   },
   errorIcon: { position: "absolute", start: 10, top: 10 },
 });
+
 export default Input;

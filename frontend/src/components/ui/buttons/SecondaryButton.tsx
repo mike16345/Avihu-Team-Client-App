@@ -29,7 +29,6 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
   const { colors, common, fonts, layout, spacing } = useStyles();
 
   const padding = size == "md" ? spacing.pdSm : spacing.pdXs;
-
   const sizing = size === "sm" ? fonts.sm.fontSize : undefined;
 
   return (
@@ -54,7 +53,9 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
         </ConditionalRender>
 
         <ConditionalRender condition={typeof children === "string"}>
-          <Text style={[size == "sm" ? fonts.sm : fonts.md]}>{children}</Text>
+          <Text fontVariant="semibold" style={[size == "sm" ? fonts.sm : fonts.md]}>
+            {children}
+          </Text>
         </ConditionalRender>
 
         <ConditionalRender condition={typeof children !== "string"}>{children}</ConditionalRender>

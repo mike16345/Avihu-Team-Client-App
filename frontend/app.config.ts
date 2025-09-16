@@ -16,6 +16,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       image: "./assets/avihu/avihuFlyTrapWithLogo.jpeg",
       backgroundColor: "#000000",
     },
+
     plugins: [
       ["expo-localization"],
 
@@ -52,7 +53,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         foregroundImage: "./assets/playstore.png",
         backgroundColor: "#000000",
       },
-
+      softwareKeyboardLayoutMode: "resize",
       package: "com.avihuteam.avihuteam",
     },
     extra: {
@@ -66,7 +67,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       API_TOKEN: process.env.API_KEY,
       TRAINER_PHONE_NUMBER: process.env.TRAINER_PHONE_NUMBER,
       CLOUDFRONT_URL: process.env.CLOUDFRONT_URL,
-      DEV_MODE: process.env.DEV_MODE,
     },
     owner: "avihuteam",
     runtimeVersion: { policy: "appVersion" },

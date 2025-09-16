@@ -34,7 +34,7 @@ const AsyncToastWrapper: React.FC<AsyncToastWrapperProps> = ({
   const animateInToast = () => {
     Animated.parallel([
       Animated.timing(buttonTranslateY, {
-        toValue: -contentHeight - 100, //added safety buffer for shadows to disapear as well
+        toValue: -contentHeight - 100,
         duration: 300,
         useNativeDriver: true,
       }),

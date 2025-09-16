@@ -1,4 +1,4 @@
-import { Animated, ScrollView, View } from "react-native";
+import { Animated, View } from "react-native";
 import { useMemo, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { useDropwDownContext } from "@/context/useDropdown";
@@ -10,11 +10,13 @@ import Graph from "../ui/graph/Graph";
 import { getDataAvgPerDate, getGrowthTrend, groupRecordedSetsByDate } from "@/utils/recordedSets";
 import { useFadeIn } from "@/styles/useFadeIn";
 import { IconName } from "@/constants/iconMap";
+import { GraphData } from "@/hooks/graph/useGraphWeighIns";
+import { GRAPH_HEIGHT } from "@/constants/Constants";
 
 const ANIMATION_DURATION = 1200;
 
 const GraphsContainer = () => {
-  const { colors, fonts, layout, spacing } = useStyles();
+  const { colors, layout, spacing } = useStyles();
   const { items, selectedValue } = useDropwDownContext();
   const opacity = useFadeIn(ANIMATION_DURATION);
 
@@ -26,23 +28,25 @@ const GraphsContainer = () => {
     setCollapseWeightGraph((prev) => !prev);
   };
 
-  const { labels, reps, repsTrend, weights, weightsTrend } = useMemo(() => {
+  const { reps, repsTrend, weights, weightsTrend } = useMemo(() => {
     const labels: string[] = [];
-    const reps: number[] = [];
-    const weights: number[] = [];
+    const reps: GraphData[] = [];
+    const weights: GraphData[] = [];
     let repsTrend = 0;
     let weightsTrend = 0;
 
     if (!selectedValue) return { labels, reps, weights, repsTrend, weightsTrend };
 
     const setsByDate = groupRecordedSetsByDate(selectedValue);
-    const { dataLabels, repAverages, weightAverages } = getDataAvgPerDate(setsByDate);
+    const { repAverages, weightAverages } = getDataAvgPerDate(setsByDate);
 
-    repsTrend = getGrowthTrend(repAverages[repAverages.length - 1], repAverages[0]);
-    weightsTrend = getGrowthTrend(weightAverages[weightAverages.length - 1], weightAverages[0]);
+    repsTrend = getGrowthTrend(repAverages[repAverages.length - 1].value, repAverages[0].value);
+    weightsTrend = getGrowthTrend(
+      weightAverages[weightAverages.length - 1].value,
+      weightAverages[0].value
+    );
 
     return {
-      labels: dataLabels,
       reps: repAverages,
       weights: weightAverages,
       repsTrend,
@@ -70,11 +74,7 @@ const GraphsContainer = () => {
   ];
 
   return (
-    <Animated.ScrollView
-      style={{ opacity }}
-      nestedScrollEnabled
-      contentContainerStyle={spacing.gapDefault}
-    >
+    <Animated.View style={[{ flex: 1, opacity: opacity }, spacing.gapDefault]}>
       <ConditionalRender condition={items.length === 0}>
         <View style={[layout.center]}>
           <Text>לא הוקלטו סטים</Text>
@@ -86,16 +86,19 @@ const GraphsContainer = () => {
           <Collapsible
             key={label + data.length}
             isCollapsed={collapseState}
+            style={[layout.flex1]}
+            customHeight={GRAPH_HEIGHT}
             onCollapseChange={handleCollapseChange}
+            keepMounted
             trigger={
               <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
                 <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
                   <Icon name={icon as IconName} />
-                  <Text style={fonts.lg}>{label}</Text>
+                  <Text fontSize={16}>{label}</Text>
                 </View>
 
                 <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
-                  <Text style={fonts.lg}>{trend}%</Text>
+                  <Text fontSize={16}>{trend}%</Text>
                   <Icon
                     width={18}
                     height={18}
@@ -107,11 +110,11 @@ const GraphsContainer = () => {
               </View>
             }
           >
-            <Graph data={data} labels={labels} />
+            <Graph data={data} />
           </Collapsible>
         ))}
       </ConditionalRender>
-    </Animated.ScrollView>
+    </Animated.View>
   );
 };
 

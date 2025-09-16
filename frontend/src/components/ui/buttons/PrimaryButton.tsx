@@ -28,7 +28,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   disabled,
   style,
 }) => {
-  const { colors, common, layout, spacing, text } = useStyles();
+  const { colors, common, layout, spacing } = useStyles();
 
   const modeSpecificStyles =
     mode == "dark"
@@ -50,6 +50,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         layout.itemsCenter,
         width,
         modeSpecificStyles,
+        { opacity: disabled ? 0.7 : 1 },
         style,
       ]}
     >
@@ -64,7 +65,9 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
 
           <ConditionalRender condition={typeof children === "string"}>
             <Text
-              style={[mode == "dark" ? colors.textOnPrimary : colors.textPrimary, text.textBold]}
+              fontVariant="bold"
+              fontSize={16}
+              style={[mode == "dark" ? colors.textOnPrimary : colors.textPrimary]}
             >
               {children}
             </Text>

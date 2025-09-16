@@ -42,9 +42,9 @@ const RecordedSets: React.FC<RecordedSetsProps> = ({ route }) => {
   };
 
   useEffect(() => {
-    BackHandler.addEventListener("hardwareBackPress", handlePressBack);
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", handlePressBack);
 
-    return BackHandler.removeEventListener("hardwareBackPress", handlePressBack);
+    return () => backHandler.remove();
   }, []);
 
   return (
