@@ -56,16 +56,20 @@ const MyWorkoutPlanScreen = () => {
 
   return (
     <View style={[layout.flex1, colors.background, spacing.pdStatusBar, spacing.gapLg]}>
-      <ConditionalRender condition={plans && selectedPlan}>
-        <View style={[{ zIndex: 2, elevation: 5 }, spacing.pdHorizontalLg]}>
-          <DropDownContextProvider items={plans} onSelect={handleSelect}>
+      <View style={[{ zIndex: 2, elevation: 5 }, spacing.pdHorizontalLg]}>
+        <DropDownContextProvider items={plans} onSelect={handleSelect}>
+          <ScrollView
+            nestedScrollEnabled
+            contentContainerStyle={[spacing.gapSm]}
+            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+          >
             <WorkoutPlanSelector
               selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
               isCardio={showCardio}
             />
-          </DropDownContextProvider>
-        </View>
-      </ConditionalRender>
+          </ScrollView>
+        </DropDownContextProvider>
+      </View>
 
       <ScrollView
         style={{ zIndex: 1, elevation: 1 }}

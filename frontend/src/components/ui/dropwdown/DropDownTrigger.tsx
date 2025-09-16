@@ -11,7 +11,7 @@ const DEFAULT_LABEL = "בחר";
 const DropDownTrigger = () => {
   const { colors, common, layout, spacing } = useStyles();
 
-  const { setShouldCollapse, selectedValue, items } = useDropwDownContext();
+  const { shouldCollapse, setShouldCollapse, selectedValue, items } = useDropwDownContext();
 
   const label = useMemo(() => {
     if (items.length === 0 || !selectedValue) return DEFAULT_LABEL;
@@ -51,7 +51,7 @@ const DropDownTrigger = () => {
           <Text>{label}</Text>
         </View>
 
-        <Icon name="chevronDown" />
+        <Icon name="chevronDown" rotation={!shouldCollapse ? 180 : 0} />
       </View>
     </PrimaryButton>
   );
