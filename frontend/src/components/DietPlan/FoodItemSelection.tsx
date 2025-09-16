@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { FoodGroup } from "@/types/foodTypes";
 import useFoodGroupQuery from "@/hooks/queries/MenuItems/useFoodGroupQuery";
 import { formatServingText } from "@/utils/utils";
@@ -24,10 +24,14 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup }) => {
       </View>
     );
 
-  const formatted = items
-    .slice(START_SLICE_INDEX, END_SLICE_INDEX)
-    .map((item) => formatServingText(item.name, item.oneServing, 1))
-    .join(" | ");
+  const formatted = useMemo(
+    () =>
+      items
+        .slice(START_SLICE_INDEX, END_SLICE_INDEX)
+        .map((item) => formatServingText(item.name, item.oneServing, 1))
+        .join(" | "),
+    [items]
+  );
 
   return (
     <TextInput multiline style={[wrap, styles.foodItemSelectionContainr]} editable={false}>
