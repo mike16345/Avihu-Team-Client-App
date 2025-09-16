@@ -1,10 +1,14 @@
 import { IExercise, IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
-import { BottomTabNavigationOptions } from "@react-navigation/bottom-tabs";
-import { ParamListBase, RouteProp } from "@react-navigation/native";
+import {
+  BottomTabNavigationEventMap,
+  BottomTabNavigationOptions,
+} from "@react-navigation/bottom-tabs";
+import { NavigationHelpers, ParamListBase, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export type RootStackParamList = {
   BottomTabs: undefined;
+  Chat: undefined;
   Profile: undefined;
 };
 
@@ -16,7 +20,7 @@ export type AuthStackParamList = {
 export type BottomStackParamList = {
   Home: undefined;
   MyWorkoutPlanPage: undefined;
-  Chat: undefined;
+  ChatTab: undefined;
   MyDietPlanPage: undefined;
   MyProgressScreen: undefined;
   BlogScreen: undefined;
@@ -45,6 +49,10 @@ export interface NavigatorTab {
   name: keyof BottomStackParamList;
   component: () => React.ReactNode;
   options: BottomTabNavigationOptions;
+  listeners?: (props: {
+    navigation: NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>;
+    route: any;
+  }) => object;
 }
 
 export interface StackNavigatorProps<T extends ParamListBase, S extends keyof T> {

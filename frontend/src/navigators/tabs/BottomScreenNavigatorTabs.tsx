@@ -21,14 +21,20 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     },
   },
   {
-    name: "Chat",
-    component: BlogScreen,
+    name: "ChatTab",
+    component: HomeScreen,
     options: {
-      tabBarLabel: "",
       tabBarIcon: ({ color }) => (
         <Icon color={color} name="chat" height={ICON_HEIGHT} width={ICON_WIDTH} />
       ),
     },
+    listeners: ({ navigation }) => ({
+      tabPress: (e) => {
+        e.preventDefault();
+
+        navigation.navigate("Chat");
+      },
+    }),
   },
   {
     name: "Home",
