@@ -17,21 +17,21 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup }) => {
   const { center, wrap } = useLayoutStyles();
   const { data: items, isLoading } = useFoodGroupQuery(foodGroup);
 
+  const formatted = useMemo(() => {
+    if (!items) return "";
+
+    return items
+      .slice(START_SLICE_INDEX, END_SLICE_INDEX)
+      .map((item) => formatServingText(item.name, item.oneServing, 1))
+      .join(" | ");
+  }, [items]);
+
   if (items == undefined || isLoading)
     return (
       <View style={[center]}>
         <SpinningIcon mode="light" />
       </View>
     );
-
-  const formatted = useMemo(
-    () =>
-      items
-        .slice(START_SLICE_INDEX, END_SLICE_INDEX)
-        .map((item) => formatServingText(item.name, item.oneServing, 1))
-        .join(" | "),
-    [items]
-  );
 
   return (
     <TextInput multiline style={[wrap, styles.foodItemSelectionContainr]} editable={false}>
@@ -41,7 +41,7 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup }) => {
 };
 
 const styles = StyleSheet.create({
-  foodItemSelectionContainr: { fontSize: 16, fontFamily: "Assistant", textAlign: "right" },
+  foodItemSelectionContainr: { fontFamily: "Assistant-Regular", fontSize: 16, textAlign: "right" },
 });
 
 export default FoodItemSelection;
