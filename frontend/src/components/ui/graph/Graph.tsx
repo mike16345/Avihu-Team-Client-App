@@ -3,7 +3,7 @@ import React, { ReactNode, useMemo } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ConditionalRender";
 import Icon from "../../Icon/Icon";
-import { type GraphData } from "@/hooks/graph/useVictoryNativeGraphWeighIns";
+import { type GraphData } from "@/hooks/graph/useGraphWeighIns";
 import { getRadiusSizeBasedOnData, padXLabel } from "@/utils/utils";
 import { LinearGradient, vec, Paint, useFont } from "@shopify/react-native-skia";
 import {

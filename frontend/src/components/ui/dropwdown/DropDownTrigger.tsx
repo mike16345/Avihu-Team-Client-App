@@ -1,16 +1,17 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { useMemo } from "react";
 import PrimaryButton from "../buttons/PrimaryButton";
 import useStyles from "@/styles/useGlobalStyles";
 import { useDropwDownContext } from "@/context/useDropdown";
 import Icon from "@/components/Icon/Icon";
+import { Text } from "../Text";
 
 const DEFAULT_LABEL = "בחר";
 
 const DropDownTrigger = () => {
   const { colors, common, layout, spacing } = useStyles();
 
-  const { setShouldCollapse, shouldCollapse, selectedValue, items } = useDropwDownContext();
+  const { setShouldCollapse, selectedValue, items } = useDropwDownContext();
 
   const label = useMemo(() => {
     if (items.length === 0 || !selectedValue) return DEFAULT_LABEL;
@@ -21,7 +22,11 @@ const DropDownTrigger = () => {
   }, [selectedValue]);
 
   return (
-    <PrimaryButton mode="light" block onPress={() => setShouldCollapse(!shouldCollapse)}>
+    <PrimaryButton
+      mode="light"
+      block
+      onPress={() => setShouldCollapse((shouldCollapse) => !shouldCollapse)}
+    >
       <View
         style={[
           layout.flexRow,

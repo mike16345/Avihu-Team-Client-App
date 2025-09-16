@@ -10,7 +10,7 @@ import Graph from "../ui/graph/Graph";
 import { getDataAvgPerDate, getGrowthTrend, groupRecordedSetsByDate } from "@/utils/recordedSets";
 import { useFadeIn } from "@/styles/useFadeIn";
 import { IconName } from "@/constants/iconMap";
-import { GraphData } from "@/hooks/graph/useVictoryNativeGraphWeighIns";
+import { GraphData } from "@/hooks/graph/useGraphWeighIns";
 import { GRAPH_HEIGHT } from "@/constants/Constants";
 
 const ANIMATION_DURATION = 1200;

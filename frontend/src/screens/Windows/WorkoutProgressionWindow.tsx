@@ -61,7 +61,6 @@ const WorkoutProgressionWindow = () => {
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
         >
           <ExerciseSelector muscleGroup={activeMuscleGroup} />
-
           <GraphsContainer />
         </ScrollView>
       </DropDownContextProvider>

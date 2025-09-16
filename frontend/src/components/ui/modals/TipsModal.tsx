@@ -1,9 +1,10 @@
-import { ScrollView, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import React, { ReactNode } from "react";
 import { CustomModal, CustomModalProps } from "./Modal";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ConditionalRender";
 import { Text } from "../Text";
+import { TextInput } from "react-native";
 
 interface TipsModalProps extends CustomModalProps {
   tips?: string[];
@@ -30,13 +31,15 @@ const TipsModal: React.FC<TipsModalProps> = ({
         </ConditionalRender>
 
         <ConditionalRender condition={tips.length !== 0}>
-          <ScrollView contentContainerStyle={[spacing.gapLg, spacing.pdVerticalMd]}>
+          <ScrollView contentContainerStyle={[spacing.pdVerticalMd]}>
             {tips.map((tip, i) => (
               <View key={tip + i} style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
                 <View
                   style={[colors.backgroundPrimary, common.roundedFull, { height: 5, width: 5 }]}
-                ></View>
-                <Text fontSize={16}>{tip}</Text>
+                />
+                <TextInput multiline style={styles.text}>
+                  {tip}
+                </TextInput>
               </View>
             ))}
           </ScrollView>
@@ -45,5 +48,9 @@ const TipsModal: React.FC<TipsModalProps> = ({
     </CustomModal>
   );
 };
+
+const styles = StyleSheet.create({
+  text: { flexWrap: "wrap", fontFamily: "Assistant-Regular", fontSize: 16 },
+});
 
 export default TipsModal;
