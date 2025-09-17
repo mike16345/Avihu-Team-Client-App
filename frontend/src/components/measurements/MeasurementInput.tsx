@@ -36,11 +36,7 @@ const MeasurementInput: React.FC<MeasurementInputProps> = ({ activeMuscleGroup }
             </Text>
           </TouchableOpacity>
 
-          <Input
-            placeholder="רשמו כאן את המידה"
-            keyboardType="decimal-pad"
-            style={[colors.outline]}
-          />
+          <Input placeholder="רשמו כאן את המידה" keyboardType="decimal-pad" />
         </View>
 
         <View style={[layout.center]}>
