@@ -136,9 +136,8 @@ const styles = StyleSheet.create({
     // Add your selected item styles here
   },
   itemText: {
-    fontSize: 28,
+    fontSize: 24,
     fontFamily: "Brutalist",
-    paddingHorizontal: 5,
   },
   labelContainer: {
     alignItems: "center",

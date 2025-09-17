@@ -40,13 +40,7 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
   return (
     <>
       <View
-        style={[
-          layout.flexRow,
-          layout.itemsCenter,
-          layout.justifyBetween,
-          spacing.pdStatusBar,
-          spacing.pdHorizontalLg,
-        ]}
+        style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween, spacing.pdStatusBar]}
       >
         <TouchableOpacity onPress={goBack}>
           <Icon name="chevronRightBig" />

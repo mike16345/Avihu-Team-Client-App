@@ -35,13 +35,6 @@ export interface RecordedWorkout {
   note: string;
 }
 
-export interface IRecordedSet {
-  repsDone: number;
-  weight: number;
-  note: string;
-  plan: string;
-}
-
 export interface IRecordedSetResponse {
   plan: string;
   exercise: string;
@@ -132,8 +125,7 @@ export interface IRecordedSet {
   weight: number;
   repsDone: number;
   setNumber: number;
-  date: Date;
-  note: string;
+  date?: Date;
 }
 
 export interface ICardioExerciseItem {

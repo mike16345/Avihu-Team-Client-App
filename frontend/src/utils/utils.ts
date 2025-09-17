@@ -46,10 +46,15 @@ export const getYouTubeThumbnail = (id: string) => {
   return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
 };
 
-export const generateWheelPickerData = (minRange: number, maxRange: number, stepSize = 1) => {
+export const generateWheelPickerData = (
+  minRange: number,
+  maxRange: number,
+  stepSize = 1,
+  showLabel = true
+) => {
   const data = [];
   for (var i = minRange; i <= maxRange; i += stepSize) {
-    data.push({ value: i, label: `${i}` });
+    data.push({ value: i, label: showLabel ? `${i}` : undefined });
   }
 
   return data;

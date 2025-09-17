@@ -27,8 +27,10 @@ const SectionWheelPicker: React.FC<SectionWheelPickerProps> = ({ data, selectedV
 
 const styles = StyleSheet.create({
   container: {
+    width: "100%",
     flexDirection: "row",
     alignItems: "center",
+    gap: 12,
   },
 });
 
