@@ -74,9 +74,6 @@ const MyWorkoutPlanScreen = () => {
       <ScrollView
         style={{ zIndex: 1, elevation: 1 }}
         contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg, { zIndex: 1 }]}
-        refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={() => refresh(refetch)} />
-        }
       >
         <ConditionalRender condition={showCardio}>
           <CardioWrapper cardioPlan={data?.cardio} />
