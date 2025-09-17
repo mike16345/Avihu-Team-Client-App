@@ -115,7 +115,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
             <ConditionalRender condition={typeof trigger === "string"}>
               <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
                 <Text {...triggerProps}>{trigger}</Text>
-                <Icon name="chevronDown" rotation={45} />
+                <Icon name="chevronDown" rotation={isCollapsed ? 0 : 180} />
               </View>
             </ConditionalRender>
 
