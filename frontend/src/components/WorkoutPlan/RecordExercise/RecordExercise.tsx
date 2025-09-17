@@ -30,7 +30,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   };
 
   return (
-    <View style={[layout.flex1, colors.background, spacing.gap20, spacing.pdHorizontalLg]}>
+    <View style={[layout.flex1, colors.background, spacing.gap20, spacing.pdHorizontalMd]}>
       <RecordExerciseHeader exercise={exercise!} />
 
       <View style={[layout.flex1, layout.justifyBetween]}>

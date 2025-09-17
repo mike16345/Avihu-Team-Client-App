@@ -15,7 +15,15 @@ interface ExerciseVideoProps {
 const ExerciseVideo: FC<ExerciseVideoProps> = ({ exercise }) => {
   const { width } = useWindowDimensions();
   const { layout, colors, common, spacing } = useStyles();
-  const { frameLayer1 } = useShadowStyles();
+  const {
+    frameLayer1,
+    frameLayer2,
+    frameLayer3,
+    frameLayer4,
+    frameLayer5,
+    frameShadow,
+    frameShadowVisible,
+  } = useShadowStyles();
   const { exerciseMethod, sets } = exercise;
   const thumbnail = getYouTubeThumbnail(extractVideoId(exercise.exerciseId.linkToVideo));
 
@@ -32,20 +40,28 @@ const ExerciseVideo: FC<ExerciseVideoProps> = ({ exercise }) => {
         </View>
         <Image
           style={[{ borderTopLeftRadius: cornerRadius, borderTopRightRadius: cornerRadius }]}
-          src={thumbnail}
+          source={{ uri: thumbnail }}
           width={width * 0.9}
           height={160}
         />
         <View
           style={[
-            { borderBottomLeftRadius: cornerRadius, borderBottomRightRadius: cornerRadius },
+            frameLayer5,
+            {
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0,
+              borderBottomLeftRadius: cornerRadius,
+              borderBottomRightRadius: cornerRadius,
+            },
             layout.center,
             colors.backgroundSurface,
-            spacing.pdHorizontalLg,
+            spacing.pdHorizontalMd,
             spacing.pdVerticalMd,
           ]}
         >
-          <Text fontSize={18}>{exercise.exerciseId.name}</Text>
+          <Text style={{ flexShrink: 1 }} fontSize={18} numberOfLines={2} ellipsizeMode="tail">
+            {exercise.exerciseId.name}
+          </Text>
         </View>
       </View>
     </View>
@@ -66,6 +82,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     zIndex: 1,
     top: "25%",
-    right: "38%",
+    right: "40%",
   },
 });

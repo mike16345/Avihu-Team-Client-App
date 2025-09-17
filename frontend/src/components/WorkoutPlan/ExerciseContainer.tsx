@@ -1,4 +1,4 @@
-import { Image, Platform, Pressable, View } from "react-native";
+import { Image, Platform, Pressable, TextInput, View } from "react-native";
 import React from "react";
 import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
@@ -49,8 +49,10 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
         variant="gray"
       >
         <View style={[layout.flexRow, layout.justifyBetween]}>
-          <View style={[layout.justifyBetween]}>
-            <Text>{exerciseId.name}</Text>
+          <View style={[layout.flex1, layout.justifyBetween]}>
+            <Text style={{ flexShrink: 1 }} fontSize={16} numberOfLines={2} ellipsizeMode="tail">
+              {exerciseId.name}
+            </Text>
             <View style={[layout.flexRow]}>
               <Text fontVariant="semibold">{setCounter}</Text>
             </View>
@@ -62,7 +64,7 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
             }}
             height={66}
             width={72}
-            style={[common.rounded]}
+            style={[common.roundedSm, { flexShrink: 0 }]}
           />
         </View>
       </Card>
