@@ -38,6 +38,7 @@ import check from "@assets/icons/check.svg";
 import edit from "@assets/icons/edit.svg";
 import pencil from "@assets/icons/pencil.svg";
 import trash from "@assets/icons/trash.svg";
+import playCircle from "@assets/icons/playCircle.svg";
 
 const icons = {
   arrowLeft,
@@ -80,6 +81,7 @@ const icons = {
   pencil,
   trash,
   edit,
+  playCircle,
 } as const;
 
 export type IconName = keyof typeof icons;
