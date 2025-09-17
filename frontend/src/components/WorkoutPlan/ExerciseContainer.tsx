@@ -5,17 +5,23 @@ import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
 import { IExercise } from "@/interfaces/Workout";
 import { buildPhotoUrl, extractVideoId, getYouTubeThumbnail } from "@/utils/utils";
+import { useNavigation } from "@react-navigation/native";
+import { WorkoutStackParamListNavigationProp } from "@/types/navigatorTypes";
 
 interface ExerciseContainerProps {
   exercise: IExercise;
-  exerciseCounter: string;
+  setCounter: string;
+  muscleGroup: string;
 }
 
 const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
-  exercise: { exerciseId },
-  exerciseCounter,
+  exercise,
+  setCounter,
+  muscleGroup,
 }) => {
   const { common, layout, spacing } = useStyles();
+  const { exerciseId } = exercise;
+  const { navigate } = useNavigation<WorkoutStackParamListNavigationProp>();
 
   const getExerciseImage = () => {
     return exerciseId.imageUrl
@@ -23,10 +29,15 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
       : getYouTubeThumbnail(extractVideoId(exerciseId.linkToVideo));
   };
 
+  const handleOpenExercise = () => {
+    navigate("RecordExercise", { exercise, muscleGroup, setNumber: 1 });
+  };
+
   const pressedOpacity = Platform.OS == "ios" ? 0.5 : 0.8;
 
   return (
     <Pressable
+      onPress={handleOpenExercise}
       style={({ pressed }) => [
         {
           opacity: pressed ? pressedOpacity : 1,
@@ -41,7 +52,7 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
           <View style={[layout.justifyBetween]}>
             <Text>{exerciseId.name}</Text>
             <View style={[layout.flexRow]}>
-              <Text fontVariant="semibold">{exerciseCounter}</Text>
+              <Text fontVariant="semibold">{setCounter}</Text>
             </View>
           </View>
 

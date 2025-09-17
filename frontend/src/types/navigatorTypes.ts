@@ -29,8 +29,7 @@ export type BottomStackParamList = {
 
 export type WorkoutPlanStackParamList = {
   WorkoutPlanPage: undefined;
-  RecordSet: {
-    handleRecordSet: (recordSet: Omit<IRecordedSet, "plan">, sessionId?: string) => Promise<void>;
+  RecordExercise: {
     recordedSet?: IRecordedSetResponse;
     exercise: IExercise;
     muscleGroup: string;
@@ -62,3 +61,5 @@ export interface StackNavigatorProps<T extends ParamListBase, S extends keyof T>
 
 export type RootStackParamListNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 export type AuthStackParamListNavigationProp = NativeStackNavigationProp<AuthStackParamList>;
+export type WorkoutStackParamListNavigationProp =
+  NativeStackNavigationProp<WorkoutPlanStackParamList>;

@@ -1,4 +1,4 @@
-import { TouchableOpacity } from "react-native";
+import { StyleProp, TouchableOpacity, ViewStyle } from "react-native";
 import React, { ReactNode } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ConditionalRender";
@@ -15,6 +15,7 @@ interface secondaryButtonProps {
   shadow?: boolean;
   onPress?: () => void;
   disabled?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
 const SecondaryButton: React.FC<secondaryButtonProps> = ({
@@ -25,11 +26,12 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
   shadow = true,
   onPress,
   disabled,
+  style,
 }) => {
   const { colors, common, fonts, layout, spacing } = useStyles();
 
   const padding = size == "md" ? spacing.pdSm : spacing.pdXs;
-  const sizing = size === "sm" ? fonts.sm.fontSize : undefined;
+  const sizing = 20;
 
   return (
     <ButtonShadow style={layout.alignSelfStart} shadow={shadow}>
@@ -46,6 +48,7 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
           layout.center,
           spacing.gapDefault,
           padding,
+          style,
         ]}
       >
         <ConditionalRender condition={rightIcon}>

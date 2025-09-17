@@ -26,7 +26,8 @@ const MuscleGroupContainer: React.FC<MuscleGroupContainerProps> = ({
         <ExerciseContainer
           key={exercise._id}
           exercise={exercise}
-          exerciseCounter={`${i + 1}/${exercises.length}`}
+          muscleGroup = {muscleGroup}
+          setCounter={`${i + 1}/${exercises.length}`}
         />
       ))}
     </View>

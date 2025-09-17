@@ -115,7 +115,6 @@ export interface IRecordedSetResponse {
 
 export interface IExercise {
   _id?: string;
-
   exerciseId: { name: string; linkToVideo: string; _id: string; imageUrl?: string };
   tipFromTrainer?: string;
   exerciseMethod?: string;
