@@ -10,3 +10,12 @@ export const MEASUREMENT_DESCRIPTIONS: Record<MeasurementMuscle, string> = {
   ירך: " באמצע הירך בנקודה הכי רחבה .",
   תאומים: "בנקודה הרחבה ביותר של שריר התאומים.",
 };
+
+export const MEASUREMENT_GROUPS_ENGLISH: Record<MeasurementMuscle, string> = {
+  חזה: "chest",
+  ישבן: "glutes",
+  תאומים: "calf",
+  זרוע: "arm",
+  ירך: "thigh",
+  מותן: "waist",
+};
