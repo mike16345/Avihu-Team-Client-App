@@ -1,8 +1,9 @@
 import { WheelPickerProps } from "@/types/wheelPickerTypes";
 import React, { useState, useRef, useEffect } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { Text } from "./Text";
 import { softHaptic } from "@/utils/haptics";
+import { FlatList } from "react-native-gesture-handler";
 
 const WheelPicker: React.FC<WheelPickerProps> = ({
   data,
@@ -79,6 +80,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
       <View style={styles.row}>
         <FlatList
           ref={flatListRef}
+          nestedScrollEnabled
           getItemLayout={(_, index) => ({
             length: itemHeight,
             offset: itemHeight * index,
