@@ -27,10 +27,18 @@ const MeasurementHistoryContent = () => {
     }, {});
   }, [data]);
 
-  const activeMuscleMeasurements = useMemo(
-    () => sortedMeasurements[MEASUREMENT_GROUPS_ENGLISH[activeMuscle]],
-    [activeMuscle, sortedMeasurements]
-  );
+  const { selectedMeasurementsByDate, selectedMuscleDates } = useMemo(() => {
+    const selectedMuscleMeasurements = sortedMeasurements[MEASUREMENT_GROUPS_ENGLISH[activeMuscle]];
+    if (!selectedMuscleMeasurements) return {};
+
+    const selectedMuscleDates = selectedMuscleMeasurements.map((measurement) => measurement.date);
+    const selectedMeasurementsByDate = selectedMuscleMeasurements.reduce((acc, { date, value }) => {
+      acc[date] = value;
+
+      return acc;
+    }, {});
+    return { selectedMuscleDates, selectedMeasurementsByDate };
+  }, [activeMuscle, sortedMeasurements]);
 
   return (
     <View style={[spacing.gapXxl]}>
@@ -43,12 +51,14 @@ const MeasurementHistoryContent = () => {
       <CustomCalendar
         selectedDate={selectedDate}
         onSelect={(date) => setSelectedDate(date)}
-        dates={activeMuscleMeasurements.map((obj) => obj.date)}
+        dates={selectedMuscleDates}
       />
 
       <Text fontSize={16} style={[text.textCenter]}>
         {DateUtils.formatDate(selectedDate, "DD.MM.YY")}
       </Text>
+
+      {/* Insert selected date value here or no value exists here */}
     </View>
   );
 };
