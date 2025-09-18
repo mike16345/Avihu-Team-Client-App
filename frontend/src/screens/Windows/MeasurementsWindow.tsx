@@ -6,6 +6,7 @@ import { MEASUREMENT_MUSCLE_GROUPS } from "@/constants/measurements";
 import { useState } from "react";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import MeasurementInput from "@/components/measurements/MeasurementInput";
+import ProgressImageUpload from "@/components/measurements/ProgressImageUpload";
 
 const MeasurementsWindow = () => {
   const { layout, colors, common, fonts, spacing, text } = useStyles();
@@ -31,15 +32,7 @@ const MeasurementsWindow = () => {
 
         <MeasurementInput activeMuscleGroup={activeMuscleGroup} />
 
-        <PrimaryButton mode="light" block icon="camera">
-          <Text fontSize={16} fontVariant="bold">
-            העלאת תמונת התקדמות
-          </Text>
-        </PrimaryButton>
-
-        <Text style={text.textCenter} fontVariant="light">
-          העלו תמונה של ההתקדמות שלכם למאמן
-        </Text>
+        <ProgressImageUpload />
       </ScrollView>
     </KeyboardAvoidingView>
   );
