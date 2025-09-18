@@ -1,4 +1,4 @@
-import { TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
 import CustomCalendar from "./CustomCalendar";
 import { useMemo, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
@@ -6,8 +6,6 @@ import { ConditionalRender } from "../ui/ConditionalRender";
 import useWeighInsQuery from "@/hooks/queries/WeighIns/useWeighInsQuery";
 import DateUtils from "@/utils/dateUtils";
 import { Text } from "../ui/Text";
-import Icon from "../Icon/Icon";
-import { CustomModal } from "../ui/modals/Modal";
 import { IWeighIn } from "@/interfaces/User";
 import EditWeighIn from "./EditWeighIn";
 
@@ -16,7 +14,6 @@ const WeighInsCalendar = () => {
   const { spacing, layout } = useStyles();
 
   const [selectedDate, setSelectedDate] = useState<string | undefined>();
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const weighInMap = useMemo(() => {
     if (!data) return {};
@@ -38,22 +35,11 @@ const WeighInsCalendar = () => {
           <Text fontSize={16}>{DateUtils.formatDate(selectedDate!, "DD.MM.YYYY")}</Text>
           <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
             <Text fontSize={16}>משקל {weighInMap[selectedDate!]?.weight}</Text>
-            <TouchableOpacity onPress={() => setIsEditModalOpen(true)}>
-              <Icon name="pencil" />
-            </TouchableOpacity>
+
+            <EditWeighIn date={selectedDate || ""} weighInToEdit={weighInMap[selectedDate || ""]} />
           </View>
         </View>
       </ConditionalRender>
-
-      <CustomModal withToasts visible={isEditModalOpen}>
-        <CustomModal.Content>
-          <EditWeighIn
-            date={selectedDate || ""}
-            weighInToEdit={weighInMap[selectedDate || ""]}
-            handleDismissModal={() => setIsEditModalOpen(false)}
-          />
-        </CustomModal.Content>
-      </CustomModal>
     </View>
   );
 };
