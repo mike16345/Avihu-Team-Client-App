@@ -4,7 +4,6 @@ import { Text } from "@/components/ui/Text";
 import HorizontalSelector from "@/components/ui/HorizontalSelector";
 import { MEASUREMENT_MUSCLE_GROUPS } from "@/constants/measurements";
 import { useState } from "react";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import MeasurementInput from "@/components/measurements/MeasurementInput";
 import ProgressImageUpload from "@/components/measurements/ProgressImageUpload";
 

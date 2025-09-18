@@ -2,7 +2,7 @@ import { deleteItem, fetchData, sendData } from "@/API/api";
 import { IUserMuscleMeasurements } from "@/interfaces/measurements";
 import { ApiResponse } from "@/types/ApiTypes";
 
-const MEASUREMENT_ENDPOINT = "muscleMeasurements";
+const MEASUREMENT_ENDPOINT = "measurements";
 
 export const useMeasurementApi = () => {
   const saveMeasurement = (userId: string, date: string, measurement: string, muscle: string) =>
