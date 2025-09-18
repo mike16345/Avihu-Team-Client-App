@@ -1,4 +1,5 @@
 export interface IMuscleMeasurement {
+  _id?: string;
   date: string;
   chest: number;
   arm: number;
@@ -9,6 +10,7 @@ export interface IMuscleMeasurement {
 }
 
 export interface IUserMuscleMeasurements {
+  _id?: string;
   userId: string;
   measurements: IMuscleMeasurement[];
 }

@@ -14,7 +14,9 @@ export const useMeasurementApi = () => {
     });
 
   const getMeasurements = (userId: string) =>
-    fetchData<ApiResponse<IUserMuscleMeasurements>>(MEASUREMENT_ENDPOINT + "/one", userId);
+    fetchData<ApiResponse<IUserMuscleMeasurements>>(MEASUREMENT_ENDPOINT + "/one", { userId }).then(
+      (res) => res.data
+    );
 
   const removeMeasurement = (userId: string, muscle: string, date: string) =>
     deleteItem<ApiResponse<IUserMuscleMeasurements>>(MEASUREMENT_ENDPOINT, {

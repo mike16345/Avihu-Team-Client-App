@@ -14,9 +14,10 @@ setupCalendarLocale();
 interface CustomCalendarProps {
   selectedDate?: string;
   onSelect: (date: string) => void;
+  dates?: string[];
 }
 
-const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate }) => {
+const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate, dates = [] }) => {
   const { common, spacing } = useStyles();
 
   const today = DateUtils.getCurrentDate("YYYY-MM-DD");
@@ -27,7 +28,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate 
   const month = DateUtils.extractMonthFromDate(currentDate);
   const year = DateUtils.extractYearFromDate(currentDate);
 
-  const { theme, marked } = useCalendarTheme(today, selectedDate);
+  const { theme, marked } = useCalendarTheme(today, selectedDate, dates);
 
   const handleSelect = (day: DateData) => {
     onSelect(day.dateString);

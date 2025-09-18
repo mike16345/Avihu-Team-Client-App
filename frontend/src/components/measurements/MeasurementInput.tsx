@@ -1,4 +1,4 @@
-import { View, Image, TouchableOpacity, useWindowDimensions, Keyboard } from "react-native";
+import { View, Image, useWindowDimensions, Keyboard } from "react-native";
 import { Card } from "../ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
 import meausrementPhoto from "@assets/measurement_photo.png";
@@ -15,6 +15,7 @@ import measurementSchema from "@/schemas/measurementSchema";
 import { useToast } from "@/hooks/useToast";
 import useSaveMeasurement from "@/hooks/mutations/measurements/useSaveMeasurement";
 import DateUtils from "@/utils/dateUtils";
+import MeasurementHistoryModal from "./MeasurementHistoryModal";
 
 interface MeasurementInputProps {
   activeMuscleGroup: string;
@@ -69,11 +70,7 @@ const MeasurementInput: React.FC<MeasurementInputProps> = ({ activeMuscleGroup }
         </Text>
 
         <View style={[layout.flexRow, spacing.gap20, layout.justifyCenter, layout.itemsCenter]}>
-          <TouchableOpacity>
-            <Text fontSize={16} fontVariant="bold">
-              לצפייה בהיקפים
-            </Text>
-          </TouchableOpacity>
+          <MeasurementHistoryModal />
 
           <Input
             placeholder="רשמו כאן את המידה"
