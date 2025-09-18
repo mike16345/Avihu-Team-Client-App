@@ -17,17 +17,20 @@ const RepWheelPicker: React.FC<RepWheelPickerProps> = ({
   itemHeight = 35,
   activeItemColor,
   inactiveItemColor,
+  disabled,
   ...props
 }) => {
-  const { common, spacing, fonts, text, colors } = useStyles();
+  const { common, spacing, text, colors, layout } = useStyles();
 
   const activeColor = activeItemColor || colors.textPrimary.color;
   const inactiveColor = inactiveItemColor || colors.textPrimary.color;
 
   return (
     <View style={spacing.gapXl}>
-      <ConditionalRender condition={typeof label == "string"}>
-        <Text style={[text.textCenter, fonts.lg, text.textBold]}>{label}</Text>
+      <ConditionalRender condition={typeof label == "string" && label.length > 0}>
+        <Text fontSize={20} fontVariant="semibold" style={[text.textCenter]}>
+          {label}
+        </Text>
       </ConditionalRender>
 
       <ConditionalRender condition={typeof label !== "string"}>{label}</ConditionalRender>
@@ -38,16 +41,32 @@ const RepWheelPicker: React.FC<RepWheelPickerProps> = ({
           spacing.pdHorizontalDefault,
           spacing.pdVerticalXs,
           common.rounded,
+          { opacity: disabled ? 0.4 : 1 },
           style,
         ]}
       >
-        <WheelPicker
-          height={height}
-          itemHeight={itemHeight}
-          activeItemColor={activeColor}
-          inactiveItemColor={inactiveColor}
-          {...props}
-        />
+        {!disabled ? (
+          <WheelPicker
+            height={height}
+            itemHeight={itemHeight}
+            activeItemColor={activeColor}
+            inactiveItemColor={inactiveColor}
+            {...props}
+          />
+        ) : (
+          <View
+            style={[
+              layout.center,
+              {
+                height: height,
+              },
+            ]}
+          >
+            <Text fontVariant="brutalist" fontSize={24}>
+              {props.selectedValue}
+            </Text>
+          </View>
+        )}
       </View>
     </View>
   );

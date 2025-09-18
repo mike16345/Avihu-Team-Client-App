@@ -5,6 +5,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { StyleProp, View, ViewStyle } from "react-native";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { Text } from "../ui/Text";
+import { getWheelPickerItemPadding } from "@/utils/utils";
 
 interface WeightWheelPickerProps {
   minWeight: number;
@@ -19,6 +20,7 @@ interface WeightWheelPickerProps {
   itemHeight?: number;
   activeItemColor: string;
   inactiveItemColor: string;
+  disabled?: boolean;
   label?: ReactNode;
   style?: StyleProp<ViewStyle>;
 }
@@ -35,11 +37,12 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
   onValueChange,
   height,
   itemHeight,
+  disabled = false,
   activeItemColor,
   inactiveItemColor,
   style,
 }) => {
-  const { common, fonts, layout, spacing, text } = useStyles();
+  const { common, layout, spacing, text } = useStyles();
 
   const dividend = 10;
   const wholePart = Math.floor(selectedWeight);
@@ -108,7 +111,9 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
   return (
     <View style={spacing.gapXl}>
       <ConditionalRender condition={typeof label == "string"}>
-        <Text style={[text.textCenter, fonts.lg, text.textBold]}>{label}</Text>
+        <Text fontSize={20} fontVariant="semibold" style={[text.textCenter]}>
+          {label}
+        </Text>
       </ConditionalRender>
 
       <ConditionalRender condition={typeof label !== "string"}>{label}</ConditionalRender>
@@ -120,14 +125,30 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
           spacing.pdVerticalXs,
           common.rounded,
           layout.center,
+          { opacity: disabled ? 0.4 : 1 },
           style,
         ]}
       >
-        <SectionWheelPicker
-          data={wheelPickerPropsArray}
-          selectedValues={[wholePart, decimalPart.toFixed(2)]}
-          onValueChange={handleValueChange}
-        />
+        {!disabled ? (
+          <SectionWheelPicker
+            data={wheelPickerPropsArray}
+            selectedValues={[wholePart, decimalPart.toFixed(2)]}
+            onValueChange={handleValueChange}
+          />
+        ) : (
+          <View
+            style={[
+              layout.center,
+              {
+                height: height,
+              },
+            ]}
+          >
+            <Text fontVariant="brutalist" fontSize={24}>{`${wholePart} ${decimalPart.toFixed(
+              2
+            )}`}</Text>
+          </View>
+        )}
       </View>
     </View>
   );

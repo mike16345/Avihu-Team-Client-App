@@ -14,6 +14,7 @@ export type WheelPickerProps = {
   activeItemColor?: string;
   inactiveItemColor?: string;
   label?: ReactNode;
+  disabled?: boolean;
 };
 
 export type SectionWheelPickerProps = {

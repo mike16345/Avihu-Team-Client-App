@@ -12,22 +12,16 @@ import Animated, {
 
 const { height: SCREEN_H } = Dimensions.get("window");
 
-// How tall the “peek” is when collapsed (only the header/arrow visible)
 const PEEK = 430;
-// Closed position is off-screen except the peek
 const CLOSED_Y = SCREEN_H - PEEK;
-// Open is fully expanded to the top
 const OPEN_Y = -60;
-const SNAP = 48; // px tolerance near OPEN/CLOSED
+const SNAP = 48;
 
 type Props = {
-  /** control from parent */
   visible: boolean;
   onOpenChange: (isOpen: boolean) => void;
   onClose: () => void;
-  /** content inside the sheet */
   children: React.ReactNode;
-  /** optional corner radius for the sheet top */
   radius?: number;
 };
 

@@ -254,3 +254,7 @@ export function padXLabel(label: string): string {
 
   return " ".repeat(spacesToAdd) + label;
 }
+
+export function getWheelPickerItemPadding(height: number, itemHeight: number) {
+  return (height - itemHeight) / 2;
+}
