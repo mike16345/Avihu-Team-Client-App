@@ -23,7 +23,7 @@ export type BottomStackParamList = {
   ChatTab: undefined;
   MyDietPlanPage: undefined;
   MyProgressScreen: undefined;
-  BlogScreen: undefined;
+  ArticleScreen: undefined;
   EmailScreen: undefined;
 };
 
