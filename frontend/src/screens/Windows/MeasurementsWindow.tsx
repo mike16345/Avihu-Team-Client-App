@@ -8,7 +8,7 @@ import MeasurementInput from "@/components/measurements/MeasurementInput";
 import ProgressImageUpload from "@/components/measurements/ProgressImageUpload";
 
 const MeasurementsWindow = () => {
-  const { layout, colors, common, fonts, spacing, text } = useStyles();
+  const { layout, spacing } = useStyles();
 
   const [activeMuscleGroup, setActiveMuscleGroup] = useState<string>(MEASUREMENT_MUSCLE_GROUPS[0]);
 
@@ -17,7 +17,7 @@ const MeasurementsWindow = () => {
       <ScrollView
         nestedScrollEnabled
         style={layout.flex1}
-        contentContainerStyle={[spacing.gap20, spacing.pdLg]}
+        contentContainerStyle={[spacing.gapLg, spacing.pdHorizontalLg]}
       >
         <Text style={layout.alignSelfStart} fontSize={16}>
           מדידת היקפים

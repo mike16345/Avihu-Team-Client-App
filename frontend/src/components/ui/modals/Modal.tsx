@@ -82,6 +82,7 @@ export const CustomModal: CompoundModal = ({
             paddingBottom: spacing.pdBottomBar.paddingBottom * 3,
             paddingTop: 48,
           },
+          props.style,
         ]}
       >
         <ModalContextProvider onDismiss={handleDismiss}>

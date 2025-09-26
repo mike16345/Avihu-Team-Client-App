@@ -56,7 +56,10 @@ const MeasurementInput: React.FC<MeasurementInputProps> = ({ activeMuscleGroup }
   };
 
   return (
-    <Card variant="gray" style={[{ padding: 0 }, layout.flex1, layout.widthFull, common.roundedMd]}>
+    <Card
+      variant="gray"
+      style={[{ padding: 0 }, spacing.gapLg, layout.flex1, layout.widthFull, common.roundedMd]}
+    >
       <Card.Header>
         <Image
           source={meausrementPhoto}
@@ -64,8 +67,8 @@ const MeasurementInput: React.FC<MeasurementInputProps> = ({ activeMuscleGroup }
           style={[layout.widthFull, common.roundedMd]}
         />
       </Card.Header>
-      <Card.Content style={[spacing.pdLg, spacing.gap20]}>
-        <Text style={[text.textCenter]} fontSize={16}>
+      <Card.Content style={[{ paddingBottom: 20 }, spacing.gapLg]}>
+        <Text style={[text.textCenter, { minHeight: 45 }]} fontSize={16}>
           {MEASUREMENT_DESCRIPTIONS[activeMuscleGroup as MeasurementMuscle]}
         </Text>
 

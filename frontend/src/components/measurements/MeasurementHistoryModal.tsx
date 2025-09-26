@@ -18,8 +18,8 @@ const MeasurementHistoryModal = () => {
         </Text>
       </TouchableOpacity>
 
-      <CustomModal visible={openModal} onDismiss={() => setOpenModal(false)}>
-        <CustomModal.Header dismissIcon="chevronRightBig">
+      <CustomModal style={{ padding: 0 }} visible={openModal} onDismiss={() => setOpenModal(false)}>
+        <CustomModal.Header style={{ paddingHorizontal: 16 }} dismissIcon="chevronRightBig">
           <Text fontSize={14} fontVariant="semibold">
             היקפים
           </Text>

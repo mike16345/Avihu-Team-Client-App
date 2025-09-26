@@ -85,7 +85,7 @@ const MeasurementHistoryContent = () => {
   };
 
   return (
-    <View style={[spacing.gapXxl]}>
+    <View style={[spacing.gapXl, layout.flex1]}>
       <HorizontalSelector
         items={MEASUREMENT_MUSCLE_GROUPS}
         selected={activeMuscle}
