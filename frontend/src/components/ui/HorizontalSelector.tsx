@@ -31,7 +31,10 @@ const HorizontalSelector: React.FC<HorizontalSelectorProps> = ({
               key={i}
               mode={isActive ? "dark" : "light"}
               onPress={() => onSelect(item)}
-              style={spacing.pdVerticalSm}
+              style={[
+                spacing.pdVerticalSm,
+                { borderWidth: 1, borderColor: "#072723", borderRadius: 8 },
+              ]}
             >
               <View style={[spacing.pdHorizontalDefault]}>
                 <Text style={isActive ? colors.textOnPrimary : colors.textPrimary}>{item}</Text>
