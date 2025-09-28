@@ -1,12 +1,14 @@
 export interface ILessonGroup {
   _id: string;
   name: string;
+  description?: string;
 }
 
 export interface IBlogCount {
   id: string;
   name: string;
   count: number;
+  description?: string;
 }
 
 export interface IBlog {

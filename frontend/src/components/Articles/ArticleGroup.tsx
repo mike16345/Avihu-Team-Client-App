@@ -4,9 +4,10 @@ import { Card } from "../ui/Card";
 import { IBlogCount } from "@/interfaces/IBlog";
 import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
+import { ConditionalRender } from "../ui/ConditionalRender";
 
 const ArticleGroup: React.FC<{ articleGroup: IBlogCount }> = ({
-  articleGroup: { count, name },
+  articleGroup: { count, name, description },
 }) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
 
@@ -14,13 +15,28 @@ const ArticleGroup: React.FC<{ articleGroup: IBlogCount }> = ({
     <TouchableOpacity style={layout.widthFull}>
       <Card
         variant="gray"
-        style={[layout.widthFull, layout.itemsStart, spacing.gapMd, common.roundedMd, spacing.pdMd]}
+        style={[layout.widthFull, layout.itemsStart, common.roundedMd, spacing.pdMd]}
       >
-        <Card.Header>
-          <Text fontVariant="bold">{name}</Text>
+        <Card.Header style={{ paddingBottom: 4 }}>
+          <Text fontVariant="bold" fontSize={16}>
+            {name}
+          </Text>
         </Card.Header>
-        <Card.Content>
-          <View style={[colors.backgroundSurface, spacing.pdXs, common.roundedSm]}>
+        <Card.Content style={[spacing.gapMd, layout.itemsStart]}>
+          <ConditionalRender condition={description}>
+            <Text fontSize={16} style={text.textLeft}>
+              {description}
+            </Text>
+          </ConditionalRender>
+
+          <View
+            style={[
+              colors.backgroundSurface,
+              spacing.pdXs,
+              common.roundedSm,
+              layout.alignSelfStart,
+            ]}
+          >
             <Text fontSize={14} fontVariant="semibold">
               {count} מאמרים
             </Text>

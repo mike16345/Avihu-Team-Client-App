@@ -21,7 +21,7 @@ const ArticleScreen = () => {
         </Text>
       );
 
-    return data.map((group, i) => <ArticleGroup key={i} articleGroup={group} />);
+    return data.map((group) => <ArticleGroup key={group.id} articleGroup={group} />);
   }, [data]);
 
   if (isLoading) return <ArticleSkeleton />;
