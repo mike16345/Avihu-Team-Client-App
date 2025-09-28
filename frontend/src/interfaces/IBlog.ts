@@ -4,6 +4,7 @@ export interface ILessonGroup {
 }
 
 export interface IBlogCount {
+  id: string;
   name: string;
   count: number;
 }
