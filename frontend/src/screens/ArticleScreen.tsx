@@ -2,14 +2,16 @@ import ArticleGroup from "@/components/Articles/ArticleGroup";
 import ArticleSkeleton from "@/components/ui/loaders/skeletons/ArticleSkeleton";
 import { Text } from "@/components/ui/Text";
 import useArticleCountQuery from "@/hooks/queries/articles/useArticleCountQuery";
+import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import useStyles from "@/styles/useGlobalStyles";
 import { useMemo } from "react";
-import { ScrollView } from "react-native";
+import { RefreshControl, ScrollView } from "react-native";
 
 const ArticleScreen = () => {
   const { colors, layout, spacing, text } = useStyles();
+  const { isRefreshing, refresh } = usePullDownToRefresh();
 
-  const { data, isLoading } = useArticleCountQuery();
+  const { data, isLoading, refetch } = useArticleCountQuery();
 
   const articleGroups = useMemo(() => {
     if (!data)
@@ -34,6 +36,9 @@ const ArticleScreen = () => {
         spacing.pdStatusBar,
         spacing.pdBottomBar,
       ]}
+      refreshControl={
+        <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+      }
     >
       <Text fontSize={24} fontVariant="light">
         מאמרים
