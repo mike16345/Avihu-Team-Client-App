@@ -1,5 +1,5 @@
-import { fetchData } from "@/API/api";
-import { IBlog } from "@/interfaces/IBlog";
+import { fetchData, updateItem } from "@/API/api";
+import { IBlog, IBlogCount } from "@/interfaces/IBlog";
 import { PaginationParams, PaginationResult } from "@/interfaces/IPagination";
 import { ApiResponse } from "@/types/ApiTypes";
 
@@ -14,5 +14,18 @@ export const useBlogsApi = () => {
     return response.data;
   };
 
-  return { getPaginatedPosts };
+  const getPostCountByGroup = async () =>
+    fetchData<ApiResponse<IBlogCount[]>>(`${BLOGS_API_ENDPOINT}/count`).then((res) => res.data);
+
+  const changeLikedStatus = async (id: string, userId: string) =>
+    await updateItem<ApiResponse<IBlog>>(`${BLOGS_API_ENDPOINT}/one/like`, { id, userId }).then(
+      (res) => res.data
+    );
+
+  const addViewer = async (id: string, userId: string) =>
+    await updateItem<ApiResponse<IBlog>>(`${BLOGS_API_ENDPOINT}/one/viewer`, { id, userId }).then(
+      (res) => res.data
+    );
+
+  return { getPaginatedPosts, getPostCountByGroup, changeLikedStatus, addViewer };
 };
