@@ -5,7 +5,6 @@ import useStyles from "@/styles/useGlobalStyles";
 import { StyleProp, View, ViewStyle } from "react-native";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { Text } from "../ui/Text";
-import { getWheelPickerItemPadding } from "@/utils/utils";
 
 interface WeightWheelPickerProps {
   minWeight: number;
@@ -70,6 +69,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
         label: `.${decimal < 10 && showZeroDecimal ? `0${decimal}` : `${decimal}`}`,
       });
     }
+
     return options;
   };
 
@@ -90,6 +90,9 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       onValueChange: (value) => {
         handleValueChange([wholePart, value]);
       },
+      onValueCommit: (value) => {
+        handleValueChange([wholePart, value]);
+      },
       height,
       itemHeight,
       activeItemColor,
@@ -99,6 +102,9 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       data: wholeWeightOptions,
       selectedValue: wholePart,
       onValueChange: (value) => {
+        handleValueChange([value, decimalPart.toFixed(2)]);
+      },
+      onValueCommit: (value) => {
         handleValueChange([value, decimalPart.toFixed(2)]);
       },
       height,
@@ -132,21 +138,23 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
         {!disabled ? (
           <SectionWheelPicker
             data={wheelPickerPropsArray}
-            selectedValues={[wholePart, decimalPart.toFixed(2)]}
+            selectedValues={[decimalPart.toFixed(2), wholePart]}
             onValueChange={handleValueChange}
           />
         ) : (
           <View
             style={[
+              layout.flexRow,
+              spacing.gap20,
               layout.center,
               {
+                marginEnd: 28,
                 height: height,
               },
             ]}
           >
-            <Text fontVariant="brutalist" fontSize={24}>{`${wholePart} ${decimalPart.toFixed(
-              2
-            )}`}</Text>
+            <Text fontVariant="brutalist" fontSize={24}>{`00.`}</Text>
+            <Text fontVariant="brutalist" fontSize={24}>{`0`}</Text>
           </View>
         )}
       </View>

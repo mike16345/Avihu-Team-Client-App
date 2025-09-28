@@ -3,12 +3,15 @@ import React, { useState, useRef, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { Text } from "./Text";
 import { softHaptic } from "@/utils/haptics";
-import { FlatList } from "react-native-gesture-handler";
+import Animated from "react-native-reanimated";
 
 const WheelPicker: React.FC<WheelPickerProps> = ({
   data,
   selectedValue,
   onValueChange,
+  onValueCommit,
+  throttleMs = 80,
+  hapticOnCommit = true,
   height = 200,
   itemHeight = 40,
   activeItemColor,
@@ -18,38 +21,56 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     data.findIndex((item) => String(item.value) == String(selectedValue))
   );
 
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<Animated.FlatList<typeof data>>(null);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+  const lastEmitTsRef = useRef(0);
+  const settlingTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const programmaticScrollRef = useRef(false);
 
   const handleScroll = (event: any) => {
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
-    if (index == selectedIndex) return;
-    if (scrollTimeout.current) {
-      clearTimeout(scrollTimeout.current);
+    if (index === selectedIndex) return;
+
+    setSelectedIndex(index);
+
+    const now = Date.now();
+    if (now - lastEmitTsRef.current >= throttleMs) {
+      lastEmitTsRef.current = now;
+      onValueChange?.(data[index].value);
     }
 
-    scrollTimeout.current = setTimeout(() => {
+    if (settlingTimerRef.current) clearTimeout(settlingTimerRef.current);
+    settlingTimerRef.current = setTimeout(() => {
+      programmaticScrollRef.current = true;
       flatListRef.current?.scrollToOffset({
         offset: index * itemHeight,
         animated: true,
       });
-
-      softHaptic();
-    }, 2000); // Triggers after 2 seconds of no scroll
-
-    softHaptic();
-    setSelectedIndex(index);
-    onValueChange(data[index].value);
+      onValueCommit?.(data[index].value);
+    }, 120);
+    if (hapticOnCommit) softHaptic();
   };
 
   const handleScrollEnd = (event: any) => {
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
-    if (index == selectedIndex) return;
 
-    onValueChange(data[index].value);
-    setSelectedIndex(selectedIndex);
+    if (programmaticScrollRef.current) {
+      programmaticScrollRef.current = false;
+    } else {
+      programmaticScrollRef.current = true;
+      flatListRef.current?.scrollToOffset({
+        offset: index * itemHeight,
+        animated: true,
+      });
+    }
+
+    if (index !== selectedIndex) {
+      setSelectedIndex(index);
+    }
+    onValueCommit?.(data[index].value);
+    if (hapticOnCommit) softHaptic();
   };
 
   const returnIndex = (contentYOffset: any) => {
@@ -61,25 +82,42 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      const isDecimal = selectedValue.toString().includes(`.`);
-      let value = selectedValue;
-      if (isDecimal) {
-        value = selectedValue.toString().slice(1, selectedValue.length);
-      }
+    const idx = data.findIndex((item) => String(item.value) === String(selectedValue));
 
-      const selectedIndex = data.findIndex((item) => String(item.value) == String(value));
-      if (selectedIndex == -1) return;
+    if (data.length < 6) {
+      const idx = data.findIndex((item) => {
+        console.log("selected value", Number(selectedValue));
+        console.log("item", Number(item.value));
 
-      flatListRef.current?.scrollToIndex({ index: selectedIndex });
-    }, 100);
+        return String(item.value) === String(selectedValue);
+      });
+      console.log("idx", idx);
+    }
+    if (idx < 0) return;
+
+    programmaticScrollRef.current = true;
+    flatListRef.current?.scrollToIndex({ index: idx, animated: false });
+    setSelectedIndex(idx);
+    lastEmitTsRef.current = 0;
+
+    return () => {
+      if (settlingTimerRef.current) clearTimeout(settlingTimerRef.current);
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+    };
   }, []);
 
   return (
     <View style={[styles.container, { height }]}>
       <View style={styles.row}>
-        <FlatList
+        <Animated.FlatList
           ref={flatListRef}
+          windowSize={16}
+          maxToRenderPerBatch={32}
+          removeClippedSubviews={false}
+          updateCellsBatchingPeriod={16}
+          onScroll={handleScroll}
+          onMomentumScrollEnd={handleScrollEnd}
+          scrollEventThrottle={16}
           nestedScrollEnabled
           getItemLayout={(_, index) => ({
             length: itemHeight,
@@ -110,10 +148,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
               </Text>
             </View>
           )}
-          onScroll={handleScroll}
-          onMomentumScrollEnd={handleScrollEnd}
-          scrollEventThrottle={16}
-          initialNumToRender={50}
+          initialNumToRender={32}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: (height - itemHeight) / 2 }}
         />

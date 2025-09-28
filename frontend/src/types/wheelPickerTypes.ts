@@ -15,6 +15,9 @@ export type WheelPickerProps = {
   inactiveItemColor?: string;
   label?: ReactNode;
   disabled?: boolean;
+  onValueCommit?: (value: number | string) => void; // fires when scroll settles
+  throttleMs?: number; // default ~80ms for live updates
+  hapticOnCommit?: boolean; // default true
 };
 
 export type SectionWheelPickerProps = {

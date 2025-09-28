@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Dimensions, StyleSheet, View, Pressable, BackHandler } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -8,6 +8,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
+  useAnimatedReaction,
 } from "react-native-reanimated";
 
 const { height: SCREEN_H } = Dimensions.get("window");
@@ -23,6 +24,8 @@ type Props = {
   onClose: () => void;
   children: React.ReactNode;
   radius?: number;
+  /** Optional: render a custom handle (icon etc). If omitted, a default small bar is shown. */
+  renderHandle?: (args: { toggle: () => void; isOpen: boolean }) => React.ReactNode;
 };
 
 export default function BottomSheetModal({
@@ -31,100 +34,153 @@ export default function BottomSheetModal({
   onClose,
   children,
   radius = 16,
+  renderHandle,
 }: Props) {
   const translateY = useSharedValue(CLOSED_Y);
   const startY = useSharedValue(CLOSED_Y);
   const lastNotifiedOpen = useSharedValue<boolean>(visible);
 
+  // Local state just for handle render & backdrop pointerEvents
+  const [isOpen, setIsOpen] = useState<boolean>(visible);
+
+  // keep local state in sync with animated open/close detection
+  useAnimatedReaction(
+    () => translateY.value <= OPEN_Y + SNAP,
+    (nowIsOpen) => {
+      if (nowIsOpen !== isOpen) runOnJS(setIsOpen)(nowIsOpen);
+    },
+    [isOpen]
+  );
+
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
   }));
 
-  const backdropStyle = useAnimatedStyle(() => ({
+  const backdropAnimatedStyle = useAnimatedStyle(() => ({
     opacity: interpolate(translateY.value, [OPEN_Y, CLOSED_Y], [0.4, 0], Extrapolation.CLAMP),
-    pointerEvents: translateY.value < CLOSED_Y ? "auto" : "none",
-  })) as any;
+  }));
 
-  const pan = Gesture.Pan()
-    .onBegin(() => {
-      startY.value = translateY.value;
-    })
-    .onUpdate((e) => {
-      const next = Math.min(CLOSED_Y, Math.max(OPEN_Y, startY.value + e.translationY));
-      translateY.value = next;
+  const notifyOpenChange = (open: boolean) => {
+    lastNotifiedOpen.value = open;
+    onOpenChange(open);
+  };
 
-      const nearOpen = next <= OPEN_Y + SNAP;
-      const nearClosed = next >= CLOSED_Y - SNAP;
+  const pan = useMemo(
+    () =>
+      Gesture.Pan()
+        .activeOffsetY([-20, 20])
+        .failOffsetX([-15, 15])
+        .onBegin(() => {
+          startY.value = translateY.value;
+        })
+        .onUpdate((e) => {
+          const next = Math.min(CLOSED_Y, Math.max(OPEN_Y, startY.value + e.translationY));
+          translateY.value = next;
 
-      let isOpenNow = lastNotifiedOpen.value;
-      if (nearOpen) isOpenNow = true;
-      else if (nearClosed) isOpenNow = false;
+          const nearOpen = next <= OPEN_Y + SNAP;
+          const nearClosed = next >= CLOSED_Y - SNAP;
 
-      if (isOpenNow !== lastNotifiedOpen.value) {
-        lastNotifiedOpen.value = isOpenNow;
-        runOnJS(onOpenChange)(isOpenNow);
-      }
-    })
-    .onEnd((e) => {
-      const mid = (CLOSED_Y - OPEN_Y) / 2;
-      const distFromTop = translateY.value - OPEN_Y;
-      const goingDown = e.velocityY > 0;
+          let isOpenNow = lastNotifiedOpen.value;
+          if (nearOpen) isOpenNow = true;
+          else if (nearClosed) isOpenNow = false;
 
-      const target = goingDown
-        ? distFromTop > mid
-          ? CLOSED_Y
-          : OPEN_Y
-        : distFromTop < mid
-        ? OPEN_Y
-        : CLOSED_Y;
+          if (isOpenNow !== lastNotifiedOpen.value) {
+            lastNotifiedOpen.value = isOpenNow;
+            runOnJS(onOpenChange)(isOpenNow);
+          }
+        })
+        .onEnd((e) => {
+          const mid = (CLOSED_Y - OPEN_Y) / 2;
+          const distFromTop = translateY.value - OPEN_Y;
+          const goingDown = e.velocityY > 0;
 
-      translateY.value = withTiming(target, { duration: 200 }, (finished) => {
-        if (finished && target === CLOSED_Y) {
-          runOnJS(onClose)();
-        } else {
-          runOnJS(onOpenChange)(true);
-        }
-      });
-    });
+          const target = goingDown
+            ? distFromTop > mid
+              ? CLOSED_Y
+              : OPEN_Y
+            : distFromTop < mid
+            ? OPEN_Y
+            : CLOSED_Y;
 
+          translateY.value = withTiming(target, { duration: 200 }, (finished) => {
+            if (finished && target === CLOSED_Y) {
+              runOnJS(onClose)();
+              runOnJS(notifyOpenChange)(false);
+            } else {
+              runOnJS(notifyOpenChange)(true);
+            }
+          });
+        }),
+    [onClose]
+  );
+
+  // Back button closes if open
   useEffect(() => {
     const backHandler = BackHandler.addEventListener("hardwareBackPress", () => {
       if (lastNotifiedOpen.value) {
         onClose();
         return true;
       }
-
       return false;
     });
+    return () => backHandler.remove();
+  }, [onClose]);
 
-    return () => {
-      backHandler.remove();
-    };
-  }, []);
-
+  // External visibility changes
   useEffect(() => {
     lastNotifiedOpen.value = visible;
-
-    translateY.value = withTiming(visible ? OPEN_Y : CLOSED_Y, { duration: 220 });
+    translateY.value = withTiming(visible ? OPEN_Y : CLOSED_Y, { duration: 220 }, (finished) => {
+      if (finished) {
+        // keep local state in sync for handle/backdrop pointer events
+        runOnJS(setIsOpen)(visible);
+      }
+    });
   }, [visible]);
+
+  const toggle = () => {
+    const target = isOpen ? CLOSED_Y : OPEN_Y;
+    translateY.value = withTiming(target, { duration: 220 }, (finished) => {
+      if (finished) {
+        if (target === CLOSED_Y) {
+          onClose();
+          notifyOpenChange(false);
+        } else {
+          notifyOpenChange(true);
+        }
+      }
+    });
+  };
 
   return (
     <View style={styles.overlay} pointerEvents="box-none">
-      <Animated.View style={[styles.backdrop, backdropStyle]}>
+      <Animated.View
+        style={[styles.backdrop, { borderRadius: radius }, backdropAnimatedStyle]}
+        pointerEvents={isOpen ? "auto" : "none"}
+      >
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
       </Animated.View>
 
-      <GestureDetector gesture={pan}>
-        <Animated.View
-          style={[
-            styles.sheet,
-            { borderTopLeftRadius: radius, borderTopRightRadius: radius },
-            sheetStyle,
-          ]}
-        >
-          <View style={{ flex: 1, height: SCREEN_H }}>{children}</View>
-        </Animated.View>
-      </GestureDetector>
+      <Animated.View
+        style={[styles.sheet, { borderRadius: radius }, sheetStyle]}
+        pointerEvents="box-none"
+      >
+        <GestureDetector gesture={pan}>
+          <View style={styles.handleContainer} pointerEvents="box-only">
+            {renderHandle ? (
+              renderHandle({ toggle, isOpen })
+            ) : (
+              <Pressable onPress={toggle} hitSlop={12} style={styles.defaultHandle}>
+                <View style={styles.handleBar} />
+              </Pressable> 
+            )}
+          </View>
+        </GestureDetector>
+
+        {/* CONTENT (scrollables live here; no pan wrapped) */}
+        <View style={styles.content} pointerEvents="box-none">
+          {children}
+        </View>
+      </Animated.View>
     </View>
   );
 }
@@ -143,12 +199,29 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
-    bottom: OPEN_Y,
+    bottom: OPEN_Y, // keeps it tall enough as you had
     backgroundColor: "white",
-    transform: [{ translateY: CLOSED_Y }],
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 8,
+  },
+  handleContainer: {
+    alignItems: "center",
+    paddingTop: 18,
+  },
+  defaultHandle: {
+    paddingVertical: 6,
+    paddingHorizontal: 20,
+  },
+  handleBar: {
+    width: 42,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: "#C8C8C8",
+  },
+  content: {
+    flex: 1,
+    minHeight: 1, // ensure layout space even with small content
   },
 });
