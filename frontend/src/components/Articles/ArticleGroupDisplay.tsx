@@ -5,14 +5,22 @@ import { IBlogCount } from "@/interfaces/IBlog";
 import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ui/ConditionalRender";
+import { ArticleStackParamsList } from "@/types/navigatorTypes";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const ArticleGroup: React.FC<{ articleGroup: IBlogCount }> = ({
-  articleGroup: { count, name, description },
+const ArticleGroupDisplay: React.FC<{ articleGroup: IBlogCount }> = ({
+  articleGroup: { count, name, description, id },
 }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, common, layout, spacing, text } = useStyles();
+  const navigation = useNavigation<NativeStackNavigationProp<ArticleStackParamsList>>();
+
+  const handlePress = () => {
+    navigation.navigate("ArticleGroup", { articleGroup: { count, name, description, id } });
+  };
 
   return (
-    <TouchableOpacity style={layout.widthFull}>
+    <TouchableOpacity style={layout.widthFull} onPress={handlePress}>
       <Card
         variant="gray"
         style={[layout.widthFull, layout.itemsStart, common.roundedMd, spacing.pdMd]}
@@ -47,4 +55,4 @@ const ArticleGroup: React.FC<{ articleGroup: IBlogCount }> = ({
   );
 };
 
-export default ArticleGroup;
+export default ArticleGroupDisplay;

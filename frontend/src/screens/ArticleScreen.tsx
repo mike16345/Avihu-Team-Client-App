@@ -1,4 +1,4 @@
-import ArticleGroup from "@/components/Articles/ArticleGroup";
+import ArticleGroupDisplay from "@/components/Articles/ArticleGroupDisplay";
 import ArticleSkeleton from "@/components/ui/loaders/skeletons/ArticleSkeleton";
 import { Text } from "@/components/ui/Text";
 import useArticleCountQuery from "@/hooks/queries/articles/useArticleCountQuery";
@@ -21,7 +21,7 @@ const ArticleScreen = () => {
         </Text>
       );
 
-    return data.map((group) => <ArticleGroup key={group.id} articleGroup={group} />);
+    return data.map((group) => <ArticleGroupDisplay key={group.id} articleGroup={group} />);
   }, [data]);
 
   if (isLoading) return <ArticleSkeleton />;

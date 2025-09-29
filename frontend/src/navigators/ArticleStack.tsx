@@ -12,12 +12,7 @@ const ArticleStack = () => {
       }}
     >
       {stacks.map((stack) => (
-        <Stack.Screen
-          key={stack.name}
-          options={{ title: stack.title }}
-          name={stack.name}
-          component={stack.component}
-        />
+        <Stack.Screen key={stack.name} name={stack.name} component={stack.component} />
       ))}
     </Stack.Navigator>
   );

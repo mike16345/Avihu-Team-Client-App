@@ -1,5 +1,5 @@
-import RecordedSets from "@/components/WorkoutPlan/RecordedSets";
-import RecordExercise from "@/components/WorkoutPlan/RecordExercise";
+import Article from "@/components/Articles/Article";
+import ArticleGroupScreen from "@/components/Articles/ArticleGroupScreen";
 import ArticleScreen from "@/screens/ArticleScreen";
 
 export const stacks = [
@@ -8,11 +8,11 @@ export const stacks = [
     component: ArticleScreen,
   },
   {
-    name: "RecordSet",
-    component: RecordExercise,
+    name: "ArticleGroup",
+    component: ArticleGroupScreen,
   },
   {
-    name: "RecordedSets",
-    component: RecordedSets,
+    name: "ViewArticle",
+    component: Article,
   },
 ];
