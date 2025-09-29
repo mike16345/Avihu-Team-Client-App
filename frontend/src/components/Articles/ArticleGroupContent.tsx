@@ -26,7 +26,7 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
     if (!data || !data.results.length)
       return <Text style={[text.textCenter, spacing.pdXl]}>לא נמצאו מאמרים לקבוצה זו</Text>;
 
-    data.results.map((article) => <ArticleCard key={article._id} />);
+    return data.results.map((article) => <ArticleCard key={article._id} article={article} />);
   }, [data]);
 
   return (
