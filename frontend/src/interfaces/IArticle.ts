@@ -4,14 +4,15 @@ export interface ILessonGroup {
   description?: string;
 }
 
-export interface IBlogCount {
+export interface IArticleCount {
   id: string;
   name: string;
   count: number;
   description?: string;
 }
 
-export interface IBlog {
+export interface IArticle {
+  _id: string;
   title: string;
   content: string;
   imageUrl?: string;

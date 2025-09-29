@@ -1,7 +1,7 @@
 import { TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Card } from "../ui/Card";
-import { IBlogCount } from "@/interfaces/IBlog";
+import { IArticleCount } from "@/interfaces/IArticle";
 import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ui/ConditionalRender";
@@ -9,7 +9,7 @@ import { ArticleStackParamsList } from "@/types/navigatorTypes";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const ArticleGroupDisplay: React.FC<{ articleGroup: IBlogCount }> = ({
+const ArticleGroupDisplay: React.FC<{ articleGroup: IArticleCount }> = ({
   articleGroup: { count, name, description, id },
 }) => {
   const { colors, common, layout, spacing, text } = useStyles();

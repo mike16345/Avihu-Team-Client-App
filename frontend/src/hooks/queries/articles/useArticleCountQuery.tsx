@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { ARTICLE_COUNT_KEY, ONE_DAY } from "@/constants/reactQuery";
-import { useBlogsApi } from "@/hooks/api/useBlogsApi";
-import { IBlogCount } from "@/interfaces/IBlog";
+import { useArticleApi } from "@/hooks/api/useArticleApi";
+import { IArticleCount } from "@/interfaces/IArticle";
 import { createRetryFunction } from "@/utils/utils";
 
 const useArticleCountQuery = () => {
-  const { getPostCountByGroup } = useBlogsApi();
+  const { getPostCountByGroup } = useArticleApi();
 
-  return useQuery<any, any, IBlogCount[], any>({
+  return useQuery<any, any, IArticleCount[], any>({
     queryFn: () => getPostCountByGroup(),
     queryKey: [ARTICLE_COUNT_KEY],
     staleTime: ONE_DAY,

@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { ARTICLE_COUNT_KEY, ONE_DAY } from "@/constants/reactQuery";
-import { useBlogsApi } from "@/hooks/api/useBlogsApi";
-import { IBlog } from "@/interfaces/IBlog";
+import { useArticleApi } from "@/hooks/api/useArticleApi";
+import { IArticle } from "@/interfaces/IArticle";
 import { PaginationParams, PaginationResult } from "@/interfaces/IPagination";
 
 const useArticleQuery = (pagination: PaginationParams) => {
-  const { getPaginatedPosts } = useBlogsApi();
+  const { getPaginatedPosts } = useArticleApi();
 
-  return useQuery<any, any, PaginationResult<IBlog>, any>({
+  return useQuery<any, any, PaginationResult<IArticle>, any>({
     queryFn: () => getPaginatedPosts(pagination),
     queryKey: [ARTICLE_COUNT_KEY, JSON.stringify(pagination.query)],
     enabled: !!pagination,

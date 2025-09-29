@@ -1,7 +1,7 @@
 import { BackHandler, TouchableOpacity, View } from "react-native";
 import React, { useEffect } from "react";
 import useStyles from "@/styles/useGlobalStyles";
-import { IBlogCount } from "@/interfaces/IBlog";
+import { IArticleCount } from "@/interfaces/IArticle";
 import Icon from "../Icon/Icon";
 import { Text } from "../ui/Text";
 import { useNavigation } from "@react-navigation/native";
@@ -9,7 +9,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArticleStackParamsList } from "@/types/navigatorTypes";
 
 interface ArticleGroupHeaderProps {
-  articleGroup: IBlogCount;
+  articleGroup: IArticleCount;
 }
 
 const ArticleGroupHeader: React.FC<ArticleGroupHeaderProps> = ({ articleGroup }) => {

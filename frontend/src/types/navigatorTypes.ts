@@ -1,4 +1,4 @@
-import { IBlogCount } from "@/interfaces/IBlog";
+import { IArticleCount } from "@/interfaces/IArticle";
 import { IExercise, IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import {
   BottomTabNavigationEventMap,
@@ -31,7 +31,7 @@ export type BottomStackParamList = {
 export type ArticleStackParamsList = {
   Articles: undefined;
   ArticleGroup: {
-    articleGroup: IBlogCount;
+    articleGroup: IArticleCount;
   };
   ViewArticle: {
     articleId: string;
