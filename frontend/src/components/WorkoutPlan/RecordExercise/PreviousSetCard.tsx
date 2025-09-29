@@ -1,7 +1,10 @@
 import Badge from "@/components/ui/Badge";
+import TipsModal from "@/components/ui/modals/TipsModal";
 import { Text } from "@/components/ui/Text";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
-import { FC, useMemo } from "react";
+import { IRecordedSet } from "@/interfaces/Workout";
+import DateUtils from "@/utils/dateUtils";
+import { FC, useEffect, useMemo, useState } from "react";
 
 interface PreviousSetCardProps {
   exercise: string;
@@ -10,33 +13,78 @@ interface PreviousSetCardProps {
 const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
   const { data } = useRecordedSetsQuery();
 
-  const details = useMemo(() => {
-    if (!data || !data.length) return "";
-    let result = "";
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const { details, lastRecordedSets, date } = useMemo(() => {
+    if (!data || !data.length) return { details: "", lastRecordedSets: [], date: null };
+
+    const isSameDay = (a: Date, b: Date) =>
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate();
+
+    let latestSet: IRecordedSet | undefined;
 
     data.forEach((item) => {
-      const keys = Object.keys(item.recordedSets);
-      const key = keys.find((k) => k === exercise);
+      const sets = item?.recordedSets?.[exercise];
+      if (!Array.isArray(sets)) return;
 
-      if (!key) return result;
-      const sets = item.recordedSets[key];
-
-      if (sets && sets.length > 0) {
-        const latestSet = sets.reduce((prev, current) =>
-          prev.date && current.date && new Date(prev.date) > new Date(current.date) ? prev : current
-        );
-        result = `סט ${latestSet.setNumber} | משקל ${latestSet.weight} | חזרות ${latestSet.repsDone}  `;
-        return;
-      }
+      sets.forEach((s) => {
+        const d = new Date(s.date!);
+        if (!latestSet || (latestSet.date && d > new Date(latestSet.date))) {
+          latestSet = s;
+        }
+      });
     });
 
-    return result;
+    if (!latestSet?.date) return { details: "", lastRecordedSets: [], date: null };
+
+    const latestDay = new Date(latestSet.date);
+    const sameDaySets: IRecordedSet[] = [];
+
+    data.forEach((item) => {
+      const sets = item?.recordedSets?.[exercise];
+      if (!Array.isArray(sets)) return;
+
+      sets.forEach((s) => {
+        if (isSameDay(new Date(s.date!), latestDay)) {
+          sameDaySets.push(s);
+        }
+      });
+    });
+
+    sameDaySets.sort((a, b) => (a?.setNumber ?? 0) - (b?.setNumber ?? 0));
+
+    const toLine = (s: NonNullable<typeof latestSet>) =>
+      `סט ${s.setNumber} | משקל ${s.weight} | חזרות ${s.repsDone}`;
+
+    const details = toLine(latestSet); // latest set summary (kept for your Badge)
+    const lastRecordedSets = sameDaySets.map(toLine);
+    const date = DateUtils.formatDate(latestDay, "DD.MM.YY");
+
+    return { details, lastRecordedSets, date };
   }, [data, exercise]);
 
+  useEffect(() => {
+    return () => setIsModalVisible(false);
+  }, []);
+
   return details ? (
-    <Badge showButton showDot>
-      <Text fontVariant="semibold">עדכון אחרון | {details}</Text>
-    </Badge>
+    <>
+      <Badge onPress={() => setIsModalVisible(true)} showButton showDot>
+        <Text fontVariant="semibold">עדכון אחרון | {details}</Text>
+      </Badge>
+      <TipsModal
+        visible={isModalVisible}
+        onDismiss={() => setIsModalVisible(false)}
+        title={
+          <Text fontSize={16} fontVariant="light">
+            עדכון אחרון {date}
+          </Text>
+        }
+        tips={lastRecordedSets}
+      />
+    </>
   ) : null;
 };
 
