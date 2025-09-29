@@ -8,7 +8,9 @@ const BLOGS_API_ENDPOINT = "blogs";
 export const useBlogsApi = () => {
   const getPaginatedPosts = async (pagination: PaginationParams) => {
     const response = await fetchData<ApiResponse<PaginationResult<IBlog>>>(
-      `${BLOGS_API_ENDPOINT}/paginate?_page=${pagination.page}&_limit=${pagination.limit}`
+      `${BLOGS_API_ENDPOINT}/paginate?_page=${pagination.page}&_limit=${
+        pagination.limit
+      }&query=${JSON.stringify(pagination.query)}`
     );
 
     return response.data;

@@ -3,6 +3,7 @@ import { ArticleStackParamsList } from "@/types/navigatorTypes";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import useStyles from "@/styles/useGlobalStyles";
 import ArticleGroupHeader from "./ArticleGroupHeader";
+import ArticleGroupContent from "./ArticleGroupContent";
 
 const ArticleGroupScreen = () => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
@@ -21,6 +22,8 @@ const ArticleGroupScreen = () => {
       ]}
     >
       <ArticleGroupHeader articleGroup={articleGroup} />
+
+      <ArticleGroupContent groupId={articleGroup.id} />
     </View>
   );
 };
