@@ -86,8 +86,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 
     if (data.length < 6) {
       const idx = data.findIndex((item) => {
-        console.log("selected value", Number(selectedValue));
-        console.log("item", Number(item.value));
 
         return String(item.value) === String(selectedValue);
       });
@@ -111,8 +109,8 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
       <View style={styles.row}>
         <Animated.FlatList
           ref={flatListRef}
-          windowSize={16}
-          maxToRenderPerBatch={32}
+          windowSize={12}
+          maxToRenderPerBatch={28}
           removeClippedSubviews={false}
           updateCellsBatchingPeriod={16}
           onScroll={handleScroll}
@@ -148,7 +146,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
               </Text>
             </View>
           )}
-          initialNumToRender={32}
+          initialNumToRender={28}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: (height - itemHeight) / 2 }}
         />

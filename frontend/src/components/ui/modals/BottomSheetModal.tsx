@@ -1,5 +1,6 @@
+import useBackHandler from "@/hooks/useBackHandler";
 import React, { useEffect, useMemo, useState } from "react";
-import { Dimensions, StyleSheet, View, Pressable, BackHandler } from "react-native";
+import { Dimensions, StyleSheet, View, Pressable, LayoutChangeEvent } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
@@ -24,6 +25,7 @@ type Props = {
   onClose: () => void;
   children: React.ReactNode;
   radius?: number;
+  onLayout?: (e: LayoutChangeEvent) => void;
   /** Optional: render a custom handle (icon etc). If omitted, a default small bar is shown. */
   renderHandle?: (args: { toggle: () => void; isOpen: boolean }) => React.ReactNode;
 };
@@ -35,6 +37,7 @@ export default function BottomSheetModal({
   children,
   radius = 16,
   renderHandle,
+  onLayout,
 }: Props) {
   const translateY = useSharedValue(CLOSED_Y);
   const startY = useSharedValue(CLOSED_Y);
@@ -63,6 +66,20 @@ export default function BottomSheetModal({
   const notifyOpenChange = (open: boolean) => {
     lastNotifiedOpen.value = open;
     onOpenChange(open);
+  };
+
+  const toggle = () => {
+    const target = isOpen ? CLOSED_Y : OPEN_Y;
+    translateY.value = withTiming(target, { duration: 220 }, (finished) => {
+      if (finished) {
+        if (target === CLOSED_Y) {
+          runOnJS(onClose)();
+          runOnJS(notifyOpenChange)(false);
+        } else {
+          runOnJS(notifyOpenChange)(true);
+        }
+      }
+    });
   };
 
   const pan = useMemo(
@@ -114,19 +131,15 @@ export default function BottomSheetModal({
     [onClose]
   );
 
-  // Back button closes if open
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", () => {
-      if (lastNotifiedOpen.value) {
-        onClose();
-        return true;
-      }
-      return false;
-    });
-    return () => backHandler.remove();
-  }, [onClose]);
+  useBackHandler(() => {
+    if (lastNotifiedOpen.value) {
+      onClose();
+      return true;
+    }
 
-  // External visibility changes
+    return false;
+  });
+
   useEffect(() => {
     lastNotifiedOpen.value = visible;
     translateY.value = withTiming(visible ? OPEN_Y : CLOSED_Y, { duration: 220 }, (finished) => {
@@ -136,20 +149,6 @@ export default function BottomSheetModal({
       }
     });
   }, [visible]);
-
-  const toggle = () => {
-    const target = isOpen ? CLOSED_Y : OPEN_Y;
-    translateY.value = withTiming(target, { duration: 220 }, (finished) => {
-      if (finished) {
-        if (target === CLOSED_Y) {
-          onClose();
-          notifyOpenChange(false);
-        } else {
-          notifyOpenChange(true);
-        }
-      }
-    });
-  };
 
   return (
     <View style={styles.overlay} pointerEvents="box-none">
@@ -161,22 +160,22 @@ export default function BottomSheetModal({
       </Animated.View>
 
       <Animated.View
+        onLayout={onLayout}
         style={[styles.sheet, { borderRadius: radius }, sheetStyle]}
         pointerEvents="box-none"
       >
         <GestureDetector gesture={pan}>
-          <View style={styles.handleContainer} pointerEvents="box-only">
+          <View style={styles.handleContainer} pointerEvents="auto">
             {renderHandle ? (
               renderHandle({ toggle, isOpen })
             ) : (
               <Pressable onPress={toggle} hitSlop={12} style={styles.defaultHandle}>
                 <View style={styles.handleBar} />
-              </Pressable> 
+              </Pressable>
             )}
           </View>
         </GestureDetector>
 
-        {/* CONTENT (scrollables live here; no pan wrapped) */}
         <View style={styles.content} pointerEvents="box-none">
           {children}
         </View>

@@ -148,7 +148,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
               spacing.gap20,
               layout.center,
               {
-                marginEnd: 28,
+                marginEnd: 16,
                 height: height,
               },
             ]}
