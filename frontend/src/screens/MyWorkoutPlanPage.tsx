@@ -81,7 +81,7 @@ const MyWorkoutPlanScreen = () => {
 
         <ConditionalRender condition={!showCardio}>
           {selectedPlan?.muscleGroups.map((muscleGroup, i) => (
-            <MuscleGroupContainer key={i} muscleGroup={muscleGroup} />
+            <MuscleGroupContainer key={i} muscleGroup={muscleGroup} plan={selectedPlan.planName} />
           ))}
         </ConditionalRender>
       </ScrollView>

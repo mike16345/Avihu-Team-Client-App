@@ -1,27 +1,32 @@
-import { Image, Platform, Pressable, TextInput, View } from "react-native";
-import React from "react";
+import { Image, Platform, Pressable, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
 import { IExercise } from "@/interfaces/Workout";
-import { buildPhotoUrl, extractVideoId, getYouTubeThumbnail } from "@/utils/utils";
+import {
+  buildPhotoUrl,
+  extractVideoId,
+  getNextSetNumberFromSession,
+  getYouTubeThumbnail,
+} from "@/utils/utils";
 import { useNavigation } from "@react-navigation/native";
 import { WorkoutStackParamListNavigationProp } from "@/types/navigatorTypes";
+import useWorkoutSession from "@/hooks/sessions/useWorkoutSession";
 
 interface ExerciseContainerProps {
   exercise: IExercise;
-  setCounter: string;
   muscleGroup: string;
+  plan: string;
 }
 
-const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
-  exercise,
-  setCounter,
-  muscleGroup,
-}) => {
+const ExerciseContainer: React.FC<ExerciseContainerProps> = ({ exercise, muscleGroup, plan }) => {
+  const pressedOpacity = Platform.OS == "ios" ? 0.5 : 0.8;
   const { common, layout, spacing } = useStyles();
   const { exerciseId } = exercise;
   const { navigate } = useNavigation<WorkoutStackParamListNavigationProp>();
+  const { session } = useWorkoutSession();
+  const [setNumber, setSetNumber] = useState(1);
 
   const getExerciseImage = () => {
     return exerciseId.imageUrl
@@ -30,10 +35,20 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
   };
 
   const handleOpenExercise = () => {
-    navigate("RecordExercise", { exercise, muscleGroup, setNumber: 1 });
+    navigate("RecordExercise", {
+      exercise,
+      muscleGroup,
+      setNumber,
+      plan: plan,
+    });
   };
 
-  const pressedOpacity = Platform.OS == "ios" ? 0.5 : 0.8;
+  useEffect(() => {
+    if (!session) return;
+    const nextSet = getNextSetNumberFromSession(session, plan, exercise.exerciseId.name);
+
+    setSetNumber(nextSet);
+  }, [session]);
 
   return (
     <Pressable
@@ -54,7 +69,9 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
               {exerciseId.name}
             </Text>
             <View style={[layout.flexRow]}>
-              <Text fontVariant="semibold">{setCounter}</Text>
+              <Text fontVariant="semibold">
+                {setNumber}/{exercise.sets.length}
+              </Text>
             </View>
           </View>
 

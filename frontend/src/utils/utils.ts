@@ -1,5 +1,6 @@
 import { AVG_CARB_CALORIES, AVG_PROTEIN_CALORIES } from "@/constants/Constants";
 import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
+import { ISession } from "@/interfaces/ISession";
 import Constants from "expo-constants";
 
 export const testEmail = (email: string) => {
@@ -257,4 +258,16 @@ export function padXLabel(label: string): string {
 
 export function getWheelPickerItemPadding(height: number, itemHeight: number) {
   return (height - itemHeight) / 2;
+}
+
+export function getNextSetNumberFromSession(
+  session: ISession | null,
+  plan: string,
+  exerciseName: string
+) {
+  if (!session) return 1;
+  const planData = session.data?.[plan];
+  const exerciseData = planData?.[exerciseName];
+
+  return exerciseData?.setNumber + 1 || 1;
 }

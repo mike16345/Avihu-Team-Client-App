@@ -1,12 +1,13 @@
 import RepWheelPicker from "@/components/ui/RepWheelPicker";
 import WeightWheelPicker from "@/components/WeightGraph/WeightWheelPicker";
 import { generateWheelPickerData } from "@/utils/utils";
-import React, { memo, useCallback, useMemo, useState } from "react";
-import { View, StyleProp, ViewStyle, StyleSheet, useWindowDimensions } from "react-native";
+import React, { memo, useCallback, useMemo } from "react";
+import { View, StyleSheet, useWindowDimensions } from "react-native";
 import Animated, { FadeInDown, FadeOutUp, LinearTransition } from "react-native-reanimated";
 import { SetInput } from "./SetInputContainer";
 import useColors from "@/styles/useColors";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
+import { DEFAULT_SET } from "@/constants/Constants";
 
 const MIN_REPS = 0;
 const MAX_REPS = 125;
@@ -95,30 +96,19 @@ const SetRow = memo(
 
 type SetInputListProps = {
   isExpanded: boolean;
-  setNumber: number;
   maxSets: number;
   containerHeight: number;
-  contentContainerStyle?: StyleProp<ViewStyle>;
-};
-
-const set: Omit<SetInput, "setNumber"> = {
-  repsDone: 0,
-  weight: 0,
+  recordedSets: SetInput[];
+  setRecordedSets: React.Dispatch<React.SetStateAction<SetInput[]>>;
 };
 
 const SetInputList: React.FC<SetInputListProps> = ({
   isExpanded,
-  setNumber,
-  contentContainerStyle,
   maxSets,
   containerHeight,
+  recordedSets,
+  setRecordedSets,
 }) => {
-  const [recordedSets, setRecordedSets] = useState<SetInput[]>([
-    {
-      ...set,
-      setNumber: setNumber,
-    },
-  ]);
   const isOneItem = recordedSets.length === 1;
   const LABEL_HEIGHT = 48;
   const maxToFitInContainer = Math.floor(
@@ -144,7 +134,7 @@ const SetInputList: React.FC<SetInputListProps> = ({
   const handleAppendSet = useCallback(() => {
     setRecordedSets((prev) => {
       const prevSetNumber = prev[prev.length - 1].setNumber;
-      const newSet = { ...set, setNumber: prevSetNumber + 1 };
+      const newSet = { ...DEFAULT_SET, setNumber: prevSetNumber + 1 };
 
       return [...prev, newSet];
     });

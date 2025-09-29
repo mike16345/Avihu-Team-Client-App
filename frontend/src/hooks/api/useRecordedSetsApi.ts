@@ -1,4 +1,4 @@
-import { fetchData, sendData, updateItem } from "@/API/api";
+import { fetchData, sendData, updateItem, deleteItem } from "@/API/api";
 import { IMuscleGroupRecordedSets, IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import { IRecordedSetPost } from "@/interfaces/Workout";
 import { ApiResponse } from "@/types/ApiTypes";
@@ -50,6 +50,10 @@ export const useRecordedSetsApi = () => {
     return fetchData<ApiResponse<IRecordedSetResponse[]>>(endpoint);
   };
 
+  const deleteRecordedSet = (id: string) => {
+    return deleteItem(RECORDED_SETS_ENDPOINT + "/" + id);
+  };
+
   return {
     addRecordedSet,
     updateRecordedSet,
@@ -57,5 +61,6 @@ export const useRecordedSetsApi = () => {
     getUserRecordedMuscleGroupNames,
     getUserRecordedExerciseNamesByMuscleGroup,
     getUserRecordedSetsByExercise,
+    deleteRecordedSet,
   };
 };

@@ -34,6 +34,7 @@ export type WorkoutPlanStackParamList = {
     exercise: IExercise;
     muscleGroup: string;
     setNumber: number;
+    plan: string;
   };
   RecordedSets: {
     recordedSets: IRecordedSetResponse[];
