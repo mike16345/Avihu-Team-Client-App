@@ -14,8 +14,7 @@ import Animated, {
 
 const { height: SCREEN_H } = Dimensions.get("window");
 
-const PEEK = 430;
-const CLOSED_Y = SCREEN_H - PEEK;
+const PEEK = 405;
 const OPEN_Y = -60;
 const SNAP = 48;
 
@@ -28,6 +27,9 @@ type Props = {
   onLayout?: (e: LayoutChangeEvent) => void;
   /** Optional: render a custom handle (icon etc). If omitted, a default small bar is shown. */
   renderHandle?: (args: { toggle: () => void; isOpen: boolean }) => React.ReactNode;
+  /** Optional: Controls how much space the bottom sheet initally takes up. */
+
+  peek?: number;
 };
 
 export default function BottomSheetModal({
@@ -38,7 +40,10 @@ export default function BottomSheetModal({
   radius = 16,
   renderHandle,
   onLayout,
+  peek = PEEK,
 }: Props) {
+  const CLOSED_Y = SCREEN_H - peek;
+
   const translateY = useSharedValue(CLOSED_Y);
   const startY = useSharedValue(CLOSED_Y);
   const lastNotifiedOpen = useSharedValue<boolean>(visible);
@@ -81,6 +86,10 @@ export default function BottomSheetModal({
       }
     });
   };
+
+  useEffect(() => {
+    translateY.value = withTiming(CLOSED_Y, { duration: 0 });
+  }, [peek]);
 
   const pan = useMemo(
     () =>

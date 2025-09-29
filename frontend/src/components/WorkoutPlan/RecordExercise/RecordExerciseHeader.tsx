@@ -16,7 +16,7 @@ interface RecordExerciseHeaderProps {
 }
 
 const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
-  const { layout, spacing } = useStyles();
+  const { layout } = useStyles();
   const { goBack } = useNavigation();
 
   const [tips, setTips] = useState<string[]>([]);
@@ -39,9 +39,7 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
 
   return (
     <>
-      <View
-        style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween, spacing.pdStatusBar]}
-      >
+      <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween, { paddingTop: 12 }]}>
         <TouchableOpacity onPress={goBack}>
           <Icon name="chevronRightBig" />
         </TouchableOpacity>

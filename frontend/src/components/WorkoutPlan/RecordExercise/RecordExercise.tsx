@@ -1,7 +1,7 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { View } from "react-native";
+import { Dimensions, View } from "react-native";
 import RecordExerciseHeader from "./RecordExerciseHeader";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import { StackNavigatorProps, WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 import ExerciseVideo from "./ExerciseVideo";
 import SetInputContainer, { SetInput } from "./SetInputContainer";
@@ -11,9 +11,15 @@ import { IRecordedSetPost } from "@/interfaces/Workout";
 import { useToast } from "@/hooks/useToast";
 import useWorkoutSession from "@/hooks/sessions/useWorkoutSession";
 import { getNextSetNumberFromSession } from "@/utils/utils";
+import PreviousSetCard from "./PreviousSetCard";
+import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
+import { LayoutChangeEvent } from "react-native";
+import { ConditionalRender } from "@/components/ui/ConditionalRender";
 
 interface RecordExerciseProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordExercise"> {}
+
+const SPACING = 92; // Accounts for approximately all the spacing (gap)
 
 const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const { layout, colors, spacing } = useStyles();
@@ -24,6 +30,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
 
   const { useAddRecordedSets: addRecordedSets } = useRecordedSetsMutations();
   const { triggerSuccessToast, triggerErrorToast } = useToast();
+  const [height, setHeight] = useState(0);
 
   const [currentSet, setCurrentSet] = useState(setNumber || 1);
 
@@ -46,7 +53,10 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
 
         handleSetLocalSession(response.session);
         setCurrentSet(nextSet);
-        triggerSuccessToast({ message: "ניתן להיות במעקב אימונים" });
+        triggerSuccessToast({
+          title: "עודכן בהצלחה ",
+          message: "הנתונים זמינים לצפייה בהיסטוריית הביצועים",
+        });
       } catch (e: any) {
         triggerErrorToast({ message: e.message });
       }
@@ -54,13 +64,36 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
     [exercise, setNumber, muscleGroup, plan]
   );
 
+  const onLayout = (e: LayoutChangeEvent) => {
+    if (e.nativeEvent.layout.height !== height) {
+      setHeight(e.nativeEvent.layout.height);
+    }
+  };
+
+  const sheetHeight = useMemo(() => Dimensions.get("screen").height - height - SPACING, [height]);
+
   return (
-    <View style={[layout.flex1, colors.background, spacing.gap20, spacing.pdHorizontalMd]}>
+    <View style={[layout.flex1, colors.background, spacing.gapLg, spacing.pdHorizontalMd]}>
       <RecordExerciseHeader exercise={exercise!} />
 
-      <View style={[layout.flex1, layout.justifyBetween]}>
-        <ExerciseVideo exercise={exercise!} />
+      <View style={[layout.flex1, spacing.gapSm]}>
+        <View onLayout={onLayout} style={[spacing.gapMd]}>
+          <ExerciseVideo exercise={exercise!} />
+          <View style={[layout.center, spacing.gapMd]}>
+            <PreviousSetCard exercise={exercise.exerciseId.name} />
+            <ConditionalRender condition={true}>
+              <SecondaryButton
+                alignStart={false}
+                onPress={() => console.log("open sets calendar")}
+                rightIcon="documentText"
+              >
+                היסטוריית משקל וחזרות
+              </SecondaryButton>
+            </ConditionalRender>
+          </View>
+        </View>
         <SetInputContainer
+          sheetHeight={sheetHeight}
           handleRecordSets={handleRecordSets}
           maxSets={exercise?.sets?.length!}
           setNumber={currentSet}

@@ -14,6 +14,7 @@ const HORIZONTAL_PADDING = 24;
 const VERTICAL_PADDING = 16;
 
 interface SetInputContainerProps {
+  sheetHeight: number;
   setNumber: number;
   maxSets: number;
   handleRecordSets: (sets: SetInput[]) => void;
@@ -25,6 +26,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   handleRecordSets,
   maxSets,
   setNumber,
+  sheetHeight,
 }) => {
   const { layout, colors, spacing, common } = useStyles();
 
@@ -57,6 +59,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   return (
     <>
       <BottomSheetModal
+        peek={sheetHeight}
         onOpenChange={(isExpanded) => setIsExpanded(isExpanded)}
         visible={isExpanded}
         renderHandle={({ toggle, isOpen }) => (

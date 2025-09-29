@@ -1,5 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { View, TouchableOpacity, StyleSheet, LayoutChangeEvent } from "react-native";
+import { View, TouchableOpacity, StyleSheet, LayoutChangeEvent, Dimensions } from "react-native";
 import { ReactNode, useState } from "react";
 import { IconName } from "@/constants/iconMap";
 import { ConditionalRender } from "./ConditionalRender";
@@ -21,7 +21,7 @@ interface Badgeprops {
 const Badge: React.FC<Badgeprops> = ({
   children,
   buttonIcon = "arrowLeft",
-  buttonLabel = "לצפיה",
+  buttonLabel = "לצפייה",
   onPress,
   showButton = false,
   showDot = false,
@@ -49,13 +49,11 @@ const Badge: React.FC<Badgeprops> = ({
         common.rounded,
         common.borderXsm,
         colors.outline,
-        spacing.pdVerticalXs,
-        spacing.pdHorizontalDefault,
         layout.flexRow,
         alignStart && layout.alignSelfStart,
         spacing.gapDefault,
         layout.itemsCenter,
-        { position: "relative" },
+        { position: "relative", paddingHorizontal: 10, paddingVertical: 4 },
       ]}
     >
       <ConditionalRender condition={showDot}>
@@ -63,7 +61,7 @@ const Badge: React.FC<Badgeprops> = ({
       </ConditionalRender>
 
       <ConditionalRender condition={typeof children === "string"}>
-        <Text style={[colors.textPrimary, { maxWidth: badgeLength }]}>{children}</Text>
+        <Text style={[{ maxWidth: badgeLength }]}>{children}</Text>
       </ConditionalRender>
 
       <ConditionalRender condition={typeof children !== "string"}>{children}</ConditionalRender>
@@ -71,27 +69,22 @@ const Badge: React.FC<Badgeprops> = ({
       <ConditionalRender condition={showButton}>
         <View
           style={[
-            styles.button,
             layout.flexRow,
             layout.itemsCenter,
-            spacing.pdHorizontalXs,
             spacing.gapXs,
             common.borderXsm,
             colors.outline,
             common.roundedSm,
+            spacing.pdHorizontalXs,
+            { paddingVertical: 0.5 },
           ]}
         >
-          <Text>{buttonLabel}</Text>
+          <Text fontVariant="semibold">{buttonLabel}</Text>
           <Icon name={buttonIcon} height={12} width={15} />
         </View>
       </ConditionalRender>
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  dot: { width: 8, height: 8 },
-  button: { position: "absolute", right: 3 },
-});
 
 export default Badge;

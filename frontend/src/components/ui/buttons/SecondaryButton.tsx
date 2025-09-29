@@ -15,6 +15,7 @@ interface secondaryButtonProps {
   shadow?: boolean;
   onPress?: () => void;
   disabled?: boolean;
+  alignStart?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -24,6 +25,7 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
   leftIcon,
   size = "md",
   shadow = true,
+  alignStart = true,
   onPress,
   disabled,
   style,
@@ -34,7 +36,7 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
   const sizing = 20;
 
   return (
-    <ButtonShadow style={layout.alignSelfStart} shadow={shadow}>
+    <ButtonShadow style={alignStart && layout.alignSelfStart} shadow={shadow}>
       <TouchableOpacity
         disabled={disabled}
         onPress={onPress}
