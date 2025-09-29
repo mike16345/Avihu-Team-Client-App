@@ -5,7 +5,6 @@ import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import RenderHTML from "react-native-render-html";
 import ArticleImage from "./ArticleImage";
-import { ConditionalRender } from "../ui/ConditionalRender";
 import ArticleMetric from "./ArticleMetric";
 
 interface ArticleCardProps {

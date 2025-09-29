@@ -1,5 +1,5 @@
-import { RefreshControl, ScrollView, View } from "react-native";
-import React, { useEffect, useMemo, useState } from "react";
+import { RefreshControl, ScrollView } from "react-native";
+import React, { useMemo, useState } from "react";
 import useArticleQuery from "@/hooks/queries/articles/useArticleQuery";
 import { PaginationParams } from "@/interfaces/IPagination";
 import useStyles from "@/styles/useGlobalStyles";
@@ -12,7 +12,7 @@ interface ArticleGroupContentProps {
 }
 
 const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { layout, spacing, text } = useStyles();
   const { isRefreshing, refresh } = usePullDownToRefresh();
 
   const [pagination, setPagination] = useState<PaginationParams>({ limit: 5, page: 1 });
