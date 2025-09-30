@@ -7,7 +7,8 @@ import useWeighInsQuery from "@/hooks/queries/WeighIns/useWeighInsQuery";
 import DateUtils from "@/utils/dateUtils";
 import { Text } from "../ui/Text";
 import { IWeighIn } from "@/interfaces/User";
-import EditWeighIn from "./EditWeighIn";
+import { extractValuesFromObject } from "@/utils/utils";
+import UpdateWeighIn from "./UpdateWeighIn";
 
 const WeighInsCalendar = () => {
   const { data } = useWeighInsQuery();
@@ -29,14 +30,29 @@ const WeighInsCalendar = () => {
 
   return (
     <View style={[spacing.gapDefault]}>
-      <CustomCalendar selectedDate={selectedDate} onSelect={setSelectedDate} />
-      <ConditionalRender condition={!!selectedDate && !!weighInMap[selectedDate]}>
+      <CustomCalendar
+        selectedDate={selectedDate}
+        onSelect={setSelectedDate}
+        dates={extractValuesFromObject(weighInMap)}
+      />
+      <ConditionalRender condition={!!selectedDate}>
         <View style={[layout.center, spacing.gapMd]}>
           <Text fontSize={16}>{DateUtils.formatDate(selectedDate!, "DD.MM.YYYY")}</Text>
           <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
-            <Text fontSize={16}>משקל {weighInMap[selectedDate!]?.weight}</Text>
+            <Text fontSize={16}>
+              <ConditionalRender condition={weighInMap[selectedDate!]?.weight}>
+                משקל {weighInMap[selectedDate!]?.weight}
+              </ConditionalRender>
 
-            <EditWeighIn date={selectedDate || ""} weighInToEdit={weighInMap[selectedDate || ""]} />
+              <ConditionalRender condition={!weighInMap[selectedDate!]?.weight}>
+                אין נתוני שקילה
+              </ConditionalRender>
+            </Text>
+
+            <UpdateWeighIn
+              date={selectedDate || ""}
+              weighInToEdit={weighInMap[selectedDate || ""]}
+            />
           </View>
         </View>
       </ConditionalRender>

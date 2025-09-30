@@ -5,26 +5,37 @@ import useDeleteWeighIn from "@/hooks/mutations/WeighIns/useDeleteWeighIn";
 import weighInSchema from "@/schemas/weighInSchema";
 import { useToast } from "@/hooks/useToast";
 import UpdateDataModal from "../ui/modals/UpdateDataModal";
+import useAddWeighIn from "@/hooks/mutations/WeighIns/useAddWeighIn";
 
 interface EditWeighInProps {
   date: string;
   weighInToEdit: IWeighIn | undefined;
 }
 
-const EditWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit }) => {
+const UpdateWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit }) => {
   const { triggerSuccessToast } = useToast();
 
   const { mutateAsync: updateWeighIn } = useUpdateWeighIn();
+  const { mutateAsync: addWeighIn } = useAddWeighIn();
   const { mutateAsync: deleteWeighIn } = useDeleteWeighIn();
 
-  const handleUpdateWeighIn = async (value: string) => {
-    try {
-      await updateWeighIn({
-        id: weighInToEdit?._id || "",
-        data: { ...weighInToEdit, weight: Number(value) },
-      });
+  const isEdit = !!weighInToEdit?._id;
 
-      triggerSuccessToast({ title: "הועלה בהצלחה ", message: "ניתן להיות במעקב דרך גרף השקילות" });
+  const handleSaveWeighIn = async (value: string) => {
+    try {
+      if (isEdit) {
+        await updateWeighIn({
+          id: weighInToEdit?._id || "",
+          data: { ...weighInToEdit, weight: Number(value) },
+        });
+
+        triggerSuccessToast({
+          title: "הועלה בהצלחה ",
+          message: "ניתן להיות במעקב דרך גרף השקילות",
+        });
+      } else {
+        await addWeighIn({ date, weight: Number(value) });
+      }
     } catch (error) {
       throw error;
     }
@@ -48,10 +59,10 @@ const EditWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit }) => {
       placeholder="הכנס משקל"
       schema={weighInSchema}
       schemaKey="weight"
-      onSave={handleUpdateWeighIn}
+      onSave={handleSaveWeighIn}
       onDelete={handleDeleteWeighIn}
     />
   );
 };
 
-export default EditWeighIn;
+export default UpdateWeighIn;
