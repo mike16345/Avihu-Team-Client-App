@@ -15,6 +15,7 @@ import UpdateDataModal from "../ui/modals/UpdateDataModal";
 import measurementSchema from "@/schemas/measurementSchema";
 import useSaveMeasurement from "@/hooks/mutations/measurements/useSaveMeasurement";
 import useDeleteMeasurement from "@/hooks/mutations/measurements/useDeleteMeasurement";
+import { extractValuesFromObject } from "@/utils/utils";
 
 const NO_MEASUREMENT_TEXT = "אין נתוני היקף זמינים";
 
@@ -30,37 +31,21 @@ const MeasurementHistoryContent = () => {
   const measurementsByMuscle = useMemo(() => {
     if (!data) return {};
 
-    return data.measurements.reduce(
-      (acc, { date, _id, ...muscles }) => {
-        Object.entries(muscles).forEach(([muscle, value]) => {
-          if (!acc[muscle]) {
-            acc[muscle] = {
-              dates: [],
-              byDate: {},
-            };
-          }
-
-          acc[muscle].dates.push(date);
-          acc[muscle].byDate[date] = { value, _id: _id! };
-        });
-        return acc;
-      },
-      {} as Record<
-        string,
-        {
-          dates: string[];
-          byDate: Record<string, { value: number; _id: string }>;
-        }
-      >
-    );
+    return data.measurements.reduce((acc, { date, _id, ...muscles }) => {
+      Object.entries(muscles).forEach(([muscle, value]) => {
+        acc[muscle] = { ...(acc[muscle] || {}), [date]: { value, _id: _id! } };
+      });
+      return acc;
+    }, {} as Record<string, { value: number; _id: string }>);
   }, [data]);
 
-  const { selectedMeasurement, selectedMeasurementGroup } = useMemo(() => {
+  const { selectedMeasurement, selectedMeasurementGroupDates } = useMemo(() => {
     const selectedMeasurementGroup =
       measurementsByMuscle[MEASUREMENT_GROUPS_ENGLISH[activeMuscle as MeasurementMuscle]];
-    const selectedMeasurement = selectedMeasurementGroup?.byDate[selectedDate];
+    const selectedMeasurementGroupDates = extractValuesFromObject(selectedMeasurementGroup || {});
+    const selectedMeasurement = selectedMeasurementGroup?.[selectedDate];
 
-    return { selectedMeasurementGroup, selectedMeasurement };
+    return { selectedMeasurement, selectedMeasurementGroupDates };
   }, [activeMuscle, measurementsByMuscle, selectedDate]);
 
   const handleSave = async (value: string) => {
@@ -95,7 +80,7 @@ const MeasurementHistoryContent = () => {
       <CustomCalendar
         selectedDate={selectedDate}
         onSelect={(date) => setSelectedDate(date)}
-        dates={selectedMeasurementGroup?.dates}
+        dates={selectedMeasurementGroupDates}
       />
 
       <Text fontSize={16} style={[text.textCenter]}>
