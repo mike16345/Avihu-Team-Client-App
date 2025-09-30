@@ -72,7 +72,9 @@ const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
   return details ? (
     <>
       <Badge onPress={() => setIsModalVisible(true)} showButton showDot>
-        <Text fontVariant="semibold">עדכון אחרון | {details}</Text>
+        <Text fontSize={12} fontVariant="semibold">
+          עדכון אחרון | {details}
+        </Text>
       </Badge>
       <TipsModal
         visible={isModalVisible}

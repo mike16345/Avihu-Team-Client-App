@@ -13,6 +13,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { WorkoutStackParamListNavigationProp } from "@/types/navigatorTypes";
 import useWorkoutSession from "@/hooks/sessions/useWorkoutSession";
+import PreviousSetCard from "./RecordExercise/PreviousSetCard";
 
 interface ExerciseContainerProps {
   exercise: IExercise;
@@ -63,26 +64,29 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({ exercise, muscleG
         style={[common.rounded, spacing.pdHorizontalMd, spacing.pdVerticalDefault]}
         variant="gray"
       >
-        <View style={[layout.flexRow, layout.justifyBetween]}>
-          <View style={[layout.flex1, layout.justifyBetween]}>
-            <Text style={{ flexShrink: 1 }} fontSize={16} numberOfLines={2} ellipsizeMode="tail">
-              {exerciseId.name}
-            </Text>
-            <View style={[layout.flexRow]}>
-              <Text fontVariant="semibold">
-                {setNumber}/{exercise.sets.length}
+        <View style={[spacing.gapDefault]}>
+          <View style={[layout.flexRow, layout.justifyBetween]}>
+            <View style={[layout.flex1, spacing.gapLg]}>
+              <Text style={{ flexShrink: 1 }} fontSize={16} numberOfLines={2} ellipsizeMode="tail">
+                {exerciseId.name}
               </Text>
+              <View style={[layout.flexRow]}>
+                <Text fontVariant="semibold">
+                  {setNumber}/{exercise.sets.length}
+                </Text>
+              </View>
             </View>
-          </View>
 
-          <Image
-            source={{
-              uri: getExerciseImage(),
-            }}
-            height={66}
-            width={72}
-            style={[common.roundedSm, { flexShrink: 0 }]}
-          />
+            <Image
+              source={{
+                uri: getExerciseImage(),
+              }}
+              height={66}
+              width={72}
+              style={[common.roundedSm, { flexShrink: 0 }]}
+            />
+          </View>
+          <PreviousSetCard exercise={exerciseId.name} />
         </View>
       </Card>
     </Pressable>

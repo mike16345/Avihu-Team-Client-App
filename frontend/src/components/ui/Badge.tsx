@@ -51,7 +51,7 @@ const Badge: React.FC<Badgeprops> = ({
         colors.outline,
         layout.flexRow,
         alignStart && layout.alignSelfStart,
-        spacing.gapDefault,
+        spacing.gapSm,
         layout.itemsCenter,
         { position: "relative", paddingHorizontal: 10, paddingVertical: 4 },
       ]}
