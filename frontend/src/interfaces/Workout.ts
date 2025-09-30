@@ -1,48 +1,8 @@
 import { ISession } from "./ISession";
 
-export interface IWorkout {
-  id: string;
-  tipFromTrainer?: string;
-  linkToVideo?: string;
-  exerciseMethod?: string;
-  name: string;
-  sets: ISet[];
-}
-
-export interface ICompletedSet {
-  repsDone: number;
-  weight: number;
-  setTime: number;
-}
-
-export interface WeightWorkout extends IWorkout {
-  sets: ISet[];
-}
-
 export interface IExerciseMethod {
   title: string;
   description: string;
-}
-
-export interface CardioWorkout extends IWorkout {
-  cardioType: "run" | "walk" | "stairmaster" | string;
-}
-
-export interface RecordedWorkout {
-  id: string;
-  workoutId: string;
-  time: number;
-  note: string;
-}
-
-export interface IRecordedSetResponse {
-  plan: string;
-  exercise: string;
-  setNumber: number;
-  weight: number;
-  repsDone: number;
-  note: string;
-  date: Date;
 }
 
 export interface IRecordedSetPost {
@@ -125,7 +85,11 @@ export interface IRecordedSet {
   weight: number;
   repsDone: number;
   setNumber: number;
-  date?: Date;
+}
+
+export interface IRecordedSetRes extends IRecordedSet {
+  _id: string;
+  date: string;
 }
 
 export interface ICardioExerciseItem {
@@ -133,7 +97,7 @@ export interface ICardioExerciseItem {
 }
 
 export interface IExerciseRecordedSets {
-  [exercise: string]: IRecordedSet[];
+  [exercise: string]: IRecordedSetRes[];
 }
 
 export interface IMuscleGroupRecordedSets {

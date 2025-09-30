@@ -273,12 +273,12 @@ export function getNextSetNumberFromSession(
 }
 
 export function extractValuesFromArray<T, K extends keyof T>(array: T[], key: K): T[K][] {
-  return array.map((item) => item[key]);
+  return array.map((item) => item[key]).filter((i) => i !== undefined);
 }
 
 export function extractValuesFromObject<
   T extends Record<string, any>,
-  K extends keyof T[keyof T] = never,
+  K extends keyof T[keyof T] = never
 >(obj: T, innerKey?: K): (K extends never ? string : T[keyof T][K])[] {
   const keys = Object.keys(obj);
 

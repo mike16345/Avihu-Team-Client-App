@@ -2,13 +2,16 @@ import Badge from "@/components/ui/Badge";
 import TipsModal from "@/components/ui/modals/TipsModal";
 import { Text } from "@/components/ui/Text";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
-import { IRecordedSet } from "@/interfaces/Workout";
+import { IRecordedSetRes } from "@/interfaces/Workout";
 import DateUtils from "@/utils/dateUtils";
 import { FC, useEffect, useMemo, useState } from "react";
 
 interface PreviousSetCardProps {
   exercise: string;
 }
+
+export const toLine = (s: IRecordedSetRes) =>
+  `סט ${s.setNumber} | משקל ${s.weight} | חזרות ${s.repsDone}`;
 
 const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
   const { data } = useRecordedSetsQuery();
@@ -23,7 +26,7 @@ const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
       a.getMonth() === b.getMonth() &&
       a.getDate() === b.getDate();
 
-    let latestSet: IRecordedSet | undefined;
+    let latestSet: IRecordedSetRes | undefined;
 
     data.forEach((item) => {
       const sets = item?.recordedSets?.[exercise];
@@ -40,7 +43,7 @@ const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
     if (!latestSet?.date) return { details: "", lastRecordedSets: [], date: null };
 
     const latestDay = new Date(latestSet.date);
-    const sameDaySets: IRecordedSet[] = [];
+    const sameDaySets: IRecordedSetRes[] = [];
 
     data.forEach((item) => {
       const sets = item?.recordedSets?.[exercise];
@@ -55,10 +58,7 @@ const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
 
     sameDaySets.sort((a, b) => (a?.setNumber ?? 0) - (b?.setNumber ?? 0));
 
-    const toLine = (s: NonNullable<typeof latestSet>) =>
-      `סט ${s.setNumber} | משקל ${s.weight} | חזרות ${s.repsDone}`;
-
-    const details = toLine(latestSet); // latest set summary (kept for your Badge)
+    const details = toLine(latestSet);
     const lastRecordedSets = sameDaySets.map(toLine);
     const date = DateUtils.formatDate(latestDay, "DD.MM.YY");
 
