@@ -249,3 +249,7 @@ export function padXLabel(label: string): string {
 
   return " ".repeat(spacesToAdd) + label;
 }
+
+export function extractKeyFromObjects<T, K extends keyof T>(array: T[], key: K): T[K][] {
+  return array.map((item) => item[key]);
+}
