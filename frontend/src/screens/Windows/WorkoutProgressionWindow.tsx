@@ -8,8 +8,8 @@ import { RefreshControl, ScrollView, View } from "react-native";
 import ErrorScreen from "../ErrorScreen";
 import WorkoutProgressScreenSkeleton from "@/components/ui/loaders/skeletons/WorkoutProgressScreenSkeleton";
 import { mapToDropDownItems } from "@/utils/utils";
-import MuscleGroupSelector from "@/components/WorkoutProgression/MuscleGroupSelector";
 import ExerciseSelector from "@/components/WorkoutProgression/ExerciseSelector";
+import HorizontalSelector from "@/components/ui/HorizontalSelector";
 
 const WorkoutProgressionWindow = () => {
   const { layout, spacing } = useStyles();
@@ -44,9 +44,10 @@ const WorkoutProgressionWindow = () => {
 
   return (
     <View style={[layout.flex1, spacing.gapSm, spacing.pdMd]}>
-      <MuscleGroupSelector
-        selectedMuscleGroup={activeMuscleGroup}
-        onMuscleGroupSelect={(val) => setActiveMuscleGroup(val)}
+      <HorizontalSelector
+        items={MUSCLE_GROUPS}
+        onSelect={(selected) => setActiveMuscleGroup(selected)}
+        selected={activeMuscleGroup}
       />
 
       <DropDownContextProvider

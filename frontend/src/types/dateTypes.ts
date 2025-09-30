@@ -18,6 +18,7 @@ export type DateFormatType =
   | "DD.MM"
   | "DD.MM.YY"
   | "DD.MM.YYYY"
+  | "DD.MM.YY"
   | "YYYY.MM.DD"
   | "YYYY"
   | "MMMM"
