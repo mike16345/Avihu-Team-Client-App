@@ -75,7 +75,7 @@ export default function BottomSheetModal({
 
   const toggle = () => {
     const target = isOpen ? CLOSED_Y : OPEN_Y;
-    translateY.value = withTiming(target, { duration: 220 }, (finished) => {
+    translateY.value = withTiming(target, { duration: 350 }, (finished) => {
       if (finished) {
         if (target === CLOSED_Y) {
           runOnJS(onClose)();

@@ -18,6 +18,11 @@ export const AVG_PROTEIN_CALORIES = 150;
 export const AVG_FAT_CALORIES = 100;
 export const AVG_CARB_CALORIES = 120;
 
+export const MIN_REPS = 0;
+export const MAX_REPS = 125;
+export const MIN_WEIGHT = 0;
+export const MAX_WEIGHT = 250;
+
 export const DEFAULT_SET: Omit<SetInput, "setNumber"> = {
   repsDone: 0,
   weight: 0,

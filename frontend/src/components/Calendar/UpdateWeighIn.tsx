@@ -20,6 +20,7 @@ const UpdateWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit }) => {
   const { mutateAsync: deleteWeighIn } = useDeleteWeighIn();
 
   const isEdit = !!weighInToEdit?._id;
+  const schemaKey = "weight";
 
   const handleSaveWeighIn = async (value: string) => {
     try {
@@ -58,8 +59,8 @@ const UpdateWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit }) => {
       existingValue={weighInToEdit?.weight.toString() || undefined}
       placeholder="הכנס משקל"
       schema={weighInSchema}
-      schemaKey="weight"
-      onSave={handleSaveWeighIn}
+      schemaKey={schemaKey}
+      onSave={(result) => handleSaveWeighIn(result[schemaKey] as string)}
       onDelete={handleDeleteWeighIn}
     />
   );

@@ -4,13 +4,13 @@ import { Text } from "@/components/ui/Text";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import { IRecordedSetRes } from "@/interfaces/Workout";
 import { FC, useEffect, useMemo, useState } from "react";
-import { Pressable, ScrollView, TouchableOpacity, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import PreviousSetCard, { toLine } from "./PreviousSetCard";
 import useStyles from "@/styles/useGlobalStyles";
 import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 import DateUtils from "@/utils/dateUtils";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
-import Icon from "@/components/Icon/Icon";
+import UpdateSetModal from "./UpdateSetModal";
 
 interface RecordedSetsHistoryModalProps {
   exercise: string;
@@ -33,7 +33,7 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
 
     for (const item of data) {
       const sets = item.recordedSets[exercise] || [];
-      console.log("sets", sets);
+
       for (const s of sets) {
         const d = s?.date;
         if (!d) continue;
@@ -54,7 +54,6 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
     return setsByDate[selectedDate] ?? [];
   }, [selectedDate, setsByDate]);
 
-  console.log("sets", sets);
   useEffect(() => {
     setSelectedDate(DateUtils.formatDate(new Date(), "YYYY-MM-DD"));
     // return () => setIsVisible(false);
@@ -88,13 +87,12 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
 
                 <ScrollView style={{ maxHeight: 200 }} contentContainerStyle={[spacing.gapDefault]}>
                   {sets.map((set, index) => (
-                    <View style={[layout.flexRow, layout.itemsCenter, spacing.gapLg]}>
-                      <Text key={set._id ?? index} fontSize={16}>
-                        {toLine(set)}
-                      </Text>
-                      <TouchableOpacity onPress={() => console.log("open update set modal")}>
-                        <Icon name="pencil" />
-                      </TouchableOpacity>
+                    <View
+                      key={set._id ?? index}
+                      style={[layout.flexRow, layout.itemsCenter, spacing.gapLg]}
+                    >
+                      <Text fontSize={16}>{toLine(set)}</Text>
+                      <UpdateSetModal set={set} />
                     </View>
                   ))}
                 </ScrollView>

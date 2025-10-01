@@ -4,10 +4,9 @@ import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import Icon from "@/components/Icon/Icon";
 import { FC, useCallback, useState } from "react";
 import BottomSheetModal from "@/components/ui/modals/BottomSheetModal";
-import Animated, { LinearTransition } from "react-native-reanimated";
+import Animated, { Easing, LinearTransition } from "react-native-reanimated";
 import { IRecordedSet } from "@/interfaces/Workout";
 import SetInputList from "./SetInputList";
-import ConfirmSetsModal from "./ConfirmSetsModal";
 import { DEFAULT_SET } from "@/constants/Constants";
 
 const HORIZONTAL_PADDING = 24;
@@ -31,7 +30,6 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   const { layout, colors, spacing, common } = useStyles();
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [containerHeight, setContainerHeight] = useState(0);
   const [isPending, setIsPending] = useState(false);
   const [recordedSets, setRecordedSets] = useState<SetInput[]>([
@@ -42,19 +40,20 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   ]);
 
   const handleSubmitSets = async () => {
-    if (!isExpanded) {
-      setIsModalVisible(true);
-    } else {
-      setIsPending(true);
-      setIsExpanded(false);
-      await handleConfirmRecordSets();
-    }
+    setIsPending(true);
+    setIsExpanded(false);
+    await handleConfirmRecordSets();
     setIsPending(false);
   };
 
   const handleConfirmRecordSets = useCallback(async () => {
     await handleRecordSets(recordedSets);
   }, [recordedSets, handleRecordSets]);
+
+  const handleCloseModal = () => {
+    setIsExpanded(false);
+    setRecordedSets((prev) => prev.slice(0, 1));
+  };
 
   return (
     <>
@@ -67,7 +66,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
             <Icon name={isOpen ? "arrowRoundDown" : "arrowRoundUp"} />
           </Pressable>
         )}
-        onClose={() => setIsExpanded(false)}
+        onClose={handleCloseModal}
         onLayout={(e) => setContainerHeight(e.nativeEvent.layout.height)}
       >
         <View
@@ -86,21 +85,13 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
             containerHeight={containerHeight}
             isExpanded={isExpanded}
           />
-          <Animated.View layout={LinearTransition.springify().damping(18).stiffness(180)}>
+          <Animated.View layout={LinearTransition.duration(250).easing(Easing.inOut(Easing.ease))}>
             <PrimaryButton loading={isPending} onPress={() => handleSubmitSets()} block>
               עדכון
             </PrimaryButton>
           </Animated.View>
         </View>
       </BottomSheetModal>
-
-      <ConfirmSetsModal
-        sets={recordedSets}
-        onClose={() => setIsModalVisible(false)}
-        onConfirm={() => handleConfirmRecordSets()}
-        visible={isModalVisible}
-        title="סטים"
-      />
     </>
   );
 };
