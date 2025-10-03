@@ -92,7 +92,7 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
                       style={[layout.flexRow, layout.itemsCenter, spacing.gapLg]}
                     >
                       <Text fontSize={16}>{toLine(set)}</Text>
-                      <UpdateSetModal set={set} />
+                      <UpdateSetModal set={set} exercise={exercise}/>
                     </View>
                   ))}
                 </ScrollView>

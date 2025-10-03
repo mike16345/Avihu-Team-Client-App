@@ -7,7 +7,7 @@ import ExerciseVideo from "./ExerciseVideo";
 import SetInputContainer, { SetInput } from "./SetInputContainer";
 import { useRecordedSetsMutations } from "@/hooks/mutations/useRecordedSetsMutations";
 import { useUserStore } from "@/store/userStore";
-import { IMuscleGroupRecordedSets, IRecordedSetPost } from "@/interfaces/Workout";
+import { IMuscleGroupRecordedSets } from "@/interfaces/Workout";
 import { useToast } from "@/hooks/useToast";
 import useWorkoutSession from "@/hooks/sessions/useWorkoutSession";
 import { getNextSetNumberFromSession } from "@/utils/utils";
@@ -16,6 +16,7 @@ import { LayoutChangeEvent } from "react-native";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import RecordedSetsHistoryModal from "./RecordedSetsHistoryModal";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
+import { AddRecordedSets } from "@/hooks/api/useRecordedSetsApi";
 
 interface RecordExerciseProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordExercise"> {}
@@ -51,14 +52,16 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const handleRecordSets = useCallback(
     async (sets: SetInput[]) => {
       try {
-        const recordedSets: IRecordedSetPost = {
+        const recordedSetsToPost: AddRecordedSets = {
           userId: userId!,
-          recordedSet: { ...sets[0], plan: plan! },
           muscleGroup: muscleGroup!,
-          exercise: exercise?.exerciseId.name!,
+          exercise: exercise.exerciseId.name,
+          recordedSets: sets.map((set) => {
+            return { ...set, plan };
+          }),
         };
 
-        const response = await addRecordedSets.mutateAsync(recordedSets);
+        const response = await addRecordedSets.mutateAsync(recordedSetsToPost);
         const nextSet = getNextSetNumberFromSession(
           response.session,
           plan,
@@ -68,7 +71,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
         handleSetLocalSession(response.session);
         setCurrentSet(nextSet);
         triggerSuccessToast({
-          title: "עודכן בהצלחה ",
+          title: "עודכן בהצלחה",
           message: "הנתונים זמינים לצפייה בהיסטוריית הביצועים",
         });
       } catch (e: any) {

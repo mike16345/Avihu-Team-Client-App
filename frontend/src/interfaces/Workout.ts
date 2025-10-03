@@ -9,7 +9,7 @@ export interface IRecordedSetPost {
   userId: string;
   muscleGroup: string;
   exercise: string;
-  recordedSet: IRecordedSet;
+  recordedSet: IRecordedSet[];
 }
 
 export interface IWorkoutPlan {

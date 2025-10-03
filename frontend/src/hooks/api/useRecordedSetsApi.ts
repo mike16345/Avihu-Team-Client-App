@@ -1,20 +1,27 @@
 import { fetchData, sendData, updateItem, deleteItem } from "@/API/api";
-import { IMuscleGroupRecordedSets, IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
-import { IRecordedSetPost } from "@/interfaces/Workout";
+import { IMuscleGroupRecordedSets, IRecordedSetResponse } from "@/interfaces/Workout";
+import { SetInput } from "@/schemas/setSchema";
 import { ApiResponse } from "@/types/ApiTypes";
 
 const RECORDED_SETS_ENDPOINT = "recordedSets";
 
+export interface AddRecordedSets {
+  userId: string;
+  recordedSets: (SetInput & { plan: string })[];
+  muscleGroup: string;
+  exercise: string;
+}
+
 export const useRecordedSetsApi = () => {
-  const addRecordedSet = (recordedSet: IRecordedSetPost, sessionId: string = "") => {
+  const addRecordedSets = (recordedSets: AddRecordedSets, sessionId: string = "") => {
     return sendData<IRecordedSetResponse>(
       RECORDED_SETS_ENDPOINT + "?sessionId=" + sessionId,
-      recordedSet
+      recordedSets
     );
   };
 
-  const updateRecordedSet = (id: string, recordedSet: IRecordedSet) => {
-    const endpoint = RECORDED_SETS_ENDPOINT + "/" + id;
+  const updateRecordedSet = (recordedSet: any) => {
+    const endpoint = RECORDED_SETS_ENDPOINT + "/one";
 
     return updateItem(endpoint, recordedSet);
   };
@@ -50,12 +57,12 @@ export const useRecordedSetsApi = () => {
     return fetchData<ApiResponse<IRecordedSetResponse[]>>(endpoint);
   };
 
-  const deleteRecordedSet = (id: string) => {
-    return deleteItem(RECORDED_SETS_ENDPOINT + "/" + id);
+  const deleteRecordedSet = (setToDelete: Partial<AddRecordedSets> & { setId: string }) => {
+    return deleteItem(RECORDED_SETS_ENDPOINT + "/one", undefined, undefined, setToDelete);
   };
 
   return {
-    addRecordedSet,
+    addRecordedSets,
     updateRecordedSet,
     getRecordedSetsByUserId,
     getUserRecordedMuscleGroupNames,
