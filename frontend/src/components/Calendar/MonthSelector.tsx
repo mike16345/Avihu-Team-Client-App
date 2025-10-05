@@ -21,15 +21,7 @@ const MonthSelector: React.FC<MonthSelectorProps> = ({
   const isActiveMonth = (index: number) => activeMonthIndex === index;
 
   return (
-    <View
-      style={[
-        { position: "relative", top: 0, right: 0 },
-        layout.flex1,
-        colors.backgroundSurface,
-        common.rounded,
-        spacing.pdDefault,
-      ]}
-    >
+    <View style={[colors.backgroundSurface, common.rounded, spacing.pdDefault]}>
       <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter]}>
         <Text fontSize={16}>חודשים</Text>
         <TouchableOpacity onPress={onCloseMonthSelect}>

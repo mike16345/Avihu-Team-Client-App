@@ -249,3 +249,20 @@ export function padXLabel(label: string): string {
 
   return " ".repeat(spacesToAdd) + label;
 }
+
+export function extractValuesFromArray<T, K extends keyof T>(array: T[], key: K): T[K][] {
+  return array.map((item) => item[key]);
+}
+
+export function extractValuesFromObject<
+  T extends Record<string, any>,
+  K extends keyof T[keyof T] = never,
+>(obj: T, innerKey?: K): (K extends never ? string : T[keyof T][K])[] {
+  const keys = Object.keys(obj);
+
+  if (!innerKey) {
+    return keys as any;
+  }
+
+  return keys.map((key) => obj[key][innerKey]) as any;
+}
