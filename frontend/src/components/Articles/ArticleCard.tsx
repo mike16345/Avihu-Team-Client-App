@@ -6,6 +6,9 @@ import useStyles from "@/styles/useGlobalStyles";
 import RenderHTML from "react-native-render-html";
 import ArticleImage from "./ArticleImage";
 import ArticleMetric from "./ArticleMetric";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { ArticleStackParamsList } from "@/types/navigatorTypes";
 
 interface ArticleCardProps {
   article: IArticle;
@@ -14,8 +17,14 @@ interface ArticleCardProps {
 const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
   const { colors, common, layout, spacing, text } = useStyles();
 
+  const navigation = useNavigation<NativeStackNavigationProp<ArticleStackParamsList>>();
+
+  const handlePress = () => {
+    navigation.navigate("ViewArticle", { articleId: article._id });
+  };
+
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={handlePress}>
       <Card style={[common.roundedMd, spacing.pdLg, spacing.gapLg]}>
         <Card.Header>
           <Text fontVariant="semibold" fontSize={16} style={[text.textLeft, { paddingBottom: 4 }]}>
@@ -23,6 +32,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
           </Text>
           <RenderHTML
             source={{ html: article.content.slice(0, 100) }}
+            contentWidth={30}
             baseStyle={{
               color: colors.textPrimary.color,
               textAlign: `left`,

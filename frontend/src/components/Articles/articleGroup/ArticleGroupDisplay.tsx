@@ -1,10 +1,10 @@
 import { TouchableOpacity, View } from "react-native";
 import React from "react";
-import { Card } from "../ui/Card";
+import { Card } from "../../ui/Card";
 import { IArticleCount } from "@/interfaces/IArticle";
-import { Text } from "../ui/Text";
+import { Text } from "../../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
-import { ConditionalRender } from "../ui/ConditionalRender";
+import { ConditionalRender } from "../../ui/ConditionalRender";
 import { ArticleStackParamsList } from "@/types/navigatorTypes";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";

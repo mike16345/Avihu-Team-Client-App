@@ -1,4 +1,4 @@
-import ArticleGroupDisplay from "@/components/Articles/ArticleGroupDisplay";
+import ArticleGroupDisplay from "@/components/Articles/articleGroup/ArticleGroupDisplay";
 import ArticleSkeleton from "@/components/ui/loaders/skeletons/ArticleSkeleton";
 import { Text } from "@/components/ui/Text";
 import useArticleCountQuery from "@/hooks/queries/articles/useArticleCountQuery";

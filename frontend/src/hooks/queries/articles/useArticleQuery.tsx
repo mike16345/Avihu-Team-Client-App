@@ -9,7 +9,7 @@ const useArticleQuery = (pagination: PaginationParams) => {
 
   return useQuery<any, any, PaginationResult<IArticle>, any>({
     queryFn: () => getPaginatedPosts(pagination),
-    queryKey: [ARTICLE_COUNT_KEY, JSON.stringify(pagination.query)],
+    queryKey: [ARTICLE_COUNT_KEY, pagination.page, JSON.stringify(pagination.query)],
     enabled: !!pagination,
     staleTime: ONE_DAY,
   });

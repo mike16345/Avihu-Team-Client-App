@@ -1,5 +1,5 @@
 import Article from "@/components/Articles/Article";
-import ArticleGroupScreen from "@/components/Articles/ArticleGroupScreen";
+import ArticleGroupScreen from "@/components/Articles/articleGroup/ArticleGroupScreen";
 import ArticleScreen from "@/screens/ArticleScreen";
 
 export const stacks = [
