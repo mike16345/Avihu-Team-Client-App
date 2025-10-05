@@ -1,17 +1,19 @@
-import { ARTICLE_KEY } from "@/constants/reactQuery";
+import { ARTICLE_COUNT_KEY, ARTICLE_KEY } from "@/constants/reactQuery";
 import { useArticleApi } from "@/hooks/api/useArticleApi";
 import queryClient from "@/QueryClient/queryClient";
 import { useUserStore } from "@/store/userStore";
 import { useMutation } from "@tanstack/react-query";
 
-const useAddViewer = () => {
+const useAddViewer = (articleId: string, group?: string) => {
   const userId = useUserStore((state) => state.currentUser?._id);
   const { addViewer } = useArticleApi();
 
   return useMutation({
-    mutationFn: (id: string) => addViewer(id, userId!),
+    mutationFn: () => addViewer(articleId, userId!),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ARTICLE_KEY] });
+      queryClient.invalidateQueries({
+        queryKey: [ARTICLE_KEY + group, ARTICLE_KEY + articleId],
+      });
     },
   });
 };
