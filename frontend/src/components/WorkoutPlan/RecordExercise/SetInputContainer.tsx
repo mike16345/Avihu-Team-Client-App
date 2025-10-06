@@ -67,7 +67,10 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
           </Pressable>
         )}
         onClose={handleCloseModal}
-        onLayout={(e) => setContainerHeight(e.nativeEvent.layout.height)}
+        onLayout={(e) => {
+          if (e.nativeEvent.layout.height !== containerHeight)
+          setContainerHeight(e.nativeEvent.layout.height);
+        }}
       >
         <View
           style={[

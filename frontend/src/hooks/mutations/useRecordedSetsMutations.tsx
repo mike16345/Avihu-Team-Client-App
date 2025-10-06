@@ -17,8 +17,8 @@ export const useRecordedSetsMutations = () => {
   });
 
   const useUpdateRecordedSet = useMutation({
-    mutationFn: ({ set, id }: { set: SetInput; id: string }) =>
-      updateRecordedSet({ ...set, setId: id }),
+    mutationFn: ({ set, id, exercise }: { set: SetInput; id: string; exercise: string }) =>
+      updateRecordedSet({ set, setId: id, userId, exercise }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [RECORDED_SETS_BY_USER_KEY + userId] });
     },

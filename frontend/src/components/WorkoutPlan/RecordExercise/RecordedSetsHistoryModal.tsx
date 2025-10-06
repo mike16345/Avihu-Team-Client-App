@@ -81,6 +81,7 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
               onSelect={setSelectedDate}
               dates={markedDates}
             />
+
             <ConditionalRender condition={!!selectedDate}>
               <View style={[spacing.gapMd, layout.center]}>
                 <Text fontSize={16}>{DateUtils.formatDate(selectedDate!, "DD.MM.YY")}</Text>
@@ -92,7 +93,7 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
                       style={[layout.flexRow, layout.itemsCenter, spacing.gapLg]}
                     >
                       <Text fontSize={16}>{toLine(set)}</Text>
-                      <UpdateSetModal set={set} exercise={exercise}/>
+                      <UpdateSetModal set={set} exercise={exercise} />
                     </View>
                   ))}
                 </ScrollView>

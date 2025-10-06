@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/useToast";
 import { ZodObject } from "zod";
 import { Keyboard } from "react-native";
 
-type FieldConfig = {
+export type FieldConfig = {
   key: string;
   label?: string;
   placeholder?: string;
@@ -67,7 +67,7 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
       prefix,
       existingValue,
       keyboardType: "number-pad",
-      schemaKey: schemaKey, // from your old props
+      schemaKey: schemaKey,
     },
   ];
 
@@ -75,7 +75,7 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
 
   const [values, setValues] = useState<Record<string, string | undefined>>(() =>
     fieldList.reduce((acc, f) => {
-      acc[f.key] = f.existingValue;
+      acc[f.key] = f.existingValue || "";
       return acc;
     }, {} as Record<string, string | undefined>)
   );
@@ -161,9 +161,11 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
   useEffect(() => {
     setValues(() =>
       fieldList.reduce((acc, f) => {
-        acc[f.key] = f.existingValue;
+        const v = f.existingValue;
+        acc[f.key] = v == null ? "" : String(v);
+
         return acc;
-      }, {} as Record<string, string | undefined>)
+      }, {} as Record<string, string>)
     );
     setErrors({});
   }, [existingValue, JSON.stringify(fields)]);
@@ -179,8 +181,8 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
           <View style={[layout.widthFull, layout.center, spacing.gapMd]}>
             <Text fontSize={16}>{DateUtils.formatDate(date!, "DD.MM.YYYY")}</Text>
             <View style={[layout.flexRow, layout.itemsCenter]}>
-              {fieldList.map((f) => (
-                <Text key={f.key} fontSize={16}>
+              {fieldList.map((f, i) => (
+                <Text key={f.key + i} fontSize={16}>
                   {f.prefix ?? prefix}
                   <Text style={[text.textUnderline]}>
                     {values[f.key] ? ` ${values[f.key]}` : "_"}
@@ -190,12 +192,14 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
             </View>
 
             <View style={[spacing.gapLg, layout.center]}>
-              {fieldList.map((f) => (
+              {fieldList.map((f, i) => (
                 <Input
-                  key={f.key}
-                  value={values[f.key]}
+                  key={f.key + i}
+                  value={values[f.key] || ""}
                   error={!!errors[f.key]}
-                  onChangeText={(txt) => setValues((prev) => ({ ...prev, [f.key]: txt }))}
+                  onChangeText={(txt) => {
+                    setValues((prev) => ({ ...prev, [f.key]: txt }));
+                  }}
                   keyboardType={f.keyboardType ?? "default"}
                   label={f.label}
                   style={[{ width: width * 0.75 }]}

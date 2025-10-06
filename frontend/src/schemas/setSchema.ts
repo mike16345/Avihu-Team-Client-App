@@ -9,7 +9,8 @@ const setSchema = z
         invalid_type_error: "מספר הסט חייב להיות מספר",
       })
       .int({ message: "מספר הסט חייב להיות שלם" })
-      .min(1, { message: "מספר הסט חייב להיות 1 ומעלה" }),
+      .min(1, { message: "מספר הסט חייב להיות 1 ומעלה" })
+      .optional(),
 
     weight: z
       .number({
