@@ -13,6 +13,8 @@ import { CARDIO_VALUE } from "@/constants/Constants";
 import CardioWrapper from "@/components/WorkoutPlan/cardio/CardioWrapper";
 import { DropDownContextProvider } from "@/context/useDropdown";
 import { mapToDropDownItems } from "@/utils/utils";
+import queryClient from "@/QueryClient/queryClient";
+import { WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 
 const MyWorkoutPlanScreen = () => {
   const { colors, layout, spacing } = useStyles();
@@ -23,15 +25,18 @@ const MyWorkoutPlanScreen = () => {
   const [selectedPlan, setSelectedPlan] = useState<IWorkoutPlan>();
   const [showCardio, setShowCardio] = useState(false);
 
+  const handleRefetch = async () => {
+    await refetch();
+    queryClient.invalidateQueries({ queryKey: [WORKOUT_SESSION_KEY] });
+  };
+
   const handleSelect = (val: any) => {
     if (val == CARDIO_VALUE) return setShowCardio(true);
-
     const selected = data?.workoutPlans.find((plan) => plan._id === val);
 
     setSelectedPlan(selected);
 
     if (!showCardio) return;
-
     setShowCardio(false);
   };
 
@@ -50,7 +55,7 @@ const MyWorkoutPlanScreen = () => {
   }, [data]);
 
   if (isError)
-    return <ErrorScreen refetchFunc={() => refresh(refetch)} isFetching={isRefetching} />;
+    return <ErrorScreen refetchFunc={() => refresh(handleRefetch)} isFetching={isRefetching} />;
 
   if (isLoading) return <WorkoutPlanSkeletonLoader />;
 
@@ -61,7 +66,7 @@ const MyWorkoutPlanScreen = () => {
           <ScrollView
             nestedScrollEnabled
             contentContainerStyle={[spacing.gapSm]}
-            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
           >
             <WorkoutPlanSelector
               selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}

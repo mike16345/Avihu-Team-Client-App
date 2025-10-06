@@ -4,7 +4,7 @@ import { Text } from "@/components/ui/Text";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import { IRecordedSetRes } from "@/interfaces/Workout";
 import { FC, useEffect, useMemo, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Dimensions, ScrollView, View } from "react-native";
 import PreviousSetCard, { toLine } from "./PreviousSetCard";
 import useStyles from "@/styles/useGlobalStyles";
 import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
@@ -56,7 +56,8 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
 
   useEffect(() => {
     setSelectedDate(DateUtils.formatDate(new Date(), "YYYY-MM-DD"));
-    // return () => setIsVisible(false);
+
+    return () => setIsVisible(false);
   }, []);
 
   return (
@@ -86,11 +87,19 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
               <View style={[spacing.gapMd, layout.center]}>
                 <Text fontSize={16}>{DateUtils.formatDate(selectedDate!, "DD.MM.YY")}</Text>
 
-                <ScrollView style={{ maxHeight: 200 }} contentContainerStyle={[spacing.gapDefault]}>
+                <ScrollView
+                  style={{ maxHeight: 200 }}
+                  contentContainerStyle={[layout.center, spacing.gapDefault]}
+                >
                   {sets.map((set, index) => (
                     <View
                       key={set._id ?? index}
-                      style={[layout.flexRow, layout.itemsCenter, spacing.gapLg]}
+                      style={[
+                        layout.flexRow,
+                        layout.itemsCenter,
+                        layout.justifyBetween,
+                        { width: Dimensions.get("screen").width * 0.51 },
+                      ]}
                     >
                       <Text fontSize={16}>{toLine(set)}</Text>
                       <UpdateSetModal set={set} exercise={exercise} />

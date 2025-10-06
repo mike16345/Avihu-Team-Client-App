@@ -15,7 +15,7 @@ interface UpdateSetModalProps {
 const UpdateSetModal: FC<UpdateSetModalProps> = ({ set, exercise }) => {
   const userId = useUserStore((state) => state.currentUser?._id);
 
-  const { triggerSuccessToast, triggerErrorToast } = useToast();
+  const { triggerSuccessToast } = useToast();
   const { useUpdateRecordedSet: updateRecordedSet, useDeleteRecordedSet: deleteRecordedSet } =
     useRecordedSetsMutations();
 
@@ -39,6 +39,7 @@ const UpdateSetModal: FC<UpdateSetModalProps> = ({ set, exercise }) => {
 
     try {
       await deleteRecordedSet.mutateAsync({ exercise, setId: set._id, userId: userId });
+      triggerSuccessToast({ message: "הסט נמחק בהצלחה" });
     } catch (e: any) {
       throw e;
     }
@@ -47,22 +48,22 @@ const UpdateSetModal: FC<UpdateSetModalProps> = ({ set, exercise }) => {
   const fields: FieldConfig[] = useMemo(
     () => [
       {
-        key: "repsDone",
-        label: "חזרות",
-        placeholder: "הכניסו חזרות",
-        prefix: "חזרות",
-        keyboardType: "numeric",
-        existingValue: set.repsDone?.toString() ?? "",
-        schemaKey: "repsDone",
-      },
-      {
         key: "weight",
         label: "משקל",
         placeholder: "הכניסו משקל",
-        prefix: "משקל",
+        prefix: `סט ${set.setNumber} | משקל`,
         keyboardType: "numeric",
         existingValue: set.weight?.toString() ?? "",
         schemaKey: "weight",
+      },
+      {
+        key: "repsDone",
+        label: "חזרות",
+        placeholder: "הכניסו חזרות",
+        prefix: ` | חזרות`,
+        keyboardType: "numeric",
+        existingValue: set.repsDone?.toString() ?? "",
+        schemaKey: "repsDone",
       },
     ],
     [set._id, set.repsDone, set.weight]

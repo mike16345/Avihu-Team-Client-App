@@ -269,7 +269,7 @@ export function getNextSetNumberFromSession(
   const planData = session.data?.[plan];
   const exerciseData = planData?.[exerciseName];
 
-  return exerciseData?.setNumber + 1 || 1;
+  return exerciseData?.setNumber || 1;
 }
 
 export function extractValuesFromArray<T, K extends keyof T>(array: T[], key: K): T[K][] {
@@ -287,4 +287,9 @@ export function extractValuesFromObject<
   }
 
   return keys.map((key) => obj[key][innerKey]) as any;
+}
+
+
+export function isEmptyObject(obj:Object){
+  return Object.keys(obj).length == 0
 }

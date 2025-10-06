@@ -43,7 +43,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
 
   const { layout, colors, spacing } = useStyles();
   const userId = useUserStore((state) => state.currentUser?._id);
-  const { handleSetLocalSession } = useWorkoutSession();
+  const { session, handleSetLocalSession } = useWorkoutSession();
   const { triggerSuccessToast, triggerErrorToast } = useToast();
 
   const [height, setHeight] = useState(0);
@@ -61,7 +61,10 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
           }),
         };
 
-        const response = await addRecordedSets.mutateAsync(recordedSetsToPost);
+        const response = await addRecordedSets.mutateAsync({
+          recordedSets: recordedSetsToPost,
+          sessionId: session?._id,
+        });
         const nextSet = getNextSetNumberFromSession(
           response.session,
           plan,
@@ -112,7 +115,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
         <SetInputContainer
           sheetHeight={sheetHeight}
           handleRecordSets={handleRecordSets}
-          maxSets={exercise?.sets?.length!}
+          maxSets={exercise?.sets?.length! - currentSet}
           setNumber={currentSet}
         />
       </View>

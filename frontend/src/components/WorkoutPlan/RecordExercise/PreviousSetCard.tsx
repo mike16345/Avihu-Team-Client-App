@@ -58,7 +58,7 @@ const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
 
     sameDaySets.sort((a, b) => (a?.setNumber ?? 0) - (b?.setNumber ?? 0));
 
-    const details = toLine(latestSet);
+    const details = toLine(sameDaySets[sameDaySets.length - 1]);
     const lastRecordedSets = sameDaySets.map(toLine);
     const date = DateUtils.formatDate(latestDay, "DD.MM.YY");
 

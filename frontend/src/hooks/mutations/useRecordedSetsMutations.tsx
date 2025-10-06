@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRecordedSetsApi } from "../api/useRecordedSetsApi";
-import { RECORDED_SETS_BY_USER_KEY } from "@/constants/reactQuery";
+import { AddRecordedSets, useRecordedSetsApi } from "../api/useRecordedSetsApi";
+import { RECORDED_SETS_BY_USER_KEY, WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 import { useUserStore } from "@/store/userStore";
 import { SetInput } from "@/components/WorkoutPlan/RecordExercise/SetInputContainer";
 
@@ -10,9 +10,16 @@ export const useRecordedSetsMutations = () => {
   const { addRecordedSets, updateRecordedSet, deleteRecordedSet } = useRecordedSetsApi();
 
   const useAddRecordedSets = useMutation({
-    mutationFn: addRecordedSets,
+    mutationFn: ({
+      recordedSets,
+      sessionId,
+    }: {
+      recordedSets: AddRecordedSets;
+      sessionId: string | undefined;
+    }) => addRecordedSets(recordedSets, sessionId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [RECORDED_SETS_BY_USER_KEY + userId] });
+      queryClient.invalidateQueries({ queryKey: [WORKOUT_SESSION_KEY] });
     },
   });
 

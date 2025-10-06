@@ -176,58 +176,65 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
         <Icon name="pencil" />
       </TouchableOpacity>
 
-      <CustomModal visible={openModal} onDismiss={() => setOpenModal(false)}>
-        <CustomModal.Content>
-          <View style={[layout.widthFull, layout.center, spacing.gapMd]}>
-            <Text fontSize={16}>{DateUtils.formatDate(date!, "DD.MM.YYYY")}</Text>
-            <View style={[layout.flexRow, layout.itemsCenter]}>
-              {fieldList.map((f, i) => (
-                <Text key={f.key + i} fontSize={16}>
-                  {f.prefix ?? prefix}
-                  <Text style={[text.textUnderline]}>
-                    {values[f.key] ? ` ${values[f.key]}` : "_"}
+      {openModal && (
+        <CustomModal visible={openModal} onDismiss={() => setOpenModal(false)}>
+          <CustomModal.Content>
+            <View style={[layout.widthFull, layout.center, spacing.gapMd]}>
+              <Text fontSize={16}>{DateUtils.formatDate(date!, "DD.MM.YYYY")}</Text>
+              <View style={[layout.flexRow, layout.itemsCenter]}>
+                {fieldList.map((f, i) => (
+                  <Text key={f.key + i} fontSize={16}>
+                    {f.prefix ?? prefix}
+                    <Text style={[text.textUnderline]}>
+                      {values[f.key] ? ` ${values[f.key]}` : "_"}
+                    </Text>
                   </Text>
-                </Text>
-              ))}
-            </View>
-
-            <View style={[spacing.gapLg, layout.center]}>
-              {fieldList.map((f, i) => (
-                <Input
-                  key={f.key + i}
-                  value={values[f.key] || ""}
-                  error={!!errors[f.key]}
-                  onChangeText={(txt) => {
-                    setValues((prev) => ({ ...prev, [f.key]: txt }));
-                  }}
-                  keyboardType={f.keyboardType ?? "default"}
-                  label={f.label}
-                  style={[{ width: width * 0.75 }]}
-                  placeholder={f.placeholder || "הכניסו פרטים"}
-                  {...(f.inputProps ?? {})}
-                />
-              ))}
-
-              <View style={[spacing.gapMd, { width: width * 0.5 }]}>
-                <PrimaryButton loading={isLoading} disabled={isLoading} onPress={handleSave} block>
-                  עדכון
-                </PrimaryButton>
-                <PrimaryButton
-                  disabled={isLoading}
-                  onPress={() => handleDismissModal()}
-                  mode="light"
-                  block
-                >
-                  ביטול
-                </PrimaryButton>
+                ))}
               </View>
+
+              <View style={[spacing.gapLg, layout.center]}>
+                {fieldList.map((f, i) => (
+                  <Input
+                    key={f.key + i}
+                    value={values[f.key] || ""}
+                    error={!!errors[f.key]}
+                    onChangeText={(txt) => {
+                      setValues((prev) => ({ ...prev, [f.key]: txt }));
+                    }}
+                    keyboardType={f.keyboardType ?? "default"}
+                    label={f.label}
+                    style={[{ width: width * 0.75 }]}
+                    placeholder={f.placeholder || "הכניסו פרטים"}
+                    {...(f.inputProps ?? {})}
+                  />
+                ))}
+
+                <View style={[spacing.gapMd, { width: width * 0.5 }]}>
+                  <PrimaryButton
+                    loading={isLoading}
+                    disabled={isLoading}
+                    onPress={handleSave}
+                    block
+                  >
+                    עדכון
+                  </PrimaryButton>
+                  <PrimaryButton
+                    disabled={isLoading}
+                    onPress={() => handleDismissModal()}
+                    mode="light"
+                    block
+                  >
+                    ביטול
+                  </PrimaryButton>
+                </View>
+              </View>
+              <TouchableOpacity disabled={isLoading} onPress={handleDelete}>
+                <Icon name="trash" />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity disabled={isLoading} onPress={handleDelete}>
-              <Icon name="trash" />
-            </TouchableOpacity>
-          </View>
-        </CustomModal.Content>
-      </CustomModal>
+          </CustomModal.Content>
+        </CustomModal>
+      )}
     </>
   );
 };
