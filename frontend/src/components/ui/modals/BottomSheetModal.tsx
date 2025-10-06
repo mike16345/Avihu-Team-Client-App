@@ -15,7 +15,7 @@ import Animated, {
 const { height: SCREEN_H } = Dimensions.get("window");
 
 const PEEK = 405;
-const OPEN_Y = -60;
+const OPEN_Y = -50;
 const SNAP = 48;
 
 type Props = {
@@ -88,7 +88,7 @@ export default function BottomSheetModal({
   };
 
   useEffect(() => {
-    translateY.value = withTiming(CLOSED_Y, { duration: 0 });
+    translateY.value = withTiming(CLOSED_Y, { duration: 100 });
   }, [peek]);
 
   const pan = useMemo(

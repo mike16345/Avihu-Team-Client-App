@@ -21,7 +21,8 @@ import { AddRecordedSets } from "@/hooks/api/useRecordedSetsApi";
 interface RecordExerciseProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordExercise"> {}
 
-const SPACING = 92; // Accounts for approximately all the spacing (gap)
+const BASE_SPACING = 92;
+const METHOD_GAP = 16;
 
 function hasRecordedSets(data: IMuscleGroupRecordedSets[], exercise: string) {
   for (const muscleGroup of data) {
@@ -90,13 +91,25 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
     }
   };
 
-  const sheetHeight = useMemo(() => Dimensions.get("screen").height - height - SPACING, [height]);
-
   const hasRecordedSetsHistory = useMemo(() => {
     if (!data || !data.length || !exercise) return false;
 
     return hasRecordedSets(data, exercise.exerciseId.name);
   }, [data, exercise]);
+
+  const dynamicSpacing = useMemo(() => {
+    const hasMethod = Boolean(exercise?.exerciseMethod);
+    const extraSpace = hasRecordedSetsHistory ? 0 : METHOD_GAP * 1.5;
+    let s = BASE_SPACING + (!hasMethod ? METHOD_GAP : 0) + extraSpace;
+
+    console.log("se", s);
+    return s;
+  }, [exercise?.exerciseMethod, hasRecordedSetsHistory]);
+
+  const sheetHeight = useMemo(
+    () => Dimensions.get("screen").height - height - dynamicSpacing,
+    [height, dynamicSpacing]
+  );
 
   return (
     <View style={[layout.flex1, colors.background, spacing.gapLg, spacing.pdHorizontalMd]}>
