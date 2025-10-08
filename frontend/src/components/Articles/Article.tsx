@@ -97,7 +97,7 @@ const Article = () => {
         </Card.Content>
       </Card>
 
-      <LikeButton articleId={articleId} likes={data?.likes || []} />
+      <LikeButton articleId={articleId} likes={data?.likes || []} group={data?.group._id!} />
     </View>
   );
 };

@@ -23,7 +23,7 @@ interface ArticleGroupContentProps {
 
 const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) => {
   const { layout, spacing, text } = useStyles();
-  const { isRefreshing, refresh } = usePullDownToRefresh();
+  const { isRefreshing } = usePullDownToRefresh();
 
   const [page, setPage] = useState<number>(1);
   const [data, setData] = useState<IArticle[]>([]);
@@ -46,6 +46,12 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
     return data.map((article) => <ArticleCard key={article._id} article={article} />);
   }, [data]);
 
+  const handleRefresh = () => {
+    setPage(1);
+
+    refetch();
+  };
+
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
 
@@ -59,9 +65,15 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
   };
 
   useEffect(() => {
-    if (!articleRes?.results || page * PAGINATION_LIMIT === data.length) return;
+    if (!articleRes?.results) return;
 
-    setData((prev) => [...prev, ...articleRes.results]);
+    setData((prev) => {
+      if (page === 1) {
+        return articleRes.results;
+      }
+
+      return [...prev, ...articleRes.results];
+    });
   }, [articleRes]);
 
   if (isError) return <ErrorScreen />;
@@ -72,9 +84,7 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
         style={[layout.flex1]}
         contentContainerStyle={[spacing.gap20]}
         onScroll={handleScroll}
-        refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
-        }
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
       >
         {articles}
       </ScrollView>

@@ -10,11 +10,12 @@ import { useUserStore } from "@/store/userStore";
 interface LikeButtonProps {
   articleId: string;
   likes: string[];
+  group: string;
 }
 
-const LikeButton: React.FC<LikeButtonProps> = ({ articleId, likes }) => {
+const LikeButton: React.FC<LikeButtonProps> = ({ articleId, likes, group }) => {
   const { flexRow, itemsCenter } = useLayoutStyles();
-  const { mutate, isPending } = useUpdateLikeStatus(articleId);
+  const { mutate, isPending } = useUpdateLikeStatus(articleId, group);
   const userId = useUserStore((state) => state.currentUser?._id);
 
   const isLiked = useMemo(() => {
