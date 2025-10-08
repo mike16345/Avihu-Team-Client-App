@@ -44,12 +44,18 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({ exercise, muscleG
     });
   };
 
+  console.log("session", session?.data);
+
   useEffect(() => {
-    if (!session) return;
+    if (!session) {
+      setSetNumber(1);
+      return;
+    }
+
     const nextSet = getNextSetNumberFromSession(session, plan, exercise.exerciseId.name);
 
     setSetNumber(nextSet);
-  }, [session]);
+  }, [session, session?.updatedAt, plan, exerciseId]);
 
   return (
     <Pressable

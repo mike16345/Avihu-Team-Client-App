@@ -26,8 +26,8 @@ const MyWorkoutPlanScreen = () => {
   const [showCardio, setShowCardio] = useState(false);
 
   const handleRefetch = async () => {
-    await refetch();
     queryClient.invalidateQueries({ queryKey: [WORKOUT_SESSION_KEY] });
+    await refetch();
   };
 
   const handleSelect = (val: any) => {

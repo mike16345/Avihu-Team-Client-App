@@ -16,7 +16,7 @@ interface SetInputContainerProps {
   sheetHeight: number;
   setNumber: number;
   maxSets: number;
-  handleRecordSets: (sets: SetInput[]) => void;
+  handleRecordSets: (sets: SetInput[]) => Promise<number>;
 }
 
 export type SetInput = Omit<IRecordedSet, "plan">;
@@ -39,15 +39,26 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
     },
   ]);
 
+  console.log("set number", setNumber);
+  console.log("recordedssets", recordedSets);
+
   const handleSubmitSets = async () => {
     setIsPending(true);
+    const nextSet = await handleConfirmRecordSets();
+
     setIsExpanded(false);
-    await handleConfirmRecordSets();
     setIsPending(false);
+    handleResetSets(nextSet);
   };
 
+  const handleResetSets = useCallback((nextSet: number) => {
+    if (!nextSet) return;
+
+    setRecordedSets([{ ...DEFAULT_SET, setNumber: nextSet }]);
+  }, []);
+
   const handleConfirmRecordSets = useCallback(async () => {
-    await handleRecordSets(recordedSets);
+    return await handleRecordSets(recordedSets);
   }, [recordedSets, handleRecordSets]);
 
   const handleCloseModal = () => {
@@ -69,7 +80,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
         onClose={handleCloseModal}
         onLayout={(e) => {
           if (e.nativeEvent.layout.height !== containerHeight)
-          setContainerHeight(e.nativeEvent.layout.height);
+            setContainerHeight(e.nativeEvent.layout.height);
         }}
       >
         <View

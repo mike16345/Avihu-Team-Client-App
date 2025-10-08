@@ -53,6 +53,8 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const [height, setHeight] = useState(0);
   const [currentSet, setCurrentSet] = useState(setNumber || 1);
 
+  console.log("session", session);
+
   const handleRecordSets = useCallback(
     async (sets: SetInput[]) => {
       try {
@@ -75,18 +77,20 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
           exercise?.exerciseId.name
         );
 
-        handleSetLocalSession(response.session);
+        handleSetLocalSession({ ...response.session });
         setCurrentSet(nextSet);
         triggerSuccessToast({
           title: "עודכן בהצלחה",
           message: "הנתונים זמינים לצפייה בהיסטוריית הביצועים",
         });
         setCountdown(exercise.restTime);
+
+        return nextSet;
       } catch (e: any) {
         triggerErrorToast({ message: e.message });
       }
     },
-    [exercise, setNumber, muscleGroup, plan]
+    [exercise, setNumber, muscleGroup, plan, session]
   );
 
   const onLayout = (e: LayoutChangeEvent) => {
