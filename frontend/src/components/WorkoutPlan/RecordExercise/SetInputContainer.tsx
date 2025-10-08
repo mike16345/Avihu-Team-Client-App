@@ -8,6 +8,7 @@ import Animated, { Easing, LinearTransition } from "react-native-reanimated";
 import { IRecordedSet } from "@/interfaces/Workout";
 import SetInputList from "./SetInputList";
 import { DEFAULT_SET } from "@/constants/Constants";
+import PreviousSetCard from "./PreviousSetCard";
 
 const HORIZONTAL_PADDING = 24;
 const VERTICAL_PADDING = 16;
@@ -16,6 +17,7 @@ interface SetInputContainerProps {
   sheetHeight: number;
   setNumber: number;
   maxSets: number;
+  exercise: string;
   handleRecordSets: (sets: SetInput[]) => Promise<number>;
 }
 
@@ -26,6 +28,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   maxSets,
   setNumber,
   sheetHeight,
+  exercise,
 }) => {
   const { layout, colors, spacing, common } = useStyles();
 
@@ -99,7 +102,11 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
             containerHeight={containerHeight}
             isExpanded={isExpanded}
           />
-          <Animated.View layout={LinearTransition.duration(250).easing(Easing.inOut(Easing.ease))}>
+          <Animated.View
+            style={[spacing.gapDefault]}
+            layout={LinearTransition.duration(250).easing(Easing.inOut(Easing.ease))}
+          >
+            {isExpanded && <PreviousSetCard exercise={exercise} />}
             <PrimaryButton loading={isPending} onPress={() => handleSubmitSets()} block>
               עדכון
             </PrimaryButton>

@@ -105,12 +105,9 @@ const SetInputList: React.FC<SetInputListProps> = ({
   recordedSets,
   setRecordedSets,
 }) => {
-  const isOneItem = recordedSets.length === 1;
   const LABEL_HEIGHT = 48;
-  const maxToFitInContainer = Math.floor(
-    containerHeight / (ROW_HEIGHT + (isOneItem ? LABEL_HEIGHT : 0) + GAP)
-  );
-  const isNotExceedingMaxSets = recordedSets.length < maxSets;
+  const maxToFitInContainer = Math.floor(containerHeight / (ROW_HEIGHT + LABEL_HEIGHT + GAP));
+  const isNotExceedingMaxSets = recordedSets.length <= maxSets;
   const isAbleToAddSet = recordedSets.length + 1 <= maxToFitInContainer;
   const isFooterVisible = isExpanded && isNotExceedingMaxSets && isAbleToAddSet;
 
