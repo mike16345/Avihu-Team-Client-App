@@ -17,6 +17,7 @@ import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import RecordedSetsHistoryModal from "./RecordedSetsHistoryModal";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import { AddRecordedSets } from "@/hooks/api/useRecordedSetsApi";
+import { useTimerStore } from "@/store/timerStore";
 
 interface RecordExerciseProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordExercise"> {}
@@ -42,8 +43,10 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const { data } = useRecordedSetsQuery();
   const { useAddRecordedSets: addRecordedSets } = useRecordedSetsMutations();
 
-  const { layout, colors, spacing } = useStyles();
   const userId = useUserStore((state) => state.currentUser?._id);
+  const setCountdown = useTimerStore((state) => state.setCountdown);
+
+  const { layout, colors, spacing } = useStyles();
   const { session, handleSetLocalSession } = useWorkoutSession();
   const { triggerSuccessToast, triggerErrorToast } = useToast();
 
@@ -78,6 +81,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
           title: "עודכן בהצלחה",
           message: "הנתונים זמינים לצפייה בהיסטוריית הביצועים",
         });
+        setCountdown(exercise.restTime);
       } catch (e: any) {
         triggerErrorToast({ message: e.message });
       }
@@ -102,7 +106,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
     const extraSpace = hasRecordedSetsHistory ? 0 : METHOD_GAP * 1.5;
     let s = BASE_SPACING + (!hasMethod ? METHOD_GAP : 0) + extraSpace;
 
-    console.log("se", s);
     return s;
   }, [exercise?.exerciseMethod, hasRecordedSetsHistory]);
 

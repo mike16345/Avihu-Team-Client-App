@@ -4,8 +4,6 @@ import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import TimerDrawer from "@/components/ui/TimerDrawer";
-import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import { useTimerStore } from "@/store/timerStore";
 import { Text } from "@/components/ui/Text";
 import { useEffect, useRef, useState } from "react";
@@ -129,7 +127,6 @@ const BottomTabNavigator = () => {
       {!keyboardVisible && (
         <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 - 40 }]} />
       )}
-      <ConditionalRender condition={!!countdown} children={<TimerDrawer />} />
     </Animated.View>
   );
 };
