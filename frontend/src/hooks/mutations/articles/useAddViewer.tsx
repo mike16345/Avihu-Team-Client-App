@@ -12,7 +12,10 @@ const useAddViewer = (articleId: string, group?: string) => {
     mutationFn: () => addViewer(articleId, userId!),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [ARTICLE_KEY + group, ARTICLE_KEY + articleId],
+        queryKey: [ARTICLE_KEY + group],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [ARTICLE_KEY + articleId],
       });
     },
   });

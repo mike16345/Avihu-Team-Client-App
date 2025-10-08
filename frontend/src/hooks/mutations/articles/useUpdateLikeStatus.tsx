@@ -11,7 +11,8 @@ const useUpdateLikeStatus = (id: string, group: string) => {
   return useMutation({
     mutationFn: () => changeLikedStatus(id, userId!),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ARTICLE_KEY + id, ARTICLE_KEY + group] });
+      queryClient.invalidateQueries({ queryKey: [ARTICLE_KEY + id] });
+      queryClient.invalidateQueries({ queryKey: [ARTICLE_KEY + group] });
     },
   });
 };

@@ -5,17 +5,14 @@ import {
   RefreshControl,
   ScrollView,
 } from "react-native";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import useArticleQuery from "@/hooks/queries/articles/useArticleQuery";
 import useStyles from "@/styles/useGlobalStyles";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import { Text } from "../../ui/Text";
 import ArticleCard from "../ArticleCard";
-import { IArticle } from "@/interfaces/IArticle";
 import { ConditionalRender } from "../../ui/ConditionalRender";
 import ErrorScreen from "@/screens/ErrorScreen";
-
-const PAGINATION_LIMIT = 5;
 
 interface ArticleGroupContentProps {
   groupId: string;
@@ -25,30 +22,24 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
   const { layout, spacing, text } = useStyles();
   const { isRefreshing } = usePullDownToRefresh();
 
-  const [page, setPage] = useState<number>(1);
-  const [data, setData] = useState<IArticle[]>([]);
-
   const {
     data: articleRes,
+    isFetchingNextPage,
+    fetchNextPage,
     isLoading,
     isError,
     refetch,
-  } = useArticleQuery({
-    limit: PAGINATION_LIMIT,
-    page: page,
-    query: { group: groupId },
-  });
+  } = useArticleQuery(groupId);
 
   const articles = useMemo(() => {
-    if ((!data || !data.length) && !isLoading)
+    const articles = articleRes?.pages.flatMap((page) => page.results) ?? [];
+    if ((!articles || !articles.length) && !isLoading)
       return <Text style={[text.textCenter, spacing.pdXl]}>לא נמצאו מאמרים לקבוצה זו</Text>;
 
-    return data.map((article) => <ArticleCard key={article._id} article={article} />);
-  }, [data]);
+    return articles.map((article) => <ArticleCard key={article._id} article={article} />);
+  }, [articleRes]);
 
   const handleRefresh = () => {
-    setPage(1);
-
     refetch();
   };
 
@@ -59,22 +50,10 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
     const isBottom =
       layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
 
-    if (!isBottom || !articleRes?.hasNextPage || isLoading) return;
+    if (!isBottom || isLoading || isFetchingNextPage) return;
 
-    setPage((prev) => prev + 1);
+    fetchNextPage();
   };
-
-  useEffect(() => {
-    if (!articleRes?.results) return;
-
-    setData((prev) => {
-      if (page === 1) {
-        return articleRes.results;
-      }
-
-      return [...prev, ...articleRes.results];
-    });
-  }, [articleRes]);
 
   if (isError) return <ErrorScreen />;
 
@@ -89,7 +68,7 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
         {articles}
       </ScrollView>
 
-      <ConditionalRender condition={isLoading}>
+      <ConditionalRender condition={isLoading || isFetchingNextPage}>
         <ActivityIndicator />
       </ConditionalRender>
     </>
