@@ -26,7 +26,7 @@ const MuscleGroupContainer: React.FC<MuscleGroupContainerProps> = ({
 
       {exercises.map((exercise, i) => (
         <ExerciseContainer
-          key={exercise._id}
+          key={exercise._id || i}
           exercise={exercise}
           plan={plan}
           muscleGroup={muscleGroup}
