@@ -48,7 +48,15 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
         </TouchableOpacity>
         <View style={[layout.flexRow, layout.itemsCenter, { gap: 6 }]}>
           <ConditionalRender condition={!!countdown}>
-            <RestTimer trigger={<IconButton style={buttonsPadding} icon={"clock"} size={20} />} />
+            <RestTimer
+              trigger={
+                <IconButton
+                  style={[buttonsPadding, { backgroundColor: "#ECFDF3" }]}
+                  icon={"clock"}
+                  size={20}
+                />
+              }
+            />
           </ConditionalRender>
           <ConditionalRender condition={!!exercise.exerciseMethod}>
             <SecondaryButton
