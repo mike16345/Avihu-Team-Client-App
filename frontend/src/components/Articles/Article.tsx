@@ -6,16 +6,17 @@ import useStyles from "@/styles/useGlobalStyles";
 import { ArticleStackParamsList } from "@/types/navigatorTypes";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { useEffect } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Text } from "../ui/Text";
 import Icon from "../Icon/Icon";
 import { Card } from "../ui/Card";
 import RenderHTML from "react-native-render-html";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import ArticleImage from "./ArticleImage";
+import BackButton from "../ui/BackButton";
 
 const Article = () => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { colors, common, layout, spacing } = useStyles();
   const currentUserId = useUserStore((state) => state.currentUser?._id);
   const route = useRoute<RouteProp<ArticleStackParamsList, "ViewArticle">>();
   const { articleId } = route.params;
@@ -47,9 +48,7 @@ const Article = () => {
         layout.flex1,
       ]}
     >
-      <TouchableOpacity>
-        <Icon name="chevronRightBig" />
-      </TouchableOpacity>
+      <BackButton<ArticleStackParamsList> />
 
       <Card style={[layout.flex1, common.roundedMd, spacing.pdMd]}>
         <Card.Header>
@@ -66,14 +65,16 @@ const Article = () => {
             {data?.title}
           </Text>
 
-          <RenderHTML
-            source={{ html: data!.content }}
-            baseStyle={{
-              color: colors.textPrimary.color,
-              fontSize: 14,
-              textAlign: `left`,
-            }}
-          />
+          <ScrollView>
+            <RenderHTML
+              source={{ html: data!.content }}
+              baseStyle={{
+                color: colors.textPrimary.color,
+                fontSize: 14,
+                textAlign: `left`,
+              }}
+            />
+          </ScrollView>
         </Card.Content>
       </Card>
 
