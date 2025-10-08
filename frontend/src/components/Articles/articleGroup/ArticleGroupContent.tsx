@@ -40,7 +40,7 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
   });
 
   const articles = useMemo(() => {
-    if (!data || !data.length)
+    if ((!data || !data.length) && !isLoading)
       return <Text style={[text.textCenter, spacing.pdXl]}>לא נמצאו מאמרים לקבוצה זו</Text>;
 
     return data.map((article) => <ArticleCard key={article._id} article={article} />);

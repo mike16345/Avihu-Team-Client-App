@@ -5,37 +5,46 @@ import { useUserStore } from "@/store/userStore";
 import useStyles from "@/styles/useGlobalStyles";
 import { ArticleStackParamsList } from "@/types/navigatorTypes";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { useEffect } from "react";
-import { ScrollView, View } from "react-native";
+import { useEffect, useMemo } from "react";
+import { RefreshControl, ScrollView, View } from "react-native";
 import { Text } from "../ui/Text";
-import Icon from "../Icon/Icon";
 import { Card } from "../ui/Card";
 import RenderHTML from "react-native-render-html";
-import PrimaryButton from "../ui/buttons/PrimaryButton";
 import ArticleImage from "./ArticleImage";
 import BackButton from "../ui/BackButton";
+import LikeButton from "./LikeButton";
+import SpinningIcon from "../ui/loaders/SpinningIcon";
+import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 
 const Article = () => {
   const { colors, common, layout, spacing } = useStyles();
   const currentUserId = useUserStore((state) => state.currentUser?._id);
   const route = useRoute<RouteProp<ArticleStackParamsList, "ViewArticle">>();
   const { articleId } = route.params;
+  const { isRefreshing, refresh } = usePullDownToRefresh();
 
-  const { data, isLoading, isError } = useOneArticleQuery(articleId);
+  const { data, isLoading, isError, refetch } = useOneArticleQuery(articleId);
   const { mutate: addViewer } = useAddViewer(articleId, data?.group?._id);
 
+  const isViewed = useMemo(() => {
+    if (!currentUserId || !data?.views.length) return false;
+
+    return !!data.views.find((viewer) => viewer === currentUserId);
+  }, [currentUserId, data?.views]);
+
   useEffect(() => {
-    if (!data) return;
-
-    const hasViewedAlready = data.views.find((viewer) => viewer === currentUserId);
-
-    if (hasViewedAlready) return;
+    if (isViewed) return;
 
     addViewer();
-  }, [data]);
+  }, [isViewed]);
 
   if (isError) return <ErrorScreen />;
-  if (isLoading) return <Text>loading...</Text>;
+  if (isLoading)
+    return (
+      <View style={[layout.flex1, layout.center]}>
+        <SpinningIcon mode="light" />
+      </View>
+    );
 
   return (
     <View
@@ -60,12 +69,18 @@ const Article = () => {
           />
         </Card.Header>
 
-        <Card.Content style={[{ gap: 4 }, layout.itemsStart]}>
-          <Text fontVariant="semibold" fontSize={16}>
+        <Card.Content style={[{ gap: 4 }, layout.itemsStart, layout.flex1]}>
+          <Text fontVariant="semibold" fontSize={16} style={{ textAlign: "left" }}>
             {data?.title}
           </Text>
 
-          <ScrollView>
+          <ScrollView
+            style={[layout.flex1]}
+            nestedScrollEnabled
+            refreshControl={
+              <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
+            }
+          >
             <RenderHTML
               source={{ html: data!.content }}
               baseStyle={{
@@ -73,19 +88,16 @@ const Article = () => {
                 fontSize: 14,
                 textAlign: `left`,
               }}
+              tagsStyles={{
+                b: { fontWeight: "bold" },
+                strong: { fontWeight: "bold" },
+              }}
             />
           </ScrollView>
         </Card.Content>
       </Card>
 
-      <PrimaryButton block mode="light">
-        <View style={[layout.flexRow, layout.itemsCenter, { gap: 2 }]}>
-          <Icon name="like" />
-          <Text fontSize={16} fontVariant="bold">
-            אהבתי
-          </Text>
-        </View>
-      </PrimaryButton>
+      <LikeButton articleId={articleId} likes={data?.likes || []} />
     </View>
   );
 };

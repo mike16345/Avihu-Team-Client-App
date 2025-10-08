@@ -4,14 +4,14 @@ import queryClient from "@/QueryClient/queryClient";
 import { useUserStore } from "@/store/userStore";
 import { useMutation } from "@tanstack/react-query";
 
-const useUpdateLikeStatus = () => {
+const useUpdateLikeStatus = (id: string) => {
   const userId = useUserStore((state) => state.currentUser?._id);
   const { changeLikedStatus } = useArticleApi();
 
   return useMutation({
-    mutationFn: (id: string) => changeLikedStatus(id, userId!),
+    mutationFn: () => changeLikedStatus(id, userId!),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [ARTICLE_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ARTICLE_KEY + id] });
     },
   });
 };

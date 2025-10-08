@@ -1,4 +1,4 @@
-import { ARTICLE_COUNT_KEY, ARTICLE_KEY } from "@/constants/reactQuery";
+import { ARTICLE_KEY } from "@/constants/reactQuery";
 import { useArticleApi } from "@/hooks/api/useArticleApi";
 import queryClient from "@/QueryClient/queryClient";
 import { useUserStore } from "@/store/userStore";
