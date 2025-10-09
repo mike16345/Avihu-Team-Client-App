@@ -10,7 +10,7 @@ export const useArticleApi = () => {
     const response = await fetchData<ApiResponse<PaginationResult<IArticle>>>(
       `${BLOGS_API_ENDPOINT}/paginate?page=${pagination.page}&limit=${
         pagination.limit
-      }&query=${JSON.stringify(pagination.query)}`
+      }&query=${encodeURIComponent(JSON.stringify(pagination.query))}`
     );
 
     return response.data;

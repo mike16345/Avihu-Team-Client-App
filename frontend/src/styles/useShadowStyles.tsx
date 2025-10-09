@@ -8,7 +8,6 @@ export const useShadowStyles = () => {
     // Button Shadows (All Buttons With Shadow)
     // Using the most visually impactful layer (layer 3 with 5% opacity and 10 blur)
     buttonShadow: {
-      backgroundColor: "#fff",
       ...Platform.select({
         ios: {
           shadowColor: "#072723",
@@ -18,6 +17,8 @@ export const useShadowStyles = () => {
         },
         android: {
           elevation: 8,
+          backgroundColor: "#F6F8FA",
+
           shadowColor: "#072723",
         },
       }),
@@ -25,8 +26,6 @@ export const useShadowStyles = () => {
 
     // Alternative button shadow using layer 4 for more subtle effect
     buttonShadowLight: {
-      backgroundColor: "#fff",
-
       ...Platform.select({
         ios: {
           shadowColor: "#072723",
@@ -35,8 +34,10 @@ export const useShadowStyles = () => {
           shadowRadius: 7,
         },
         android: {
-          elevation: 6,
-          shadowColor: "#072723",
+          /*   elevation: 6,
+      backgroundColor: "#F6F8FA",
+
+          shadowColor: "#072723", */
         },
       }),
     },
@@ -50,10 +51,6 @@ export const useShadowStyles = () => {
           shadowOffset: { width: 0, height: 3 },
           shadowOpacity: 0.2, // Reduced from 0% to make it visible
           shadowRadius: 64,
-        },
-        android: {
-          elevation: 20,
-          shadowColor: "#999999",
         },
       }),
     },
