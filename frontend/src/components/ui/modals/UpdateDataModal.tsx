@@ -84,6 +84,7 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
 
   const [openModal, setOpenModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const coerce = (raw: string | undefined, f: FieldConfig) => {
     if (f.parse) return f.parse(raw);
@@ -146,7 +147,7 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
   };
 
   const handleDelete = async () => {
-    setIsLoading(true);
+    setIsDeleting(true);
     try {
       await onDelete();
 
@@ -154,7 +155,7 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
     } catch (error: any) {
       triggerErrorToast({ message: error?.response?.message });
     } finally {
-      setIsLoading(false);
+      setIsDeleting(false);
     }
   };
 
@@ -212,14 +213,14 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
                 <View style={[spacing.gapMd, { width: width * 0.5 }]}>
                   <PrimaryButton
                     loading={isLoading}
-                    disabled={isLoading}
+                    disabled={isLoading || isDeleting}
                     onPress={handleSave}
                     block
                   >
                     עדכון
                   </PrimaryButton>
                   <PrimaryButton
-                    disabled={isLoading}
+                    disabled={isLoading || isDeleting}
                     onPress={() => handleDismissModal()}
                     mode="light"
                     block
@@ -228,7 +229,7 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
                   </PrimaryButton>
                 </View>
               </View>
-              <TouchableOpacity disabled={isLoading} onPress={handleDelete}>
+              <TouchableOpacity disabled={isLoading || isDeleting} onPress={handleDelete}>
                 <Icon name="trash" />
               </TouchableOpacity>
             </View>

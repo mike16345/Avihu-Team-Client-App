@@ -42,14 +42,10 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
     },
   ]);
 
-  console.log("set number", setNumber);
-  console.log("recordedssets", recordedSets);
-
   const handleSubmitSets = async () => {
     setIsPending(true);
     const nextSet = await handleConfirmRecordSets();
 
-    setIsExpanded(false);
     setIsPending(false);
     handleResetSets(nextSet);
   };

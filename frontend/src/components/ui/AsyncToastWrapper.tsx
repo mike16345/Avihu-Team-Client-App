@@ -71,9 +71,7 @@ const AsyncToastWrapper: React.FC<AsyncToastWrapperProps> = ({
     title?: string;
   }) => {
     setToast({ message, duration, title, type: "success" });
-
     animateInToast();
-
     setTimeout(() => {
       animateOutToast();
     }, duration);
@@ -94,7 +92,7 @@ const AsyncToastWrapper: React.FC<AsyncToastWrapperProps> = ({
         message: messages?.error?.message || error.message,
         title: messages?.error?.title,
         duration: toastDuration,
-      }); //Making the user waut 5 X toast duration until they can try again after an error seems bad in terms of UX. I swapped this to the global toast instead.
+      });
     }
   };
 

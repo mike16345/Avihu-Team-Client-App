@@ -21,7 +21,7 @@ const RestTimer: FC<RestTimerProps> = ({ trigger }) => {
     <>
       <TriggerWrapper trigger={trigger} setOpen={() => setIsVisible(true)} />
 
-      <CustomModal visible={isVisible} style={[layout.flex1]}>
+      <CustomModal visible={isVisible} onDismiss={() => setIsVisible(false)} style={[layout.flex1]}>
         <View style={[layout.flex1, layout.center]}>
           <Text fontSize={100} fontVariant="brutalist">
             {countdown}
