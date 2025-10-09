@@ -14,7 +14,7 @@ const ArticleGroupHeader: React.FC<ArticleGroupHeaderProps> = ({ articleGroup })
   const { layout, spacing, text } = useStyles();
 
   return (
-    <View style={spacing.gapMd}>
+    <View style={[spacing.gapMd, spacing.pdHorizontalLg]}>
       <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter]}>
         <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
           <BackButton<ArticleStackParamsList> />

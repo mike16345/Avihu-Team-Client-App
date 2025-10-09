@@ -16,7 +16,7 @@ const ArticleGroupScreen = () => {
         spacing.pdStatusBar,
         spacing.pdBottomBar,
         colors.background,
-        spacing.pdLg,
+        spacing.pdVerticalLg,
         layout.flex1,
         spacing.gap20,
       ]}
