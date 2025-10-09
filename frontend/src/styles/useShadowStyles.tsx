@@ -12,8 +12,8 @@ export const useShadowStyles = () => {
       ...Platform.select({
         ios: {
           shadowColor: "#072723",
-          shadowOffset: { width: 0, height: 17 },
-          shadowOpacity: 0.05,
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.2,
           shadowRadius: 10,
         },
         android: {
@@ -47,8 +47,8 @@ export const useShadowStyles = () => {
       ...Platform.select({
         ios: {
           shadowColor: "#999999",
-          shadowOffset: { width: 0, height: 228 },
-          shadowOpacity: 0.03, // Reduced from 0% to make it visible
+          shadowOffset: { width: 0, height: 3 },
+          shadowOpacity: 0.2, // Reduced from 0% to make it visible
           shadowRadius: 64,
         },
         android: {
