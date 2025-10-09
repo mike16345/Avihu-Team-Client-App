@@ -1,6 +1,7 @@
 export interface PaginationParams {
   limit: number;
   page: number;
+  query?: Record<string, any>;
 }
 
 export interface PaginationResult<T> {
