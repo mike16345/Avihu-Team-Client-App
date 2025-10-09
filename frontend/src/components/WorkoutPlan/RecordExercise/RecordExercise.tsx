@@ -53,8 +53,6 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const [height, setHeight] = useState(0);
   const [currentSet, setCurrentSet] = useState(setNumber || 1);
 
-  console.log("session", session);
-
   const handleRecordSets = useCallback(
     async (sets: SetInput[]) => {
       try {

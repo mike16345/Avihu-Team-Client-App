@@ -43,22 +43,16 @@ export default function BottomSheetModal({
   peek = PEEK,
 }: Props) {
   const CLOSED_Y = SCREEN_H - peek;
+  const HEIGHT = OPEN_Y - CLOSED_Y;
+  const EDGE_SNAP_PX = Math.max(12, HEIGHT * 0.12);
+  const FLICK_VELOCITY = 600; // px/s
 
   const translateY = useSharedValue(CLOSED_Y);
+  // const containerHeight = useSharedValue(180);
   const startY = useSharedValue(CLOSED_Y);
   const lastNotifiedOpen = useSharedValue<boolean>(visible);
 
-  // Local state just for handle render & backdrop pointerEvents
   const [isOpen, setIsOpen] = useState<boolean>(visible);
-
-  // keep local state in sync with animated open/close detection
-  useAnimatedReaction(
-    () => translateY.value <= OPEN_Y + SNAP,
-    (nowIsOpen) => {
-      if (nowIsOpen !== isOpen) runOnJS(setIsOpen)(nowIsOpen);
-    },
-    [isOpen]
-  );
 
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -75,17 +69,33 @@ export default function BottomSheetModal({
 
   const toggle = () => {
     const target = isOpen ? CLOSED_Y : OPEN_Y;
+
+    // if (!isOpen) {
+    //   containerHeight.value = withTiming(target, { duration: 0 });
+    // }
+
     translateY.value = withTiming(target, { duration: 350 }, (finished) => {
-      if (finished) {
-        if (target === CLOSED_Y) {
-          runOnJS(onClose)();
-          runOnJS(notifyOpenChange)(false);
-        } else {
-          runOnJS(notifyOpenChange)(true);
-        }
+      if (!finished) return;
+
+      if (target === CLOSED_Y) {
+        runOnJS(onClose)();
+        runOnJS(notifyOpenChange)(false);
+      } else {
+        runOnJS(notifyOpenChange)(true);
       }
+      // if (isOpen) {
+      //   containerHeight.value = withTiming(185, { duration: 0 });
+      // }
     });
   };
+
+  useAnimatedReaction(
+    () => translateY.value <= OPEN_Y + SNAP,
+    (nowIsOpen) => {
+      if (nowIsOpen !== isOpen) runOnJS(setIsOpen)(nowIsOpen);
+    },
+    [isOpen]
+  );
 
   useEffect(() => {
     translateY.value = withTiming(CLOSED_Y, { duration: 100 });
@@ -103,8 +113,8 @@ export default function BottomSheetModal({
           const next = Math.min(CLOSED_Y, Math.max(OPEN_Y, startY.value + e.translationY));
           translateY.value = next;
 
-          const nearOpen = next <= OPEN_Y + SNAP;
-          const nearClosed = next >= CLOSED_Y - SNAP;
+          const nearOpen = next <= OPEN_Y + EDGE_SNAP_PX;
+          const nearClosed = next >= CLOSED_Y - EDGE_SNAP_PX;
 
           let isOpenNow = lastNotifiedOpen.value;
           if (nearOpen) isOpenNow = true;
@@ -115,18 +125,29 @@ export default function BottomSheetModal({
             runOnJS(onOpenChange)(isOpenNow);
           }
         })
-        .onEnd((e) => {
-          const mid = (CLOSED_Y - OPEN_Y) / 2;
-          const distFromTop = translateY.value - OPEN_Y;
-          const goingDown = e.velocityY > 0;
 
-          const target = goingDown
-            ? distFromTop > mid
-              ? CLOSED_Y
-              : OPEN_Y
-            : distFromTop < mid
-            ? OPEN_Y
-            : CLOSED_Y;
+        .onEnd((e) => {
+          const MID = (OPEN_Y + CLOSED_Y) / 1.5;
+
+          const delta = translateY.value - startY.value; // +down, -up this gesture
+          const goingUp = delta < 0;
+          const isFlick = Math.abs(e.velocityY) >= FLICK_VELOCITY;
+
+          let target: number;
+
+          if (isFlick) {
+            // Flick decides outright by velocity direction
+            target = e.velocityY > 0 ? CLOSED_Y : OPEN_Y;
+          } else {
+            // Simple rule: must cross halfway *in the direction you dragged*
+            const startedOpen = startY.value <= MID;
+            const crossedUp = goingUp && translateY.value <= MID;
+            const crossedDown = !goingUp && translateY.value >= MID;
+
+            if (crossedUp) target = OPEN_Y;
+            else if (crossedDown) target = CLOSED_Y;
+            else target = startedOpen ? OPEN_Y : CLOSED_Y; // snap back to where you started
+          }
 
           translateY.value = withTiming(target, { duration: 200 }, (finished) => {
             if (finished && target === CLOSED_Y) {

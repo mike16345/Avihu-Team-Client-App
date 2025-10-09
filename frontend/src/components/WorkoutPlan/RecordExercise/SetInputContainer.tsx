@@ -73,7 +73,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
         visible={isExpanded}
         renderHandle={({ toggle, isOpen }) => (
           <Pressable onPress={toggle}>
-            <Icon name={isOpen ? "arrowRoundDown" : "arrowRoundUp"} />
+            <Icon rotation={isOpen ? 180 : 0} name={"arrowRoundUp"} />
           </Pressable>
         )}
         onClose={handleCloseModal}
@@ -103,7 +103,12 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
             layout={LinearTransition.duration(250).easing(Easing.inOut(Easing.ease))}
           >
             {isExpanded && <PreviousSetCard exercise={exercise} />}
-            <PrimaryButton loading={isPending} onPress={() => handleSubmitSets()} block>
+            <PrimaryButton
+              disabled={setNumber >= maxSets}
+              loading={isPending}
+              onPress={() => handleSubmitSets()}
+              block
+            >
               עדכון
             </PrimaryButton>
           </Animated.View>
