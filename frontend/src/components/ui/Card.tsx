@@ -1,5 +1,6 @@
 import { StyleProp, View, ViewProps, ViewStyle } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
+import { useShadowStyles } from "@/styles/useShadowStyles";
 
 export type CardVariants = "gray" | "white" | "success";
 interface CardProps extends ViewProps {
@@ -16,6 +17,7 @@ interface CompoundCard extends React.FC<CardProps> {
 
 export const Card: CompoundCard = ({ children, variant = "white", style, ...props }) => {
   const { colors, common, spacing, fonts } = useStyles();
+  const { frameShadow } = useShadowStyles();
 
   spacing.pdDefault.padding;
   fonts.lg;
@@ -34,6 +36,7 @@ export const Card: CompoundCard = ({ children, variant = "white", style, ...prop
         spacing.pdDefault,
         common.roundedSm,
         spacing.gapSm,
+        frameShadow,
         style,
       ]}
       {...props}

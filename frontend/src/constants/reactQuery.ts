@@ -2,6 +2,8 @@ export const ONE_HOUR = 60 * 60 * 1000;
 export const ONE_DAY = ONE_HOUR * 24;
 
 export const DIET_PLAN_KEY = `diet-plan-user-`;
+export const ARTICLE_KEY = `article-`;
+export const ARTICLE_COUNT_KEY = `article-count`;
 export const MENU_ITEMS_KEY = `menu-items-`;
 export const WEIGH_INS_KEY = `weigh-ins-user-`;
 export const MEASUREMENTS_KEY = `measurements-user-`;

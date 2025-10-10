@@ -1,3 +1,4 @@
+import { IArticleCount } from "@/interfaces/IArticle";
 import { IExercise, IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
 import {
   BottomTabNavigationEventMap,
@@ -23,8 +24,18 @@ export type BottomStackParamList = {
   ChatTab: undefined;
   MyDietPlanPage: undefined;
   MyProgressScreen: undefined;
-  BlogScreen: undefined;
+  ArticleScreen: undefined;
   EmailScreen: undefined;
+};
+
+export type ArticleStackParamsList = {
+  Articles: undefined;
+  ArticleGroup: {
+    articleGroup: IArticleCount;
+  };
+  ViewArticle: {
+    articleId: string;
+  };
 };
 
 export type WorkoutPlanStackParamList = {

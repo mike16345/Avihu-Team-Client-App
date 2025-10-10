@@ -11,11 +11,11 @@ import {
 import RenderHTML from "react-native-render-html";
 import useStyles from "@/styles/useGlobalStyles";
 import useCardStyles from "@/styles/useCardStyles";
-import { useBlogsApi } from "@/hooks/api/useBlogsApi";
+import { useBlogsApi } from "@/hooks/api/useArticleApi";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { IBlog } from "@/interfaces/IBlog";
+import { IBlog } from "@/interfaces/IArticle";
 import { buildPhotoUrl } from "@/utils/utils";
-import BlogImage from "@/components/Blog/BlogImage";
+import BlogImage from "@/components/Articles/ArticleImage";
 import DateUtils from "@/utils/dateUtils";
 import { Text } from "@/components/ui/Text";
 import Loader from "@/components/ui/loaders/Loader";

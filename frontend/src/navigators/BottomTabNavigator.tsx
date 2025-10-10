@@ -142,7 +142,10 @@ const styles = StyleSheet.create({
     height: TAB_BAR_HEIGHT,
     alignItems: "center",
     borderRadius: 100,
-    overflow: "hidden",
+    shadowColor: "#072723",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
   },
   shadowContainer: {
     position: "absolute",

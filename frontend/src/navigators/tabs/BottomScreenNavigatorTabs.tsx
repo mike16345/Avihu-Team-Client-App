@@ -1,9 +1,9 @@
 import MyDietPlanScreen from "@/screens/MyDietPlanScreen";
 import { NavigatorTab } from "@/types/navigatorTypes";
 import WorkoutPlanStack from "../WorkoutPlanStack";
-import BlogScreen from "@/screens/BlogScreen";
 import Icon from "@/components/Icon/Icon";
 import HomeScreen from "@/screens/HomeScreen";
+import ArticleStack from "../ArticleStack";
 
 const ICON_HEIGHT = 24;
 const ICON_WIDTH = 24;
@@ -29,7 +29,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
       ),
     },
     listeners: ({ navigation }) => ({
-      tabPress: (e) => {
+      tabPress: (e: any) => {
         e.preventDefault();
 
         navigation.navigate("Chat");
@@ -57,8 +57,8 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     },
   },
   {
-    name: "BlogScreen",
-    component: BlogScreen,
+    name: "ArticleScreen",
+    component: ArticleStack,
     options: {
       tabBarLabel: "",
       tabBarIcon: ({ color }: { color: string }) => (
