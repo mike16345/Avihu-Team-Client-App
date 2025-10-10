@@ -1,4 +1,4 @@
-import { View, Pressable, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet, useWindowDimensions } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import Icon from "@/components/Icon/Icon";
@@ -68,7 +68,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   return (
     <>
       <BottomSheetModal
-        peek={sheetHeight}
+        peek={useWindowDimensions().height * 0.5}
         onOpenChange={(isExpanded) => setIsExpanded(isExpanded)}
         visible={isExpanded}
         renderHandle={({ toggle, isOpen }) => (
