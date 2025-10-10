@@ -53,18 +53,21 @@ const Badge: React.FC<Badgeprops> = ({
         alignStart && layout.alignSelfStart,
         spacing.gapSm,
         layout.itemsCenter,
+        layout.justifyBetween,
         { position: "relative", paddingHorizontal: 10, paddingVertical: 4 },
       ]}
     >
-      <ConditionalRender condition={showDot}>
-        <GreenDot />
-      </ConditionalRender>
+      <View style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
+        <ConditionalRender condition={showDot}>
+          <GreenDot />
+        </ConditionalRender>
 
-      <ConditionalRender condition={typeof children === "string"}>
-        <Text style={[{ maxWidth: badgeLength }]}>{children}</Text>
-      </ConditionalRender>
+        <ConditionalRender condition={typeof children === "string"}>
+          <Text style={[{ maxWidth: badgeLength }]}>{children}</Text>
+        </ConditionalRender>
 
-      <ConditionalRender condition={typeof children !== "string"}>{children}</ConditionalRender>
+        <ConditionalRender condition={typeof children !== "string"}>{children}</ConditionalRender>
+      </View>
 
       <ConditionalRender condition={showButton}>
         <View
