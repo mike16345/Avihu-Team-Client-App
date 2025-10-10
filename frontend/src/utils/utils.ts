@@ -289,7 +289,14 @@ export function extractValuesFromObject<
   return keys.map((key) => obj[key][innerKey]) as any;
 }
 
+export function isEmptyObject(obj: Object) {
+  return Object.keys(obj).length == 0;
+}
 
-export function isEmptyObject(obj:Object){
-  return Object.keys(obj).length == 0
+export function reverseString(str: string) {
+  const charArray = str.split("");
+  const reversedArray = charArray.reverse();
+  const reversedStr = reversedArray.join("");
+
+  return reversedStr;
 }

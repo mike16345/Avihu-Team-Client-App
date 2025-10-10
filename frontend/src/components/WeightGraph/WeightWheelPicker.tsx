@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useCallback, useMemo } from "react";
 import SectionWheelPicker from "../ui/SectionWheelPicker";
 import { WheelPickerProps, WheelPickerOption } from "@/types/wheelPickerTypes";
 import useStyles from "@/styles/useGlobalStyles";
@@ -73,15 +73,22 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
     return options;
   };
 
-  const wholeWeightOptions = generateWholeWeightOptions();
-  const decimalWeightOptions = generateDecimalWeightOptions();
+  const wholeWeightOptions = useMemo(generateWholeWeightOptions, [minWeight, maxWeight, stepSize]);
+  const decimalWeightOptions = useMemo(generateDecimalWeightOptions, [
+    decimalRange,
+    decimalStepSize,
+    decimalRange,
+  ]);
 
-  const handleValueChange = (values: any[]) => {
-    const wholeValue = values[0];
-    const decimalValue = showZeroDecimal ? Number(values[1]) : Number(values[1]) / 10;
+  const handleValueChange = useCallback(
+    (values: any[]) => {
+      const wholeValue = values[0];
+      const decimalValue = showZeroDecimal ? Number(values[1]) : Number(values[1]) / 10;
 
-    onValueChange(wholeValue + decimalValue);
-  };
+      onValueChange(wholeValue + decimalValue);
+    },
+    [showZeroDecimal]
+  );
 
   const wheelPickerPropsArray: WheelPickerProps[] = [
     {

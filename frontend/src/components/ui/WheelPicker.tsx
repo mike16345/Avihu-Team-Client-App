@@ -87,6 +87,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     <View style={[styles.container, { height }]}>
       <View style={styles.row}>
         <Animated.FlatList
+          style={{ direction: "rtl" }}
           ref={flatListRef}
           windowSize={12}
           maxToRenderPerBatch={28}
@@ -115,11 +116,13 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
               ]}
             >
               <Text
+                fontSize={24}
+                fontVariant="brutalist"
                 style={[
-                  styles.itemText,
                   index === selectedIndex
                     ? { color: activeItemColor }
                     : { color: inactiveItemColor },
+                  { direction: "ltr" },
                 ]}
               >
                 {item.value}

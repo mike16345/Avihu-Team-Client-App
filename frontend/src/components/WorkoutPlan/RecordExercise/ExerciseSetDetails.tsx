@@ -16,8 +16,6 @@ const ExerciseSetDetails: FC<ExerciseSetDetailsProps> = ({ sets, exerciseMethod 
   const { pdVerticalXs, pdHorizontalMd } = useSpacingStyles();
   const { roundedSm } = useCommonStyles();
 
-  console.log("exercise method", exerciseMethod);
-
   const details = useMemo(() => {
     let details = "";
     if (!sets || !sets.length) return details;
