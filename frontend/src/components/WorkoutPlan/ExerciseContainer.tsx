@@ -44,8 +44,6 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({ exercise, muscleG
     });
   };
 
-  console.log("session", session?.data);
-
   useEffect(() => {
     if (!session) {
       setSetNumber(1);
@@ -73,7 +71,12 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({ exercise, muscleG
         <View style={[spacing.gapDefault]}>
           <View style={[layout.flexRow, layout.justifyBetween]}>
             <View style={[layout.flex1, spacing.gapLg]}>
-              <Text style={{ flexShrink: 1 }} fontSize={16} numberOfLines={2} ellipsizeMode="tail">
+              <Text
+                style={{ flexShrink: 1, alignSelf: "flex-start" }}
+                fontSize={16}
+                numberOfLines={2}
+                ellipsizeMode="tail"
+              >
                 {exerciseId.name}
               </Text>
               <View style={[layout.flexRow]}>
