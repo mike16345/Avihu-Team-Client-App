@@ -17,7 +17,7 @@ import queryClient from "@/QueryClient/queryClient";
 import { WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 
 const MyWorkoutPlanScreen = () => {
-  const { colors, layout, spacing } = useStyles();
+  const { colors, layout, spacing, common } = useStyles();
   const { refresh } = usePullDownToRefresh();
 
   const { data, isError, isLoading, refetch, isRefetching } = useWorkoutPlanQuery();
@@ -65,6 +65,7 @@ const MyWorkoutPlanScreen = () => {
         <DropDownContextProvider items={plans} onSelect={handleSelect}>
           <ScrollView
             nestedScrollEnabled
+            style={common.roundedMd}
             contentContainerStyle={[spacing.gapSm]}
             refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
           >
