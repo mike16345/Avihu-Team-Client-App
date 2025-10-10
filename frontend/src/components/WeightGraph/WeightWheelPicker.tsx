@@ -65,7 +65,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
 
     for (let decimal = 0; decimal < decimalRange; decimal += decimalStepSize) {
       options.push({
-        value: decimal < 10 && showZeroDecimal ? `0${decimal}.` : `${decimal}.`,
+        value: decimal < 10 && showZeroDecimal ? `.0${decimal}` : `.${decimal}`,
         label: `.${decimal < 10 && showZeroDecimal ? `0${decimal}` : `${decimal}`}`,
       });
     }
