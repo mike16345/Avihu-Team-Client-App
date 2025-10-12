@@ -1,10 +1,9 @@
 import Badge from "@/components/ui/Badge";
 import TipsModal from "@/components/ui/modals/TipsModal";
 import { Text } from "@/components/ui/Text";
-import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
+import useGetLastRecordedSet from "@/hooks/queries/RecordedSets/useLastRecordedSetQuery";
 import { IRecordedSetRes } from "@/interfaces/Workout";
-import DateUtils from "@/utils/dateUtils";
-import { FC, useEffect, useMemo, useState } from "react";
+import { FC, useEffect, useState } from "react";
 
 interface PreviousSetCardProps {
   exercise: string;
@@ -14,56 +13,9 @@ export const toLine = (s: IRecordedSetRes) =>
   `סט ${s.setNumber} | משקל ${s.weight} | חזרות ${s.repsDone}`;
 
 const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
-  const { data } = useRecordedSetsQuery();
+  const { details, lastRecordedSets, date } = useGetLastRecordedSet(exercise);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const { details, lastRecordedSets, date } = useMemo(() => {
-    if (!data || !data.length) return { details: "", lastRecordedSets: [], date: null };
-
-    const isSameDay = (a: Date, b: Date) =>
-      a.getFullYear() === b.getFullYear() &&
-      a.getMonth() === b.getMonth() &&
-      a.getDate() === b.getDate();
-
-    let latestSet: IRecordedSetRes | undefined;
-
-    data.forEach((item) => {
-      const sets = item?.recordedSets?.[exercise];
-      if (!Array.isArray(sets)) return;
-
-      sets.forEach((s) => {
-        const d = new Date(s.date!);
-        if (!latestSet || (latestSet.date && d > new Date(latestSet.date))) {
-          latestSet = s;
-        }
-      });
-    });
-
-    if (!latestSet?.date) return { details: "", lastRecordedSets: [], date: null };
-
-    const latestDay = new Date(latestSet.date);
-    const sameDaySets: IRecordedSetRes[] = [];
-
-    data.forEach((item) => {
-      const sets = item?.recordedSets?.[exercise];
-      if (!Array.isArray(sets)) return;
-
-      sets.forEach((s) => {
-        if (isSameDay(new Date(s.date!), latestDay)) {
-          sameDaySets.push(s);
-        }
-      });
-    });
-
-    sameDaySets.sort((a, b) => (a?.setNumber ?? 0) - (b?.setNumber ?? 0));
-
-    const details = toLine(sameDaySets[sameDaySets.length - 1]);
-    const lastRecordedSets = sameDaySets.map(toLine);
-    const date = DateUtils.formatDate(latestDay, "DD.MM.YY");
-
-    return { details, lastRecordedSets, date };
-  }, [data, exercise]);
 
   useEffect(() => {
     return () => setIsModalVisible(false);

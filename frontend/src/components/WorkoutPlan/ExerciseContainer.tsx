@@ -81,7 +81,7 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({ exercise, muscleG
               </Text>
               <View style={[layout.flexRow]}>
                 <Text fontVariant="semibold">
-                  {setNumber}/{exercise.sets.length}
+                  {setNumber - 1}/{exercise.sets.length}
                 </Text>
               </View>
             </View>

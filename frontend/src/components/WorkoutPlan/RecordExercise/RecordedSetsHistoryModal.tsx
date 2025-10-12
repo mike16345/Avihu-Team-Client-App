@@ -90,6 +90,7 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
                 <ScrollView
                   style={{ maxHeight: 200 }}
                   contentContainerStyle={[layout.center, spacing.gapDefault]}
+                  showsVerticalScrollIndicator={false}
                 >
                   {sets.map((set, index) => (
                     <View
@@ -98,7 +99,7 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
                         layout.flexRow,
                         layout.itemsCenter,
                         layout.justifyBetween,
-                        { width: Dimensions.get("screen").width * 0.51 },
+                        { width: Dimensions.get("screen").width * 0.6 },
                       ]}
                     >
                       <Text fontSize={16}>{toLine(set)}</Text>

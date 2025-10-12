@@ -42,6 +42,11 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
     },
   ]);
 
+  const handleCloseModal = () => {
+    setIsExpanded(false);
+    setRecordedSets((prev) => prev.slice(0, 1));
+  };
+
   const handleSubmitSets = async () => {
     setIsPending(true);
     const nextSet = await handleConfirmRecordSets();
@@ -59,11 +64,6 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   const handleConfirmRecordSets = useCallback(async () => {
     return await handleRecordSets(recordedSets);
   }, [recordedSets, handleRecordSets]);
-
-  const handleCloseModal = () => {
-    setIsExpanded(false);
-    setRecordedSets((prev) => prev.slice(0, 1));
-  };
 
   return (
     <>
@@ -104,7 +104,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
           >
             {isExpanded && <PreviousSetCard exercise={exercise} />}
             <PrimaryButton
-              disabled={setNumber >= maxSets}
+              disabled={recordedSets[recordedSets.length - 1].setNumber > maxSets}
               loading={isPending}
               onPress={() => handleSubmitSets()}
               block

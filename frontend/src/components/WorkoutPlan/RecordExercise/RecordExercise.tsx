@@ -133,7 +133,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
         <SetInputContainer
           sheetHeight={sheetHeight}
           handleRecordSets={handleRecordSets}
-          maxSets={exercise?.sets?.length! - currentSet}
+          maxSets={exercise?.sets?.length!}
           setNumber={currentSet}
           exercise={exercise.exerciseId.name}
         />
