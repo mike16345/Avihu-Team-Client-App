@@ -21,8 +21,11 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 
   const flatListRef = useRef<FlatList<typeof data>>(null);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
+  const isProgrammatic = useRef<boolean>(false);
 
   const handleScroll = (event: any) => {
+    if (isProgrammatic.current) return; // ✅ Skip haptics & logic
+
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
 
@@ -47,6 +50,10 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   };
 
   const handleScrollEnd = (event: any) => {
+    if (isProgrammatic.current) {
+      isProgrammatic.current = false; // ✅ Re-enable after programmatic scroll ends
+      return;
+    }
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
     if (index == selectedIndex) return;
@@ -65,6 +72,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 
   useEffect(() => {
     const timeout = setTimeout(() => {
+      isProgrammatic.current = true;
       const isDecimal = selectedValue.toString().includes(`.`);
       let value = selectedValue;
 
@@ -75,8 +83,8 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
       const selectedIndex = data.findIndex((item) => String(item.value) == String(value));
       if (selectedIndex == -1) return;
 
-      flatListRef.current?.scrollToIndex({ index: selectedIndex });
-    }, 100);
+      flatListRef.current?.scrollToIndex({ index: selectedIndex, animated: true });
+    }, 250);
 
     return () => {
       clearTimeout(timeout);
