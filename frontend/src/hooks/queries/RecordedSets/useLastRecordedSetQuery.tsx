@@ -6,7 +6,7 @@ import DateUtils from "@/utils/dateUtils";
 
 type LastRecorded = {
   details: string;
-  lastRecordedSets: string[];
+  lastRecordedSets: IRecordedSetRes[];
   date: string | null;
 };
 
@@ -26,7 +26,6 @@ function computeForExercise(
 
   let latestSet: IRecordedSetRes | undefined;
 
-  // find latest set (by date) for this exercise across all docs
   for (const item of data) {
     const sets = item?.recordedSets?.[exercise];
     if (!Array.isArray(sets)) continue;
@@ -34,6 +33,7 @@ function computeForExercise(
     for (const s of sets) {
       if (!s?.date) continue;
       const d = new Date(s.date);
+
       if (!latestSet || (latestSet.date && d > new Date(latestSet.date))) {
         latestSet = s;
       }
@@ -60,17 +60,15 @@ function computeForExercise(
   sameDaySets.sort((a, b) => (a?.setNumber ?? 0) - (b?.setNumber ?? 0));
 
   const details = sameDaySets.length ? toLine(sameDaySets[sameDaySets.length - 1]) : "";
-  const lastRecordedSets = sameDaySets.map(toLine);
   const date = DateUtils.formatDate(latestDay, "DD.MM.YY");
 
-  return { details, lastRecordedSets, date };
+  return { details, lastRecordedSets: sameDaySets, date };
 }
 
 const useGetLastRecordedSet = (exercise: string) => {
   const { data } = useRecordedSetsQuery();
 
   return useMemo<LastRecorded>(() => {
-    console.log("running use memo");
     if (!data) return { details: "", lastRecordedSets: [], date: null };
 
     const ref = data as unknown as object;

@@ -9,6 +9,7 @@ import { IRecordedSet } from "@/interfaces/Workout";
 import SetInputList from "./SetInputList";
 import { DEFAULT_SET } from "@/constants/Constants";
 import PreviousSetCard from "./PreviousSetCard";
+import useGetLastRecordedSet from "@/hooks/queries/RecordedSets/useLastRecordedSetQuery";
 
 const HORIZONTAL_PADDING = 24;
 const VERTICAL_PADDING = 16;
@@ -30,6 +31,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   sheetHeight,
   exercise,
 }) => {
+  const lastRecordedSets = useGetLastRecordedSet(exercise).lastRecordedSets;
   const { layout, colors, spacing, common } = useStyles();
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -37,7 +39,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   const [isPending, setIsPending] = useState(false);
   const [recordedSets, setRecordedSets] = useState<SetInput[]>([
     {
-      ...DEFAULT_SET,
+      ...lastRecordedSets[lastRecordedSets.length - 1],
       setNumber,
     },
   ]);
