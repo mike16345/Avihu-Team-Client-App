@@ -73,11 +73,11 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   useEffect(() => {
     const timeout = setTimeout(() => {
       isProgrammatic.current = true;
-      const isDecimal = selectedValue.toString().includes(`.`);
+      const isDecimal = selectedValue?.toString().includes(`.`);
       let value = selectedValue;
 
       if (isDecimal) {
-        value = selectedValue.toString().slice(1, selectedValue.length);
+        value = selectedValue?.toString().slice(1, selectedValue.length);
       }
 
       const selectedIndex = data.findIndex((item) => String(item.value) == String(value));
@@ -112,7 +112,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
             index,
           })}
           data={data}
-          keyExtractor={(_, index) => index.toString()}
+          keyExtractor={(_, index) => index?.toString()}
           renderItem={({ item, index }) => (
             <View
               style={[
