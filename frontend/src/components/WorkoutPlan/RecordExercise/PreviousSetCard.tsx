@@ -13,7 +13,7 @@ export const toLine = (s: IRecordedSetRes) =>
   `סט ${s.setNumber} | משקל ${s.weight} | חזרות ${s.repsDone}`;
 
 const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
-  const { details, lastRecordedSets, date } = useGetLastRecordedSet(exercise);
+  const { formattedSets, date } = useGetLastRecordedSet(exercise);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -21,11 +21,11 @@ const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
     return () => setIsModalVisible(false);
   }, []);
 
-  return details ? (
+  return formattedSets ? (
     <>
       <Badge onPress={() => setIsModalVisible(true)} showButton showDot>
         <Text fontSize={12} fontVariant="semibold">
-          עדכון אחרון | {details}
+          עדכון אחרון | {formattedSets[formattedSets.length - 1]}
         </Text>
       </Badge>
       <TipsModal
@@ -36,7 +36,7 @@ const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
             עדכון אחרון {date}
           </Text>
         }
-        tips={lastRecordedSets}
+        tips={formattedSets}
       />
     </>
   ) : null;

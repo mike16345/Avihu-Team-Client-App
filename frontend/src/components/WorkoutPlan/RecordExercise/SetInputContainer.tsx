@@ -5,11 +5,11 @@ import Icon from "@/components/Icon/Icon";
 import { FC, useCallback, useState } from "react";
 import BottomSheetModal from "@/components/ui/modals/BottomSheetModal";
 import Animated, { Easing, LinearTransition } from "react-native-reanimated";
-import { IRecordedSet } from "@/interfaces/Workout";
+import { IExercise, IRecordedSet } from "@/interfaces/Workout";
 import SetInputList from "./SetInputList";
-import { DEFAULT_SET } from "@/constants/Constants";
 import PreviousSetCard from "./PreviousSetCard";
 import useGetLastRecordedSet from "@/hooks/queries/RecordedSets/useLastRecordedSetQuery";
+import { isIndexOutOfBounds } from "@/utils/utils";
 
 const HORIZONTAL_PADDING = 24;
 const VERTICAL_PADDING = 16;
@@ -18,7 +18,7 @@ interface SetInputContainerProps {
   sheetHeight: number;
   setNumber: number;
   maxSets: number;
-  exercise: string;
+  exercise: IExercise;
   handleRecordSets: (sets: SetInput[]) => Promise<number>;
 }
 
@@ -31,7 +31,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   sheetHeight,
   exercise,
 }) => {
-  const lastRecordedSets = useGetLastRecordedSet(exercise).lastRecordedSets;
+  const lastRecordedSets = useGetLastRecordedSet(exercise.exerciseId.name).lastRecordedSets;
   const { layout, colors, spacing, common } = useStyles();
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -54,13 +54,18 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
     const nextSet = await handleConfirmRecordSets();
 
     setIsPending(false);
-    handleResetSets(nextSet);
+    handleResetSets(nextSet, recordedSets[recordedSets.length - 1]?.weight || 0);
   };
 
-  const handleResetSets = useCallback((nextSet: number) => {
+  const handleResetSets = useCallback((nextSet: number, prevWeight: number) => {
     if (!nextSet) return;
 
-    setRecordedSets([{ ...DEFAULT_SET, setNumber: nextSet }]);
+    const isOutOfBounds = isIndexOutOfBounds(exercise.sets, nextSet);
+    const reps = isOutOfBounds
+      ? exercise.sets[exercise.sets.length - 1].minReps
+      : exercise.sets[nextSet].minReps;
+
+    setRecordedSets([{ repsDone: reps, weight: prevWeight, setNumber: nextSet }]);
   }, []);
 
   const handleConfirmRecordSets = useCallback(async () => {
@@ -104,7 +109,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
             style={[spacing.gapDefault]}
             layout={LinearTransition.duration(250).easing(Easing.inOut(Easing.ease))}
           >
-            {isExpanded && <PreviousSetCard exercise={exercise} />}
+            {isExpanded && <PreviousSetCard exercise={exercise.exerciseId.name} />}
             <PrimaryButton
               disabled={recordedSets[recordedSets.length - 1].setNumber > maxSets}
               loading={isPending}

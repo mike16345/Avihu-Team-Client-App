@@ -278,7 +278,7 @@ export function extractValuesFromArray<T, K extends keyof T>(array: T[], key: K)
 
 export function extractValuesFromObject<
   T extends Record<string, any>,
-  K extends keyof T[keyof T] = never,
+  K extends keyof T[keyof T] = never
 >(obj: T, innerKey?: K): (K extends never ? string : T[keyof T][K])[] {
   const keys = Object.keys(obj);
 
@@ -299,4 +299,10 @@ export function reverseString(str: string) {
   const reversedStr = reversedArray.join("");
 
   return reversedStr;
+}
+
+export function isIndexOutOfBounds(arr: any[], index: number) {
+  if (!Array.isArray(arr)) return true;
+
+  return index < 0 || index >= arr.length;
 }

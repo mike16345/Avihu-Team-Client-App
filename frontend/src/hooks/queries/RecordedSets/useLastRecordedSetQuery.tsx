@@ -5,7 +5,7 @@ import { IRecordedSetRes } from "@/interfaces/Workout";
 import DateUtils from "@/utils/dateUtils";
 
 type LastRecorded = {
-  details: string;
+  formattedSets: string[];
   lastRecordedSets: IRecordedSetRes[];
   date: string | null;
 };
@@ -22,7 +22,7 @@ function computeForExercise(
   exercise: string,
   toLine: (s: IRecordedSetRes) => string
 ): LastRecorded {
-  if (!data?.length) return { details: "", lastRecordedSets: [], date: null };
+  if (!data?.length) return { formattedSets: [], lastRecordedSets: [], date: null };
 
   let latestSet: IRecordedSetRes | undefined;
 
@@ -40,7 +40,7 @@ function computeForExercise(
     }
   }
 
-  if (!latestSet?.date) return { details: "", lastRecordedSets: [], date: null };
+  if (!latestSet?.date) return { formattedSets: [], lastRecordedSets: [], date: null };
 
   const latestDay = new Date(latestSet.date);
   const sameDaySets: IRecordedSetRes[] = [];
@@ -58,19 +58,18 @@ function computeForExercise(
   }
 
   sameDaySets.sort((a, b) => (a?.setNumber ?? 0) - (b?.setNumber ?? 0));
-  const formattedSameDaySets = sameDaySets.map((s) => toLine(s));
 
-  const details = sameDaySets.length ? formattedSameDaySets[formattedSameDaySets.length - 1] : "";
+  const formattedSets = sameDaySets.length ? sameDaySets.map((s) => toLine(s)) : [];
   const date = DateUtils.formatDate(latestDay, "DD.MM.YY");
 
-  return { details, lastRecordedSets: formattedSameDaySets, date };
+  return { formattedSets, lastRecordedSets: sameDaySets, date };
 }
 
 const useGetLastRecordedSet = (exercise: string) => {
   const { data } = useRecordedSetsQuery();
 
   return useMemo<LastRecorded>(() => {
-    if (!data) return { details: "", lastRecordedSets: [], date: null };
+    if (!data) return { formattedSets: [], lastRecordedSets: [], date: null };
 
     const ref = data as unknown as object;
     let perExercise = _lastRecordedCache.get(ref);
@@ -85,6 +84,7 @@ const useGetLastRecordedSet = (exercise: string) => {
 
     const computed = computeForExercise(data, exercise, toLine);
     perExercise.set(exercise, computed);
+
     return computed;
   }, [data, exercise]);
 };

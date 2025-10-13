@@ -135,7 +135,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
           handleRecordSets={handleRecordSets}
           maxSets={exercise?.sets?.length!}
           setNumber={currentSet}
-          exercise={exercise.exerciseId.name}
+          exercise={exercise}
         />
       </View>
     </View>

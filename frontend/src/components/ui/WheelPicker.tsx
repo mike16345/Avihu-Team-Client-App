@@ -1,6 +1,6 @@
 import { WheelPickerProps } from "@/types/wheelPickerTypes";
 import React, { useState, useRef, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
 import { Text } from "./Text";
 import { softHaptic } from "@/utils/haptics";
 import Animated from "react-native-reanimated";
@@ -50,10 +50,8 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   };
 
   const handleScrollEnd = (event: any) => {
-    if (isProgrammatic.current) {
-      isProgrammatic.current = false; // ✅ Re-enable after programmatic scroll ends
-      return;
-    }
+    if (isProgrammatic.current) isProgrammatic.current = false; // ✅ Re-enable after programmatic scroll ends
+
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
     if (index == selectedIndex) return;
@@ -71,8 +69,8 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   };
 
   useEffect(() => {
+    isProgrammatic.current = true;
     const timeout = setTimeout(() => {
-      isProgrammatic.current = true;
       const isDecimal = selectedValue?.toString().includes(`.`);
       let value = selectedValue;
 
@@ -88,6 +86,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 
     return () => {
       clearTimeout(timeout);
+      isProgrammatic.current = false;
     };
   }, []);
 
@@ -130,7 +129,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
                   index === selectedIndex
                     ? { color: activeItemColor }
                     : { color: inactiveItemColor },
-                  { direction: "ltr" },
+                  { direction: Platform.OS == "android" ? "ltr" : "rtl" },
                 ]}
               >
                 {item.value}

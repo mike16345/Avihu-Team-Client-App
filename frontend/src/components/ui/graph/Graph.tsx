@@ -120,6 +120,7 @@ const Graph: React.FC<GraphProps> = ({
           font: font,
           labelColor: labelColor,
           lineWidth: 0,
+          tickCount: data[0]?.label?.length > 12 ? 2 : undefined,
           formatXLabel(label) {
             return padXLabel(label);
           },
