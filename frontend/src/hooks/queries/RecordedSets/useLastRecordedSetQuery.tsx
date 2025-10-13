@@ -58,11 +58,12 @@ function computeForExercise(
   }
 
   sameDaySets.sort((a, b) => (a?.setNumber ?? 0) - (b?.setNumber ?? 0));
+  const formattedSameDaySets = sameDaySets.map((s) => toLine(s));
 
-  const details = sameDaySets.length ? toLine(sameDaySets[sameDaySets.length - 1]) : "";
+  const details = sameDaySets.length ? formattedSameDaySets[formattedSameDaySets.length - 1] : "";
   const date = DateUtils.formatDate(latestDay, "DD.MM.YY");
 
-  return { details, lastRecordedSets: sameDaySets, date };
+  return { details, lastRecordedSets: formattedSameDaySets, date };
 }
 
 const useGetLastRecordedSet = (exercise: string) => {
