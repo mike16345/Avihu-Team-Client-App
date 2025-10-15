@@ -1,4 +1,5 @@
 // hooks/useNotification.ts
+import { NotificationBodies, NotificationIdentifiers } from "@/constants/notifications";
 import { useNotificationStore } from "@/store/notificationStore";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
@@ -8,7 +9,6 @@ const { addNotification } = useNotificationStore();
 type TriggerAt = number | Date | null | undefined;
 
 const DEFAULT_CHANNEL_ID = "default";
-const DAILY_REMINDER_ID = "daily-8am-reminder";
 
 /** Create (or update) the default Android notification channel */
 async function ensureAndroidChannel() {
@@ -104,10 +104,10 @@ export const useNotification = () => {
     }
 
     await Notifications.scheduleNotificationAsync({
-      identifier: DAILY_REMINDER_ID,
+      identifier: NotificationIdentifiers.DAILY_WEIGH_IN_REMINDER_ID,
       content: {
         title: "Avihu Team",
-        body: "לא לשכוח לשלוח את השקילה היומית שלכם!",
+        body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
       },
       trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
     });
@@ -139,7 +139,9 @@ export const useNotification = () => {
       }
 
       const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-      const alreadyScheduled = scheduled.some((n) => n.identifier === DAILY_REMINDER_ID);
+      const alreadyScheduled = scheduled.some(
+        (n) => n.identifier === NotificationIdentifiers.DAILY_WEIGH_IN_REMINDER_ID
+      );
 
       if (!alreadyScheduled) {
         await scheduleDailyReminder();
