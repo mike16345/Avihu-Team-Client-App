@@ -134,12 +134,21 @@ export const useNotification = () => {
       }
 
       const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-      const alreadyScheduledWeightIn = scheduled.some(
-        (n) => n.identifier === NotificationIdentifiers.DAILY_WEIGH_IN_REMINDER_ID
-      );
-      const alreadyScheduledMeasurement = scheduled.some(
-        (n) => n.identifier === NotificationIdentifiers.WEEKLY_MEASUERMENT_REMINDER_ID
-      );
+
+      let alreadyScheduledWeightIn = false;
+      let alreadyScheduledMeasurement = false;
+
+      for (const n of scheduled) {
+        if (n.identifier === NotificationIdentifiers.DAILY_WEIGH_IN_REMINDER_ID) {
+          alreadyScheduledWeightIn = true;
+        }
+        if (n.identifier === NotificationIdentifiers.WEEKLY_MEASUERMENT_REMINDER_ID) {
+          alreadyScheduledMeasurement = true;
+        }
+
+        // Early exit if both are already scheduled
+        if (alreadyScheduledWeightIn && alreadyScheduledMeasurement) break;
+      }
 
       if (!alreadyScheduledMeasurement) {
         await scheduleWeeklyMeasurementReminder();
