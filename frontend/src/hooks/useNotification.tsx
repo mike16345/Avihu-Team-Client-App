@@ -5,8 +5,6 @@ import { getNextEightAM, getNextEightAMOnSunday, toTrigger } from "@/utils/notif
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
-const { addNotification } = useNotificationStore();
-
 export type TriggerAt = number | Date | null | undefined;
 
 const DEFAULT_CHANNEL_ID = "default";
@@ -175,7 +173,7 @@ export const useNotification = () => {
       return Notifications.addNotificationReceivedListener((n) => {
         const { title, body, data } = n.request.content;
 
-        addNotification({
+        useNotificationStore.getState().addNotification({
           id: n.request.identifier,
           title,
           body,

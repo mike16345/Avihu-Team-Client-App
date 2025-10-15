@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useUserStore } from "@/store/userStore";
-import useNotification from "@/hooks/useNotfication";
+import useNotification from "@/hooks/useNotification";
 import { NO_ACCESS, SESSION_EXPIRED } from "@/constants/Constants";
 import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 import useLogout from "@/hooks/useLogout";

@@ -1,4 +1,4 @@
-import { TriggerAt } from "@/hooks/useNotfication";
+import { TriggerAt } from "@/hooks/useNotification";
 import * as Notifications from "expo-notifications";
 
 export function toTrigger(

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import useNotification from "@/hooks/useNotfication";
+import useNotification from "@/hooks/useNotification";
 import { heavyHaptic, lightHaptic, mediumHaptic, warningNotificationHaptic } from "@/utils/haptics";
 
 interface ITimerStore {
@@ -36,15 +36,15 @@ export const useTimerStore = create<ITimerStore>((set, get) => ({
       const remaining = Math.max(state.initialCountdown! - elapsedSeconds, 0);
 
       if (remaining >= 8 && remaining <= 10) {
-        lightHaptic()
+        lightHaptic();
       } else if (remaining >= 5 && remaining <= 7) {
-        mediumHaptic()
+        mediumHaptic();
       } else if (remaining >= 1 && remaining <= 4) {
-        heavyHaptic()
+        heavyHaptic();
       }
 
       if (remaining === 0) {
-        warningNotificationHaptic()
+        warningNotificationHaptic();
 
         clearInterval(state.intervalId!);
 
@@ -77,10 +77,9 @@ export const useTimerStore = create<ITimerStore>((set, get) => ({
     const { stopCountdown, startCountdown } = get();
 
     stopCountdown();
-    
+
     if (seconds !== null) {
       startCountdown(seconds);
     }
-  
   },
 }));
