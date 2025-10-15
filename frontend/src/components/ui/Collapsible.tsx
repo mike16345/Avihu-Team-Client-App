@@ -125,8 +125,11 @@ const Collapsible: React.FC<CollapsibleProps> = ({
       </ConditionalRender>
 
       <Card.Content>
-        <ConditionalRender condition={!measured}>
+        <ConditionalRender condition={!isCollapsed}>
           <View
+            collapsable={false}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
             onLayout={getContentHeight}
             style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
           >

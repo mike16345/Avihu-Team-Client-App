@@ -39,7 +39,10 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
     setIsCollapsed((isCollapsed) => !isCollapsed);
   };
 
-  const mealEatenIndicatorText = !isEaten ? "סיום ארוחה" : "ביטול סימון";
+  const mealEatenIndicatorText = useMemo(
+    () => (!isEaten ? "סיום ארוחה" : "ביטול סימון"),
+    [isEaten]
+  );
 
   const dietItems = useMemo(() => {
     return Object.keys(meal).filter((key) => key !== "_id");

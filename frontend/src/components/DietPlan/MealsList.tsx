@@ -15,7 +15,7 @@ const MealsList: FC<MealsListProps> = () => {
   const meals = data?.meals || [];
 
   return (
-    <View style={[{ height: height * 0.5 }]}>
+    <View style={[{ height: height * 0.55 }]}>
       <ScrollView style={{ flexGrow: 1 }} contentContainerStyle={[{ flexGrow: 1 }, spacing.gap20]}>
         <ConditionalRender condition={isLoading}>
           <View style={[layout.center]}>
