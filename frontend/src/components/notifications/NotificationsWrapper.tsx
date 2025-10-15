@@ -1,9 +1,16 @@
-import { TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useState } from "react";
 import Icon from "../Icon/Icon";
 import NotificationModal from "./NotificationModal";
+import { useNotificationStore } from "@/store/notificationStore";
+import { ConditionalRender } from "../ui/ConditionalRender";
+import { Text } from "../ui/Text";
+import useStyles from "@/styles/useGlobalStyles";
 
 const NotificationsWrapper = () => {
+  const { notifications } = useNotificationStore();
+  const { layout, common } = useStyles();
+
   const [openNavigationModal, setOpenNavigationModal] = useState(false);
 
   return (
@@ -14,10 +21,11 @@ const NotificationsWrapper = () => {
       >
         <Icon name="bell" height={30} width={30} />
 
-        {/*   <View style={[layout.center, common.roundedFull, styles.notificationBadge]}>
-               <Text fontVariant="bold">2</Text>
-             </View> */}
-        {/* Uncomment when logic for notifications is built */}
+        <ConditionalRender condition={!!notifications.length}>
+          <View style={[layout.center, common.roundedFull, styles.notificationBadge]}>
+            <Text fontVariant="bold">{notifications.length}</Text>
+          </View>
+        </ConditionalRender>
       </TouchableOpacity>
 
       <NotificationModal
@@ -29,14 +37,13 @@ const NotificationsWrapper = () => {
   );
 };
 
-/* const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   notificationBadge: {
     backgroundColor: "#95FDA8",
     position: "absolute",
     paddingHorizontal: 5,
     top: -5,
   },
-}); */
-/* Uncomment when logic for notifications is built */
+});
 
 export default NotificationsWrapper;
