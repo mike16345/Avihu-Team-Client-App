@@ -1,5 +1,5 @@
 import { WheelPickerProps } from "@/types/wheelPickerTypes";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { View, StyleSheet, Platform } from "react-native";
 import { Text } from "./Text";
 import { softHaptic } from "@/utils/haptics";
@@ -21,11 +21,8 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 
   const flatListRef = useRef<FlatList<typeof data>>(null);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
-  const isProgrammatic = useRef<boolean>(false);
 
   const handleScroll = (event: any) => {
-    if (isProgrammatic.current) return; // ✅ Skip haptics & logic
-
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
 
@@ -50,12 +47,10 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   };
 
   const handleScrollEnd = (event: any) => {
-    if (isProgrammatic.current) isProgrammatic.current = false; // ✅ Re-enable after programmatic scroll ends
-
     const { contentOffset } = event.nativeEvent;
     const index = returnIndex(contentOffset.y);
-    if (index == selectedIndex) return;
 
+    if (index == selectedIndex) return;
     onValueChange(data[index].value);
     setSelectedIndex(selectedIndex);
   };
@@ -67,28 +62,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
 
     return index;
   };
-
-  useEffect(() => {
-    isProgrammatic.current = true;
-    const timeout = setTimeout(() => {
-      const isDecimal = selectedValue?.toString().includes(`.`);
-      let value = selectedValue;
-
-      if (isDecimal) {
-        value = selectedValue?.toString().slice(1, selectedValue.length);
-      }
-
-      const selectedIndex = data.findIndex((item) => String(item.value) == String(value));
-      if (selectedIndex == -1) return;
-
-      flatListRef.current?.scrollToIndex({ index: selectedIndex, animated: true });
-    }, 250);
-
-    return () => {
-      clearTimeout(timeout);
-      isProgrammatic.current = false;
-    };
-  }, []);
 
   return (
     <View style={[styles.container, { height }]}>
@@ -103,6 +76,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
           updateCellsBatchingPeriod={16}
           onScroll={handleScroll}
           onMomentumScrollEnd={handleScrollEnd}
+          initialScrollIndex={selectedIndex}
           scrollEventThrottle={16}
           nestedScrollEnabled
           getItemLayout={(_, index) => ({

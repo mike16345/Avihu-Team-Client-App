@@ -21,7 +21,7 @@ const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
     return () => setIsModalVisible(false);
   }, []);
 
-  return formattedSets ? (
+  return formattedSets.length > 0 ? (
     <>
       <Badge onPress={() => setIsModalVisible(true)} showButton showDot>
         <Text fontSize={12} fontVariant="semibold">

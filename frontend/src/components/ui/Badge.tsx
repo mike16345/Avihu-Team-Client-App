@@ -82,7 +82,7 @@ const Badge: React.FC<Badgeprops> = ({
             { paddingVertical: 0.5 },
           ]}
         >
-          <Text fontVariant="semibold">{buttonLabel}</Text>
+          <Text>{buttonLabel}</Text>
           <Icon name={buttonIcon} height={12} width={15} />
         </View>
       </ConditionalRender>
