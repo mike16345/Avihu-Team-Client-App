@@ -7,10 +7,12 @@ import { IMuscleGroupWorkouts } from "@/interfaces/Workout";
 
 interface MuscleGroupContainerProps {
   muscleGroup: IMuscleGroupWorkouts;
+  plan: string;
 }
 
 const MuscleGroupContainer: React.FC<MuscleGroupContainerProps> = ({
   muscleGroup: { exercises, muscleGroup },
+  plan,
 }) => {
   const { colors, common, layout, spacing } = useStyles();
 
@@ -24,9 +26,10 @@ const MuscleGroupContainer: React.FC<MuscleGroupContainerProps> = ({
 
       {exercises.map((exercise, i) => (
         <ExerciseContainer
-          key={exercise._id}
+          key={exercise._id || i}
           exercise={exercise}
-          exerciseCounter={`${i + 1}/${exercises.length}`}
+          plan={plan}
+          muscleGroup={muscleGroup}
         />
       ))}
     </View>

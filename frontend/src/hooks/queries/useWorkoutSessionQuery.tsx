@@ -1,35 +1,39 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSessionsApi } from "../api/useSessionsApi";
-import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { ONE_HOUR, WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
+import { ISession } from "@/interfaces/ISession";
+import useSession from "../sessions/useSession";
 
 const useWorkoutSessionQuery = () => {
   const { getSession } = useSessionsApi();
-  const { getItem, removeItem } = useAsyncStorage(WORKOUT_SESSION_KEY);
+  const { session, setLocal, removeLocal } = useSession<ISession>(WORKOUT_SESSION_KEY);
 
   const loadWorkoutSession = async () => {
-    const session = await getItem();
-    if (!session) return;
+    if (!session) return null;
 
     try {
-      const sessionJSON = JSON.parse(session);
-      const sessionId = sessionJSON?._id || "";
-      const currentWorkoutSession = await getSession(sessionId);
+      const currentWorkoutSession = await getSession(session._id);
 
-      if (!currentWorkoutSession) removeItem();
+      if (currentWorkoutSession) {
+        setLocal(currentWorkoutSession.data);
+      }
 
       return currentWorkoutSession;
-    } catch (e) {
-      removeItem();
-      return null;
+    } catch (e: any) {
+      console.log("e", e);
+      if (e?.response?.status == 404) {
+        console.log("removing session");
+        removeLocal();
+      }
+      return {};
     }
   };
 
   return useQuery({
     queryKey: [WORKOUT_SESSION_KEY],
     queryFn: loadWorkoutSession,
-    enabled: true,
-    staleTime: ONE_HOUR,
+    enabled: !!session,
+    staleTime: ONE_HOUR * 1.5,
   });
 };
 

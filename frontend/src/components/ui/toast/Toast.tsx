@@ -5,12 +5,18 @@ import { IToast } from "@/interfaces/toast";
 import useStyles from "@/styles/useGlobalStyles";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
+interface ToastProps {
+  toast: IToast;
+  externalTranslateY?: Animated.Value;
+  onDismissToast: () => void;
+}
 
-const Toast: React.FC<{ toast: IToast; externalTranslateY?: Animated.Value }> = ({
+const Toast: React.FC<ToastProps> = ({
   toast: { message, title, type, duration },
   externalTranslateY,
+  onDismissToast,
 }) => {
-  const { colors, common, layout, spacing, text } = useStyles();
+  const { colors, common, layout, spacing } = useStyles();
 
   const stylesByType = {
     success: {
@@ -44,7 +50,7 @@ const Toast: React.FC<{ toast: IToast; externalTranslateY?: Animated.Value }> = 
 
       onPanResponderRelease: (_, gestureState) => {
         if (gestureState.dy > 20) {
-          // Dismiss if dragged down far enough
+          onDismissToast();
           Animated.timing(pan, {
             toValue: SCREEN_HEIGHT,
             duration: 300,
@@ -105,10 +111,14 @@ const Toast: React.FC<{ toast: IToast; externalTranslateY?: Animated.Value }> = 
       ]}
     >
       <View style={[common.roundedFull, spacing.pdHorizontalSm, layout.center, titleContainer]}>
-        <Text style={[colors.textOnPrimary, text.textBold]}>{title}</Text>
+        <Text fontSize={12} fontVariant="bold" style={[colors.textOnPrimary]}>
+          {title}
+        </Text>
       </View>
 
-      <Text style={messageStyle}>{message}</Text>
+      <Text fontSize={12} style={messageStyle}>
+        {message}
+      </Text>
     </Animated.View>
   );
 };

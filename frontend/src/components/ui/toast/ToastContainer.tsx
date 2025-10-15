@@ -10,8 +10,10 @@ interface ToastContainerProps {
 }
 
 const ToastContainer: FC<ToastContainerProps> = ({ modalToasts }) => {
-  const toasts = useToastStore((state) => state.toasts);
   const { layout, spacing } = useStyles();
+
+  const toasts = useToastStore((state) => state.toasts);
+  const removeToast = useToastStore((state) => state.removeToast);
 
   const toastsToUse = modalToasts || toasts;
   if (!toastsToUse || toastsToUse.length == 0) return;
@@ -28,7 +30,7 @@ const ToastContainer: FC<ToastContainerProps> = ({ modalToasts }) => {
       ]}
     >
       {toastsToUse.slice(-3).map((toast) => (
-        <Toast key={toast.id} toast={toast} />
+        <Toast key={toast.id} toast={toast} onDismissToast={() => removeToast(toast.id || "")} />
       ))}
     </View>
   );

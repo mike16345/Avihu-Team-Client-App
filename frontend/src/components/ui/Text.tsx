@@ -8,7 +8,8 @@ type FontVariant =
   | "medium"
   | "semibold"
   | "bold"
-  | "extrabold";
+  | "extrabold"
+  | "brutalist";
 
 const FONT_MAP: Record<FontVariant, string> = {
   extraLight: "Assistant-ExtraLight",
@@ -18,6 +19,7 @@ const FONT_MAP: Record<FontVariant, string> = {
   semibold: "Assistant-SemiBold",
   bold: "Assistant-Bold",
   extrabold: "Assistant-ExtraBold",
+  brutalist: "Brutalist",
 };
 
 export interface TextProps extends RNTextProps {

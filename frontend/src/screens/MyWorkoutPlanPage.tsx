@@ -13,9 +13,11 @@ import { CARDIO_VALUE } from "@/constants/Constants";
 import CardioWrapper from "@/components/WorkoutPlan/cardio/CardioWrapper";
 import { DropDownContextProvider } from "@/context/useDropdown";
 import { mapToDropDownItems } from "@/utils/utils";
+import queryClient from "@/QueryClient/queryClient";
+import { WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 
 const MyWorkoutPlanScreen = () => {
-  const { colors, layout, spacing } = useStyles();
+  const { colors, layout, spacing, common } = useStyles();
   const { refresh } = usePullDownToRefresh();
 
   const { data, isError, isLoading, refetch, isRefetching } = useWorkoutPlanQuery();
@@ -23,15 +25,18 @@ const MyWorkoutPlanScreen = () => {
   const [selectedPlan, setSelectedPlan] = useState<IWorkoutPlan>();
   const [showCardio, setShowCardio] = useState(false);
 
+  const handleRefetch = async () => {
+    queryClient.invalidateQueries({ queryKey: [WORKOUT_SESSION_KEY] });
+    await refetch();
+  };
+
   const handleSelect = (val: any) => {
     if (val == CARDIO_VALUE) return setShowCardio(true);
-
     const selected = data?.workoutPlans.find((plan) => plan._id === val);
 
     setSelectedPlan(selected);
 
     if (!showCardio) return;
-
     setShowCardio(false);
   };
 
@@ -50,7 +55,7 @@ const MyWorkoutPlanScreen = () => {
   }, [data]);
 
   if (isError)
-    return <ErrorScreen refetchFunc={() => refresh(refetch)} isFetching={isRefetching} />;
+    return <ErrorScreen refetchFunc={() => refresh(handleRefetch)} isFetching={isRefetching} />;
 
   if (isLoading) return <WorkoutPlanSkeletonLoader />;
 
@@ -60,8 +65,9 @@ const MyWorkoutPlanScreen = () => {
         <DropDownContextProvider items={plans} onSelect={handleSelect}>
           <ScrollView
             nestedScrollEnabled
+            style={common.roundedMd}
             contentContainerStyle={[spacing.gapSm]}
-            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
           >
             <WorkoutPlanSelector
               selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
@@ -74,9 +80,6 @@ const MyWorkoutPlanScreen = () => {
       <ScrollView
         style={{ zIndex: 1, elevation: 1 }}
         contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg, { zIndex: 1 }]}
-        refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={() => refresh(refetch)} />
-        }
       >
         <ConditionalRender condition={showCardio}>
           <CardioWrapper cardioPlan={data?.cardio} />
@@ -84,7 +87,7 @@ const MyWorkoutPlanScreen = () => {
 
         <ConditionalRender condition={!showCardio}>
           {selectedPlan?.muscleGroups.map((muscleGroup, i) => (
-            <MuscleGroupContainer key={i} muscleGroup={muscleGroup} />
+            <MuscleGroupContainer key={i} muscleGroup={muscleGroup} plan={selectedPlan.planName} />
           ))}
         </ConditionalRender>
       </ScrollView>

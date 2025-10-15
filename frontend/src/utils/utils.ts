@@ -1,5 +1,6 @@
 import { AVG_CARB_CALORIES, AVG_PROTEIN_CALORIES } from "@/constants/Constants";
 import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
+import { ISession } from "@/interfaces/ISession";
 import Constants from "expo-constants";
 
 export const testEmail = (email: string) => {
@@ -46,10 +47,15 @@ export const getYouTubeThumbnail = (id: string) => {
   return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
 };
 
-export const generateWheelPickerData = (minRange: number, maxRange: number, stepSize = 1) => {
+export const generateWheelPickerData = (
+  minRange: number,
+  maxRange: number,
+  stepSize = 1,
+  showLabel = true
+) => {
   const data = [];
   for (var i = minRange; i <= maxRange; i += stepSize) {
-    data.push({ value: i, label: `${i}` });
+    data.push({ value: i, label: showLabel ? `${i}` : undefined });
   }
 
   return data;
@@ -250,8 +256,24 @@ export function padXLabel(label: string): string {
   return " ".repeat(spacesToAdd) + label;
 }
 
+export function getWheelPickerItemPadding(height: number, itemHeight: number) {
+  return (height - itemHeight) / 2;
+}
+
+export function getNextSetNumberFromSession(
+  session: ISession | null,
+  plan: string,
+  exerciseName: string
+) {
+  if (!session) return 1;
+  const planData = session.data?.[plan];
+  const exerciseData = planData?.[exerciseName];
+
+  return exerciseData?.setNumber || 1;
+}
+
 export function extractValuesFromArray<T, K extends keyof T>(array: T[], key: K): T[K][] {
-  return array.map((item) => item[key]);
+  return array.map((item) => item[key]).filter((i) => i !== undefined);
 }
 
 export function extractValuesFromObject<
@@ -265,4 +287,22 @@ export function extractValuesFromObject<
   }
 
   return keys.map((key) => obj[key][innerKey]) as any;
+}
+
+export function isEmptyObject(obj: Object) {
+  return Object.keys(obj).length == 0;
+}
+
+export function reverseString(str: string) {
+  const charArray = str.split("");
+  const reversedArray = charArray.reverse();
+  const reversedStr = reversedArray.join("");
+
+  return reversedStr;
+}
+
+export function isIndexOutOfBounds(arr: any[], index: number) {
+  if (!Array.isArray(arr)) return true;
+
+  return index < 0 || index >= arr.length;
 }

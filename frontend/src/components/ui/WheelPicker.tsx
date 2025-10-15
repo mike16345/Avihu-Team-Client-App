@@ -1,8 +1,10 @@
 import { WheelPickerProps } from "@/types/wheelPickerTypes";
-import React, { useState, useRef, useEffect } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { View, StyleSheet, Platform } from "react-native";
 import { Text } from "./Text";
 import { softHaptic } from "@/utils/haptics";
+import Animated from "react-native-reanimated";
+import { FlatList } from "react-native-reanimated/lib/typescript/Animated";
 
 const WheelPicker: React.FC<WheelPickerProps> = ({
   data,
@@ -17,13 +19,14 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     data.findIndex((item) => String(item.value) == String(selectedValue))
   );
 
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<FlatList<typeof data>>(null);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleScroll = (event: any) => {
-    const { contentOffset } = event.nativeEvent;
-    const index = returnIndex(contentOffset.y);
+    const index = returnIndex(event);
+
     if (index == selectedIndex) return;
+
     if (scrollTimeout.current) {
       clearTimeout(scrollTimeout.current);
     }
@@ -35,7 +38,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
       });
 
       softHaptic();
-    }, 2000); // Triggers after 2 seconds of no scroll
+    }, 500);
 
     softHaptic();
     setSelectedIndex(index);
@@ -43,75 +46,91 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   };
 
   const handleScrollEnd = (event: any) => {
-    const { contentOffset } = event.nativeEvent;
-    const index = returnIndex(contentOffset.y);
-    if (index == selectedIndex) return;
+    const index = returnIndex(event);
 
+    if (index == selectedIndex) return;
     onValueChange(data[index].value);
-    setSelectedIndex(selectedIndex);
+    setSelectedIndex(index);
   };
 
-  const returnIndex = (contentYOffset: any) => {
-    let index = Math.round(contentYOffset / itemHeight);
+  const returnIndex = (event: any) => {
+    const { contentOffset } = event.nativeEvent;
+    const offsetY = contentOffset.y;
+    let index = Math.round(offsetY / itemHeight);
 
     index = index >= data.length - 1 ? data.length - 1 : index < 0 ? 0 : index;
 
     return index;
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      const isDecimal = selectedValue.toString().includes(`.`);
-      let value = selectedValue;
-      if (isDecimal) {
-        value = selectedValue.toString().slice(1, selectedValue.length);
+  const clearTimeouts = useCallback((timeouts: (NodeJS.Timeout | null)[]) => {
+    for (const timeout of timeouts) {
+      if (timeout) {
+        clearTimeout(timeout);
       }
+    }
+  }, []);
 
-      const selectedIndex = data.findIndex((item) => String(item.value) == String(value));
-      if (selectedIndex == -1) return;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const index = data.findIndex((i) => i.value == selectedValue);
+      if (index === -1) return;
 
-      flatListRef.current?.scrollToIndex({ index: selectedIndex });
-    }, 100);
+      flatListRef.current?.scrollToIndex({
+        index,
+        animated: false,
+      });
+    }, 0);
+
+    return () => {
+      clearTimeouts([timer, scrollTimeout.current]);
+    };
   }, []);
 
   return (
     <View style={[styles.container, { height }]}>
       <View style={styles.row}>
-        <FlatList
+        <Animated.FlatList
+          style={{ direction: "rtl" }}
           ref={flatListRef}
+          windowSize={12}
+          maxToRenderPerBatch={28}
+          initialNumToRender={28}
+          removeClippedSubviews={false}
+          updateCellsBatchingPeriod={16}
+          onScroll={handleScroll}
+          onMomentumScrollEnd={handleScrollEnd}
+          scrollEventThrottle={16}
           getItemLayout={(_, index) => ({
             length: itemHeight,
             offset: itemHeight * index,
             index,
           })}
           data={data}
-          keyExtractor={(_, index) => index.toString()}
+          keyExtractor={(_, index) => index?.toString()}
           renderItem={({ item, index }) => (
             <View
               style={[
                 styles.item,
-                index === selectedIndex ? [styles.selectedItem] : null,
                 {
                   height: itemHeight,
                 },
               ]}
             >
               <Text
+                fontSize={24}
+                fontVariant="brutalist"
                 style={[
-                  styles.itemText,
                   index === selectedIndex
                     ? { color: activeItemColor }
                     : { color: inactiveItemColor },
+                  { direction: Platform.OS == "android" ? "ltr" : "rtl" },
                 ]}
               >
                 {item.value}
               </Text>
             </View>
           )}
-          onScroll={handleScroll}
-          onMomentumScrollEnd={handleScrollEnd}
-          scrollEventThrottle={16}
-          initialNumToRender={50}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: (height - itemHeight) / 2 }}
         />
@@ -131,22 +150,6 @@ const styles = StyleSheet.create({
   item: {
     alignItems: "center",
     justifyContent: "center",
-  },
-  selectedItem: {
-    // Add your selected item styles here
-  },
-  itemText: {
-    fontSize: 28,
-    fontFamily: "Brutalist",
-    paddingHorizontal: 5,
-  },
-  labelContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  labelText: {
-    fontSize: 18,
-    marginLeft: 8,
   },
 });
 

@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { stacks } from "./stacks/WorkoutPlanStacks";
+import RecordExercise from "@/components/WorkoutPlan/RecordExercise/RecordExercise";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,7 +20,12 @@ const WorkoutPlanStack = () => {
           component={stack.component}
         />
       ))}
+      <Stack.Screen
+        name="RecordExercise"
+        component={RecordExercise}
+      />
     </Stack.Navigator>
+
   );
 };
 
