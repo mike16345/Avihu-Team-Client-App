@@ -82,6 +82,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
 
   const handleValueChange = useCallback(
     (values: any[]) => {
+      console.log("values", values);
       const wholeValue = values[0];
       const decimalValue = showZeroDecimal ? Number(values[1]) : Number(values[1]) / 10;
 

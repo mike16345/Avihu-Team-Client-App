@@ -35,11 +35,7 @@ export const useTimerStore = create<ITimerStore>((set, get) => ({
       const elapsedSeconds = Math.floor((Date.now() - state.startTime!) / 1000);
       const remaining = Math.max(state.initialCountdown! - elapsedSeconds, 0);
 
-      if (remaining >= 8 && remaining <= 10) {
-        lightHaptic();
-      } else if (remaining >= 5 && remaining <= 7) {
-        mediumHaptic();
-      } else if (remaining >= 1 && remaining <= 4) {
+      if (remaining >= 1 && remaining <= 5) {
         heavyHaptic();
       }
 

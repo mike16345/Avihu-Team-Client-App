@@ -35,11 +35,13 @@ const ExerciseSetDetails: FC<ExerciseSetDetailsProps> = ({ sets, exerciseMethod 
     }
     // Case 2: all sets share same min–max range (e.g., 8–12)
     else if (allEqual(mins) && allEqual(maxs)) {
-      details = `${prefix}${countPart} ${mins[0]}–${maxs[0]} חזרות`;
+      const includeMax = maxs[0] !== 0;
+      const reps = includeMax ? `${mins[0]}–${maxs[0]}` : mins[0];
+      details = `${prefix}${countPart} ${reps} חזרות`;
     }
     // Case 3: different per-set (use minReps only, e.g., 8 | 10 | 12 | 14)
     else {
-      details = `${prefix} ${mins.join(" | ")}`;
+      details = `${prefix} ${mins.reverse().join(" | ")}`;
     }
 
     return details.replace(/\([^)]*[A-Za-z][^)]*\)/g, "").trim();

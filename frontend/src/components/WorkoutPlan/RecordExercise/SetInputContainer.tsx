@@ -10,6 +10,7 @@ import SetInputList from "./SetInputList";
 import PreviousSetCard from "./PreviousSetCard";
 import useGetLastRecordedSet from "@/hooks/queries/RecordedSets/useLastRecordedSetQuery";
 import { isIndexOutOfBounds } from "@/utils/utils";
+import { DEFAULT_SET } from "@/constants/Constants";
 
 const HORIZONTAL_PADDING = 24;
 const VERTICAL_PADDING = 16;
@@ -32,17 +33,21 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   exercise,
 }) => {
   const lastRecordedSets = useGetLastRecordedSet(exercise.exerciseId.name).lastRecordedSets;
+
   const { layout, colors, spacing, common } = useStyles();
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [containerHeight, setContainerHeight] = useState(0);
   const [isPending, setIsPending] = useState(false);
-  const [recordedSets, setRecordedSets] = useState<SetInput[]>([
-    {
-      ...lastRecordedSets[lastRecordedSets.length - 1],
-      setNumber,
-    },
-  ]);
+  const [recordedSets, setRecordedSets] = useState<SetInput[]>(() => {
+    const defaultSet = lastRecordedSets[lastRecordedSets.length - 1] ?? DEFAULT_SET;
+    return [
+      {
+        ...defaultSet,
+        setNumber,
+      },
+    ];
+  });
 
   const handleCloseModal = () => {
     setIsExpanded(false);

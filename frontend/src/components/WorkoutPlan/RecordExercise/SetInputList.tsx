@@ -37,7 +37,9 @@ const SetRow = memo(
     const inactiveColor = colors.textPrimary.color;
 
     const handleWeight = useCallback(
-      (val: number) => onUpdate("weight", val, index),
+      (val: number) => {
+        onUpdate("weight", val, index);
+      },
       [onUpdate, index]
     );
 
