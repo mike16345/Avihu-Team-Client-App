@@ -178,7 +178,7 @@ export const useNotification = () => {
           title,
           body,
           data,
-          createdAt: new Date().toISOString(),
+          type: body == NotificationBodies.DAILY_WEIGH_IN_REMINDER ? "weighIn" : "measurement",
         });
       });
     } catch (error) {

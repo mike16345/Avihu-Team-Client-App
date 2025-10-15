@@ -5,7 +5,12 @@ import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
 import Icon from "@/components/Icon/Icon";
 
-const ReminderContainer = () => {
+interface ReminderContainerProps {
+  type: "weighIn" | "measurement";
+  handleDismiss: () => void;
+}
+
+const ReminderContainer: React.FC<ReminderContainerProps> = ({ type, handleDismiss }) => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
 
   return (
@@ -14,7 +19,7 @@ const ReminderContainer = () => {
         <Icon name="info" height={20} width={20} />
         <View style={[layout.flex1, layout.itemsStart]}>
           <Text fontSize={16} fontVariant="semibold" style={{ paddingBottom: 4 }}>
-            מתזכרים אותך לעדכן היקפים
+            מתזכרים אותך לעדכן {type == "measurement" ? "היקפים" : "שקילה יומית"}
           </Text>
           <Text fontSize={14} fontVariant="regular" style={{ color: "grey" }}>
             כדי שנוכל להיות במעקב חשוב
@@ -29,7 +34,7 @@ const ReminderContainer = () => {
                 למעבר לחץ כאן
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleDismiss}>
               <Text fontSize={14} fontVariant="semibold" style={{ color: "grey" }}>
                 התעלם
               </Text>
@@ -37,7 +42,7 @@ const ReminderContainer = () => {
           </View>
         </View>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleDismiss}>
           <Icon name="closeSoft" height={20} width={20} />
         </TouchableOpacity>
       </Card.Content>

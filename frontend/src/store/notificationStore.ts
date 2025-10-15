@@ -6,7 +6,7 @@ export interface INotification {
   title: string | null;
   body: string | null;
   data: any;
-  createdAt: string | Date;
+  type: "weighIn" | "measurement";
 }
 
 interface INotificationStore {
