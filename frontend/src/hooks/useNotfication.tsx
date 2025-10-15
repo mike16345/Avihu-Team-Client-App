@@ -1,6 +1,9 @@
 // hooks/useNotification.ts
+import { useNotificationStore } from "@/store/notificationStore";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
+
+const { addNotification } = useNotificationStore();
 
 type TriggerAt = number | Date | null | undefined;
 
@@ -158,12 +161,31 @@ export const useNotification = () => {
     }
   };
 
+  const notificationReceivedListener = () => {
+    try {
+      return Notifications.addNotificationReceivedListener((n) => {
+        const { title, body, data } = n.request.content;
+
+        addNotification({
+          id: n.request.identifier,
+          title,
+          body,
+          data,
+          createdAt: new Date().toISOString(),
+        });
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return {
     requestPermissions,
     initializeNotifications,
     showNotification,
     cancelNotification,
     scheduleDailyReminder,
+    notificationReceivedListener,
   };
 };
 
