@@ -23,8 +23,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleScroll = (event: any) => {
-    const { contentOffset } = event.nativeEvent;
-    const index = returnIndex(contentOffset.y);
+    const index = returnIndex(event);
 
     if (index == selectedIndex) return;
 
@@ -47,16 +46,17 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   };
 
   const handleScrollEnd = (event: any) => {
-    const { contentOffset } = event.nativeEvent;
-    const index = returnIndex(contentOffset.y);
+    const index = returnIndex(event);
 
     if (index == selectedIndex) return;
     onValueChange(data[index].value);
-    setSelectedIndex(selectedIndex);
+    setSelectedIndex(index);
   };
 
-  const returnIndex = (contentYOffset: any) => {
-    let index = Math.round(contentYOffset / itemHeight);
+  const returnIndex = (event: any) => {
+    const { contentOffset } = event.nativeEvent;
+    const offsetY = contentOffset.y;
+    let index = Math.round(offsetY / itemHeight);
 
     index = index >= data.length - 1 ? data.length - 1 : index < 0 ? 0 : index;
 
@@ -78,7 +78,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
           onMomentumScrollEnd={handleScrollEnd}
           initialScrollIndex={selectedIndex}
           scrollEventThrottle={16}
-          nestedScrollEnabled
           getItemLayout={(_, index) => ({
             length: itemHeight,
             offset: itemHeight * index,
@@ -90,7 +89,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
             <View
               style={[
                 styles.item,
-                index === selectedIndex ? [styles.selectedItem] : null,
                 {
                   height: itemHeight,
                 },
@@ -129,21 +127,6 @@ const styles = StyleSheet.create({
   item: {
     alignItems: "center",
     justifyContent: "center",
-  },
-  selectedItem: {
-    // Add your selected item styles here
-  },
-  itemText: {
-    fontSize: 24,
-    fontFamily: "Brutalist",
-  },
-  labelContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  labelText: {
-    fontSize: 18,
-    marginLeft: 8,
   },
 });
 
