@@ -1,5 +1,5 @@
 import { WheelPickerProps } from "@/types/wheelPickerTypes";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { View, StyleSheet, Platform } from "react-native";
 import { Text } from "./Text";
 import { softHaptic } from "@/utils/haptics";
@@ -63,6 +63,30 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     return index;
   };
 
+  const clearTimeouts = useCallback((timeouts: (NodeJS.Timeout | null)[]) => {
+    for (const timeout of timeouts) {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const index = data.findIndex((i) => i.value == selectedValue);
+      if (index === -1) return;
+
+      flatListRef.current?.scrollToIndex({
+        index,
+        animated: false,
+      });
+    }, 0);
+
+    return () => {
+      clearTimeouts([timer, scrollTimeout.current]);
+    };
+  }, []);
+
   return (
     <View style={[styles.container, { height }]}>
       <View style={styles.row}>
@@ -76,7 +100,6 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
           updateCellsBatchingPeriod={16}
           onScroll={handleScroll}
           onMomentumScrollEnd={handleScrollEnd}
-          initialScrollIndex={selectedIndex}
           scrollEventThrottle={16}
           getItemLayout={(_, index) => ({
             length: itemHeight,
