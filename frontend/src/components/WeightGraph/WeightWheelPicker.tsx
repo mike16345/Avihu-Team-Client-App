@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useCallback, useMemo } from "react";
 import SectionWheelPicker from "../ui/SectionWheelPicker";
 import { WheelPickerProps, WheelPickerOption } from "@/types/wheelPickerTypes";
 import useStyles from "@/styles/useGlobalStyles";
@@ -19,6 +19,7 @@ interface WeightWheelPickerProps {
   itemHeight?: number;
   activeItemColor: string;
   inactiveItemColor: string;
+  disabled?: boolean;
   label?: ReactNode;
   style?: StyleProp<ViewStyle>;
 }
@@ -35,11 +36,12 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
   onValueChange,
   height,
   itemHeight,
+  disabled = false,
   activeItemColor,
   inactiveItemColor,
   style,
 }) => {
-  const { common, fonts, layout, spacing, text } = useStyles();
+  const { common, layout, spacing, text } = useStyles();
 
   const dividend = 10;
   const wholePart = Math.floor(selectedWeight);
@@ -67,24 +69,36 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
         label: `.${decimal < 10 && showZeroDecimal ? `0${decimal}` : `${decimal}`}`,
       });
     }
+
     return options;
   };
 
-  const wholeWeightOptions = generateWholeWeightOptions();
-  const decimalWeightOptions = generateDecimalWeightOptions();
+  const wholeWeightOptions = useMemo(generateWholeWeightOptions, [minWeight, maxWeight, stepSize]);
+  const decimalWeightOptions = useMemo(generateDecimalWeightOptions, [
+    decimalRange,
+    decimalStepSize,
+    decimalRange,
+  ]);
 
-  const handleValueChange = (values: any[]) => {
-    const wholeValue = values[0];
-    const decimalValue = showZeroDecimal ? Number(values[1]) : Number(values[1]) / 10;
+  const handleValueChange = useCallback(
+    (values: any[]) => {
+      console.log("values", values);
+      const wholeValue = values[0];
+      const decimalValue = showZeroDecimal ? Number(values[1]) : Number(values[1]) / 10;
 
-    onValueChange(wholeValue + decimalValue);
-  };
+      onValueChange(wholeValue + decimalValue);
+    },
+    [showZeroDecimal]
+  );
 
   const wheelPickerPropsArray: WheelPickerProps[] = [
     {
       data: decimalWeightOptions,
       selectedValue: decimalPart.toFixed(2),
       onValueChange: (value) => {
+        handleValueChange([wholePart, value]);
+      },
+      onValueCommit: (value) => {
         handleValueChange([wholePart, value]);
       },
       height,
@@ -98,6 +112,9 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       onValueChange: (value) => {
         handleValueChange([value, decimalPart.toFixed(2)]);
       },
+      onValueCommit: (value) => {
+        handleValueChange([value, decimalPart.toFixed(2)]);
+      },
       height,
       itemHeight,
       activeItemColor,
@@ -108,7 +125,9 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
   return (
     <View style={spacing.gapXl}>
       <ConditionalRender condition={typeof label == "string"}>
-        <Text style={[text.textCenter, fonts.lg, text.textBold]}>{label}</Text>
+        <Text fontSize={20} fontVariant="semibold" style={[text.textCenter]}>
+          {label}
+        </Text>
       </ConditionalRender>
 
       <ConditionalRender condition={typeof label !== "string"}>{label}</ConditionalRender>
@@ -120,14 +139,32 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
           spacing.pdVerticalXs,
           common.rounded,
           layout.center,
+          { opacity: disabled ? 0.4 : 1 },
           style,
         ]}
       >
-        <SectionWheelPicker
-          data={wheelPickerPropsArray}
-          selectedValues={[wholePart, decimalPart.toFixed(2)]}
-          onValueChange={handleValueChange}
-        />
+        {!disabled ? (
+          <SectionWheelPicker
+            data={wheelPickerPropsArray}
+            selectedValues={[decimalPart.toFixed(2), wholePart]}
+            onValueChange={handleValueChange}
+          />
+        ) : (
+          <View
+            style={[
+              layout.flexRow,
+              spacing.gap20,
+              layout.center,
+              {
+                marginEnd: 16,
+                height: height,
+              },
+            ]}
+          >
+            <Text style={{ direction: "rtl" }} fontVariant="brutalist" fontSize={24}>{`00.`}</Text>
+            <Text fontVariant="brutalist" fontSize={24}>{`0`}</Text>
+          </View>
+        )}
       </View>
     </View>
   );

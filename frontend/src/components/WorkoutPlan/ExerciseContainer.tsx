@@ -1,21 +1,33 @@
 import { Image, Platform, Pressable, View } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
 import { IExercise } from "@/interfaces/Workout";
-import { buildPhotoUrl, extractVideoId, getYouTubeThumbnail } from "@/utils/utils";
+import {
+  buildPhotoUrl,
+  extractVideoId,
+  getNextSetNumberFromSession,
+  getYouTubeThumbnail,
+} from "@/utils/utils";
+import { useNavigation } from "@react-navigation/native";
+import { WorkoutStackParamListNavigationProp } from "@/types/navigatorTypes";
+import useWorkoutSession from "@/hooks/sessions/useWorkoutSession";
+import PreviousSetCard from "./RecordExercise/PreviousSetCard";
 
 interface ExerciseContainerProps {
   exercise: IExercise;
-  exerciseCounter: string;
+  muscleGroup: string;
+  plan: string;
 }
 
-const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
-  exercise: { exerciseId },
-  exerciseCounter,
-}) => {
+const ExerciseContainer: React.FC<ExerciseContainerProps> = ({ exercise, muscleGroup, plan }) => {
+  const pressedOpacity = Platform.OS == "ios" ? 0.5 : 0.8;
   const { common, layout, spacing } = useStyles();
+  const { exerciseId } = exercise;
+  const { navigate } = useNavigation<WorkoutStackParamListNavigationProp>();
+  const { session } = useWorkoutSession();
+  const [setNumber, setSetNumber] = useState(1);
 
   const getExerciseImage = () => {
     return exerciseId.imageUrl
@@ -23,10 +35,29 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
       : getYouTubeThumbnail(extractVideoId(exerciseId.linkToVideo));
   };
 
-  const pressedOpacity = Platform.OS == "ios" ? 0.5 : 0.8;
+  const handleOpenExercise = () => {
+    navigate("RecordExercise", {
+      exercise,
+      muscleGroup,
+      setNumber,
+      plan: plan,
+    });
+  };
+
+  useEffect(() => {
+    if (!session) {
+      setSetNumber(1);
+      return;
+    }
+
+    const nextSet = getNextSetNumberFromSession(session, plan, exercise.exerciseId.name);
+
+    setSetNumber(nextSet);
+  }, [session, session?.updatedAt, plan, exerciseId]);
 
   return (
     <Pressable
+      onPress={handleOpenExercise}
       style={({ pressed }) => [
         {
           opacity: pressed ? pressedOpacity : 1,
@@ -37,22 +68,34 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({
         style={[common.rounded, spacing.pdHorizontalMd, spacing.pdVerticalDefault]}
         variant="gray"
       >
-        <View style={[layout.flexRow, layout.justifyBetween]}>
-          <View style={[layout.justifyBetween]}>
-            <Text>{exerciseId.name}</Text>
-            <View style={[layout.flexRow]}>
-              <Text fontVariant="semibold">{exerciseCounter}</Text>
+        <View style={[spacing.gapDefault]}>
+          <View style={[layout.flexRow, layout.justifyBetween]}>
+            <View style={[layout.flex1, spacing.gapLg]}>
+              <Text
+                style={{ flexShrink: 1, alignSelf: "flex-start" }}
+                fontSize={16}
+                numberOfLines={2}
+                ellipsizeMode="tail"
+              >
+                {exerciseId.name}
+              </Text>
+              <View style={[layout.flexRow]}>
+                <Text fontVariant="semibold">
+                  {setNumber - 1}/{exercise.sets.length}
+                </Text>
+              </View>
             </View>
-          </View>
 
-          <Image
-            source={{
-              uri: getExerciseImage(),
-            }}
-            height={66}
-            width={72}
-            style={[common.rounded]}
-          />
+            <Image
+              source={{
+                uri: getExerciseImage(),
+              }}
+              height={66}
+              width={72}
+              style={[common.roundedSm, { flexShrink: 0 }]}
+            />
+          </View>
+          <PreviousSetCard exercise={exerciseId.name} />
         </View>
       </Card>
     </Pressable>

@@ -27,6 +27,7 @@ const MeasurementHistoryContent = () => {
 
   const [activeMuscle, setActiveMuscle] = useState<string>(MEASUREMENT_MUSCLE_GROUPS[0]);
   const [selectedDate, setSelectedDate] = useState<string>(DateUtils.getCurrentDate("YYYY-MM-DD"));
+  const schemaKey = "measurement";
 
   const measurementsByMuscle = useMemo(() => {
     if (!data) return {};
@@ -98,9 +99,9 @@ const MeasurementHistoryContent = () => {
           prefix={`היקף ${activeMuscle}`}
           placeholder="הכנס היקף"
           schema={measurementSchema}
-          schemaKey="measurement"
+          schemaKey={schemaKey}
           existingValue={selectedMeasurement?.value?.toString()}
-          onSave={handleSave}
+          onSave={(result) => handleSave(result[schemaKey] as string)}
           onDelete={handleDelete}
         />
       </View>

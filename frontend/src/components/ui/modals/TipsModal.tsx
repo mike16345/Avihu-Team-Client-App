@@ -37,7 +37,7 @@ const TipsModal: React.FC<TipsModalProps> = ({
                 <View
                   style={[colors.backgroundPrimary, common.roundedFull, { height: 5, width: 5 }]}
                 />
-                <TextInput multiline style={styles.text}>
+                <TextInput multiline style={styles.text} editable={false}>
                   {tip}
                 </TextInput>
               </View>

@@ -3,10 +3,7 @@ import { Animated, Keyboard, StyleSheet, useWindowDimensions, View } from "react
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
-
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import TimerDrawer from "@/components/ui/TimerDrawer";
-import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import { useTimerStore } from "@/store/timerStore";
 import { Text } from "@/components/ui/Text";
 import { useEffect, useRef, useState } from "react";
@@ -67,7 +64,7 @@ const BottomTabNavigator = () => {
         backBehavior="initialRoute"
         initialRouteName={INITIAL_ROUTE_NAME}
         sceneContainerStyle={[
-          colors.background,
+          colors.backgroundTransparent,
           {
             paddingBottom: keyboardVisible ? BOTTOM_BAR_HEIGHT : BOTTOM_BAR_HEIGHT + 80,
             paddingTop: isHomeScreen ? 36 : 36,
@@ -128,9 +125,8 @@ const BottomTabNavigator = () => {
         </Text>
       </Animated.View>
       {!keyboardVisible && (
-        <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 }]}></View>
+        <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 - 40 }]} />
       )}
-      <ConditionalRender condition={!!countdown} children={<TimerDrawer />} />
     </Animated.View>
   );
 };
@@ -153,9 +149,11 @@ const styles = StyleSheet.create({
   },
   shadowContainer: {
     position: "absolute",
+    overflow: "hidden",
     borderRadius: 100,
     bottom: BOTTOM_BAR_HEIGHT,
-    height: 85,
+    height: 70,
+    alignItems: "center",
     alignSelf: "center",
     zIndex: -1,
     shadowColor: "#000",

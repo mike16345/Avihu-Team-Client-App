@@ -8,6 +8,7 @@ import { monthNames, setupCalendarLocale } from "@/config/calendarConfig";
 import CalendarHeader from "./CalendarHeader";
 import MonthSelector from "./MonthSelector";
 import DateUtils from "@/utils/dateUtils";
+import { ConditionalRender } from "../ui/ConditionalRender";
 
 setupCalendarLocale();
 
@@ -60,7 +61,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate,
 
   return (
     <View style={[{ position: "relative" }, common.rounded]}>
-      <View style={{ display: !showMonths ? "flex" : "none" }}>
+      <ConditionalRender condition={!showMonths}>
         <Calendar
           style={[common.roundedSm, spacing.pdDefault]}
           key={currentDate}
@@ -81,14 +82,14 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ onSelect, selectedDate,
           )}
           hideArrows
         />
-      </View>
-      <View style={{ display: showMonths ? "flex" : "none" }}>
+      </ConditionalRender>
+      <ConditionalRender condition={showMonths}>
         <MonthSelector
           activeMonthIndex={month}
           onCloseMonthSelect={() => setShowMonths(false)}
           onMonthSelect={(monthIndex) => handleMonthSelect(monthIndex)}
         />
-      </View>
+      </ConditionalRender>
     </View>
   );
 };
