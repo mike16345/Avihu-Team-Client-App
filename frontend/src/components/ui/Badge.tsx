@@ -1,5 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { View, TouchableOpacity, StyleSheet, LayoutChangeEvent, Dimensions } from "react-native";
+import { View, TouchableOpacity, LayoutChangeEvent } from "react-native";
 import { ReactNode, useState } from "react";
 import { IconName } from "@/constants/iconMap";
 import { ConditionalRender } from "./ConditionalRender";
@@ -82,8 +82,8 @@ const Badge: React.FC<Badgeprops> = ({
             { paddingVertical: 0.5 },
           ]}
         >
-          <Text>{buttonLabel}</Text>
-          <Icon name={buttonIcon} height={12} width={15} />
+          {buttonLabel && <Text>{buttonLabel}</Text>}
+          <Icon name={buttonIcon} height={15} width={26} />
         </View>
       </ConditionalRender>
     </TouchableOpacity>

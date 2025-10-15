@@ -23,7 +23,7 @@ const PreviousSetCard: FC<PreviousSetCardProps> = ({ exercise }) => {
 
   return formattedSets.length > 0 ? (
     <>
-      <Badge onPress={() => setIsModalVisible(true)} showButton showDot>
+      <Badge buttonLabel="" onPress={() => setIsModalVisible(true)} showButton showDot>
         <Text fontSize={12} fontVariant="semibold">
           עדכון אחרון | {formattedSets[formattedSets.length - 1]}
         </Text>
