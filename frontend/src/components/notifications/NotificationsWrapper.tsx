@@ -29,7 +29,7 @@ const NotificationsWrapper = () => {
       </TouchableOpacity>
 
       <NotificationModal
-        notifications={[]}
+        notifications={notifications}
         visible={openNavigationModal}
         onDismiss={() => setOpenNavigationModal(false)}
       />
