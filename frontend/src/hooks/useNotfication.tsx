@@ -1,12 +1,13 @@
 // hooks/useNotification.ts
 import { NotificationBodies, NotificationIdentifiers } from "@/constants/notifications";
 import { useNotificationStore } from "@/store/notificationStore";
+import { getNextEightAM, getNextEightAMOnSunday, toTrigger } from "@/utils/notification";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
 const { addNotification } = useNotificationStore();
 
-type TriggerAt = number | Date | null | undefined;
+export type TriggerAt = number | Date | null | undefined;
 
 const DEFAULT_CHANNEL_ID = "default";
 
@@ -17,44 +18,6 @@ async function ensureAndroidChannel() {
     name: "Default",
     importance: Notifications.AndroidImportance.DEFAULT,
   });
-}
-
-/** Helper: convert various "when" inputs to a typed NotificationTriggerInput */
-function toTrigger(
-  triggerAt: TriggerAt,
-  opts: { repeats?: boolean; channelId?: string } = {}
-): Notifications.NotificationTriggerInput {
-  if (triggerAt == null) {
-    // Immediate delivery must be `null` (not {}).
-    return null;
-  }
-
-  if (triggerAt instanceof Date) {
-    return {
-      type: Notifications.SchedulableTriggerInputTypes.DATE,
-      date: triggerAt,
-      channelId: opts.channelId,
-    } satisfies Notifications.DateTriggerInput;
-  }
-
-  // seconds-from-now; clamp to >= 1s
-  const seconds = Math.max(1, Math.floor(triggerAt));
-  return {
-    type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-    seconds,
-    repeats: !!opts.repeats,
-    channelId: opts.channelId,
-  } satisfies Notifications.TimeIntervalTriggerInput;
-}
-
-/** Compute the next local 08:00 from "now" */
-function getNextEightAM(from = new Date()) {
-  const next = new Date(from);
-  next.setHours(8, 0, 0, 0);
-  if (next <= from) {
-    next.setDate(next.getDate() + 1);
-  }
-  return next;
 }
 
 export const useNotification = () => {
@@ -82,7 +45,7 @@ export const useNotification = () => {
   };
 
   /** Schedule the daily reminder at 08:00 (idempotent) */
-  const scheduleDailyReminder = async () => {
+  const scheduleDailyWeightInReminder = async () => {
     const next8am = getNextEightAM();
 
     // iOS: true repeating daily trigger at hh:mm
@@ -108,6 +71,38 @@ export const useNotification = () => {
       content: {
         title: "Avihu Team",
         body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
+      },
+      trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
+    });
+  };
+
+  const scheduleWeeklyMeasurementReminder = async () => {
+    const nextSunday8am = getNextEightAMOnSunday();
+
+    // iOS: true repeating daily trigger at hh:mm
+    const iosTrigger: Notifications.WeeklyTriggerInput = {
+      type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+      weekday: 1,
+      hour: 8,
+      minute: 0,
+    };
+
+    // Android: schedule a one-off date at next 08:00 (re-schedule later as needed)
+    const androidTrigger: Notifications.DateTriggerInput = {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: nextSunday8am,
+      channelId: DEFAULT_CHANNEL_ID,
+    };
+
+    if (Platform.OS === "android") {
+      await ensureAndroidChannel();
+    }
+
+    await Notifications.scheduleNotificationAsync({
+      identifier: NotificationIdentifiers.WEEKLY_MEASUERMENT_REMINDER_ID,
+      content: {
+        title: "Avihu Team",
+        body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER_ID,
       },
       trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
     });
@@ -139,16 +134,19 @@ export const useNotification = () => {
       }
 
       const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-      const alreadyScheduled = scheduled.some(
+      const alreadyScheduledWeightIn = scheduled.some(
         (n) => n.identifier === NotificationIdentifiers.DAILY_WEIGH_IN_REMINDER_ID
       );
+      const alreadyScheduledMeasurement = scheduled.some(
+        (n) => n.identifier === NotificationIdentifiers.WEEKLY_MEASUERMENT_REMINDER_ID
+      );
 
-      if (!alreadyScheduled) {
-        await scheduleDailyReminder();
-      } else if (Platform.OS === "android") {
-        // Optional: on Android, if the scheduled time drifted (e.g., across DST),
-        // you could cancel & re-schedule here by checking the trigger.
-        // For now, we leave it as-is to keep behavior predictable.
+      if (!alreadyScheduledMeasurement) {
+        await scheduleWeeklyMeasurementReminder();
+      }
+
+      if (!alreadyScheduledWeightIn) {
+        await scheduleDailyWeightInReminder();
       }
     } catch (error) {
       console.log(error);
@@ -186,7 +184,8 @@ export const useNotification = () => {
     initializeNotifications,
     showNotification,
     cancelNotification,
-    scheduleDailyReminder,
+    scheduleDailyWeightInReminder,
+    scheduleWeeklyMeasurementReminder,
     notificationReceivedListener,
   };
 };
