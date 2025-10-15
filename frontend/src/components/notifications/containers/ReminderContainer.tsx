@@ -11,7 +11,7 @@ interface ReminderContainerProps {
 }
 
 const ReminderContainer: React.FC<ReminderContainerProps> = ({ type, handleDismiss }) => {
-  const { colors, common, fonts, layout, spacing, text } = useStyles();
+  const { common, layout, spacing } = useStyles();
 
   return (
     <Card style={[common.roundedMd, layout.widthFull, layout.itemsStart, spacing.pdMd]}>

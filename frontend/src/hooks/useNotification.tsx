@@ -2,12 +2,14 @@
 import { NotificationBodies, NotificationIdentifiers } from "@/constants/notifications";
 import { useNotificationStore } from "@/store/notificationStore";
 import { getNextEightAM, getNextEightAMOnSunday, toTrigger } from "@/utils/notification";
+import { generateUniqueId } from "@/utils/utils";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
 export type TriggerAt = number | Date | null | undefined;
 
 const DEFAULT_CHANNEL_ID = "default";
+let notificationListenerSet = false;
 
 /** Create (or update) the default Android notification channel */
 async function ensureAndroidChannel() {
@@ -22,7 +24,7 @@ export const useNotification = () => {
   // Set the global notification handler (keeps your previous behavior)
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
-      shouldShowAlert: true,
+      shouldShowBanner: true,
       shouldPlaySound: true,
       shouldSetBadge: true,
     }),
@@ -69,6 +71,7 @@ export const useNotification = () => {
       content: {
         title: "Avihu Team",
         body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
+        data: { id: generateUniqueId() },
       },
       trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
     });
@@ -78,11 +81,15 @@ export const useNotification = () => {
     const nextSunday8am = getNextEightAMOnSunday();
 
     // iOS: true repeating daily trigger at hh:mm
-    const iosTrigger: Notifications.WeeklyTriggerInput = {
+    /*   const iosTrigger: Notifications.WeeklyTriggerInput = {
       type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
       weekday: 1,
       hour: 8,
       minute: 0,
+    }; */
+    const iosTrigger: Notifications.TimeIntervalTriggerInput = {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 5,
     };
 
     // Android: schedule a one-off date at next 08:00 (re-schedule later as needed)
@@ -101,6 +108,7 @@ export const useNotification = () => {
       content: {
         title: "Avihu Team",
         body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER_ID,
+        data: { id: generateUniqueId() },
       },
       trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
     });
@@ -131,7 +139,11 @@ export const useNotification = () => {
         await ensureAndroidChannel();
       }
 
-      const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+      await Notifications.cancelAllScheduledNotificationsAsync();
+
+      await scheduleWeeklyMeasurementReminder();
+
+      /*  const scheduled = await Notifications.getAllScheduledNotificationsAsync();
 
       let alreadyScheduledWeightIn = false;
       let alreadyScheduledMeasurement = false;
@@ -154,7 +166,7 @@ export const useNotification = () => {
 
       if (!alreadyScheduledWeightIn) {
         await scheduleDailyWeightInReminder();
-      }
+      } */
     } catch (error) {
       console.log(error);
     }
@@ -169,12 +181,16 @@ export const useNotification = () => {
   };
 
   const notificationReceivedListener = () => {
+    if (notificationListenerSet) return console.log("listener already set returning now");
+    // ✅ guard against multiple adds
+    notificationListenerSet = true;
+
     try {
       return Notifications.addNotificationReceivedListener((n) => {
         const { title, body, data } = n.request.content;
 
         useNotificationStore.getState().addNotification({
-          id: n.request.identifier,
+          id: data.id,
           title,
           body,
           data,

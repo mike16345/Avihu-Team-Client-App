@@ -1,6 +1,11 @@
-import Animated, { SlideOutLeft } from "react-native-reanimated";
+import React from "react";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  runOnJS,
+} from "react-native-reanimated";
 import { INotification, useNotificationStore } from "@/store/notificationStore";
-import React, { useMemo } from "react";
 import ReminderContainer from "./ReminderContainer";
 
 interface NotificationProps {
@@ -10,35 +15,30 @@ interface NotificationProps {
 const Notification: React.FC<NotificationProps> = ({ notification }) => {
   const { removeNotification } = useNotificationStore();
 
+  // Shared values for manual animation
+  const translateX = useSharedValue(0);
+  const opacity = useSharedValue(1);
+
+  // Called when user presses dismiss
   const handleRemove = () => {
-    removeNotification(notification.id);
+    // Animate out manually
+    translateX.value = withTiming(-300, { duration: 250 }); // slide left
+    opacity.value = withTiming(0, { duration: 250 }, (finished) => {
+      if (finished) {
+        runOnJS(removeNotification)(notification.id); // remove from store after animation
+      }
+    });
   };
 
-  const NotificationContainer = useMemo(() => {
-    switch (notification.type) {
-      /* In the future all notification types will be added in switch case */
-
-      default:
-        return <ReminderContainer type={notification.type} handleDismiss={handleRemove} />;
-    }
-  }, [notification]);
+  // Animated styles
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+    opacity: opacity.value,
+  }));
 
   return (
-    <Animated.View
-      exiting={SlideOutLeft.springify()}
-      style={{
-        backgroundColor: "#1e1e1e",
-        padding: 14,
-        borderRadius: 12,
-        marginVertical: 6,
-        marginHorizontal: 16,
-        shadowColor: "#000",
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        elevation: 3,
-      }}
-    >
-      {NotificationContainer}
+    <Animated.View style={[animatedStyle, { width: "100%" }]}>
+      <ReminderContainer type={notification.type} handleDismiss={handleRemove} />
     </Animated.View>
   );
 };

@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { lightHaptic } from "@/utils/haptics";
 
 export interface INotification {
@@ -13,22 +15,41 @@ interface INotificationStore {
   notifications: INotification[];
   addNotification: (notification: INotification) => void;
   removeNotification: (id: string) => void;
+  clearNotifications: () => void;
 }
 
-export const useNotificationStore = create<INotificationStore>((set, get) => ({
-  notifications: [],
+export const useNotificationStore = create<INotificationStore>()(
+  persist(
+    (set, get) => ({
+      notifications: [],
 
-  addNotification: (notification: INotification) => {
-    set((state) => ({
-      notifications: [notification, ...state.notifications],
-    }));
-  },
+      addNotification: (notification: INotification) => {
+        set((state) => {
+          const exists = state.notifications.some((n) => n.id === notification.id);
+          if (exists) return state; // skip duplicates
 
-  removeNotification: (id: string) => {
-    set((state) => ({
-      notifications: state.notifications.filter((n) => n.id !== id),
-    }));
+          return {
+            notifications: [notification, ...state.notifications],
+          };
+        });
+      },
 
-    lightHaptic();
-  },
-}));
+      removeNotification: (id: string) => {
+        set((state) => ({
+          notifications: state.notifications.filter((n) => n.id !== id),
+        }));
+
+        lightHaptic();
+      },
+
+      clearNotifications: () => {
+        set({ notifications: [] });
+      },
+    }),
+    {
+      name: "notification-store",
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({ notifications: state.notifications }),
+    }
+  )
+);
