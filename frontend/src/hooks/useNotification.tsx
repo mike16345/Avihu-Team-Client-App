@@ -1,5 +1,9 @@
 // hooks/useNotification.ts
-import { NotificationBodies, NotificationIdentifiers } from "@/constants/notifications";
+import {
+  NOTIFICATION_TITLE,
+  NotificationBodies,
+  NotificationIdentifiers,
+} from "@/constants/notifications";
 import { useNotificationStore } from "@/store/notificationStore";
 import { getNextEightAM, getNextEightAMOnSunday, toTrigger } from "@/utils/notification";
 import { generateUniqueId } from "@/utils/utils";
@@ -68,9 +72,9 @@ export const useNotification = () => {
     const data = { id: generateUniqueId() };
 
     await Notifications.scheduleNotificationAsync({
-      identifier: NotificationIdentifiers.DAILY_WEIGH_IN_REMINDER_ID,
+      identifier: NotificationIdentifiers.NEW_DAILY_WEIGH_IN_REMINDER_ID,
       content: {
-        title: "Avihu Team",
+        title: NOTIFICATION_TITLE,
         body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
         data,
       },
@@ -79,7 +83,7 @@ export const useNotification = () => {
 
     useNotificationStore().addNotification({
       id: data.id,
-      title: "Avihu Team",
+      title: NOTIFICATION_TITLE,
       body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
       data,
       status: "pending",
@@ -119,7 +123,7 @@ export const useNotification = () => {
     await Notifications.scheduleNotificationAsync({
       identifier: NotificationIdentifiers.WEEKLY_MEASUERMENT_REMINDER_ID,
       content: {
-        title: "Avihu Team",
+        title: NOTIFICATION_TITLE,
         body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER,
         data,
       },
@@ -128,7 +132,7 @@ export const useNotification = () => {
 
     useNotificationStore().addNotification({
       id: data.id,
-      title: "Avihu Team",
+      title: NOTIFICATION_TITLE,
       body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER,
       data,
       status: "pending",
@@ -144,7 +148,7 @@ export const useNotification = () => {
         await ensureAndroidChannel();
       }
       const identifier = await Notifications.scheduleNotificationAsync({
-        content: { title: "Avihu Team", body },
+        content: { title: NOTIFICATION_TITLE, body },
         trigger: toTrigger(triggerAt ?? 1, {
           channelId: Platform.OS === "android" ? DEFAULT_CHANNEL_ID : undefined,
         }),
@@ -162,6 +166,10 @@ export const useNotification = () => {
         await ensureAndroidChannel();
       }
 
+      await Notifications.cancelScheduledNotificationAsync(
+        NotificationIdentifiers.OLD_DAILY_WEIGH_IN_REMINDER_ID
+      ); // Remove old notification schedule for legacy users - MUST
+
       /*  await Notifications.cancelAllScheduledNotificationsAsync();
 
       await scheduleWeeklyMeasurementReminder(); */
@@ -172,7 +180,7 @@ export const useNotification = () => {
       let alreadyScheduledMeasurement = false;
 
       for (const n of scheduled) {
-        if (n.identifier === NotificationIdentifiers.DAILY_WEIGH_IN_REMINDER_ID) {
+        if (n.identifier === NotificationIdentifiers.NEW_DAILY_WEIGH_IN_REMINDER_ID) {
           alreadyScheduledWeightIn = true;
         }
         if (n.identifier === NotificationIdentifiers.WEEKLY_MEASUERMENT_REMINDER_ID) {
@@ -203,23 +211,17 @@ export const useNotification = () => {
     }
   };
 
-  /*  const notificationReceivedListener = () => {
+  const notificationReceivedListener = () => {
     try {
       return Notifications.addNotificationReceivedListener((n) => {
-        const { title, body, data } = n.request.content;
+        const { data }: { data: { id: string } } = n.request.content;
 
-        useNotificationStore.getState().addNotification({
-          id: data.id,
-          title,
-          body,
-          data,
-          type: body == NotificationBodies.DAILY_WEIGH_IN_REMINDER ? "weighIn" : "measurement",
-        });
+        useNotificationStore.getState().updateNotificationStatus(data.id);
       });
     } catch (error) {
       console.error(error);
     }
-  }; */
+  };
 
   return {
     requestPermissions,

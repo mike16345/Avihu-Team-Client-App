@@ -19,6 +19,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     plugins: [
       ["expo-localization"],
+      "expo-background-task",
 
       [
         "expo-image-picker",
@@ -29,6 +30,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       [
         "expo-notifications",
+
         {
           icon: "./assets/app-icon.png",
           color: "#ffffff",

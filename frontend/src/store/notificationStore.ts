@@ -15,8 +15,12 @@ export interface INotification {
 
 interface INotificationStore {
   notifications: INotification[];
+  getPendingNotifications: () => INotification[];
+  getDeliveredNotifications: () => INotification[];
   addNotification: (notification: INotification) => void;
   removeNotification: (id: string) => void;
+  updateNotificationStatus: (id: string) => void;
+  updateNotificationsPastTriggerTime: () => void;
   clearNotifications: () => void;
 }
 
@@ -26,7 +30,23 @@ export const useNotificationStore = create<INotificationStore>()(
       notifications: [],
 
       getPendingNotifications: () => get().notifications.filter((n) => n.status === "pending"),
+
       getDeliveredNotifications: () => get().notifications.filter((n) => n.status === "delivered"),
+
+      updateNotificationsPastTriggerTime: () => {
+        set((state) => {
+          const now = Date.now();
+
+          return {
+            notifications: state.notifications.map((n) => {
+              const triggerTimeInMilliseconds = n.triggerTime.getTime();
+              const isPassedTriggerTime = now >= triggerTimeInMilliseconds;
+
+              return isPassedTriggerTime ? { ...n, status: "delivered" } : n;
+            }),
+          };
+        });
+      },
 
       addNotification: (notification: INotification) => {
         set((state) => {
@@ -39,7 +59,7 @@ export const useNotificationStore = create<INotificationStore>()(
         });
       },
 
-      updateNotification: (id: string) => {
+      updateNotificationStatus: (id: string) => {
         set((state) => ({
           notifications: state.notifications.map((n) =>
             n.id === id ? { ...n, status: "delivered" } : n

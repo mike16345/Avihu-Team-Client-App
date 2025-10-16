@@ -14,11 +14,19 @@ import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
 import ToastContainer from "@/components/ui/toast/ToastContainer";
 import useCustomFonts from "@/hooks/useCustomFonts";
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
+import useBackgroundTasks from "@/hooks/useBackgroundTasks";
+import { useEffect } from "react";
 
 export default function App() {
   const ready = useOneTimeRTLFix();
   const colorScheme = Appearance.getColorScheme();
   const [loaded] = useCustomFonts();
+  const { registerBackgroundTask, runTaskOnAppOpen } = useBackgroundTasks();
+
+  useEffect(() => {
+    registerBackgroundTask();
+    runTaskOnAppOpen();
+  }, []);
 
   if (!loaded || !ready) return;
 
