@@ -5,5 +5,5 @@ export const NotificationIdentifiers = {
 
 export const NotificationBodies = {
   DAILY_WEIGH_IN_REMINDER: "מתזכרים אותך לעדכן את השקילה היומית שלך",
-  WEEKLY_MEASUERMENT_REMINDER_ID: "מתזכרים אותך לעדכן היקפים",
+  WEEKLY_MEASUERMENT_REMINDER: "מתזכרים אותך לעדכן היקפים",
 };

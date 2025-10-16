@@ -65,14 +65,26 @@ export const useNotification = () => {
       await ensureAndroidChannel();
     }
 
+    const data = { id: generateUniqueId() };
+
     await Notifications.scheduleNotificationAsync({
       identifier: NotificationIdentifiers.DAILY_WEIGH_IN_REMINDER_ID,
       content: {
         title: "Avihu Team",
         body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
-        data: { id: generateUniqueId() },
+        data,
       },
       trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
+    });
+
+    useNotificationStore().addNotification({
+      id: data.id,
+      title: "Avihu Team",
+      body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
+      data,
+      status: "pending",
+      triggerTime: next8am,
+      type: "weighIn",
     });
   };
 
@@ -102,14 +114,26 @@ export const useNotification = () => {
       await ensureAndroidChannel();
     }
 
+    const data = { id: generateUniqueId() };
+
     await Notifications.scheduleNotificationAsync({
       identifier: NotificationIdentifiers.WEEKLY_MEASUERMENT_REMINDER_ID,
       content: {
         title: "Avihu Team",
-        body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER_ID,
-        data: { id: generateUniqueId() },
+        body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER,
+        data,
       },
       trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
+    });
+
+    useNotificationStore().addNotification({
+      id: data.id,
+      title: "Avihu Team",
+      body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER,
+      data,
+      status: "pending",
+      triggerTime: nextSunday8am,
+      type: "measurement",
     });
   };
 
@@ -179,7 +203,7 @@ export const useNotification = () => {
     }
   };
 
-  const notificationReceivedListener = () => {
+  /*  const notificationReceivedListener = () => {
     try {
       return Notifications.addNotificationReceivedListener((n) => {
         const { title, body, data } = n.request.content;
@@ -195,7 +219,7 @@ export const useNotification = () => {
     } catch (error) {
       console.error(error);
     }
-  };
+  }; */
 
   return {
     requestPermissions,

@@ -9,6 +9,8 @@ export interface INotification {
   body: string | null;
   data: any;
   type: "weighIn" | "measurement";
+  triggerTime: Date;
+  status: "pending" | "delivered";
 }
 
 interface INotificationStore {
@@ -23,6 +25,9 @@ export const useNotificationStore = create<INotificationStore>()(
     (set, get) => ({
       notifications: [],
 
+      getPendingNotifications: () => get().notifications.filter((n) => n.status === "pending"),
+      getDeliveredNotifications: () => get().notifications.filter((n) => n.status === "delivered"),
+
       addNotification: (notification: INotification) => {
         set((state) => {
           const exists = state.notifications.some((n) => n.id === notification.id);
@@ -34,6 +39,13 @@ export const useNotificationStore = create<INotificationStore>()(
         });
       },
 
+      updateNotification: (id: string) => {
+        set((state) => ({
+          notifications: state.notifications.map((n) =>
+            n.id === id ? { ...n, status: "delivered" } : n
+          ),
+        }));
+      },
       removeNotification: (id: string) => {
         set((state) => ({
           notifications: state.notifications.filter((n) => n.id !== id),
