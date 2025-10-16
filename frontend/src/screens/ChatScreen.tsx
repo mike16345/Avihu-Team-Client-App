@@ -120,8 +120,7 @@ const ChatScreen = () => {
       }
     } catch (error: any) {
       const status = error?.response?.status;
-      const message =
-        error?.response?.data?.message || "אירעה שגיאה בשליחת ההודעה";
+      const message = error?.response?.data?.message || "אירעה שגיאה בשליחת ההודעה";
 
       triggerErrorToast({ message });
 

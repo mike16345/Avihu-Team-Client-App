@@ -44,24 +44,21 @@ const useChatStorage = () => {
     [setLocal]
   );
 
-  const upsertSession = useCallback(
-    (state: IChatSessionsState, sessionId: string) => {
-      const existing = state.sessions[sessionId];
+  const upsertSession = useCallback((state: IChatSessionsState, sessionId: string) => {
+    const existing = state.sessions[sessionId];
 
-      if (existing) {
-        return {
-          ...state.sessions,
-          [sessionId]: existing,
-        };
-      }
-
+    if (existing) {
       return {
         ...state.sessions,
-        [sessionId]: createEmptySession(sessionId),
+        [sessionId]: existing,
       };
-    },
-    []
-  );
+    }
+
+    return {
+      ...state.sessions,
+      [sessionId]: createEmptySession(sessionId),
+    };
+  }, []);
 
   const ensureSession = useCallback(
     async (sessionId?: string) => {
@@ -117,8 +114,7 @@ const useChatStorage = () => {
   const appendMessage = useCallback(
     async (sessionId: string, message: IChatMessage) => {
       const baseState = latestStateRef.current ?? INITIAL_STATE;
-      const currentSession =
-        baseState.sessions[sessionId] ?? createEmptySession(sessionId);
+      const currentSession = baseState.sessions[sessionId] ?? createEmptySession(sessionId);
 
       const nextSession: IChatSession = {
         ...currentSession,
@@ -143,8 +139,7 @@ const useChatStorage = () => {
   const updateSessionMeta = useCallback(
     async (sessionId: string, meta: Partial<IChatSessionMeta>) => {
       const baseState = latestStateRef.current ?? INITIAL_STATE;
-      const currentSession =
-        baseState.sessions[sessionId] ?? createEmptySession(sessionId);
+      const currentSession = baseState.sessions[sessionId] ?? createEmptySession(sessionId);
 
       const nextSession: IChatSession = {
         ...currentSession,
@@ -193,9 +188,7 @@ const useChatStorage = () => {
 
       const { [sessionId]: _removed, ...rest } = baseState.sessions;
       const nextActiveId =
-        baseState.activeSessionId === sessionId
-          ? Object.keys(rest)[0]
-          : baseState.activeSessionId;
+        baseState.activeSessionId === sessionId ? Object.keys(rest)[0] : baseState.activeSessionId;
 
       const nextState: IChatSessionsState = {
         activeSessionId: nextActiveId,

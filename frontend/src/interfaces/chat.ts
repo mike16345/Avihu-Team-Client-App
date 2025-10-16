@@ -1,8 +1,4 @@
-export type ChatReason =
-  | "ANSWER_GENERATED"
-  | "CACHE_HIT"
-  | "NOT_FITNESS"
-  | "RETRIEVAL_EMPTY";
+export type ChatReason = "ANSWER_GENERATED" | "CACHE_HIT" | "NOT_FITNESS" | "RETRIEVAL_EMPTY";
 
 export interface IChatCitation {
   marker: string;

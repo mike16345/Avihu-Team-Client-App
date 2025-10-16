@@ -36,12 +36,7 @@ export const buildRagQueryPayload = ({
 };
 
 export const useChatApi = () => {
-  const sendQuery = async ({
-    userId,
-    sessionId,
-    question,
-    overrides,
-  }: BuildPayloadParams) => {
+  const sendQuery = async ({ userId, sessionId, question, overrides }: BuildPayloadParams) => {
     const payload = buildRagQueryPayload({
       userId,
       sessionId,

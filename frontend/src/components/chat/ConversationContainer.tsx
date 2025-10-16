@@ -115,10 +115,7 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({ conversat
             {item.text}
           </ChatBubble>
           <ConditionalRender condition={item.reason}>
-            <Text
-              fontSize={12}
-              style={[reasonStyle, { writingDirection: isRTL ? "rtl" : "ltr" }]}
-            >
+            <Text fontSize={12} style={[reasonStyle, { writingDirection: isRTL ? "rtl" : "ltr" }]}>
               {item.reason}
             </Text>
           </ConditionalRender>
