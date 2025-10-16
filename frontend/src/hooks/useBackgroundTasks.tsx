@@ -7,20 +7,21 @@ const BACKGROUND_TASK_NAME = "CHECK_PENDING_NOTIFICATIONS_TASK";
 const FIFTEEN_MINUTES = 15 * 60;
 
 // Define what the task does
-TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
-  try {
-    console.log("[BackgroundTask] Running check for pending notifications...");
-
-    useNotificationStore().updateNotificationsPastTriggerTime();
-
-    return BackgroundTask.BackgroundTaskResult.Success;
-  } catch (error) {
-    console.error("[BackgroundTask] Failed:", error);
-    return BackgroundTask.BackgroundTaskResult.Failed;
-  }
-});
 
 const useBackgroundTasks = () => {
+  TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
+    try {
+      console.log("[BackgroundTask] Running check for pending notifications...");
+
+      useNotificationStore.getState().updateNotificationsPastTriggerTime();
+
+      return BackgroundTask.BackgroundTaskResult.Success;
+    } catch (error) {
+      console.error("[BackgroundTask] Failed:", error);
+      return BackgroundTask.BackgroundTaskResult.Failed;
+    }
+  });
+
   // Register periodic task to run every ~15 min
   const registerBackgroundTask = React.useCallback(async () => {
     try {
@@ -40,7 +41,7 @@ const useBackgroundTasks = () => {
   const runTaskOnAppOpen = React.useCallback(async () => {
     console.log("[BackgroundTask] Running on app open...");
     try {
-      useNotificationStore().updateNotificationsPastTriggerTime();
+      useNotificationStore.getState().updateNotificationsPastTriggerTime();
     } catch (error) {
       console.error("[BackgroundTask] App open task failed:", error);
     }
