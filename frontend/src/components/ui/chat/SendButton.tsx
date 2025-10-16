@@ -19,6 +19,7 @@ const SendButton: React.FC<SendButtonProps> = ({ onPress, disabled }) => {
         layout.alignSelfStart,
         spacing.pdDefault,
         common.roundedFull,
+        disabled ? { opacity: 0.5 } : null,
       ]}
     >
       <Icon name="send" height={24} width={24} />
