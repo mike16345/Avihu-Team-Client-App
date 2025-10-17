@@ -119,6 +119,7 @@ const ChatScreen = () => {
         });
       }
     } catch (error: any) {
+      console.log(JSON.stringify(error, undefined, 2));
       const status = error?.response?.status;
       const message = error?.response?.data?.message || "אירעה שגיאה בשליחת ההודעה";
 
