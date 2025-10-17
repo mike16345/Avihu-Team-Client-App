@@ -6,8 +6,6 @@ import { useNotificationStore } from "@/store/notificationStore";
 const BACKGROUND_TASK_NAME = "CHECK_PENDING_NOTIFICATIONS_TASK";
 const FIFTEEN_MINUTES = 15 * 60;
 
-// Define what the task does
-
 const useBackgroundTasks = () => {
   TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
     try {
