@@ -81,7 +81,7 @@ export const useNotification = () => {
       trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
     });
 
-    useNotificationStore().addNotification({
+    useNotificationStore.getState().addNotification({
       id: data.id,
       title: NOTIFICATION_TITLE,
       body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
@@ -102,10 +102,6 @@ export const useNotification = () => {
       hour: 8,
       minute: 0,
     };
-    /*    const iosTrigger: Notifications.TimeIntervalTriggerInput = {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-      seconds: 5,
-    }; */
 
     // Android: schedule a one-off date at next 08:00 (re-schedule later as needed)
     const androidTrigger: Notifications.DateTriggerInput = {
@@ -130,7 +126,7 @@ export const useNotification = () => {
       trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
     });
 
-    useNotificationStore().addNotification({
+    useNotificationStore.getState().addNotification({
       id: data.id,
       title: NOTIFICATION_TITLE,
       body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER,
@@ -169,10 +165,6 @@ export const useNotification = () => {
       await Notifications.cancelScheduledNotificationAsync(
         NotificationIdentifiers.OLD_DAILY_WEIGH_IN_REMINDER_ID
       ); // Remove old notification schedule for legacy users - MUST
-
-      /*  await Notifications.cancelAllScheduledNotificationsAsync();
-
-      await scheduleWeeklyMeasurementReminder(); */
 
       const scheduled = await Notifications.getAllScheduledNotificationsAsync();
 

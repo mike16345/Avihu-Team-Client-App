@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Icon from "../Icon/Icon";
 import NotificationModal from "./NotificationModal";
 import { useNotificationStore } from "@/store/notificationStore";
@@ -8,10 +8,12 @@ import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 
 const NotificationsWrapper = () => {
-  const { notifications } = useNotificationStore();
+  const { getDeliveredNotifications, notifications: allNotifications } = useNotificationStore();
   const { layout, common } = useStyles();
 
   const [openNavigationModal, setOpenNavigationModal] = useState(false);
+
+  const notifications = useMemo(() => getDeliveredNotifications(), [allNotifications]);
 
   return (
     <>

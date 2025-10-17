@@ -39,7 +39,7 @@ export const useNotificationStore = create<INotificationStore>()(
 
           return {
             notifications: state.notifications.map((n) => {
-              const triggerTimeInMilliseconds = n.triggerTime.getTime();
+              const triggerTimeInMilliseconds = new Date(n.triggerTime).getTime();
               const isPassedTriggerTime = now >= triggerTimeInMilliseconds;
 
               return isPassedTriggerTime ? { ...n, status: "delivered" } : n;
