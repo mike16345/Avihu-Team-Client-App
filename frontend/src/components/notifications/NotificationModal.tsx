@@ -11,14 +11,22 @@ interface NotificationModalProps extends CustomModalProps {
   notifications: INotification[];
 }
 
-const NotificationModal: React.FC<NotificationModalProps> = ({ notifications, ...props }) => {
+const NotificationModal: React.FC<NotificationModalProps> = ({
+  notifications,
+  onDismiss,
+  ...props
+}) => {
   const { layout, spacing, common } = useStyles();
 
   const notificationMap = useMemo(() => {
     if (!notifications.length) return;
 
     return notifications.map((notification) => (
-      <Notification key={notification.id} notification={notification} />
+      <Notification
+        key={notification.id}
+        notification={notification}
+        onNavigate={() => onDismiss?.()}
+      />
     ));
   }, [notifications]);
 

@@ -4,14 +4,34 @@ import { Text } from "@/components/ui/Text";
 import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
 import Icon from "@/components/Icon/Icon";
+import { BottomStackParamList } from "@/types/navigatorTypes";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { generateUniqueId } from "@/utils/utils";
 
 interface ReminderContainerProps {
   type: "weighIn" | "measurement";
   handleDismiss: () => void;
+  onNavigate: () => void;
 }
 
-const ReminderContainer: React.FC<ReminderContainerProps> = ({ type, handleDismiss }) => {
+const ReminderContainer: React.FC<ReminderContainerProps> = ({
+  type,
+  handleDismiss,
+  onNavigate,
+}) => {
   const { common, layout, spacing } = useStyles();
+
+  const navigation = useNavigation<NativeStackNavigationProp<BottomStackParamList>>();
+
+  const handleNavigation = () => {
+    navigation.navigate("Home", {
+      window: type == "measurement" ? 2 : 1,
+      paramId: generateUniqueId(),
+    });
+
+    onNavigate();
+  };
 
   return (
     <Card style={[common.roundedMd, layout.widthFull, layout.itemsStart, spacing.pdMd]}>
@@ -29,7 +49,7 @@ const ReminderContainer: React.FC<ReminderContainerProps> = ({ type, handleDismi
           </Text>
 
           <View style={[layout.flexRow, layout.justifyStart, { gap: 12 }]}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleNavigation}>
               <Text fontSize={14} fontVariant="semibold">
                 למעבר לחץ כאן
               </Text>

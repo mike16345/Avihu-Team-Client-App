@@ -10,9 +10,10 @@ import ReminderContainer from "./ReminderContainer";
 
 interface NotificationProps {
   notification: INotification;
+  onNavigate: () => void;
 }
 
-const Notification: React.FC<NotificationProps> = ({ notification }) => {
+const Notification: React.FC<NotificationProps> = ({ notification, onNavigate }) => {
   const { removeNotification } = useNotificationStore();
 
   // Shared values for manual animation
@@ -38,7 +39,11 @@ const Notification: React.FC<NotificationProps> = ({ notification }) => {
 
   return (
     <Animated.View style={[animatedStyle, { width: "100%" }]}>
-      <ReminderContainer type={notification.type} handleDismiss={handleRemove} />
+      <ReminderContainer
+        type={notification.type}
+        handleDismiss={handleRemove}
+        onNavigate={onNavigate}
+      />
     </Animated.View>
   );
 };
