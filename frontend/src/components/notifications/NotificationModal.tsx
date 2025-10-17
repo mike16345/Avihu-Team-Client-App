@@ -31,7 +31,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
   }, [notifications]);
 
   return (
-    <CustomModal {...props}>
+    <CustomModal onDismiss={onDismiss} {...props}>
       <CustomModal.Header>התראות</CustomModal.Header>
       <CustomModal.Content style={{ padding: 0 }}>
         <ConditionalRender condition={!notifications.length}>
