@@ -6,9 +6,11 @@ import { ConditionalRender } from "../ui/ConditionalRender";
 import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 import { useNavigation } from "@react-navigation/native";
 import { buildPhotoUrl } from "@/utils/utils";
+import { useShadowStyles } from "@/styles/useShadowStyles";
 
 const Avatar = () => {
   const { colors, common, fonts, layout } = useStyles();
+  const { frameShadow } = useShadowStyles();
   const { currentUser } = useUserStore();
   const navigation = useNavigation<RootStackParamListNavigationProp>();
 
@@ -25,6 +27,7 @@ const Avatar = () => {
             common.borderXsm,
             colors.outline,
             styles.avatar,
+            frameShadow,
           ]}
         >
           <Text fontVariant="bold" style={fonts.lg}>
