@@ -19,7 +19,6 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ children, variant = "prompt", l
       : [colors.backgroundSurface, layout.alignSelfEnd];
 
   const isRTL = (language ?? "he").toLowerCase().startsWith("he");
-  const directionStyle = isRTL ? textStyles.textRight : textStyles.textLeft;
   const writingDirection = isRTL ? "rtl" : "ltr";
 
   const translateY = useRef(new Animated.Value(40)).current;
@@ -53,7 +52,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ children, variant = "prompt", l
       <Text
         fontVariant={variant == "prompt" ? "light" : "regular"}
         fontSize={16}
-        style={[directionStyle, colors.textPrimary, { lineHeight: 20, writingDirection }]}
+        style={[colors.textPrimary, { lineHeight: 20, writingDirection }]}
       >
         {children}
       </Text>
