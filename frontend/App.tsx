@@ -32,7 +32,7 @@ export default function App() {
   if (!loaded || !ready) return;
 
   return (
-    <KeyboardProvider>
+    <KeyboardProvider preserveEdgeToEdge>
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
