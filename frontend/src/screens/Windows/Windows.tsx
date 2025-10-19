@@ -1,6 +1,6 @@
 import Icon from "@/components/Icon/Icon";
 import useStyles from "@/styles/useGlobalStyles";
-import React, { ReactNode, useCallback, useRef, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useRef } from "react";
 import {
   FlatList,
   I18nManager,
@@ -13,16 +13,17 @@ import {
 
 interface WindowProps {
   windowItems: ReactNode[];
+  currentIndex: number;
+  onIndexChange: (index: number) => void;
 }
 
-const Windows: React.FC<WindowProps> = ({ windowItems }) => {
+const Windows: React.FC<WindowProps> = ({ windowItems, currentIndex = 1, onIndexChange }) => {
   const { width } = useWindowDimensions();
   const { layout, spacing } = useStyles();
   const separator = spacing.gapMd.gap ?? 0;
 
   const listRef = useRef<FlatList<ReactNode>>(null);
   const dragStartXRef = useRef(0);
-  const [activeIndex, setActiveIndex] = useState(0);
 
   const getItemLayout = useCallback(
     (_: unknown, index: number) => ({
@@ -35,7 +36,7 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
 
   const snapToIndex = (idx: number) => {
     listRef.current?.scrollToIndex({ index: idx, animated: true, viewPosition: 0 });
-    setActiveIndex(idx); // update immediately so next swipe is relative
+    onIndexChange(idx); // update immediately so next swipe is relative
   };
 
   const onScrollBeginDrag = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -53,8 +54,8 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
     const movedEnough = Math.abs(dx) >= threshold;
 
     const next = movedEnough
-      ? Math.min(Math.max(activeIndex + visualDir, 0), windowItems.length - 1)
-      : activeIndex;
+      ? Math.min(Math.max(currentIndex + visualDir, 0), windowItems.length - 1)
+      : currentIndex;
 
     snapToIndex(next);
   };
@@ -63,6 +64,8 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
     ({ item }) => <View style={{ width }}>{item}</View>,
     [width]
   );
+
+  useEffect(() => snapToIndex(currentIndex), [currentIndex]);
 
   return (
     <>
@@ -73,6 +76,7 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
         keyboardShouldPersistTaps="handled"
         keyExtractor={(_, i) => String(i)}
         renderItem={renderItem}
+        initialScrollIndex={currentIndex}
         ItemSeparatorComponent={() => <View style={{ width: separator }} />}
         getItemLayout={getItemLayout}
         showsHorizontalScrollIndicator={false}
@@ -85,7 +89,12 @@ const Windows: React.FC<WindowProps> = ({ windowItems }) => {
 
       <View style={[spacing.gapDefault, layout.flexRow, layout.center]}>
         {windowItems.map((_, i) => (
-          <Icon key={i} name={i === activeIndex ? "elipse" : "elipseSoft"} height={10} width={10} />
+          <Icon
+            key={i}
+            name={i === currentIndex ? "elipse" : "elipseSoft"}
+            height={10}
+            width={10}
+          />
         ))}
       </View>
     </>
