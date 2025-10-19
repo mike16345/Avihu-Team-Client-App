@@ -9,8 +9,6 @@ const FIFTEEN_MINUTES = 15 * 60;
 const useBackgroundTasks = () => {
   TaskManager.defineTask(BACKGROUND_TASK_NAME, async () => {
     try {
-      console.log("[BackgroundTask] Running check for pending notifications...");
-
       useNotificationStore.getState().updateNotificationsPastTriggerTime();
 
       return BackgroundTask.BackgroundTaskResult.Success;
@@ -28,7 +26,6 @@ const useBackgroundTasks = () => {
         await BackgroundTask.registerTaskAsync(BACKGROUND_TASK_NAME, {
           minimumInterval: FIFTEEN_MINUTES,
         });
-        console.log("[BackgroundTask] Registered periodic background task");
       }
     } catch (error) {
       console.error("[BackgroundTask] Registration failed:", error);
@@ -37,7 +34,6 @@ const useBackgroundTasks = () => {
 
   //  Manually trigger the same logic when app opens
   const runTaskOnAppOpen = React.useCallback(async () => {
-    console.log("[BackgroundTask] Running on app open...");
     try {
       useNotificationStore.getState().updateNotificationsPastTriggerTime();
     } catch (error) {
