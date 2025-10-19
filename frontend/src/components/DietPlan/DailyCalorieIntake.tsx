@@ -14,12 +14,12 @@ const DailyCalorieIntake = () => {
 
   return (
     <View style={[layout.flexRow, layout.widthFull]}>
-      <View style={[layout.widthFull, spacing.gapLg]}>
+      <View style={[layout.widthFull, spacing.gap20]}>
         <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
-          <Text fontVariant="bold" style={[fonts.xl]}>
+          <Text fontVariant="bold" fontSize={24}>
             {totalCalories}
           </Text>
-          <Text>קלוריות יומיות</Text>
+          <Text fontSize={16}>קלוריות יומיות</Text>
         </View>
         <ProgressBar value={totalCaloriesEaten} maxValue={totalCalories} />
         <Badge disabled alignStart showDot>
