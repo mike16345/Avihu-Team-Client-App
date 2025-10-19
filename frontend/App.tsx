@@ -14,6 +14,7 @@ import { useOneTimeRTLFix } from "@/hooks/useEnsureRTL";
 import ToastContainer from "@/components/ui/toast/ToastContainer";
 import useCustomFonts from "@/hooks/useCustomFonts";
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 export default function App() {
   const ready = useOneTimeRTLFix();
@@ -23,24 +24,26 @@ export default function App() {
   if (!loaded || !ready) return;
 
   return (
-    <ThemeProvider>
-      <GestureHandlerRootView>
-        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-          <View style={[{ direction: "rtl" }, { flex: 1 }]}>
-            <PersistQueryClientProvider
-              client={queryClient}
-              persistOptions={{ persister: persister }}
-            >
-              <NavigationContainer>
-                <RootNavigator />
-                <StatusBar key={colorScheme} translucent style={"dark"} />
-                <ToastContainer />
-                <Update />
-              </NavigationContainer>
-            </PersistQueryClientProvider>
-          </View>
-        </SafeAreaProvider>
-      </GestureHandlerRootView>
-    </ThemeProvider>
+    <KeyboardProvider>
+      <ThemeProvider>
+        <GestureHandlerRootView>
+          <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+            <View style={[{ direction: "rtl" }, { flex: 1 }]}>
+              <PersistQueryClientProvider
+                client={queryClient}
+                persistOptions={{ persister: persister }}
+              >
+                <NavigationContainer>
+                  <RootNavigator />
+                  <StatusBar key={colorScheme} translucent style={"dark"} />
+                  <ToastContainer />
+                  <Update />
+                </NavigationContainer>
+              </PersistQueryClientProvider>
+            </View>
+          </SafeAreaProvider>
+        </GestureHandlerRootView>
+      </ThemeProvider>
+    </KeyboardProvider>
   );
 }
