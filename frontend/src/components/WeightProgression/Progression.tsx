@@ -13,7 +13,7 @@ const Progression = () => {
   const [showCalendar, setShowCalendar] = useState(false);
 
   return (
-    <View style={[spacing.gapMd, { flex: 1 }]}>
+    <View style={[spacing.gap14, { flex: 1 }]}>
       <View style={[layout.flexRow, spacing.gapDefault, layout.center]}>
         <Icon name="graph" />
         <Switch isOn={showCalendar} setIsOn={setShowCalendar} />

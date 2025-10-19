@@ -12,10 +12,10 @@ const WeightProgressionWindow = () => {
     <ScrollView
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={[
-        spacing.gapMd,
+        spacing.gap14,
+        spacing.pdHorizontalLg,
         {
           paddingVertical: 12,
-          paddingHorizontal: 20,
         },
       ]}
       refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />}

@@ -62,7 +62,7 @@ const WeightInput = () => {
   };
 
   return (
-    <View style={[layout.center, spacing.gapMd]}>
+    <View style={[layout.center, spacing.gap14]}>
       <View style={[spacing.pdHorizontalLg]}>
         <Input
           value={weighIn}
