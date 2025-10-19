@@ -18,7 +18,7 @@ const NotificationsWrapper = () => {
   return (
     <>
       <TouchableOpacity
-        style={{ position: "relative" }}
+        style={{ position: "relative", paddingVertical: 5 }}
         onPress={() => setOpenNavigationModal(true)}
       >
         <Icon name="bell" height={30} width={30} />
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#95FDA8",
     position: "absolute",
     paddingHorizontal: 5,
-    top: -5,
+    top: 0,
   },
 });
 
