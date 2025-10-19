@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback, View } from "react-native";
+import { Clipboard, Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback, View } from "react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import ChatInput from "@/components/ui/inputs/ChatInput";
@@ -13,6 +13,14 @@ import { useUserStore } from "@/store/userStore";
 import { useToast } from "@/hooks/useToast";
 import { generateUniqueId } from "@/utils/utils";
 import useChatApi from "@/hooks/api/useChatApi";
+import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
+
+interface RetryContext {
+  sessionId: string;
+  messageId: string;
+  prompt: string;
+  userId: string;
+}
 
 const ChatScreen = () => {
   const { colors, layout, spacing, text } = useStyles();
@@ -28,11 +36,14 @@ const ChatScreen = () => {
     createSession,
     appendUserMessage,
     appendAssistantMessage,
+    updateMessage,
+    removeMessage,
     updateSessionMeta,
   } = useChatStorage();
 
   const [prompt, setPrompt] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const [retryContext, setRetryContext] = useState<RetryContext | null>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentUserId = currentUser?._id;
@@ -44,7 +55,100 @@ const ChatScreen = () => {
   }, [storageLoading, activeSessionId, createSession]);
 
   const conversation = useMemo<IChatMessage[]>(() => messages ?? [], [messages]);
-  const chatInitiated = loading || conversation.length > 0;
+  const hasVisibleMessages = useMemo(
+    () =>
+      conversation.some(
+        (message) => message.variant === "prompt" || (message.variant === "response" && !message.greeting)
+      ),
+    [conversation]
+  );
+  const chatInitiated = loading || hasVisibleMessages;
+
+  const executeQuery = useCallback(
+    async ({
+      sessionId,
+      question,
+      messageId,
+      userId,
+    }: {
+      sessionId: string;
+      question: string;
+      messageId: string;
+      userId: string;
+    }) => {
+      setLoading(true);
+      setRetryContext(null);
+
+      await updateMessage(sessionId, messageId, { error: false });
+
+      try {
+        const response = await sendQuery({
+          userId,
+          sessionId,
+          question,
+        });
+
+        const responseTimestamp = new Date().toISOString();
+
+        const assistantMessage: IChatMessage = {
+          id: generateUniqueId(),
+          variant: "response",
+          text: response.answer ?? "",
+          createdAt: responseTimestamp,
+          language: (response.language as IChatMessage["language"]) ?? "he",
+          notice: response.notice,
+          citations: response.citations ?? [],
+          reason: response.reason,
+          cached: response.cached,
+          usage: response.usage,
+          refusal: response.refusal,
+          greeting: response.greeting,
+        };
+
+        await appendAssistantMessage(sessionId, assistantMessage);
+
+        await updateSessionMeta(sessionId, {
+          language: response.language,
+          notice: response.notice,
+          lastReason: response.reason,
+          cached: response.cached,
+          refusal: response.refusal,
+          greeting: response.greeting,
+          updatedAt: responseTimestamp,
+        });
+
+        if (response.notice && response.notice !== meta.notice) {
+          triggerSuccessToast({
+            title: "לתשומת לבך",
+            message: response.notice,
+          });
+        }
+      } catch (error: any) {
+        console.log(JSON.stringify(error, undefined, 2));
+        const status = error?.response?.status;
+        const message = error?.response?.data?.message || "אירעה שגיאה בשליחת ההודעה";
+
+        triggerErrorToast({ message });
+
+        const shouldOfferRetry = !status || status >= 500;
+        if (shouldOfferRetry) {
+          await updateMessage(sessionId, messageId, { error: true });
+          setRetryContext({ sessionId, messageId, prompt: question, userId });
+        }
+      } finally {
+        setLoading(false);
+      }
+    },
+    [
+      appendAssistantMessage,
+      meta.notice,
+      sendQuery,
+      triggerErrorToast,
+      triggerSuccessToast,
+      updateMessage,
+      updateSessionMeta,
+    ]
+  );
 
   const handleSend = useCallback(async () => {
     const trimmedPrompt = prompt?.trim();
@@ -76,78 +180,68 @@ const ChatScreen = () => {
       language: "he",
     };
 
+    setLoading(true);
     await appendUserMessage(sessionId, userMessage);
     setPrompt(undefined);
-    setLoading(true);
 
-    try {
-      const response = await sendQuery({
-        userId: currentUserId,
-        sessionId,
-        question: trimmedPrompt,
-      });
-
-      const responseText = response.answer || "";
-      const responseTimestamp = new Date().toISOString();
-
-      const assistantMessage: IChatMessage = {
-        id: generateUniqueId(),
-        variant: "response",
-        text: responseText,
-        createdAt: responseTimestamp,
-        language: response.language,
-        notice: response.notice,
-        citations: response.citations ?? [],
-        reason: response.reason,
-        cached: response.cached,
-      };
-
-      await appendAssistantMessage(sessionId, assistantMessage);
-
-      await updateSessionMeta(sessionId, {
-        language: response.language,
-        notice: response.notice,
-        lastReason: response.reason,
-        cached: response.cached,
-        updatedAt: responseTimestamp,
-      });
-
-      if (response.notice && response.notice !== meta.notice) {
-        triggerSuccessToast({
-          title: "לתשומת לבך",
-          message: response.notice,
-        });
-      }
-    } catch (error: any) {
-      console.log(JSON.stringify(error, undefined, 2));
-      const status = error?.response?.status;
-      const message = error?.response?.data?.message || "אירעה שגיאה בשליחת ההודעה";
-
-      triggerErrorToast({ message });
-
-      if (status === 429) {
-        // Allow button re-enable after notifying
-        setLoading(false);
-        return;
-      }
-    }
-
-    setLoading(false);
+    await executeQuery({
+      sessionId,
+      question: trimmedPrompt,
+      messageId: userMessage.id,
+      userId: currentUserId,
+    });
   }, [
     activeSessionId,
-    appendAssistantMessage,
     appendUserMessage,
     createSession,
     currentUserId,
+    executeQuery,
     loading,
-    meta.notice,
     prompt,
-    sendQuery,
     storageLoading,
     triggerErrorToast,
-    triggerSuccessToast,
-    updateSessionMeta,
   ]);
+
+  const handleRetry = useCallback(async () => {
+    if (!retryContext || loading || storageLoading) return;
+
+    await executeQuery({
+      sessionId: retryContext.sessionId,
+      question: retryContext.prompt,
+      messageId: retryContext.messageId,
+      userId: retryContext.userId,
+    });
+  }, [executeQuery, loading, retryContext, storageLoading]);
+
+  const handleCopyMessage = useCallback(
+    async (message: IChatMessage) => {
+      if (!message.text) return;
+
+      try {
+        if (Clipboard && typeof Clipboard.setString === "function") {
+          Clipboard.setString(message.text);
+        } else {
+          const webClipboard = (globalThis as any)?.navigator?.clipboard;
+          if (webClipboard?.writeText) {
+            await webClipboard.writeText(message.text);
+          }
+        }
+
+        triggerSuccessToast({ message: "הטקסט הועתק" });
+      } catch {
+        triggerErrorToast({ message: "העתקה נכשלה" });
+      }
+    },
+    [triggerErrorToast, triggerSuccessToast]
+  );
+
+  const handleDeleteMessage = useCallback(
+    async (message: IChatMessage) => {
+      if (!activeSessionId) return;
+      await removeMessage(activeSessionId, message.id);
+    },
+    [activeSessionId, removeMessage]
+  );
 
   useEffect(() => {
     return () => {
@@ -174,7 +268,18 @@ const ChatScreen = () => {
             <InitialChatContainer />
           </ConditionalRender>
           <ConditionalRender condition={chatInitiated}>
-            <ConversationContainer conversation={conversation} loading={loading} />
+            <ConversationContainer
+              conversation={conversation}
+              loading={loading}
+              onCopyMessage={handleCopyMessage}
+              onDeleteMessage={handleDeleteMessage}
+            />
+          </ConditionalRender>
+
+          <ConditionalRender condition={!!retryContext && !loading}>
+            <SecondaryButton onPress={handleRetry} alignStart={false}>
+              נסו שוב
+            </SecondaryButton>
           </ConditionalRender>
 
           <View style={[layout.flexRow, spacing.gapDefault]}>
