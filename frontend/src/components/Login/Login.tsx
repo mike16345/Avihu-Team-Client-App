@@ -1,7 +1,6 @@
 import {
   View,
   Keyboard,
-  KeyboardAvoidingView,
   useWindowDimensions,
   TouchableOpacity,
   Platform,
@@ -22,6 +21,7 @@ import { getRegisterOrLoginPrompt, getRegisterOrLoginPromptLabel } from "@/utils
 import RegisterForm from "./RegisterForm";
 import { Tabs, TabsList } from "../ui/Tabs";
 import { useTabs } from "@/hooks/useTabs";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 
 export interface IUserCredentials {
   email: string;
