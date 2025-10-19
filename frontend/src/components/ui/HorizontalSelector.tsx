@@ -20,7 +20,7 @@ const HorizontalSelector: React.FC<HorizontalSelectorProps> = ({
     <View>
       <ScrollView
         horizontal
-        contentContainerStyle={[spacing.gapDefault, layout.alignSelfStart, spacing.pdHorizontalMd]}
+        contentContainerStyle={[spacing.gapDefault, layout.alignSelfStart]}
         nestedScrollEnabled
       >
         {items.map((item, i) => {

@@ -34,7 +34,13 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
   };
 
   return (
-    <View style={[spacing.gapMd, spacing.pdSm, layout.flex1]}>
+    <View
+      style={[
+        spacing.gapXxl,
+        { paddingTop: 15, paddingBottom: 40, paddingHorizontal: 60 },
+        layout.flex1,
+      ]}
+    >
       <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונה</Text>
 
       <SelectUploadType returnImage={(image: string) => addImage(image)} />

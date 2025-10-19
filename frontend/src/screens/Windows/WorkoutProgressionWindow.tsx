@@ -43,12 +43,14 @@ const WorkoutProgressionWindow = () => {
   if (isError) return <ErrorScreen />;
 
   return (
-    <View style={[layout.flex1, spacing.gapLg /* spacing.pdMd */]}>
-      <HorizontalSelector
-        items={MUSCLE_GROUPS}
-        onSelect={(selected) => setActiveMuscleGroup(selected)}
-        selected={activeMuscleGroup}
-      />
+    <View style={[layout.flex1, spacing.gapLg]}>
+      <View style={spacing.pdHorizontalMd}>
+        <HorizontalSelector
+          items={MUSCLE_GROUPS}
+          onSelect={(selected) => setActiveMuscleGroup(selected)}
+          selected={activeMuscleGroup}
+        />
+      </View>
 
       <DropDownContextProvider
         key={activeExercises.length}

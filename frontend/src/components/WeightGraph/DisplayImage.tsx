@@ -39,7 +39,7 @@ const DisplayImage: React.FC<DisplayImageProps> = ({ images, removeImage }) => {
             >
               <Image
                 source={{ uri: image }}
-                style={[{ width: width * 0.3 }, layout.flex1, layout.center, common.rounded]}
+                style={[{ width: width * 0.23 }, layout.flex1, layout.center, common.rounded]}
               />
               <TouchableOpacity onPress={() => removeImage(i)}>
                 <Icon name="close" />

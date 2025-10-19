@@ -93,7 +93,7 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
   }, []);
 
   return (
-    <View style={[layout.flexRow, layout.center, spacing.gapXxl, layout.widthFull]}>
+    <View style={[layout.flexRow, layout.center, { gap: 40 }, layout.widthFull]}>
       <IconButton icon="camera" onPress={takePhoto} />
       <IconButton icon="gallery" onPress={pickImage} />
     </View>
