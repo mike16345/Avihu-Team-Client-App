@@ -2,6 +2,10 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { lightHaptic } from "@/utils/haptics";
+import { Platform } from "react-native";
+import { generateUniqueId } from "@/utils/utils";
+import { NOTIFICATION_TITLE, NotificationBodies } from "@/constants/notifications";
+import { getNextEightAM, getNextEightAMOnSunday } from "@/utils/notification";
 
 export interface INotification {
   id: string;
@@ -41,6 +45,28 @@ export const useNotificationStore = create<INotificationStore>()(
             notifications: state.notifications.map((n) => {
               const triggerTimeInMilliseconds = new Date(n.triggerTime).getTime();
               const isPassedTriggerTime = now >= triggerTimeInMilliseconds;
+
+              if (Platform.OS == "ios" && isPassedTriggerTime) {
+                const isMeasurementNotification = n.type == "measurement";
+
+                const triggerTime = isMeasurementNotification
+                  ? getNextEightAMOnSunday()
+                  : getNextEightAM();
+
+                queueMicrotask(() => {
+                  get().addNotification({
+                    id: generateUniqueId(),
+                    title: NOTIFICATION_TITLE,
+                    status: "pending",
+                    type: n.type,
+                    body: isMeasurementNotification
+                      ? NotificationBodies.WEEKLY_MEASUERMENT_REMINDER
+                      : NotificationBodies.DAILY_WEIGH_IN_REMINDER,
+                    data: {},
+                    triggerTime,
+                  });
+                });
+              }
 
               return isPassedTriggerTime ? { ...n, status: "delivered" } : n;
             }),
