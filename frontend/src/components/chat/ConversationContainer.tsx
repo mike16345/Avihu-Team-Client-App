@@ -12,7 +12,7 @@ interface ConversationContainerProps {
 }
 
 const ConversationContainer: React.FC<ConversationContainerProps> = ({ conversation, loading }) => {
-  const { spacing, layout } = useStyles();
+  const { spacing } = useStyles();
 
   return (
     <>

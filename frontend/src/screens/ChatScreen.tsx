@@ -8,6 +8,7 @@ import InitialChatContainer from "@/components/chat/InitialChatContainer";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import ConversationContainer from "@/components/chat/ConversationContainer";
 import { IChatMessage } from "@/interfaces/chat";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 const ChatScreen = () => {
   const { colors, layout, spacing, text } = useStyles();
@@ -36,7 +37,7 @@ const ChatScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView style={layout.flex1} behavior="padding">
+    <KeyboardAwareScrollView contentContainerStyle={layout.flex1}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={[spacing.pdXl, layout.flex1, spacing.gap20]}>
           <Text fontVariant="light" fontSize={14} style={text.textCenter}>
@@ -62,7 +63,7 @@ const ChatScreen = () => {
           </View>
         </View>
       </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 };
 
