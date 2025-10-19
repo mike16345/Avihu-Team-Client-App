@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import useNotification from "@/hooks/useNotfication";
+import useNotification from "@/hooks/useNotification";
 import { heavyHaptic, lightHaptic, mediumHaptic, warningNotificationHaptic } from "@/utils/haptics";
 
 interface ITimerStore {

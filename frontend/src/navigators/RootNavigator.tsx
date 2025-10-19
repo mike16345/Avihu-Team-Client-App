@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useUserStore } from "@/store/userStore";
-import useNotification from "@/hooks/useNotfication";
+import useNotification from "@/hooks/useNotification";
 import { NO_ACCESS, SESSION_EXPIRED } from "@/constants/Constants";
 import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 import useLogout from "@/hooks/useLogout";
@@ -19,7 +19,8 @@ const RootNavigator = () => {
   const { currentUser, setCurrentUser } = useUserStore();
   const { data } = useUserQuery(currentUser?._id);
   const { checkUserSessionToken } = useUserApi();
-  const { initializeNotifications, requestPermissions } = useNotification();
+  const { initializeNotifications, requestPermissions, notificationReceivedListener } =
+    useNotification();
   const { handleLogout } = useLogout();
 
   const [loading, setLoading] = useState(true);
@@ -70,6 +71,12 @@ const RootNavigator = () => {
         initializeNotifications();
       })
       .catch((err) => console.log(err));
+
+    const notificationListener = notificationReceivedListener();
+
+    return () => {
+      notificationListener?.remove();
+    };
   }, []);
 
   useEffect(() => {

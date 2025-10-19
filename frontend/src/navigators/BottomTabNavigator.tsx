@@ -4,7 +4,6 @@ import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useTimerStore } from "@/store/timerStore";
 import { Text } from "@/components/ui/Text";
 import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/Icon/Icon";
@@ -19,7 +18,6 @@ const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "Home";
 
 const BottomTabNavigator = () => {
   const { layout, colors, common, fonts, spacing } = useStyles();
-  const { countdown } = useTimerStore();
   const { width } = useWindowDimensions();
   const opacity = useFadeIn();
 

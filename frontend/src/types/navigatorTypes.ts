@@ -1,5 +1,5 @@
 import { IArticleCount } from "@/interfaces/IArticle";
-import { IExercise, IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
+import { IExercise, IRecordedSetResponse } from "@/interfaces/Workout";
 import {
   BottomTabNavigationEventMap,
   BottomTabNavigationOptions,
@@ -19,7 +19,7 @@ export type AuthStackParamList = {
 };
 
 export type BottomStackParamList = {
-  Home: undefined;
+  Home: { window?: number; paramId?: string } | undefined;
   MyWorkoutPlanPage: undefined;
   ChatTab: undefined;
   MyDietPlanPage: undefined;
