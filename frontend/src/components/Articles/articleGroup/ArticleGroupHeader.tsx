@@ -11,10 +11,10 @@ interface ArticleGroupHeaderProps {
 }
 
 const ArticleGroupHeader: React.FC<ArticleGroupHeaderProps> = ({ articleGroup }) => {
-  const { layout, spacing, text } = useStyles();
+  const { layout, spacing, text, colors, common } = useStyles();
 
   return (
-    <View style={[spacing.gapMd, spacing.pdHorizontalLg]}>
+    <View style={[spacing.gapLg, spacing.pdHorizontalLg]}>
       <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter]}>
         <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
           <BackButton<ArticleStackParamsList> />
@@ -23,9 +23,18 @@ const ArticleGroupHeader: React.FC<ArticleGroupHeaderProps> = ({ articleGroup })
           </Text>
         </View>
 
-        <Text fontSize={14} fontVariant="bold">
-          {articleGroup.count} מאמרים
-        </Text>
+        <View
+          style={[
+            spacing.pdVerticalXs,
+            colors.backgroundSurface,
+            common.roundedSm,
+            { paddingHorizontal: 14 },
+          ]}
+        >
+          <Text fontSize={14} fontVariant="semibold">
+            {articleGroup.count} מאמרים
+          </Text>
+        </View>
       </View>
 
       <Text fontSize={16} fontVariant="regular" style={text.textLeft}>

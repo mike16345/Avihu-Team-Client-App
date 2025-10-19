@@ -13,7 +13,7 @@ const ArticleMetric: React.FC<ArticleMetricProps> = ({ icon, value }) => {
   const { layout, spacing } = useStyles();
 
   return (
-    <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
+    <View style={[layout.flexRow, layout.itemsCenter, { gap: 6 }]}>
       <Icon name={icon} />
       <Text fontSize={16} fontVariant="semibold">
         {value}

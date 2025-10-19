@@ -25,7 +25,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
 
   return (
     <TouchableOpacity onPress={handlePress}>
-      <Card style={[common.roundedMd, spacing.pdLg, spacing.gapLg]}>
+      <Card style={[common.roundedMd, spacing.pdMd, spacing.gapLg]}>
         <Card.Header>
           <Text fontVariant="semibold" fontSize={16} style={[text.textLeft, { paddingBottom: 4 }]}>
             {article.title}
