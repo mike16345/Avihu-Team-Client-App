@@ -24,10 +24,12 @@ export default function TopBar() {
         },
       ]}
     >
-      <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
+      <View style={[layout.flexRow, layout.itemsCenter, { gap: 10 }]}>
         <Avatar />
 
-        <Text style={fonts.lg}>ברוך הבא {currentUser?.firstName}</Text>
+        <Text fontSize={16} fontVariant="light" style={fonts.lg}>
+          ברוך הבא {currentUser?.firstName}
+        </Text>
       </View>
 
       <NotificationsWrapper />
