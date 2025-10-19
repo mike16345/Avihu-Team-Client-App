@@ -43,7 +43,7 @@ const WorkoutProgressionWindow = () => {
   if (isError) return <ErrorScreen />;
 
   return (
-    <View style={[layout.flex1, spacing.gapSm, spacing.pdMd]}>
+    <View style={[layout.flex1, spacing.gapLg /* spacing.pdMd */]}>
       <HorizontalSelector
         items={MUSCLE_GROUPS}
         onSelect={(selected) => setActiveMuscleGroup(selected)}
@@ -58,7 +58,7 @@ const WorkoutProgressionWindow = () => {
         <ScrollView
           nestedScrollEnabled
           style={[layout.flex1]}
-          contentContainerStyle={[spacing.gapSm]}
+          contentContainerStyle={spacing.gap14}
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
         >
           <ExerciseSelector muscleGroup={activeMuscleGroup} />
