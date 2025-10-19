@@ -15,11 +15,7 @@ interface ConversationContainerProps {
   onDeleteMessage?: (message: IChatMessage) => Promise<void> | void;
 }
 
-const REFUSAL_REASONS: Array<IChatMessage["reason"]> = [
-  "BLOCKED",
-  "NOT_FITNESS",
-  "CACHE_REFUSAL",
-];
+const REFUSAL_REASONS: Array<IChatMessage["reason"]> = ["BLOCKED", "NOT_FITNESS", "CACHE_REFUSAL"];
 
 const ConversationContainer: React.FC<ConversationContainerProps> = ({
   conversation,
@@ -159,15 +155,14 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
           ? "אפשר לדבר רק על נושאים שקשורים לכושר."
           : "מצטער, איני יכול לעזור עם הבקשה הזו.";
 
-      const bubbleText = isRefusal
-        ? item.text?.trim() || fallbackRefusalText
-        : item.text;
+      const bubbleText = isRefusal ? item.text?.trim() || fallbackRefusalText : item.text;
 
       const shouldRenderBubble =
         item.variant === "prompt" || (bubbleText && bubbleText.trim().length > 0) || isRefusal;
 
       const isRTL = (item.language ?? "he").toLowerCase().startsWith("he");
-      const alignmentStyle = item.variant === "prompt" ? layout.alignSelfStart : layout.alignSelfEnd;
+      const alignmentStyle =
+        item.variant === "prompt" ? layout.alignSelfStart : layout.alignSelfEnd;
 
       const shouldShowCitations =
         !isRefusal && item.variant === "response" && !!item.citations && item.citations.length > 0;
@@ -187,7 +182,11 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
           <ConditionalRender condition={item.error}>
             <Text
               fontSize={12}
-              style={[alignmentStyle, colors.textDanger, { writingDirection: isRTL ? "rtl" : "ltr" }]}
+              style={[
+                alignmentStyle,
+                colors.textDanger,
+                { writingDirection: isRTL ? "rtl" : "ltr" },
+              ]}
             >
               השליחה נכשלה, נסו שוב.
             </Text>

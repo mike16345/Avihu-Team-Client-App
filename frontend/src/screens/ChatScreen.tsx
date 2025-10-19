@@ -1,4 +1,10 @@
-import { Clipboard, Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback, View } from "react-native";
+import {
+  Clipboard,
+  Keyboard,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import ChatInput from "@/components/ui/inputs/ChatInput";
@@ -58,7 +64,8 @@ const ChatScreen = () => {
   const hasVisibleMessages = useMemo(
     () =>
       conversation.some(
-        (message) => message.variant === "prompt" || (message.variant === "response" && !message.greeting)
+        (message) =>
+          message.variant === "prompt" || (message.variant === "response" && !message.greeting)
       ),
     [conversation]
   );
