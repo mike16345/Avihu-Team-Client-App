@@ -10,10 +10,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     slug: "avihu-team",
     version: "1.2.0",
     orientation: "portrait",
-    icon: "./assets/appstore.png",
+    icon: "./assets/app-logo.png",
     userInterfaceStyle: "dark",
     splash: {
-      image: "./assets/avihu/avihuFlyTrapWithLogo.jpeg",
+      image: "./assets/app-logo.png",
       backgroundColor: "#000000",
     },
 
@@ -32,7 +32,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         "expo-notifications",
 
         {
-          icon: "./assets/app-icon.png",
+          icon: "./assets/app-logo.png",
           color: "#ffffff",
           defaultChannel: "default",
           enableBackgroundRemoteNotifications: false,
@@ -43,7 +43,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       bundleIdentifier: isDev ? "com.avihuteam.test" : "com.avihuteam.avihuteam",
       supportsTablet: false,
       splash: {
-        image: "./assets/avihu/avihuFlyTrapWithLogo.jpeg",
+        image: "./assets/app-logo.png",
         backgroundColor: "#000000",
       },
       infoPlist: {
@@ -52,7 +52,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/playstore.png",
+        foregroundImage: "./assets/app-logo.png",
         backgroundColor: "#000000",
       },
       softwareKeyboardLayoutMode: "resize",
