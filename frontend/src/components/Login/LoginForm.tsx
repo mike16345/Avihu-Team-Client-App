@@ -75,8 +75,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
         setCurrentUser(res?.data.data.user);
         setItem(JSON.stringify(res.data));
       })
-      .catch((err) => {
-        triggerErrorToast({ message: err.response.data.message });
+      .catch(() => {
+        triggerErrorToast({ message: "מייל או סיסמה שגויים" });
       })
       .finally(() => setLoading(false));
   };
