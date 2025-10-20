@@ -9,12 +9,12 @@ const WeightCardsContainer = () => {
   const { data } = useWeighInsQuery();
   const { layout } = useStyles();
 
-  const { latestWeighIn, monthlyWeighInAverage } = useMemo(() => {
-    if (!data) return { latestWeighIn: 0, monthlyWeighInAverage: 0 };
+  const { latestWeighIn, monthlyWeighInProgress } = useMemo(() => {
+    if (!data) return { latestWeighIn: 0, monthlyWeighInProgress: 0 };
 
     return {
       latestWeighIn: DateUtils.getLatestItem(data, "date")?.weight || 0,
-      monthlyWeighInAverage: DateUtils.getAverageInLastXDays(data, "date", "weight", 30),
+      monthlyWeighInProgress: DateUtils.getProgressInLastXDays(data, "date", "weight", 30),
     };
   }, [data]);
 
@@ -23,8 +23,8 @@ const WeightCardsContainer = () => {
       <WeightCard
         title="מגמה חודשית"
         unit='ק"ג'
-        value={monthlyWeighInAverage.toFixed(2)}
-        operator="+"
+        value={monthlyWeighInProgress.toFixed(2)}
+        operator={monthlyWeighInProgress > 0 ? "+" : undefined}
       />
       <WeightCard title="משקל נוכחי" unit='ק"ג' value={latestWeighIn.toFixed(2)} />
     </View>
