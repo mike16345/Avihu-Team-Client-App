@@ -1,10 +1,5 @@
 import React from "react";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  runOnJS,
-} from "react-native-reanimated";
+import Animated, { LinearTransition, FadeOutLeft } from "react-native-reanimated";
 import { INotification, useNotificationStore } from "@/store/notificationStore";
 import ReminderContainer from "./ReminderContainer";
 
@@ -16,29 +11,15 @@ interface NotificationProps {
 const Notification: React.FC<NotificationProps> = ({ notification, onNavigate }) => {
   const { removeNotification } = useNotificationStore();
 
-  // Shared values for manual animation
-  const translateX = useSharedValue(0);
-  const opacity = useSharedValue(1);
-
-  // Called when user presses dismiss
   const handleRemove = () => {
-    // Animate out manually
-    translateX.value = withTiming(-300, { duration: 250 }); // slide left
-    opacity.value = withTiming(0, { duration: 250 }, (finished) => {
-      if (finished) {
-        runOnJS(removeNotification)(notification.id); // remove from store after animation
-      }
-    });
+    removeNotification(notification.id);
   };
 
-  // Animated styles
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-    opacity: opacity.value,
-  }));
-
   return (
-    <Animated.View style={[animatedStyle, { width: "100%" }]}>
+    <Animated.View
+      layout={LinearTransition.springify().damping(18).stiffness(180)}
+      exiting={FadeOutLeft.duration(120)}
+    >
       <ReminderContainer
         type={notification.type}
         handleDismiss={handleRemove}
