@@ -22,6 +22,9 @@ interface INotificationStore {
   getPendingNotifications: () => INotification[];
   getDeliveredNotifications: () => INotification[];
   addNotification: (notification: INotification) => void;
+  addWeighInNotification: (id?: string) => void;
+  addMeasurementNotification: (id?: string) => void;
+  addNotificationsIfNecessary: () => void;
   removeNotification: (id: string) => void;
   updateNotificationStatus: (id: string) => void;
   updateNotificationsPastTriggerTime: () => void;
@@ -72,6 +75,61 @@ export const useNotificationStore = create<INotificationStore>()(
             }),
           };
         });
+      },
+
+      addWeighInNotification: (id) => {
+        const triggerTime = getNextEightAM();
+        const data = { id: id || generateUniqueId() };
+        const pendingNotifications = get().getPendingNotifications();
+
+        if (
+          pendingNotifications.find(
+            (n) =>
+              n.type == "weighIn" && new Date(n.triggerTime).getTime() === triggerTime.getTime()
+          )
+        )
+          return;
+
+        get().addNotification({
+          id: data.id,
+          status: "pending",
+          title: NOTIFICATION_TITLE,
+          body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
+          type: "weighIn",
+          data,
+          triggerTime,
+        });
+      },
+
+      addMeasurementNotification: (id) => {
+        const triggerTime = getNextEightAMOnSunday();
+        const data = { id: id || generateUniqueId() };
+        const pendingNotifications = get().getPendingNotifications();
+
+        if (
+          pendingNotifications.find(
+            (n) =>
+              n.type == "measurement" && new Date(n.triggerTime).getTime() === triggerTime.getTime()
+          )
+        )
+          return;
+
+        get().addNotification({
+          id: data.id,
+          status: "pending",
+          title: NOTIFICATION_TITLE,
+          body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER,
+          type: "measurement",
+          data,
+          triggerTime,
+        });
+      },
+
+      addNotificationsIfNecessary: () => {
+        if (Platform.OS == "android") return;
+
+        get().addWeighInNotification();
+        get().addMeasurementNotification();
       },
 
       addNotification: (notification: INotification) => {
