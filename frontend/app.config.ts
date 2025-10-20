@@ -11,7 +11,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     version: "1.2.0",
     orientation: "portrait",
     icon: "./assets/app-logo.png",
-    userInterfaceStyle: "dark",
+    userInterfaceStyle: "automatic",
     splash: {
       image: "./assets/app-logo.png",
       backgroundColor: "#000000",
