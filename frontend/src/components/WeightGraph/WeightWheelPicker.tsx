@@ -160,7 +160,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
               },
             ]}
           >
-            <Text style={{ direction: "rtl" }} fontVariant="brutalist" fontSize={24}>{`00.`}</Text>
+            <Text style={{ direction: "rtl" }} fontVariant="brutalist" fontSize={24}>{`.00`}</Text>
             <Text fontVariant="brutalist" fontSize={24}>{`0`}</Text>
           </View>
         )}
