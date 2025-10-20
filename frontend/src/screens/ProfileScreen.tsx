@@ -20,15 +20,17 @@ const ProfileScreen = () => {
   };
 
   return (
-    <View style={[layout.flex1, { paddingTop: 48 }, spacing.pdBottomBar, spacing.pdHorizontalLg]}>
+    <View style={[layout.flex1, { paddingTop: 48 }, spacing.pdBottomBar]}>
       <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
         <View style={[{ marginBottom: 30 }]}>
           <ProfileHeading />
         </View>
         <UserDetailsWrapper />
-        <PrimaryButton style={[{ marginTop: 20 }]} block mode="light" onPress={onLogOut}>
-          <Text fontVariant="bold">התנתק</Text>
-        </PrimaryButton>
+        <View style={spacing.pdHorizontalLg}>
+          <PrimaryButton style={{ marginTop: 20 }} block mode="light" onPress={onLogOut}>
+            <Text fontVariant="bold">התנתק</Text>
+          </PrimaryButton>
+        </View>
       </ScrollView>
     </View>
   );
