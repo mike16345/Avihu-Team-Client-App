@@ -81,15 +81,7 @@ export const useNotification = () => {
       trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
     });
 
-    useNotificationStore.getState().addNotification({
-      id: data.id,
-      title: NOTIFICATION_TITLE,
-      body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
-      data,
-      status: "pending",
-      triggerTime: next8am,
-      type: "weighIn",
-    });
+    useNotificationStore.getState().addWeighInNotification(data.id);
   };
 
   const scheduleWeeklyMeasurementReminder = async () => {
@@ -126,15 +118,7 @@ export const useNotification = () => {
       trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
     });
 
-    useNotificationStore.getState().addNotification({
-      id: data.id,
-      title: NOTIFICATION_TITLE,
-      body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER,
-      data,
-      status: "pending",
-      triggerTime: nextSunday8am,
-      type: "measurement",
-    });
+    useNotificationStore.getState().addMeasurementNotification(data.id);
   };
 
   /** Show a one-off notification now or in N seconds, or at a Date */
