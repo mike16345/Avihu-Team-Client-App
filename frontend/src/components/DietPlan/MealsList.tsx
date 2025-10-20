@@ -5,6 +5,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
+import { Text } from "../ui/Text";
 
 interface MealsListProps {}
 
@@ -22,6 +23,11 @@ const MealsList: FC<MealsListProps> = () => {
             <SpinningIcon mode="light" />
           </View>
         </ConditionalRender>
+
+        <ConditionalRender condition={!meals.length && !isLoading}>
+          <Text style={{ textAlign: "center" }}>אין תוכנית תזונה</Text>
+        </ConditionalRender>
+
         {meals.map((meal, i) => {
           return <CollapsibleMeal key={meal._id ?? i} meal={meal} index={i} />;
         })}
