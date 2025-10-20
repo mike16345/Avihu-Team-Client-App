@@ -7,7 +7,7 @@ import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { useDietPlanStore } from "@/store/useDietPlanStore";
 
 const DailyCalorieIntake = () => {
-  const { layout, spacing, fonts } = useStyles();
+  const { layout, spacing } = useStyles();
   const totalCaloriesEaten = useDietPlanStore((state) => state.totalCaloriesEaten);
   const { data } = useDietPlanQuery();
   const { totalCalories = 0, freeCalories = 0 } = data || {};
