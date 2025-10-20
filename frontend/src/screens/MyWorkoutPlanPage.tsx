@@ -1,6 +1,6 @@
 import { RefreshControl, ScrollView, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IWorkoutPlan } from "@/interfaces/Workout";
 import MuscleGroupContainer from "@/components/WorkoutPlan/MuscleGroupContainer";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
@@ -15,12 +15,13 @@ import { DropDownContextProvider } from "@/context/useDropdown";
 import { mapToDropDownItems } from "@/utils/utils";
 import queryClient from "@/QueryClient/queryClient";
 import { WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
+import { Text } from "@/components/ui/Text";
 
 const MyWorkoutPlanScreen = () => {
   const { colors, layout, spacing, common } = useStyles();
   const { refresh } = usePullDownToRefresh();
 
-  const { data, isError, isLoading, refetch, isRefetching } = useWorkoutPlanQuery();
+  const { data, isError, isLoading, error, refetch, isRefetching } = useWorkoutPlanQuery();
 
   const [selectedPlan, setSelectedPlan] = useState<IWorkoutPlan>();
   const [showCardio, setShowCardio] = useState(false);
@@ -54,6 +55,12 @@ const MyWorkoutPlanScreen = () => {
     return plans;
   }, [data]);
 
+  if (error?.status == 404)
+    return (
+      <View style={[layout.flex1, layout.center]}>
+        <Text>אין תוכנית אימונים זמינה</Text>
+      </View>
+    );
   if (isError)
     return <ErrorScreen refetchFunc={() => refresh(handleRefetch)} isFetching={isRefetching} />;
 

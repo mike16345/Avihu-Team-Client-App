@@ -65,6 +65,7 @@ export const createRetryFunction = (ignoreStatusCode: number, maxRetries: number
   return (failureCount: number, error: any) => {
     console.log("error", error);
     // Check if error response exists and matches the ignored status code
+
     if (error?.status === ignoreStatusCode) {
       return false; // Stop retrying for the specified status code
     }
@@ -278,7 +279,7 @@ export function extractValuesFromArray<T, K extends keyof T>(array: T[], key: K)
 
 export function extractValuesFromObject<
   T extends Record<string, any>,
-  K extends keyof T[keyof T] = never,
+  K extends keyof T[keyof T] = never
 >(obj: T, innerKey?: K): (K extends never ? string : T[keyof T][K])[] {
   const keys = Object.keys(obj);
 
