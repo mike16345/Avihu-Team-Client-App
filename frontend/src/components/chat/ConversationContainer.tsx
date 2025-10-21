@@ -136,6 +136,7 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({ conversat
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         inverted
+        nestedScrollEnabled
         contentContainerStyle={[spacing.gap20]}
         keyboardShouldPersistTaps="handled"
       />

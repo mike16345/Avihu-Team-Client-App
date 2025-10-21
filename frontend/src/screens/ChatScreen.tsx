@@ -165,31 +165,33 @@ const ChatScreen = () => {
 
   return (
     <KeyboardAwareScrollView contentContainerStyle={layout.flex1}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={[spacing.pdXl, layout.flex1, spacing.gap20]}>
-          <Text fontVariant="light" fontSize={14} style={text.textCenter}>
-            תשובות כלליות בלבד, פנו למאמן להכוונה מדויקת
-          </Text>
+      <View style={[spacing.pdXl, layout.flex1, spacing.gap20]}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <>
+            <Text fontVariant="light" fontSize={14} style={text.textCenter}>
+              תשובות כלליות בלבד, פנו למאמן להכוונה מדויקת
+            </Text>
 
-          <ConditionalRender condition={!chatInitiated}>
-            <InitialChatContainer />
-          </ConditionalRender>
-          <ConditionalRender condition={chatInitiated}>
-            <ConversationContainer conversation={conversation} loading={loading} />
-          </ConditionalRender>
+            <ConditionalRender condition={!chatInitiated}>
+              <InitialChatContainer />
+            </ConditionalRender>
+            <ConditionalRender condition={chatInitiated}>
+              <ConversationContainer conversation={conversation} loading={loading} />
+            </ConditionalRender>
+          </>
+        </TouchableWithoutFeedback>
 
-          <View style={[layout.flexRow, spacing.gapDefault]}>
-            <ChatInput
-              style={[colors.backgroundSurface, layout.flex1]}
-              placeholder="כתבו כאן"
-              onChangeText={(val) => setPrompt(val)}
-              value={prompt ?? ""}
-            />
+        <View style={[layout.flexRow, spacing.gapDefault]}>
+          <ChatInput
+            style={[colors.backgroundSurface, layout.flex1]}
+            placeholder="כתבו כאן"
+            onChangeText={(val) => setPrompt(val)}
+            value={prompt ?? ""}
+          />
 
-            <SendButton disabled={isSendDisabled} onPress={handleSend} />
-          </View>
+          <SendButton disabled={isSendDisabled} onPress={handleSend} />
         </View>
-      </TouchableWithoutFeedback>
+      </View>
     </KeyboardAwareScrollView>
   );
 };
