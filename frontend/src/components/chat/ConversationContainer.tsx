@@ -7,6 +7,8 @@ import ChatBubble from "../ui/chat/ChatBubble";
 import Loader from "../ui/loaders/Loader";
 import { Text } from "../ui/Text";
 import MessageContextMenu from "./MessageContextMenu";
+import { useUserStore } from "@/store/userStore";
+import { greetUser } from "@/utils/chat-utils";
 
 interface ConversationContainerProps {
   conversation: IChatMessage[];
@@ -23,6 +25,7 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
   onCopyMessage,
   onDeleteMessage,
 }) => {
+  const user = useUserStore((state) => state.currentUser);
   const { spacing, layout, colors, common, text } = useStyles();
 
   const [menuVisible, setMenuVisible] = useState(false);
@@ -143,9 +146,8 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
 
   const renderItem = useCallback(
     ({ item }: { item: IChatMessage }) => {
-      if (item.variant === "response" && (item.greeting || item.reason === "GREETING")) {
-        return null;
-      }
+      const isGreeting =
+        item.variant === "response" && (item.greeting || item.reason === "GREETING");
 
       const isRefusal =
         item.variant === "response" && (item.refusal || REFUSAL_REASONS.includes(item.reason));
@@ -155,7 +157,11 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
           ? "אפשר לדבר רק על נושאים שקשורים לכושר."
           : "מצטער, איני יכול לעזור עם הבקשה הזו.";
 
-      const bubbleText = isRefusal ? item.text?.trim() || fallbackRefusalText : item.text;
+      const bubbleText = isGreeting
+        ? greetUser(user, item)
+        : isRefusal
+        ? item.text?.trim() || fallbackRefusalText
+        : item.text;
 
       const shouldRenderBubble =
         item.variant === "prompt" || (bubbleText && bubbleText.trim().length > 0) || isRefusal;
@@ -212,12 +218,16 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const listContentStyle = useMemo(() => [spacing.gap20], [spacing.gap20]);
 
   return (
-    <View style={[layout.flex1]} pointerEvents="box-none">
+    <View style={[layout.flex1, spacing.gapDefault]} pointerEvents="box-none">
       <FlatList
         data={conversation}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         inverted
+        removeClippedSubviews
+        windowSize={7} // 5–9 is a good range
+        maxToRenderPerBatch={8}
+        updateCellsBatchingPeriod={50}
         contentContainerStyle={listContentStyle}
         keyboardShouldPersistTaps="handled"
         scrollEventThrottle={16}

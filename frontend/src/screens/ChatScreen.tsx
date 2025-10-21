@@ -233,13 +233,11 @@ const ChatScreen = () => {
             await webClipboard.writeText(message.text);
           }
         }
-
-        triggerSuccessToast({ message: "הטקסט הועתק" });
       } catch {
         triggerErrorToast({ message: "העתקה נכשלה" });
       }
     },
-    [triggerErrorToast, triggerSuccessToast]
+    [triggerErrorToast]
   );
 
   const handleDeleteMessage = useCallback(
@@ -260,6 +258,7 @@ const ChatScreen = () => {
 
   const isSendDisabled = useMemo(() => {
     const trimmed = prompt?.trim();
+
     return !trimmed || loading || storageLoading;
   }, [loading, prompt, storageLoading]);
 
@@ -284,7 +283,7 @@ const ChatScreen = () => {
           </ConditionalRender>
 
           <ConditionalRender condition={!!retryContext && !loading}>
-            <SecondaryButton onPress={handleRetry} alignStart={false}>
+            <SecondaryButton onPress={handleRetry} alignStart>
               נסו שוב
             </SecondaryButton>
           </ConditionalRender>
