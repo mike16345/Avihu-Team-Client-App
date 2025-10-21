@@ -82,7 +82,6 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
 
   const handleValueChange = useCallback(
     (values: any[]) => {
-      console.log("values", values);
       const wholeValue = values[0];
       const decimalValue = showZeroDecimal ? Number(values[1]) : Number(values[1]) / 10;
 
@@ -161,7 +160,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
               },
             ]}
           >
-            <Text style={{ direction: "rtl" }} fontVariant="brutalist" fontSize={24}>{`00.`}</Text>
+            <Text style={{ direction: "rtl" }} fontVariant="brutalist" fontSize={24}>{`.00`}</Text>
             <Text fontVariant="brutalist" fontSize={24}>{`0`}</Text>
           </View>
         )}

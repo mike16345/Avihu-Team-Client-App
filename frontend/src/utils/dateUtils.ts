@@ -25,9 +25,39 @@ class DateUtils {
 
     if (recentWeighIns.length === 0) return 0;
 
+    console.log("recent weighins", recentWeighIns);
+
     const totalWeight = recentWeighIns.reduce((sum, w) => sum + (w[keyToCalculate] as number), 0);
 
+    console.log("total Weight", totalWeight);
+    console.log("total ", recentWeighIns.length);
+    console.log("average", totalWeight / recentWeighIns.length);
+
     return totalWeight / recentWeighIns.length;
+  }
+  static getProgressInLastXDays<T>(
+    items: T[],
+    dateKey: keyof T,
+    keyToCalculate: keyof T,
+    days: number
+  ): number {
+    const today = new Date();
+    const xDaysAgo = new Date(today);
+    xDaysAgo.setDate(today.getDate() - days);
+
+    const recentWeighIns = items.filter((w) => {
+      const weighInDate = new Date(w[dateKey] as any);
+      return weighInDate >= xDaysAgo && weighInDate <= today;
+    });
+
+    if (recentWeighIns.length === 0) return 0;
+
+    const firstDate = recentWeighIns[0];
+    const lastDate = recentWeighIns[recentWeighIns.length - 1];
+
+    const totalWeight = lastDate[keyToCalculate] - firstDate[keyToCalculate];
+
+    return totalWeight;
   }
 
   static sortByDate(values: DateAndValue[], order: "asc" | "desc"): { date: Date; value: any }[] {

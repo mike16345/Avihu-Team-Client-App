@@ -6,6 +6,7 @@ import { MEASUREMENT_MUSCLE_GROUPS } from "@/constants/measurements";
 import { useState } from "react";
 import MeasurementInput from "@/components/measurements/MeasurementInput";
 import ProgressImageUpload from "@/components/measurements/ProgressImageUpload";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 const MeasurementsWindow = () => {
   const { layout, spacing } = useStyles();
@@ -13,27 +14,26 @@ const MeasurementsWindow = () => {
   const [activeMuscleGroup, setActiveMuscleGroup] = useState<string>(MEASUREMENT_MUSCLE_GROUPS[0]);
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={[layout.flex1]}>
-      <ScrollView
-        nestedScrollEnabled
-        style={layout.flex1}
-        contentContainerStyle={[spacing.gapLg, spacing.pdHorizontalLg]}
-      >
-        <Text style={layout.alignSelfStart} fontSize={16}>
-          מדידת היקפים
-        </Text>
+    <KeyboardAwareScrollView
+      bottomOffset={100}
+      nestedScrollEnabled
+      style={layout.flex1}
+      contentContainerStyle={[spacing.gapLg, spacing.pdHorizontalLg]}
+    >
+      <Text style={layout.alignSelfStart} fontSize={16}>
+        מדידת היקפים
+      </Text>
 
-        <HorizontalSelector
-          items={MEASUREMENT_MUSCLE_GROUPS}
-          selected={activeMuscleGroup}
-          onSelect={(selected) => setActiveMuscleGroup(selected)}
-        />
+      <HorizontalSelector
+        items={MEASUREMENT_MUSCLE_GROUPS}
+        selected={activeMuscleGroup}
+        onSelect={(selected) => setActiveMuscleGroup(selected)}
+      />
 
-        <MeasurementInput activeMuscleGroup={activeMuscleGroup} />
+      <MeasurementInput activeMuscleGroup={activeMuscleGroup} />
 
-        <ProgressImageUpload />
-      </ScrollView>
-    </KeyboardAvoidingView>
+      <ProgressImageUpload />
+    </KeyboardAwareScrollView>
   );
 };
 

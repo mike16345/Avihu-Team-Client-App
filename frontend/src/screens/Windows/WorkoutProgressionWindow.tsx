@@ -13,7 +13,7 @@ import HorizontalSelector from "@/components/ui/HorizontalSelector";
 
 const WorkoutProgressionWindow = () => {
   const { layout, spacing } = useStyles();
-  const { data, isLoading, isError, isRefetching, refetch } = useRecordedSetsQuery();
+  const { data, isLoading, isError, error, isRefetching, refetch } = useRecordedSetsQuery();
 
   const [activeMuscleGroup, setActiveMuscleGroup] = useState<string>(MUSCLE_GROUPS[0]);
 
@@ -40,15 +40,17 @@ const WorkoutProgressionWindow = () => {
   const activeExercises = exercisesByMuscleGroups[activeMuscleGroup] || [];
 
   if (isLoading) return <WorkoutProgressScreenSkeleton />;
-  if (isError) return <ErrorScreen />;
+  if (isError && error.status !== 404) return <ErrorScreen />;
 
   return (
-    <View style={[layout.flex1, spacing.gapSm, spacing.pdMd]}>
-      <HorizontalSelector
-        items={MUSCLE_GROUPS}
-        onSelect={(selected) => setActiveMuscleGroup(selected)}
-        selected={activeMuscleGroup}
-      />
+    <View style={[layout.flex1, spacing.gapLg]}>
+      <View style={spacing.pdHorizontalMd}>
+        <HorizontalSelector
+          items={MUSCLE_GROUPS}
+          onSelect={(selected) => setActiveMuscleGroup(selected)}
+          selected={activeMuscleGroup}
+        />
+      </View>
 
       <DropDownContextProvider
         key={activeExercises.length}
@@ -58,7 +60,7 @@ const WorkoutProgressionWindow = () => {
         <ScrollView
           nestedScrollEnabled
           style={[layout.flex1]}
-          contentContainerStyle={[spacing.gapSm]}
+          contentContainerStyle={spacing.gap14}
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
         >
           <ExerciseSelector muscleGroup={activeMuscleGroup} />

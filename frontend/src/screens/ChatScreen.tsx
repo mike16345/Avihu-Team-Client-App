@@ -1,7 +1,6 @@
 import {
   Clipboard,
   Keyboard,
-  KeyboardAvoidingView,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -19,6 +18,7 @@ import { useUserStore } from "@/store/userStore";
 import { useToast } from "@/hooks/useToast";
 import { generateUniqueId } from "@/utils/utils";
 import useChatApi from "@/hooks/api/useChatApi";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 
 interface RetryContext {
@@ -263,12 +263,13 @@ const ChatScreen = () => {
   }, [loading, prompt, storageLoading]);
 
   return (
-    <KeyboardAvoidingView style={layout.flex1} behavior="padding">
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={[spacing.pdXl, layout.flex1, spacing.gap20]}>
-          <Text fontVariant="light" fontSize={14} style={text.textCenter}>
-            תשובות כלליות בלבד, פנו למאמן להכוונה מדויקת
-          </Text>
+    <KeyboardAwareScrollView contentContainerStyle={layout.flex1}>
+      <View style={[spacing.pdXl, layout.flex1, spacing.gap20]}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <>
+            <Text fontVariant="light" fontSize={14} style={text.textCenter}>
+              תשובות כלליות בלבד, פנו למאמן להכוונה מדויקת
+            </Text>
 
           <ConditionalRender condition={!chatInitiated}>
             <InitialChatContainer />
@@ -288,19 +289,18 @@ const ChatScreen = () => {
             </SecondaryButton>
           </ConditionalRender>
 
-          <View style={[layout.flexRow, spacing.gapDefault]}>
-            <ChatInput
-              style={[colors.backgroundSurface, layout.flex1]}
-              placeholder="כתבו כאן"
-              onChangeText={(val) => setPrompt(val)}
-              value={prompt ?? ""}
-            />
+        <View style={[layout.flexRow, spacing.gapDefault]}>
+          <ChatInput
+            style={[colors.backgroundSurface, layout.flex1]}
+            placeholder="כתבו כאן"
+            onChangeText={(val) => setPrompt(val)}
+            value={prompt ?? ""}
+          />
 
-            <SendButton disabled={isSendDisabled} onPress={handleSend} />
-          </View>
+          <SendButton disabled={isSendDisabled} onPress={handleSend} />
         </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      </View>
+    </KeyboardAwareScrollView>
   );
 };
 

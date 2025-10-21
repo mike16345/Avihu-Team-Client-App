@@ -23,14 +23,19 @@ const ArticleGroupDisplay: React.FC<{ articleGroup: IArticleCount }> = ({
     <TouchableOpacity style={layout.widthFull} onPress={handlePress}>
       <Card
         variant="gray"
-        style={[layout.widthFull, layout.itemsStart, common.roundedMd, spacing.pdMd]}
+        style={[
+          layout.widthFull,
+          layout.itemsStart,
+          common.roundedMd,
+          { paddingVertical: 14, paddingHorizontal: 18 },
+        ]}
       >
         <Card.Header style={{ paddingBottom: 4 }}>
           <Text fontVariant="bold" fontSize={16}>
             {name}
           </Text>
         </Card.Header>
-        <Card.Content style={[spacing.gapMd, layout.itemsStart]}>
+        <Card.Content style={[spacing.gap14, layout.itemsStart]}>
           <ConditionalRender condition={description}>
             <Text fontSize={16} style={text.textLeft}>
               {description}
@@ -40,9 +45,10 @@ const ArticleGroupDisplay: React.FC<{ articleGroup: IArticleCount }> = ({
           <View
             style={[
               colors.backgroundSurface,
-              spacing.pdXs,
+              spacing.pdVerticalXs,
               common.roundedSm,
               layout.alignSelfStart,
+              { paddingHorizontal: 14 },
             ]}
           >
             <Text fontSize={14} fontVariant="semibold">

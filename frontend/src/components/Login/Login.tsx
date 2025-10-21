@@ -1,7 +1,6 @@
 import {
   View,
   Keyboard,
-  KeyboardAvoidingView,
   useWindowDimensions,
   TouchableOpacity,
   Platform,
@@ -22,6 +21,7 @@ import { getRegisterOrLoginPrompt, getRegisterOrLoginPromptLabel } from "@/utils
 import RegisterForm from "./RegisterForm";
 import { Tabs, TabsList } from "../ui/Tabs";
 import { useTabs } from "@/hooks/useTabs";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 
 export interface IUserCredentials {
   email: string;
@@ -109,7 +109,7 @@ export default function Login({ onLogin }: ILoginProps) {
           { height: height, width: width },
         ]}
       >
-        <View style={[layout.flex1, layout.justifyCenter]}>
+        <View style={[layout.flex1, layout.justifyStart, { paddingTop: 48 }]}>
           <Image source={appIcon} style={styles.logo} />
         </View>
 
@@ -119,7 +119,7 @@ export default function Login({ onLogin }: ILoginProps) {
         >
           <ConditionalRender condition={!isForgotPassword}>
             <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value)}>
-              <View style={[spacing.gapDefault]}>
+              <View style={[spacing.gapXxl]}>
                 <TabsList>{tabTriggers}</TabsList>
                 {tabContent}
               </View>
@@ -133,11 +133,24 @@ export default function Login({ onLogin }: ILoginProps) {
             />
           </ConditionalRender>
 
-          <View style={[layout.flexRow, layout.center, spacing.gapSm, { zIndex: 30 }]}>
-            <Text style={[colors.textPrimary]}>{registerOrLoginPrompt}</Text>
+          <View
+            style={[
+              layout.flexRow,
+              layout.center,
+              spacing.gapSm,
+              { zIndex: 30, paddingBottom: 32 },
+            ]}
+          >
+            <Text fontSize={16} style={[colors.textPrimary]}>
+              {registerOrLoginPrompt}
+            </Text>
 
             <TouchableOpacity onPress={bottomPromptHandler}>
-              <Text style={[colors.textPrimary, text.textBold]}>
+              <Text
+                fontVariant="semibold"
+                fontSize={16}
+                style={[colors.textPrimary, text.textBold]}
+              >
                 {getRegisterOrLoginPromptLabel(isRegistering, isChangingPassword)}
               </Text>
             </TouchableOpacity>

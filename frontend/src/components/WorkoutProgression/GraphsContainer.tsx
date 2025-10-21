@@ -74,7 +74,14 @@ const GraphsContainer = () => {
   ];
 
   return (
-    <Animated.View style={[{ flex: 1, opacity: opacity }, spacing.gapDefault]}>
+    <Animated.View
+      style={[
+        { flex: 1, opacity: opacity },
+        spacing.gap14,
+        spacing.pdHorizontalMd,
+        spacing.pdBottomBar,
+      ]}
+    >
       <ConditionalRender condition={items.length === 0}>
         <View style={[layout.center]}>
           <Text>לא הוקלטו סטים</Text>

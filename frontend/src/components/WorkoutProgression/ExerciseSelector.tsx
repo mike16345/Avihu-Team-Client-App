@@ -19,8 +19,11 @@ const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({ muscleGroup }) => {
     MUSCLE_GROUPS_ENGLISH[muscleInHebrew];
 
   return (
-    <View style={spacing.gapDefault}>
-      <Card variant="gray" style={[spacing.gap20, common.roundedMd]}>
+    <View style={[spacing.gapDefault, spacing.pdHorizontalMd]}>
+      <Card
+        variant="gray"
+        style={[spacing.gap20, common.roundedMd, spacing.pdVertical20, spacing.pdHorizontalMd]}
+      >
         <Card.Header>
           <View style={[layout.flexRow, layout.justifyBetween, spacing.pdHorizontalDefault]}>
             <Text fontVariant="bold" fontSize={20}>
@@ -34,7 +37,10 @@ const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({ muscleGroup }) => {
             />
           </View>
         </Card.Header>
-        <Card.Content>
+        <Card.Content style={{ gap: 6 }}>
+          <Text fontSize={16} fontVariant="semibold" style={layout.alignSelfStart}>
+            תרגיל
+          </Text>
           <DropDownTrigger />
         </Card.Content>
       </Card>

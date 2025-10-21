@@ -9,10 +9,10 @@ interface UserDetailContainerProps {
 }
 
 const UserDetailContainer: React.FC<UserDetailContainerProps> = ({ label, value }) => {
-  const { text, common } = useStyles();
+  const { text, common, spacing } = useStyles();
 
   return (
-    <Card variant="gray" style={common.roundedMd}>
+    <Card variant="gray" style={[common.roundedMd, spacing.mgHorizontalLg]}>
       <Card.Header>
         <Text style={text.textCenter}>{label}</Text>
       </Card.Header>

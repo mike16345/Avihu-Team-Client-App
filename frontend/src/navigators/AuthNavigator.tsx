@@ -5,16 +5,19 @@ import { useQueryClient } from "@tanstack/react-query";
 import SuccessScreen from "@/screens/SuccessScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "@/types/navigatorTypes";
+import { useNotificationStore } from "@/store/notificationStore";
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 export default function AuthNavigator() {
   const queryClient = useQueryClient();
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
+  const { addNotificationsIfNecessary } = useNotificationStore();
 
   const onLogin = (user: IUser) => {
     queryClient.setQueryData(["user-", user._id], user);
     setCurrentUser(user);
+    addNotificationsIfNecessary();
   };
 
   return (

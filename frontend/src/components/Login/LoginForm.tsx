@@ -23,7 +23,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuccess }) => {
-  const { colors, spacing, text } = useStyles();
+  const { colors, spacing, text, layout } = useStyles();
   const { triggerErrorToast, triggerSuccessToast } = useToast();
   const { loginUser } = useUserApi();
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
@@ -75,8 +75,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
         setCurrentUser(res?.data.data.user);
         setItem(JSON.stringify(res.data));
       })
-      .catch((err) => {
-        triggerErrorToast({ message: err.response.data.message });
+      .catch(() => {
+        triggerErrorToast({ message: "מייל או סיסמה שגויים" });
       })
       .finally(() => setLoading(false));
   };
@@ -119,7 +119,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
       />
 
       <TouchableOpacity onPress={onForgotPasswordPress}>
-        <Text style={[colors.textPrimary, text.textBold]}>שכחתי סיסמה</Text>
+        <Text
+          fontVariant="semibold"
+          fontSize={16}
+          style={[colors.textPrimary, text.textBold, layout.alignSelfStart]}
+        >
+          שכחתי סיסמה
+        </Text>
       </TouchableOpacity>
 
       <PrimaryButton block mode="dark" onPress={handleSubmit} loading={loading}>
