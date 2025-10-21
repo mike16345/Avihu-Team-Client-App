@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback, View } from "react-native";
+import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import ChatInput from "@/components/ui/inputs/ChatInput";
