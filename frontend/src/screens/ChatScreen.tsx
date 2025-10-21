@@ -1,5 +1,5 @@
 import { Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback, View } from "react-native";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import ChatInput from "@/components/ui/inputs/ChatInput";
 import SendButton from "@/components/ui/chat/SendButton";
@@ -8,33 +8,160 @@ import InitialChatContainer from "@/components/chat/InitialChatContainer";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import ConversationContainer from "@/components/chat/ConversationContainer";
 import { IChatMessage } from "@/interfaces/chat";
+import useChatStorage from "@/hooks/sessions/useChatStorage";
+import { useUserStore } from "@/store/userStore";
+import { useToast } from "@/hooks/useToast";
+import { generateUniqueId } from "@/utils/utils";
+import useChatApi from "@/hooks/api/useChatApi";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 const ChatScreen = () => {
   const { colors, layout, spacing, text } = useStyles();
+  const { triggerErrorToast, triggerSuccessToast } = useToast();
+  const { currentUser } = useUserStore();
+  const { sendQuery } = useChatApi();
 
-  const [chatInitiated, setChatInitiated] = useState(false);
-  const [conversation, setConversation] = useState<IChatMessage[]>([]);
+  const {
+    isLoading: storageLoading,
+    activeSessionId,
+    messages,
+    meta,
+    createSession,
+    appendUserMessage,
+    appendAssistantMessage,
+    updateSessionMeta,
+  } = useChatStorage();
+
   const [prompt, setPrompt] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleSend = async () => {
-    if (!prompt) return;
+  const currentUserId = currentUser?._id;
 
-    setChatInitiated(true);
-    setConversation((prev) => [{ text: prompt, variant: "prompt" }, ...prev]);
+  useEffect(() => {
+    if (!storageLoading && !activeSessionId) {
+      createSession();
+    }
+  }, [storageLoading, activeSessionId, createSession]);
+
+  const conversation = useMemo<IChatMessage[]>(() => messages ?? [], [messages]);
+  const chatInitiated = loading || conversation.length > 0;
+
+  const handleSend = useCallback(async () => {
+    const trimmedPrompt = prompt?.trim();
+    if (!trimmedPrompt || loading || storageLoading) return;
+
+    if (!currentUserId) {
+      triggerErrorToast({ message: "אין משתמש" });
+      return;
+    }
+
+    if (debounceRef.current) {
+      return;
+    }
+
+    debounceRef.current = setTimeout(() => {
+      debounceRef.current = null;
+    }, 400);
+
+    Keyboard.dismiss();
+
+    const sessionId = activeSessionId ?? (await createSession());
+    const now = new Date().toISOString();
+
+    const userMessage: IChatMessage = {
+      id: generateUniqueId(),
+      variant: "prompt",
+      text: trimmedPrompt,
+      createdAt: now,
+      language: "he",
+    };
+
+    await appendUserMessage(sessionId, userMessage);
     setPrompt(undefined);
+    setLoading(true);
 
-    setTimeout(() => {
-      setLoading(true);
+    try {
+      const response = await sendQuery({
+        userId: currentUserId,
+        sessionId,
+        question: trimmedPrompt,
+      });
 
-      // Simulate server response after additional 2.5s (total 3s)
-      setTimeout(() => {
+      const responseText = response.answer || "";
+      const responseTimestamp = new Date().toISOString();
+
+      const assistantMessage: IChatMessage = {
+        id: generateUniqueId(),
+        variant: "response",
+        text: responseText,
+        createdAt: responseTimestamp,
+        language: response.language,
+        notice: response.notice,
+        citations: response.citations ?? [],
+        reason: response.reason,
+        cached: response.cached,
+      };
+
+      await appendAssistantMessage(sessionId, assistantMessage);
+
+      await updateSessionMeta(sessionId, {
+        language: response.language,
+        notice: response.notice,
+        lastReason: response.reason,
+        cached: response.cached,
+        updatedAt: responseTimestamp,
+      });
+
+      if (response.notice && response.notice !== meta.notice) {
+        triggerSuccessToast({
+          title: "לתשומת לבך",
+          message: response.notice,
+        });
+      }
+    } catch (error: any) {
+      console.log(JSON.stringify(error, undefined, 2));
+      const status = error?.response?.status;
+      const message = error?.response?.data?.message || "אירעה שגיאה בשליחת ההודעה";
+
+      triggerErrorToast({ message });
+
+      if (status === 429) {
+        // Allow button re-enable after notifying
         setLoading(false);
-        setConversation((prev) => [{ text: "תשובה לדוגמא מהצאט", variant: "response" }, ...prev]);
-      }, 2500);
-    }, 500);
-  };
+        return;
+      }
+    }
+
+    setLoading(false);
+  }, [
+    activeSessionId,
+    appendAssistantMessage,
+    appendUserMessage,
+    createSession,
+    currentUserId,
+    loading,
+    meta.notice,
+    prompt,
+    sendQuery,
+    storageLoading,
+    triggerErrorToast,
+    triggerSuccessToast,
+    updateSessionMeta,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
+
+  const isSendDisabled = useMemo(() => {
+    const trimmed = prompt?.trim();
+    return !trimmed || loading || storageLoading;
+  }, [loading, prompt, storageLoading]);
 
   return (
     <KeyboardAwareScrollView contentContainerStyle={layout.flex1}>
@@ -56,10 +183,10 @@ const ChatScreen = () => {
               style={[colors.backgroundSurface, layout.flex1]}
               placeholder="כתבו כאן"
               onChangeText={(val) => setPrompt(val)}
-              value={prompt}
+              value={prompt ?? ""}
             />
 
-            <SendButton disabled={!prompt} onPress={handleSend} />
+            <SendButton disabled={isSendDisabled} onPress={handleSend} />
           </View>
         </View>
       </TouchableWithoutFeedback>
