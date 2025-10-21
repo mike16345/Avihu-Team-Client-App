@@ -7,8 +7,8 @@ const isPreview = !!Constants?.expoConfig?.extra?.API_URL_PREVIEW;
 const URL = isPreview
   ? Constants?.expoConfig?.extra?.API_URL_PREVIEW
   : isExpo
-  ? process.env.EXPO_PUBLIC_SERVER
-  : Constants?.expoConfig?.extra?.API_URL;
+    ? process.env.EXPO_PUBLIC_SERVER
+    : Constants?.expoConfig?.extra?.API_URL;
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: URL,
