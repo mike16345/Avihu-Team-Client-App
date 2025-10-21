@@ -1,9 +1,4 @@
-import {
-  Clipboard,
-  Keyboard,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Clipboard, Keyboard, TouchableWithoutFeedback, View } from "react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import ChatInput from "@/components/ui/inputs/ChatInput";
@@ -266,39 +261,41 @@ const ChatScreen = () => {
     <KeyboardAwareScrollView contentContainerStyle={layout.flex1}>
       <View style={[spacing.pdXl, layout.flex1, spacing.gap20]}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <>
+          <View style={[layout.flex1, spacing.gap20]}>
             <Text fontVariant="light" fontSize={14} style={text.textCenter}>
               תשובות כלליות בלבד, פנו למאמן להכוונה מדויקת
             </Text>
 
-          <ConditionalRender condition={!chatInitiated}>
-            <InitialChatContainer />
-          </ConditionalRender>
-          <ConditionalRender condition={chatInitiated}>
-            <ConversationContainer
-              conversation={conversation}
-              loading={loading}
-              onCopyMessage={handleCopyMessage}
-              onDeleteMessage={handleDeleteMessage}
-            />
-          </ConditionalRender>
+            <ConditionalRender condition={!chatInitiated}>
+              <InitialChatContainer />
+            </ConditionalRender>
+            <ConditionalRender condition={chatInitiated}>
+              <ConversationContainer
+                conversation={conversation}
+                loading={loading}
+                onCopyMessage={handleCopyMessage}
+                onDeleteMessage={handleDeleteMessage}
+              />
+            </ConditionalRender>
 
-          <ConditionalRender condition={!!retryContext && !loading}>
-            <SecondaryButton onPress={handleRetry} alignStart>
-              נסו שוב
-            </SecondaryButton>
-          </ConditionalRender>
+            <ConditionalRender condition={!!retryContext && !loading}>
+              <SecondaryButton onPress={handleRetry} alignStart>
+                נסו שוב
+              </SecondaryButton>
+            </ConditionalRender>
 
-        <View style={[layout.flexRow, spacing.gapDefault]}>
-          <ChatInput
-            style={[colors.backgroundSurface, layout.flex1]}
-            placeholder="כתבו כאן"
-            onChangeText={(val) => setPrompt(val)}
-            value={prompt ?? ""}
-          />
+            <View style={[layout.flexRow, spacing.gapDefault]}>
+              <ChatInput
+                style={[colors.backgroundSurface, layout.flex1]}
+                placeholder="כתבו כאן"
+                onChangeText={(val) => setPrompt(val)}
+                value={prompt ?? ""}
+              />
 
-          <SendButton disabled={isSendDisabled} onPress={handleSend} />
-        </View>
+              <SendButton disabled={isSendDisabled} onPress={handleSend} />
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
       </View>
     </KeyboardAwareScrollView>
   );
