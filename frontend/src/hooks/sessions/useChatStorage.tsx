@@ -136,6 +136,62 @@ const useChatStorage = () => {
     [persistState]
   );
 
+  const updateMessage = useCallback(
+    async (sessionId: string, messageId: string, partial: Partial<IChatMessage>) => {
+      const baseState = latestStateRef.current ?? INITIAL_STATE;
+      const currentSession = baseState.sessions[sessionId];
+      if (!currentSession) return;
+
+      const nextMessages = currentSession.messages.map((message) =>
+        message.id === messageId ? { ...message, ...partial } : message
+      );
+
+      const nextSession: IChatSession = {
+        ...currentSession,
+        updatedAt: partial.createdAt ?? new Date().toISOString(),
+        messages: nextMessages,
+      };
+
+      const nextState: IChatSessionsState = {
+        ...baseState,
+        sessions: {
+          ...baseState.sessions,
+          [sessionId]: nextSession,
+        },
+      };
+
+      await persistState(nextState);
+    },
+    [persistState]
+  );
+
+  const removeMessage = useCallback(
+    async (sessionId: string, messageId: string) => {
+      const baseState = latestStateRef.current ?? INITIAL_STATE;
+      const currentSession = baseState.sessions[sessionId];
+      if (!currentSession) return;
+
+      const nextMessages = currentSession.messages.filter((message) => message.id !== messageId);
+
+      const nextSession: IChatSession = {
+        ...currentSession,
+        updatedAt: new Date().toISOString(),
+        messages: nextMessages,
+      };
+
+      const nextState: IChatSessionsState = {
+        ...baseState,
+        sessions: {
+          ...baseState.sessions,
+          [sessionId]: nextSession,
+        },
+      };
+
+      await persistState(nextState);
+    },
+    [persistState]
+  );
+
   const updateSessionMeta = useCallback(
     async (sessionId: string, meta: Partial<IChatSessionMeta>) => {
       const baseState = latestStateRef.current ?? INITIAL_STATE;
@@ -240,9 +296,12 @@ const useChatStorage = () => {
     setActiveSession,
     appendUserMessage,
     appendAssistantMessage,
+    updateMessage,
+    removeMessage,
     updateSessionMeta,
     clearSession,
     removeSession,
+    getSession: (sessionId: string) => resolvedState.sessions[sessionId],
   };
 };
 

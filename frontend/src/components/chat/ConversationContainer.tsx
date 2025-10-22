@@ -1,19 +1,57 @@
-import { View, FlatList } from "react-native";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo, useState } from "react";
+import { FlatList, Pressable, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import ChatBubble from "../ui/chat/ChatBubble";
 import { IChatMessage } from "@/interfaces/chat";
 import { ConditionalRender } from "../ui/ConditionalRender";
+import ChatBubble from "../ui/chat/ChatBubble";
 import Loader from "../ui/loaders/Loader";
 import { Text } from "../ui/Text";
+import MessageContextMenu from "./MessageContextMenu";
+import { useUserStore } from "@/store/userStore";
+import { greetUser } from "@/utils/chat-utils";
 
 interface ConversationContainerProps {
   conversation: IChatMessage[];
   loading: boolean;
+  onCopyMessage?: (message: IChatMessage) => void;
+  onDeleteMessage?: (message: IChatMessage) => Promise<void> | void;
 }
 
-const ConversationContainer: React.FC<ConversationContainerProps> = ({ conversation, loading }) => {
+const REFUSAL_REASONS: Array<IChatMessage["reason"]> = ["BLOCKED", "NOT_FITNESS", "CACHE_REFUSAL"];
+
+const ConversationContainer: React.FC<ConversationContainerProps> = ({
+  conversation,
+  loading,
+  onCopyMessage,
+  onDeleteMessage,
+}) => {
+  const user = useUserStore((state) => state.currentUser);
   const { spacing, layout, colors, common, text } = useStyles();
+
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<IChatMessage | null>(null);
+
+  const handleCloseMenu = useCallback(() => {
+    setMenuVisible(false);
+    setSelectedMessage(null);
+  }, []);
+
+  const handleLongPress = useCallback((message: IChatMessage) => {
+    setSelectedMessage(message);
+    setMenuVisible(true);
+  }, []);
+
+  const handleCopy = useCallback(() => {
+    if (selectedMessage && onCopyMessage) {
+      onCopyMessage(selectedMessage);
+    }
+  }, [onCopyMessage, selectedMessage]);
+
+  const handleDelete = useCallback(() => {
+    if (selectedMessage && onDeleteMessage) {
+      onDeleteMessage(selectedMessage);
+    }
+  }, [onDeleteMessage, selectedMessage]);
 
   const renderCitations = useCallback(
     (item: IChatMessage) => {
@@ -23,6 +61,7 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({ conversat
 
       return (
         <View
+          pointerEvents="none"
           style={[
             alignStyle,
             colors.backgroundSurfaceVariant,
@@ -77,6 +116,7 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({ conversat
 
       return (
         <View
+          pointerEvents="none"
           style={[
             alignStyle,
             colors.backgroundWarningContainer,
@@ -106,39 +146,92 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({ conversat
 
   const renderItem = useCallback(
     ({ item }: { item: IChatMessage }) => {
+      const isGreeting =
+        item.variant === "response" && (item.greeting || item.reason === "GREETING");
+
+      const isRefusal =
+        item.variant === "response" && (item.refusal || REFUSAL_REASONS.includes(item.reason));
+
+      const fallbackRefusalText =
+        item.reason === "NOT_FITNESS"
+          ? "אפשר לדבר רק על נושאים שקשורים לכושר."
+          : "מצטער, איני יכול לעזור עם הבקשה הזו.";
+
+      const bubbleText = isGreeting
+        ? greetUser(user, item)
+        : isRefusal
+          ? item.text?.trim() || fallbackRefusalText
+          : item.text;
+
+      const shouldRenderBubble =
+        item.variant === "prompt" || (bubbleText && bubbleText.trim().length > 0) || isRefusal;
+
       const isRTL = (item.language ?? "he").toLowerCase().startsWith("he");
-      const reasonStyle = isRTL ? text.textRight : text.textLeft;
+      const alignmentStyle =
+        item.variant === "prompt" ? layout.alignSelfStart : layout.alignSelfEnd;
+
+      const shouldShowCitations =
+        !isRefusal && item.variant === "response" && !!item.citations && item.citations.length > 0;
 
       return (
         <View style={[spacing.gapXs]}>
-          <ChatBubble variant={item.variant} language={item.language}>
-            {item.text}
-          </ChatBubble>
-          <ConditionalRender condition={item.reason}>
-            <Text fontSize={12} style={[reasonStyle, { writingDirection: isRTL ? "rtl" : "ltr" }]}>
-              {item.reason}
+          <ConditionalRender condition={item.notice}>{renderNotice(item)}</ConditionalRender>
+
+          <ConditionalRender condition={shouldRenderBubble}>
+            <Pressable onLongPress={() => handleLongPress(item)} delayLongPress={200}>
+              <ChatBubble variant={item.variant} language={item.language}>
+                {bubbleText}
+              </ChatBubble>
+            </Pressable>
+          </ConditionalRender>
+
+          <ConditionalRender condition={item.error}>
+            <Text
+              fontSize={12}
+              style={[
+                alignmentStyle,
+                colors.textDanger,
+                { writingDirection: isRTL ? "rtl" : "ltr" },
+              ]}
+            >
+              השליחה נכשלה, נסו שוב.
             </Text>
           </ConditionalRender>
-          <ConditionalRender condition={item.citations && item.citations.length > 0}>
+
+          <ConditionalRender condition={shouldShowCitations}>
             {renderCitations(item)}
           </ConditionalRender>
-          <ConditionalRender condition={item.notice}>{renderNotice(item)}</ConditionalRender>
         </View>
       );
     },
-    [renderCitations, renderNotice, spacing.gapXs, text.textLeft, text.textRight]
+    [
+      colors.textDanger,
+      handleLongPress,
+      layout.alignSelfEnd,
+      layout.alignSelfStart,
+      renderCitations,
+      renderNotice,
+      spacing.gapXs,
+    ]
   );
 
+  const listContentStyle = useMemo(() => [spacing.gap20], [spacing.gap20]);
+
   return (
-    <>
+    <View style={[layout.flex1, spacing.gapDefault]} pointerEvents="box-none">
       <FlatList
         data={conversation}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         inverted
-        nestedScrollEnabled
-        contentContainerStyle={[spacing.gap20]}
+        removeClippedSubviews
+        windowSize={7} // 5–9 is a good range
+        maxToRenderPerBatch={8}
+        updateCellsBatchingPeriod={50}
+        contentContainerStyle={listContentStyle}
         keyboardShouldPersistTaps="handled"
+        scrollEventThrottle={16}
+        maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
       />
 
       <ConditionalRender condition={loading}>
@@ -146,7 +239,14 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({ conversat
           <Loader />
         </ChatBubble>
       </ConditionalRender>
-    </>
+
+      <MessageContextMenu
+        visible={menuVisible && !!selectedMessage}
+        onClose={handleCloseMenu}
+        onCopy={selectedMessage?.text ? handleCopy : undefined}
+        onDelete={selectedMessage ? handleDelete : undefined}
+      />
+    </View>
   );
 };
 
