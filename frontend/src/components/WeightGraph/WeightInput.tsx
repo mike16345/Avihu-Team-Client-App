@@ -67,7 +67,7 @@ const WeightInput = () => {
         <Input
           value={weighIn}
           error={!!error}
-          keyboardType="number-pad"
+          keyboardType="decimal-pad"
           style={[{ width: width * 0.75 }]}
           onChangeText={(val) => setWeighIn(val)}
           placeholder="רשמו כאן את המשקל היומי"

@@ -13,8 +13,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     icon: "./assets/app-logo.png",
     userInterfaceStyle: "automatic",
     splash: {
-      image: "./assets/app-logo.png",
-      backgroundColor: "#000000",
+      image: "./assets/splash-screen.png",
+      backgroundColor: "#FFFFFF",
     },
 
     plugins: [
@@ -43,8 +43,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       bundleIdentifier: isDev ? "com.avihuteam.test" : "com.avihuteam.avihuteam",
       supportsTablet: false,
       splash: {
-        image: "./assets/app-logo.png",
-        backgroundColor: "#000000",
+        image: "./assets/splash-screen.png",
+        backgroundColor: "#FFFFFF",
       },
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
@@ -53,7 +53,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/app-logo.png",
-        backgroundColor: "#000000",
+        backgroundColor: "#FFFFFF",
       },
       softwareKeyboardLayoutMode: "resize",
       package: "com.avihuteam.avihuteam",

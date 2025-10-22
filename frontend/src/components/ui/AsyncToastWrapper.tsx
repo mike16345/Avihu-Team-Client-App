@@ -1,9 +1,15 @@
 import { IToast } from "@/interfaces/toast";
-import React, { ReactNode, useEffect, useRef, useState } from "react";
-import { Animated, StyleProp, TouchableOpacity, View, ViewStyle } from "react-native";
+import React, { ReactNode, useEffect, useState } from "react";
+import { StyleProp, TouchableOpacity, View, ViewStyle } from "react-native";
 import { ConditionalRender } from "./ConditionalRender";
 import Toast from "./toast/Toast";
 import { useToast } from "@/hooks/useToast";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  runOnJS,
+} from "react-native-reanimated";
 
 interface AsyncToastWrapperProps {
   children: ReactNode;
@@ -28,37 +34,19 @@ const AsyncToastWrapper: React.FC<AsyncToastWrapperProps> = ({
   const [toast, setToast] = useState<Partial<IToast> | undefined>();
   const [contentHeight, setContentHeight] = useState(0);
 
-  const buttonTranslateY = useRef(new Animated.Value(0)).current;
-  const toastTranslateY = useRef(new Animated.Value(0)).current;
+  const buttonTranslateY = useSharedValue(0);
+  const toastTranslateY = useSharedValue(0);
 
   const animateInToast = () => {
-    Animated.parallel([
-      Animated.timing(buttonTranslateY, {
-        toValue: -contentHeight - 100,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(toastTranslateY, {
-        toValue: -contentHeight / 1.5,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    buttonTranslateY.value = withTiming(-contentHeight - 100, { duration: 300 });
+    toastTranslateY.value = withTiming(-contentHeight / 1.5, { duration: 300 });
   };
 
   const animateOutToast = () => {
-    Animated.parallel([
-      Animated.timing(buttonTranslateY, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(toastTranslateY, {
-        toValue: contentHeight,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => setToast(undefined));
+    buttonTranslateY.value = withTiming(0, { duration: 300 });
+    toastTranslateY.value = withTiming(contentHeight, { duration: 300 }, (finished) => {
+      if (finished) runOnJS(setToast)(undefined);
+    });
   };
 
   const showLocalToast = ({
@@ -97,18 +85,18 @@ const AsyncToastWrapper: React.FC<AsyncToastWrapperProps> = ({
   };
 
   useEffect(() => {
-    toastTranslateY.setValue(contentHeight);
+    toastTranslateY.value = contentHeight;
   }, [contentHeight]);
+
+  const buttonAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: buttonTranslateY.value }],
+  }));
 
   return (
     <View style={[style, { overflow: "hidden" }]}>
       <Animated.View
-        style={{
-          transform: [{ translateY: buttonTranslateY }],
-        }}
-        onLayout={(e) => {
-          setContentHeight(e.nativeEvent.layout.height);
-        }}
+        style={buttonAnimatedStyle}
+        onLayout={(e) => setContentHeight(e.nativeEvent.layout.height)}
       >
         <TouchableOpacity onPress={handlePress}>{children}</TouchableOpacity>
       </Animated.View>

@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
-import { View, TouchableOpacity, Animated, LayoutChangeEvent, Dimensions } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, TouchableOpacity, LayoutChangeEvent, Dimensions } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "./Text";
 import { ConditionalRender } from "./ConditionalRender";
 import ButtonShadow from "./buttons/ButtonShadow";
+import Animated, { useSharedValue, withSpring, SharedValue } from "react-native-reanimated";
 
 interface TabsRootProps<T extends string> {
   value: T;
@@ -31,7 +32,7 @@ type TabsContextValue<T extends string> = {
   setValue: (v: T) => void;
   tabWidth: number;
   registerTab: (value: T, label: string) => void;
-  translateX: Animated.Value;
+  translateX: SharedValue<number>;
 };
 
 const TabsContext = React.createContext<TabsContextValue<any>>({
@@ -39,14 +40,14 @@ const TabsContext = React.createContext<TabsContextValue<any>>({
   setValue: () => {},
   tabWidth: 0,
   registerTab: () => {},
-  translateX: new Animated.Value(0),
+  translateX: 0,
 });
 
 export const Tabs = <T extends string>({ value, onValueChange, children }: TabsRootProps<T>) => {
   const [tabs, setTabs] = useState<{ value: T; label: string }[]>([]);
   const [containerWidth, setContainerWidth] = useState(Dimensions.get("window").width);
 
-  const translateX = useRef(new Animated.Value(0)).current;
+  const translateX = useSharedValue(0);
 
   const tabWidth = containerWidth / (tabs.length || 1) - 0.5;
 
@@ -69,10 +70,7 @@ export const Tabs = <T extends string>({ value, onValueChange, children }: TabsR
     let activeIndex = tabs.findIndex((t) => t.label === value);
     activeIndex = activeIndex == -1 ? 0 : activeIndex;
 
-    Animated.spring(translateX, {
-      toValue: -activeIndex * tabWidth,
-      useNativeDriver: true,
-    }).start();
+    translateX.value = withSpring(-activeIndex * tabWidth, { damping: 14 });
   }, [value, tabWidth, tabs]);
 
   return (

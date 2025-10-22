@@ -1,4 +1,4 @@
-import { Animated, Keyboard, TouchableOpacity } from "react-native";
+import { Keyboard, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
@@ -15,7 +15,7 @@ import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 import { useToast } from "@/hooks/useToast";
 import { IUser } from "@/interfaces/User";
 import PasswordInput from "../ui/inputs/PasswordInput";
-import { useFadeIn } from "@/styles/useFadeIn";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 interface LoginFormProps {
   onLoginSuccess: (user: IUser) => void;
@@ -29,7 +29,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
   const { setItem } = useAsyncStorage(SESSION_TOKEN_KEY);
 
-  const opacity = useFadeIn();
   const [inputtedCrendentials, setInputtedCredentials] = useState<IUserCredentials>({
     email: ``,
     password: ``,
@@ -82,7 +81,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
   };
 
   return (
-    <Animated.View style={[spacing.gap20, { opacity }]}>
+    <Animated.View entering={FadeIn.duration(500)} style={[spacing.gap20]}>
       <Input
         keyboardType="email-address"
         label="אימייל"

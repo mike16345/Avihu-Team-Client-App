@@ -1,34 +1,48 @@
 import Icon from "@/components/Icon/Icon";
 import useColors from "@/styles/useColors";
-import React, { useEffect, useRef } from "react";
-import { Animated, Easing } from "react-native";
+import React, { useEffect } from "react";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
+} from "react-native-reanimated";
 
-const SpinningIcon: React.FC<{ mode: "dark" | "light" }> = ({ mode = "dark" }) => {
-  const spinAnim = useRef(new Animated.Value(0)).current;
+interface SpinningIconProps {
+  mode?: "dark" | "light";
+}
 
+const duration = 800;
+const easing = Easing.bezier(0.25, -0.5, 0.25, 1);
+
+const SpinningIcon: React.FC<SpinningIconProps> = ({ mode = "dark" }) => {
   const { textPrimary, textOnPrimary } = useColors();
 
-  const spin = spinAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "720deg"],
-  });
+  // Shared value for rotation
+  const rotation = useSharedValue(0);
 
+  // Start continuous rotation once
   useEffect(() => {
-    Animated.loop(
-      Animated.timing(spinAnim, {
-        toValue: 1,
-        duration: 1500, // 1 second per rotation
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
-  }, [spinAnim]);
+    rotation.value = withRepeat(
+      withTiming(1, {
+        duration,
+        easing,
+      }),
+      -1 // infinite
+    );
+  }, []);
+
+  // Animated style
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value * 360}deg` }],
+  }));
 
   return (
-    <Animated.View style={{ transform: [{ rotate: spin }] }}>
+    <Animated.View style={animatedStyle}>
       <Icon
         name="loader"
-        color={mode == "dark" ? textOnPrimary.color : textPrimary.color}
+        color={mode === "dark" ? textOnPrimary.color : textPrimary.color}
         variant="outline"
       />
     </Animated.View>

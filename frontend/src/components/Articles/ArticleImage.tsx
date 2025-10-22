@@ -3,6 +3,7 @@ import { useState } from "react";
 import { View, Image, LayoutChangeEvent } from "react-native";
 import WorkoutVideoPopup from "../WorkoutPlan/WorkoutVideoPopup";
 import { ConditionalRender } from "../ui/ConditionalRender";
+import defaultImage from "@assets/icon.png";
 
 interface ArticleImageProps {
   imageUrl?: string;
@@ -34,6 +35,7 @@ const ArticleImage: React.FC<ArticleImageProps> = ({
       <ConditionalRender condition={uri && !isPlayable}>
         <Image
           source={{ uri }}
+          defaultSource={defaultImage}
           height={height}
           width={containerWidth}
           style={{

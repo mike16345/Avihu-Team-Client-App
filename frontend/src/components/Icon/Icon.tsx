@@ -1,4 +1,3 @@
-import { useSharedValue } from "react-native-reanimated";
 import icons, { IconName } from "../../constants/iconMap";
 import React from "react";
 
