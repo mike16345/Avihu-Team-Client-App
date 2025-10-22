@@ -16,7 +16,13 @@ export type FieldConfig = {
   label?: string;
   placeholder?: string;
   prefix?: string;
-  keyboardType?: "default" | "number-pad" | "numeric" | "email-address" | "phone-pad";
+  keyboardType?:
+    | "default"
+    | "number-pad"
+    | "numeric"
+    | "email-address"
+    | "phone-pad"
+    | "decimal-pad";
   existingValue?: string;
   schemaKey?: string;
   parse?: (raw: string | undefined) => unknown;
@@ -66,7 +72,7 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
       placeholder,
       prefix,
       existingValue,
-      keyboardType: "number-pad",
+      keyboardType: "decimal-pad",
       schemaKey: schemaKey,
     },
   ];
