@@ -230,7 +230,9 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const bannerTextStyle = useMemo(() => {
     if (!statusBanner) return null;
 
-    return statusBanner.variant === "paused" ? colors.textOnErrorContainer : colors.textOnWarningContainer;
+    return statusBanner.variant === "paused"
+      ? colors.textOnErrorContainer
+      : colors.textOnWarningContainer;
   }, [colors.textOnErrorContainer, colors.textOnWarningContainer, statusBanner]);
 
   return (

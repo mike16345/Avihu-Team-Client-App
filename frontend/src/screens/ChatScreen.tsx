@@ -367,7 +367,9 @@ const ChatScreen = () => {
       return;
     }
 
-    const latestPrompt = conversation.find((message) => message.variant === "prompt" && message.text);
+    const latestPrompt = conversation.find(
+      (message) => message.variant === "prompt" && message.text
+    );
 
     if (!latestPrompt?.text) return;
 
@@ -377,14 +379,7 @@ const ChatScreen = () => {
       prompt: latestPrompt.text,
       userId: currentUserId,
     });
-  }, [
-    activeSessionId,
-    conversation,
-    currentUserId,
-    isPausedActive,
-    retryContext,
-    setRetryContext,
-  ]);
+  }, [activeSessionId, conversation, currentUserId, isPausedActive, retryContext, setRetryContext]);
 
   const isSendDisabled = useMemo(() => {
     const trimmed = prompt?.trim();
