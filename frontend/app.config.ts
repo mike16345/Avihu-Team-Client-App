@@ -14,7 +14,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     userInterfaceStyle: "automatic",
     splash: {
       image: "./assets/splash-screen.png",
-      backgroundColor: "#000000",
+      backgroundColor: "#FFFFFF",
     },
 
     plugins: [
@@ -44,7 +44,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       supportsTablet: false,
       splash: {
         image: "./assets/splash-screen.png",
-        backgroundColor: "#000000",
+        backgroundColor: "#FFFFFF",
       },
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
@@ -53,7 +53,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/app-logo.png",
-        backgroundColor: "#000000",
+        backgroundColor: "#FFFFFF",
       },
       softwareKeyboardLayoutMode: "resize",
       package: "com.avihuteam.avihuteam",
