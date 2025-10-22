@@ -40,12 +40,14 @@ const ChatScreen = () => {
     updateMessage,
     removeMessage,
     updateSessionMeta,
+    setSessionQuota,
   } = useChatStorage();
 
   const [prompt, setPrompt] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [retryContext, setRetryContext] = useState<RetryContext | null>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const quotaTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentUserId = currentUser?._id;
 
@@ -56,6 +58,98 @@ const ChatScreen = () => {
   }, [storageLoading, activeSessionId, createSession]);
 
   const conversation = useMemo<IChatMessage[]>(() => messages ?? [], [messages]);
+
+  const quotaState = meta.quota;
+  const pausedState = meta.paused;
+
+  const isQuotaActive = useMemo(() => {
+    if (!quotaState?.active || !quotaState.resetAt) return false;
+    const resetDate = new Date(quotaState.resetAt);
+    if (Number.isNaN(resetDate.getTime())) return false;
+
+    return Date.now() < resetDate.getTime();
+  }, [quotaState]);
+
+  const isPausedActive = useMemo(() => !!pausedState?.active, [pausedState?.active]);
+
+  useEffect(() => {
+    if (quotaTimeoutRef.current) {
+      clearTimeout(quotaTimeoutRef.current);
+      quotaTimeoutRef.current = null;
+    }
+
+    if (!activeSessionId) return;
+
+    if (!quotaState?.active) return;
+
+    const resetDate = quotaState.resetAt ? new Date(quotaState.resetAt) : null;
+
+    if (!resetDate || Number.isNaN(resetDate.getTime()) || Date.now() >= resetDate.getTime()) {
+      void setSessionQuota(activeSessionId, null);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      void setSessionQuota(activeSessionId, null);
+    }, resetDate.getTime() - Date.now());
+
+    quotaTimeoutRef.current = timeoutId;
+
+    return () => {
+      if (quotaTimeoutRef.current) {
+        clearTimeout(quotaTimeoutRef.current);
+        quotaTimeoutRef.current = null;
+      }
+    };
+  }, [activeSessionId, quotaState, setSessionQuota]);
+
+  useEffect(() => {
+    return () => {
+      if (quotaTimeoutRef.current) {
+        clearTimeout(quotaTimeoutRef.current);
+        quotaTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  const quotaResetLabel = useMemo(() => {
+    if (!quotaState?.resetAt) return "";
+    const resetDate = new Date(quotaState.resetAt);
+    if (Number.isNaN(resetDate.getTime())) return "";
+    const now = new Date();
+    const isSameDay = resetDate.toDateString() === now.toDateString();
+
+    if (isSameDay) {
+      return resetDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+
+    return resetDate.toLocaleString([], {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }, [quotaState?.resetAt]);
+
+  const quotaBannerMessage = useMemo(() => {
+    if (!isQuotaActive || !quotaState) return null;
+    return `הגעת למכסה היומית שלך (${quotaState.limit} שאלות). תוכל לנסות שוב אחרי ${quotaResetLabel}.\nDaily question limit reached (${quotaState.limit}). Try again after ${quotaResetLabel}.`;
+  }, [isQuotaActive, quotaResetLabel, quotaState]);
+
+  const statusBanner = useMemo(() => {
+    if (quotaBannerMessage) {
+      return { variant: "quota" as const, message: quotaBannerMessage };
+    }
+
+    if (isPausedActive && pausedState?.message) {
+      return { variant: "paused" as const, message: pausedState.message };
+    }
+
+    return null;
+  }, [isPausedActive, pausedState?.message, quotaBannerMessage]);
+
+  const isComposerLocked = isQuotaActive || isPausedActive;
   const hasVisibleMessages = useMemo(
     () =>
       conversation.some(
@@ -129,13 +223,23 @@ const ChatScreen = () => {
         console.log(JSON.stringify(error, undefined, 2));
         const status = error?.response?.status;
         const message = error?.response?.data?.message || "אירעה שגיאה בשליחת ההודעה";
+        const ragError = error?.ragError as
+          | { type: "quota"; payload?: { limit?: number; resetAt?: string } }
+          | { type: "paused"; payload?: { message?: string } }
+          | undefined;
 
-        triggerErrorToast({ message });
+        if (!ragError || ragError.type === "paused") {
+          triggerErrorToast({ message });
+        }
 
-        const shouldOfferRetry = !status || status >= 500;
-        if (shouldOfferRetry) {
+        if (ragError?.type === "quota") {
           await updateMessage(sessionId, messageId, { error: true });
-          setRetryContext({ sessionId, messageId, prompt: question, userId });
+        } else {
+          const shouldOfferRetry = ragError?.type === "paused" || !status || status >= 500;
+          if (shouldOfferRetry) {
+            await updateMessage(sessionId, messageId, { error: true });
+            setRetryContext({ sessionId, messageId, prompt: question, userId });
+          }
         }
       } finally {
         setLoading(false);
@@ -154,7 +258,7 @@ const ChatScreen = () => {
 
   const handleSend = useCallback(async () => {
     const trimmedPrompt = prompt?.trim();
-    if (!trimmedPrompt || loading || storageLoading) return;
+    if (!trimmedPrompt || loading || storageLoading || isComposerLocked) return;
 
     if (!currentUserId) {
       triggerErrorToast({ message: "אין משתמש" });
@@ -198,6 +302,7 @@ const ChatScreen = () => {
     createSession,
     currentUserId,
     executeQuery,
+    isComposerLocked,
     loading,
     prompt,
     storageLoading,
@@ -251,11 +356,41 @@ const ChatScreen = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (
+      !isPausedActive ||
+      retryContext ||
+      !activeSessionId ||
+      !currentUserId ||
+      !conversation?.length
+    ) {
+      return;
+    }
+
+    const latestPrompt = conversation.find((message) => message.variant === "prompt" && message.text);
+
+    if (!latestPrompt?.text) return;
+
+    setRetryContext({
+      sessionId: activeSessionId,
+      messageId: latestPrompt.id,
+      prompt: latestPrompt.text,
+      userId: currentUserId,
+    });
+  }, [
+    activeSessionId,
+    conversation,
+    currentUserId,
+    isPausedActive,
+    retryContext,
+    setRetryContext,
+  ]);
+
   const isSendDisabled = useMemo(() => {
     const trimmed = prompt?.trim();
 
-    return !trimmed || loading || storageLoading;
-  }, [loading, prompt, storageLoading]);
+    return !trimmed || loading || storageLoading || isComposerLocked;
+  }, [isComposerLocked, loading, prompt, storageLoading]);
 
   return (
     <KeyboardAwareScrollView contentContainerStyle={layout.flex1}>
@@ -275,6 +410,7 @@ const ChatScreen = () => {
                 loading={loading}
                 onCopyMessage={handleCopyMessage}
                 onDeleteMessage={handleDeleteMessage}
+                statusBanner={statusBanner}
               />
             </ConditionalRender>
 
@@ -290,6 +426,7 @@ const ChatScreen = () => {
                 placeholder="כתבו כאן"
                 onChangeText={(val) => setPrompt(val)}
                 value={prompt ?? ""}
+                editable={!isComposerLocked}
               />
 
               <SendButton disabled={isSendDisabled} onPress={handleSend} />

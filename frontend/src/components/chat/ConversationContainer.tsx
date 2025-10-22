@@ -15,6 +15,7 @@ interface ConversationContainerProps {
   loading: boolean;
   onCopyMessage?: (message: IChatMessage) => void;
   onDeleteMessage?: (message: IChatMessage) => Promise<void> | void;
+  statusBanner?: { variant: "quota" | "paused"; message: string } | null;
 }
 
 const REFUSAL_REASONS: Array<IChatMessage["reason"]> = ["BLOCKED", "NOT_FITNESS", "CACHE_REFUSAL"];
@@ -24,6 +25,7 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
   loading,
   onCopyMessage,
   onDeleteMessage,
+  statusBanner,
 }) => {
   const user = useUserStore((state) => state.currentUser);
   const { spacing, layout, colors, common, text } = useStyles();
@@ -217,8 +219,41 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
 
   const listContentStyle = useMemo(() => [spacing.gap20], [spacing.gap20]);
 
+  const bannerBackgroundStyle = useMemo(() => {
+    if (!statusBanner) return null;
+
+    return statusBanner.variant === "paused"
+      ? colors.backgroundErrorContainer
+      : colors.backgroundWarningContainer;
+  }, [colors.backgroundErrorContainer, colors.backgroundWarningContainer, statusBanner]);
+
+  const bannerTextStyle = useMemo(() => {
+    if (!statusBanner) return null;
+
+    return statusBanner.variant === "paused" ? colors.textOnErrorContainer : colors.textOnWarningContainer;
+  }, [colors.textOnErrorContainer, colors.textOnWarningContainer, statusBanner]);
+
   return (
     <View style={[layout.flex1, spacing.gapDefault]} pointerEvents="box-none">
+      <ConditionalRender condition={!!statusBanner?.message}>
+        <View
+          style={[
+            bannerBackgroundStyle ?? colors.backgroundSurfaceVariant,
+            colors.outline,
+            common.borderXsm,
+            common.rounded,
+            spacing.pdDefault,
+          ]}
+        >
+          <Text
+            fontSize={12}
+            style={[text.textRight, bannerTextStyle ?? colors.textOnSurface, { lineHeight: 18 }]}
+          >
+            {statusBanner?.message}
+          </Text>
+        </View>
+      </ConditionalRender>
+
       <FlatList
         data={conversation}
         keyExtractor={(item) => item.id}
