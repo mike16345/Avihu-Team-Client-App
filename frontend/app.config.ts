@@ -13,7 +13,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     icon: "./assets/app-logo.png",
     userInterfaceStyle: "automatic",
     splash: {
-      image: "./assets/app-logo.png",
+      image: "./assets/splash-screen.png",
       backgroundColor: "#000000",
     },
 
@@ -43,7 +43,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       bundleIdentifier: isDev ? "com.avihuteam.test" : "com.avihuteam.avihuteam",
       supportsTablet: false,
       splash: {
-        image: "./assets/app-logo.png",
+        image: "./assets/splash-screen.png",
         backgroundColor: "#000000",
       },
       infoPlist: {
