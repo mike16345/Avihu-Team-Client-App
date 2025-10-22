@@ -1,66 +1,51 @@
 import useStyles from "@/styles/useGlobalStyles";
-import React, { useEffect, useRef, useState } from "react";
-import { View, TouchableOpacity, Animated, StyleSheet, Dimensions, Modal } from "react-native";
-
+import React, { useEffect, useState } from "react";
+import { View, TouchableOpacity, StyleSheet, Dimensions, Modal } from "react-native";
 import { softHaptic } from "@/utils/haptics";
+import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 
-const { height } = Dimensions.get("window");
+const { height: windowHeight } = Dimensions.get("window");
 
 interface BottomDrawerProps {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  heightVariant?: `auto` | `fixed`;
+  heightVariant?: "auto" | "fixed";
 }
 
 const BottomDrawer: React.FC<BottomDrawerProps> = ({
   open,
   onClose,
   children,
-  heightVariant = `fixed`,
+  heightVariant = "fixed",
 }) => {
   const { colors } = useStyles();
-
-  const slideAnim = useRef(new Animated.Value(height)).current;
-
   const [isVisible, setIsVisible] = useState(open);
 
   useEffect(() => {
     if (open) {
-      setIsVisible(true); // Show the modal when open is true
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      setIsVisible(true);
       softHaptic();
     } else {
       softHaptic();
-      Animated.timing(slideAnim, {
-        toValue: height, // Slide out to the right
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setIsVisible(false)); // Hide modal after animation completes
+      setIsVisible(false);
     }
   }, [open]);
 
   return (
     <Modal onRequestClose={onClose} transparent visible={isVisible} animationType="fade">
-      <TouchableOpacity
-        style={[styles.overlay]}
-        onPress={onClose}
-        activeOpacity={1}
-      ></TouchableOpacity>
+      <TouchableOpacity style={styles.overlay} onPress={onClose} activeOpacity={1} />
+
       <Animated.View
         style={[
           styles.drawerContainer,
           colors.backgroundSurface,
-
           {
-            height: heightVariant === `fixed` ? height * 0.6 : `auto`,
+            height: heightVariant === "fixed" ? windowHeight * 0.6 : "auto",
           },
-          { transform: [{ translateY: slideAnim }] },
         ]}
+        entering={SlideInDown.duration(300)}
+        exiting={SlideOutDown.duration(300)}
       >
         <View style={styles.drawerContent}>{children}</View>
       </Animated.View>

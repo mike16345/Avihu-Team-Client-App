@@ -1,4 +1,4 @@
-import { Animated, Keyboard } from "react-native";
+import { Keyboard } from "react-native";
 import { useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import Input from "../ui/inputs/Input";
@@ -6,10 +6,10 @@ import PrimaryButton from "../ui/buttons/PrimaryButton";
 import { testEmail, testPhone } from "@/utils/utils";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useToast } from "@/hooks/useToast";
-import { useFadeIn } from "@/styles/useFadeIn";
 import { errorNotificationHaptic } from "@/utils/haptics";
 import { useNavigation } from "@react-navigation/native";
 import { AuthStackParamListNavigationProp } from "@/types/navigatorTypes";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 interface INewUserDetails {
   name: string;
@@ -33,7 +33,6 @@ const RegisterForm = () => {
   const { spacing } = useStyles();
   const { submitLead } = useUserApi();
   const { triggerErrorToast } = useToast();
-  const opacity = useFadeIn();
   const navigation = useNavigation<AuthStackParamListNavigationProp>();
 
   const [newUserDetails, setNewUserDetails] = useState<INewUserDetails>(DEFAULT_FORM_DATA);
@@ -90,7 +89,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <Animated.View style={[spacing.gap20, { opacity }]}>
+    <Animated.View entering={FadeIn.duration(500)} style={[spacing.gap20]}>
       <Input
         label="שם מלא"
         placeholder="הכנס שם מלא"

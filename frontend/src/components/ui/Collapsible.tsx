@@ -1,17 +1,16 @@
-import {
-  View,
-  TouchableOpacity,
-  LayoutChangeEvent,
-  Animated,
-  StyleProp,
-  ViewStyle,
-} from "react-native";
+import { View, TouchableOpacity, LayoutChangeEvent, StyleProp, ViewStyle } from "react-native";
 import { Card, CardVariants } from "./Card";
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { ConditionalRender } from "./ConditionalRender";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text, TextProps } from "./Text";
 import Icon from "../Icon/Icon";
+import Animated, {
+  useSharedValue,
+  withTiming,
+  useAnimatedStyle,
+  runOnJS,
+} from "react-native-reanimated";
 import React from "react";
 
 interface CollapsibleProps {
@@ -22,9 +21,9 @@ interface CollapsibleProps {
   style?: StyleProp<ViewStyle>;
   variant?: CardVariants;
   customHeight?: number;
-  keepMounted?: boolean; // keep child mounted when collapsed (avoids remount cost)
-  freezeOnCollapse?: boolean; // stop child re-renders while collapsed
-  onExpandEnd?: () => void; // optional hooks if you need them
+  keepMounted?: boolean;
+  freezeOnCollapse?: boolean;
+  onExpandEnd?: () => void;
   onCollapseEnd?: () => void;
   triggerProps?: TextProps;
 }
@@ -51,9 +50,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
   const [measured, setMeasured] = useState(false);
   const [renderChildren, setRenderChildren] = useState(false);
 
-  const height = useRef(new Animated.Value(0)).current;
-  const animRef = useRef<Animated.CompositeAnimation | null>(null);
-  const isAnimatingRef = useRef(false);
+  const height = useSharedValue(0);
 
   const getContentHeight = useCallback(
     (e: LayoutChangeEvent) => {
@@ -66,40 +63,29 @@ const Collapsible: React.FC<CollapsibleProps> = ({
     [contentHeight, customHeight]
   );
 
+  // Animate on collapse/expand
   useEffect(() => {
-    animRef.current?.stop();
-
-    const run = (to: number, cb?: () => void) => {
-      isAnimatingRef.current = true;
-      animRef.current = Animated.timing(height, {
-        toValue: to,
-        useNativeDriver: false, // height cannot be on native driver
-        duration: ANIMATION_DURATION,
-      });
-      animRef.current.start(() => {
-        isAnimatingRef.current = false;
-        animRef.current = null;
-        cb?.();
+    const runAnimation = (toValue: number, callback?: () => void) => {
+      height.value = withTiming(toValue, { duration: ANIMATION_DURATION }, (finished) => {
+        if (finished && callback) runOnJS(callback)();
       });
     };
 
     if (!isCollapsed) {
-      // ensure mounted before expanding (only when not keeping mounted)
       if (!keepMounted) setRenderChildren(true);
-      run(contentHeight, onExpandEnd);
+      runAnimation(contentHeight, onExpandEnd);
     } else {
-      run(0, () => {
+      runAnimation(0, () => {
         if (!keepMounted) setRenderChildren(false);
         onCollapseEnd?.();
       });
     }
-
-    return () => {
-      animRef.current?.stop();
-      animRef.current = null;
-      isAnimatingRef.current = false;
-    };
   }, [isCollapsed, contentHeight, keepMounted, onExpandEnd, onCollapseEnd]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: height.value,
+    overflow: "hidden",
+  }));
 
   const memoizedChild = React.useMemo(() => children, [isCollapsed ? null : children]);
 
@@ -107,18 +93,13 @@ const Collapsible: React.FC<CollapsibleProps> = ({
     <Card variant={variant} style={style}>
       <ConditionalRender condition={trigger}>
         <Card.Header>
-          <TouchableOpacity
-            onPress={() => {
-              onCollapseChange?.();
-            }}
-          >
+          <TouchableOpacity onPress={onCollapseChange}>
             <ConditionalRender condition={typeof trigger === "string"}>
               <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
                 <Text {...triggerProps}>{trigger}</Text>
                 <Icon name="chevronDown" rotation={isCollapsed ? 0 : 180} />
               </View>
             </ConditionalRender>
-
             <ConditionalRender condition={typeof trigger !== "string"}>{trigger}</ConditionalRender>
           </TouchableOpacity>
         </Card.Header>
@@ -138,17 +119,13 @@ const Collapsible: React.FC<CollapsibleProps> = ({
         </ConditionalRender>
 
         <Animated.View
-          shouldRasterizeIOS={isAnimatingRef.current}
-          renderToHardwareTextureAndroid={isAnimatingRef.current}
-          style={[layout.flex1, { height, overflow: "hidden" }]}
+          style={[layout.flex1, animatedStyle]}
           collapsable
           pointerEvents={isCollapsed ? "none" : "auto"}
         >
           {keepMounted ? (
             freezeOnCollapse ? (
-              <View style={[layout.flex1]} shouldRasterizeIOS renderToHardwareTextureAndroid>
-                {memoizedChild}
-              </View>
+              <View style={[layout.flex1]}>{memoizedChild}</View>
             ) : (
               children
             )

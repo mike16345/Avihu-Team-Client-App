@@ -1,6 +1,7 @@
 import useStyles from "@/styles/useGlobalStyles";
 import { FC, useRef } from "react";
-import { TouchableOpacity, StyleSheet, Animated } from "react-native";
+import { TouchableOpacity, StyleSheet } from "react-native";
+import Animated, { useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 
 interface SwitchProps {
   isOn: boolean;
@@ -9,22 +10,13 @@ interface SwitchProps {
 
 const Switch: FC<SwitchProps> = ({ isOn, setIsOn }) => {
   const { colors } = useStyles();
-  const anim = useRef(new Animated.Value(isOn ? 1 : 0)).current;
+  const translateX = useSharedValue(isOn ? -15 : 1);
 
   const toggleSwitch = () => {
     setIsOn((prev) => !prev);
 
-    Animated.spring(anim, {
-      toValue: isOn ? 0 : 1,
-      useNativeDriver: false,
-      friction: 6,
-    }).start();
+    translateX.value = withTiming(isOn ? 1 : -15, { duration: 150 });
   };
-
-  const translateX = anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, -15],
-  });
 
   return (
     <TouchableOpacity style={[colors.backgroundPrimary, styles.switch]} onPress={toggleSwitch}>
