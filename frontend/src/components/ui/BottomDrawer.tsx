@@ -2,9 +2,10 @@ import useStyles from "@/styles/useGlobalStyles";
 import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, StyleSheet, Dimensions, Modal } from "react-native";
 import { softHaptic } from "@/utils/haptics";
-import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
+import Animated, { useSharedValue, withTiming } from "react-native-reanimated";
 
 const { height: windowHeight } = Dimensions.get("window");
+const DRAWER_HEIGHT = windowHeight * 0.6;
 
 interface BottomDrawerProps {
   open: boolean;
@@ -21,13 +22,16 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
 }) => {
   const { colors } = useStyles();
   const [isVisible, setIsVisible] = useState(open);
+  const translateY = useSharedValue(DRAWER_HEIGHT);
 
   useEffect(() => {
     if (open) {
       setIsVisible(true);
+      translateY.value = withTiming(0);
       softHaptic();
     } else {
       softHaptic();
+      translateY.value = withTiming(DRAWER_HEIGHT);
       setIsVisible(false);
     }
   }, [open]);
@@ -41,11 +45,10 @@ const BottomDrawer: React.FC<BottomDrawerProps> = ({
           styles.drawerContainer,
           colors.backgroundSurface,
           {
-            height: heightVariant === "fixed" ? windowHeight * 0.6 : "auto",
+            height: heightVariant === "fixed" ? DRAWER_HEIGHT : "auto",
+            transform: [{ translateY }],
           },
         ]}
-        entering={SlideInDown.duration(300)}
-        exiting={SlideOutDown.duration(300)}
       >
         <View style={styles.drawerContent}>{children}</View>
       </Animated.View>
