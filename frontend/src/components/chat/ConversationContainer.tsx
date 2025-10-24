@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { IChatMessage } from "@/interfaces/chat";
@@ -9,10 +9,11 @@ import { Text } from "../ui/Text";
 import MessageContextMenu from "./MessageContextMenu";
 import { useUserStore } from "@/store/userStore";
 import { greetUser } from "@/utils/chat-utils";
+import StatusBanner from "./StatusBanner";
 
 interface ConversationContainerProps {
   conversation: IChatMessage[];
-  loading: boolean;
+  loading?: boolean;
   onCopyMessage?: (message: IChatMessage) => void;
   onDeleteMessage?: (message: IChatMessage) => Promise<void> | void;
   statusBanner?: { variant: "quota" | "paused"; message: string } | null;
@@ -33,7 +34,40 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<IChatMessage | null>(null);
 
-  const flatListRef = useRef<FlatList | null>(null);
+  const flatListRef = useRef<FlatList<IChatMessage> | null>(null);
+  const loaderMessageRef = useRef<IChatMessage>({
+    id: "__loading",
+    variant: "response",
+    text: "",
+    createdAt: new Date().toISOString(),
+    loading: true,
+  });
+
+  const displayData = useMemo(() => {
+    if (loading) {
+      return [loaderMessageRef.current, ...conversation];
+    }
+
+    return conversation;
+  }, [conversation, loading]);
+
+  const leadingItemId = displayData[0]?.id;
+
+  useEffect(() => {
+    if (!flatListRef.current || displayData.length === 0) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      try {
+        flatListRef.current?.scrollToIndex({ index: 0, animated: true });
+      } catch {
+        flatListRef.current?.scrollToOffset?.({ offset: 0, animated: true });
+      }
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [displayData.length, leadingItemId]);
 
   const handleCloseMenu = useCallback(() => {
     setMenuVisible(false);
@@ -124,6 +158,16 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
 
   const renderItem = useCallback(
     ({ item }: { item: IChatMessage }) => {
+      if (item.loading) {
+        return (
+          <View style={[spacing.gapXs]}>
+            <ChatBubble variant="response">
+              <Loader />
+            </ChatBubble>
+          </View>
+        );
+      }
+
       const isGreeting =
         item.variant === "response" && (item.greeting || item.reason === "GREETING");
 
@@ -185,44 +229,13 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
     [handleLongPress, renderCitations, renderNotice]
   );
 
-  const { bannerTextStyle, bannerBackgroundStyle } = useMemo(() => {
-    if (!statusBanner) return {};
-
-    return statusBanner.variant === "paused"
-      ? {
-          bannerTextStyle: colors.textOnErrorContainer,
-          bannerBackgroundStyle: colors.backgroundErrorContainer,
-        }
-      : {
-          bannerTextStyle: colors.textOnWarningContainer,
-          bannerBackgroundStyle: colors.backgroundWarningContainer,
-        };
-  }, [statusBanner]);
-
   return (
     <View style={[layout.flex1, spacing.gapDefault]} pointerEvents="box-none">
-      <ConditionalRender condition={!!statusBanner?.message}>
-        <View
-          style={[
-            bannerBackgroundStyle ?? colors.backgroundSurfaceVariant,
-            colors.outline,
-            common.borderXsm,
-            common.rounded,
-            spacing.pdDefault,
-          ]}
-        >
-          <Text
-            fontSize={12}
-            style={[text.textRight, bannerTextStyle ?? colors.textOnSurface, { lineHeight: 18 }]}
-          >
-            {statusBanner?.message}
-          </Text>
-        </View>
-      </ConditionalRender>
+      <StatusBanner banner={statusBanner ?? null} />
 
       <FlatList
         ref={flatListRef}
-        data={conversation}
+        data={displayData}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         inverted
@@ -235,12 +248,6 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
         scrollEventThrottle={16}
         maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
       />
-
-      <ConditionalRender condition={loading}>
-        <ChatBubble variant="response">
-          <Loader />
-        </ChatBubble>
-      </ConditionalRender>
 
       <MessageContextMenu
         visible={menuVisible && !!selectedMessage}
