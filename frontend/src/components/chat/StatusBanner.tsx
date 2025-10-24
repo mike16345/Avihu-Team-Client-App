@@ -19,9 +19,7 @@ const StatusBanner: React.FC<StatusBannerProps> = ({ banner }) => {
       : colors.backgroundSecondaryContainer;
 
   const textStyle =
-    banner.variant === "quota"
-      ? colors.textOnWarningContainer
-      : colors.textOnSecondaryContainer;
+    banner.variant === "quota" ? colors.textOnWarningContainer : colors.textOnSecondaryContainer;
 
   return (
     <View

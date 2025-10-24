@@ -30,10 +30,7 @@ const ChatScreen = () => {
   } = useChatStorage();
 
   const { statusBanner, isComposerLocked } = useQuotaPause(activeSessionId);
-  const { loading, retryContext, send, retry } = useChatController(
-    currentUserId,
-    activeSessionId
-  );
+  const { loading, retryContext, send, retry } = useChatController(currentUserId, activeSessionId);
 
   const [prompt, setPrompt] = useState<string>("");
 
