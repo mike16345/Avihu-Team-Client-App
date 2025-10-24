@@ -5,7 +5,7 @@ import { softHaptic } from "@/utils/haptics";
 import Animated, { useSharedValue, withTiming } from "react-native-reanimated";
 
 const { height: windowHeight } = Dimensions.get("window");
-const DRAWER_HEIGHT = windowHeight * 0.6;
+const DRAWER_HEIGHT = windowHeight * 0.7;
 
 interface BottomDrawerProps {
   open: boolean;
