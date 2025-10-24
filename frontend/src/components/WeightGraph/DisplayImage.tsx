@@ -1,12 +1,6 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useState } from "react";
-import {
-  Image,
-  View,
-  TouchableOpacity,
-  useWindowDimensions,
-  LayoutChangeEvent,
-} from "react-native";
+import { Image, View, TouchableOpacity, LayoutChangeEvent } from "react-native";
 import Icon from "../Icon/Icon";
 import { ConditionalRender } from "../ui/ConditionalRender";
 
@@ -17,7 +11,6 @@ interface DisplayImageProps {
 
 const DisplayImage: React.FC<DisplayImageProps> = ({ images, removeImage }) => {
   const { common, layout, spacing } = useStyles();
-  const { width } = useWindowDimensions();
   const [height, setHeight] = useState(0);
 
   const onLayout = (e: LayoutChangeEvent) => {
@@ -39,7 +32,8 @@ const DisplayImage: React.FC<DisplayImageProps> = ({ images, removeImage }) => {
             >
               <Image
                 source={{ uri: image }}
-                style={[{ width: width * 0.23 }, layout.flex1, layout.center, common.rounded]}
+                resizeMode="cover"
+                style={[layout.flex1, layout.sizeFull, layout.center, common.rounded]}
               />
               <TouchableOpacity onPress={() => removeImage(i)}>
                 <Icon name="close" />

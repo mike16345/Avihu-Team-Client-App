@@ -36,17 +36,19 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
   return (
     <View
       style={[
-        spacing.gapXxl,
-        { paddingTop: 15, paddingBottom: 40, paddingHorizontal: 60 },
+        { paddingTop: 10, paddingBottom: 25, paddingHorizontal: 50 },
+        spacing.gapDefault,
         layout.flex1,
       ]}
     >
       <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונה</Text>
 
-      <SelectUploadType returnImage={(image: string) => addImage(image)} />
+      <View style={[layout.flex1, spacing.gapDefault]}>
+        <SelectUploadType returnImage={(image: string) => addImage(image)} />
 
-      <View style={[layout.flex1]}>
-        <DisplayImage images={images} removeImage={(index) => deleteImageByIndex(index)} />
+        <View style={[layout.flex1]}>
+          <DisplayImage images={images} removeImage={(index) => deleteImageByIndex(index)} />
+        </View>
       </View>
 
       <View style={[spacing.gapLg]}>

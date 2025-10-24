@@ -68,9 +68,16 @@ export const Tabs = <T extends string>({ value, onValueChange, children }: TabsR
 
   useEffect(() => {
     let activeIndex = tabs.findIndex((t) => t.label === value);
-    activeIndex = activeIndex == -1 ? 0 : activeIndex;
+    activeIndex = activeIndex === -1 ? 0 : activeIndex;
 
-    translateX.value = withSpring(-activeIndex * tabWidth, { damping: 14 });
+    translateX.value = withSpring(-activeIndex * tabWidth, {
+      damping: 24, // more damping = less bounce
+      duration: 1800,
+      stiffness: 120, // lower stiffness = less punch / less "slam"
+      mass: 1, // leave mass normal
+      velocity: 0, // start speed
+      overshootClamping: true, // prevents the tiny overshoot wobble
+    });
   }, [value, tabWidth, tabs]);
 
   return (
