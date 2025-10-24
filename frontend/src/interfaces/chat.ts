@@ -34,6 +34,17 @@ export interface IChatMessage {
   error?: boolean;
 }
 
+export interface IChatQuotaState {
+  active: boolean;
+  limit: number;
+  resetAt: string;
+}
+
+export interface IChatPausedState {
+  active: boolean;
+  message: string;
+}
+
 export interface IChatSessionMeta {
   language?: string;
   notice?: string;
@@ -42,6 +53,8 @@ export interface IChatSessionMeta {
   refusal?: boolean;
   greeting?: boolean;
   updatedAt?: string;
+  quota?: IChatQuotaState | null;
+  paused?: IChatPausedState | null;
 }
 
 export interface IChatSession {

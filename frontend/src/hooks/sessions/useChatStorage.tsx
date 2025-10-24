@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { CHAT_SESSIONS_STORAGE_KEY } from "@/constants/reactQuery";
 import {
   IChatMessage,
+  IChatPausedState,
+  IChatQuotaState,
   IChatSession,
   IChatSessionMeta,
   IChatSessionsState,
@@ -21,7 +23,10 @@ const createEmptySession = (id: string): IChatSession => {
     createdAt: now,
     updatedAt: now,
     messages: [],
-    meta: {},
+    meta: {
+      quota: null,
+      paused: null,
+    },
   };
 };
 
@@ -269,6 +274,13 @@ const useChatStorage = () => {
 
   const messages = activeSession?.messages ?? [];
   const meta = activeSession?.meta ?? {};
+  const resolvedMeta: IChatSessionMeta = {
+    ...meta,
+    quota: meta.quota ?? null,
+    paused: meta.paused ?? null,
+  };
+
+  console.log("resolved meta", resolvedMeta);
 
   const appendUserMessage = useCallback(
     async (sessionId: string, message: IChatMessage) => {
@@ -284,13 +296,27 @@ const useChatStorage = () => {
     [appendMessage]
   );
 
+  const setSessionQuota = useCallback(
+    async (sessionId: string, quota: IChatQuotaState | null) => {
+      await updateSessionMeta(sessionId, { quota });
+    },
+    [updateSessionMeta]
+  );
+
+  const setSessionPaused = useCallback(
+    async (sessionId: string, paused: IChatPausedState | null) => {
+      await updateSessionMeta(sessionId, { paused });
+    },
+    [updateSessionMeta]
+  );
+
   return {
     isLoading,
     state: resolvedState,
     activeSession,
     activeSessionId: resolvedState.activeSessionId,
     messages,
-    meta,
+    meta: resolvedMeta,
     ensureSession,
     createSession,
     setActiveSession,
@@ -302,6 +328,8 @@ const useChatStorage = () => {
     clearSession,
     removeSession,
     getSession: (sessionId: string) => resolvedState.sessions[sessionId],
+    setSessionQuota,
+    setSessionPaused,
   };
 };
 
