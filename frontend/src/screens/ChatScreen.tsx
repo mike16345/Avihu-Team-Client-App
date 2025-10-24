@@ -36,12 +36,6 @@ const ChatScreen = () => {
 
   const conversation = useMemo<IChatMessage[]>(() => messages ?? [], [messages]);
 
-  useEffect(() => {
-    if (!storageLoading && !activeSessionId) {
-      createSession();
-    }
-  }, [storageLoading, activeSessionId, createSession]);
-
   const handleCopyMessage = useCallback(
     async (message: IChatMessage) => {
       if (!message.text) return;
@@ -93,8 +87,8 @@ const ChatScreen = () => {
 
     Keyboard.dismiss();
 
-    await send(trimmedPrompt);
     setPrompt("");
+    await send(trimmedPrompt);
   }, [isComposerLocked, loading, prompt, send, storageLoading]);
 
   const handleRetry = useCallback(async () => {
@@ -102,6 +96,12 @@ const ChatScreen = () => {
 
     await retry();
   }, [loading, retry, retryContext, storageLoading]);
+
+  useEffect(() => {
+    if (!storageLoading && !activeSessionId) {
+      createSession();
+    }
+  }, [storageLoading, activeSessionId, createSession]);
 
   return (
     <KeyboardGestureArea interpolator="ios" style={layout.flex1}>
