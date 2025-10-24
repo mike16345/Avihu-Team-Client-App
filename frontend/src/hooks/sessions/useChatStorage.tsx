@@ -280,6 +280,8 @@ const useChatStorage = () => {
     paused: meta.paused ?? null,
   };
 
+  console.log("resolved meta", resolvedMeta);
+
   const appendUserMessage = useCallback(
     async (sessionId: string, message: IChatMessage) => {
       await appendMessage(sessionId, message);

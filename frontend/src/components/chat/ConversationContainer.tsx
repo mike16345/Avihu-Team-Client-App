@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { FlatList, Pressable, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { IChatMessage } from "@/interfaces/chat";
@@ -33,6 +33,8 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<IChatMessage | null>(null);
 
+  const flatListRef = useRef<FlatList | null>(null);
+
   const handleCloseMenu = useCallback(() => {
     setMenuVisible(false);
     setSelectedMessage(null);
@@ -55,96 +57,70 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
     }
   }, [onDeleteMessage, selectedMessage]);
 
-  const renderCitations = useCallback(
-    (item: IChatMessage) => {
-      if (!item.citations || item.citations.length === 0) return null;
+  const renderCitations = useCallback((item: IChatMessage) => {
+    if (!item.citations || item.citations.length === 0) return null;
 
-      const alignStyle = item.variant === "prompt" ? layout.alignSelfStart : layout.alignSelfEnd;
+    const alignStyle = item.variant === "prompt" ? layout.alignSelfStart : layout.alignSelfEnd;
 
-      return (
-        <View
-          pointerEvents="none"
-          style={[
-            alignStyle,
-            colors.backgroundSurfaceVariant,
-            colors.outline,
-            common.borderXsm,
-            spacing.pdSm,
-            spacing.gapXs,
-            common.rounded,
-            layout.flexColumn,
-          ]}
-        >
-          {item.citations.map((citation) => {
-            const details: string[] = [];
-            if (citation.sourceId) details.push(citation.sourceId);
-            if (typeof citation.page === "number") details.push(`page ${citation.page}`);
-            if (typeof citation.score === "number") {
-              details.push(`score ${citation.score.toFixed(2)}`);
-            }
+    return (
+      <View
+        pointerEvents="none"
+        style={[
+          alignStyle,
+          colors.backgroundSurfaceVariant,
+          colors.outline,
+          common.borderXsm,
+          spacing.pdSm,
+          spacing.gapXs,
+          common.rounded,
+          layout.flexColumn,
+        ]}
+      >
+        {item.citations.map((citation) => {
+          const details: string[] = [];
+          if (citation.sourceId) details.push(citation.sourceId);
+          if (typeof citation.page === "number") details.push(`page ${citation.page}`);
+          if (typeof citation.score === "number") {
+            details.push(`score ${citation.score.toFixed(2)}`);
+          }
 
-            return (
-              <Text
-                key={`${item.id}-${citation.marker}`}
-                fontSize={12}
-                style={[text.textLeft, { writingDirection: "ltr" }]}
-              >
-                {`${citation.marker} ${details.join(" · ")}`.trim()}
-              </Text>
-            );
-          })}
-        </View>
-      );
-    },
-    [
-      colors.backgroundSurfaceVariant,
-      colors.outline,
-      common.borderXsm,
-      common.rounded,
-      layout.alignSelfEnd,
-      layout.alignSelfStart,
-      layout.flexColumn,
-      spacing.gapXs,
-      spacing.pdSm,
-      text.textLeft,
-    ]
-  );
+          return (
+            <Text
+              key={`${item.id}-${citation.marker}`}
+              fontSize={12}
+              style={[text.textLeft, { writingDirection: "ltr" }]}
+            >
+              {`${citation.marker} ${details.join(" · ")}`.trim()}
+            </Text>
+          );
+        })}
+      </View>
+    );
+  }, []);
 
-  const renderNotice = useCallback(
-    (item: IChatMessage) => {
-      if (!item.notice) return null;
+  const renderNotice = useCallback((item: IChatMessage) => {
+    if (!item.notice) return null;
 
-      const alignStyle = item.variant === "prompt" ? layout.alignSelfStart : layout.alignSelfEnd;
+    const alignStyle = item.variant === "prompt" ? layout.alignSelfStart : layout.alignSelfEnd;
 
-      return (
-        <View
-          pointerEvents="none"
-          style={[
-            alignStyle,
-            colors.backgroundWarningContainer,
-            colors.outline,
-            common.borderXsm,
-            spacing.pdSm,
-            common.rounded,
-          ]}
-        >
-          <Text fontSize={12} style={[text.textRight, { lineHeight: 16 }]}>
-            {item.notice}
-          </Text>
-        </View>
-      );
-    },
-    [
-      colors.backgroundWarningContainer,
-      colors.outline,
-      common.borderXsm,
-      common.rounded,
-      layout.alignSelfEnd,
-      layout.alignSelfStart,
-      spacing.pdSm,
-      text.textRight,
-    ]
-  );
+    return (
+      <View
+        pointerEvents="none"
+        style={[
+          alignStyle,
+          colors.backgroundWarningContainer,
+          colors.outline,
+          common.borderXsm,
+          spacing.pdSm,
+          common.rounded,
+        ]}
+      >
+        <Text fontSize={12} style={[text.textRight, { lineHeight: 16 }]}>
+          {item.notice}
+        </Text>
+      </View>
+    );
+  }, []);
 
   const renderItem = useCallback(
     ({ item }: { item: IChatMessage }) => {
@@ -162,8 +138,8 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
       const bubbleText = isGreeting
         ? greetUser(user, item)
         : isRefusal
-          ? item.text?.trim() || fallbackRefusalText
-          : item.text;
+        ? item.text?.trim() || fallbackRefusalText
+        : item.text;
 
       const shouldRenderBubble =
         item.variant === "prompt" || (bubbleText && bubbleText.trim().length > 0) || isRefusal;
@@ -206,34 +182,22 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
         </View>
       );
     },
-    [
-      colors.textDanger,
-      handleLongPress,
-      layout.alignSelfEnd,
-      layout.alignSelfStart,
-      renderCitations,
-      renderNotice,
-      spacing.gapXs,
-    ]
+    [handleLongPress, renderCitations, renderNotice]
   );
 
-  const listContentStyle = useMemo(() => [spacing.gap20], [spacing.gap20]);
-
-  const bannerBackgroundStyle = useMemo(() => {
-    if (!statusBanner) return null;
+  const { bannerTextStyle, bannerBackgroundStyle } = useMemo(() => {
+    if (!statusBanner) return {};
 
     return statusBanner.variant === "paused"
-      ? colors.backgroundErrorContainer
-      : colors.backgroundWarningContainer;
-  }, [colors.backgroundErrorContainer, colors.backgroundWarningContainer, statusBanner]);
-
-  const bannerTextStyle = useMemo(() => {
-    if (!statusBanner) return null;
-
-    return statusBanner.variant === "paused"
-      ? colors.textOnErrorContainer
-      : colors.textOnWarningContainer;
-  }, [colors.textOnErrorContainer, colors.textOnWarningContainer, statusBanner]);
+      ? {
+          bannerTextStyle: colors.textOnErrorContainer,
+          bannerBackgroundStyle: colors.backgroundErrorContainer,
+        }
+      : {
+          bannerTextStyle: colors.textOnWarningContainer,
+          bannerBackgroundStyle: colors.backgroundWarningContainer,
+        };
+  }, [statusBanner]);
 
   return (
     <View style={[layout.flex1, spacing.gapDefault]} pointerEvents="box-none">
@@ -257,15 +221,16 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
       </ConditionalRender>
 
       <FlatList
+        ref={flatListRef}
         data={conversation}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         inverted
         removeClippedSubviews
-        windowSize={7} // 5–9 is a good range
+        windowSize={7}
         maxToRenderPerBatch={8}
         updateCellsBatchingPeriod={50}
-        contentContainerStyle={listContentStyle}
+        contentContainerStyle={spacing.gap20}
         keyboardShouldPersistTaps="handled"
         scrollEventThrottle={16}
         maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
