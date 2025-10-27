@@ -43,7 +43,7 @@ export const buildRagQueryPayload = ({
 };
 
 export const useChatApi = () => {
-  const { setSessionQuota, setSessionPaused } = useChatStorage();
+  const { updateSessionMeta, setSessionPaused } = useChatStorage();
 
   const clearPausedState = useCallback(
     async (sessionId?: string) => {
@@ -67,7 +67,7 @@ export const useChatApi = () => {
         resetAt: payload.resetAt,
       };
 
-      await setSessionQuota(sessionId, quotaState);
+      await updateSessionMeta(sessionId, { quota: quotaState });
 
       console.info("[Telemetry] rag.daily_quota_hit", {
         userId: context.userId,
@@ -76,7 +76,7 @@ export const useChatApi = () => {
         resetAt: quotaState.resetAt,
       });
     },
-    [setSessionQuota]
+    [updateSessionMeta]
   );
 
   const handlePaused = useCallback(
@@ -127,17 +127,6 @@ export const useChatApi = () => {
 
         if (status === 429 && code === "DAILY_LIMIT_REACHED") {
           await handleQuotaHit(sessionId, data, { userId });
-
-          const quotaError = new Error("Daily quota reached");
-          (quotaError as any).response = error?.response;
-          (quotaError as any).ragError = {
-            type: "quota",
-            payload: {
-              limit: data?.limit,
-              resetAt: data?.resetAt,
-            },
-          };
-          throw quotaError;
         }
 
         if (status === 503 && code === "SERVICE_PAUSED") {

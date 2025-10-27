@@ -108,9 +108,9 @@ const ChatScreen = () => {
       <KeyboardAvoidingView
         keyboardVerticalOffset={80}
         behavior="translate-with-padding"
-        style={[spacing.pdXl, layout.flex1, spacing.gap20]}
+        style={[spacing.pdXl, layout.flex1]}
       >
-        <View style={[layout.flex1, spacing.gap20]}>
+        <View style={[layout.flex1, spacing.gapDefault]}>
           <Text
             fontVariant="light"
             fontSize={14}

@@ -9,7 +9,7 @@ interface StatusBannerProps {
 }
 
 const StatusBanner: React.FC<StatusBannerProps> = ({ banner }) => {
-  const { colors, common, spacing, text } = useStyles();
+  const { colors, common, spacing } = useStyles();
 
   if (!banner) return null;
 
@@ -19,14 +19,14 @@ const StatusBanner: React.FC<StatusBannerProps> = ({ banner }) => {
       : colors.backgroundSecondaryContainer;
 
   const textStyle =
-    banner.variant === "quota" ? colors.textOnWarningContainer : colors.textOnSecondaryContainer;
+    banner.variant === "quota" ? colors.textDanger : colors.textOnSecondaryContainer;
 
   return (
     <View
       pointerEvents="none"
       style={[backgroundStyle, colors.outline, common.borderXsm, common.rounded, spacing.pdDefault]}
     >
-      <Text fontSize={12} style={[text.textRight, textStyle, { lineHeight: 18 }]}>
+      <Text fontSize={12} style={[textStyle, { lineHeight: 18 }]}>
         {banner.message}
       </Text>
     </View>

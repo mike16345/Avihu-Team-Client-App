@@ -7,7 +7,7 @@ export interface StatusBannerState {
 }
 
 const useQuotaPause = (sessionId?: string) => {
-  const { meta, setSessionQuota } = useChatStorage();
+  const { meta, updateSessionMeta } = useChatStorage();
 
   const quotaState = meta.quota;
   const pausedState = meta.paused;
@@ -37,22 +37,22 @@ const useQuotaPause = (sessionId?: string) => {
     const resetTime = resetDate.getTime();
 
     if (Number.isNaN(resetTime)) {
-      void setSessionQuota(sessionId, null);
+      void updateSessionMeta(sessionId, { quota: null });
       return;
     }
 
     const now = Date.now();
 
     if (now >= resetTime) {
-      void setSessionQuota(sessionId, null);
+      void updateSessionMeta(sessionId, { quota: null });
       return;
     }
 
     timeoutRef.current = setTimeout(() => {
-      void setSessionQuota(sessionId, null);
+      void updateSessionMeta(sessionId, { quota: null });
       timeoutRef.current = null;
     }, resetTime - now);
-  }, [quotaState?.active, quotaState?.resetAt, sessionId, setSessionQuota]);
+  }, [quotaState?.active, quotaState?.resetAt, sessionId, updateSessionMeta]);
 
   const isQuotaActive = useMemo(() => {
     if (!quotaState?.active || !quotaState.resetAt) return false;

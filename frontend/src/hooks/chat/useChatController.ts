@@ -109,7 +109,6 @@ const useChatController = (currentUserId?: string, activeSessionId?: string) => 
           });
         }
       } catch (error: any) {
-        console.log(JSON.stringify(error, undefined, 2));
         const status = error?.response?.status;
         const message = error?.response?.data?.message || "אירעה שגיאה בשליחת ההודעה";
         const ragError = error?.ragError as
@@ -123,6 +122,13 @@ const useChatController = (currentUserId?: string, activeSessionId?: string) => 
 
         if (ragError?.type === "quota") {
           await updateMessage(sessionId, messageId, { error: true });
+          await updateSessionMeta(sessionId, {
+            quota: {
+              active: false,
+              limit: ragError.payload?.limit ?? 0,
+              resetAt: ragError.payload?.resetAt ?? new Date().toISOString(),
+            },
+          });
         } else {
           const shouldOfferRetry = ragError?.type === "paused" || !status || status >= 500;
           if (shouldOfferRetry) {
