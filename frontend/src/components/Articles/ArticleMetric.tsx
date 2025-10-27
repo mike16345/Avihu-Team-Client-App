@@ -10,7 +10,7 @@ interface ArticleMetricProps {
 }
 
 const ArticleMetric: React.FC<ArticleMetricProps> = ({ icon, value }) => {
-  const { layout, spacing } = useStyles();
+  const { layout } = useStyles();
 
   return (
     <View style={[layout.flexRow, layout.itemsCenter, { gap: 6 }]}>
