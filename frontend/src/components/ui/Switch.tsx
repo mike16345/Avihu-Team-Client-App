@@ -1,7 +1,7 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { FC, useRef } from "react";
+import { FC } from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
-import Animated, { useSharedValue, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { useSharedValue, withTiming } from "react-native-reanimated";
 
 interface SwitchProps {
   isOn: boolean;

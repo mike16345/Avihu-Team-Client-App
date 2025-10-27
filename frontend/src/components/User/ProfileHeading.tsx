@@ -8,7 +8,6 @@ import UploadDrawer from "../ui/UploadDrawer";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useToast } from "@/hooks/useToast";
 import { buildPhotoUrl } from "@/utils/utils";
-import { AuthStackParamListNavigationProp } from "@/types/navigatorTypes";
 import { useNavigation } from "@react-navigation/native";
 
 const ICON_SIZE = 30;
@@ -19,7 +18,7 @@ const ProfileHeading = () => {
   const { currentUser } = useUserStore();
   const { updateProfilePhoto } = useUserApi();
   const { triggerErrorToast } = useToast();
-  const navigation = useNavigation<AuthStackParamListNavigationProp>();
+  const navigation = useNavigation<any>();
 
   const [profileHeight, setProfileHeight] = useState(0);
   const [loading, setLoading] = useState(false);

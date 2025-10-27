@@ -37,10 +37,6 @@ const useChatStorage = () => {
   const resolvedState = session ?? INITIAL_STATE;
   const latestStateRef = useRef<IChatSessionsState>(resolvedState);
 
-  useEffect(() => {
-    latestStateRef.current = resolvedState;
-  }, [resolvedState]);
-
   const persistState = useCallback(
     async (nextState: IChatSessionsState) => {
       latestStateRef.current = nextState;
@@ -165,6 +161,8 @@ const useChatStorage = () => {
         },
       };
 
+      console.log("Next state ", JSON.stringify(nextState, null, 2));
+
       await persistState(nextState);
     },
     [persistState]
@@ -280,8 +278,6 @@ const useChatStorage = () => {
     paused: meta.paused ?? null,
   };
 
-  console.log("resolved meta", resolvedMeta);
-
   const appendUserMessage = useCallback(
     async (sessionId: string, message: IChatMessage) => {
       await appendMessage(sessionId, message);
@@ -296,19 +292,16 @@ const useChatStorage = () => {
     [appendMessage]
   );
 
-  const setSessionQuota = useCallback(
-    async (sessionId: string, quota: IChatQuotaState | null) => {
-      await updateSessionMeta(sessionId, { quota });
-    },
-    [updateSessionMeta]
-  );
-
   const setSessionPaused = useCallback(
     async (sessionId: string, paused: IChatPausedState | null) => {
       await updateSessionMeta(sessionId, { paused });
     },
     [updateSessionMeta]
   );
+
+  useEffect(() => {
+    latestStateRef.current = resolvedState;
+  }, [resolvedState]);
 
   return {
     isLoading,
@@ -328,7 +321,6 @@ const useChatStorage = () => {
     clearSession,
     removeSession,
     getSession: (sessionId: string) => resolvedState.sessions[sessionId],
-    setSessionQuota,
     setSessionPaused,
   };
 };

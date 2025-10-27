@@ -7,7 +7,7 @@ import Animated, { FadeInDown, FadeOutUp, LinearTransition } from "react-native-
 import { SetInput } from "./SetInputContainer";
 import useColors from "@/styles/useColors";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
-import { DEFAULT_SET, MAX_REPS, MAX_WEIGHT, MIN_REPS, MIN_WEIGHT } from "@/constants/Constants";
+import { MAX_REPS, MAX_WEIGHT, MIN_REPS, MIN_WEIGHT } from "@/constants/Constants";
 
 const STEP_SIZE = 1;
 const HORIZONTAL_PADDING = 24;

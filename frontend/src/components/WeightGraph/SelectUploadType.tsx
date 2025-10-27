@@ -17,7 +17,7 @@ const imagePickerOptions: ImagePicker.ImagePickerOptions = {
 };
 
 const SelectUploadType: React.FC<SelectUploadTypeProps> = ({ returnImage }) => {
-  const { layout, spacing } = useStyles();
+  const { layout } = useStyles();
 
   const [_, requestPermission] = ImagePicker.useCameraPermissions();
 

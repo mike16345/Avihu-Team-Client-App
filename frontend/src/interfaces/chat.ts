@@ -32,6 +32,7 @@ export interface IChatMessage {
   refusal?: boolean;
   greeting?: boolean;
   error?: boolean;
+  loading?: boolean;
 }
 
 export interface IChatQuotaState {

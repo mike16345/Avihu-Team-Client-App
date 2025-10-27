@@ -1,5 +1,4 @@
 import { View } from "react-native";
-import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { Card } from "@/components/ui/Card";
 import { Text } from "@/components/ui/Text";
