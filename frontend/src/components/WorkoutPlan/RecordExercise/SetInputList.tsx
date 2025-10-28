@@ -130,7 +130,11 @@ const SetInputList: React.FC<SetInputListProps> = ({
   const handleAppendSet = useCallback(() => {
     setRecordedSets((prev) => {
       const prevSet = prev[prev.length - 1];
-      const newSet = { ...prevSet, setNumber: prevSet.setNumber + 1 };
+      const newSet: SetInput = {
+        repsDone: prevSet.repsDone,
+        weight: prevSet.weight,
+        setNumber: prevSet.setNumber + 1,
+      };
 
       return [...prev, newSet];
     });

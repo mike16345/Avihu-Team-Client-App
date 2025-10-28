@@ -41,9 +41,11 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   const [isPending, setIsPending] = useState(false);
   const [recordedSets, setRecordedSets] = useState<SetInput[]>(() => {
     const defaultSet = lastRecordedSets[lastRecordedSets.length - 1] ?? DEFAULT_SET;
+
     return [
       {
-        ...defaultSet,
+        repsDone: defaultSet.repsDone,
+        weight: defaultSet.weight,
         setNumber,
       },
     ];
