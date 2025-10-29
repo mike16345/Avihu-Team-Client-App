@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { CHAT_SESSIONS_STORAGE_KEY } from "@/constants/reactQuery";
 import {
   IChatMessage,
+  IChatPausedState,
+  IChatQuotaState,
   IChatSession,
   IChatSessionMeta,
   IChatSessionsState,
@@ -21,7 +23,10 @@ const createEmptySession = (id: string): IChatSession => {
     createdAt: now,
     updatedAt: now,
     messages: [],
-    meta: {},
+    meta: {
+      quota: null,
+      paused: null,
+    },
   };
 };
 
@@ -31,10 +36,6 @@ const useChatStorage = () => {
 
   const resolvedState = session ?? INITIAL_STATE;
   const latestStateRef = useRef<IChatSessionsState>(resolvedState);
-
-  useEffect(() => {
-    latestStateRef.current = resolvedState;
-  }, [resolvedState]);
 
   const persistState = useCallback(
     async (nextState: IChatSessionsState) => {
@@ -136,6 +137,64 @@ const useChatStorage = () => {
     [persistState]
   );
 
+  const updateMessage = useCallback(
+    async (sessionId: string, messageId: string, partial: Partial<IChatMessage>) => {
+      const baseState = latestStateRef.current ?? INITIAL_STATE;
+      const currentSession = baseState.sessions[sessionId];
+      if (!currentSession) return;
+
+      const nextMessages = currentSession.messages.map((message) =>
+        message.id === messageId ? { ...message, ...partial } : message
+      );
+
+      const nextSession: IChatSession = {
+        ...currentSession,
+        updatedAt: partial.createdAt ?? new Date().toISOString(),
+        messages: nextMessages,
+      };
+
+      const nextState: IChatSessionsState = {
+        ...baseState,
+        sessions: {
+          ...baseState.sessions,
+          [sessionId]: nextSession,
+        },
+      };
+
+      console.log("Next state ", JSON.stringify(nextState, null, 2));
+
+      await persistState(nextState);
+    },
+    [persistState]
+  );
+
+  const removeMessage = useCallback(
+    async (sessionId: string, messageId: string) => {
+      const baseState = latestStateRef.current ?? INITIAL_STATE;
+      const currentSession = baseState.sessions[sessionId];
+      if (!currentSession) return;
+
+      const nextMessages = currentSession.messages.filter((message) => message.id !== messageId);
+
+      const nextSession: IChatSession = {
+        ...currentSession,
+        updatedAt: new Date().toISOString(),
+        messages: nextMessages,
+      };
+
+      const nextState: IChatSessionsState = {
+        ...baseState,
+        sessions: {
+          ...baseState.sessions,
+          [sessionId]: nextSession,
+        },
+      };
+
+      await persistState(nextState);
+    },
+    [persistState]
+  );
+
   const updateSessionMeta = useCallback(
     async (sessionId: string, meta: Partial<IChatSessionMeta>) => {
       const baseState = latestStateRef.current ?? INITIAL_STATE;
@@ -213,6 +272,11 @@ const useChatStorage = () => {
 
   const messages = activeSession?.messages ?? [];
   const meta = activeSession?.meta ?? {};
+  const resolvedMeta: IChatSessionMeta = {
+    ...meta,
+    quota: meta.quota ?? null,
+    paused: meta.paused ?? null,
+  };
 
   const appendUserMessage = useCallback(
     async (sessionId: string, message: IChatMessage) => {
@@ -228,21 +292,36 @@ const useChatStorage = () => {
     [appendMessage]
   );
 
+  const setSessionPaused = useCallback(
+    async (sessionId: string, paused: IChatPausedState | null) => {
+      await updateSessionMeta(sessionId, { paused });
+    },
+    [updateSessionMeta]
+  );
+
+  useEffect(() => {
+    latestStateRef.current = resolvedState;
+  }, [resolvedState]);
+
   return {
     isLoading,
     state: resolvedState,
     activeSession,
     activeSessionId: resolvedState.activeSessionId,
     messages,
-    meta,
+    meta: resolvedMeta,
     ensureSession,
     createSession,
     setActiveSession,
     appendUserMessage,
     appendAssistantMessage,
+    updateMessage,
+    removeMessage,
     updateSessionMeta,
     clearSession,
     removeSession,
+    getSession: (sessionId: string) => resolvedState.sessions[sessionId],
+    setSessionPaused,
   };
 };
 

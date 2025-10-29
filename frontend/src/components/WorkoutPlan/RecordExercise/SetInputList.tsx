@@ -7,7 +7,7 @@ import Animated, { FadeInDown, FadeOutUp, LinearTransition } from "react-native-
 import { SetInput } from "./SetInputContainer";
 import useColors from "@/styles/useColors";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
-import { DEFAULT_SET, MAX_REPS, MAX_WEIGHT, MIN_REPS, MIN_WEIGHT } from "@/constants/Constants";
+import { MAX_REPS, MAX_WEIGHT, MIN_REPS, MIN_WEIGHT } from "@/constants/Constants";
 
 const STEP_SIZE = 1;
 const HORIZONTAL_PADDING = 24;
@@ -130,7 +130,11 @@ const SetInputList: React.FC<SetInputListProps> = ({
   const handleAppendSet = useCallback(() => {
     setRecordedSets((prev) => {
       const prevSet = prev[prev.length - 1];
-      const newSet = { ...prevSet, setNumber: prevSet.setNumber + 1 };
+      const newSet: SetInput = {
+        repsDone: prevSet.repsDone,
+        weight: prevSet.weight,
+        setNumber: prevSet.setNumber + 1,
+      };
 
       return [...prev, newSet];
     });

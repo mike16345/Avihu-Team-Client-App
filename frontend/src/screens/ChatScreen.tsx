@@ -1,5 +1,5 @@
-import { Keyboard, TouchableWithoutFeedback, View } from "react-native";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Clipboard, Keyboard, View } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import ChatInput from "@/components/ui/inputs/ChatInput";
 import SendButton from "@/components/ui/chat/SendButton";
@@ -11,32 +11,91 @@ import { IChatMessage } from "@/interfaces/chat";
 import useChatStorage from "@/hooks/sessions/useChatStorage";
 import { useUserStore } from "@/store/userStore";
 import { useToast } from "@/hooks/useToast";
-import { generateUniqueId } from "@/utils/utils";
-import useChatApi from "@/hooks/api/useChatApi";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import useQuotaPause from "@/hooks/chat/useQuotaPause";
+import useChatController from "@/hooks/chat/useChatController";
+import { KeyboardAvoidingView, KeyboardGestureArea } from "react-native-keyboard-controller";
+import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 
 const ChatScreen = () => {
   const { colors, layout, spacing, text } = useStyles();
-  const { triggerErrorToast, triggerSuccessToast } = useToast();
-  const { currentUser } = useUserStore();
-  const { sendQuery } = useChatApi();
+  const { triggerErrorToast } = useToast();
+  const currentUserId = useUserStore((state) => state.currentUser?._id);
 
   const {
     isLoading: storageLoading,
     activeSessionId,
     messages,
-    meta,
     createSession,
-    appendUserMessage,
-    appendAssistantMessage,
-    updateSessionMeta,
+    removeMessage,
   } = useChatStorage();
 
-  const [prompt, setPrompt] = useState<string>();
-  const [loading, setLoading] = useState(false);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const { statusBanner, isComposerLocked } = useQuotaPause(activeSessionId);
+  const { loading, retryContext, send, retry } = useChatController(currentUserId, activeSessionId);
 
-  const currentUserId = currentUser?._id;
+  const [prompt, setPrompt] = useState<string>("");
+
+  const conversation = useMemo<IChatMessage[]>(() => messages ?? [], [messages]);
+
+  const handleCopyMessage = useCallback(
+    async (message: IChatMessage) => {
+      if (!message.text) return;
+
+      try {
+        if (Clipboard && typeof Clipboard.setString === "function") {
+          Clipboard.setString(message.text);
+        } else {
+          const webClipboard = (globalThis as any)?.navigator?.clipboard;
+          if (webClipboard?.writeText) {
+            await webClipboard.writeText(message.text);
+          }
+        }
+      } catch {
+        triggerErrorToast({ message: "העתקה נכשלה" });
+      }
+    },
+    [triggerErrorToast]
+  );
+
+  const handleDeleteMessage = useCallback(
+    async (message: IChatMessage) => {
+      if (!activeSessionId) return;
+      await removeMessage(activeSessionId, message.id);
+    },
+    [activeSessionId, removeMessage]
+  );
+
+  const hasVisibleMessages = useMemo(
+    () =>
+      conversation.some(
+        (message) =>
+          message.variant === "prompt" || (message.variant === "response" && !message.greeting)
+      ),
+    [conversation]
+  );
+
+  const chatInitiated = loading || hasVisibleMessages;
+
+  const isSendDisabled = useMemo(() => {
+    const trimmed = prompt.trim();
+
+    return !trimmed || loading || storageLoading || isComposerLocked;
+  }, [isComposerLocked, loading, prompt, storageLoading]);
+
+  const handleSend = useCallback(async () => {
+    const trimmedPrompt = prompt.trim();
+    if (!trimmedPrompt || loading || storageLoading || isComposerLocked) return;
+
+    Keyboard.dismiss();
+
+    setPrompt("");
+    await send(trimmedPrompt);
+  }, [isComposerLocked, loading, prompt, send, storageLoading]);
+
+  const handleRetry = useCallback(async () => {
+    if (!retryContext || loading || storageLoading) return;
+
+    await retry();
+  }, [loading, retry, retryContext, storageLoading]);
 
   useEffect(() => {
     if (!storageLoading && !activeSessionId) {
@@ -44,155 +103,55 @@ const ChatScreen = () => {
     }
   }, [storageLoading, activeSessionId, createSession]);
 
-  const conversation = useMemo<IChatMessage[]>(() => messages ?? [], [messages]);
-  const chatInitiated = loading || conversation.length > 0;
-
-  const handleSend = useCallback(async () => {
-    const trimmedPrompt = prompt?.trim();
-    if (!trimmedPrompt || loading || storageLoading) return;
-
-    if (!currentUserId) {
-      triggerErrorToast({ message: "אין משתמש" });
-      return;
-    }
-
-    if (debounceRef.current) {
-      return;
-    }
-
-    debounceRef.current = setTimeout(() => {
-      debounceRef.current = null;
-    }, 400);
-
-    Keyboard.dismiss();
-
-    const sessionId = activeSessionId ?? (await createSession());
-    const now = new Date().toISOString();
-
-    const userMessage: IChatMessage = {
-      id: generateUniqueId(),
-      variant: "prompt",
-      text: trimmedPrompt,
-      createdAt: now,
-      language: "he",
-    };
-
-    await appendUserMessage(sessionId, userMessage);
-    setPrompt(undefined);
-    setLoading(true);
-
-    try {
-      const response = await sendQuery({
-        userId: currentUserId,
-        sessionId,
-        question: trimmedPrompt,
-      });
-
-      const responseText = response.answer || "";
-      const responseTimestamp = new Date().toISOString();
-
-      const assistantMessage: IChatMessage = {
-        id: generateUniqueId(),
-        variant: "response",
-        text: responseText,
-        createdAt: responseTimestamp,
-        language: response.language,
-        notice: response.notice,
-        citations: response.citations ?? [],
-        reason: response.reason,
-        cached: response.cached,
-      };
-
-      await appendAssistantMessage(sessionId, assistantMessage);
-
-      await updateSessionMeta(sessionId, {
-        language: response.language,
-        notice: response.notice,
-        lastReason: response.reason,
-        cached: response.cached,
-        updatedAt: responseTimestamp,
-      });
-
-      if (response.notice && response.notice !== meta.notice) {
-        triggerSuccessToast({
-          title: "לתשומת לבך",
-          message: response.notice,
-        });
-      }
-    } catch (error: any) {
-      console.log(JSON.stringify(error, undefined, 2));
-      const status = error?.response?.status;
-      const message = error?.response?.data?.message || "אירעה שגיאה בשליחת ההודעה";
-
-      triggerErrorToast({ message });
-
-      if (status === 429) {
-        // Allow button re-enable after notifying
-        setLoading(false);
-        return;
-      }
-    }
-
-    setLoading(false);
-  }, [
-    activeSessionId,
-    appendAssistantMessage,
-    appendUserMessage,
-    createSession,
-    currentUserId,
-    loading,
-    meta.notice,
-    prompt,
-    sendQuery,
-    storageLoading,
-    triggerErrorToast,
-    triggerSuccessToast,
-    updateSessionMeta,
-  ]);
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
-  }, []);
-
-  const isSendDisabled = useMemo(() => {
-    const trimmed = prompt?.trim();
-    return !trimmed || loading || storageLoading;
-  }, [loading, prompt, storageLoading]);
-
   return (
-    <KeyboardAwareScrollView contentContainerStyle={layout.flex1}>
-      <View style={[spacing.pdXl, layout.flex1, spacing.gap20]}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <>
-            <Text fontVariant="light" fontSize={14} style={text.textCenter}>
-              תשובות כלליות בלבד, פנו למאמן להכוונה מדויקת
-            </Text>
+    <KeyboardGestureArea interpolator="ios" style={layout.flex1}>
+      <KeyboardAvoidingView
+        keyboardVerticalOffset={80}
+        behavior="translate-with-padding"
+        style={[spacing.pdXl, layout.flex1]}
+      >
+        <View style={[layout.flex1, spacing.gapDefault]}>
+          <Text
+            fontVariant="light"
+            fontSize={14}
+            style={[text.textCenter, spacing.pdVerticalDefault]}
+          >
+            תשובות כלליות בלבד, פנו למאמן להכוונה מדויקת
+          </Text>
 
-            <ConditionalRender condition={!chatInitiated}>
-              <InitialChatContainer />
-            </ConditionalRender>
-            <ConditionalRender condition={chatInitiated}>
-              <ConversationContainer conversation={conversation} loading={loading} />
-            </ConditionalRender>
-          </>
-        </TouchableWithoutFeedback>
+          <ConditionalRender condition={!chatInitiated}>
+            <InitialChatContainer />
+          </ConditionalRender>
+          <ConditionalRender condition={chatInitiated}>
+            <ConversationContainer
+              conversation={conversation}
+              loading={loading}
+              onCopyMessage={handleCopyMessage}
+              onDeleteMessage={handleDeleteMessage}
+              statusBanner={statusBanner}
+            />
+          </ConditionalRender>
 
-        <View style={[layout.flexRow, spacing.gapDefault]}>
-          <ChatInput
-            style={[colors.backgroundSurface, layout.flex1]}
-            placeholder="כתבו כאן"
-            onChangeText={(val) => setPrompt(val)}
-            value={prompt ?? ""}
-          />
+          <ConditionalRender condition={!!retryContext && !loading}>
+            <SecondaryButton onPress={handleRetry} alignStart>
+              נסו שוב
+            </SecondaryButton>
+          </ConditionalRender>
 
-          <SendButton disabled={isSendDisabled} onPress={handleSend} />
+          <View style={[layout.flexRow, spacing.gapDefault]}>
+            <ChatInput
+              style={[colors.backgroundSurface, layout.flex1]}
+              placeholder="כתבו כאן"
+              onChangeText={setPrompt}
+              value={prompt}
+              editable={!isComposerLocked}
+            />
+
+            <SendButton disabled={isSendDisabled} onPress={handleSend} />
+          </View>
         </View>
-      </View>
-    </KeyboardAwareScrollView>
+      </KeyboardAvoidingView>
+    </KeyboardGestureArea>
   );
 };
 

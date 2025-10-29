@@ -1,8 +1,15 @@
-export type ChatReason = "ANSWER_GENERATED" | "CACHE_HIT" | "NOT_FITNESS" | "RETRIEVAL_EMPTY";
+export type ChatReason =
+  | "ANSWER_GENERATED"
+  | "CACHE_HIT"
+  | "CACHE_REFUSAL"
+  | "NOT_FITNESS"
+  | "RETRIEVAL_EMPTY"
+  | "GREETING"
+  | "BLOCKED";
 
 export interface IChatCitation {
   marker: string;
-  sourceId: string;
+  sourceId?: string;
   page?: number;
   score?: number;
 }
@@ -12,11 +19,31 @@ export interface IChatMessage {
   variant: "response" | "prompt";
   text: string;
   createdAt: string;
-  language?: string;
+  language?: "he" | "en";
   notice?: string;
   citations?: IChatCitation[];
   reason?: ChatReason;
   cached?: boolean;
+  usage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+  refusal?: boolean;
+  greeting?: boolean;
+  error?: boolean;
+  loading?: boolean;
+}
+
+export interface IChatQuotaState {
+  active: boolean;
+  limit: number;
+  resetAt: string;
+}
+
+export interface IChatPausedState {
+  active: boolean;
+  message: string;
 }
 
 export interface IChatSessionMeta {
@@ -24,7 +51,11 @@ export interface IChatSessionMeta {
   notice?: string;
   lastReason?: ChatReason;
   cached?: boolean;
+  refusal?: boolean;
+  greeting?: boolean;
   updatedAt?: string;
+  quota?: IChatQuotaState | null;
+  paused?: IChatPausedState | null;
 }
 
 export interface IChatSession {
@@ -59,4 +90,6 @@ export interface IRagQueryResponse {
   cached?: boolean;
   notice?: string;
   language?: string;
+  refusal?: boolean;
+  greeting?: boolean;
 }

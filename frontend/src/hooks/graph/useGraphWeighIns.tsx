@@ -31,7 +31,7 @@ export function useGraphWeighIns(data: IWeighIn[] | undefined) {
     const monthlyMap: Record<string, { total: number; count: number }> = {};
     const monthOrder: string[] = [];
 
-    data.forEach((item, idx) => {
+    data.forEach((item) => {
       const dateObj = new Date(item.date);
 
       const today = new Date(item.date);

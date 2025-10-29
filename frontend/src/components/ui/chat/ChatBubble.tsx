@@ -10,7 +10,7 @@ interface ChatBubbleProps {
 }
 
 const ChatBubble: React.FC<ChatBubbleProps> = ({ children, variant = "prompt", language }) => {
-  const { colors, common, layout, spacing, text: textStyles } = useStyles();
+  const { colors, common, layout, spacing } = useStyles();
   const { width } = useWindowDimensions();
 
   const variantStyles =

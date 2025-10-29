@@ -1,4 +1,3 @@
-import { KeyboardAvoidingView, ScrollView } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
 import HorizontalSelector from "@/components/ui/HorizontalSelector";
