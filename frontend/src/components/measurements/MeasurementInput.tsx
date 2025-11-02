@@ -1,12 +1,12 @@
 import { View, Image, useWindowDimensions, Keyboard } from "react-native";
 import { Card } from "../ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
-import meausrementPhoto from "@assets/measurement_photo.png";
 import { Text } from "../ui/Text";
 import {
   MEASUREMENT_DESCRIPTIONS,
   MEASUREMENT_GROUPS_ENGLISH,
   MeasurementMuscle,
+  muscleImages,
 } from "@/constants/measurements";
 import Input from "../ui/inputs/Input";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
@@ -59,9 +59,8 @@ const MeasurementInput: React.FC<MeasurementInputProps> = ({ activeMuscleGroup }
     <Card variant="gray" style={[{ padding: 0 }, spacing.gapLg, layout.flex1, layout.widthFull]}>
       <Card.Header>
         <Image
-          source={meausrementPhoto}
-          height={0.5}
-          style={[layout.widthFull, common.roundedSm]}
+          source={muscleImages[activeMuscleGroup as string]}
+          style={[layout.widthFull, common.roundedSm, { height: 192 }]}
         />
       </Card.Header>
       <Card.Content style={[{ paddingBottom: 20 }, spacing.gapLg]}>

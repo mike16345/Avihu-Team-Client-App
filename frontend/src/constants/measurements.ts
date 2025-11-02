@@ -1,3 +1,7 @@
+import Chest from "@assets/measurements/masurement-chest.jpg";
+import Hip from "@assets/measurements/measurement-hips.png";
+import Arm from "@assets/measurements/masurement-arm.jpg";
+
 export const MEASUREMENT_MUSCLE_GROUPS = ["חזה", "זרוע", "מותן", "ישבן", "ירך", "תאומים"] as const;
 
 export type MeasurementMuscle = (typeof MEASUREMENT_MUSCLE_GROUPS)[number];
@@ -19,3 +23,12 @@ export const MEASUREMENT_GROUPS_ENGLISH: Record<MeasurementMuscle, string> = {
   ירך: "thigh",
   מותן: "waist",
 };
+
+export const muscleImages: Record<string, any> = {
+  חזה: Chest,
+  ישבן: Hip,
+  תאומים: Hip,
+  זרוע: Arm,
+  ירך: Hip,
+  מותן: Hip,
+} as const;
