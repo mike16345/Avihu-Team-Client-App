@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
 import React, { ReactNode } from "react";
 import { CustomModal, CustomModalProps } from "./Modal";
 import useStyles from "@/styles/useGlobalStyles";
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     fontFamily: "Assistant-Regular",
     fontSize: 16,
-    paddingTop: 0,
+    ...(Platform.OS == "ios" ? { paddingTop: 0 } : {}),
   },
 });
 
