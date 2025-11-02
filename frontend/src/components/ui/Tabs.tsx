@@ -100,10 +100,10 @@ export const TabsList = ({ children }: TabsListProps) => {
         layout.itemsCenter,
         spacing.gapDefault,
         colors.backgroundSecondary,
-        common.rounded,
+        common.roundedSm,
         colors.outline,
         common.borderXsm,
-        { height: 35, position: "relative", zIndex: 1 },
+        { height: 36, position: "relative", zIndex: 1 },
       ]}
     >
       <Animated.View
@@ -122,7 +122,7 @@ export const TabsList = ({ children }: TabsListProps) => {
               colors.backgroundSurface,
               colors.outline,
               common.borderXsm,
-              common.rounded,
+              common.roundedSm,
             ]}
           >
             <Text fontVariant="semibold">{value}</Text>
