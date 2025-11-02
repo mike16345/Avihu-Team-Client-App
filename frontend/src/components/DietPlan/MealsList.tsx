@@ -17,7 +17,11 @@ const MealsList: FC<MealsListProps> = () => {
 
   return (
     <View style={[{ height: height * 0.55 }]}>
-      <ScrollView style={{ flexGrow: 1 }} contentContainerStyle={[{ flexGrow: 1 }, spacing.gap20]}>
+      <ScrollView
+        style={{ flexGrow: 1 }}
+        contentContainerStyle={[{ flexGrow: 1 }, spacing.gap20]}
+        showsVerticalScrollIndicator={false}
+      >
         <ConditionalRender condition={isLoading}>
           <View style={[layout.center]}>
             <SpinningIcon mode="light" />

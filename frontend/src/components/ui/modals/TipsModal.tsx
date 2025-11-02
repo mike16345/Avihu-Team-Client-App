@@ -50,7 +50,12 @@ const TipsModal: React.FC<TipsModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-  text: { flexWrap: "wrap", fontFamily: "Assistant-Regular", fontSize: 16 },
+  text: {
+    flexWrap: "wrap",
+    fontFamily: "Assistant-Regular",
+    fontSize: 16,
+    paddingTop: 0,
+  },
 });
 
 export default TipsModal;

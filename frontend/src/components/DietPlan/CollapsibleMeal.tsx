@@ -7,6 +7,9 @@ import PrimaryButton from "../ui/buttons/PrimaryButton";
 import DietItemContent from "./DietItemContent";
 import { foodGroupToName } from "@/utils/utils";
 import { useRecordMeal } from "@/hooks/useRecordMeal";
+import { Text } from "../ui/Text";
+import Icon from "../Icon/Icon";
+import { selectionHaptic } from "@/utils/haptics";
 
 interface CollapsibleMealProps {
   meal: IMeal;
@@ -33,6 +36,8 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
     } else {
       recordMeal(meal, index);
     }
+
+    selectionHaptic();
   };
 
   const toggleCollapse = () => {
@@ -50,13 +55,34 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
 
   return (
     <Collapsible
-      trigger={`ארוחה ${index + 1}`}
-      triggerProps={{ fontSize: 16, fontVariant: "semibold" }}
+      trigger={
+        <View
+          style={[
+            layout.flexRow,
+            layout.itemsCenter,
+            layout.justifyBetween,
+            { paddingHorizontal: 18, paddingVertical: 14 },
+          ]}
+        >
+          <Text fontSize={16} fontVariant="semibold">
+            ארוחה {index + 1}
+          </Text>
+          <Icon name="chevronDown" rotation={isCollapsed ? 0 : 180} />
+        </View>
+      }
       variant={isEaten ? "success" : "gray"}
       isCollapsed={isCollapsed}
       onCollapseChange={toggleCollapse}
+      style={{ padding: 0 }}
     >
-      <View style={[layout.flex1, layout.flexGrow, spacing.gapLg]}>
+      <View
+        style={[
+          layout.flex1,
+          layout.flexGrow,
+          spacing.gapLg,
+          { paddingTop: 12, paddingHorizontal: 18 },
+        ]}
+      >
         {dietItems.map((dietItem, i) => {
           return (
             <DietItemContent
@@ -66,7 +92,12 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
             />
           );
         })}
-        <PrimaryButton mode={isEaten ? "light" : "dark"} onPress={handleMealPress} block>
+        <PrimaryButton
+          style={{ marginBottom: 20 }}
+          mode={isEaten ? "light" : "dark"}
+          onPress={handleMealPress}
+          block
+        >
           {mealEatenIndicatorText}
         </PrimaryButton>
       </View>

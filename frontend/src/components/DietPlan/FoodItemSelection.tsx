@@ -8,12 +8,13 @@ import { useLayoutStyles } from "@/styles/useLayoutStyles";
 
 interface FoodItemSelectionProps {
   foodGroup: FoodGroup;
+  servingAmount: number;
 }
 
 const START_SLICE_INDEX = 0;
 const END_SLICE_INDEX = 5;
 
-const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup }) => {
+const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup, servingAmount = 1 }) => {
   const { center, wrap } = useLayoutStyles();
   const { data: items, isLoading } = useFoodGroupQuery(foodGroup);
 
@@ -22,7 +23,7 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup }) => {
 
     return items
       .slice(START_SLICE_INDEX, END_SLICE_INDEX)
-      .map((item) => formatServingText(item.name, item.oneServing, 1))
+      .map((item) => formatServingText(item.name, item.oneServing, servingAmount, 1))
       .join(" | ");
   }, [items]);
 

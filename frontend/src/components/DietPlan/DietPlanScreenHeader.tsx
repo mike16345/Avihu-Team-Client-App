@@ -17,12 +17,13 @@ const DietPlanScreenHeader = () => {
     <>
       <ScrollView
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />}
+        contentContainerStyle={spacing.pdHorizontalMd}
       >
         <View style={[layout.flexRow, spacing.gapLg, layout.itemsCenter]}>
           <View style={[layout.flexRow, layout.widthFull, { flex: 2 }]}>
             <DailyCalorieIntake />
           </View>
-          <View style={[layout.flexRow, layout.center, { flex: 1 }]}>
+          <View style={[layout.flexRow, layout.justifyEnd, { flex: 1 }]}>
             <SecondaryButton onPress={() => setIsOpen(true)} rightIcon="info">
               <Text fontVariant="semibold">דגשים</Text>
             </SecondaryButton>

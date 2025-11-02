@@ -197,6 +197,7 @@ const unitLabels: Record<DietItemUnit, string> = {
 export function formatServingText<K extends keyof IServingItem>(
   name: string,
   oneServing: IServingItem,
+  servingAmount: number,
   servingsToShow: 1 | 2 = 2,
   ignoreKeys: K[] = []
 ): string {
@@ -209,10 +210,10 @@ export function formatServingText<K extends keyof IServingItem>(
     .slice(0, servingsToShow) // limit to requested number of servings
     .map(([unitKey, value]) => {
       const label = unitLabels[unitKey as DietItemUnit];
-      return `${value} ${label}`;
+      return `${value * servingAmount} ${label}`;
     });
 
-  return [name, ...units].join(" | ");
+  return [name, ...units].join(" ");
 }
 
 export function getTotalCaloriesInMeal(meal: IMeal) {
