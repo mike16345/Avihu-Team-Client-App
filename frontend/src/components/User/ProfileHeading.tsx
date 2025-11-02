@@ -96,7 +96,7 @@ const ProfileHeading = () => {
 };
 
 const styles = StyleSheet.create({
-  backButton: { position: "absolute", top: 0, start: 0 },
+  backButton: { position: "absolute", top: 0, start: 24 },
 });
 
 export default ProfileHeading;
