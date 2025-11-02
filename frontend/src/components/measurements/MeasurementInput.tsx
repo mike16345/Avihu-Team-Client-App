@@ -56,15 +56,12 @@ const MeasurementInput: React.FC<MeasurementInputProps> = ({ activeMuscleGroup }
   };
 
   return (
-    <Card
-      variant="gray"
-      style={[{ padding: 0 }, spacing.gapLg, layout.flex1, layout.widthFull, common.roundedMd]}
-    >
+    <Card variant="gray" style={[{ padding: 0 }, spacing.gapLg, layout.flex1, layout.widthFull]}>
       <Card.Header>
         <Image
           source={meausrementPhoto}
           height={0.5}
-          style={[layout.widthFull, common.roundedMd]}
+          style={[layout.widthFull, common.roundedSm]}
         />
       </Card.Header>
       <Card.Content style={[{ paddingBottom: 20 }, spacing.gapLg]}>
