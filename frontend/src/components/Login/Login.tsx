@@ -8,7 +8,7 @@ import {
   Image,
   StyleSheet,
 } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import appIcon from "@assets/app-icon.png";
 import useStyles from "@/styles/useGlobalStyles";
 import { IUser } from "@/interfaces/User";
@@ -22,6 +22,7 @@ import RegisterForm from "./RegisterForm";
 import { Tabs, TabsList } from "../ui/Tabs";
 import { useTabs } from "@/hooks/useTabs";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import Animated, { useSharedValue, Easing, withTiming } from "react-native-reanimated";
 
 export interface IUserCredentials {
   email: string;
@@ -44,6 +45,8 @@ export default function Login({ onLogin }: ILoginProps) {
   const { text, colors, layout, spacing } = useStyles();
   const { height, width } = useWindowDimensions();
   const { triggerSuccessToast } = useToast();
+
+  const translateY = useSharedValue(0);
 
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -94,6 +97,27 @@ export default function Login({ onLogin }: ILoginProps) {
   const bottomPromptHandler =
     isRegistering || isChangingPassword ? handleBackPress : handleClickRegister;
 
+  useEffect(() => {
+    Keyboard.addListener("keyboardWillShow", () => {
+      translateY.value = withTiming(-500, {
+        duration: 200,
+        easing: Easing.linear,
+      });
+    });
+
+    Keyboard.addListener("keyboardWillHide", () => {
+      translateY.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.linear,
+      });
+    });
+
+    return () => {
+      Keyboard.removeAllListeners("keyboardWillShow");
+      Keyboard.removeAllListeners("keyboardWillHide");
+    };
+  }, []);
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
@@ -109,9 +133,15 @@ export default function Login({ onLogin }: ILoginProps) {
           { height: height, width: width },
         ]}
       >
-        <View style={[layout.flex1, layout.justifyStart, { paddingTop: 48 }]}>
+        <Animated.View
+          style={[
+            layout.flex1,
+            layout.justifyStart,
+            { paddingTop: 48, transform: [{ translateY }] },
+          ]}
+        >
           <Image source={appIcon} style={styles.logo} />
-        </View>
+        </Animated.View>
 
         <KeyboardAvoidingView
           behavior="padding"
