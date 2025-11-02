@@ -22,18 +22,15 @@ const DisplayImage: React.FC<DisplayImageProps> = ({ images, removeImage }) => {
   };
 
   return (
-    <View style={[layout.flex1]} onLayout={onLayout}>
+    <View onLayout={onLayout} style={layout.center}>
       <ConditionalRender condition={images?.length !== 0}>
-        <View style={[layout.flexRow, spacing.gapXl, layout.flex1, spacing.pdDefault]}>
+        <View style={[layout.flexRow, spacing.gap30]}>
           {images?.map((image, i) => (
-            <View
-              key={i}
-              style={[spacing.gapDefault, layout.center, layout.flex1, { margin: "auto" }]}
-            >
+            <View key={i} style={[spacing.gapLg, layout.center]}>
               <Image
                 source={{ uri: image }}
                 resizeMode="cover"
-                style={[layout.flex1, layout.sizeFull, layout.center, common.rounded]}
+                style={[{ width: 92, height: 156 }, common.rounded]}
               />
               <TouchableOpacity onPress={() => removeImage(i)}>
                 <Icon name="close" />

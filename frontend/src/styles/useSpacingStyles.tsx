@@ -179,6 +179,9 @@ export const useSpacingStyles = () => {
     gap20: {
       gap: 20,
     },
+    gap30: {
+      gap: 30,
+    },
     gapXl: {
       gap: 24,
     },
