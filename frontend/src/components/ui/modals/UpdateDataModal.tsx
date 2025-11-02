@@ -186,7 +186,7 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
       {openModal && (
         <CustomModal visible={openModal} onDismiss={() => setOpenModal(false)}>
           <CustomModal.Content>
-            <View style={[layout.widthFull, layout.center, spacing.gapMd]}>
+            <View style={[layout.widthFull, layout.center, spacing.gapXl]}>
               <Text fontSize={16}>{DateUtils.formatDate(date!, "DD.MM.YYYY")}</Text>
               <View style={[layout.flexRow, layout.itemsCenter]}>
                 {fieldList.map((f, i) => (
