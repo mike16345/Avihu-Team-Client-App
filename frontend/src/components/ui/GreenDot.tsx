@@ -17,6 +17,8 @@ const GreenDot: React.FC<GreenDotProps> = ({ size = 8, filled = 1 }) => {
         borderRadius: size / 2,
         backgroundColor: "transparent",
         overflow: "hidden",
+        borderWidth: 1,
+        borderColor: backgroundSuccess.backgroundColor,
       }}
     >
       <View
