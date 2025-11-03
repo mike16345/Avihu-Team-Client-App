@@ -20,7 +20,7 @@ const HorizontalSelector: React.FC<HorizontalSelectorProps> = ({
     <View>
       <ScrollView
         horizontal
-        contentContainerStyle={[spacing.gapDefault, layout.alignSelfStart]}
+        contentContainerStyle={[spacing.gapDefault, layout.alignSelfStart, { paddingEnd: 12 }]}
         nestedScrollEnabled
         showsHorizontalScrollIndicator={false}
       >
