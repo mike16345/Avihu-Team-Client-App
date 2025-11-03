@@ -124,7 +124,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
         <View onLayout={onLayout} style={[spacing.gapMd]}>
           <ExerciseVideo exercise={exercise!} />
           <ConditionalRender condition={hasRecordedSetsHistory}>
-            <View style={[layout.center, spacing.gapMd]}>
+            <View style={[layout.center, spacing.gap20]}>
               <PreviousSetCard exercise={exercise.exerciseId.name} />
               <RecordedSetsHistoryModal exercise={exercise.exerciseId.name} />
             </View>
