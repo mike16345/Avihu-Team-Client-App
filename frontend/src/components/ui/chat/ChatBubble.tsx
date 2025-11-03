@@ -52,7 +52,10 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ children, variant = "prompt", l
       <Text
         fontVariant={variant == "prompt" ? "light" : "regular"}
         fontSize={16}
-        style={[colors.textPrimary, { lineHeight: 20, writingDirection }]}
+        style={[
+          colors.textPrimary,
+          { lineHeight: 20, writingDirection, textAlign: isRTL ? "left" : "right" },
+        ]}
       >
         {children}
       </Text>

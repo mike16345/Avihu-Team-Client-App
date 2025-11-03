@@ -19,7 +19,11 @@ export default function AppNavigator() {
       <Stack.Screen
         name="Chat"
         component={ChatScreen}
-        options={{ presentation: "modal", header: () => <ChatHeader />, headerShown: true }}
+        options={{
+          presentation: "containedModal",
+          header: () => <ChatHeader />,
+          headerShown: true,
+        }}
       />
     </Stack.Navigator>
   );

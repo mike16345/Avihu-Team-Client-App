@@ -41,7 +41,8 @@ const MessageContextMenu: React.FC<MessageContextMenuProps> = ({
             common.borderXsm,
             common.rounded,
             spacing.pdMd,
-            spacing.gapSm,
+            spacing.gapDefault,
+            layout.itemsStart,
             { minWidth: 180 },
           ]}
         >

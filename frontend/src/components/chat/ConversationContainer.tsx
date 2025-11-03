@@ -182,8 +182,8 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
       const bubbleText = isGreeting
         ? greetUser(user, item)
         : isRefusal
-          ? item.text?.trim() || fallbackRefusalText
-          : item.text;
+        ? item.text?.trim() || fallbackRefusalText
+        : item.text;
 
       const shouldRenderBubble =
         item.variant === "prompt" || (bubbleText && bubbleText.trim().length > 0) || isRefusal;
@@ -247,6 +247,7 @@ const ConversationContainer: React.FC<ConversationContainerProps> = ({
         keyboardShouldPersistTaps="handled"
         scrollEventThrottle={16}
         maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
+        showsVerticalScrollIndicator={false}
       />
 
       <MessageContextMenu
