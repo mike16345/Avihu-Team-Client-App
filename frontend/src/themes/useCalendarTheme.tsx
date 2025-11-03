@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { MarkingProps } from "react-native-calendars/src/calendar/day/marking";
 import useStyles from "@/styles/useGlobalStyles";
 import { Theme } from "react-native-calendars/src/types";
+
 export interface ExtendedMarking extends MarkingProps {
   weight?: number;
   customStyles?: any;
@@ -34,6 +35,35 @@ const useCalendarTheme = (
         dayTextAtIndex5: { color: DAY_HEADER_COLOR },
         dayTextAtIndex6: { color: DAY_HEADER_COLOR },
         dayTextAtIndex7: { color: DAY_HEADER_COLOR },
+      },
+      "stylesheet.day.basic": {
+        base: {
+          width: 32,
+          height: 32,
+          alignItems: "center",
+          justifyContent: "center",
+        },
+        text: {
+          marginTop: 0,
+          fontSize: 16,
+          fontFamily: "Assistant-Regular",
+          fontWeight: "400",
+          color: "#2d4150",
+        },
+        dot: {
+          width: 4,
+          height: 4,
+          marginTop: 2,
+          marginBottom: 4,
+          borderRadius: 2,
+          opacity: 1,
+        },
+        dotContainer: {
+          flexDirection: "row",
+          justifyContent: "center",
+          marginTop: 2, // Space between number and dots
+          marginBottom: 4, // Space between dots and bottom edge
+        },
       },
       weekVerticalMargin: 2,
       textDayFontFamily: "Assistant-Regular",
@@ -86,7 +116,7 @@ const useCalendarTheme = (
     });
 
     return { marked: baseMarked, theme };
-  }, [selected, today, highlightedDates]);
+  }, [selected, today, highlightedDates, colors, common]);
 
   return { marked, theme };
 };
