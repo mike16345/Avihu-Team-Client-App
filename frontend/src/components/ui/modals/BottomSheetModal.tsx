@@ -41,7 +41,7 @@ export default function BottomSheetModal({
 }: Props) {
   // Calculate heights based on available screen space
   const MIN_HEIGHT = peek - 200; // Closed state
-  const MAX_HEIGHT = SCREEN_H - BOTTOM_BAR_HEIGHT - 160; // Fully open, leaving 60px from top
+  const MAX_HEIGHT = SCREEN_H - BOTTOM_BAR_HEIGHT - SCREEN_H * 0.23; // Fully open, leaving 60px from top
   const HEIGHT_RANGE = MAX_HEIGHT - MIN_HEIGHT;
   const EDGE_SNAP_PX = Math.max(12, HEIGHT_RANGE * 0.12);
   const FLICK_VELOCITY = 600;
@@ -216,7 +216,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     bottom: BOTTOM_BAR_HEIGHT,
     zIndex: 999,
-    marginTop: 10,
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,

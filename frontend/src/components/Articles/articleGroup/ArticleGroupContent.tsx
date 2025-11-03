@@ -64,6 +64,7 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
         contentContainerStyle={[spacing.gap20, spacing.pdHorizontalLg]}
         onScroll={handleScroll}
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+        showsVerticalScrollIndicator={false}
       >
         {articles}
       </ScrollView>

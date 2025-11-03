@@ -103,6 +103,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
             common.roundedMd,
             colors.backgroundSurface,
             styles.inputContainer,
+            { overflow: "hidden" },
           ]}
         >
           <SetInputList
