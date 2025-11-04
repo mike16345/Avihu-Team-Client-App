@@ -197,7 +197,7 @@ const unitLabels: Record<DietItemUnit, string> = {
 export function formatServingText<K extends keyof IServingItem>(
   name: string,
   oneServing: IServingItem,
-  servingAmount: number,
+  servingAmount: number = 1,
   servingsToShow: 1 | 2 = 2,
   ignoreKeys: K[] = []
 ): string {

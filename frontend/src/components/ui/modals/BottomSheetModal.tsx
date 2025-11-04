@@ -214,7 +214,7 @@ export default function BottomSheetModal({
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    bottom: BOTTOM_BAR_HEIGHT,
+    bottom: BOTTOM_BAR_HEIGHT - 10,
     zIndex: 999,
   },
   backdrop: {
