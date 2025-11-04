@@ -61,7 +61,7 @@ const BottomTabNavigator = () => {
   }, [activeIndex]);
 
   return (
-    <Animated.View style={[layout.flex1, colors.backgroundTransparent, { opacity }]}>
+    <Animated.View style={[layout.flex1, colors.background, { opacity }]}>
       <Tab.Navigator
         backBehavior="initialRoute"
         initialRouteName={INITIAL_ROUTE_NAME}
