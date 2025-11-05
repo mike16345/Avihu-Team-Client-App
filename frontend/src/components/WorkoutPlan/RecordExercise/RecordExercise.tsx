@@ -130,13 +130,15 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
             </View>
           </ConditionalRender>
         </View>
-        <SetInputContainer
-          sheetHeight={sheetHeight}
-          handleRecordSets={handleRecordSets}
-          maxSets={exercise?.sets?.length!}
-          setNumber={currentSet}
-          exercise={exercise}
-        />
+        <View style={{ flex: 1 }} onLayout={onLayout}>
+          <SetInputContainer
+            sheetHeight={sheetHeight}
+            handleRecordSets={handleRecordSets}
+            maxSets={exercise?.sets?.length!}
+            setNumber={currentSet}
+            exercise={exercise}
+          />
+        </View>
       </View>
     </View>
   );
