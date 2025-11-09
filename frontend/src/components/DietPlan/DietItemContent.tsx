@@ -29,7 +29,11 @@ const DietItemContent: React.FC<DietItemContentProps> = ({ name, dietItem }) => 
           <FoodItemSelection foodGroup={apiFoodGroup} servingAmount={dietItem.quantity} />
         </View>
 
-        <AdditionalDietItemsModal name={name} foodGroup={apiFoodGroup} />
+        <AdditionalDietItemsModal
+          name={name}
+          foodGroup={apiFoodGroup}
+          servingSize={dietItem.quantity}
+        />
       </View>
     </>
   );

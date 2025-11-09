@@ -18,6 +18,7 @@ const DietPlanScreenHeader = () => {
       <ScrollView
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} />}
         contentContainerStyle={spacing.pdHorizontalMd}
+        style={{ flexGrow: 0 }}
       >
         <View style={[layout.flexRow, spacing.gapLg, layout.itemsCenter]}>
           <View style={[layout.flexRow, layout.widthFull, { flex: 2 }]}>
