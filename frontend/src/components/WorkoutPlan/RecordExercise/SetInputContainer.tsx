@@ -103,6 +103,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
             common.roundedMd,
             colors.backgroundSurface,
             styles.inputContainer,
+            { overflow: "hidden" },
           ]}
         >
           <SetInputList
@@ -113,7 +114,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
             isExpanded={isExpanded}
           />
           <Animated.View
-            style={[spacing.gapDefault]}
+            style={[spacing.gapLg]}
             layout={LinearTransition.duration(250).easing(Easing.inOut(Easing.ease))}
           >
             {isExpanded && <PreviousSetCard exercise={exercise.exerciseId.name} />}

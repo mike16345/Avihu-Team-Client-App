@@ -4,10 +4,10 @@ import useStyles from "@/styles/useGlobalStyles";
 import { View } from "react-native";
 
 const MyDietPlanScreen = () => {
-  const { spacing } = useStyles();
+  const { spacing, layout } = useStyles();
 
   return (
-    <View style={[spacing.pdHorizontalMd, spacing.gap20, spacing.pdStatusBar]}>
+    <View style={[spacing.gap34, spacing.pdStatusBar, layout.flex1]}>
       <DietPlanScreenHeader />
       <DietPlanContentTabs />
     </View>

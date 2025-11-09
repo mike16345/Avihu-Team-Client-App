@@ -6,6 +6,7 @@ import { useState } from "react";
 import MeasurementInput from "@/components/measurements/MeasurementInput";
 import ProgressImageUpload from "@/components/measurements/ProgressImageUpload";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { View } from "react-native";
 
 const MeasurementsWindow = () => {
   const { layout, spacing } = useStyles();
@@ -17,21 +18,25 @@ const MeasurementsWindow = () => {
       bottomOffset={100}
       nestedScrollEnabled
       style={layout.flex1}
-      contentContainerStyle={[spacing.gapLg, spacing.pdHorizontalLg]}
+      contentContainerStyle={[spacing.gapLg]}
     >
-      <Text style={layout.alignSelfStart} fontSize={16}>
-        מדידת היקפים
-      </Text>
+      <View style={[spacing.gapLg, { paddingStart: 24 }]}>
+        <Text style={[layout.alignSelfStart]} fontSize={16}>
+          מדידת היקפים
+        </Text>
 
-      <HorizontalSelector
-        items={MEASUREMENT_MUSCLE_GROUPS}
-        selected={activeMuscleGroup}
-        onSelect={(selected) => setActiveMuscleGroup(selected)}
-      />
+        <HorizontalSelector
+          items={MEASUREMENT_MUSCLE_GROUPS}
+          selected={activeMuscleGroup}
+          onSelect={(selected) => setActiveMuscleGroup(selected)}
+        />
+      </View>
 
-      <MeasurementInput activeMuscleGroup={activeMuscleGroup} />
+      <View style={[spacing.pdHorizontalLg, spacing.gapLg]}>
+        <MeasurementInput activeMuscleGroup={activeMuscleGroup} />
 
-      <ProgressImageUpload />
+        <ProgressImageUpload />
+      </View>
     </KeyboardAwareScrollView>
   );
 };

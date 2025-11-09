@@ -49,7 +49,7 @@ export const useNotificationStore = create<INotificationStore>()(
               const triggerTimeInMilliseconds = new Date(n.triggerTime).getTime();
               const isPassedTriggerTime = now >= triggerTimeInMilliseconds;
 
-              if (Platform.OS == "ios" && isPassedTriggerTime) {
+              if (Platform.OS == "ios" && isPassedTriggerTime && n.status == "pending") {
                 const isMeasurementNotification = n.type == "measurement";
 
                 const triggerTime = isMeasurementNotification

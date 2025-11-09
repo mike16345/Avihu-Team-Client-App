@@ -16,7 +16,7 @@ const SendButton: React.FC<SendButtonProps> = ({ onPress, disabled }) => {
       onPress={onPress}
       style={[
         colors.backgroundPrimary,
-        layout.alignSelfStart,
+        layout.alignSelfEnd,
         spacing.pdDefault,
         common.roundedFull,
         disabled ? { opacity: 0.5 } : null,

@@ -14,9 +14,14 @@ import { Card } from "../ui/Card";
 interface AdditionalDietItemsModalProps {
   foodGroup: FoodGroup;
   name: string;
+  servingSize: number;
 }
 
-const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({ name, foodGroup }) => {
+const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({
+  name,
+  foodGroup,
+  servingSize,
+}) => {
   const { colors, layout, common, spacing } = useStyles();
   const { data = [], isLoading } = useFoodGroupQuery(foodGroup);
 
@@ -61,7 +66,7 @@ const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({ name, foo
             {data.map((item, i) => {
               return (
                 <Text key={item?._id || i} style={[layout.alignSelfStart]} fontVariant="semibold">
-                  {formatServingText(item.name, item.oneServing)}
+                  {formatServingText(item.name, item.oneServing, servingSize)}
                 </Text>
               );
             })}

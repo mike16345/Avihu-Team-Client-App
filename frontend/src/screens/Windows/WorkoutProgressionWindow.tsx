@@ -44,7 +44,7 @@ const WorkoutProgressionWindow = () => {
 
   return (
     <View style={[layout.flex1, spacing.gapLg]}>
-      <View style={spacing.pdHorizontalMd}>
+      <View style={{ paddingStart: 16 }}>
         <HorizontalSelector
           items={MUSCLE_GROUPS}
           onSelect={(selected) => setActiveMuscleGroup(selected)}
@@ -62,6 +62,7 @@ const WorkoutProgressionWindow = () => {
           style={[layout.flex1]}
           contentContainerStyle={spacing.gap14}
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+          showsVerticalScrollIndicator={false}
         >
           <ExerciseSelector muscleGroup={activeMuscleGroup} />
           <GraphsContainer />

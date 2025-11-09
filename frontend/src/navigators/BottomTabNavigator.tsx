@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/Icon/Icon";
 import { indicators } from "@/utils/navbar";
 import { useFadeIn } from "@/styles/useFadeIn";
+import { Canvas, LinearGradient, Rect, vec } from "@shopify/react-native-skia";
 
 const Tab = createBottomTabNavigator<BottomStackParamList>();
 const HORIZONTAL_MARGIN = 5;
@@ -37,6 +38,9 @@ const BottomTabNavigator = () => {
     inputRange: [0, TABS_COUNT - 1],
     outputRange: [0, (-indicatorWidth - 5) * (TABS_COUNT - 1)],
   });
+
+  const rgba = (r: number, g: number, b: number, a: number) => `rgba(${r},${g},${b},${a})`;
+  const BASE = { r: 238, g: 240, b: 242 };
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
@@ -104,6 +108,26 @@ const BottomTabNavigator = () => {
           );
         })}
       </Tab.Navigator>
+      <Canvas style={styles.shadowCanvas} pointerEvents="none">
+        <Rect x={0} y={0} width={width} height={250}>
+          <LinearGradient
+            start={vec(0, 0)}
+            end={vec(0, 250)}
+            // multiple rgba stops using exact background color with decreasing alpha
+            colors={[
+              "rgba(0,0,0,0.00)",
+              "rgba(0,0,0,0.06)",
+              "rgba(0,0,0,0.10)",
+              rgba(BASE.r, BASE.g, BASE.b, 1.0), // full color at the top of the gradient
+              // fully transparent at bottom
+            ]}
+            // optional: control where each stop sits (0..1)
+            // these positions give a gentle, non-sharp falloff
+            positions={[0, 0.35, 0.72, 1]}
+          />
+        </Rect>
+      </Canvas>
+
       <Animated.View
         style={[
           styles.activeIndicator,
@@ -130,6 +154,14 @@ const BottomTabNavigator = () => {
 };
 
 const styles = StyleSheet.create({
+  shadowCanvas: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: BOTTOM_BAR_HEIGHT - 100, // Position relative to navbar
+    height: 120, // Control gradient height here
+    zIndex: -1, // adjust based on your Figma frame’s height
+  },
   activeIndicator: {
     position: "absolute",
     bottom: BOTTOM_BAR_HEIGHT + 15,

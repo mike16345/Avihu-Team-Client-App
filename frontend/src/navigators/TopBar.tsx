@@ -19,8 +19,6 @@ export default function TopBar() {
         spacing.pdHorizontalLg,
         {
           height: height * 0.12,
-          borderBottomWidth: 0.25,
-          borderBottomColor: colors.borderBackground.borderColor,
         },
       ]}
     >

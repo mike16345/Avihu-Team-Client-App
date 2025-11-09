@@ -75,6 +75,7 @@ const MyWorkoutPlanScreen = () => {
             style={common.roundedMd}
             contentContainerStyle={[spacing.gapSm]}
             refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
+            showsVerticalScrollIndicator={false}
           >
             <WorkoutPlanSelector
               selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
@@ -87,6 +88,7 @@ const MyWorkoutPlanScreen = () => {
       <ScrollView
         style={{ zIndex: 1, elevation: 1 }}
         contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg, { zIndex: 1 }]}
+        showsVerticalScrollIndicator={false}
       >
         <ConditionalRender condition={showCardio}>
           <CardioWrapper cardioPlan={data?.cardio} />

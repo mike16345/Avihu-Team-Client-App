@@ -19,6 +19,7 @@ interface CollapsibleProps {
   children: ReactNode;
   trigger?: ReactNode;
   style?: StyleProp<ViewStyle>;
+  contentStyle?: StyleProp<ViewStyle>;
   variant?: CardVariants;
   customHeight?: number;
   keepMounted?: boolean;
@@ -36,6 +37,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
   isCollapsed,
   onCollapseChange,
   style,
+  contentStyle,
   variant = "gray",
   customHeight = 0,
   keepMounted = false,
@@ -105,7 +107,7 @@ const Collapsible: React.FC<CollapsibleProps> = ({
         </Card.Header>
       </ConditionalRender>
 
-      <Card.Content>
+      <Card.Content style={contentStyle}>
         <ConditionalRender condition={!isCollapsed}>
           <View
             collapsable={false}

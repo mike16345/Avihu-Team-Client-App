@@ -1,4 +1,4 @@
-import { Clipboard, Keyboard, View } from "react-native";
+import { Clipboard, Keyboard, Platform, View } from "react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import ChatInput from "@/components/ui/inputs/ChatInput";
@@ -140,7 +140,11 @@ const ChatScreen = () => {
 
           <View style={[layout.flexRow, spacing.gapDefault]}>
             <ChatInput
-              style={[colors.backgroundSurface, layout.flex1]}
+              style={[
+                colors.backgroundSurface,
+                layout.flex1,
+                Platform.OS === "ios" ? { paddingTop: 15 } : {},
+              ]}
               placeholder="כתבו כאן"
               onChangeText={setPrompt}
               value={prompt}

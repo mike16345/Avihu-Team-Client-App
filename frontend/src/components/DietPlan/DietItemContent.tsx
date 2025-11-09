@@ -26,10 +26,14 @@ const DietItemContent: React.FC<DietItemContentProps> = ({ name, dietItem }) => 
           <GreenDotGenerator count={dietItem.quantity} />
         </View>
         <View style={{ minHeight: 45 }}>
-          <FoodItemSelection foodGroup={apiFoodGroup} />
+          <FoodItemSelection foodGroup={apiFoodGroup} servingAmount={dietItem.quantity} />
         </View>
 
-        <AdditionalDietItemsModal name={name} foodGroup={apiFoodGroup} />
+        <AdditionalDietItemsModal
+          name={name}
+          foodGroup={apiFoodGroup}
+          servingSize={dietItem.quantity}
+        />
       </View>
     </>
   );

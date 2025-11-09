@@ -29,6 +29,7 @@ const ArticleScreen = () => {
   return (
     <ScrollView
       style={[colors.background, layout.flex1]}
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={[
         layout.itemsStart,
         spacing.gap20,
