@@ -1,4 +1,4 @@
-import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
+import { BOTTOM_BAR_HEIGHT, TOP_BAR_HEIGHT } from "@/constants/Constants";
 import useBackHandler from "@/hooks/useBackHandler";
 import React, { useEffect, useMemo, useState } from "react";
 import { Dimensions, StyleSheet, View, Pressable, LayoutChangeEvent } from "react-native";
@@ -41,7 +41,7 @@ export default function BottomSheetModal({
 }: Props) {
   // Calculate heights based on available screen space
   const MIN_HEIGHT = peek - 210; // Closed state
-  const MAX_HEIGHT = SCREEN_H - BOTTOM_BAR_HEIGHT - SCREEN_H * 0.23; // Fully open, leaving 60px from top
+  const MAX_HEIGHT = SCREEN_H - BOTTOM_BAR_HEIGHT - TOP_BAR_HEIGHT * 3.5; // Fully open, leaving 60px from top
   const HEIGHT_RANGE = MAX_HEIGHT - MIN_HEIGHT;
   const EDGE_SNAP_PX = Math.max(12, HEIGHT_RANGE * 0.12);
   const FLICK_VELOCITY = 600;
@@ -234,8 +234,7 @@ const styles = StyleSheet.create({
   },
   handleContainer: {
     alignItems: "center",
-    paddingTop: 12,
-    paddingBottom: 6,
+    paddingVertical: 10,
     borderBottomWidth: 0.5,
     borderColor: "#E2E2E2",
   },
