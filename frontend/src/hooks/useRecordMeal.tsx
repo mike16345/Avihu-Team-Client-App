@@ -20,6 +20,7 @@ interface RecordedMealSession {
   sessionId: string;
   startedAt: string;
   meals: RecordedMeal[];
+  freeCaloriesConsumed: boolean;
   expiresAt: string;
   active: boolean;
 }
@@ -52,6 +53,7 @@ export function useRecordMeal() {
       startedAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + SESSION_EXPIRY_HOURS * 60 * 60 * 1000).toISOString(),
       meals: [],
+      freeCaloriesConsumed: false,
       active: true,
     };
 
@@ -89,6 +91,15 @@ export function useRecordMeal() {
     }
 
     await startNewSession();
+  };
+
+  const recordFreeCalorieConsumption = async (hasConsumed: boolean) => {
+    const session = await getSessionFromStorage();
+
+    if (!session) return;
+
+    session.freeCaloriesConsumed = hasConsumed;
+    await persist(session);
   };
 
   const recordMeal = async (meal: IMeal, mealNumber: number) => {
@@ -165,5 +176,6 @@ export function useRecordMeal() {
     expireSession,
     recordMeal,
     cancelMeal,
+    recordFreeCalorieConsumption,
   };
 }
