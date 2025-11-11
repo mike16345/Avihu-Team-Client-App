@@ -125,8 +125,6 @@ export const useNotification = () => {
 
   /** Initialize: avoid duplicates (don’t blanket-cancel on Android) */
   const initializeNotifications = async () => {
-    const currentUser = useUserStore((state) => state.currentUser);
-
     try {
       if (Platform.OS === "android") {
         await ensureAndroidChannel();
@@ -135,8 +133,6 @@ export const useNotification = () => {
       await Notifications.cancelScheduledNotificationAsync(
         NotificationIdentifiers.OLD_DAILY_WEIGH_IN_REMINDER_ID
       ); // Remove old notification schedule for legacy users - MUST
-
-      if (!currentUser) return;
 
       const scheduled = await Notifications.getAllScheduledNotificationsAsync();
 
