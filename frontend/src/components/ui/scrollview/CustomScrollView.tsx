@@ -8,8 +8,12 @@ import {
 import React, { useRef, useState } from "react";
 import { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import ScrollViewShadow from "./ScrollViewShadow";
+import {
+  KeyboardAwareScrollView,
+  KeyboardAwareScrollViewProps,
+} from "react-native-keyboard-controller";
 
-const CustomScrollView: React.FC<ScrollViewProps> = ({ children, ...props }) => {
+const CustomScrollView: React.FC<KeyboardAwareScrollViewProps> = ({ children, ...props }) => {
   const shadowOpacity = useSharedValue(1);
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -33,7 +37,7 @@ const CustomScrollView: React.FC<ScrollViewProps> = ({ children, ...props }) => 
     <View style={{ flex: 1 }}>
       <ScrollViewShadow inverted isAtEnd={isAtTop} style={animatedShadowStyle} />
 
-      <ScrollView
+      <KeyboardAwareScrollView
         ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled
@@ -42,7 +46,7 @@ const CustomScrollView: React.FC<ScrollViewProps> = ({ children, ...props }) => 
         scrollEventThrottle={16} // Smooth scroll tracking
       >
         {children}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <ScrollViewShadow isAtEnd={isAtBottom} style={animatedShadowStyle} />
     </View>

@@ -4,7 +4,7 @@ import { DropDownContextProvider } from "@/context/useDropdown";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import useStyles from "@/styles/useGlobalStyles";
 import { useMemo, useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import { RefreshControl, View } from "react-native";
 import ErrorScreen from "../ErrorScreen";
 import WorkoutProgressScreenSkeleton from "@/components/ui/loaders/skeletons/WorkoutProgressScreenSkeleton";
 import { mapToDropDownItems } from "@/utils/utils";
