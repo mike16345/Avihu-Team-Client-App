@@ -41,7 +41,7 @@ const IconButton: React.FC<IconButtonProps> = ({
           layout.alignSelfStart,
           layout.flexRow,
           layout.itemsCenter,
-          spacing.gapSm,
+          { gap: 6 },
           style,
         ]}
       >

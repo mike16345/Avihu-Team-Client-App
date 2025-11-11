@@ -56,7 +56,7 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
                   icon={"clock"}
                   size={20}
                   label={
-                    <Text fontVariant="bold" fontSize={15}>
+                    <Text fontVariant="semibold" fontSize={14}>
                       {countdown}
                     </Text>
                   }
