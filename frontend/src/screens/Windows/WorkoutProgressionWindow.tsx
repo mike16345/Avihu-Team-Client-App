@@ -10,6 +10,7 @@ import WorkoutProgressScreenSkeleton from "@/components/ui/loaders/skeletons/Wor
 import { mapToDropDownItems } from "@/utils/utils";
 import ExerciseSelector from "@/components/WorkoutProgression/ExerciseSelector";
 import HorizontalSelector from "@/components/ui/HorizontalSelector";
+import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 
 const WorkoutProgressionWindow = () => {
   const { layout, spacing } = useStyles();
@@ -43,7 +44,7 @@ const WorkoutProgressionWindow = () => {
   if (isError && error.status !== 404) return <ErrorScreen />;
 
   return (
-    <View style={[layout.flex1, spacing.gapLg]}>
+    <View style={[layout.flex1]}>
       <View style={{ paddingStart: 16 }}>
         <HorizontalSelector
           items={MUSCLE_GROUPS}
@@ -57,16 +58,16 @@ const WorkoutProgressionWindow = () => {
         items={activeExercises}
         onSelect={() => {}}
       >
-        <ScrollView
+        <CustomScrollView
           nestedScrollEnabled
           style={[layout.flex1]}
-          contentContainerStyle={spacing.gap14}
+          contentContainerStyle={[spacing.gap14, { paddingTop: 16 }]}
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
           showsVerticalScrollIndicator={false}
         >
           <ExerciseSelector muscleGroup={activeMuscleGroup} />
           <GraphsContainer />
-        </ScrollView>
+        </CustomScrollView>
       </DropDownContextProvider>
     </View>
   );
