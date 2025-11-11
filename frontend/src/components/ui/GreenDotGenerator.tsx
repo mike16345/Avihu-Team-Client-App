@@ -11,7 +11,9 @@ const GreenDotGenerator: React.FC<GreenDotGeneratorProps> = ({ count }) => {
   const { spacing, layout } = useStyles();
 
   const fullDots = Math.floor(count);
-  const decimal = count % 1;
+  const decimal = (count % 1) - 0.05;
+
+  console.warn("decimal", decimal);
 
   return (
     <View style={[layout.flexRow, spacing.gapXs]}>
