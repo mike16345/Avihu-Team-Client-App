@@ -1,5 +1,12 @@
 import { BottomStackParamList } from "@/types/navigatorTypes";
-import { Animated, Keyboard, StyleSheet, useWindowDimensions, View } from "react-native";
+import {
+  Animated,
+  I18nManager,
+  Keyboard,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
@@ -9,6 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/Icon/Icon";
 import { indicators } from "@/utils/navbar";
 import { useFadeIn } from "@/styles/useFadeIn";
+import { IconLayoutContext } from "@/context/useiconLayout";
 
 const Tab = createBottomTabNavigator<BottomStackParamList>();
 const HORIZONTAL_MARGIN = 5;
@@ -29,14 +37,29 @@ const BottomTabNavigator = () => {
 
   const indicatorAnim = useRef(new Animated.Value(0)).current;
 
+  const layoutsRef = useRef<Record<string, number>>({});
+
+  const setIconLayout = (name: string, x: number) => {
+    layoutsRef.current[name] = x;
+  };
+
+  const getIconLayout = (name: string) => layoutsRef.current[name];
+
   const isHomeScreen = BottomScreenNavigatorTabs[activeIndex].name == "Home";
   const lastIndex = BottomScreenNavigatorTabs.length - 1;
   const activeIndicatorStartOffset = activeIndex == 0 ? 20 : activeIndex == lastIndex ? 0 : 10;
 
-  const translateX = indicatorAnim.interpolate({
-    inputRange: [0, TABS_COUNT - 1],
-    outputRange: [0, (-indicatorWidth - 5) * (TABS_COUNT - 1)],
-  });
+  const moveIndicatorToTab = (tabName: string) => {
+    const x = getIconLayout(tabName); // x is absolute center of icon
+    console.warn("x", x);
+    if (x != null && indicatorWidth > 0) {
+      // subtract half of indicator width to center it
+      Animated.spring(indicatorAnim, {
+        toValue: -x - indicatorWidth / 2,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
 
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
@@ -49,73 +72,91 @@ const BottomTabNavigator = () => {
     };
   }, []);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     Animated.spring(indicatorAnim, {
       toValue: activeIndex,
       useNativeDriver: true,
     }).start();
-  }, [activeIndex]);
+  }, [activeIndex]); */
 
   return (
     <Animated.View style={[layout.flex1, colors.background, { opacity }]}>
-      <Tab.Navigator
-        backBehavior="initialRoute"
-        initialRouteName={INITIAL_ROUTE_NAME}
-        sceneContainerStyle={[
-          colors.backgroundTransparent,
-          {
-            paddingBottom: keyboardVisible ? BOTTOM_BAR_HEIGHT : BOTTOM_BAR_HEIGHT + 80,
-            paddingTop: isHomeScreen ? 36 : 36,
-          },
-        ]}
-        screenOptions={{
-          headerShown: false,
-          tabBarStyle: [
-            styles.navigationBar,
-            spacing.mgHorizontalSm,
-            colors.backgroundSurface,
+      <IconLayoutContext.Provider value={{ setIconLayout, getIconLayout }}>
+        <Tab.Navigator
+          backBehavior="initialRoute"
+          initialRouteName={INITIAL_ROUTE_NAME}
+          sceneContainerStyle={[
+            colors.backgroundTransparent,
             {
-              opacity: keyboardVisible ? 0 : 100,
-              position: "absolute",
-              left: HORIZONTAL_MARGIN,
-              right: HORIZONTAL_MARGIN,
-              bottom: BOTTOM_BAR_HEIGHT,
+              paddingBottom: keyboardVisible ? BOTTOM_BAR_HEIGHT : BOTTOM_BAR_HEIGHT + 80,
+              paddingTop: isHomeScreen ? 36 : 36,
             },
-          ],
-          tabBarItemStyle: { height: TAB_BAR_HEIGHT },
-          tabBarActiveTintColor: colors.textPrimary.color,
-          tabBarInactiveTintColor: colors.textPrimary.color,
-          tabBarShowLabel: false,
-          tabBarHideOnKeyboard: true,
-        }}
-      >
-        {BottomScreenNavigatorTabs.map((tab, index) => {
-          return (
-            <Tab.Screen
-              listeners={(props) => ({
-                focus: () => setActiveIndex(index),
-                ...(typeof tab.listeners === "function" ? tab.listeners(props) : tab.listeners),
-              })}
-              key={tab.name}
-              name={tab.name}
-              component={tab.component}
-              options={{ ...tab.options }}
-            />
-          );
-        })}
-      </Tab.Navigator>
+          ]}
+          screenOptions={{
+            headerShown: false,
+            tabBarStyle: [
+              styles.navigationBar,
+              spacing.mgHorizontalSm,
+              colors.backgroundSurface,
+              {
+                opacity: keyboardVisible ? 0 : 100,
+                position: "absolute",
+                left: HORIZONTAL_MARGIN,
+                right: HORIZONTAL_MARGIN,
+                bottom: BOTTOM_BAR_HEIGHT,
+              },
+            ],
+            tabBarItemStyle: { height: TAB_BAR_HEIGHT },
+            tabBarActiveTintColor: colors.textPrimary.color,
+            tabBarInactiveTintColor: colors.textPrimary.color,
+            tabBarShowLabel: false,
+            tabBarHideOnKeyboard: true,
+          }}
+        >
+          {BottomScreenNavigatorTabs.map((tab, index) => {
+            return (
+              <Tab.Screen
+                listeners={(props) => ({
+                  focus: () => {
+                    // 1️⃣ Update your active index as before
+                    setActiveIndex(index);
+
+                    // 2️⃣ Move the animated indicator to this tab
+                    moveIndicatorToTab(tab.name);
+
+                    // 3️⃣ Call any additional listeners defined in the tab
+                    if (typeof tab.listeners === "function") {
+                      const additionalListeners = tab.listeners(props);
+                      // If the tab also has a focus listener, call it
+                      additionalListeners?.focus?.();
+                    }
+                  },
+                  // You could also merge other listeners if needed
+                  ...(typeof tab.listeners === "object" ? tab.listeners : {}),
+                })}
+                key={tab.name}
+                name={tab.name}
+                component={tab.component}
+                options={{ ...tab.options }}
+              />
+            );
+          })}
+        </Tab.Navigator>
+      </IconLayoutContext.Provider>
 
       <Animated.View
         style={[
           styles.activeIndicator,
-          { start: activeIndicatorStartOffset },
           colors.backgroundPrimary,
           layout.flexRow,
           layout.itemsCenter,
           spacing.pdSm,
           spacing.gapXs,
           common.roundedFull,
-          { transform: [{ translateX }], display: keyboardVisible ? "none" : "flex" },
+          {
+            transform: [{ translateX: indicatorAnim }],
+            display: keyboardVisible ? "none" : "flex",
+          },
         ]}
       >
         <Icon name={indicators[activeIndex].icon} color="white" />
