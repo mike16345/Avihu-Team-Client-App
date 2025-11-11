@@ -25,11 +25,11 @@ const DailyCalorieIntake = () => {
       <View style={[layout.widthFull, spacing.gap20]}>
         <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
           <Text fontVariant="bold" fontSize={24}>
-            {totalCalories + freeCalories}
+            {totalCalories}
           </Text>
           <Text fontSize={16}>קלוריות יומיות</Text>
         </View>
-        <ProgressBar value={totalCaloriesEaten} maxValue={totalCalories + freeCalories} />
+        <ProgressBar value={totalCaloriesEaten} maxValue={totalCalories} />
         <Badge
           style={[session?.freeCaloriesConsumed ? { backgroundColor: "#EDFFEB" } : {}]}
           alignStart
