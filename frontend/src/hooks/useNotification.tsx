@@ -5,6 +5,7 @@ import {
   NotificationIdentifiers,
 } from "@/constants/notifications";
 import { useNotificationStore } from "@/store/notificationStore";
+import { useUserStore } from "@/store/userStore";
 import { getNextEightAM, getNextEightAMOnSunday, toTrigger } from "@/utils/notification";
 import { generateUniqueId } from "@/utils/utils";
 import * as Notifications from "expo-notifications";
@@ -124,6 +125,8 @@ export const useNotification = () => {
 
   /** Initialize: avoid duplicates (don’t blanket-cancel on Android) */
   const initializeNotifications = async () => {
+    const currentUser = useUserStore((state) => state.currentUser);
+
     try {
       if (Platform.OS === "android") {
         await ensureAndroidChannel();
@@ -132,6 +135,8 @@ export const useNotification = () => {
       await Notifications.cancelScheduledNotificationAsync(
         NotificationIdentifiers.OLD_DAILY_WEIGH_IN_REMINDER_ID
       ); // Remove old notification schedule for legacy users - MUST
+
+      if (!currentUser) return;
 
       const scheduled = await Notifications.getAllScheduledNotificationsAsync();
 
