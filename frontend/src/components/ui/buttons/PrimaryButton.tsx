@@ -32,7 +32,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
 
   const modeSpecificStyles =
     mode == "dark"
-      ? colors.backgroundPrimary
+      ? [colors.backgroundPrimary, common.borderXsm, { borderColor: "transparent" }]
       : [colors.backgroundSurface, common.borderXsm, colors.outline];
 
   const width = block ? layout.widthFull : layout.alignSelfStart;

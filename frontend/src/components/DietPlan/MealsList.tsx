@@ -1,6 +1,6 @@
 import { FC } from "react";
 import CollapsibleMeal from "./CollapsibleMeal";
-import { ScrollView, useWindowDimensions, View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { ConditionalRender } from "../ui/ConditionalRender";
@@ -17,7 +17,7 @@ const MealsList: FC<MealsListProps> = () => {
   const meals = data?.meals || [];
 
   return (
-    <View style={[{ height: height * 0.55 }]}>
+    <View style={[{ height: height * 0.5 }]}>
       <CustomScrollView
         style={{ flexGrow: 1 }}
         contentContainerStyle={[{ flexGrow: 1 }, spacing.gap20, spacing.pdHorizontalMd]}
