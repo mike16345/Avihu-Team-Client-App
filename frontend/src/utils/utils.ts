@@ -199,7 +199,8 @@ export function formatServingText<K extends keyof IServingItem>(
   oneServing: IServingItem,
   servingAmount: number = 1,
   servingsToShow: 1 | 2 = 2,
-  ignoreKeys: K[] = []
+  ignoreKeys: K[] = [],
+  separator = " "
 ): string {
   const units = Object.entries(oneServing)
     .filter(([key, value]) => {
@@ -213,7 +214,7 @@ export function formatServingText<K extends keyof IServingItem>(
       return `${value * servingAmount} ${label}`;
     });
 
-  return [name, ...units].join(" ");
+  return [name, ...units].join(separator);
 }
 
 export function getTotalCaloriesInMeal(meal: IMeal) {
