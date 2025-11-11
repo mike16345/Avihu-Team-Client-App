@@ -20,7 +20,7 @@ const MealsList: FC<MealsListProps> = () => {
     <View style={[{ height: height * 0.55 }]}>
       <CustomScrollView
         style={{ flexGrow: 1 }}
-        contentContainerStyle={[{ flexGrow: 1 }, spacing.gap20]}
+        contentContainerStyle={[{ flexGrow: 1 }, spacing.gap20, spacing.pdHorizontalMd]}
         topShadow={false}
       >
         <ConditionalRender condition={isLoading}>

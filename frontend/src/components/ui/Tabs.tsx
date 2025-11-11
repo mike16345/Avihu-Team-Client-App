@@ -10,6 +10,7 @@ interface TabsRootProps<T extends string> {
   value: T;
   onValueChange: (value: T) => void;
   children: React.ReactNode;
+  horizontalPadding?: number;
 }
 
 interface TabsListProps {
@@ -43,7 +44,12 @@ const TabsContext = React.createContext<TabsContextValue<any>>({
   translateX: 0,
 });
 
-export const Tabs = <T extends string>({ value, onValueChange, children }: TabsRootProps<T>) => {
+export const Tabs = <T extends string>({
+  value,
+  onValueChange,
+  children,
+  horizontalPadding,
+}: TabsRootProps<T>) => {
   const [tabs, setTabs] = useState<{ value: T; label: string }[]>([]);
   const [containerWidth, setContainerWidth] = useState(Dimensions.get("window").width);
 
@@ -52,7 +58,10 @@ export const Tabs = <T extends string>({ value, onValueChange, children }: TabsR
   const tabWidth = containerWidth / (tabs.length || 1) - 0.5;
 
   const onLayout = (e: LayoutChangeEvent) => {
-    const width = e.nativeEvent.layout.width;
+    let width = e.nativeEvent.layout.width;
+    if (horizontalPadding) {
+      width = width - horizontalPadding * 2;
+    }
 
     if (width !== containerWidth) setContainerWidth(width);
   };

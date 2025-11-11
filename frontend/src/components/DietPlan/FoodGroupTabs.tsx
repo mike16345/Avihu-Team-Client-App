@@ -23,7 +23,10 @@ const FoodGroupTabs = () => {
     getContent: (_, items) => {
       return (
         <Card style={{ maxHeight: height / 2 - (BOTTOM_BAR_HEIGHT + 20) }} variant="gray">
-          <ScrollView contentContainerStyle={[spacing.gapDefault]}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[spacing.gapDefault]}
+          >
             {items.map((item) => (
               <Text
                 style={[layout.alignSelfStart]}
@@ -49,8 +52,12 @@ const FoodGroupTabs = () => {
     );
 
   return (
-    <Tabs value={selectedTab || tabNames[0]} onValueChange={setSelectedTab}>
-      <View style={[spacing.gap20, { paddingBottom: 100 }]}>
+    <Tabs
+      horizontalPadding={spacing.pdHorizontalMd.paddingHorizontal}
+      value={selectedTab || tabNames[0]}
+      onValueChange={setSelectedTab}
+    >
+      <View style={[spacing.gap20, { paddingBottom: 100 }, spacing.pdHorizontalMd]}>
         <TabsList>{tabTriggers}</TabsList>
         {tabContent}
       </View>
