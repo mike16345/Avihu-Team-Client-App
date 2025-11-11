@@ -13,6 +13,7 @@ import { Text } from "../../ui/Text";
 import ArticleCard from "../ArticleCard";
 import { ConditionalRender } from "../../ui/ConditionalRender";
 import ErrorScreen from "@/screens/ErrorScreen";
+import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 
 interface ArticleGroupContentProps {
   groupId: string;
@@ -59,15 +60,15 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
 
   return (
     <>
-      <ScrollView
+      <CustomScrollView
         style={[layout.flex1]}
         contentContainerStyle={[spacing.gap20, spacing.pdHorizontalLg]}
         onScroll={handleScroll}
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
-        showsVerticalScrollIndicator={false}
+        topShadow={false}
       >
         {articles}
-      </ScrollView>
+      </CustomScrollView>
 
       <ConditionalRender condition={isLoading || isFetchingNextPage}>
         <ActivityIndicator />

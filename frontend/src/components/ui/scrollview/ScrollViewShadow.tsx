@@ -3,38 +3,43 @@ import React, { useMemo } from "react";
 import { Canvas, LinearGradient, Rect, vec } from "@shopify/react-native-skia";
 import Animated from "react-native-reanimated";
 import useStyles from "@/styles/useGlobalStyles";
+import useColors from "@/styles/useColors";
 
 interface ScrollViewShadowProps {
   style: StyleProp<ViewStyle>;
   inverted?: boolean;
   isAtEnd: boolean;
+  startingColor?: string;
 }
 
 const ScrollViewShadow: React.FC<ScrollViewShadowProps> = ({
   style,
   inverted = false,
   isAtEnd,
+  startingColor,
 }) => {
   const { width } = useWindowDimensions();
-  const { colors } = useStyles();
+  const { background } = useColors();
+
+  const firstColor = startingColor || background.backgroundColor;
 
   const notAtEndStyles = {
     positions: [0, 0.4, 0.75, 1],
     colors: [
       "rgba(0,0,0,0.0005)",
       "rgba(248, 248, 248,0)",
-      colors.background.backgroundColor, // Match exact bottom container color
-      colors.background.backgroundColor, // Match exact bottom container color
+      firstColor, // Match exact bottom container color
+      firstColor, // Match exact bottom container color
     ],
     invertedPositions: [0, 0.4],
-    invertedColors: [colors.background.backgroundColor, "rgba(248, 248, 248,0)"],
+    invertedColors: [firstColor, "rgba(248, 248, 248,0)"],
   };
 
   const endStyles = {
     positions: [0.5, 1],
-    colors: ["rgba(248, 248, 248,0)", colors.background.backgroundColor],
+    colors: ["rgba(248, 248, 248,0)", firstColor],
     invertedPositions: [0, 0.025],
-    invertedColors: [colors.background.backgroundColor, "rgba(248, 248, 248,0)"],
+    invertedColors: [firstColor, "rgba(248, 248, 248,0)"],
   };
 
   const gradientStyles = useMemo(() => (isAtEnd ? endStyles : notAtEndStyles), [isAtEnd]);

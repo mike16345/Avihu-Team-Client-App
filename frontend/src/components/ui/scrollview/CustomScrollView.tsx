@@ -12,8 +12,23 @@ import {
   KeyboardAwareScrollView,
   KeyboardAwareScrollViewProps,
 } from "react-native-keyboard-controller";
+import { ConditionalRender } from "../ConditionalRender";
 
-const CustomScrollView: React.FC<KeyboardAwareScrollViewProps> = ({ children, ...props }) => {
+interface CustomScrollViewProps extends KeyboardAwareScrollViewProps {
+  topShadow?: boolean;
+  bottomShadow?: boolean;
+  topShadowFirstColor?: string;
+  bottomShadowFirstColor?: string;
+}
+
+const CustomScrollView: React.FC<CustomScrollViewProps> = ({
+  children,
+  topShadow = true,
+  bottomShadow = true,
+  topShadowFirstColor,
+  bottomShadowFirstColor,
+  ...props
+}) => {
   const shadowOpacity = useSharedValue(1);
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -35,7 +50,14 @@ const CustomScrollView: React.FC<KeyboardAwareScrollViewProps> = ({ children, ..
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollViewShadow inverted isAtEnd={isAtTop} style={animatedShadowStyle} />
+      <ConditionalRender condition={topShadow}>
+        <ScrollViewShadow
+          inverted
+          isAtEnd={isAtTop}
+          style={animatedShadowStyle}
+          startingColor={topShadowFirstColor}
+        />
+      </ConditionalRender>
 
       <KeyboardAwareScrollView
         ref={scrollViewRef}
@@ -48,7 +70,13 @@ const CustomScrollView: React.FC<KeyboardAwareScrollViewProps> = ({ children, ..
         {children}
       </KeyboardAwareScrollView>
 
-      <ScrollViewShadow isAtEnd={isAtBottom} style={animatedShadowStyle} />
+      <ConditionalRender condition={bottomShadow}>
+        <ScrollViewShadow
+          isAtEnd={isAtBottom}
+          style={animatedShadowStyle}
+          startingColor={bottomShadowFirstColor}
+        />
+      </ConditionalRender>
     </View>
   );
 };

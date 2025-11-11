@@ -17,6 +17,7 @@ import queryClient from "@/QueryClient/queryClient";
 import { WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 import { Text } from "@/components/ui/Text";
 import { useShadowStyles } from "@/styles/useShadowStyles";
+import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 
 const MyWorkoutPlanScreen = () => {
   const { colors, layout, spacing, common } = useStyles();
@@ -81,11 +82,12 @@ const MyWorkoutPlanScreen = () => {
         </DropDownContextProvider>
       </View>
 
-      <ScrollView
+      <CustomScrollView
         style={{ zIndex: 1, elevation: 1 }}
         contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg, { zIndex: 1 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
+        topShadow={false}
       >
         <ConditionalRender condition={showCardio}>
           <CardioWrapper cardioPlan={data?.cardio} />
@@ -96,7 +98,7 @@ const MyWorkoutPlanScreen = () => {
             <MuscleGroupContainer key={i} muscleGroup={muscleGroup} plan={selectedPlan.planName} />
           ))}
         </ConditionalRender>
-      </ScrollView>
+      </CustomScrollView>
     </View>
   );
 };
