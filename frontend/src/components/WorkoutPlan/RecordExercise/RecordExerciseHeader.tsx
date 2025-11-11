@@ -10,6 +10,7 @@ import { FC, useEffect, useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import RestTimer from "./RestTimer";
 import { useTimerStore } from "@/store/timerStore";
+import { Text } from "@/components/ui/Text";
 
 const buttonsPadding = { paddingHorizontal: 14, paddingVertical: 8 };
 
@@ -54,6 +55,11 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
                   style={[buttonsPadding, { backgroundColor: "#ECFDF3" }]}
                   icon={"clock"}
                   size={20}
+                  label={
+                    <Text fontVariant="bold" fontSize={15}>
+                      {countdown}
+                    </Text>
+                  }
                 />
               }
             />
