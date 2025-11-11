@@ -49,7 +49,7 @@ const BottomTabNavigator = () => {
     const isArticleScreen = tabName == "ArticleScreen";
 
     const xValue = x - indicatorWidth / 2;
-    const addedSpacing = isWorkoutSceen ? -5 : isArticleScreen ? +5 : 0;
+    const addedSpacing = isWorkoutSceen ? -10 : isArticleScreen ? +10 : 0;
 
     const value = xValue + addedSpacing;
 
