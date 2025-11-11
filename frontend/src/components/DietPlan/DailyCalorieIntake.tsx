@@ -6,7 +6,7 @@ import Badge from "../ui/Badge";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { useDietPlanStore } from "@/store/useDietPlanStore";
 import { useRecordMeal } from "@/hooks/useRecordMeal";
-import { softHaptic } from "@/utils/haptics";
+import { selectionHaptic } from "@/utils/haptics";
 
 const DailyCalorieIntake = () => {
   const { layout, spacing } = useStyles();
@@ -16,8 +16,8 @@ const DailyCalorieIntake = () => {
   const { session, recordFreeCalorieConsumption } = useRecordMeal();
 
   const handlePress = async () => {
-    await recordFreeCalorieConsumption(!session?.freeCaloriesConsumed);
-    softHaptic();
+    await recordFreeCalorieConsumption(!session?.freeCaloriesConsumed, freeCalories);
+    selectionHaptic();
   };
 
   return (
@@ -25,11 +25,11 @@ const DailyCalorieIntake = () => {
       <View style={[layout.widthFull, spacing.gap20]}>
         <View style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
           <Text fontVariant="bold" fontSize={24}>
-            {totalCalories}
+            {totalCalories + freeCalories}
           </Text>
           <Text fontSize={16}>קלוריות יומיות</Text>
         </View>
-        <ProgressBar value={totalCaloriesEaten} maxValue={totalCalories} />
+        <ProgressBar value={totalCaloriesEaten} maxValue={totalCalories + freeCalories} />
         <Badge
           style={[session?.freeCaloriesConsumed ? { backgroundColor: "#EDFFEB" } : {}]}
           alignStart
