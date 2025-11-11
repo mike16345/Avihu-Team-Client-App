@@ -1,12 +1,5 @@
 import { BottomStackParamList } from "@/types/navigatorTypes";
-import {
-  Animated,
-  I18nManager,
-  Keyboard,
-  StyleSheet,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Keyboard, StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
@@ -15,27 +8,25 @@ import { Text } from "@/components/ui/Text";
 import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/Icon/Icon";
 import { indicators } from "@/utils/navbar";
-import { useFadeIn } from "@/styles/useFadeIn";
 import { IconLayoutContext } from "@/context/useiconLayout";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 
 const Tab = createBottomTabNavigator<BottomStackParamList>();
 const HORIZONTAL_MARGIN = 5;
-const TABS_COUNT = BottomScreenNavigatorTabs.length;
 const TAB_BAR_HEIGHT = 70;
 const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "Home";
 
 const BottomTabNavigator = () => {
   const { layout, colors, common, fonts, spacing } = useStyles();
   const { width } = useWindowDimensions();
-  const opacity = useFadeIn();
 
-  const indicatorWidth = (width - HORIZONTAL_MARGIN * 4) / TABS_COUNT - 8;
+  const indicatorWidth = 80;
   const [activeIndex, setActiveIndex] = useState(() => {
     return BottomScreenNavigatorTabs.findIndex((tab) => tab.name == INITIAL_ROUTE_NAME);
   });
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
-  const indicatorAnim = useRef(new Animated.Value(0)).current;
+  const indicatorAnim = useSharedValue(0);
 
   const layoutsRef = useRef<Record<string, number>>({});
 
@@ -46,18 +37,28 @@ const BottomTabNavigator = () => {
   const getIconLayout = (name: string) => layoutsRef.current[name];
 
   const isHomeScreen = BottomScreenNavigatorTabs[activeIndex].name == "Home";
-  const lastIndex = BottomScreenNavigatorTabs.length - 1;
-  const activeIndicatorStartOffset = activeIndex == 0 ? 20 : activeIndex == lastIndex ? 0 : 10;
+
+  const indicatorStyle = useAnimatedStyle(() => ({
+    end: indicatorAnim.value,
+  }));
 
   const moveIndicatorToTab = (tabName: string) => {
     const x = getIconLayout(tabName); // x is absolute center of icon
-    console.warn("x", x);
+
+    const isWorkoutSceen = tabName == "MyWorkoutPlanPage";
+    const isArticleScreen = tabName == "ArticleScreen";
+
+    const xValue = x - indicatorWidth / 2;
+    const addedSpacing = isWorkoutSceen ? -5 : isArticleScreen ? +5 : 0;
+
+    const value = xValue + addedSpacing;
+
     if (x != null && indicatorWidth > 0) {
-      // subtract half of indicator width to center it
-      Animated.spring(indicatorAnim, {
-        toValue: -x - indicatorWidth / 2,
-        useNativeDriver: true,
-      }).start();
+      indicatorAnim.value = withSpring(value, {
+        damping: 15,
+        stiffness: 150,
+        mass: 1,
+      });
     }
   };
 
@@ -72,15 +73,8 @@ const BottomTabNavigator = () => {
     };
   }, []);
 
-  /*   useEffect(() => {
-    Animated.spring(indicatorAnim, {
-      toValue: activeIndex,
-      useNativeDriver: true,
-    }).start();
-  }, [activeIndex]); */
-
   return (
-    <Animated.View style={[layout.flex1, colors.background, { opacity }]}>
+    <Animated.View style={[layout.flex1, colors.background]}>
       <IconLayoutContext.Provider value={{ setIconLayout, getIconLayout }}>
         <Tab.Navigator
           backBehavior="initialRoute"
@@ -118,21 +112,10 @@ const BottomTabNavigator = () => {
               <Tab.Screen
                 listeners={(props) => ({
                   focus: () => {
-                    // 1️⃣ Update your active index as before
                     setActiveIndex(index);
-
-                    // 2️⃣ Move the animated indicator to this tab
                     moveIndicatorToTab(tab.name);
-
-                    // 3️⃣ Call any additional listeners defined in the tab
-                    if (typeof tab.listeners === "function") {
-                      const additionalListeners = tab.listeners(props);
-                      // If the tab also has a focus listener, call it
-                      additionalListeners?.focus?.();
-                    }
                   },
-                  // You could also merge other listeners if needed
-                  ...(typeof tab.listeners === "object" ? tab.listeners : {}),
+                  ...(typeof tab.listeners === "function" ? tab.listeners(props) : tab.listeners),
                 })}
                 key={tab.name}
                 name={tab.name}
@@ -151,10 +134,10 @@ const BottomTabNavigator = () => {
           layout.flexRow,
           layout.itemsCenter,
           spacing.pdSm,
-          spacing.gapXs,
+          spacing.gapSm,
           common.roundedFull,
+          indicatorStyle,
           {
-            transform: [{ translateX: indicatorAnim }],
             display: keyboardVisible ? "none" : "flex",
           },
         ]}
@@ -175,6 +158,7 @@ const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
     bottom: BOTTOM_BAR_HEIGHT + 15,
+    width: 80,
     height: 40,
     zIndex: 10000,
   },
