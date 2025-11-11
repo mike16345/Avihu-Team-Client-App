@@ -6,6 +6,7 @@ export type CardVariants = "gray" | "white" | "success";
 interface CardProps extends ViewProps {
   variant?: CardVariants;
   style?: StyleProp<ViewStyle>;
+  shadow?: boolean;
 }
 
 type CardSubComponentProps = ViewProps;
@@ -15,7 +16,13 @@ interface CompoundCard extends React.FC<CardProps> {
   Footer: React.FC<CardSubComponentProps>;
 }
 
-export const Card: CompoundCard = ({ children, variant = "white", style, ...props }) => {
+export const Card: CompoundCard = ({
+  children,
+  variant = "white",
+  style,
+  shadow = true,
+  ...props
+}) => {
   const { colors, common, spacing, fonts } = useStyles();
   const { frameShadow } = useShadowStyles();
 
@@ -36,7 +43,7 @@ export const Card: CompoundCard = ({ children, variant = "white", style, ...prop
         spacing.pdDefault,
         common.roundedSm,
         spacing.gapSm,
-        frameShadow,
+        shadow ? frameShadow : {},
         style,
       ]}
       {...props}

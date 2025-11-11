@@ -20,7 +20,7 @@ const ExerciseSelector: React.FC<ExerciseSelectorProps> = ({ muscleGroup }) => {
 
   return (
     <View style={[spacing.gapDefault, spacing.pdHorizontalMd]}>
-      <Card variant="gray" style={[common.roundedMd, spacing.pdVertical20, spacing.pdHorizontalMd]}>
+      <Card variant="gray" style={[common.rounded, spacing.pdVertical20, spacing.pdHorizontalMd]}>
         <Card.Header>
           <View style={[layout.flexRow, layout.justifyBetween, spacing.pdHorizontalDefault]}>
             <Text fontVariant="bold" fontSize={20}>

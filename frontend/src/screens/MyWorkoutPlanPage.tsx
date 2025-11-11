@@ -16,9 +16,11 @@ import { mapToDropDownItems } from "@/utils/utils";
 import queryClient from "@/QueryClient/queryClient";
 import { WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 import { Text } from "@/components/ui/Text";
+import { useShadowStyles } from "@/styles/useShadowStyles";
 
 const MyWorkoutPlanScreen = () => {
   const { colors, layout, spacing, common } = useStyles();
+  const { frameShadow } = useShadowStyles();
   const { refresh } = usePullDownToRefresh();
 
   const { data, isError, isLoading, error, refetch, isRefetching } = useWorkoutPlanQuery();
@@ -67,16 +69,10 @@ const MyWorkoutPlanScreen = () => {
   if (isLoading) return <WorkoutPlanSkeletonLoader />;
 
   return (
-    <View style={[layout.flex1, colors.background, spacing.pdStatusBar, spacing.gapLg]}>
-      <View style={[{ zIndex: 2, elevation: 5 }, spacing.pdHorizontalLg]}>
+    <View style={[layout.flex1, colors.background, spacing.pdStatusBar]}>
+      <View style={[{ zIndex: 2, elevation: 5 }, frameShadow, spacing.pdHorizontalLg]}>
         <DropDownContextProvider items={plans} onSelect={handleSelect}>
-          <ScrollView
-            nestedScrollEnabled
-            style={common.roundedMd}
-            contentContainerStyle={[spacing.gapSm]}
-            refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
-            showsVerticalScrollIndicator={false}
-          >
+          <ScrollView style={[common.rounded]}>
             <WorkoutPlanSelector
               selectedPlan={showCardio ? CARDIO_VALUE : selectedPlan?.planName || ""}
               isCardio={showCardio}
@@ -89,6 +85,7 @@ const MyWorkoutPlanScreen = () => {
         style={{ zIndex: 1, elevation: 1 }}
         contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg, { zIndex: 1 }]}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
       >
         <ConditionalRender condition={showCardio}>
           <CardioWrapper cardioPlan={data?.cardio} />
