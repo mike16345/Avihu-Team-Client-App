@@ -10,6 +10,7 @@ import Icon from "@/components/Icon/Icon";
 import { indicators } from "@/utils/navbar";
 import { IconLayoutContext } from "@/context/useiconLayout";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import useNotification from "@/hooks/useNotification";
 
 const Tab = createBottomTabNavigator<BottomStackParamList>();
 const HORIZONTAL_MARGIN = 5;
@@ -19,6 +20,7 @@ const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "Home";
 const BottomTabNavigator = () => {
   const { layout, colors, common, fonts, spacing } = useStyles();
   const { width } = useWindowDimensions();
+  const { initializeNotifications } = useNotification();
 
   const indicatorWidth = 80;
   const [activeIndex, setActiveIndex] = useState(() => {
@@ -65,6 +67,8 @@ const BottomTabNavigator = () => {
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", () => setKeyboardVisible(true));
     const hideSub = Keyboard.addListener("keyboardDidHide", () => setKeyboardVisible(false));
+
+    initializeNotifications();
 
     return () => {
       setKeyboardVisible(false);
