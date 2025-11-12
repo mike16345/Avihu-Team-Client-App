@@ -1,4 +1,9 @@
-import { AVG_CARB_CALORIES, AVG_PROTEIN_CALORIES } from "@/constants/Constants";
+import {
+  AVG_CARB_CALORIES,
+  AVG_FAT_CALORIES,
+  AVG_PROTEIN_CALORIES,
+  AVG_VEGGIE_CALORIES,
+} from "@/constants/Constants";
 import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
 import { ISession } from "@/interfaces/ISession";
 import Constants from "expo-constants";
@@ -220,8 +225,11 @@ export function formatServingText<K extends keyof IServingItem>(
 export function getTotalCaloriesInMeal(meal: IMeal) {
   const proteinCalories = meal.totalProtein.quantity * AVG_PROTEIN_CALORIES;
   const carbCalories = meal.totalCarbs.quantity * AVG_CARB_CALORIES;
+  const veggieCalories = meal.totalVeggies.quantity * AVG_VEGGIE_CALORIES;
+  const fatCalories = meal.totalFats.quantity * AVG_FAT_CALORIES; // Each gram of fat has 9 calories
+  const totalEaten = proteinCalories + carbCalories + veggieCalories + fatCalories;
 
-  return proteinCalories + carbCalories;
+  return totalEaten;
 }
 
 type mapToDropDownItemOptions<T> = {

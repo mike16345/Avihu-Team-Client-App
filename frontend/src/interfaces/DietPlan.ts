@@ -21,6 +21,8 @@ export interface IMeal {
   _id: string;
   totalProtein: IDietItem;
   totalCarbs: IDietItem;
+  totalVeggies: IDietItem;
+  totalFats: IDietItem;
 }
 
 export interface IDietPlan {
