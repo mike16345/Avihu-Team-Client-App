@@ -5,6 +5,7 @@ import { Text } from "./Text";
 import { ConditionalRender } from "./ConditionalRender";
 import ButtonShadow from "./buttons/ButtonShadow";
 import Animated, { useSharedValue, withSpring, SharedValue } from "react-native-reanimated";
+import { selectionHaptic } from "@/utils/haptics";
 
 interface TabsRootProps<T extends string> {
   value: T;
@@ -152,7 +153,13 @@ export const TabsTrigger = ({ label, value }: TabsTriggerProps) => {
   }, []);
 
   return (
-    <TouchableOpacity style={[layout.flex1, layout.widthFull]} onPress={() => setValue(value)}>
+    <TouchableOpacity
+      style={[layout.flex1, layout.widthFull]}
+      onPress={() => {
+        selectionHaptic();
+        setValue(value);
+      }}
+    >
       <ConditionalRender condition={value !== activeValue}>
         <View style={[layout.center, layout.heightFull]}>
           <Text fontVariant="semibold" style={[text.textCenter, colors.textPrimary]}>

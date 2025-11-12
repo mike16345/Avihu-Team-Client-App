@@ -1,3 +1,4 @@
+import { selectionHaptic } from "@/utils/haptics";
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 import { ItemType } from "react-native-dropdown-picker";
 
@@ -30,6 +31,7 @@ export const DropDownContextProvider = ({
   const [shouldCollapse, setShouldCollapse] = useState(true);
 
   const handleSelect = (value: any) => {
+    selectionHaptic();
     setSelectedValue(value);
     setShouldCollapse(true);
     onSelect(value);

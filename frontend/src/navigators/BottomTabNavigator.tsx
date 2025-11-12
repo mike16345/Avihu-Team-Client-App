@@ -11,6 +11,7 @@ import { indicators } from "@/utils/navbar";
 import { IconLayoutContext } from "@/context/useiconLayout";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import useNotification from "@/hooks/useNotification";
+import { selectionHaptic } from "@/utils/haptics";
 
 const Tab = createBottomTabNavigator<BottomStackParamList>();
 const HORIZONTAL_MARGIN = 5;
@@ -45,6 +46,7 @@ const BottomTabNavigator = () => {
   }));
 
   const moveIndicatorToTab = (tabName: string) => {
+    selectionHaptic();
     const x = getIconLayout(tabName); // x is absolute center of icon
 
     const isWorkoutSceen = tabName == "MyWorkoutPlanPage";

@@ -2,6 +2,7 @@ import { ScrollView, View } from "react-native";
 import { Text } from "./Text";
 import PrimaryButton from "./buttons/PrimaryButton";
 import useStyles from "@/styles/useGlobalStyles";
+import { selectionHaptic } from "@/utils/haptics";
 
 interface HorizontalSelectorProps {
   selected: string;
@@ -15,6 +16,11 @@ const HorizontalSelector: React.FC<HorizontalSelectorProps> = ({
   items = [],
 }) => {
   const { colors, spacing, layout, text } = useStyles();
+
+  const handleSelect = (item: string) => {
+    selectionHaptic();
+    onSelect(item);
+  };
 
   return (
     <View>
@@ -31,7 +37,7 @@ const HorizontalSelector: React.FC<HorizontalSelectorProps> = ({
             <PrimaryButton
               key={i}
               mode={isActive ? "dark" : "light"}
-              onPress={() => onSelect(item)}
+              onPress={() => handleSelect(item)}
               style={[
                 spacing.pdVerticalSm,
                 { borderWidth: 1, borderColor: "#072723", borderRadius: 8 },
