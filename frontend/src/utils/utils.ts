@@ -318,15 +318,14 @@ export function isIndexOutOfBounds(arr: any[], index: number) {
   return index < 0 || index >= arr.length;
 }
 
-
 export function isHtmlEmpty(html?: string | null): boolean {
   if (!html) return true;
 
   // Remove all HTML tags entirely
   const textOnly = html
-    .replace(/<[^>]+>/g, "")  // remove tags
-    .replace(/&nbsp;/g, "")   // remove non-breaking spaces
-    .replace(/\s+/g, "");     // remove all whitespace
+    .replace(/<[^>]+>/g, "") // remove tags
+    .replace(/&nbsp;/g, "") // remove non-breaking spaces
+    .replace(/\s+/g, ""); // remove all whitespace
 
   return textOnly.length === 0;
 }
