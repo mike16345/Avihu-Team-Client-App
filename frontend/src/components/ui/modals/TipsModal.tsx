@@ -1,24 +1,44 @@
 import { Platform, ScrollView, StyleSheet, View } from "react-native";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { CustomModal, CustomModalProps } from "./Modal";
 import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ConditionalRender";
 import { Text } from "../Text";
 import { TextInput } from "react-native";
+import  { RenderHTMLSource } from "react-native-render-html";
 
 interface TipsModalProps extends CustomModalProps {
   tips?: string[];
   noDataMessage?: string;
   title?: ReactNode;
+  useHtmlRenderer?: boolean;
 }
 
 const TipsModal: React.FC<TipsModalProps> = ({
   tips = [],
   noDataMessage = "אין דגשים להצגה",
   title,
+  useHtmlRenderer = false,
   ...props
 }) => {
   const { colors, common, layout, spacing } = useStyles();
+
+  const Tips = useMemo(() => {
+    if (useHtmlRenderer) {
+      return tips.map((tip, i) => {
+        return <RenderHTMLSource key={i} source={{ html: tip }} />;
+      });
+    }
+
+    return tips.map((tip, i) => (
+      <View key={tip + i} style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
+        <View style={[colors.backgroundPrimary, common.roundedFull, { height: 5, width: 5 }]} />
+        <TextInput multiline style={styles.text} editable={false}>
+          {tip}
+        </TextInput>
+      </View>
+    ));
+  }, [tips, useHtmlRenderer]);
 
   return (
     <CustomModal {...props}>
@@ -31,18 +51,7 @@ const TipsModal: React.FC<TipsModalProps> = ({
         </ConditionalRender>
 
         <ConditionalRender condition={tips.length !== 0}>
-          <ScrollView contentContainerStyle={[spacing.pdVerticalMd]}>
-            {tips.map((tip, i) => (
-              <View key={tip + i} style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}>
-                <View
-                  style={[colors.backgroundPrimary, common.roundedFull, { height: 5, width: 5 }]}
-                />
-                <TextInput multiline style={styles.text} editable={false}>
-                  {tip}
-                </TextInput>
-              </View>
-            ))}
-          </ScrollView>
+          <ScrollView contentContainerStyle={[spacing.pdVerticalMd]}>{Tips}</ScrollView>
         </ConditionalRender>
       </CustomModal.Content>
     </CustomModal>
