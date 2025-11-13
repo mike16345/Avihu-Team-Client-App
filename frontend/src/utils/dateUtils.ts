@@ -25,13 +25,7 @@ class DateUtils {
 
     if (recentWeighIns.length === 0) return 0;
 
-    console.log("recent weighins", recentWeighIns);
-
     const totalWeight = recentWeighIns.reduce((sum, w) => sum + (w[keyToCalculate] as number), 0);
-
-    console.log("total Weight", totalWeight);
-    console.log("total ", recentWeighIns.length);
-    console.log("average", totalWeight / recentWeighIns.length);
 
     return totalWeight / recentWeighIns.length;
   }

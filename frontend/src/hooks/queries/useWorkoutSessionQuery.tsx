@@ -20,9 +20,7 @@ const useWorkoutSessionQuery = () => {
 
       return currentWorkoutSession;
     } catch (e: any) {
-      console.log("e", e);
       if (e?.response?.status == 404) {
-        console.log("removing session");
         removeLocal();
       }
       return {};
