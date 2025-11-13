@@ -5,7 +5,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ConditionalRender";
 import { Text } from "../Text";
 import { TextInput } from "react-native";
-import  { RenderHTMLSource } from "react-native-render-html";
+import { RenderHTMLSource } from "react-native-render-html";
 
 interface TipsModalProps extends CustomModalProps {
   tips?: string[];
