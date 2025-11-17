@@ -13,6 +13,7 @@
     "build:android:prod": "eas build --platform android --profile production",
     "update:prod": "eas update --branch production --environment production --message",
     "build:ios:dev": "eas build --platform ios --profile development",
+    "build:ios:preview": "eas build --platform ios --profile preview",
     "build:ios:prod": "eas build --platform ios --profile production"
   },
   "expo": {
