@@ -17,6 +17,7 @@ import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-c
 import useBackgroundTasks from "@/hooks/useBackgroundTasks";
 import { useEffect } from "react";
 import { KeyboardProvider } from "react-native-keyboard-controller";
+import { HtmlRenderProvider } from "@/navigators/providers/HTMLRendererProvider";
 
 export default function App() {
   const ready = useOneTimeRTLFix();
@@ -36,19 +37,21 @@ export default function App() {
       <ThemeProvider>
         <GestureHandlerRootView>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-            <View style={[{ direction: "rtl" }, { flex: 1 }]}>
-              <PersistQueryClientProvider
-                client={queryClient}
-                persistOptions={{ persister: persister }}
-              >
-                <NavigationContainer>
-                  <RootNavigator />
-                  <StatusBar key={colorScheme} translucent style={"dark"} />
-                  <ToastContainer />
-                  <Update />
-                </NavigationContainer>
-              </PersistQueryClientProvider>
-            </View>
+            <HtmlRenderProvider>
+              <View style={[{ direction: "rtl" }, { flex: 1 }]}>
+                <PersistQueryClientProvider
+                  client={queryClient}
+                  persistOptions={{ persister: persister }}
+                >
+                  <NavigationContainer>
+                    <RootNavigator />
+                    <StatusBar key={colorScheme} translucent style={"dark"} />
+                    <ToastContainer />
+                    <Update />
+                  </NavigationContainer>
+                </PersistQueryClientProvider>
+              </View>
+            </HtmlRenderProvider>
           </SafeAreaProvider>
         </GestureHandlerRootView>
       </ThemeProvider>

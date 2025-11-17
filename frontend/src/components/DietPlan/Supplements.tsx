@@ -13,22 +13,24 @@ const Supplements = () => {
   const supplements = data?.supplements || [];
 
   return (
-    <Card style={{ maxHeight: height / 1.8 - (BOTTOM_BAR_HEIGHT + 20) }} variant="gray">
-      <ScrollView contentContainerStyle={[spacing.gapDefault]}>
-        <ConditionalRender condition={!data?.supplements?.length}>
-          <View style={[layout.center]}>
-            <Text>אין תוספים</Text>
-          </View>
-        </ConditionalRender>
-        {supplements.map((item, i) => {
-          return (
-            <Text key={item + i} style={[layout.alignSelfStart]} fontVariant="semibold">
-              {item}
-            </Text>
-          );
-        })}
-      </ScrollView>
-    </Card>
+    <View style={spacing.pdHorizontalMd}>
+      <Card style={{ maxHeight: height / 1.8 - (BOTTOM_BAR_HEIGHT + 20) }} variant="gray">
+        <ScrollView contentContainerStyle={[spacing.gapDefault]}>
+          <ConditionalRender condition={!data?.supplements?.length}>
+            <View style={[layout.center]}>
+              <Text>אין תוספים</Text>
+            </View>
+          </ConditionalRender>
+          {supplements.map((item, i) => {
+            return (
+              <Text key={item + i} style={[layout.alignSelfStart]} fontVariant="semibold">
+                {item}
+              </Text>
+            );
+          })}
+        </ScrollView>
+      </Card>
+    </View>
   );
 };
 

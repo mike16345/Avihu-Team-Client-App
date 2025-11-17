@@ -66,7 +66,7 @@ const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({
             {data.map((item, i) => {
               return (
                 <Text key={item?._id || i} style={[layout.alignSelfStart]} fontVariant="semibold">
-                  {formatServingText(item.name, item.oneServing, servingSize)}
+                  {formatServingText(item.name, item.oneServing, servingSize, 2, [], " | ")}
                 </Text>
               );
             })}

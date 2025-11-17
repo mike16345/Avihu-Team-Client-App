@@ -11,6 +11,6 @@ export const useDietPlanStore = create<IUserStore>((set, get) => ({
     const totalCalories = get().totalCaloriesEaten;
     const caloriesToSet = override ? calories : totalCalories + calories;
 
-    set({ totalCaloriesEaten: caloriesToSet });
+    set({ totalCaloriesEaten: caloriesToSet <= 0 ? 0 : caloriesToSet });
   },
 }));

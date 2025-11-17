@@ -1,10 +1,12 @@
 import { StyleProp, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { ReactNode } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import ButtonShadow from "./ButtonShadow";
 import { IconName } from "@/constants/iconMap";
 import Icon from "@/components/Icon/Icon";
 import { ViewStyle } from "react-native";
+import { Text } from "../Text";
+import { ConditionalRender } from "../ConditionalRender";
 
 interface IconButtonProps {
   icon: IconName;
@@ -12,9 +14,17 @@ interface IconButtonProps {
   disabled?: boolean;
   size?: number;
   style?: StyleProp<ViewStyle>;
+  label?: ReactNode;
 }
 
-const IconButton: React.FC<IconButtonProps> = ({ icon, onPress, disabled, style, size = 24 }) => {
+const IconButton: React.FC<IconButtonProps> = ({
+  icon,
+  onPress,
+  disabled,
+  style,
+  label,
+  size = 24,
+}) => {
   const { colors, common, spacing, layout } = useStyles();
 
   return (
@@ -29,9 +39,20 @@ const IconButton: React.FC<IconButtonProps> = ({ icon, onPress, disabled, style,
           common.borderXsm,
           colors.outline,
           layout.alignSelfStart,
+          layout.flexRow,
+          layout.itemsCenter,
+          { gap: 6 },
           style,
         ]}
       >
+        <ConditionalRender condition={label}>
+          <ConditionalRender condition={typeof label === "string"}>
+            <Text>{label}</Text>
+          </ConditionalRender>
+
+          <ConditionalRender condition={typeof label !== "string"}>{label}</ConditionalRender>
+        </ConditionalRender>
+
         <Icon name={icon} height={size} width={size} />
       </TouchableOpacity>
     </ButtonShadow>

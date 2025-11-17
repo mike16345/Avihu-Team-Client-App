@@ -20,6 +20,7 @@ interface RecordedMealSession {
   sessionId: string;
   startedAt: string;
   meals: RecordedMeal[];
+  freeCaloriesConsumed: boolean;
   expiresAt: string;
   active: boolean;
 }
@@ -37,6 +38,7 @@ function needsPrompt(startedAt: string) {
 
 export function useRecordMeal() {
   const setTotalCaloriesEaten = useDietPlanStore((state) => state.setTotalCaloriesEaten);
+  const totalCaloriesEaten = useDietPlanStore((state) => state.totalCaloriesEaten);
 
   const [session, setSession] = useState<RecordedMealSession | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
@@ -52,6 +54,7 @@ export function useRecordMeal() {
       startedAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + SESSION_EXPIRY_HOURS * 60 * 60 * 1000).toISOString(),
       meals: [],
+      freeCaloriesConsumed: false,
       active: true,
     };
 
@@ -89,6 +92,21 @@ export function useRecordMeal() {
     }
 
     await startNewSession();
+  };
+
+  const recordFreeCalorieConsumption = async (hasConsumed: boolean, calories: number) => {
+    const session = await getSessionFromStorage();
+
+    if (!session) return;
+
+    session.freeCaloriesConsumed = hasConsumed;
+    await persist(session);
+
+    const newCalorieCount = hasConsumed
+      ? totalCaloriesEaten + calories
+      : totalCaloriesEaten - calories;
+
+    setTotalCaloriesEaten(newCalorieCount, true);
   };
 
   const recordMeal = async (meal: IMeal, mealNumber: number) => {
@@ -165,5 +183,6 @@ export function useRecordMeal() {
     expireSession,
     recordMeal,
     cancelMeal,
+    recordFreeCalorieConsumption,
   };
 }

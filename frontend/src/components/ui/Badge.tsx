@@ -1,5 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
-import { View, TouchableOpacity, LayoutChangeEvent } from "react-native";
+import { View, TouchableOpacity, LayoutChangeEvent, StyleProp, ViewStyle } from "react-native";
 import { ReactNode, useState } from "react";
 import { IconName } from "@/constants/iconMap";
 import { ConditionalRender } from "./ConditionalRender";
@@ -16,6 +16,7 @@ interface Badgeprops {
   onPress?: () => void;
   disabled?: boolean;
   alignStart?: boolean;
+  style?: StyleProp<ViewStyle>;
 }
 
 const Badge: React.FC<Badgeprops> = ({
@@ -27,6 +28,7 @@ const Badge: React.FC<Badgeprops> = ({
   showDot = false,
   disabled = false,
   alignStart = false,
+  style,
 }) => {
   const { colors, common, layout, spacing } = useStyles();
 
@@ -55,6 +57,7 @@ const Badge: React.FC<Badgeprops> = ({
         layout.itemsCenter,
         layout.justifyBetween,
         { position: "relative", paddingHorizontal: 10, paddingVertical: 4 },
+        style,
       ]}
     >
       <View style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>

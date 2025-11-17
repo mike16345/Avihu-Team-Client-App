@@ -3,14 +3,14 @@ import Progression from "@/components/WeightProgression/Progression";
 import WeightCardsContainer from "@/components/WeightGraph/WeightCardsContainer";
 import useWeighInsQuery from "@/hooks/queries/WeighIns/useWeighInsQuery";
 import { RefreshControl } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 
 const WeightProgressionWindow = () => {
   const { spacing } = useStyles();
   const { isRefetching, refetch } = useWeighInsQuery();
 
   return (
-    <KeyboardAwareScrollView
+    <CustomScrollView
       bottomOffset={100}
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={[
@@ -24,7 +24,7 @@ const WeightProgressionWindow = () => {
     >
       <WeightCardsContainer />
       <Progression />
-    </KeyboardAwareScrollView>
+    </CustomScrollView>
   );
 };
 

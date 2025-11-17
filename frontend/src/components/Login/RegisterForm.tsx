@@ -4,12 +4,12 @@ import useStyles from "@/styles/useGlobalStyles";
 import Input from "../ui/inputs/Input";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import { testEmail, testPhone } from "@/utils/utils";
-import { useUserApi } from "@/hooks/api/useUserApi";
 import { useToast } from "@/hooks/useToast";
 import { errorNotificationHaptic } from "@/utils/haptics";
 import { useNavigation } from "@react-navigation/native";
 import { AuthStackParamListNavigationProp } from "@/types/navigatorTypes";
 import Animated, { FadeIn } from "react-native-reanimated";
+import { useLeadsApi } from "@/hooks/api/useLeadsApi";
 
 interface INewUserDetails {
   name: string;
@@ -31,7 +31,7 @@ const DEFAULT_FORM_DATA = {
 
 const RegisterForm = () => {
   const { spacing } = useStyles();
-  const { submitLead } = useUserApi();
+  const { create: submitLead } = useLeadsApi();
   const { triggerErrorToast } = useToast();
   const navigation = useNavigation<AuthStackParamListNavigationProp>();
 
@@ -73,7 +73,7 @@ const RegisterForm = () => {
     setLoading(true);
 
     try {
-      await submitLead(formattedEmail, name, phone);
+      await submitLead({ email: formattedEmail, fullName: name, phone });
 
       setNewUserDetails(DEFAULT_FORM_DATA);
 

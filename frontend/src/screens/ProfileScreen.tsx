@@ -7,6 +7,7 @@ import ProfileHeading from "@/components/User/ProfileHeading";
 import UserDetailsWrapper from "@/components/User/UserDetailsWrapper";
 import { ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 
 const ProfileScreen = () => {
   const { layout, spacing } = useStyles();
@@ -21,7 +22,7 @@ const ProfileScreen = () => {
 
   return (
     <View style={[layout.flex1, { paddingTop: 48 }, spacing.pdBottomBar]}>
-      <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled>
+      <CustomScrollView topShadow={false}>
         <View style={[{ marginBottom: 30 }]}>
           <ProfileHeading />
         </View>
@@ -31,7 +32,7 @@ const ProfileScreen = () => {
             <Text fontVariant="bold">התנתק</Text>
           </PrimaryButton>
         </View>
-      </ScrollView>
+      </CustomScrollView>
     </View>
   );
 };

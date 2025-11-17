@@ -30,7 +30,7 @@ const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan,
   return (
     <>
       <View style={[spacing.gapDefault]}>
-        <Card variant="gray" style={[spacing.gapLg, common.roundedMd]}>
+        <Card variant="gray" shadow={false} style={[spacing.gapLg, common.roundedMd]}>
           <Card.Header>
             <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter]}>
               <Text fontVariant="bold">

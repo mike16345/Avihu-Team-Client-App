@@ -5,8 +5,8 @@ import { MEASUREMENT_MUSCLE_GROUPS } from "@/constants/measurements";
 import { useState } from "react";
 import MeasurementInput from "@/components/measurements/MeasurementInput";
 import ProgressImageUpload from "@/components/measurements/ProgressImageUpload";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { View } from "react-native";
+import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 
 const MeasurementsWindow = () => {
   const { layout, spacing } = useStyles();
@@ -14,7 +14,7 @@ const MeasurementsWindow = () => {
   const [activeMuscleGroup, setActiveMuscleGroup] = useState<string>(MEASUREMENT_MUSCLE_GROUPS[0]);
 
   return (
-    <KeyboardAwareScrollView
+    <CustomScrollView
       bottomOffset={100}
       nestedScrollEnabled
       style={layout.flex1}
@@ -37,7 +37,7 @@ const MeasurementsWindow = () => {
 
         <ProgressImageUpload />
       </View>
-    </KeyboardAwareScrollView>
+    </CustomScrollView>
   );
 };
 

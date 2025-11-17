@@ -5,27 +5,34 @@ import { formatServingText } from "@/utils/utils";
 import { StyleSheet, TextInput, View } from "react-native";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { useLayoutStyles } from "@/styles/useLayoutStyles";
+import { ICustomItem } from "@/interfaces/DietPlan";
 
 interface FoodItemSelectionProps {
   foodGroup: FoodGroup;
   servingAmount: number;
+  customItems?: ICustomItem[];
 }
 
 const START_SLICE_INDEX = 0;
 const END_SLICE_INDEX = 5;
 
-const FoodItemSelection: FC<FoodItemSelectionProps> = ({ foodGroup, servingAmount = 1 }) => {
+const FoodItemSelection: FC<FoodItemSelectionProps> = ({
+  foodGroup,
+  servingAmount = 1,
+  customItems = [],
+}) => {
   const { center, wrap } = useLayoutStyles();
   const { data: items, isLoading } = useFoodGroupQuery(foodGroup);
 
   const formatted = useMemo(() => {
     if (!items) return "";
+    const allItems = [...customItems, ...items];
 
-    return items
+    return allItems
       .slice(START_SLICE_INDEX, END_SLICE_INDEX)
       .map((item) => formatServingText(item.name, item.oneServing, servingAmount, 1))
       .join(" | ");
-  }, [items]);
+  }, [items, customItems]);
 
   if (items == undefined || isLoading)
     return (

@@ -66,11 +66,7 @@ const RootNavigator = () => {
   useEffect(() => {
     checkLoginStatus().then(() => setLoading(false));
 
-    requestPermissions()
-      .then(() => {
-        initializeNotifications();
-      })
-      .catch((err) => console.log(err));
+    requestPermissions().catch((err) => console.log(err));
 
     const notificationListener = notificationReceivedListener();
 

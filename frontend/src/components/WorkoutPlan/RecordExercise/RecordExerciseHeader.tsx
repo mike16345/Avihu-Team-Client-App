@@ -10,6 +10,8 @@ import { FC, useEffect, useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import RestTimer from "./RestTimer";
 import { useTimerStore } from "@/store/timerStore";
+import { Text } from "@/components/ui/Text";
+import { isHtmlEmpty } from "@/utils/utils";
 
 const buttonsPadding = { paddingHorizontal: 14, paddingVertical: 8 };
 
@@ -25,6 +27,7 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
   const [tips, setTips] = useState<string[]>([]);
   const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
+  const [isHTML, setIsHTML] = useState(false);
 
   const handleOpenModal = (tips: string[], title: string) => {
     setTips(tips);
@@ -36,6 +39,7 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
     setTips([]);
     setModalTitle("");
     setIsTipsModalOpen(false);
+    setIsHTML(false);
   };
 
   useEffect(() => handleDismissModal, []);
@@ -54,6 +58,11 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
                   style={[buttonsPadding, { backgroundColor: "#ECFDF3" }]}
                   icon={"clock"}
                   size={20}
+                  label={
+                    <Text fontVariant="semibold" fontSize={14}>
+                      {countdown}
+                    </Text>
+                  }
                 />
               }
             />
@@ -67,9 +76,12 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
               שיטת אימון
             </SecondaryButton>
           </ConditionalRender>
-          <ConditionalRender condition={!!exercise.tipFromTrainer}>
+          <ConditionalRender condition={!isHtmlEmpty(exercise.tipFromTrainer)}>
             <SecondaryButton
-              onPress={() => handleOpenModal([exercise.tipFromTrainer || ""], "דגשים")}
+              onPress={() => {
+                handleOpenModal([exercise.tipFromTrainer || ""], "דגשים");
+                setIsHTML(true);
+              }}
               style={buttonsPadding}
               rightIcon="info"
             >
@@ -84,6 +96,7 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
         onDismiss={handleDismissModal}
         visible={isTipsModalOpen}
         tips={tips}
+        useHtmlRenderer={isHTML}
       />
     </>
   );

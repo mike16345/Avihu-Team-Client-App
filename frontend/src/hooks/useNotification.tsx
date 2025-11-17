@@ -5,6 +5,7 @@ import {
   NotificationIdentifiers,
 } from "@/constants/notifications";
 import { useNotificationStore } from "@/store/notificationStore";
+import { useUserStore } from "@/store/userStore";
 import { getNextEightAM, getNextEightAMOnSunday, toTrigger } from "@/utils/notification";
 import { generateUniqueId } from "@/utils/utils";
 import * as Notifications from "expo-notifications";
@@ -51,15 +52,7 @@ export const useNotification = () => {
   const scheduleDailyWeightInReminder = async () => {
     const next8am = getNextEightAM();
 
-    // iOS: true repeating daily trigger at hh:mm
-    const iosTrigger: Notifications.DailyTriggerInput = {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour: 8,
-      minute: 0,
-    };
-
-    // Android: schedule a one-off date at next 08:00 (re-schedule later as needed)
-    const androidTrigger: Notifications.DateTriggerInput = {
+    const trigger: Notifications.DateTriggerInput = {
       type: Notifications.SchedulableTriggerInputTypes.DATE,
       date: next8am,
       channelId: DEFAULT_CHANNEL_ID,
@@ -78,7 +71,7 @@ export const useNotification = () => {
         body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
         data,
       },
-      trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
+      trigger,
     });
 
     useNotificationStore.getState().addWeighInNotification(data.id);
@@ -87,16 +80,7 @@ export const useNotification = () => {
   const scheduleWeeklyMeasurementReminder = async () => {
     const nextSunday8am = getNextEightAMOnSunday();
 
-    // iOS: true repeating daily trigger at hh:mm
-    const iosTrigger: Notifications.WeeklyTriggerInput = {
-      type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-      weekday: 1,
-      hour: 8,
-      minute: 0,
-    };
-
-    // Android: schedule a one-off date at next 08:00 (re-schedule later as needed)
-    const androidTrigger: Notifications.DateTriggerInput = {
+    const trigger: Notifications.DateTriggerInput = {
       type: Notifications.SchedulableTriggerInputTypes.DATE,
       date: nextSunday8am,
       channelId: DEFAULT_CHANNEL_ID,
@@ -115,7 +99,7 @@ export const useNotification = () => {
         body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER,
         data,
       },
-      trigger: Platform.OS === "ios" ? iosTrigger : androidTrigger,
+      trigger,
     });
 
     useNotificationStore.getState().addMeasurementNotification(data.id);

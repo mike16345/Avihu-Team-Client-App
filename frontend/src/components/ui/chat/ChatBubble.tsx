@@ -2,6 +2,7 @@ import { Animated, useWindowDimensions } from "react-native";
 import React, { ReactNode, useEffect, useRef } from "react";
 import { Text } from "../Text";
 import useStyles from "@/styles/useGlobalStyles";
+import { selectionHaptic } from "@/utils/haptics";
 
 interface ChatBubbleProps {
   variant?: "prompt" | "response";
@@ -36,6 +37,10 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ children, variant = "prompt", l
       duration: 250,
       useNativeDriver: true,
     }).start();
+
+    if (variant == "response") {
+      selectionHaptic();
+    }
   }, []);
 
   return (

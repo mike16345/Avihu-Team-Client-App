@@ -1,11 +1,12 @@
 import { FC } from "react";
 import CollapsibleMeal from "./CollapsibleMeal";
-import { ScrollView, useWindowDimensions, View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { Text } from "../ui/Text";
+import CustomScrollView from "../ui/scrollview/CustomScrollView";
 
 interface MealsListProps {}
 
@@ -16,11 +17,11 @@ const MealsList: FC<MealsListProps> = () => {
   const meals = data?.meals || [];
 
   return (
-    <View style={[{ height: height * 0.55 }]}>
-      <ScrollView
+    <View style={[{ height: height * 0.5 }]}>
+      <CustomScrollView
         style={{ flexGrow: 1 }}
-        contentContainerStyle={[{ flexGrow: 1 }, spacing.gap20]}
-        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[{ flexGrow: 1 }, spacing.gap20, spacing.pdHorizontalMd]}
+        topShadow={false}
       >
         <ConditionalRender condition={isLoading}>
           <View style={[layout.center]}>
@@ -35,7 +36,7 @@ const MealsList: FC<MealsListProps> = () => {
         {meals.map((meal, i) => {
           return <CollapsibleMeal key={meal._id ?? i} meal={meal} index={i} />;
         })}
-      </ScrollView>
+      </CustomScrollView>
     </View>
   );
 };

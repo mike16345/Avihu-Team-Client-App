@@ -18,6 +18,8 @@ const DietItemContent: React.FC<DietItemContentProps> = ({ name, dietItem }) => 
 
   const apiFoodGroup = foodGroupToApiFoodGroupName(name) as FoodGroup;
 
+  if (dietItem.quantity <= 0) return null;
+
   return (
     <>
       <View style={[spacing.gapDefault]}>
@@ -26,7 +28,11 @@ const DietItemContent: React.FC<DietItemContentProps> = ({ name, dietItem }) => 
           <GreenDotGenerator count={dietItem.quantity} />
         </View>
         <View style={{ minHeight: 45 }}>
-          <FoodItemSelection foodGroup={apiFoodGroup} servingAmount={dietItem.quantity} />
+          <FoodItemSelection
+            customItems={dietItem.customItems}
+            foodGroup={apiFoodGroup}
+            servingAmount={dietItem.quantity}
+          />
         </View>
 
         <AdditionalDietItemsModal

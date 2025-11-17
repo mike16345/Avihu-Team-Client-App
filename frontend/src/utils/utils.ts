@@ -1,4 +1,9 @@
-import { AVG_CARB_CALORIES, AVG_PROTEIN_CALORIES } from "@/constants/Constants";
+import {
+  AVG_CARB_CALORIES,
+  AVG_FAT_CALORIES,
+  AVG_PROTEIN_CALORIES,
+  AVG_VEGGIE_CALORIES,
+} from "@/constants/Constants";
 import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
 import { ISession } from "@/interfaces/ISession";
 import Constants from "expo-constants";
@@ -199,7 +204,8 @@ export function formatServingText<K extends keyof IServingItem>(
   oneServing: IServingItem,
   servingAmount: number = 1,
   servingsToShow: 1 | 2 = 2,
-  ignoreKeys: K[] = []
+  ignoreKeys: K[] = [],
+  separator = " "
 ): string {
   const units = Object.entries(oneServing)
     .filter(([key, value]) => {
@@ -213,14 +219,17 @@ export function formatServingText<K extends keyof IServingItem>(
       return `${value * servingAmount} ${label}`;
     });
 
-  return [name, ...units].join(" ");
+  return [name, ...units].join(separator);
 }
 
 export function getTotalCaloriesInMeal(meal: IMeal) {
   const proteinCalories = meal.totalProtein.quantity * AVG_PROTEIN_CALORIES;
   const carbCalories = meal.totalCarbs.quantity * AVG_CARB_CALORIES;
+  const veggieCalories = meal.totalVeggies.quantity * AVG_VEGGIE_CALORIES;
+  const fatCalories = meal.totalFats.quantity * AVG_FAT_CALORIES; // Each gram of fat has 9 calories
+  const totalEaten = proteinCalories + carbCalories + veggieCalories + fatCalories;
 
-  return proteinCalories + carbCalories;
+  return totalEaten;
 }
 
 type mapToDropDownItemOptions<T> = {
@@ -280,7 +289,7 @@ export function extractValuesFromArray<T, K extends keyof T>(array: T[], key: K)
 
 export function extractValuesFromObject<
   T extends Record<string, any>,
-  K extends keyof T[keyof T] = never
+  K extends keyof T[keyof T] = never,
 >(obj: T, innerKey?: K): (K extends never ? string : T[keyof T][K])[] {
   const keys = Object.keys(obj);
 
@@ -307,4 +316,16 @@ export function isIndexOutOfBounds(arr: any[], index: number) {
   if (!Array.isArray(arr)) return true;
 
   return index < 0 || index >= arr.length;
+}
+
+export function isHtmlEmpty(html?: string | null): boolean {
+  if (!html) return true;
+
+  // Remove all HTML tags entirely
+  const textOnly = html
+    .replace(/<[^>]+>/g, "") // remove tags
+    .replace(/&nbsp;/g, "") // remove non-breaking spaces
+    .replace(/\s+/g, ""); // remove all whitespace
+
+  return textOnly.length === 0;
 }

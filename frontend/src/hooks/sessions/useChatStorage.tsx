@@ -161,8 +161,6 @@ const useChatStorage = () => {
         },
       };
 
-      console.log("Next state ", JSON.stringify(nextState, null, 2));
-
       await persistState(nextState);
     },
     [persistState]

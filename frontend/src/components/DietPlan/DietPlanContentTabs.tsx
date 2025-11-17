@@ -29,10 +29,16 @@ const DietPlanContentTabs = () => {
   const { tabTriggers, tabContent } = useTabs(tabs);
 
   return (
-    <View style={[spacing.pdHorizontalMd, { flex: 1 }]}>
-      <Tabs value={selectedTab} onValueChange={onTabChange}>
+    <View style={[{ flex: 1 }]}>
+      <Tabs
+        horizontalPadding={spacing.pdHorizontalMd.paddingHorizontal}
+        value={selectedTab}
+        onValueChange={onTabChange}
+      >
         <View style={[spacing.gap20]}>
-          <TabsList>{tabTriggers}</TabsList>
+          <View style={spacing.pdHorizontalMd}>
+            <TabsList>{tabTriggers}</TabsList>
+          </View>
           {tabContent}
         </View>
       </Tabs>

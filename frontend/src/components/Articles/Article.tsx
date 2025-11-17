@@ -9,12 +9,12 @@ import { useEffect, useMemo } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
 import { Text } from "../ui/Text";
 import { Card } from "../ui/Card";
-import RenderHTML from "react-native-render-html";
 import ArticleImage from "./ArticleImage";
 import BackButton from "../ui/BackButton";
 import LikeButton from "./LikeButton";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
+import HtmlBlock from "../ui/HTMLBlock";
 
 const Article = () => {
   const { colors, common, layout, spacing } = useStyles();
@@ -81,18 +81,7 @@ const Article = () => {
               <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
             }
           >
-            <RenderHTML
-              source={{ html: data!.content }}
-              baseStyle={{
-                color: colors.textPrimary.color,
-                fontSize: 14,
-                textAlign: `left`,
-              }}
-              tagsStyles={{
-                b: { fontWeight: "bold" },
-                strong: { fontWeight: "bold" },
-              }}
-            />
+            <HtmlBlock source={{ html: data!.content }} />
           </ScrollView>
         </Card.Content>
       </Card>

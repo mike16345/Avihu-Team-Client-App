@@ -49,28 +49,6 @@ export const useNotificationStore = create<INotificationStore>()(
               const triggerTimeInMilliseconds = new Date(n.triggerTime).getTime();
               const isPassedTriggerTime = now >= triggerTimeInMilliseconds;
 
-              if (Platform.OS == "ios" && isPassedTriggerTime && n.status == "pending") {
-                const isMeasurementNotification = n.type == "measurement";
-
-                const triggerTime = isMeasurementNotification
-                  ? getNextEightAMOnSunday()
-                  : getNextEightAM();
-
-                queueMicrotask(() => {
-                  get().addNotification({
-                    id: generateUniqueId(),
-                    title: NOTIFICATION_TITLE,
-                    status: "pending",
-                    type: n.type,
-                    body: isMeasurementNotification
-                      ? NotificationBodies.WEEKLY_MEASUERMENT_REMINDER
-                      : NotificationBodies.DAILY_WEIGH_IN_REMINDER,
-                    data: {},
-                    triggerTime,
-                  });
-                });
-              }
-
               return isPassedTriggerTime ? { ...n, status: "delivered" } : n;
             }),
           };
