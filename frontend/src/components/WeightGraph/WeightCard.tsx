@@ -20,6 +20,7 @@ const WeightCard: React.FC<CardProps> = ({ title, value, unit, operator = "" }) 
     <Card
       variant="gray"
       style={[spacing.pdHorizontalMd, spacing.pdVerticalDefault, { width: cardWidth }]}
+      shadow={false}
     >
       <Card.Header>
         <Text style={[layout.alignSelfStart]} fontSize={16}>
