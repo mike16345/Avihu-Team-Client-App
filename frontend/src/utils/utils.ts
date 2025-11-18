@@ -223,13 +223,13 @@ export function formatServingText<K extends keyof IServingItem>(
 }
 
 export function getTotalCaloriesInMeal(meal: IMeal) {
-  const proteinCalories = meal.totalProtein.quantity * AVG_PROTEIN_CALORIES;
-  const carbCalories = meal.totalCarbs.quantity * AVG_CARB_CALORIES;
-  const veggieCalories = meal.totalVeggies.quantity * AVG_VEGGIE_CALORIES;
-  const fatCalories = meal.totalFats.quantity * AVG_FAT_CALORIES; // Each gram of fat has 9 calories
+  const proteinCalories = meal.totalProtein?.quantity * AVG_PROTEIN_CALORIES || 0;
+  const carbCalories = meal.totalCarbs?.quantity * AVG_CARB_CALORIES || 0;
+  const veggieCalories = meal.totalVeggies?.quantity * AVG_VEGGIE_CALORIES || 0;
+  const fatCalories = meal.totalFats?.quantity * AVG_FAT_CALORIES || 0;
   const totalEaten = proteinCalories + carbCalories + veggieCalories + fatCalories;
 
-  return totalEaten;
+  return totalEaten || 0;
 }
 
 type mapToDropDownItemOptions<T> = {
@@ -289,7 +289,7 @@ export function extractValuesFromArray<T, K extends keyof T>(array: T[], key: K)
 
 export function extractValuesFromObject<
   T extends Record<string, any>,
-  K extends keyof T[keyof T] = never,
+  K extends keyof T[keyof T] = never
 >(obj: T, innerKey?: K): (K extends never ? string : T[keyof T][K])[] {
   const keys = Object.keys(obj);
 

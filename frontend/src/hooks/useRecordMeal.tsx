@@ -126,6 +126,7 @@ export function useRecordMeal() {
       ...session,
       meals: [...session.meals, recordedMeal],
     };
+
     await persist(updated);
     setTotalCaloriesEaten(totalCalories, false);
 
