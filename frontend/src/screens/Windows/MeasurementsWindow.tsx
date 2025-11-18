@@ -20,8 +20,8 @@ const MeasurementsWindow = () => {
       style={layout.flex1}
       contentContainerStyle={[spacing.gapLg]}
     >
-      <View style={[spacing.gapLg, { paddingStart: 24 }]}>
-        <Text style={[layout.alignSelfStart]} fontSize={16}>
+      <View style={[spacing.gapLg]}>
+        <Text style={[layout.alignSelfStart, { paddingStart: 24 }]} fontSize={16}>
           מדידת היקפים
         </Text>
 
@@ -29,6 +29,7 @@ const MeasurementsWindow = () => {
           items={MEASUREMENT_MUSCLE_GROUPS}
           selected={activeMuscleGroup}
           onSelect={(selected) => setActiveMuscleGroup(selected)}
+          style={{ paddingStart: 24 }}
         />
       </View>
 

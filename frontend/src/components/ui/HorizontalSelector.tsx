@@ -1,4 +1,4 @@
-import { ScrollView, View } from "react-native";
+import { ScrollView, StyleProp, View, ViewStyle } from "react-native";
 import { Text } from "./Text";
 import PrimaryButton from "./buttons/PrimaryButton";
 import useStyles from "@/styles/useGlobalStyles";
@@ -8,12 +8,14 @@ interface HorizontalSelectorProps {
   selected: string;
   onSelect: (item: string) => void;
   items: string[];
+  style?: StyleProp<ViewStyle>;
 }
 
 const HorizontalSelector: React.FC<HorizontalSelectorProps> = ({
   onSelect,
   selected,
   items = [],
+  style,
 }) => {
   const { colors, spacing, layout, text } = useStyles();
 
@@ -26,7 +28,7 @@ const HorizontalSelector: React.FC<HorizontalSelectorProps> = ({
     <View>
       <ScrollView
         horizontal
-        contentContainerStyle={[spacing.gapDefault, layout.alignSelfStart, { paddingEnd: 12 }]}
+        contentContainerStyle={[spacing.gapDefault, layout.alignSelfStart, style]}
         nestedScrollEnabled
         showsHorizontalScrollIndicator={false}
       >

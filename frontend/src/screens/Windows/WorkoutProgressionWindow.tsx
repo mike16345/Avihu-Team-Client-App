@@ -45,11 +45,12 @@ const WorkoutProgressionWindow = () => {
 
   return (
     <View style={[layout.flex1]}>
-      <View style={{ paddingStart: 16 }}>
+      <View>
         <HorizontalSelector
           items={MUSCLE_GROUPS}
           onSelect={(selected) => setActiveMuscleGroup(selected)}
           selected={activeMuscleGroup}
+          style={{ paddingStart: 16 }}
         />
       </View>
 
