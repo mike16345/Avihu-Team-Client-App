@@ -46,7 +46,7 @@ const ScrollViewShadow: React.FC<ScrollViewShadowProps> = ({
 
   return (
     <Animated.View
-      style={[styles.shadowContainer, inverted ? { top: 0 } : { bottom: -50 }, style]}
+      style={[styles.shadowContainer, inverted ? { top: -0 } : { bottom: -50 }, style]}
       pointerEvents="none"
     >
       <Canvas style={styles.shadowCanvas}>

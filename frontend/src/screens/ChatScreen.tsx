@@ -138,7 +138,7 @@ const ChatScreen = () => {
             </SecondaryButton>
           </ConditionalRender>
 
-          <View style={[layout.flexRow, spacing.gapDefault]}>
+          <View style={[layout.flexRow, { gap: 24 }]}>
             <ChatInput
               style={[
                 colors.backgroundSurface,

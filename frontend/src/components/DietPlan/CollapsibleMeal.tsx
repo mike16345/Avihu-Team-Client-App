@@ -84,7 +84,6 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
         ]}
       >
         {dietItems.map((dietItem, i) => {
-          
           return (
             <DietItemContent
               key={`${dietItem}-${i}`}

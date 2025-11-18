@@ -36,7 +36,7 @@ const DailyCalorieIntake = () => {
           showDot
           onPress={handlePress}
         >
-          <Text fontVariant="medium">{freeCalories} קלוריות חופשיות בנוסף</Text>
+          <Text fontVariant="medium">{freeCalories} קלוריות חופשיות </Text>
         </Badge>
       </View>
     </View>

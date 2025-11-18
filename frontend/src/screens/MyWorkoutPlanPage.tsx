@@ -87,7 +87,9 @@ const MyWorkoutPlanScreen = () => {
         contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg, { zIndex: 1 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
-        topShadow={false}
+        topShadow={true}
+        topShadowFirstColor="#F4F4F4"
+        scrollShadowStyleTop={{ top: -7 }}
       >
         <ConditionalRender condition={showCardio}>
           <CardioWrapper cardioPlan={data?.cardio} />
