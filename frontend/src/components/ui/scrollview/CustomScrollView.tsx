@@ -4,6 +4,8 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   View,
+  StyleProp,
+  ViewStyle,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
@@ -19,6 +21,8 @@ interface CustomScrollViewProps extends KeyboardAwareScrollViewProps {
   bottomShadow?: boolean;
   topShadowFirstColor?: string;
   bottomShadowFirstColor?: string;
+  scrollShadowStyleTop?: StyleProp<ViewStyle>;
+  scrollShadowStyleBottom?: StyleProp<ViewStyle>;
 }
 
 const CustomScrollView: React.FC<CustomScrollViewProps> = ({
@@ -27,6 +31,8 @@ const CustomScrollView: React.FC<CustomScrollViewProps> = ({
   bottomShadow = true,
   topShadowFirstColor,
   bottomShadowFirstColor,
+  scrollShadowStyleTop,
+  scrollShadowStyleBottom,
   ...props
 }) => {
   const shadowOpacity = useSharedValue(1);
@@ -54,7 +60,7 @@ const CustomScrollView: React.FC<CustomScrollViewProps> = ({
         <ScrollViewShadow
           inverted
           isAtEnd={isAtTop}
-          style={animatedShadowStyle}
+          style={[animatedShadowStyle, scrollShadowStyleTop]}
           startingColor={topShadowFirstColor}
         />
       </ConditionalRender>
@@ -73,7 +79,7 @@ const CustomScrollView: React.FC<CustomScrollViewProps> = ({
       <ConditionalRender condition={bottomShadow}>
         <ScrollViewShadow
           isAtEnd={isAtBottom}
-          style={animatedShadowStyle}
+          style={[animatedShadowStyle, scrollShadowStyleBottom]}
           startingColor={bottomShadowFirstColor}
         />
       </ConditionalRender>
