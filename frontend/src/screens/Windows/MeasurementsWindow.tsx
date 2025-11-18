@@ -29,7 +29,7 @@ const MeasurementsWindow = () => {
           items={MEASUREMENT_MUSCLE_GROUPS}
           selected={activeMuscleGroup}
           onSelect={(selected) => setActiveMuscleGroup(selected)}
-          style={{ paddingStart: 24 }}
+          style={{ paddingHorizontal: 24 }}
         />
       </View>
 

@@ -50,7 +50,7 @@ const WorkoutProgressionWindow = () => {
           items={MUSCLE_GROUPS}
           onSelect={(selected) => setActiveMuscleGroup(selected)}
           selected={activeMuscleGroup}
-          style={{ paddingStart: 16 }}
+          style={{ paddingHorizontal: 16 }}
         />
       </View>
 
