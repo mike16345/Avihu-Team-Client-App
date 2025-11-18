@@ -1,7 +1,7 @@
-import { View, Image, TouchableOpacity, BackHandler } from "react-native";
+import { View, Image, TouchableOpacity, BackHandler, StyleSheet } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import Icon from "../Icon/Icon";
-import appIcon from "@assets/app-icon.png";
+import appIcon from "@assets/app-logo.png";
 import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect } from "react";
@@ -36,12 +36,35 @@ const ChatHeader = () => {
         { borderBottomWidth: 1 },
       ]}
     >
-      <TouchableOpacity onPress={goBack}>
+      <TouchableOpacity
+        style={[layout.flexRow, spacing.gapDefault, layout.center, styles.shadow]}
+        onPress={goBack}
+      >
         <Icon name="chevronRightBig" />
+        <Image source={appIcon} style={styles.logo} />
       </TouchableOpacity>
-      <Image source={appIcon} style={{ height: 54, width: 54 }} />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  logo: {
+    height: 54,
+    width: 54,
+    borderRadius: 17,
+  },
+  shadow: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: -4,
+      height: 8,
+    },
+    shadowOpacity: 0.2, // Increased slightly so the shadow remains visible as it stretches
+    shadowRadius: 11,
+
+    // Android Shadow Property
+    elevation: 20,
+  },
+});
 
 export default ChatHeader;
