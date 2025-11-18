@@ -21,7 +21,6 @@
       "reactNativeDirectoryCheck": {
         "exclude": [
           "@react-navigation/material-bottom-tabs",
-          "react-native-vector-icons",
           "moment",
           "moment-timezone",
           "react-native-web-webview"
@@ -77,7 +76,6 @@
     "react-native-svg": "15.11.2",
     "react-native-svg-transformer": "^1.5.1",
     "react-native-tab-view": "^3.5.2",
-    "react-native-vector-icons": "^10.1.0",
     "react-native-web": "^0.20.0",
     "react-native-web-webview": "^1.0.2",
     "react-native-webview": "13.13.5",
@@ -89,7 +87,6 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~19.0.10",
-    "@types/react-native-vector-icons": "^6.4.18",
     "dotenv-cli": "^7.4.4",
     "eas-cli": "^16.7.0",
     "typescript": "~5.8.3"
