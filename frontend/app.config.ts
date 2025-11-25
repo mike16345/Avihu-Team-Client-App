@@ -40,7 +40,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
     ],
     ios: {
-      bundleIdentifier: isDev ? "com.avihuteam.test" : "com.avihuteam.avihuteam",
+      bundleIdentifier: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
       supportsTablet: false,
       splash: {
         image: "./assets/splash-screen.png",
