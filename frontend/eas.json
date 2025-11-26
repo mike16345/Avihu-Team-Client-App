@@ -8,6 +8,7 @@
       "environment": "development"
     },
     "preview": {
+      "android": { "credentialsSource": "local" },
       "distribution": "store",
       "channel": "preview",
       "autoIncrement": true,

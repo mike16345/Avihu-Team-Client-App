@@ -10,11 +10,13 @@
     "web": "expo start -c --web",
     "typecheck": "tsc --noEmit",
     "build:android:dev": "eas build --platform android --profile development",
+    "build:android:preview": "eas build --platform android --profile preview",
     "build:android:prod": "eas build --platform android --profile production",
-    "update:prod": "eas update --branch production --environment production --message",
     "build:ios:dev": "eas build --platform ios --profile development",
     "build:ios:preview": "eas build --platform ios --profile preview",
-    "build:ios:prod": "eas build --platform ios --profile production"
+    "build:ios:prod": "eas build --platform ios --profile production",
+    "update:prod": "eas update --branch production --environment production --message",
+    "update:preview": "eas update --branch preview --environment preview --message"
   },
   "expo": {
     "doctor": {
@@ -38,7 +40,7 @@
     "@react-navigation/material-top-tabs": "^6.6.13",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
-    "@shopify/react-native-skia": "2.0.0-next.4",
+    "@shopify/react-native-skia": "^2.1.1",
     "@tanstack/query-async-storage-persister": "^5.0.0",
     "@tanstack/react-query": "^5.0.0",
     "@tanstack/react-query-persist-client": "^5.0.0",
@@ -94,7 +96,7 @@
   "overrides": {
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "@shopify/react-native-skia": "2.0.0-next.4"
+    "@shopify/react-native-skia": "2.1.1"
   },
   "private": true
 }
