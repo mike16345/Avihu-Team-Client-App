@@ -10,18 +10,19 @@
     "web": "expo start -c --web",
     "typecheck": "tsc --noEmit",
     "build:android:dev": "eas build --platform android --profile development",
+    "build:android:preview": "eas build --platform android --profile preview",
     "build:android:prod": "eas build --platform android --profile production",
-    "update:prod": "eas update --branch production --environment production --message",
     "build:ios:dev": "eas build --platform ios --profile development",
     "build:ios:preview": "eas build --platform ios --profile preview",
-    "build:ios:prod": "eas build --platform ios --profile production"
+    "build:ios:prod": "eas build --platform ios --profile production",
+    "update:prod": "eas update --branch production --environment production --message",
+    "update:preview": "eas update --branch preview --environment preview --message"
   },
   "expo": {
     "doctor": {
       "reactNativeDirectoryCheck": {
         "exclude": [
           "@react-navigation/material-bottom-tabs",
-          "react-native-vector-icons",
           "moment",
           "moment-timezone",
           "react-native-web-webview"
@@ -39,7 +40,7 @@
     "@react-navigation/material-top-tabs": "^6.6.13",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
-    "@shopify/react-native-skia": "2.0.0-next.4",
+    "@shopify/react-native-skia": "^2.1.1",
     "@tanstack/query-async-storage-persister": "^5.0.0",
     "@tanstack/react-query": "^5.0.0",
     "@tanstack/react-query-persist-client": "^5.0.0",
@@ -77,7 +78,6 @@
     "react-native-svg": "15.11.2",
     "react-native-svg-transformer": "^1.5.1",
     "react-native-tab-view": "^3.5.2",
-    "react-native-vector-icons": "^10.1.0",
     "react-native-web": "^0.20.0",
     "react-native-web-webview": "^1.0.2",
     "react-native-webview": "13.13.5",
@@ -89,7 +89,6 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@types/react": "~19.0.10",
-    "@types/react-native-vector-icons": "^6.4.18",
     "dotenv-cli": "^7.4.4",
     "eas-cli": "^16.7.0",
     "typescript": "~5.8.3"
@@ -97,7 +96,7 @@
   "overrides": {
     "react": "19.0.0",
     "react-dom": "19.0.0",
-    "@shopify/react-native-skia": "2.0.0-next.4"
+    "@shopify/react-native-skia": "2.1.1"
   },
   "private": true
 }
