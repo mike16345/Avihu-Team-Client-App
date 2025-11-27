@@ -6,7 +6,7 @@ import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { useMemo } from "react";
-import { RenderHTMLSource } from "react-native-render-html";
+import HtmlBlock from "../ui/HTMLBlock";
 
 const Supplements = () => {
   const { layout, spacing } = useStyles();
@@ -16,7 +16,7 @@ const Supplements = () => {
     if (!data?.supplements) return [];
 
     return data.supplements.map((supplement, i) => (
-      <RenderHTMLSource key={i} source={{ html: supplement }} />
+      <HtmlBlock key={i} source={{ html: supplement }} />
     ));
   }, [data?.supplements]);
 

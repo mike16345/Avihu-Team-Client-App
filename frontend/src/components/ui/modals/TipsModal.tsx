@@ -5,7 +5,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { ConditionalRender } from "../ConditionalRender";
 import { Text } from "../Text";
 import { TextInput } from "react-native";
-import { RenderHTMLSource } from "react-native-render-html";
+import HtmlBlock from "../HTMLBlock";
 
 interface TipsModalProps extends CustomModalProps {
   tips?: string[];
@@ -26,7 +26,7 @@ const TipsModal: React.FC<TipsModalProps> = ({
   const Tips = useMemo(() => {
     if (useHtmlRenderer) {
       return tips.map((tip, i) => {
-        return <RenderHTMLSource key={i} source={{ html: tip }} />;
+        return <HtmlBlock key={i} source={{ html: tip }} />;
       });
     }
 

@@ -1,11 +1,52 @@
-import { FC } from "react";
+import useColors from "@/styles/useColors";
+import { FC, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
-import { RenderHTMLSource, RenderHTMLSourceProps } from "react-native-render-html";
+import RenderHTML, { RenderHTMLProps } from "react-native-render-html";
 
-const HtmlBlock: FC<RenderHTMLSourceProps> = ({ ...props }) => {
+const HtmlBlock: FC<RenderHTMLProps> = ({ ...props }) => {
   const { width } = useWindowDimensions();
+  const { textPrimary } = useColors();
 
-  return <RenderHTMLSource contentWidth={width} {...props} />;
+  const baseStyle = useMemo(
+    () => ({
+      color: textPrimary.color,
+      fontSize: 14,
+      textAlign: "left",
+    }),
+    []
+  );
+  const tagStyle = useMemo(
+    () => ({
+      ol: { direction: "rtl" },
+      li: { textAlign: "right" },
+      b: { fontWeight: "bold" },
+      strong: { fontWeight: "bold" },
+      u: { textDecorationLine: "underline" },
+      s: { textDecorationLine: "line-through" },
+      i: { fontStyle: "italic" },
+      em: { fontStyle: "italic" },
+    }),
+    []
+  );
+  const rendererProps = useMemo(
+    () => ({
+      ol: { enableExperimentalRtl: true },
+      ul: {
+        enableExperimentalRtl: true,
+      },
+    }),
+    []
+  );
+
+  return (
+    <RenderHTML
+      baseStyle={baseStyle}
+      tagsStyles={tagStyle}
+      renderersProps={rendererProps}
+      contentWidth={width}
+      {...props}
+    />
+  );
 };
 
 export default HtmlBlock;
