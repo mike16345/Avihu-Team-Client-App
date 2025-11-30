@@ -20,7 +20,7 @@ const RepWheelPicker: React.FC<RepWheelPickerProps> = ({
   disabled,
   ...props
 }) => {
-  const { common, spacing, text, colors, layout } = useStyles();
+  const { common, spacing, text, colors } = useStyles();
 
   const activeColor = activeItemColor || colors.textPrimary.color;
   const inactiveColor = inactiveItemColor || colors.textPrimary.color;
@@ -44,29 +44,15 @@ const RepWheelPicker: React.FC<RepWheelPickerProps> = ({
           { opacity: disabled ? 0.4 : 1 },
           style,
         ]}
+        pointerEvents={disabled ? "none" : "auto"}
       >
-        {!disabled ? (
-          <WheelPicker
-            height={height}
-            itemHeight={itemHeight}
-            activeItemColor={activeColor}
-            inactiveItemColor={inactiveColor}
-            {...props}
-          />
-        ) : (
-          <View
-            style={[
-              layout.center,
-              {
-                height: height,
-              },
-            ]}
-          >
-            <Text fontVariant="brutalist" fontSize={24}>
-              {props.selectedValue}
-            </Text>
-          </View>
-        )}
+        <WheelPicker
+          height={height}
+          itemHeight={itemHeight}
+          activeItemColor={activeColor}
+          inactiveItemColor={inactiveColor}
+          {...props}
+        />
       </View>
     </View>
   );
