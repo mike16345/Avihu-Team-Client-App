@@ -18,12 +18,12 @@ import RecordedSetsHistoryModal from "./RecordedSetsHistoryModal";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import { AddRecordedSets } from "@/hooks/api/useRecordedSetsApi";
 import { useTimerStore } from "@/store/timerStore";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
-interface RecordExerciseProps
-  extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordExercise"> {}
-
-const BASE_SPACING = 92;
-const METHOD_GAP = 16;
+interface RecordExerciseProps extends StackNavigatorProps<
+  WorkoutPlanStackParamList,
+  "RecordExercise"
+> {}
 
 function hasRecordedSets(data: IMuscleGroupRecordedSets[], exercise: string) {
   for (const muscleGroup of data) {
@@ -50,7 +50,22 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const { session, handleSetLocalSession } = useWorkoutSession();
   const { triggerSuccessToast, triggerErrorToast } = useToast();
 
-  const [height, setHeight] = useState(0);
+  const [sheetHeight, setSheetHeight] = useState(Dimensions.get("window").height / 2);
+  const tabBarHeight = useBottomTabBarHeight();
+
+  const handleSetInputLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      const { y } = e.nativeEvent.layout;
+      const windowHeight = Dimensions.get("window").height;
+
+      // Distance from top of this view to bottom of screen,
+      // minus the tab bar so we don't overlap it
+      const availableHeight = windowHeight - y - tabBarHeight + 18;
+
+      setSheetHeight(availableHeight);
+    },
+    [tabBarHeight]
+  );
   const [currentSet, setCurrentSet] = useState(setNumber || 1);
 
   const handleRecordSets = useCallback(
@@ -91,37 +106,18 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
     [exercise, setNumber, muscleGroup, plan, session]
   );
 
-  const onLayout = (e: LayoutChangeEvent) => {
-    if (e.nativeEvent.layout.height !== height) {
-      setHeight(e.nativeEvent.layout.height);
-    }
-  };
-
   const hasRecordedSetsHistory = useMemo(() => {
     if (!data || !data.length || !exercise) return false;
 
     return hasRecordedSets(data, exercise.exerciseId.name);
   }, [data, exercise]);
 
-  const dynamicSpacing = useMemo(() => {
-    const hasMethod = Boolean(exercise?.exerciseMethod);
-    const extraSpace = hasRecordedSetsHistory ? 0 : METHOD_GAP * 1.5;
-    let s = BASE_SPACING + (!hasMethod ? METHOD_GAP : 0) + extraSpace;
-
-    return s;
-  }, [exercise?.exerciseMethod, hasRecordedSetsHistory]);
-
-  const sheetHeight = useMemo(
-    () => Dimensions.get("screen").height - height - dynamicSpacing,
-    [height, dynamicSpacing]
-  );
-
   return (
     <View style={[layout.flex1, colors.background, spacing.gapLg, spacing.pdHorizontalMd]}>
       <RecordExerciseHeader exercise={exercise!} />
 
       <View style={[layout.flex1, spacing.gapSm]}>
-        <View onLayout={onLayout} style={[spacing.gapMd]}>
+        <View style={[spacing.gapMd]}>
           <ExerciseVideo exercise={exercise!} />
           <ConditionalRender condition={hasRecordedSetsHistory}>
             <View style={[layout.center, spacing.gap20]}>
@@ -130,7 +126,8 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
             </View>
           </ConditionalRender>
         </View>
-        <View style={{ flex: 1 }} onLayout={onLayout}>
+
+        <View style={{ flex: 1 }} onLayout={handleSetInputLayout}>
           <SetInputContainer
             sheetHeight={sheetHeight}
             handleRecordSets={handleRecordSets}

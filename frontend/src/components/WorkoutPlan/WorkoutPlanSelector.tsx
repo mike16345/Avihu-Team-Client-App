@@ -50,7 +50,12 @@ const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan,
         <DropDownContent />
       </View>
 
-      <TipsModal tips={tips} visible={showTips} onDismiss={() => setShowTips(false)} />
+      <TipsModal
+        tips={tips}
+        useHtmlRenderer
+        visible={showTips}
+        onDismiss={() => setShowTips(false)}
+      />
     </>
   );
 };

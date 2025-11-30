@@ -3,8 +3,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { View, StyleSheet, Platform } from "react-native";
 import { Text } from "./Text";
 import { softHaptic } from "@/utils/haptics";
-import Animated from "react-native-reanimated";
-import { FlatList } from "react-native-reanimated/lib/typescript/Animated";
+import { FlatList } from "react-native-gesture-handler";
 
 const WheelPicker: React.FC<WheelPickerProps> = ({
   data,
@@ -19,7 +18,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
     data.findIndex((item) => String(item.value) == String(selectedValue))
   );
 
-  const flatListRef = useRef<FlatList<typeof data>>(null);
+  const flatListRef = useRef<FlatList>(null);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleScroll = (event: any) => {
@@ -38,7 +37,7 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
       });
 
       softHaptic();
-    }, 500);
+    }, 250);
 
     softHaptic();
     setSelectedIndex(index);
@@ -90,17 +89,18 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   return (
     <View style={[styles.container, { height }]}>
       <View style={styles.row}>
-        <Animated.FlatList
+        <FlatList
           style={{ direction: "rtl" }}
           ref={flatListRef}
-          windowSize={12}
-          maxToRenderPerBatch={28}
-          initialNumToRender={28}
+          windowSize={14}
+          maxToRenderPerBatch={35}
+          initialNumToRender={35}
           removeClippedSubviews={false}
-          updateCellsBatchingPeriod={16}
+          updateCellsBatchingPeriod={24}
           onScroll={handleScroll}
           onMomentumScrollEnd={handleScrollEnd}
           scrollEventThrottle={16}
+          nestedScrollEnabled
           getItemLayout={(_, index) => ({
             length: itemHeight,
             offset: itemHeight * index,

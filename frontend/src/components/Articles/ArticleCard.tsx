@@ -3,12 +3,12 @@ import { TouchableOpacity } from "react-native";
 import { Card } from "../ui/Card";
 import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
-import RenderHTML from "react-native-render-html";
 import ArticleImage from "./ArticleImage";
 import ArticleMetric from "./ArticleMetric";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArticleStackParamsList } from "@/types/navigatorTypes";
+import HtmlBlock from "../ui/HTMLBlock";
 
 interface ArticleCardProps {
   article: IArticle;
@@ -30,14 +30,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
           <Text fontVariant="semibold" fontSize={16} style={[text.textLeft, { paddingBottom: 4 }]}>
             {article.title}
           </Text>
-          <RenderHTML
-            source={{ html: article.content.slice(0, 100) }}
-            contentWidth={30}
-            baseStyle={{
-              color: colors.textPrimary.color,
-              textAlign: `left`,
-            }}
-          />
+          <HtmlBlock source={{ html: article.content.slice(0, 100) }} contentWidth={30} />
         </Card.Header>
         <Card.Content>
           <ArticleImage imageUrl={article.imageUrl} linkToVideo={article.link} />

@@ -17,6 +17,7 @@ import Icon from "@/components/Icon/Icon";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import YoutubePlayer, { PLAYER_STATES, YoutubeIframeRef } from "react-native-youtube-iframe";
 import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
+import { useLayoutStore } from "@/store/layoutStore";
 
 interface ExerciseVideoProps {
   exercise: IExercise;
@@ -26,6 +27,8 @@ const VIDEO_HEIGHT = 180;
 
 const ExerciseVideo: FC<ExerciseVideoProps> = ({ exercise }) => {
   const { exerciseMethod, sets } = exercise;
+  const isSheetExpanded = useLayoutStore((state) => state.isSheetExpanded);
+
   const { width } = useWindowDimensions();
   const { layout, colors, common, spacing } = useStyles();
 
@@ -108,7 +111,10 @@ const ExerciseVideo: FC<ExerciseVideoProps> = ({ exercise }) => {
         </ConditionalRender>
 
         <ConditionalRender condition={isPlaying}>
-          <View style={[styles.playerContainer, { width: width * 0.9, height: VIDEO_HEIGHT }]}>
+          <View
+            pointerEvents={isSheetExpanded ? "none" : "auto"}
+            style={[styles.playerContainer, { width: width * 0.9, height: VIDEO_HEIGHT }]}
+          >
             <YoutubePlayer
               ref={playerRef}
               play={isPlaying}
