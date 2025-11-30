@@ -20,8 +20,10 @@ import { AddRecordedSets } from "@/hooks/api/useRecordedSetsApi";
 import { useTimerStore } from "@/store/timerStore";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
-interface RecordExerciseProps
-  extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordExercise"> {}
+interface RecordExerciseProps extends StackNavigatorProps<
+  WorkoutPlanStackParamList,
+  "RecordExercise"
+> {}
 
 function hasRecordedSets(data: IMuscleGroupRecordedSets[], exercise: string) {
   for (const muscleGroup of data) {
