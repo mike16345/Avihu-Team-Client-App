@@ -25,7 +25,7 @@ const MeasurementHistoryModal = () => {
           </Text>
         </CustomModal.Header>
 
-        <CustomModal.Content style={[{ borderWidth: 0 }, colors.background]}>
+        <CustomModal.Content style={[{ borderWidth: 0, padding: 0 }]}>
           <MeasurementHistoryContent />
         </CustomModal.Content>
       </CustomModal>

@@ -73,22 +73,25 @@ const MeasurementHistoryContent = () => {
   return (
     <View style={[spacing.gapXl, layout.flex1]}>
       <HorizontalSelector
+        style={{ paddingHorizontal: 16 }}
         items={MEASUREMENT_MUSCLE_GROUPS}
         selected={activeMuscle}
         onSelect={(selected) => setActiveMuscle(selected)}
       />
 
-      <CustomCalendar
-        selectedDate={selectedDate}
-        onSelect={(date) => setSelectedDate(date)}
-        dates={selectedMeasurementGroupDates}
-      />
+      <View style={{ paddingHorizontal: 16 }}>
+        <CustomCalendar
+          selectedDate={selectedDate}
+          onSelect={(date) => setSelectedDate(date)}
+          dates={selectedMeasurementGroupDates}
+        />
+      </View>
 
       <Text fontSize={16} style={[text.textCenter]}>
         {DateUtils.formatDate(selectedDate, "DD.MM.YY")}
       </Text>
 
-      <View style={[layout.flexRow, spacing.gapSm, layout.itemsCenter, layout.center]}>
+      <View style={[layout.flexRow, spacing.gapLg, layout.itemsCenter, layout.center]}>
         <Text fontSize={16}>
           {selectedMeasurement ? `היקף ${selectedMeasurement?.value}` : NO_MEASUREMENT_TEXT}
         </Text>
