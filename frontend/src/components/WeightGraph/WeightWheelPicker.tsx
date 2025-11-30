@@ -141,29 +141,13 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
           { opacity: disabled ? 0.4 : 1 },
           style,
         ]}
+        pointerEvents={disabled ? "none" : "auto"}
       >
-        {!disabled ? (
-          <SectionWheelPicker
-            data={wheelPickerPropsArray}
-            selectedValues={[decimalPart.toFixed(2), wholePart]}
-            onValueChange={handleValueChange}
-          />
-        ) : (
-          <View
-            style={[
-              layout.flexRow,
-              spacing.gap20,
-              layout.center,
-              {
-                marginEnd: 16,
-                height: height,
-              },
-            ]}
-          >
-            <Text style={{ direction: "rtl" }} fontVariant="brutalist" fontSize={24}>{`.00`}</Text>
-            <Text fontVariant="brutalist" fontSize={24}>{`0`}</Text>
-          </View>
-        )}
+        <SectionWheelPicker
+          data={wheelPickerPropsArray}
+          selectedValues={[decimalPart.toFixed(2), wholePart]}
+          onValueChange={handleValueChange}
+        />
       </View>
     </View>
   );

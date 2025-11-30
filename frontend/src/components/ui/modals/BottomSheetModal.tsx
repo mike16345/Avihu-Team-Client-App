@@ -200,7 +200,7 @@ export default function BottomSheetModal({
             {renderHandle ? (
               renderHandle({ toggle, isOpen })
             ) : (
-              <Pressable onPress={toggle} hitSlop={12} style={styles.defaultHandle}>
+              <Pressable onPress={toggle} style={styles.defaultHandle}>
                 <View style={styles.handleBar} />
               </Pressable>
             )}

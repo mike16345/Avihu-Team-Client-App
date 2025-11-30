@@ -11,6 +11,7 @@ import PreviousSetCard from "./PreviousSetCard";
 import useGetLastRecordedSet from "@/hooks/queries/RecordedSets/useLastRecordedSetQuery";
 import { isIndexOutOfBounds } from "@/utils/utils";
 import { DEFAULT_SET, IS_IOS } from "@/constants/Constants";
+import { useLayoutStore } from "@/store/layoutStore";
 
 const HORIZONTAL_PADDING = 24;
 const VERTICAL_PADDING = 16;
@@ -35,6 +36,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   const lastRecordedSets = useGetLastRecordedSet(exercise.exerciseId.name).lastRecordedSets;
   const { height } = useWindowDimensions();
   const { layout, colors, spacing, common } = useStyles();
+  const setIsSheetExpanded = useLayoutStore((state) => state.setIsSheetExpanded);
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [containerHeight, setContainerHeight] = useState(0);
@@ -83,7 +85,10 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
     <>
       <BottomSheetModal
         peek={IS_IOS ? height * 0.5 : sheetHeight}
-        onOpenChange={(isExpanded) => setIsExpanded(isExpanded)}
+        onOpenChange={(isExpanded) => {
+          setIsExpanded(isExpanded);
+          setIsSheetExpanded(isExpanded);
+        }}
         visible={isExpanded}
         renderHandle={({ toggle, isOpen }) => (
           <Pressable onPress={toggle}>
