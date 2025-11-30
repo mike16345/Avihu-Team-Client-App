@@ -2,7 +2,7 @@ import { BottomStackParamList } from "@/types/navigatorTypes";
 import { Keyboard, StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
-import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
+import { BOTTOM_BAR_HEIGHT, DEFAULT_PAGE_TOP_PADDING } from "@/constants/Constants";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text } from "@/components/ui/Text";
 import { useEffect, useRef, useState } from "react";
@@ -38,8 +38,6 @@ const BottomTabNavigator = () => {
   };
 
   const getIconLayout = (name: string) => layoutsRef.current[name];
-
-  const isHomeScreen = BottomScreenNavigatorTabs[activeIndex].name == "Home";
 
   const indicatorStyle = useAnimatedStyle(() => ({
     end: indicatorAnim.value,
@@ -87,9 +85,10 @@ const BottomTabNavigator = () => {
           initialRouteName={INITIAL_ROUTE_NAME}
           sceneContainerStyle={[
             colors.backgroundTransparent,
+
             {
               paddingBottom: keyboardVisible ? BOTTOM_BAR_HEIGHT : BOTTOM_BAR_HEIGHT + 80,
-              paddingTop: isHomeScreen ? 36 : 36,
+              paddingTop: DEFAULT_PAGE_TOP_PADDING,
             },
           ]}
           screenOptions={{

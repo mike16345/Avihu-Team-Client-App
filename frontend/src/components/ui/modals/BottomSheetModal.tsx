@@ -1,5 +1,6 @@
-import { BOTTOM_BAR_HEIGHT, TOP_BAR_HEIGHT } from "@/constants/Constants";
+import { BOTTOM_BAR_HEIGHT, IS_IOS, TOP_BAR_HEIGHT } from "@/constants/Constants";
 import useBackHandler from "@/hooks/useBackHandler";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import React, { useEffect, useMemo, useState } from "react";
 import { Dimensions, StyleSheet, View, Pressable, LayoutChangeEvent } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -39,9 +40,12 @@ export default function BottomSheetModal({
   onLayout,
   peek = PEEK,
 }: Props) {
+  const bottomTabBarHeight = useBottomTabBarHeight();
   // Calculate heights based on available screen space
-  const MIN_HEIGHT = peek - 210; // Closed state
-  const MAX_HEIGHT = SCREEN_H - BOTTOM_BAR_HEIGHT - TOP_BAR_HEIGHT * 3.5; // Fully open, leaving 60px from top
+  const MIN_HEIGHT = peek - 210; // Closed state at peek
+  const MAX_HEIGHT = IS_IOS
+    ? SCREEN_H - BOTTOM_BAR_HEIGHT - TOP_BAR_HEIGHT * 3.5
+    : SCREEN_H - bottomTabBarHeight - TOP_BAR_HEIGHT - 90;
   const HEIGHT_RANGE = MAX_HEIGHT - MIN_HEIGHT;
   const EDGE_SNAP_PX = Math.max(12, HEIGHT_RANGE * 0.12);
   const FLICK_VELOCITY = 600;
@@ -92,11 +96,11 @@ export default function BottomSheetModal({
     },
     [isOpen]
   );
-
   useEffect(() => {
-    const newMinHeight = peek;
-    sheetHeight.value = withTiming(newMinHeight, { duration: 100 });
-  }, [peek]);
+    const target = Math.min(Math.max(sheetHeight.value, MIN_HEIGHT), MAX_HEIGHT);
+
+    sheetHeight.value = withTiming(target, { duration: 150 });
+  }, [peek, MIN_HEIGHT, MAX_HEIGHT]);
 
   const pan = useMemo(
     () =>
