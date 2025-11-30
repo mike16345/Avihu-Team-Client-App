@@ -1,3 +1,4 @@
+import { IS_IOS } from "@/constants/Constants";
 import useColors from "@/styles/useColors";
 import { FC, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
@@ -30,9 +31,9 @@ const HtmlBlock: FC<RenderHTMLProps> = ({ ...props }) => {
   );
   const rendererProps = useMemo(
     () => ({
-      ol: { enableExperimentalRtl: true },
+      ol: { enableExperimentalRtl: IS_IOS },
       ul: {
-        enableExperimentalRtl: true,
+        enableExperimentalRtl: IS_IOS,
       },
     }),
     []

@@ -1,4 +1,8 @@
 import { SetInput } from "@/components/WorkoutPlan/RecordExercise/SetInputContainer";
+import { Platform } from "react-native";
+
+export const IS_IOS = Platform.OS === "ios";
+export const IS_ANDROID = Platform.OS === "android";
 
 export const DEFAULT_INITIAL_WEIGHT = 60;
 export const DEFAULT_INITIAL_WEIGHT_DECIMAL = 50;
