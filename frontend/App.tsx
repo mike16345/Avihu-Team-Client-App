@@ -33,7 +33,7 @@ export default function App() {
   if (!loaded || !ready) return null;
 
   return (
-    <KeyboardProvider preserveEdgeToEdge statusBarTranslucent>
+    <KeyboardProvider preserveEdgeToEdge>
       <ThemeProvider>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>

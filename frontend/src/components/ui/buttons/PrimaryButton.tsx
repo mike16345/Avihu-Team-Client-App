@@ -7,7 +7,7 @@ import { IconName } from "@/constants/iconMap";
 import Icon from "@/components/Icon/Icon";
 import { Text } from "../Text";
 
-interface PrimaryButtonProps {
+interface PrimaryButtonProps extends React.ComponentProps<typeof TouchableOpacity> {
   children: ReactNode;
   mode?: "dark" | "light";
   block?: boolean;
@@ -27,6 +27,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   onPress,
   disabled,
   style,
+  ...props
 }) => {
   const { colors, common, layout, spacing } = useStyles();
 
@@ -53,6 +54,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         { opacity: disabled ? 0.5 : 1 },
         style,
       ]}
+      {...props}
     >
       <ConditionalRender condition={!loading}>
         <>

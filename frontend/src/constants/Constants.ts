@@ -11,6 +11,7 @@ export const DEFAULT_MESSAGE_TO_TRAINER = "מה קורה אחי?";
 export const BOTTOM_BAR_HEIGHT = 20;
 export const TOP_BAR_HEIGHT = 40;
 export const GRAPH_HEIGHT = 250;
+export const RECORD_SET_SHEET_MAX_PEEK_HEIGHT = 240;
 
 export const STREAM_ENABLED = false;
 export const EMAIL_ERROR = "אנא הכניסו כתובת מייל תקינה";

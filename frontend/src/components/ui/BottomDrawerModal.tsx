@@ -1,12 +1,15 @@
-import React, { ReactNode, useMemo } from "react";
-import { StyleSheet, View, useWindowDimensions, Pressable } from "react-native";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import { StyleSheet, View, useWindowDimensions, Pressable, LayoutChangeEvent } from "react-native";
 import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
+  runOnUI,
+  withTiming,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import useBackHandler from "@/hooks/useBackHandler";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 type FixedRangeBottomDrawerProps = {
   /** Collapsed height in px – parent decides (e.g. X px above navbar) */
@@ -15,27 +18,30 @@ type FixedRangeBottomDrawerProps = {
   topOffset: number;
   /** Optional: get notified when drawer expands/collapses */
   onStateChange?: (isExpanded: boolean) => void;
-  children: ReactNode;
-};
+  onLayout?: (e: LayoutChangeEvent) => void;
 
-const SPRING_CONFIG = {
-  damping: 18,
-  stiffness: 220,
-  mass: 0.9,
+  renderHandle?: (args: { toggle: () => void; isOpen: boolean }) => React.ReactNode;
+  children: ReactNode;
 };
 
 const FixedRangeBottomDrawer: React.FC<FixedRangeBottomDrawerProps> = ({
   minHeight,
   topOffset,
   onStateChange,
+  onLayout,
+  renderHandle,
   children,
 }) => {
   const { height: screenHeight } = useWindowDimensions();
+  const bottomBarHeight = useBottomTabBarHeight();
+
+  const [isOpenJS, setIsOpenJS] = useState(false); // 👈 NEW
 
   // Maximum height the drawer can reach (fixed distance from top).
   const maxHeight = useMemo(() => {
-    const h = screenHeight - topOffset;
-    // Safety: never smaller than minHeight
+    const bottomOffset = 30;
+    const h = screenHeight - (bottomBarHeight + bottomOffset) - topOffset;
+
     return Math.max(h, minHeight);
   }, [screenHeight, topOffset, minHeight]);
 
@@ -46,11 +52,12 @@ const FixedRangeBottomDrawer: React.FC<FixedRangeBottomDrawerProps> = ({
 
   const notifyStateChange = (expanded: boolean) => {
     if (onStateChange) onStateChange(expanded);
+    setIsOpenJS(expanded); // 👈 NEW
   };
 
   const animateTo = (targetHeight: number, expanded: boolean) => {
     "worklet";
-    height.value = withSpring(targetHeight, SPRING_CONFIG, (finished) => {
+    height.value = withTiming(targetHeight, { duration: 250 }, (finished) => {
       if (finished) {
         isExpanded.value = expanded;
         if (onStateChange) {
@@ -96,22 +103,37 @@ const FixedRangeBottomDrawer: React.FC<FixedRangeBottomDrawerProps> = ({
   }));
 
   const onHandlePress = () => {
-    // Call worklet toggle from JS
-    toggle(); // Reanimated v3 can call worklets directly from JS
+    runOnUI(toggle)();
   };
 
-  return (
-    <GestureDetector gesture={panGesture}>
-      <Animated.View style={[styles.container, animatedStyle]}>
-        {/* Handle */}
-        <Pressable onPress={onHandlePress} style={styles.handleArea}>
-          <View style={styles.handleBar} />
-        </Pressable>
+  useEffect(() => {
+    height.value = withTiming(minHeight, { duration: 50 });
+  }, [minHeight]);
 
-        {/* Content */}
-        <View style={styles.content}>{children}</View>
-      </Animated.View>
-    </GestureDetector>
+  useBackHandler(() => {
+    if (isExpanded.value) {
+      onHandlePress();
+      return true;
+    }
+    return false;
+  });
+
+  return (
+    <Animated.View onLayout={onLayout} style={[styles.container, animatedStyle]}>
+      <GestureDetector gesture={panGesture}>
+        <View style={styles.handleContainer} pointerEvents="auto">
+          {renderHandle ? (
+            renderHandle({ toggle: onHandlePress, isOpen: isOpenJS })
+          ) : (
+            <Pressable onPress={toggle} style={styles.defaultHandle}>
+              <View style={styles.handleBar} />
+            </Pressable>
+          )}
+        </View>
+      </GestureDetector>
+
+      <View style={styles.content}>{children}</View>
+    </Animated.View>
   );
 };
 
@@ -121,9 +143,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderRadius: 16,
     overflow: "hidden",
+    zIndex: 999,
     // backgroundColor intentionally neutral – you style it outside if you want
     backgroundColor: "white",
   },
@@ -132,11 +154,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  defaultHandle: {
+    paddingVertical: 6,
+    paddingHorizontal: 20,
+  },
+  handleContainer: {
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 0.5,
+    borderColor: "#E2E2E2",
+  },
   handleBar: {
-    width: 40,
-    height: 4,
-    borderRadius: 999,
-    backgroundColor: "#CCCCCC",
+    width: 42,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: "#C8C8C8",
   },
   content: {
     flex: 1,

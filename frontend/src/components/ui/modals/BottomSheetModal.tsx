@@ -60,15 +60,6 @@ export default function BottomSheetModal({
     height: sheetHeight.value,
   }));
 
-  const backdropAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      sheetHeight.value,
-      [MIN_HEIGHT, MAX_HEIGHT],
-      [0, 0.4],
-      Extrapolation.CLAMP
-    ),
-  }));
-
   const notifyOpenChange = (open: boolean) => {
     lastNotifiedOpen.value = open;
     onOpenChange(open);
@@ -96,6 +87,7 @@ export default function BottomSheetModal({
     },
     [isOpen]
   );
+  
   useEffect(() => {
     const target = Math.min(Math.max(sheetHeight.value, MIN_HEIGHT), MAX_HEIGHT);
 
@@ -183,13 +175,6 @@ export default function BottomSheetModal({
 
   return (
     <View style={styles.overlay} pointerEvents="box-none">
-      <Animated.View
-        style={[styles.backdrop, { borderRadius: radius }, backdropAnimatedStyle]}
-        pointerEvents={isOpen ? "auto" : "none"}
-      >
-        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-      </Animated.View>
-
       <Animated.View
         onLayout={onLayout}
         style={[styles.sheet, { borderRadius: radius }, sheetStyle]}
