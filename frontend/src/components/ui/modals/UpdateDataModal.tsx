@@ -94,7 +94,12 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
 
   const coerce = (raw: string | undefined, f: FieldConfig) => {
     if (f.parse) return f.parse(raw);
-    if (f.keyboardType === "number-pad" || f.keyboardType === "numeric") {
+
+    if (
+      f.keyboardType === "number-pad" ||
+      f.keyboardType === "numeric" ||
+      f.keyboardType === "decimal-pad"
+    ) {
       const n = Number(raw);
       return Number.isNaN(n) ? raw : n;
     }
