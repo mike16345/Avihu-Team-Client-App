@@ -12,18 +12,16 @@ import { useToast } from "@/hooks/useToast";
 import useWorkoutSession from "@/hooks/sessions/useWorkoutSession";
 import { getNextSetNumberFromSession } from "@/utils/utils";
 import PreviousSetCard from "./PreviousSetCard";
-import { LayoutChangeEvent } from "react-native";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import RecordedSetsHistoryModal from "./RecordedSetsHistoryModal";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import { AddRecordedSets } from "@/hooks/api/useRecordedSetsApi";
 import { useTimerStore } from "@/store/timerStore";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { DEFAULT_PAGE_TOP_PADDING } from "@/constants/Constants";
 
-interface RecordExerciseProps extends StackNavigatorProps<
-  WorkoutPlanStackParamList,
-  "RecordExercise"
-> {}
+interface RecordExerciseProps
+  extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordExercise"> {}
 
 function hasRecordedSets(data: IMuscleGroupRecordedSets[], exercise: string) {
   for (const muscleGroup of data) {
@@ -50,23 +48,24 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const { session, handleSetLocalSession } = useWorkoutSession();
   const { triggerSuccessToast, triggerErrorToast } = useToast();
 
-  const [sheetHeight, setSheetHeight] = useState(Dimensions.get("window").height / 2);
+  const [containerHeight, setContainerHeight] = useState(0);
+
   const tabBarHeight = useBottomTabBarHeight();
 
-  const handleSetInputLayout = useCallback(
-    (e: LayoutChangeEvent) => {
-      const { y } = e.nativeEvent.layout;
-      const windowHeight = Dimensions.get("window").height;
-
-      // Distance from top of this view to bottom of screen,
-      // minus the tab bar so we don't overlap it
-      const availableHeight = windowHeight - y - tabBarHeight + 18;
-
-      setSheetHeight(availableHeight);
-    },
-    [tabBarHeight]
-  );
   const [currentSet, setCurrentSet] = useState(setNumber || 1);
+
+  const sheetHeight = useMemo(() => {
+    const windowHeight = Dimensions.get("screen").height;
+    const buttonHeight = 60;
+    const availableHeight =
+      windowHeight -
+      containerHeight -
+      (tabBarHeight + 30) -
+      DEFAULT_PAGE_TOP_PADDING -
+      buttonHeight;
+
+    return availableHeight;
+  }, [containerHeight]);
 
   const handleRecordSets = useCallback(
     async (sets: SetInput[]) => {
@@ -114,9 +113,15 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
 
   return (
     <View style={[layout.flex1, colors.background, spacing.gapLg, spacing.pdHorizontalMd]}>
-      <RecordExerciseHeader exercise={exercise!} />
+      <View
+        style={[spacing.gapLg]}
+        onLayout={(e) => {
+          const { height } = e.nativeEvent.layout;
+          setContainerHeight(height);
+        }}
+      >
+        <RecordExerciseHeader exercise={exercise!} />
 
-      <View style={[layout.flex1, spacing.gapSm]}>
         <View style={[spacing.gapMd]}>
           <ExerciseVideo exercise={exercise!} />
           <ConditionalRender condition={hasRecordedSetsHistory}>
@@ -126,16 +131,15 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
             </View>
           </ConditionalRender>
         </View>
-
-        <View style={{ flex: 1 }} onLayout={handleSetInputLayout}>
-          <SetInputContainer
-            sheetHeight={sheetHeight}
-            handleRecordSets={handleRecordSets}
-            maxSets={exercise?.sets?.length!}
-            setNumber={currentSet}
-            exercise={exercise}
-          />
-        </View>
+      </View>
+      <View style={{ flex: 1 }}>
+        <SetInputContainer
+          sheetHeight={sheetHeight}
+          handleRecordSets={handleRecordSets}
+          maxSets={exercise?.sets?.length!}
+          setNumber={currentSet}
+          exercise={exercise}
+        />
       </View>
     </View>
   );

@@ -30,12 +30,12 @@ export default function App() {
     runTaskOnAppOpen();
   }, []);
 
-  if (!loaded || !ready) return;
+  if (!loaded || !ready) return null;
 
   return (
-    <KeyboardProvider preserveEdgeToEdge>
+    <KeyboardProvider preserveEdgeToEdge statusBarTranslucent>
       <ThemeProvider>
-        <GestureHandlerRootView>
+        <GestureHandlerRootView style={{ flex: 1 }}>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
             <HtmlRenderProvider>
               <View style={[{ direction: "rtl" }, { flex: 1 }]}>
@@ -45,7 +45,7 @@ export default function App() {
                 >
                   <NavigationContainer>
                     <RootNavigator />
-                    <StatusBar key={colorScheme} translucent style={"dark"} />
+                    <StatusBar key={colorScheme} style={"dark"} />
                     <ToastContainer />
                     <Update />
                   </NavigationContainer>
