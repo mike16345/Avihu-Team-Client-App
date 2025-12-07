@@ -19,7 +19,7 @@ const HtmlBlock: FC<RenderHTMLProps> = ({ ...props }) => {
   const tagStyle = useMemo(
     () => ({
       ol: { direction: "rtl" },
-      li: { textAlign: "right" },
+      li: { textAlign: "start" },
       b: { fontWeight: "bold" },
       strong: { fontWeight: "bold" },
       u: { textDecorationLine: "underline" },

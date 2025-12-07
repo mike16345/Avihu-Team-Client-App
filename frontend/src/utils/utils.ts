@@ -205,7 +205,8 @@ export function formatServingText<K extends keyof IServingItem>(
   servingAmount: number = 1,
   servingsToShow: 1 | 2 = 2,
   ignoreKeys: K[] = [],
-  separator = " "
+  separator = " ",
+  reverse: boolean = false
 ): string {
   const units = Object.entries(oneServing)
     .filter(([key, value]) => {
@@ -219,7 +220,9 @@ export function formatServingText<K extends keyof IServingItem>(
       return `${value * servingAmount} ${label}`;
     });
 
-  return [name, ...units].join(separator);
+  const serving = reverse ? [...units, name] : [name, ...units];
+
+  return serving.join(separator);
 }
 
 export function getTotalCaloriesInMeal(meal: IMeal) {
@@ -289,7 +292,7 @@ export function extractValuesFromArray<T, K extends keyof T>(array: T[], key: K)
 
 export function extractValuesFromObject<
   T extends Record<string, any>,
-  K extends keyof T[keyof T] = never
+  K extends keyof T[keyof T] = never,
 >(obj: T, innerKey?: K): (K extends never ? string : T[keyof T][K])[] {
   const keys = Object.keys(obj);
 
