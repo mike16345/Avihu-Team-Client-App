@@ -20,6 +20,8 @@ interface RecordExerciseHeaderProps {
 }
 
 const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
+  console.warn("exerc", exercise);
+
   const { layout } = useStyles();
   const { goBack } = useNavigation();
   const countdown = useTimerStore((state) => state.countdown);
@@ -76,10 +78,10 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
               שיטת אימון
             </SecondaryButton>
           </ConditionalRender>
-          <ConditionalRender condition={!isHtmlEmpty(exercise.tipFromTrainer)}>
+          <ConditionalRender condition={!isHtmlEmpty(exercise.exerciseId.tipFromTrainer)}>
             <SecondaryButton
               onPress={() => {
-                handleOpenModal([exercise.tipFromTrainer || ""], "דגשים");
+                handleOpenModal([exercise.exerciseId.tipFromTrainer || ""], "דגשים");
                 setIsHTML(true);
               }}
               style={buttonsPadding}
