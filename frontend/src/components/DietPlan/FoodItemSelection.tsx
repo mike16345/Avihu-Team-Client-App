@@ -30,7 +30,7 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
 
     return allItems
       .slice(START_SLICE_INDEX, END_SLICE_INDEX)
-      .map((item) => formatServingText(item.name, item.oneServing, servingAmount, 1))
+      .map((item) => formatServingText(item.name, item.oneServing, servingAmount, 1, [], " ", true))
       .join(" | ");
   }, [items, customItems]);
 
