@@ -12,6 +12,7 @@ import RestTimer from "./RestTimer";
 import { useTimerStore } from "@/store/timerStore";
 import { Text } from "@/components/ui/Text";
 import { isHtmlEmpty } from "@/utils/utils";
+import useExerciseMethodQuery from "@/hooks/queries/useExerciseMethodQuery";
 
 const buttonsPadding = { paddingHorizontal: 14, paddingVertical: 8 };
 
@@ -20,16 +21,21 @@ interface RecordExerciseHeaderProps {
 }
 
 const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
-  console.warn("exerc", exercise);
-
   const { layout } = useStyles();
   const { goBack } = useNavigation();
   const countdown = useTimerStore((state) => state.countdown);
+  const { data: exerciseMethod } = useExerciseMethodQuery(exercise.exerciseMethod || null);
 
   const [tips, setTips] = useState<string[]>([]);
   const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [isHTML, setIsHTML] = useState(false);
+
+  const handleOpenExerciseMethodModal = () => {
+    if (!exerciseMethod) return;
+
+    handleOpenModal([exerciseMethod.data.title, exerciseMethod.data.description], "שיטת אימון");
+  };
 
   const handleOpenModal = (tips: string[], title: string) => {
     setTips(tips);
@@ -71,7 +77,7 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
           </ConditionalRender>
           <ConditionalRender condition={!!exercise.exerciseMethod}>
             <SecondaryButton
-              onPress={() => handleOpenModal([exercise.exerciseMethod || ""], "שיטת אימון")}
+              onPress={() => handleOpenExerciseMethodModal()}
               style={buttonsPadding}
               rightIcon="info"
             >
