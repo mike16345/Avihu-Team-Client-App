@@ -13,6 +13,7 @@ export interface IUser {
   imagesUploaded: boolean;
   password?: string;
   hasAccess: boolean;
+  profileImage?: string;
 }
 
 // WeighIn interface

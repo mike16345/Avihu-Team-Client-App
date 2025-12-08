@@ -1,10 +1,14 @@
-import NativeIcon from "@/components/Icon/NativeIcon";
 import MyDietPlanScreen from "@/screens/MyDietPlanScreen";
-import MyProgressScreen from "@/screens/MyProgressScreen";
 import { NavigatorTab } from "@/types/navigatorTypes";
 import WorkoutPlanStack from "../WorkoutPlanStack";
-import BlogScreen from "@/screens/BlogScreen";
-import MyWorkoutProgressionScreen from "@/screens/MyWorkoutProgressionScreen";
+import Icon from "@/components/Icon/Icon";
+import HomeScreen from "@/screens/HomeScreen";
+import ArticleStack from "../ArticleStack";
+import { useIconLayout } from "@/context/useiconLayout";
+import { View } from "react-native";
+
+const ICON_HEIGHT = 24;
+const ICON_WIDTH = 24;
 
 const BottomScreenNavigatorTabs: NavigatorTab[] = [
   {
@@ -13,10 +17,74 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     options: {
       tabBarLabel: "",
       tabBarAccessibilityLabel: "אימונים",
+      tabBarIcon: ({ color }) => {
+        const { setIconLayout } = useIconLayout();
+        return (
+          <View
+            ref={(ref) => {
+              if (ref) {
+                ref.measureInWindow((x, y, width) => {
+                  setIconLayout("MyWorkoutPlanPage", x + width / 2);
+                });
+              }
+            }}
+          >
+            <Icon color={color} name="dumbbell" height={ICON_HEIGHT} width={ICON_WIDTH} />
+          </View>
+        );
+      },
+    },
+  },
+  {
+    name: "ChatTab",
+    component: HomeScreen,
+    options: {
+      tabBarIcon: ({ color }) => {
+        const { setIconLayout } = useIconLayout();
+        return (
+          <View
+            ref={(ref) => {
+              if (ref) {
+                ref.measureInWindow((x, y, width) => {
+                  setIconLayout("ChatTab", x + width / 2);
+                });
+              }
+            }}
+          >
+            <Icon color={color} name="chat" height={ICON_HEIGHT} width={ICON_WIDTH} />
+          </View>
+        );
+      },
+    },
+    listeners: ({ navigation }) => ({
+      tabPress: (e: any) => {
+        e.preventDefault();
 
-      tabBarIcon: ({ color }) => (
-        <NativeIcon library="MaterialCommunityIcons" color={color} name="weight-lifter" size={28} />
-      ),
+        navigation.navigate("Chat");
+      },
+    }),
+  },
+  {
+    name: "Home",
+    component: HomeScreen,
+    options: {
+      tabBarLabel: "",
+      tabBarIcon: ({ color }) => {
+        const { setIconLayout } = useIconLayout();
+        return (
+          <View
+            ref={(ref) => {
+              if (ref) {
+                ref.measureInWindow((x, y, width) => {
+                  setIconLayout("Home", x + width / 2);
+                });
+              }
+            }}
+          >
+            <Icon color={color} name="home" height={ICON_HEIGHT} width={ICON_WIDTH} />
+          </View>
+        );
+      },
     },
   },
   {
@@ -24,37 +92,47 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     component: MyDietPlanScreen,
     options: {
       tabBarLabel: "",
-      tabBarIcon: ({ color, focused }) => (
-        <NativeIcon
-          library="MaterialCommunityIcons"
-          color={color}
-          name={focused ? "food" : "food-outline"}
-          size={28}
-        />
-      ),
+      tabBarIcon: ({ color }) => {
+        const { setIconLayout } = useIconLayout();
+        return (
+          <View
+            ref={(ref) => {
+              if (ref) {
+                ref.measureInWindow((x, y, width) => {
+                  setIconLayout("MyDietPlanPage", x + width / 2);
+                });
+              }
+            }}
+          >
+            <Icon color={color} name="chefHat" height={ICON_HEIGHT} width={ICON_WIDTH} />
+          </View>
+        );
+      },
     },
   },
   {
-    name: "MyProgressScreen",
-    component: MyProgressScreen,
+    name: "ArticleScreen",
+    component: ArticleStack,
     options: {
       tabBarLabel: "",
-
-      tabBarIcon: ({ color }: { color: string }) => (
-        <NativeIcon library="MaterialIcons" name="monitor-heart" color={color} size={28} />
-      ),
+      tabBarIcon: ({ color }) => {
+        const { setIconLayout } = useIconLayout();
+        return (
+          <View
+            ref={(ref) => {
+              if (ref) {
+                ref.measureInWindow((x, y, width) => {
+                  setIconLayout("ArticleScreen", x + width / 2);
+                });
+              }
+            }}
+          >
+            <Icon color={color} name="sideBar" height={ICON_HEIGHT} width={ICON_WIDTH} />
+          </View>
+        );
+      },
     },
   },
-  // {
-  //   name: "BlogScreen",
-  //   component: BlogScreen,
-  //   options: {
-  //     tabBarLabel: "",
-  //     tabBarIcon: ({ color }: { color: string }) => (
-  //       <NativeIcon library="MaterialIcons" name="post-add" color={color} size={28} />
-  //     ),
-  //   },
-  // },
 ];
 
 export default BottomScreenNavigatorTabs;

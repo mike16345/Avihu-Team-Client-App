@@ -1,16 +1,9 @@
 export interface ICustomItem {
+  _id: string;
   name: string;
   dietaryType: string[];
   foodGroup: string;
-  oneServing: {
-    grams?: number;
-    spoons?: number;
-    scoops?: number;
-    cups?: number;
-    teaSpoons?: number;
-    pieces?: number;
-    units?: number;
-  };
+  oneServing: IServingItem;
 }
 
 export interface ICustomMenuItem {
@@ -20,15 +13,16 @@ export interface ICustomMenuItem {
 
 export interface IDietItem {
   quantity: number;
-  unit: DietItemUnit;
   customItems?: ICustomItem[];
   extraItems: string[];
 }
 
 export interface IMeal {
-  _id?: string;
+  _id: string;
   totalProtein: IDietItem;
   totalCarbs: IDietItem;
+  totalVeggies: IDietItem;
+  totalFats: IDietItem;
 }
 
 export interface IDietPlan {
@@ -38,20 +32,34 @@ export interface IDietPlan {
   fatsPerDay?: number;
   veggiesPerDay?: number;
   customInstructions?: string[];
+  supplements?: string[];
 }
 
 export interface IDietPlanPreset extends IDietPlan {
   name: string;
 }
 
-export type DietItemUnit = "grams" | "spoons";
+export type DietItemUnit =
+  | "grams"
+  | "spoons"
+  | "pieces"
+  | "scoops"
+  | "cups"
+  | "units"
+  | "teaSpoons";
 
 export interface IServingItem {
-  spoons: number;
-  grams: number;
+  grams?: number;
+  spoons?: number;
+  scoops?: number;
+  cups?: number;
+  teaSpoons?: number;
+  pieces?: number;
+  units?: number;
 }
 
 export interface IMenuItem {
+  _id: string;
   name: string;
   dietaryType: string[];
   foodGroup: string;
@@ -64,8 +72,8 @@ export interface IMenue {
 }
 
 export type CustomItems = {
-  fats: string[];
-  carbs: string[];
-  vegetables: string[];
-  protein: string[];
+  fats: ICustomItem[];
+  carbs: ICustomItem[];
+  vegetables: ICustomItem[];
+  protein: ICustomItem[];
 };

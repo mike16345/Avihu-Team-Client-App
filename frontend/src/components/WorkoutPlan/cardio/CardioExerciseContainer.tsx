@@ -3,7 +3,6 @@ import React from "react";
 import { Text } from "@/components/ui/Text";
 import { ICardioWorkout } from "@/interfaces/Workout";
 import useStyles from "@/styles/useGlobalStyles";
-import Divider from "@/components/ui/Divider";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 
 interface CardioExerciseContainerProps {
@@ -32,7 +31,6 @@ const CardioExerciseContainer: React.FC<CardioExerciseContainerProps> = ({
               <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>
                 {warmUpAmount} דק' חימום
               </Text>
-              <Divider orientation="vertical" color={colors.textPrimary.color} thickness={1.5} />
             </ConditionalRender>
             <Text style={[colors.textOnBackground, text.textRight, text.textBold]}>{distance}</Text>
           </View>

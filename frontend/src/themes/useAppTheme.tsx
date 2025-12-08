@@ -1,14 +1,7 @@
 import { createContext, ReactNode, useContext, useState } from "react";
-import { Appearance } from "react-native";
-import {
-  MD3DarkTheme as DefaultDarkTheme,
-  MD3LightTheme as DefaultLightTheme,
-} from "react-native-paper";
 
-export const LightTheme = {
-  ...DefaultLightTheme,
+export const defaultTheme = {
   fonts: {
-    ...DefaultLightTheme.fonts,
     regular: {
       fontFamily: "Assistant",
       fontWeight: "normal",
@@ -27,91 +20,19 @@ export const LightTheme = {
     },
   },
   colors: {
-    ...DefaultLightTheme.colors,
-    primary: "#10b981",
-    onPrimary: "#ffffff",
-    primaryContainer: "#a7f3d0",
-    onPrimaryContainer: "#064e3b",
-    secondary: "#333333",
-    onSecondary: "#ffffff",
-    secondaryContainer: "#d1d5db",
-    onSecondaryContainer: "#1f2937",
-    tertiary: "#ffa4a8",
-    onTertiary: "#ffffff",
-    tertiaryContainer: "#ffccd2",
-    onTertiaryContainer: "#7f1d1d",
-    info: "#17a2b8",
-    onInfo: "#ffffff",
-    infoContainer: "#d1ecf1",
-    onInfoContainer: "#0c5460",
-    success: "#28a745",
-    onSuccess: "#ffffff",
-    successContainer: "#d4edda",
-    onSuccessContainer: "#155724",
-    warning: "#ffc107",
-    onWarning: "#212529",
-    warningContainer: "#fff3cd",
-    onWarningContainer: "#856404",
-    error: "#f5365c",
-    onError: "#ffffff",
-    errorContainer: "#ffd6d6",
-    onErrorContainer: "#7f0000",
-    background: "#f8f9fa",
-    onBackground: "#1f2937",
-    surface: "#ffffff",
-    onSurface: "#1f2937",
-    surfaceVariant: "#e5e7eb",
-    onSurfaceVariant: "#4b5563",
-    outline: "#d1d5db",
-    outlineVariant: "#e5e7eb",
-    shadow: "#000000",
-    scrim: "#000000",
-    inverseSurface: "#1f2937",
-    inverseOnSurface: "#e5e7eb",
-    inversePrimary: "#a7f3d0",
-    elevation: {
-      level0: "transparent",
-      level1: "#f1f5f9",
-      level2: "#e2e8f0",
-      level3: "#cbd5e1",
-      level4: "#94a3b8",
-      level5: "#64748b",
-    },
-    surfaceDisabled: "rgba(31, 41, 55, 0.12)",
-    onSurfaceDisabled: "rgba(31, 41, 55, 0.38)",
-    backdrop: "rgba(51, 65, 85, 0.4)",
-  },
-};
-
-export const DarkTheme = {
-  ...DefaultDarkTheme,
-  fonts: {
-    ...DefaultDarkTheme.fonts,
-    regular: {
-      fontFamily: "Assistant",
-      fontWeight: "normal",
-    },
-    medium: {
-      fontFamily: "Assistant",
-      fontWeight: "normal",
-    },
-    light: {
-      fontFamily: "Assistant",
-      fontWeight: "normal",
-    },
-    thin: {
-      fontFamily: "Assistant",
-      fontWeight: "normal",
-    },
-  },
-  colors: {
-    ...DefaultDarkTheme.colors,
-    primary: "#128472",
-    onPrimary: "#064e3b",
+    primary: "#072723",
+    onPrimary: "#F8F8F8",
+    secondary: "#EFF1F5",
+    onSecondary: "#F8F8F8",
+    success: "#17B26A",
+    successContainer: "#EDFFEB",
+    error: "#F04438",
+    errorContainer: "#F8F8F8",
+    background: "#F8F8F8",
+    shadow: "#072723",
+    surface: "#ffffffff",
     primaryContainer: "#065f46",
     onPrimaryContainer: "#a7f3d0",
-    secondary: "#d1d5db",
-    onSecondary: "#1f2937",
     secondaryContainer: "#25262A",
     onSecondaryContainer: "#e5e7eb",
     tertiary: "#ffa4a8",
@@ -122,27 +43,21 @@ export const DarkTheme = {
     onInfo: "#0c5460",
     infoContainer: "#0c5460",
     onInfoContainer: "#d1ecf1",
-    success: "#28a745",
     onSuccess: "#155724",
-    successContainer: "#155724",
     onSuccessContainer: "#d4edda",
     warning: "#ffc107",
     onWarning: "#856404",
-    warningContainer: "#856404",
+    warningContainer: "#F8F8F8",
     onWarningContainer: "#fff3cd",
-    error: "#f5365c",
-    onError: "#7f0000",
-    errorContainer: "#7f0000",
+    onError: "#F8F8F8",
     onErrorContainer: "#ffd6d6",
-    background: "#050503",
     onBackground: "#f8f9fa",
-    surface: "#1f2937",
+
     onSurface: "#e5e7eb",
     surfaceVariant: "#4b5563",
     onSurfaceVariant: "#d1d5db",
-    outline: "#e5e7eb",
+    outline: "#D0D5DD",
     outlineVariant: "#4b5563",
-    shadow: "#000000",
     scrim: "#000000",
     inverseSurface: "#e5e7eb",
     inverseOnSurface: "#1f2937",
@@ -162,14 +77,14 @@ export const DarkTheme = {
 };
 
 type ThemeContextType = {
-  theme: typeof LightTheme;
-  setTheme: (theme: typeof LightTheme) => void;
+  theme: typeof defaultTheme;
+  setTheme: (theme: typeof defaultTheme) => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState(DarkTheme);
+  const [theme, setTheme] = useState(defaultTheme);
 
   /* useEffect(() => {
     const listener = Appearance.addChangeListener(({ colorScheme }) => {
@@ -184,7 +99,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 };
 
-const getPreferredTheme = () => (Appearance.getColorScheme() === "light" ? LightTheme : DarkTheme);
+/* const getPreferredTheme = () => (Appearance.getColorScheme() === "light" ? LightTheme : DarkTheme); */
 
 export const useThemeContext = (): ThemeContextType => {
   const context = useContext(ThemeContext);

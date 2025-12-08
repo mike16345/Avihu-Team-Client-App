@@ -1,68 +1,44 @@
 import useStyles from "@/styles/useGlobalStyles";
-import React from "react";
-import { Image, View, TouchableOpacity, useWindowDimensions } from "react-native";
-import NativeIcon from "../Icon/NativeIcon";
-import SelectUploadType from "./SelectUploadType";
-import { Text } from "../ui/Text";
+import React, { useState } from "react";
+import { Image, View, TouchableOpacity, LayoutChangeEvent } from "react-native";
+import Icon from "../Icon/Icon";
+import { ConditionalRender } from "../ui/ConditionalRender";
 
 interface DisplayImageProps {
-  image?: string;
-  removeImage: () => void;
-  handleImageSelected: (image: string) => void;
+  images?: string[];
+  removeImage: (index: number) => void;
 }
 
-const DisplayImage: React.FC<DisplayImageProps> = ({ image, removeImage, handleImageSelected }) => {
-  const { colors, common, fonts, layout, spacing } = useStyles();
-  const { height, width } = useWindowDimensions();
+const DisplayImage: React.FC<DisplayImageProps> = ({ images, removeImage }) => {
+  const { common, layout, spacing } = useStyles();
+  const [height, setHeight] = useState(0);
+
+  const onLayout = (e: LayoutChangeEvent) => {
+    const currentHeight = e.nativeEvent.layout.height;
+
+    if (currentHeight !== height) {
+      setHeight(currentHeight);
+    }
+  };
 
   return (
-    <View>
-      {image ? (
-        <View
-          style={{ position: `relative`, width: width * 0.7, height: height * 0.3, margin: `auto` }}
-        >
-          <Image
-            source={{ uri: image }}
-            style={[
-              { width: width * 0.7, height: height * 0.3 },
-              layout.center,
-              common.borderDefault,
-              colors.borderPrimary,
-            ]}
-          />
-          <TouchableOpacity
-            style={[
-              { position: `absolute`, top: 0, borderBottomEndRadius: 12 },
-              colors.backgroundPrimary,
-            ]}
-            onPress={removeImage}
-          >
-            <NativeIcon
-              library="FontAwesome"
-              name="trash"
-              style={[colors.textOnBackground, fonts.xl, spacing.pdSm]}
-            />
-          </TouchableOpacity>
+    <View onLayout={onLayout} style={layout.center}>
+      <ConditionalRender condition={images?.length !== 0}>
+        <View style={[layout.flexRow, spacing.gap30]}>
+          {images?.map((image, i) => (
+            <View key={i} style={[spacing.gapLg, layout.center]}>
+              <Image
+                source={{ uri: image }}
+                resizeMode="cover"
+                style={[{ width: 92, height: 156 }, common.rounded]}
+              />
+              <TouchableOpacity onPress={() => removeImage(i)}>
+                <Icon name="close" />
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
-      ) : (
-        <View
-          style={[
-            { height: height * 0.35, margin: `auto` },
-            layout.center,
-            spacing.gapLg,
-            layout.widthFull,
-          ]}
-        >
-          <NativeIcon
-            library="MaterialCommunityIcons"
-            name="image-off-outline"
-            style={[colors.textOnBackground, { fontSize: 86 }]}
-          />
-          <Text style={colors.textOnBackground}>אין תמונה להצגה!</Text>
-          <Text style={colors.textOnBackground}>בחרו אופן העלאת תמונה</Text>
-          <SelectUploadType returnImage={(image: string) => handleImageSelected(image)} />
-        </View>
-      )}
+      </ConditionalRender>
     </View>
   );
 };

@@ -1,35 +1,29 @@
-import { useEffect, useLayoutEffect } from "react";
-import Login from "@/components/Login/Login";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import BottomTabNavigator from "./BottomTabNavigator";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useUserStore } from "@/store/userStore";
-import { IUser } from "@/interfaces/User";
-import useNotification from "@/hooks/useNotfication";
-import { showAlert } from "@/utils/utils";
+import useNotification from "@/hooks/useNotification";
 import { NO_ACCESS, SESSION_EXPIRED } from "@/constants/Constants";
-import { useQueryClient } from "@tanstack/react-query";
 import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 import useLogout from "@/hooks/useLogout";
 import useUserQuery from "@/hooks/queries/useUserQuery";
-
-const Stack = createNativeStackNavigator();
+import SplashScreen from "@/screens/SplashScreen";
+import { useToast } from "@/hooks/useToast";
+import AuthNavigator from "./AuthNavigator";
+import AppNavigator from "./AppNavigator";
 
 const RootNavigator = () => {
-  const queryClient = useQueryClient();
   const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
+  const { triggerErrorToast } = useToast();
 
   const { currentUser, setCurrentUser } = useUserStore();
   const { data } = useUserQuery(currentUser?._id);
   const { checkUserSessionToken } = useUserApi();
-  const { initializeNotifications, requestPermissions } = useNotification();
+  const { initializeNotifications, requestPermissions, notificationReceivedListener } =
+    useNotification();
   const { handleLogout } = useLogout();
 
-  const onLogin = (user: IUser) => {
-    queryClient.setQueryData(["user-", user._id], user);
-    setCurrentUser(user);
-  };
+  const [loading, setLoading] = useState(true);
 
   const getUserFromLocalStorage = async () => {
     const token = await sessionStorage.getItem();
@@ -50,15 +44,15 @@ const RootNavigator = () => {
       const { isValid, hasAccess } = await checkUserSessionToken(tokenData);
 
       if (!hasAccess) {
-        showAlert("error", NO_ACCESS);
-        handleLogout();
-        return;
+        triggerErrorToast({ message: NO_ACCESS });
+
+        return handleLogout();
       }
 
       if (!isValid) {
-        showAlert("error", SESSION_EXPIRED);
-        handleLogout();
-        return;
+        triggerErrorToast({ message: SESSION_EXPIRED });
+
+        return handleLogout();
       }
     } catch (error) {
       return;
@@ -70,12 +64,15 @@ const RootNavigator = () => {
   }, []);
 
   useEffect(() => {
-    checkLoginStatus();
-    requestPermissions()
-      .then(() => {
-        initializeNotifications();
-      })
-      .catch((err) => console.log(err));
+    checkLoginStatus().then(() => setLoading(false));
+
+    requestPermissions().catch((err) => console.log(err));
+
+    const notificationListener = notificationReceivedListener();
+
+    return () => {
+      notificationListener?.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -83,19 +80,9 @@ const RootNavigator = () => {
     setCurrentUser(data);
   }, [data]);
 
-  return (
-    <>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {currentUser ? (
-          <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
-        ) : (
-          <>
-            <Stack.Screen children={() => <Login onLogin={onLogin} />} name="LoginScreen" />
-          </>
-        )}
-      </Stack.Navigator>
-    </>
-  );
+  if (loading) return <SplashScreen />;
+
+  return currentUser ? <AppNavigator /> : <AuthNavigator />;
 };
 
 export default RootNavigator;

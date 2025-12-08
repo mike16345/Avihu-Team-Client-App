@@ -1,35 +1,23 @@
-import { useMemo } from "react";
-import { useThemeContext } from "./useAppTheme";
-import { hexToRgba } from "@/utils/utils";
+import useStyles from "@/styles/useGlobalStyles";
 
-const LARGE_AMOUNT_OF_DOTS = 35;
+const useGraphTheme = () => {
+  const { colors } = useStyles();
 
-const useGraphTheme = (data: number[] = []) => {
-  const { theme } = useThemeContext();
-  const isLargeAmountOfDots = useMemo(() => data?.length > LARGE_AMOUNT_OF_DOTS, [data]);
-
-  const color = (opacity = 1) => hexToRgba(theme.colors.primary, opacity);
-  const labelColor = (opacity = 1) => hexToRgba(theme.colors.onSurface, opacity);
+  const color = () => `rgba(119, 243, 146, 1)`;
+  const labelColor = () => `rgba(69, 68, 89, 1)`;
 
   return {
-    backgroundColor: theme.colors.secondaryContainer,
-    backgroundGradientFrom: theme.colors.secondaryContainer,
-    backgroundGradientTo: theme.colors.secondaryContainer,
-    decimalPlaces: 2,
-    color: color,
-    labelColor: labelColor,
-    style: {
-      borderRadius: 16,
-    },
-    propsForLabels: {
-      fontSize: 12,
-      fontWeight: "bold",
-      fontFamily: "sans-serif-light",
-    },
+    backgroundGradientFrom: colors.backgroundSecondary.backgroundColor,
+    backgroundGradientTo: colors.backgroundSecondary.backgroundColor,
+    fillShadowGradientTo: "#9FFFA2",
+    fillShadowGradientFrom: "#79F681",
+    color,
+    labelColor,
     propsForDots: {
-      r: isLargeAmountOfDots ? "2" : "4",
-      strokeWidth: isLargeAmountOfDots ? "0.5" : "1",
-      stroke: "#fff",
+      r: "6",
+      strokeWidth: "2",
+      stroke: "#FFF",
+      fill: "#33B333",
     },
   };
 };

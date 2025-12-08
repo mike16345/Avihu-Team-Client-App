@@ -9,6 +9,9 @@ const useColors = () => {
     backgroundPrimary: {
       backgroundColor: theme.colors.primary,
     },
+    backgroundTransparent: {
+      backgroundColor: "transparent",
+    },
     textOnPrimary: {
       color: theme.colors.onPrimary,
     },

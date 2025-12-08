@@ -35,7 +35,7 @@ export const useSpacingStyles = () => {
       marginHorizontal: 8,
     },
     mgHorizontalDefault: {
-      marginHorizontal: 12,
+      marginHorizontal: 10,
     },
     mgHorizontalMd: {
       marginHorizontal: 16,
@@ -132,6 +132,9 @@ export const useSpacingStyles = () => {
     pdVerticalMd: {
       paddingVertical: 16,
     },
+    pdVertical20: {
+      paddingVertical: 20,
+    },
     pdVerticalLg: {
       paddingVertical: 24,
     },
@@ -169,6 +172,18 @@ export const useSpacingStyles = () => {
     },
     gapLg: {
       gap: 16,
+    },
+    gap14: {
+      gap: 14,
+    },
+    gap20: {
+      gap: 20,
+    },
+    gap30: {
+      gap: 30,
+    },
+    gap34: {
+      gap: 34,
     },
     gapXl: {
       gap: 24,
