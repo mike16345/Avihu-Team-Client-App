@@ -164,7 +164,7 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
 
       handleDismissModal();
     } catch (error: any) {
-      triggerErrorToast({ message: error?.response?.message });
+      triggerErrorToast({ message: error?.response?.message, isModalToast: true });
     } finally {
       setIsDeleting(false);
     }
