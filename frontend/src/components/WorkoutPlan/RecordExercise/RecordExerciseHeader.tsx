@@ -13,6 +13,8 @@ import { useTimerStore } from "@/store/timerStore";
 import { Text } from "@/components/ui/Text";
 import { isHtmlEmpty } from "@/utils/utils";
 import useExerciseMethodQuery from "@/hooks/queries/useExerciseMethodQuery";
+import { CustomModal } from "@/components/ui/modals/Modal";
+import HtmlBlock from "@/components/ui/HTMLBlock";
 
 const buttonsPadding = { paddingHorizontal: 14, paddingVertical: 8 };
 
@@ -24,17 +26,20 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
   const { layout } = useStyles();
   const { goBack } = useNavigation();
   const countdown = useTimerStore((state) => state.countdown);
-  const { data: exerciseMethod } = useExerciseMethodQuery(exercise.exerciseMethod || null);
+  const { data: exerciseMethod, isLoading } = useExerciseMethodQuery(
+    exercise.exerciseMethod || null
+  );
 
   const [tips, setTips] = useState<string[]>([]);
   const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
+  const [isExerciseMethodModalOpen, setisExerciseMethodModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [isHTML, setIsHTML] = useState(false);
 
   const handleOpenExerciseMethodModal = () => {
     if (!exerciseMethod) return;
 
-    handleOpenModal([exerciseMethod.data.title, exerciseMethod.data.description], "שיטת אימון");
+    setisExerciseMethodModalOpen(true);
   };
 
   const handleOpenModal = (tips: string[], title: string) => {
@@ -80,6 +85,7 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
               onPress={() => handleOpenExerciseMethodModal()}
               style={buttonsPadding}
               rightIcon="info"
+              disabled={isLoading}
             >
               שיטת אימון
             </SecondaryButton>
@@ -106,6 +112,20 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
         tips={tips}
         useHtmlRenderer={isHTML}
       />
+
+      <CustomModal
+        visible={isExerciseMethodModalOpen}
+        onDismiss={() => setisExerciseMethodModalOpen(false)}
+      >
+        <CustomModal.Header>שיטת אימון</CustomModal.Header>
+        <CustomModal.Content style={{ gap: 16 }}>
+          <Text fontVariant="bold" fontSize={16} style={{ textAlign: "left" }}>
+            {exerciseMethod?.data.title}
+          </Text>
+
+          <HtmlBlock source={{ html: exerciseMethod?.data.description || "" }} />
+        </CustomModal.Content>
+      </CustomModal>
     </>
   );
 };
