@@ -3,7 +3,6 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   RefreshControl,
-  ScrollView,
 } from "react-native";
 import React, { useMemo } from "react";
 import useArticleQuery from "@/hooks/queries/articles/useArticleQuery";
@@ -14,12 +13,16 @@ import ArticleCard from "../ArticleCard";
 import { ConditionalRender } from "../../ui/ConditionalRender";
 import ErrorScreen from "@/screens/ErrorScreen";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
+import { useQueryClient } from "@tanstack/react-query";
+import { ARTICLE_KEY } from "@/constants/reactQuery";
 
 interface ArticleGroupContentProps {
   groupId: string;
 }
 
 const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) => {
+  const queryClient = useQueryClient();
+
   const { layout, spacing, text } = useStyles();
   const { isRefreshing } = usePullDownToRefresh();
 
@@ -29,7 +32,6 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
     fetchNextPage,
     isLoading,
     isError,
-    refetch,
   } = useArticleQuery(groupId);
 
   const articles = useMemo(() => {
@@ -38,10 +40,10 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
       return <Text style={[text.textCenter, spacing.pdXl]}>לא נמצאו מאמרים לקבוצה זו</Text>;
 
     return articles.map((article) => <ArticleCard key={article._id} article={article} />);
-  }, [articleRes]);
+  }, [articleRes?.pageParams, articleRes?.pages]);
 
   const handleRefresh = () => {
-    refetch();
+    queryClient.invalidateQueries({ queryKey: [ARTICLE_KEY + groupId] });
   };
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
