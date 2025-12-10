@@ -87,7 +87,7 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
             onChangeState={handleVideoStateChange}
             initialPlayerParams={{ loop: false, rel: false }}
             width={Platform.OS == `ios` ? videoWidth * 0.95 : videoWidth}
-            height={Platform.OS == `ios` ? videoHeight * 0.85 : videoHeight}
+            height={Platform.OS == `ios` ? videoHeight * 0.75 : videoHeight}
             videoId={videoId}
             webViewStyle={styles.video}
           />

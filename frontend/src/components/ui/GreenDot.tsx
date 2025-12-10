@@ -23,7 +23,7 @@ const GreenDot: React.FC<GreenDotProps> = ({ size = 8, filled = 1 }) => {
     >
       <View
         style={{
-          width: size * filled,
+          width: size * filled - 0.5,
           height: size,
           ...backgroundSuccess,
         }}

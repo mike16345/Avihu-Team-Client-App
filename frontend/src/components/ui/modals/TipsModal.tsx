@@ -51,7 +51,12 @@ const TipsModal: React.FC<TipsModalProps> = ({
         </ConditionalRender>
 
         <ConditionalRender condition={tips.length !== 0}>
-          <ScrollView contentContainerStyle={[spacing.pdVerticalMd]}>{Tips}</ScrollView>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[spacing.pdVerticalMd]}
+          >
+            {Tips}
+          </ScrollView>
         </ConditionalRender>
       </CustomModal.Content>
     </CustomModal>

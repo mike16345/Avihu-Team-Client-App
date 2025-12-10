@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { useToastStore } from "@/store/toastStore";
 import Toast from "./Toast";
 import useStyles from "@/styles/useGlobalStyles";
@@ -11,6 +11,7 @@ interface ToastContainerProps {
 
 const ToastContainer: FC<ToastContainerProps> = ({ modalToasts }) => {
   const { layout, spacing } = useStyles();
+  const { width } = useWindowDimensions();
 
   const toasts = useToastStore((state) => state.toasts);
   const removeToast = useToastStore((state) => state.removeToast);
@@ -26,7 +27,7 @@ const ToastContainer: FC<ToastContainerProps> = ({ modalToasts }) => {
         layout.justifyEnd,
         layout.itemsCenter,
         spacing.gapDefault,
-        { position: "absolute", bottom: 100, left: modalToasts ? 15 : 0 },
+        { position: "absolute", bottom: 100, width },
       ]}
     >
       {toastsToUse.slice(-3).map((toast) => (
