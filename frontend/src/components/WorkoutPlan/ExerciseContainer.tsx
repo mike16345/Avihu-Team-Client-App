@@ -1,19 +1,14 @@
 import { Image, Platform, Pressable, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useMemo } from "react";
 import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
 import { IExercise } from "@/interfaces/Workout";
-import {
-  buildPhotoUrl,
-  extractVideoId,
-  getNextSetNumberFromSession,
-  getYouTubeThumbnail,
-} from "@/utils/utils";
+import { buildPhotoUrl, extractVideoId, getYouTubeThumbnail } from "@/utils/utils";
 import { useNavigation } from "@react-navigation/native";
 import { WorkoutStackParamListNavigationProp } from "@/types/navigatorTypes";
-import useWorkoutSession from "@/hooks/sessions/useWorkoutSession";
 import PreviousSetCard from "./RecordExercise/PreviousSetCard";
+import { useWorkoutSessionStore } from "@/store/workoutSessionStore";
 
 interface ExerciseContainerProps {
   exercise: IExercise;
@@ -26,8 +21,13 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({ exercise, muscleG
   const { common, layout, spacing } = useStyles();
   const { exerciseId } = exercise;
   const { navigate } = useNavigation<WorkoutStackParamListNavigationProp>();
-  const { session } = useWorkoutSession();
-  const [setNumber, setSetNumber] = useState(1);
+  const { workoutSession, getNextSetNumber } = useWorkoutSessionStore();
+
+  const setNumber = useMemo(() => {
+    if (!workoutSession) return 1;
+
+    return getNextSetNumber(plan, exercise.exerciseId.name);
+  }, [exercise.exerciseId.name, plan, workoutSession]);
 
   const getExerciseImage = () => {
     return exerciseId.imageUrl
@@ -39,21 +39,9 @@ const ExerciseContainer: React.FC<ExerciseContainerProps> = ({ exercise, muscleG
     navigate("RecordExercise", {
       exercise,
       muscleGroup,
-      setNumber,
       plan: plan,
     });
   };
-
-  useEffect(() => {
-    if (!session) {
-      setSetNumber(1);
-      return;
-    }
-
-    const nextSet = getNextSetNumberFromSession(session, plan, exercise.exerciseId.name);
-
-    setSetNumber(nextSet);
-  }, [session, session?.updatedAt, plan, exerciseId]);
 
   return (
     <Pressable

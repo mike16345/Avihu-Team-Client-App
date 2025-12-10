@@ -7,7 +7,7 @@ import Animated, { Easing, LinearTransition } from "react-native-reanimated";
 import { IExercise, IRecordedSet } from "@/interfaces/Workout";
 import SetInputList from "./SetInputList";
 import PreviousSetCard from "./PreviousSetCard";
-import useGetLastRecordedSet from "@/hooks/queries/RecordedSets/useLastRecordedSetQuery";
+import { useGetLastRecordedSetForSetNumber } from "@/hooks/queries/RecordedSets/useLastRecordedSetQuery";
 import { isIndexOutOfBounds } from "@/utils/utils";
 import {
   DEFAULT_PAGE_TOP_PADDING,
@@ -27,7 +27,7 @@ interface SetInputContainerProps {
   setNumber: number;
   maxSets: number;
   exercise: IExercise;
-  handleRecordSets: (sets: SetInput[]) => Promise<number>;
+  handleRecordSets: (sets: SetInput[]) => Promise<number | undefined>;
 }
 
 export type SetInput = Omit<IRecordedSet, "plan">;
@@ -39,8 +39,11 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   sheetHeight,
   exercise,
 }) => {
-  const lastRecordedSets = useGetLastRecordedSet(exercise.exerciseId.name).lastRecordedSets;
   const { layout, colors, spacing, common } = useStyles();
+  const lastRecordedSetForSetNumber = useGetLastRecordedSetForSetNumber(
+    exercise.exerciseId.name,
+    setNumber
+  );
   const setIsSheetExpanded = useLayoutStore((state) => state.setIsSheetExpanded);
   const topoffset = IS_IOS
     ? TOP_BAR_HEIGHT
@@ -50,7 +53,10 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   const [containerHeight, setContainerHeight] = useState(0);
   const [isPending, setIsPending] = useState(false);
   const [recordedSets, setRecordedSets] = useState<SetInput[]>(() => {
-    const defaultSet = lastRecordedSets[lastRecordedSets.length - 1] ?? DEFAULT_SET;
+    const defaultSet = lastRecordedSetForSetNumber ?? {
+      weight: DEFAULT_SET.weight,
+      repsDone: exercise.sets[setNumber - 1].minReps,
+    };
 
     return [
       {
@@ -71,7 +77,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
 
   const handleSubmitSets = async () => {
     setIsPending(true);
-    const nextSet = await handleConfirmRecordSets();
+    const nextSet = (await handleConfirmRecordSets()) ?? setNumber;
 
     setIsPending(false);
     handleResetSets(nextSet, recordedSets[recordedSets.length - 1]?.weight || 0);
@@ -94,57 +100,6 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
 
   return (
     <>
-      {/* <BottomSheetModal
-        peek={IS_IOS ? height * 0.5 : sheetHeight}
-        onOpenChange={(isExpanded) => {
-          setIsExpanded(isExpanded);
-          setIsSheetExpanded(isExpanded);
-        }}
-        visible={isExpanded}
-        renderHandle={({ toggle, isOpen }) => (
-          <Pressable onPress={toggle}>
-            <Icon rotation={isOpen ? 180 : 0} name={"arrowRoundUp"} />
-          </Pressable>
-        )}
-        onClose={handleCloseModal}
-        onLayout={(e) => {
-          if (e.nativeEvent.layout.height !== containerHeight)
-            setContainerHeight(e.nativeEvent.layout.height);
-        }}
-      >
-        <View
-          style={[
-            layout.flex1,
-            isExpanded ? layout.justifyBetween : spacing.gapLg,
-            common.roundedMd,
-            colors.backgroundSurface,
-            styles.inputContainer,
-            { overflow: "hidden" },
-          ]}
-        >
-          <SetInputList
-            recordedSets={recordedSets}
-            setRecordedSets={setRecordedSets}
-            maxSets={maxSets}
-            containerHeight={containerHeight}
-            isExpanded={isExpanded}
-          />
-          <Animated.View
-            style={[spacing.gapLg]}
-            layout={LinearTransition.duration(250).easing(Easing.inOut(Easing.ease))}
-          >
-            {isExpanded && <PreviousSetCard exercise={exercise.exerciseId.name} />}
-            <PrimaryButton
-              disabled={recordedSets[recordedSets.length - 1].setNumber > maxSets}
-              loading={isPending}
-              onPress={() => handleSubmitSets()}
-              block
-            >
-              עדכון
-            </PrimaryButton>
-          </Animated.View>
-        </View>
-      </BottomSheetModal> */}
       <FixedRangeBottomDrawer
         onStateChange={handleStateChange}
         minHeight={
