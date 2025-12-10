@@ -123,7 +123,7 @@ const ExerciseVideo: FC<ExerciseVideoProps> = ({ exercise }) => {
               onReady={onReady}
               onChangeState={handleVideoStateChange}
               initialPlayerParams={{ loop: true, rel: false }}
-              webViewStyle={{ height: VIDEO_HEIGHT }}
+              webViewStyle={{ height: VIDEO_HEIGHT - 30 }}
               viewContainerStyle={{ height: VIDEO_HEIGHT }}
             />
             {isLoading && (

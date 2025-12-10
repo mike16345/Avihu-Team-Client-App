@@ -7,7 +7,7 @@ import { IExercise } from "@/interfaces/Workout";
 import useStyles from "@/styles/useGlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { FC, useEffect, useState } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, ScrollView } from "react-native";
 import RestTimer from "./RestTimer";
 import { useTimerStore } from "@/store/timerStore";
 import { Text } from "@/components/ui/Text";
@@ -123,7 +123,9 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
             {exerciseMethod?.data.title}
           </Text>
 
-          <HtmlBlock source={{ html: exerciseMethod?.data.description || "" }} />
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <HtmlBlock source={{ html: exerciseMethod?.data.description || "" }} />
+          </ScrollView>
         </CustomModal.Content>
       </CustomModal>
     </>

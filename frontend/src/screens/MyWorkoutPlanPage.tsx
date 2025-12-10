@@ -89,7 +89,7 @@ const MyWorkoutPlanScreen = () => {
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
         topShadow={true}
         topShadowFirstColor="#F4F4F4"
-        scrollShadowStyleTop={{ top: -7 }}
+        scrollShadowStyleTop={{ top: 0 }}
       >
         <ConditionalRender condition={showCardio}>
           <CardioWrapper cardioPlan={data?.cardio} />
