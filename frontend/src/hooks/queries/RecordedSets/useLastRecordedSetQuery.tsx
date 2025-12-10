@@ -65,6 +65,41 @@ function computeForExercise(
   return { formattedSets, lastRecordedSets: sameDaySets, date };
 }
 
+function findLastSetForSetNumber(
+  data: any[],
+  exercise: string,
+  targetSetNumber: number
+): IRecordedSetRes | null {
+  if (!data?.length) return null;
+
+  let lastMatch: IRecordedSetRes | null = null;
+
+  for (const item of data) {
+    const sets = item?.recordedSets?.[exercise];
+    if (!Array.isArray(sets)) continue;
+
+    for (const s of sets) {
+      if (s?.setNumber !== targetSetNumber || !s?.date) continue;
+
+      const setDate = new Date(s.date);
+      if (!lastMatch || (lastMatch.date && setDate > new Date(lastMatch.date))) {
+        lastMatch = s;
+      }
+    }
+  }
+
+  return lastMatch;
+}
+
+export const useGetLastRecordedSetForSetNumber = (exercise: string, setNumber: number) => {
+  const { data } = useRecordedSetsQuery();
+
+  return useMemo<IRecordedSetRes | null>(() => {
+    if (!data) return null;
+    return findLastSetForSetNumber(data, exercise, setNumber);
+  }, [data, exercise, setNumber]);
+};
+
 const useGetLastRecordedSet = (exercise: string) => {
   const { data } = useRecordedSetsQuery();
 

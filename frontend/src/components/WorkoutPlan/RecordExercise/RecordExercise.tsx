@@ -9,8 +9,6 @@ import { useRecordedSetsMutations } from "@/hooks/mutations/useRecordedSetsMutat
 import { useUserStore } from "@/store/userStore";
 import { IMuscleGroupRecordedSets } from "@/interfaces/Workout";
 import { useToast } from "@/hooks/useToast";
-import useWorkoutSession from "@/hooks/sessions/useWorkoutSession";
-import { getNextSetNumberFromSession } from "@/utils/utils";
 import PreviousSetCard from "./PreviousSetCard";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import RecordedSetsHistoryModal from "./RecordedSetsHistoryModal";
@@ -19,6 +17,7 @@ import { AddRecordedSets } from "@/hooks/api/useRecordedSetsApi";
 import { useTimerStore } from "@/store/timerStore";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { DEFAULT_PAGE_TOP_PADDING } from "@/constants/Constants";
+import { useWorkoutSessionStore } from "@/store/workoutSessionStore";
 
 interface RecordExerciseProps
   extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordExercise"> {}
@@ -36,7 +35,8 @@ function hasRecordedSets(data: IMuscleGroupRecordedSets[], exercise: string) {
 }
 
 const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
-  const { exercise, setNumber, muscleGroup, plan } = route?.params! || {};
+  const { exercise, muscleGroup, plan } = route?.params! || {};
+  const tabBarHeight = useBottomTabBarHeight();
 
   const { data } = useRecordedSetsQuery();
   const { useAddRecordedSets: addRecordedSets } = useRecordedSetsMutations();
@@ -45,14 +45,13 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const setCountdown = useTimerStore((state) => state.setCountdown);
 
   const { layout, colors, spacing } = useStyles();
-  const { session, handleSetLocalSession } = useWorkoutSession();
+  const { workoutSession, getNextSetNumber, setWorkoutSession } = useWorkoutSessionStore();
   const { triggerSuccessToast, triggerErrorToast } = useToast();
 
   const [containerHeight, setContainerHeight] = useState(0);
-
-  const tabBarHeight = useBottomTabBarHeight();
-
-  const [currentSet, setCurrentSet] = useState(setNumber || 1);
+  const [currentSet, setCurrentSet] = useState(() =>
+    getNextSetNumber(plan, exercise.exerciseId.name)
+  );
 
   const sheetHeight = useMemo(() => {
     const windowHeight = Dimensions.get("screen").height;
@@ -78,19 +77,14 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
             return { ...set, plan };
           }),
         };
-
         const response = await addRecordedSets.mutateAsync({
           recordedSets: recordedSetsToPost,
-          sessionId: session?._id,
+          sessionId: workoutSession?._id,
         });
-        const nextSet = getNextSetNumberFromSession(
-          response.session,
-          plan,
-          exercise?.exerciseId.name
-        );
+        const nextSet = getNextSetNumber(plan, exercise?.exerciseId.name, response.session);
 
-        handleSetLocalSession({ ...response.session });
         setCurrentSet(nextSet);
+        setWorkoutSession({ ...response.session });
         triggerSuccessToast({
           title: "עודכן בהצלחה",
           message: "הנתונים זמינים לצפייה בהיסטוריית הביצועים",
@@ -102,7 +96,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
         triggerErrorToast({ message: e.message });
       }
     },
-    [exercise, setNumber, muscleGroup, plan, session]
+    [exercise, muscleGroup, plan, workoutSession, addRecordedSets, setCountdown, setWorkoutSession]
   );
 
   const hasRecordedSetsHistory = useMemo(() => {
