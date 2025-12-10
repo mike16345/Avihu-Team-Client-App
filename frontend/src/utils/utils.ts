@@ -235,6 +235,11 @@ export function getTotalCaloriesInMeal(meal: IMeal) {
   return totalEaten || 0;
 }
 
+export function removeMealFromTotalCalories(caloriesToRemove: number, totalCalories: number) {
+  const newTotal = totalCalories - caloriesToRemove;
+  return newTotal < 0 ? 0 : newTotal;
+}
+
 type mapToDropDownItemOptions<T> = {
   labelKey: keyof T;
   valueKey: keyof T;
@@ -292,7 +297,7 @@ export function extractValuesFromArray<T, K extends keyof T>(array: T[], key: K)
 
 export function extractValuesFromObject<
   T extends Record<string, any>,
-  K extends keyof T[keyof T] = never,
+  K extends keyof T[keyof T] = never
 >(obj: T, innerKey?: K): (K extends never ? string : T[keyof T][K])[] {
   const keys = Object.keys(obj);
 
