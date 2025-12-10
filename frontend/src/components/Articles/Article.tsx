@@ -77,6 +77,7 @@ const Article = () => {
           <ScrollView
             style={[layout.flex1, spacing.pdHorizontalMd]}
             nestedScrollEnabled
+            showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
             }
