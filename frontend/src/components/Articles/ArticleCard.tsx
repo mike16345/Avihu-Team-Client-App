@@ -15,7 +15,7 @@ interface ArticleCardProps {
 }
 
 const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
-  const { colors, common, layout, spacing, text } = useStyles();
+  const { common, layout, spacing, text } = useStyles();
 
   const navigation = useNavigation<NativeStackNavigationProp<ArticleStackParamsList>>();
 
@@ -30,7 +30,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
           <Text fontVariant="semibold" fontSize={16} style={[text.textLeft, { paddingBottom: 4 }]}>
             {article.title}
           </Text>
-          <HtmlBlock source={{ html: article.content.slice(0, 100) }} contentWidth={30} />
+          <HtmlBlock source={{ html: article.content.slice(0, 150) }} />
         </Card.Header>
         <Card.Content>
           <ArticleImage imageUrl={article.imageUrl} linkToVideo={article.link} />
