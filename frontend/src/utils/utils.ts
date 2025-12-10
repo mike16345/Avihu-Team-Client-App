@@ -235,6 +235,11 @@ export function getTotalCaloriesInMeal(meal: IMeal) {
   return totalEaten || 0;
 }
 
+export function removeMealFromTotalCalories(caloriesToRemove: number, totalCalories: number) {
+  const newTotal = totalCalories - caloriesToRemove;
+  return newTotal < 0 ? 0 : newTotal;
+}
+
 type mapToDropDownItemOptions<T> = {
   labelKey: keyof T;
   valueKey: keyof T;

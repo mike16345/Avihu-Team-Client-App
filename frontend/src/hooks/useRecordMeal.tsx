@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IMeal } from "@/interfaces/DietPlan";
-import { generateUniqueId, getTotalCaloriesInMeal } from "@/utils/utils";
+import {
+  generateUniqueId,
+  getTotalCaloriesInMeal,
+  removeMealFromTotalCalories,
+} from "@/utils/utils";
 import { useDietPlanStore } from "@/store/useDietPlanStore";
 
 const SESSION_KEY = "RecordedMealSession";
@@ -114,6 +118,7 @@ export function useRecordMeal() {
 
     if (!session) return;
     const totalCalories = getTotalCaloriesInMeal(meal);
+
     const recordedMeal: RecordedMeal = {
       id: meal._id,
       name: `ארוחה ${mealNumber + 1}`,
@@ -141,10 +146,15 @@ export function useRecordMeal() {
     const session = await getSessionFromStorage();
     if (!session) return;
 
+    const mealToCancel = session.meals.find((m) => m.id === mealId);
+    if (!mealToCancel) return;
+
+    const caloriesToRemove = mealToCancel.calories;
+    const deducedCount = removeMealFromTotalCalories(caloriesToRemove, totalCaloriesEaten);
     const updatedMeals = session.meals.filter((m) => m.id !== mealId);
     const updated: RecordedMealSession = { ...session, meals: updatedMeals };
-    const total = updatedMeals.reduce((sum, m) => sum + m.calories, 0);
-    setTotalCaloriesEaten(total);
+
+    setTotalCaloriesEaten(deducedCount);
 
     await persist(updated);
 
