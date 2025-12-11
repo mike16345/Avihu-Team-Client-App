@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { ISession } from "@/interfaces/ISession";
+import { ONE_HOUR } from "@/constants/reactQuery";
 
 export function getNextSetNumberFromSession(
   session: ISession | null,
@@ -14,6 +15,7 @@ export function getNextSetNumberFromSession(
 
   return (exerciseData?.setNumber as number) || 1;
 }
+const SESSION_TTL_MS = ONE_HOUR * 6; // 6 hours
 
 export interface IWorkoutSessionStore {
   workoutSession: ISession | null;
@@ -43,6 +45,18 @@ export const useWorkoutSessionStore = create<IWorkoutSessionStore>()(
     {
       name: "workout-session-store",
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: () => (state) => {
+        const session = state?.workoutSession as any;
+        if (!session?.updatedAt || !state) return;
+
+        const lastUpdateMs = new Date(session.updatedAt).getTime();
+        if (Number.isNaN(lastUpdateMs)) return;
+
+        const ageMs = Date.now() - lastUpdateMs;
+        if (ageMs > SESSION_TTL_MS) {
+          state.clearWorkoutSession();
+        }
+      },
       partialize: (state) => ({ workoutSession: state.workoutSession }),
     }
   )

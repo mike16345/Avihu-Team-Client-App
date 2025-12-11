@@ -18,7 +18,6 @@ import { WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 import { Text } from "@/components/ui/Text";
 import { useShadowStyles } from "@/styles/useShadowStyles";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
-import useWorkoutSessionQuery from "@/hooks/queries/useWorkoutSessionQuery";
 
 const MyWorkoutPlanScreen = () => {
   const { colors, layout, spacing, common } = useStyles();
@@ -26,7 +25,6 @@ const MyWorkoutPlanScreen = () => {
   const { refresh } = usePullDownToRefresh();
 
   const { data, isError, isLoading, error, refetch, isRefetching } = useWorkoutPlanQuery();
-  const { isLoading: isWorkoutSessionLoading } = useWorkoutSessionQuery();
 
   const [selectedPlan, setSelectedPlan] = useState<IWorkoutPlan>();
   const [showCardio, setShowCardio] = useState(false);
@@ -69,7 +67,7 @@ const MyWorkoutPlanScreen = () => {
   if (isError)
     return <ErrorScreen refetchFunc={() => refresh(handleRefetch)} isFetching={isRefetching} />;
 
-  if (isLoading || isWorkoutSessionLoading) return <WorkoutPlanSkeletonLoader />;
+  if (isLoading) return <WorkoutPlanSkeletonLoader />;
 
   return (
     <View style={[layout.flex1, colors.background, spacing.pdStatusBar]}>

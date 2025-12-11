@@ -18,12 +18,14 @@ import useBackgroundTasks from "@/hooks/useBackgroundTasks";
 import { useEffect } from "react";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { HtmlRenderProvider } from "@/navigators/providers/HTMLRendererProvider";
+import { useWorkoutSessionExpiryWatcher } from "@/hooks/useWorkoutSessionExpiryWatcher";
 
 export default function App() {
   const ready = useOneTimeRTLFix();
   const colorScheme = Appearance.getColorScheme();
   const [loaded] = useCustomFonts();
   const { registerBackgroundTask, runTaskOnAppOpen } = useBackgroundTasks();
+  useWorkoutSessionExpiryWatcher();
 
   useEffect(() => {
     registerBackgroundTask();
