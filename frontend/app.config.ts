@@ -8,7 +8,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...config,
     name: "Avihu Team",
     slug: "avihu-team",
-    version: "2.0.5",
+    version: "2.0.4",
     orientation: "portrait",
     icon: "./assets/app-logo.png",
     userInterfaceStyle: "automatic",

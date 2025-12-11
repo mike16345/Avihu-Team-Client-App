@@ -19,7 +19,6 @@ export interface IWorkoutSessionStore {
   workoutSession: ISession | null;
   getNextSetNumber: (plan: string, exercise: string, serverSession?: ISession) => number;
   setWorkoutSession: (data: ISession) => void;
-
   clearWorkoutSession: () => void;
 }
 
