@@ -2,7 +2,7 @@ import { View, Pressable, StyleSheet, StatusBar } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import Icon from "@/components/Icon/Icon";
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import Animated, { Easing, LinearTransition } from "react-native-reanimated";
 import { IExercise, IRecordedSet } from "@/interfaces/Workout";
 import SetInputList from "./SetInputList";
@@ -53,9 +53,14 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   const [containerHeight, setContainerHeight] = useState(0);
   const [isPending, setIsPending] = useState(false);
   const [recordedSets, setRecordedSets] = useState<SetInput[]>(() => {
+    const isOutOfBounds = isIndexOutOfBounds(exercise.sets, setNumber);
+    const reps = isOutOfBounds
+      ? exercise.sets[exercise.sets.length - 1].minReps
+      : exercise.sets[setNumber].minReps;
+
     const defaultSet = lastRecordedSetForSetNumber ?? {
       weight: DEFAULT_SET.weight,
-      repsDone: exercise.sets[setNumber - 1].minReps,
+      repsDone: reps,
     };
 
     return [
@@ -98,6 +103,10 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
     return await handleRecordSets(recordedSets);
   }, [recordedSets, handleRecordSets]);
 
+  const isRecordedSetsDisabled = useMemo(() => {
+    return recordedSets[recordedSets.length - 1].setNumber > maxSets;
+  }, [recordedSets[recordedSets.length - 1].setNumber, maxSets]);
+
   return (
     <>
       <FixedRangeBottomDrawer
@@ -125,7 +134,11 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
             common.roundedMd,
             colors.backgroundSurface,
             styles.inputContainer,
-            { overflow: "hidden" },
+            {
+              overflow: "hidden",
+              pointerEvents: isRecordedSetsDisabled ? "none" : "auto",
+              opacity: isRecordedSetsDisabled ? 0.5 : 1,
+            },
           ]}
         >
           <SetInputList
