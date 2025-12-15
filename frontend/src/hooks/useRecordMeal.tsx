@@ -25,6 +25,7 @@ interface RecordedMealSession {
   startedAt: string;
   meals: RecordedMeal[];
   freeCaloriesConsumed: boolean;
+  freeCalories: number;
   expiresAt: string;
   active: boolean;
 }
@@ -59,6 +60,7 @@ export function useRecordMeal() {
       expiresAt: new Date(Date.now() + SESSION_EXPIRY_HOURS * 60 * 60 * 1000).toISOString(),
       meals: [],
       freeCaloriesConsumed: false,
+      freeCalories: 0,
       active: true,
     };
 
@@ -104,6 +106,7 @@ export function useRecordMeal() {
     if (!session) return;
 
     session.freeCaloriesConsumed = hasConsumed;
+    session.freeCalories = calories;
     await persist(session);
 
     const newCalorieCount = hasConsumed
@@ -178,7 +181,9 @@ export function useRecordMeal() {
     }
 
     const totalCalories = session.meals.reduce((acc, m) => acc + m.calories, 0);
-    setTotalCaloriesEaten(totalCalories, true);
+    const freeCalories = session.freeCaloriesConsumed ? session.freeCalories : 0;
+
+    setTotalCaloriesEaten(totalCalories + freeCalories, true);
     setSession(session);
   };
 
