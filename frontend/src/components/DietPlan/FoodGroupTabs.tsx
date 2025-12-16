@@ -57,7 +57,7 @@ const FoodGroupTabs = () => {
       value={selectedTab || tabNames[0]}
       onValueChange={setSelectedTab}
     >
-      <View style={[spacing.gap20, { paddingBottom: 100 }, spacing.pdHorizontalMd]}>
+      <View style={[spacing.gap20, spacing.pdBottomBar, spacing.pdHorizontalMd]}>
         <TabsList>{tabTriggers}</TabsList>
         {tabContent}
       </View>
