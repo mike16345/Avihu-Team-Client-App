@@ -9,6 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArticleStackParamsList } from "@/types/navigatorTypes";
 import HtmlBlock from "../ui/HTMLBlock";
+import { ConditionalRender } from "../ui/ConditionalRender";
 
 interface ArticleCardProps {
   article: IArticle;
@@ -30,7 +31,16 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
           <Text fontVariant="semibold" fontSize={16} style={[text.textLeft, { paddingBottom: 4 }]}>
             {article.title}
           </Text>
-          <HtmlBlock source={{ html: article.content.slice(0, 150) }} />
+
+          <ConditionalRender condition={!!article.subtitle}>
+            <Text style={{ textAlign: "left" }} fontSize={14}>
+              {article.subtitle}
+            </Text>
+          </ConditionalRender>
+
+          <ConditionalRender condition={!article.subtitle}>
+            <HtmlBlock source={{ html: article.content.slice(0, 150) }} />
+          </ConditionalRender>
         </Card.Header>
         <Card.Content>
           <ArticleImage imageUrl={article.imageUrl} linkToVideo={article.link} />
