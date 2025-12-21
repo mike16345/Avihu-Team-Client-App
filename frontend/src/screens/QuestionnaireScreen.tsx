@@ -1,9 +1,12 @@
+import Icon from "@/components/Icon/Icon";
+import IconButton from "@/components/ui/buttons/IconButton";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
+import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 import Input from "@/components/ui/inputs/Input";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { FC } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const fields = [
@@ -21,19 +24,35 @@ const QuestionnaireScreen: FC = () => {
   return (
     <SafeAreaView style={[layout.flex1, colors.background, spacing.gap30, spacing.pdHorizontalLg]}>
       <View style={spacing.gapSm}>
+        <View
+          style={[
+            layout.flexRow,
+            layout.itemsCenter,
+            spacing.gap14,
+            colors.backgroundSurface,
+            { width: 100 },
+            common.rounded,
+            spacing.pdXs,
+          ]}
+        >
+          <TouchableOpacity>
+            <Icon name="chevronRightBig" />
+          </TouchableOpacity>
+          <Text fontVariant="bold">1 מתוך 3</Text>
+        </View>
         <Text
           fontVariant="extrabold"
           fontSize={28}
           style={[colors.textPrimary, { textAlign: "left" }]}
         >
-          כותרת
+          פרטים אישיים
         </Text>
         <Text
           fontVariant="regular"
           fontSize={16}
           style={[styles.subtitle, , { textAlign: "left" }]}
         >
-          היי! יש לך עדיין חשבון?
+          נא למלא פרטים אישיים
         </Text>
       </View>
       <ScrollView
@@ -52,9 +71,14 @@ const QuestionnaireScreen: FC = () => {
           ))}
         </View>
       </ScrollView>
-      <PrimaryButton block style={styles.ctaButton}>
-        הבא
-      </PrimaryButton>
+      <View style={[layout.flexRow, spacing.gapDefault]}>
+        <PrimaryButton mode="light" block style={styles.ctaButton}>
+          חזור
+        </PrimaryButton>
+        <PrimaryButton block style={styles.ctaButton}>
+          הבא
+        </PrimaryButton>
+      </View>
     </SafeAreaView>
   );
 };
@@ -76,6 +100,7 @@ const styles = StyleSheet.create({
   },
   ctaButton: {
     marginTop: 8,
+    width: "49%",
   },
 });
 
