@@ -9,54 +9,52 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const fields = [
   { label: "שם פרטי", value: "אביהו" },
   { label: "שם משפחה", value: "בושרי" },
-  { label: "קוד אמינות", value: "596HG" },
-  { label: "קוד אמינות", value: "596HG" },
-  { label: "קוד אמינות", value: "596HG" },
-  { label: "קוד אמינות", value: "596HG" },
+  { label: "מספר טךפון", value: "0546107337" },
+  { label: "כתובת", value: "נחל ירקון 36" },
+  { label: "משקל", value: "85 קג" },
+  { label: "גובה", value: "1.78 ס'מ" },
 ];
 
 const QuestionnaireScreen: FC = () => {
   const { spacing, layout, colors, common } = useStyles();
 
   return (
-    <SafeAreaView style={[layout.flex1, colors.background]}>
+    <SafeAreaView style={[layout.flex1, colors.background, spacing.gap30, spacing.pdHorizontalLg]}>
+      <View style={spacing.gapSm}>
+        <Text
+          fontVariant="extrabold"
+          fontSize={28}
+          style={[colors.textPrimary, { textAlign: "left" }]}
+        >
+          כותרת
+        </Text>
+        <Text
+          fontVariant="regular"
+          fontSize={16}
+          style={[styles.subtitle, , { textAlign: "left" }]}
+        >
+          היי! יש לך עדיין חשבון?
+        </Text>
+      </View>
       <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          spacing.pdHorizontalLg,
-          spacing.pdVerticalXl,
-          spacing.gapXl,
-        ]}
+        contentContainerStyle={[styles.content, spacing.gapXl]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={spacing.gapSm}>
-          <Text fontVariant="extrabold" fontSize={28} style={colors.textPrimary}>
-            כותרת
-          </Text>
-          <Text fontVariant="regular" fontSize={16} style={styles.subtitle}>
-            היי! יש לך עדיין חשבון?
-          </Text>
-        </View>
-
-        <View
-          style={[
-            spacing.gapMd,
-            spacing.pdLg,
-            common.roundedMd,
-            colors.backgroundSurface,
-            styles.formPanel,
-          ]}
-        >
+        <View style={[spacing.gapLg, common.roundedMd]}>
           {fields.map((field, index) => (
-            <Input key={`${field.label}-${index}`} label={field.label} defaultValue={field.value} />
+            <Input
+              key={`${field.label}-${index}`}
+              label={field.label}
+              defaultValue={field.value}
+              style={[colors.backgroundSurface]}
+            />
           ))}
         </View>
-
-        <PrimaryButton block style={styles.ctaButton}>
-          הבא
-        </PrimaryButton>
       </ScrollView>
+      <PrimaryButton block style={styles.ctaButton}>
+        הבא
+      </PrimaryButton>
     </SafeAreaView>
   );
 };
