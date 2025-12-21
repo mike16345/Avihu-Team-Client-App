@@ -4,12 +4,13 @@ import ProfileScreen from "@/screens/ProfileScreen";
 import { RootStackParamList } from "@/types/navigatorTypes";
 import ChatHeader from "@/components/chat/ChatHeader";
 import ChatScreen from "@/screens/ChatScreen";
+import QuestionnaireScreen from "@/screens/QuestionnaireScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator initialRouteName="BottomTabs" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
       <Stack.Screen
         name="Profile"
@@ -25,6 +26,7 @@ export default function AppNavigator() {
           headerShown: true,
         }}
       />
+      <Stack.Screen name="Questionnaire" component={QuestionnaireScreen} />
     </Stack.Navigator>
   );
 }
