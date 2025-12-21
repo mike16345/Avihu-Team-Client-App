@@ -75,25 +75,20 @@ const SectionScreen: FC<SectionScreenProps> = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView style={[layout.flex1, colors.background, styles.rtl]}>
+    <SafeAreaView style={[layout.flex1, colors.background, styles.rtl, spacing.pdHorizontalLg]}>
       {/* <BackButton backIcon="chevronRightBig" /> */}
+      <View style={styles.stepPill}>
+        <Text fontVariant="bold" style={styles.stepPillText}>
+          {`שלב ${stepIndex + 1} מתוך ${sections.length}`}
+        </Text>
+      </View>
       <ScrollView
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.content,
-          spacing.pdHorizontalLg,
-          spacing.pdVerticalXl,
-          spacing.gapXl,
-        ]}
+        contentContainerStyle={[styles.content, spacing.pdVerticalXl, spacing.gapXl]}
       >
         <View style={[styles.topBar, styles.rtl]}>
           <View style={[spacing.gapSm]}>
-            <View style={styles.stepPill}>
-              <Text fontVariant="bold" style={styles.stepPillText}>
-                {`שלב ${stepIndex + 1} מתוך ${sections.length}`}
-              </Text>
-            </View>
             <Text fontVariant="extrabold" fontSize={28} style={[colors.textPrimary, styles.right]}>
               {section.title}
             </Text>
@@ -113,11 +108,10 @@ const SectionScreen: FC<SectionScreenProps> = ({ route, navigation }) => {
             />
           ))}
         </View>
-
-        <PrimaryButton block onPress={goNext} style={styles.ctaButton}>
-          {isLast ? "סיום" : "הבא"}
-        </PrimaryButton>
       </ScrollView>
+      <PrimaryButton block onPress={goNext} style={styles.ctaButton}>
+        {isLast ? "סיום" : "הבא"}
+      </PrimaryButton>
     </SafeAreaView>
   );
 };
@@ -161,6 +155,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 6,
     elevation: 3,
+    width: 100,
   },
   stepPillText: {
     color: "#072723",
