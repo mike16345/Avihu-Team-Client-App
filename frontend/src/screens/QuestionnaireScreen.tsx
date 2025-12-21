@@ -1,5 +1,6 @@
 import BackButton from "@/components/ui/BackButton";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
+import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 import Input from "@/components/ui/inputs/Input";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
@@ -9,7 +10,7 @@ import {
 } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { FC } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type QuestionnaireStackParamList = {
