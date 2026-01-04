@@ -18,7 +18,9 @@ type FormPresetScreenProps = StackNavigatorProps<RootStackParamList, "FormPreset
 };
 
 const FormPresetScreen = ({ route }: FormPresetScreenProps) => {
-  const { formId } = route.params;
+  /*   const { formId } = route.params; */
+
+  const formId = "695a951dbf9c367da2a2eed3";
   const { layout, spacing, colors } = useStyles();
   const setActiveFormId = useFormStore((state) => state.setActiveFormId);
   const { data, isLoading, isError, refetch } = useFormPresetById(formId);
@@ -52,9 +54,9 @@ const FormPresetScreen = ({ route }: FormPresetScreenProps) => {
   }
 
   return (
-    <SafeAreaView style={[layout.flex1, colors.background]}>
+    <View style={[layout.flex1, colors.background]}>
       <DynamicForm form={data} />
-    </SafeAreaView>
+    </View>
   );
 };
 

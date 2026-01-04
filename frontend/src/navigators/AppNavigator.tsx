@@ -27,7 +27,7 @@ export default function AppNavigator() {
           headerShown: true,
         }}
       /> */}
-      <Stack.Screen name="Questionnaire" component={QuestionnaireScreen} />
+      {/*      <Stack.Screen name="Questionnaire" component={QuestionnaireScreen} /> */}
       <Stack.Screen name="FormPreset" component={FormPresetScreen} />
     </Stack.Navigator>
   );
