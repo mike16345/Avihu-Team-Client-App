@@ -5,6 +5,7 @@ import { RootStackParamList } from "@/types/navigatorTypes";
 import ChatHeader from "@/components/chat/ChatHeader";
 import ChatScreen from "@/screens/ChatScreen";
 import QuestionnaireScreen from "@/screens/QuestionnaireScreen";
+import FormPresetScreen from "@/screens/FormPresetScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -27,6 +28,7 @@ export default function AppNavigator() {
         }}
       /> */}
       <Stack.Screen name="Questionnaire" component={QuestionnaireScreen} />
+      <Stack.Screen name="FormPreset" component={FormPresetScreen} />
     </Stack.Navigator>
   );
 }

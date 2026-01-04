@@ -11,6 +11,8 @@ import SplashScreen from "@/screens/SplashScreen";
 import { useToast } from "@/hooks/useToast";
 import AuthNavigator from "./AuthNavigator";
 import AppNavigator from "./AppNavigator";
+import { navigateFromRoot } from "./navigationRef";
+import useFormPresetNotifications from "@/hooks/useFormPresetNotifications";
 
 const RootNavigator = () => {
   const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
@@ -19,9 +21,14 @@ const RootNavigator = () => {
   const { currentUser, setCurrentUser } = useUserStore();
   const { data } = useUserQuery(currentUser?._id);
   const { checkUserSessionToken } = useUserApi();
-  const { initializeNotifications, requestPermissions, notificationReceivedListener } =
-    useNotification();
+  const {
+    initializeNotifications,
+    requestPermissions,
+    notificationReceivedListener,
+    notificationResponseListener,
+  } = useNotification();
   const { handleLogout } = useLogout();
+  useFormPresetNotifications();
 
   const [loading, setLoading] = useState(true);
 
@@ -69,9 +76,15 @@ const RootNavigator = () => {
     requestPermissions().catch((err) => console.log(err));
 
     const notificationListener = notificationReceivedListener();
+    const notificationTapListener = notificationResponseListener((data) => {
+      if (data?.type === "formPreset" && data?.formId) {
+        navigateFromRoot("FormPreset", { formId: data.formId });
+      }
+    });
 
     return () => {
       notificationListener?.remove();
+      notificationTapListener?.remove();
     };
   }, []);
 
