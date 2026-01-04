@@ -21,11 +21,7 @@ const FileUploadInput: React.FC<FileUploadInputProps> = ({ value, onChange }) =>
     <View style={[spacing.gapSm]}>
       <UploadDrawer
         handleUpload={handleUpload}
-        trigger={
-          <PrimaryButton mode="light">
-            העלאת קבצים
-          </PrimaryButton>
-        }
+        trigger={<PrimaryButton mode="light">העלאת קבצים</PrimaryButton>}
       />
       <Text fontSize={14} style={colors.textPrimary}>
         {value.length ? `נבחרו ${value.length} קבצים` : "לא נבחרו קבצים"}

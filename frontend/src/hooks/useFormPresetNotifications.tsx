@@ -22,11 +22,7 @@ const useFormPresetNotifications = () => {
   const { data } = useFormPresets();
   const { showNotification } = useNotification();
   const userId = useUserStore((state) => state.currentUser?._id);
-  const {
-    markNotificationShown,
-    hasShownNotification,
-    isFormCompleted,
-  } = useFormStore();
+  const { markNotificationShown, hasShownNotification, isFormCompleted } = useFormStore();
 
   useEffect(() => {
     if (!data || !userId) return;
@@ -53,7 +49,14 @@ const useFormPresetNotifications = () => {
     };
 
     notify().catch((error) => console.log(error));
-  }, [data, userId, showNotification, hasShownNotification, isFormCompleted, markNotificationShown]);
+  }, [
+    data,
+    userId,
+    showNotification,
+    hasShownNotification,
+    isFormCompleted,
+    markNotificationShown,
+  ]);
 };
 
 export default useFormPresetNotifications;

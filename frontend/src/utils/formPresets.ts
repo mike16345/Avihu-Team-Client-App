@@ -1,11 +1,9 @@
 import moment from "moment";
 import { FormPreset } from "@/interfaces/FormPreset";
 
-export const getMonthOccurrenceKey = (date: Date = new Date()) =>
-  moment(date).format("YYYY-MM");
+export const getMonthOccurrenceKey = (date: Date = new Date()) => moment(date).format("YYYY-MM");
 
-export const getDateOccurrenceKey = (date: Date | string) =>
-  moment(date).format("YYYY-MM-DD");
+export const getDateOccurrenceKey = (date: Date | string) => moment(date).format("YYYY-MM-DD");
 
 export const getOccurrenceKeyForForm = (form: FormPreset, now: Date = new Date()) => {
   if (form.type === "monthly") {
