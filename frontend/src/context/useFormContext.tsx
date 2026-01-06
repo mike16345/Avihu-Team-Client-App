@@ -42,6 +42,21 @@ interface FormProviderProps {
   children: React.ReactNode;
 }
 
+/* -------------------------------- helpers -------------------------------- */
+
+const shallowEqualErrors = (a: QuestionErrors, b: QuestionErrors) => {
+  const aKeys = Object.keys(a);
+  const bKeys = Object.keys(b);
+  if (aKeys.length !== bKeys.length) return false;
+
+  for (const key of aKeys) {
+    if (a[key] !== b[key]) return false;
+  }
+  return true;
+};
+
+/* -------------------------------------------------------------------------- */
+
 export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, children }) => {
   const userId = useUserStore((s) => s.currentUser?._id);
   const { progressByFormId, updateFormProgress, clearFormProgress } = useFormStore();
@@ -79,9 +94,11 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       const idx = sections.findIndex((s) => s._id === progress.currentSectionId);
       return idx >= 0 ? idx : 0;
     }
+
     if (progress?.currentSectionIndex !== undefined) {
       return progress.currentSectionIndex <= lastSectionIndex ? progress.currentSectionIndex : 0;
     }
+
     return 0;
   }, [progress, sections, lastSectionIndex]);
 
@@ -138,15 +155,23 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
     }
   };
 
-  const buildSectionSchema = (sectionId: string) => {
-    const section = sections.find((s) => s._id === sectionId);
-    if (!section) return z.object({});
-    const shape: Record<string, z.ZodTypeAny> = {};
-    section.questions.forEach((q) => {
-      shape[q._id] = buildQuestionSchema(q);
+  /**
+   * Build ALL section schemas once.
+   * Rebuilt only if the form structure changes.
+   */
+  const sectionSchemas = useMemo(() => {
+    const map = new Map<string, z.ZodObject<any>>();
+
+    sections.forEach((section) => {
+      const shape: Record<string, z.ZodTypeAny> = {};
+      section.questions.forEach((q) => {
+        shape[q._id] = buildQuestionSchema(q);
+      });
+      map.set(section._id, z.object(shape));
     });
-    return z.object(shape);
-  };
+
+    return map;
+  }, [sections]);
 
   const hasInvalidOptionsInSection = (index: number) =>
     sections[index]?.questions.some((q) => invalidOptionsByQuestionId[q._id]) ?? false;
@@ -155,20 +180,27 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
     const section = sections[index];
     if (!section) return false;
 
-    const schema = buildSectionSchema(section._id);
-    const values = Object.fromEntries(section.questions.map((q) => [q._id, answers[q._id]]));
+    const schema = sectionSchemas.get(section._id);
+    if (!schema) return true;
+
+    const values: Record<string, unknown> = {};
+    section.questions.forEach((q) => {
+      values[q._id] = answers[q._id];
+    });
 
     const result = schema.safeParse(values);
     if (result.success) return true;
 
     const nextErrors: QuestionErrors = {};
     result.error.issues.forEach((issue) => {
-      if (typeof issue.path[0] === "string") {
-        nextErrors[issue.path[0]] = issue.message;
+      const id = issue.path[0];
+      if (typeof id === "string") {
+        nextErrors[id] = issue.message;
       }
     });
 
-    setErrors((prev) => ({ ...prev, ...nextErrors }));
+    setErrors((prev) => (shallowEqualErrors(prev, nextErrors) ? prev : { ...prev, ...nextErrors }));
+
     return false;
   };
 

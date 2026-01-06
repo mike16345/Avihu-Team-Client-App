@@ -7,6 +7,7 @@ import FormSectionHeader from "./FormSectionHeader";
 import FormSectionFooter from "./FormSectionFooter";
 import FormSectionContent from "./FormSectionContent";
 import { useFormContext } from "@/context/useFormContext";
+import { useFormStore } from "@/store/formStore";
 
 const FormSectionScreen = ({
   route,
@@ -16,6 +17,7 @@ const FormSectionScreen = ({
   navigation: any;
 }) => {
   const { spacing, layout } = useStyles();
+  const { updateFormProgress: updateFormStoreProgress } = useFormStore();
   const {
     sections,
     handleSubmit,
@@ -65,6 +67,10 @@ const FormSectionScreen = ({
 
     if (!isLast) {
       navigation.push("FormSection", { sectionIndex: sectionIndex + 1 });
+      updateFormStoreProgress(formId, {
+        previousSectionId: section._id,
+        previousSectionIndex: sectionIndex,
+      });
     }
   };
 

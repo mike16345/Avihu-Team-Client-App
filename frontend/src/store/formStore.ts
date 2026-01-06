@@ -4,6 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FormPresetType } from "@/interfaces/FormPreset";
 
 type FormProgress = {
+  previousSectionId?: string;
+  previousSectionIndex?: number;
   currentSectionId?: string;
   currentSectionIndex?: number;
   answers: Record<string, unknown>;

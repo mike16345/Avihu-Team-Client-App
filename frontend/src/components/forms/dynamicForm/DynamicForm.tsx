@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FormPreset } from "@/interfaces/FormPreset";
 import { useFormStore } from "@/store/formStore";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import FormSectionScreen from "./formSection/FormSectionScreen";
 import { FormProvider } from "@/context/useFormContext";
+import { Platform } from "react-native";
 
 interface DynamicFormProps {
   form: FormPreset;
@@ -14,33 +15,15 @@ export type SectionStackParamList = {
   FormSection: { sectionIndex: number };
 };
 
-type QuestionErrors = Record<string, string>;
-
-interface FormContextType {
-  sections: FormPreset["sections"];
-  answers: Record<string, unknown>;
-  errors: QuestionErrors;
-  updateAnswer: (questionId: string, value: unknown) => void;
-  handleSubmit: () => void;
-  isPending: boolean;
-  validateSection: (index: number) => boolean;
-  hasInvalidOptionsInSection: (index: number) => boolean;
-  invalidOptionsByQuestionId: Record<string, boolean>;
-  formId: string;
-  initialSectionIndex: number;
-  progress: any;
-  updateFormProgress: any;
-  didInitStackRef: React.MutableRefObject<boolean>;
-}
-
-export const FormContext = React.createContext<FormContextType | null>(null);
 const Stack = createNativeStackNavigator<SectionStackParamList>();
 
 const DynamicForm: React.FC<DynamicFormProps> = ({ form, onComplete }) => {
   const { progressByFormId, updateFormProgress } = useFormStore();
+
+  const [isAscending, setIsAscending] = useState(true);
+
   const progress = progressByFormId[form._id];
   const hasInitializedRef = useRef(false);
-
   const sections = form.sections || [];
   const lastSectionIndex = Math.max(sections.length - 1, 0);
 
@@ -56,6 +39,26 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ form, onComplete }) => {
 
     return 0;
   }, [progress?.currentSectionId, progress?.currentSectionIndex, sections, lastSectionIndex]);
+
+  const slideAnimation = useMemo(() => {
+    const ascendingAnimation = Platform.OS === "ios" ? "ios_from_left" : "slide_from_left";
+    const descendingAnimation = Platform.OS === "ios" ? "ios_from_right" : "slide_from_right";
+    return isAscending ? ascendingAnimation : descendingAnimation;
+  }, [isAscending]);
+
+  const calculateAscending = () => {
+    const prev = progress?.previousSectionIndex ?? 0;
+    const current = progress?.currentSectionIndex ?? 0;
+    if (prev === current) return;
+
+    const isAscending = current >= prev;
+    setIsAscending(isAscending);
+  };
+
+  useEffect(
+    () => calculateAscending(),
+    [progress?.currentSectionIndex, progress?.previousSectionIndex]
+  );
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
@@ -84,6 +87,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ form, onComplete }) => {
           name="FormSection"
           component={FormSectionScreen}
           initialParams={{ sectionIndex: initialSectionIndex }}
+          options={{ animation: slideAnimation }}
         />
       </Stack.Navigator>
     </FormProvider>
