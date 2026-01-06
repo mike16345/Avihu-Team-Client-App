@@ -6,11 +6,13 @@ import Input from "@/components/ui/inputs/Input";
 import RadioGroup from "../inputs/RadioGroup";
 import CheckboxGroup from "../inputs/CheckboxGroup";
 import { ItemType } from "react-native-dropdown-picker";
-import DropdownMenu from "@/components/ui/dropwdown/DropdownMenu";
 import RangeSelector from "../inputs/RangeSelector";
 import FileUploadInput from "../inputs/FileUploadInput";
 import { INVALID_OPTIONS_MESSAGE } from "@/constants/Constants";
 import { useFormContext } from "@/context/useFormContext";
+import { DropDownContextProvider } from "@/context/useDropdown";
+import DropDownTrigger from "@/components/ui/dropwdown/DropDownTrigger";
+import DropDownContent from "@/components/ui/dropwdown/DropDownContent";
 
 interface QuestionInputProps {
   question: FormQuestion;
@@ -80,11 +82,13 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
           value: option,
         }));
         return (
-          <DropdownMenu
-            items={items}
-            selectedValue={questionValue as string}
+          <DropDownContextProvider
             onSelect={(value) => updateAnswer(question._id, value)}
-          />
+            items={items}
+          >
+            <DropDownTrigger />
+            <DropDownContent />
+          </DropDownContextProvider>
         );
       }
       case "range":
