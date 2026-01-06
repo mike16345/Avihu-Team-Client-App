@@ -9,7 +9,7 @@ import Loader from "@/components/ui/loaders/Loader";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import { Text } from "@/components/ui/Text";
 import { useFormStore } from "@/store/formStore";
-import DynamicForm from "@/components/forms/DynamicForm";
+import DynamicForm from "@/components/forms/dynamicForm/DynamicForm";
 
 type FormPresetRouteProp = RouteProp<RootStackParamList, "FormPreset">;
 
