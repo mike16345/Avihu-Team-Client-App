@@ -43,7 +43,7 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
           <Input
             placeholder={question.question}
             value={(questionValue as string) || ""}
-            onChangeText={(value) => updateAnswer(question._id, value)}
+            onChangeText={(value) => updateAnswer(question._id, String(value))}
             error={!!errorMessage}
             style={colors.backgroundSurface}
           />
@@ -53,7 +53,7 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
           <Input
             placeholder={question.question}
             value={(questionValue as string) || ""}
-            onChangeText={(value) => updateAnswer(question._id, value)}
+            onChangeText={(value) => updateAnswer(question._id, String(value))}
             error={!!errorMessage}
             style={[colors.backgroundSurface, styles.textarea]}
             multiline
@@ -65,7 +65,7 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
           <RadioGroup
             options={question.options || []}
             value={questionValue as string}
-            onChange={(value) => updateAnswer(question._id, value)}
+            onChange={(value) => updateAnswer(question._id, String(value))}
           />
         );
       case "checkboxes":
@@ -83,7 +83,7 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
         }));
         return (
           <DropDownContextProvider
-            onSelect={(value) => updateAnswer(question._id, value)}
+            onSelect={(value) => updateAnswer(question._id, String(value))}
             items={items}
           >
             <DropDownTrigger />
@@ -96,7 +96,7 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
           <RangeSelector
             options={question.options || []}
             value={questionValue as string}
-            onChange={(value) => updateAnswer(question._id, value)}
+            onChange={(value) => updateAnswer(question._id, String(value))}
           />
         );
       case "file-upload":

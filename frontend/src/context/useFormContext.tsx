@@ -6,6 +6,8 @@ import { useUserStore } from "@/store/userStore";
 import { getOccurrenceKeyForForm, isOptionQuestionType } from "@/utils/formPresets";
 import useAddFormResponse from "@/hooks/mutations/forms/useAddFormResponse";
 import { INVALID_OPTIONS_MESSAGE, REQUIRED_MESSAGE } from "@/constants/Constants";
+import { useImageApi } from "@/hooks/api/useImageApi";
+import { useToast } from "@/hooks/useToast";
 
 export type QuestionErrors = Record<string, string>;
 
@@ -61,6 +63,8 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
   const userId = useUserStore((s) => s.currentUser?._id);
   const { progressByFormId, updateFormProgress, clearFormProgress } = useFormStore();
   const progress = progressByFormId[form._id];
+  const { handleUploadImageToS3 } = useImageApi();
+  const { triggerErrorToast } = useToast();
 
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [errors, setErrors] = useState<QuestionErrors>({});
@@ -206,6 +210,46 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
   /* ---------------- submit ---------------- */
 
+  const isLocalFileUri = (value: string) => /^(file|content):\/\//.test(value);
+
+  const getFileExtension = (uri: string) => {
+    const match = uri.match(/\.([a-zA-Z0-9]+)(?:\?|$)/);
+    return match?.[1]?.toLowerCase() || "jpg";
+  };
+
+  const uploadFileAnswers = async () => {
+    const nextAnswers = { ...answers };
+
+    for (const section of sections) {
+      for (const question of section.questions) {
+        if (question.type !== "file-upload") continue;
+
+        const currentValue = answers[question._id];
+        const uris = Array.isArray(currentValue) ? (currentValue as string[]) : [];
+        if (!uris.length) continue;
+
+        const uploaded: string[] = [];
+
+        for (let index = 0; index < uris.length; index += 1) {
+          const uri = uris[index];
+          if (!uri || !isLocalFileUri(uri)) {
+            if (uri) uploaded.push(uri);
+            continue;
+          }
+
+          const extension = getFileExtension(uri);
+          const imageName = `${form._id}/${question._id}/${userId}-${index}.${extension}`;
+          const { urlToStore } = await handleUploadImageToS3(uri, userId!, imageName);
+          uploaded.push(urlToStore);
+        }
+
+        nextAnswers[question._id] = uploaded;
+      }
+    }
+
+    return nextAnswers;
+  };
+
   const handleSubmit = async () => {
     if (sections.some((_, i) => hasInvalidOptionsInSection(i))) {
       const invalid: QuestionErrors = {};
@@ -222,6 +266,16 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
     if (!userId) return;
 
+    let finalAnswers = answers;
+
+    try {
+      finalAnswers = await uploadFileAnswers();
+      setAnswers(finalAnswers);
+      updateFormProgress(form._id, { answers: finalAnswers });
+    } catch (error) {
+      triggerErrorToast({ message: "Failed to upload files." });
+    }
+
     const payload = {
       formId: form._id,
       userId,
@@ -233,7 +287,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
           _id: q._id,
           type: q.type,
           question: q.question,
-          answer: answers[q._id],
+          answer: finalAnswers[q._id],
         })),
       })),
     };
