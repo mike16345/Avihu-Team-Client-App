@@ -1,4 +1,5 @@
-import { sendData } from "@/API/api";
+import { fetchData, sendData } from "@/API/api";
+import { IFormResponse } from "@/interfaces/IFormResponse";
 import { ApiResponse } from "@/types/ApiTypes";
 
 const FORM_RESPONSES_ENDPOINT = "/presets/forms/responses";
@@ -8,5 +9,8 @@ export const useFormResponseApi = () => {
     return sendData<ApiResponse<any>>(`${FORM_RESPONSES_ENDPOINT}`, payload);
   };
 
-  return { submitFormResponse };
+  const getFormResponses = async (query: Partial<IFormResponse>) =>
+    fetchData<ApiResponse<IFormResponse[]>>(FORM_RESPONSES_ENDPOINT, query).then((res) => res.data);
+
+  return { submitFormResponse, getFormResponses };
 };

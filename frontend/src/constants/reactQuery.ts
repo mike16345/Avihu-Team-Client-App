@@ -10,6 +10,7 @@ export const MEASUREMENTS_KEY = `measurements-user-`;
 export const WORKOUT_PLAN_KEY = `workout-plan-user-`;
 export const FORM_PRESETS_KEY = "form-presets";
 export const FORM_PRESET_KEY = "form-preset";
+export const ONBOARDING_FORM_PRESET_KEY = "onboarding-form-preset";
 export const TODAYS_GENERAL_FORM_PRESET_KEY = "today-general-form-preset";
 
 export const EXERCISE_METHOD = `exercise-method-`;
