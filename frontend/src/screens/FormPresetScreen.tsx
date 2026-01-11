@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { RootStackParamList, StackNavigatorProps } from "@/types/navigatorTypes";
-import useFormPresetById from "@/hooks/queries/useFormPresetById";
+import useFormPresetById from "@/hooks/queries/FormPreset/useFormPresetById";
 import Loader from "@/components/ui/loaders/Loader";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import { Text } from "@/components/ui/Text";

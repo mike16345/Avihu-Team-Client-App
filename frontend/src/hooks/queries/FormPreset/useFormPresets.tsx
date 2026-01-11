@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useFormPresetsApi } from "../api/useFormPresetsApi";
 import { FORM_PRESETS_KEY } from "@/constants/reactQuery";
+import { useFormPresetsApi } from "@/hooks/api/useFormPresetsApi";
 
 const useFormPresets = () => {
   const { getFormPresets } = useFormPresetsApi();

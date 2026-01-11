@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import useFormPresets from "@/hooks/queries/useFormPresets";
 import useNotification from "@/hooks/useNotification";
 import { useFormStore } from "@/store/formStore";
 import { useUserStore } from "@/store/userStore";
 import { getOccurrenceKeyForForm } from "@/utils/formPresets";
 import { FormPreset } from "@/interfaces/FormPreset";
+import useFormPresets from "./queries/FormPreset/useFormPresets";
 
 const buildNotificationBody = (form: FormPreset) => {
   if (form.type === "monthly") {
