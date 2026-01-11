@@ -1,7 +1,9 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
+import { useUserStore } from "@/store/userStore";
+import { useNavigation } from "@react-navigation/native";
 
 interface FormSectionHeaderProps {
   currentSection: number;
@@ -16,7 +18,13 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
   sectionTitle,
   sectionDescription,
 }) => {
-  const { colors, spacing } = useStyles();
+  const { colors, spacing, layout, text } = useStyles();
+  const { currentUser } = useUserStore();
+  const navigation = useNavigation();
+
+  const goHome = () => {
+    navigation.navigate("BottomTabs");
+  };
 
   return (
     <View
@@ -27,10 +35,20 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
         { borderBottomWidth: 1, borderColor: "#cccccc" },
       ]}
     >
-      <View style={[styles.stepPill, colors.backgroundSurface]}>
-        <Text fontVariant="bold" style={styles.stepPillText}>
-          {`שלב ${currentSection} מתוך ${totalSections}`}
-        </Text>
+      <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
+        <View style={[styles.stepPill, colors.backgroundSurface]}>
+          <Text fontVariant="bold" style={styles.stepPillText}>
+            {`שלב ${currentSection} מתוך ${totalSections}`}
+          </Text>
+        </View>
+
+        {currentUser?.completedOnboarding && (
+          <TouchableOpacity onPress={goHome}>
+            <Text fontVariant="bold" style={[text.textUnderline]}>
+              סגור ומלא אחר כך
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={[spacing.gapSm]}>
