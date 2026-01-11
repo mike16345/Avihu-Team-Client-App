@@ -21,7 +21,7 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
   isLoading,
 }) => {
   const { spacing, layout } = useStyles();
-  const containerWidth = useWindowDimensions().width - spacing.pdHorizontalLg.paddingHorizontal * 2;
+  const containerWidth = useWindowDimensions().width;
 
   return (
     <View
@@ -29,6 +29,7 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
         layout.flexRow,
         layout.justifyCenter,
         layout.itemsCenter,
+        spacing.pdHorizontalLg,
         spacing.gapLg,
         spacing.pdBottomBar,
         { width: containerWidth },

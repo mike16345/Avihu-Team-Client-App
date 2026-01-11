@@ -17,7 +17,11 @@ const QuestionContainer = ({ question }: QuestionContainerProps) => {
   return (
     <View key={question._id} style={[spacing.gapSm]}>
       <View style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
-        <Text fontVariant="semibold" fontSize={16} style={[colors.textPrimary]}>
+        <Text
+          fontVariant="semibold"
+          fontSize={16}
+          style={[colors.textPrimary, styles.paddingStart]}
+        >
           {question.question}
         </Text>
         {question.required ? (
@@ -27,15 +31,22 @@ const QuestionContainer = ({ question }: QuestionContainerProps) => {
         ) : null}
       </View>
       {question.description ? (
-        <Text fontVariant="regular" fontSize={14} style={[styles.subtitle, styles.right]}>
+        <Text
+          fontVariant="regular"
+          fontSize={14}
+          style={[styles.subtitle, styles.right, styles.paddingStart]}
+        >
           {question.description}
         </Text>
       ) : null}
-      <QuestionInput
-        question={question}
-        error={errors[question._id]}
-        inValidOptions={invalidOptionsByQuestionId[question._id]}
-      />
+
+      <View style={question.type !== "range" && spacing.pdHorizontalLg}>
+        <QuestionInput
+          question={question}
+          error={errors[question._id]}
+          inValidOptions={invalidOptionsByQuestionId[question._id]}
+        />
+      </View>
     </View>
   );
 };
@@ -48,6 +59,7 @@ const styles = StyleSheet.create({
     color: "#4A5568",
     marginTop: 4,
   },
+  paddingStart: { paddingStart: 24 },
 });
 
 export default QuestionContainer;

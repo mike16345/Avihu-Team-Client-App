@@ -75,7 +75,7 @@ const FormSectionScreen = ({
   };
 
   return (
-    <View style={[layout.flex1, spacing.pdHorizontalLg, spacing.pdStatusBar, spacing.pdBottomBar]}>
+    <View style={[layout.flex1, spacing.pdStatusBar, spacing.pdBottomBar]}>
       <FormSectionHeader
         currentSection={sectionIndex + 1}
         totalSections={sections.length}
