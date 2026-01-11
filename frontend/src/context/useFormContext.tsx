@@ -151,11 +151,18 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
     if (!q.required) return z.any().optional();
 
     switch (q.type) {
-      case "checkboxes":
+      case "range":
+        return z.number({ required_error: REQUIRED_MESSAGE }).min(1, { message: REQUIRED_MESSAGE });
       case "file-upload":
-        return z.array(z.any()).min(1, REQUIRED_MESSAGE);
+        return z
+          .array(z.any(), { required_error: REQUIRED_MESSAGE })
+          .min(1, { message: REQUIRED_MESSAGE });
+      case "checkboxes":
+        return z
+          .array(z.string(), { required_error: REQUIRED_MESSAGE })
+          .min(1, { message: REQUIRED_MESSAGE });
       default:
-        return z.string().min(1, REQUIRED_MESSAGE);
+        return z.string({ required_error: REQUIRED_MESSAGE }).min(1, { message: REQUIRED_MESSAGE });
     }
   };
 

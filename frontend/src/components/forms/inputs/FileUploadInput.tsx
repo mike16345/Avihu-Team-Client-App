@@ -11,14 +11,14 @@ interface FileUploadInputProps {
 }
 
 const FileUploadInput: React.FC<FileUploadInputProps> = ({ value, onChange }) => {
-  const { spacing, colors } = useStyles();
+  const { spacing, colors, layout } = useStyles();
 
   const handleUpload = async (images: string[]) => {
     onChange(images);
   };
 
   return (
-    <View style={[spacing.gapSm]}>
+    <View style={[spacing.gapSm, layout.itemsStart]}>
       <UploadDrawer
         handleUpload={handleUpload}
         trigger={<PrimaryButton mode="light">העלאת קבצים</PrimaryButton>}
