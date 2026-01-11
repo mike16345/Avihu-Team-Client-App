@@ -8,14 +8,15 @@ import { useFormContext } from "@/context/useFormContext";
 
 interface QuestionContainerProps {
   question: FormQuestion;
+  isLast: boolean;
 }
 
-const QuestionContainer = ({ question }: QuestionContainerProps) => {
+const QuestionContainer = ({ question, isLast }: QuestionContainerProps) => {
   const { spacing, layout, colors } = useStyles();
   const { errors, invalidOptionsByQuestionId } = useFormContext();
 
   return (
-    <View key={question._id} style={[spacing.gapSm]}>
+    <View key={question._id} style={[spacing.gapMd, !isLast && styles.borderBottom]}>
       <View style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
         <Text
           fontVariant="semibold"
@@ -60,6 +61,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   paddingStart: { paddingStart: 24 },
+  borderBottom: { borderBottomWidth: 1, paddingBottom: 20, borderColor: "#cccccc" },
 });
 
 export default QuestionContainer;

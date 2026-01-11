@@ -8,6 +8,7 @@ import useAddFormResponse from "@/hooks/mutations/forms/useAddFormResponse";
 import { INVALID_OPTIONS_MESSAGE, REQUIRED_MESSAGE } from "@/constants/Constants";
 import { useImageApi } from "@/hooks/api/useImageApi";
 import { useToast } from "@/hooks/useToast";
+import { errorNotificationHaptic } from "@/utils/haptics";
 
 export type QuestionErrors = Record<string, string>;
 
@@ -64,7 +65,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
   const { progressByFormId, updateFormProgress, clearFormProgress } = useFormStore();
   const progress = progressByFormId[form._id];
   const { handleUploadImageToS3 } = useImageApi();
-  const { triggerErrorToast } = useToast();
+  const { triggerErrorToast, triggerSuccessToast } = useToast();
 
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [errors, setErrors] = useState<QuestionErrors>({});
@@ -152,7 +153,9 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
     switch (q.type) {
       case "range":
-        return z.number({ required_error: REQUIRED_MESSAGE }).min(1, { message: REQUIRED_MESSAGE });
+        return z.coerce
+          .number({ required_error: REQUIRED_MESSAGE })
+          .min(1, { message: REQUIRED_MESSAGE });
       case "file-upload":
         return z
           .array(z.any(), { required_error: REQUIRED_MESSAGE })
@@ -210,6 +213,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       }
     });
 
+    errorNotificationHaptic();
     setErrors((prev) => (shallowEqualErrors(prev, nextErrors) ? prev : { ...prev, ...nextErrors }));
 
     return false;
@@ -279,6 +283,8 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       finalAnswers = await uploadFileAnswers();
       setAnswers(finalAnswers);
       updateFormProgress(form._id, { answers: finalAnswers });
+
+      triggerSuccessToast({ title: "הטופס נשלח בהצלחה" });
     } catch (error) {
       triggerErrorToast({ message: "Failed to upload files." });
     }

@@ -31,8 +31,9 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
         layout.itemsCenter,
         spacing.pdHorizontalLg,
         spacing.gapLg,
+        spacing.pdVerticalLg,
         spacing.pdBottomBar,
-        { width: containerWidth },
+        { width: containerWidth, borderTopWidth: 1, borderColor: "#cccccc" },
       ]}
     >
       <PrimaryButton

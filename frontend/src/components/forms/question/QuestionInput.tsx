@@ -116,7 +116,14 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
     <>
       {renderQuestionInput(question)}
       {error && !inValidOptions ? (
-        <Text fontSize={14} style={[colors.textDanger, { marginEnd: "auto" }]}>
+        <Text
+          fontSize={14}
+          style={[
+            colors.textDanger,
+            { marginEnd: "auto" },
+            question.type == "range" && { paddingStart: 24 },
+          ]}
+        >
           {errors[question._id]}
         </Text>
       ) : null}

@@ -19,8 +19,12 @@ const FormSectionContent: React.FC<FormSectionContentProps> = ({ currentSection 
       nestedScrollEnabled
     >
       <View style={[spacing.gapLg]}>
-        {currentSection.questions.map((question) => (
-          <QuestionContainer key={question._id} question={question} />
+        {currentSection.questions.map((question, index) => (
+          <QuestionContainer
+            key={question._id}
+            question={question}
+            isLast={index === currentSection.questions.length - 1}
+          />
         ))}
       </View>
     </ScrollView>

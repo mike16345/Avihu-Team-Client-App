@@ -19,7 +19,14 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
   const { colors, spacing } = useStyles();
 
   return (
-    <View style={[spacing.gap20, spacing.pdVerticalXl, spacing.pdHorizontalLg]}>
+    <View
+      style={[
+        spacing.gap20,
+        spacing.pdVerticalXl,
+        spacing.pdHorizontalLg,
+        { borderBottomWidth: 1, borderColor: "#cccccc" },
+      ]}
+    >
       <View style={[styles.stepPill, colors.backgroundSurface]}>
         <Text fontVariant="bold" style={styles.stepPillText}>
           {`שלב ${currentSection} מתוך ${totalSections}`}
