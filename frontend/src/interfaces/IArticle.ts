@@ -14,6 +14,7 @@ export interface IArticleCount {
 export interface IArticle {
   _id: string;
   title: string;
+  subtitle: string;
   content: string;
   imageUrl?: string;
   date: Date;
