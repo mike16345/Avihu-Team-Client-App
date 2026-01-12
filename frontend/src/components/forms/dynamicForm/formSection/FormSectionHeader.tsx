@@ -2,8 +2,9 @@ import { StyleSheet, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
-import { useUserStore } from "@/store/userStore";
 import { useNavigation } from "@react-navigation/native";
+import { useFormContext } from "@/context/useFormContext";
+import { useNotificationStore } from "@/store/notificationStore";
 
 interface FormSectionHeaderProps {
   currentSection: number;
@@ -19,10 +20,18 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
   sectionDescription,
 }) => {
   const { colors, spacing, layout, text } = useStyles();
-  const { currentUser } = useUserStore();
+  const { formType, formId } = useFormContext();
   const navigation = useNavigation();
+  const { addGeneralFormNotification, addMonthlyFormNotification } = useNotificationStore();
 
   const goHome = () => {
+    const isGeneralForm = formType === "general";
+    if (isGeneralForm) {
+      addGeneralFormNotification(formId);
+    } else {
+      addMonthlyFormNotification(formId);
+    }
+
     navigation.navigate("BottomTabs");
   };
 
@@ -42,7 +51,7 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
           </Text>
         </View>
 
-        {currentUser?.completedOnboarding && (
+        {formType !== "onboarding" && (
           <TouchableOpacity onPress={goHome}>
             <Text fontVariant="bold" style={[text.textUnderline]}>
               סגור ומלא אחר כך

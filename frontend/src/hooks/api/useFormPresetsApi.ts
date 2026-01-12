@@ -6,8 +6,8 @@ import DateUtils from "@/utils/dateUtils";
 const FORM_PRESETS_ENDPOINT = "presets/forms";
 
 export const useFormPresetsApi = () => {
-  const getFormPresets = async () =>
-    fetchData<ApiResponse<FormPreset[]>>(FORM_PRESETS_ENDPOINT).then((res) => res.data);
+  const getFormPresets = async (query?: Partial<FormPreset>) =>
+    fetchData<ApiResponse<FormPreset[]>>(FORM_PRESETS_ENDPOINT, query).then((res) => res.data);
 
   const getFormPresetById = async (id: string) =>
     fetchData<ApiResponse<FormPreset>>(`${FORM_PRESETS_ENDPOINT}/one`, { id }).then(
@@ -20,12 +20,12 @@ export const useFormPresetsApi = () => {
     );
 
   const getOnBoardingFormPreset = async () =>
-    fetchData<ApiResponse<FormPreset>>(`${FORM_PRESETS_ENDPOINT}/forms/one`, {
+    fetchData<ApiResponse<FormPreset>>(`${FORM_PRESETS_ENDPOINT}/form/one`, {
       type: "onboarding",
     }).then((res) => res.data);
 
   const getGeneralFormForToday = async () =>
-    fetchData<ApiResponse<FormPreset>>(`${FORM_PRESETS_ENDPOINT}/forms/one`, {
+    fetchData<ApiResponse<FormPreset>>(`${FORM_PRESETS_ENDPOINT}/form/one`, {
       type: "general",
       showOn: DateUtils.formatDate(new Date(), "YYYY-MM-DD"),
     }).then((res) => res.data);
