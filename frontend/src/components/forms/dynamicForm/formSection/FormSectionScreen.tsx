@@ -86,9 +86,7 @@ const FormSectionScreen = ({
       <FormSectionContent currentSection={section} />
 
       <FormSectionFooter
-        goBack={() =>
-          navigation.goBack() || navigation.push("FormSection", { sectionIndex: sectionIndex - 1 })
-        }
+        goBack={() => navigation.push("FormSection", { sectionIndex: sectionIndex - 1 })}
         goNext={goNext}
         handleSubmit={handleSubmit}
         isLast={isLast}

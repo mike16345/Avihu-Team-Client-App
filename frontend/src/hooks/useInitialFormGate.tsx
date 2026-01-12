@@ -42,7 +42,7 @@ const useInitialFormGate = () => {
       const hasCompletedOnboarding = !!currentUser.completedOnboarding;
 
       // 1. Onboarding
-      if (!hasCompletedOnboarding) {
+      if (hasCompletedOnboarding) {
         try {
           const onboardingForm = await queryClient.fetchQuery<FormPreset>({
             queryKey: [ONBOARDING_FORM_PRESET_KEY],
@@ -102,8 +102,10 @@ const useInitialFormGate = () => {
         const dailyForm = await queryClient.fetchQuery<FormPreset>({
           queryKey: [TODAYS_GENERAL_FORM_PRESET_KEY],
           queryFn: getGeneralFormForToday,
+          staleTime: 1000,
         });
 
+        console.warn("dailyForm", dailyForm);
         if (dailyForm) {
           const occurrenceKey = getOccurrenceKeyForForm(dailyForm);
           if (!occurrenceKey) return;
