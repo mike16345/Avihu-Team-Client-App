@@ -65,7 +65,8 @@ const shallowEqualErrors = (a: QuestionErrors, b: QuestionErrors) => {
 /* -------------------------------------------------------------------------- */
 
 export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, children }) => {
-  const userId = useUserStore((s) => s.currentUser?._id);
+  const { currentUser, setCurrentUser } = useUserStore();
+
   const {
     progressByFormId,
     updateFormProgress,
@@ -91,6 +92,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
   const sections = form.sections || [];
   const lastSectionIndex = Math.max(sections.length - 1, 0);
   const formType = form.type;
+  const userId = currentUser?._id;
 
   /* ---------------- invalid options ---------------- */
 
@@ -316,6 +318,13 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       updateFormProgress(form._id, { answers: finalAnswers });
       markFormCompleted();
       removeNotification(form._id);
+      if (formType == "onboarding") {
+        setCurrentUser({
+          ...currentUser,
+          completedOnboarding: true,
+        });
+      }
+
       navigation.navigate("BottomTabs");
 
       triggerSuccessToast({ title: "הטופס נשלח בהצלחה" });
