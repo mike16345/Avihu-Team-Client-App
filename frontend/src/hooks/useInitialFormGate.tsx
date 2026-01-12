@@ -4,7 +4,11 @@ import { useFormStore } from "@/store/formStore";
 import { useEffect, useRef } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQueryClient } from "@tanstack/react-query";
-import { ONBOARDING_FORM_PRESET_KEY, FORM_PRESETS_KEY } from "@/constants/reactQuery";
+import {
+  ONBOARDING_FORM_PRESET_KEY,
+  FORM_PRESETS_KEY,
+  TODAYS_GENERAL_FORM_PRESET_KEY,
+} from "@/constants/reactQuery";
 import { useFormResponseApi } from "./api/useFormResponseApi";
 import { useFormPresetsApi } from "./api/useFormPresetsApi";
 import { FormPreset } from "@/interfaces/FormPreset";
@@ -94,15 +98,22 @@ const useInitialFormGate = () => {
       }
 
       // 3. Daily
-      const dailyForm = await getGeneralFormForToday();
+      try {
+        const dailyForm = await queryClient.fetchQuery<FormPreset>({
+          queryKey: [TODAYS_GENERAL_FORM_PRESET_KEY],
+          queryFn: getGeneralFormForToday,
+        });
 
-      if (dailyForm) {
-        const occurrenceKey = getOccurrenceKeyForForm(dailyForm);
-        if (!occurrenceKey) return;
+        if (dailyForm) {
+          const occurrenceKey = getOccurrenceKeyForForm(dailyForm);
+          if (!occurrenceKey) return;
 
-        if (!isFormCompleted("general", currentUser._id, dailyForm._id, occurrenceKey)) {
-          addGeneralFormNotification(dailyForm._id);
+          if (!isFormCompleted("general", currentUser._id, dailyForm._id, occurrenceKey)) {
+            addGeneralFormNotification(dailyForm._id);
+          }
         }
+      } catch (error) {
+        console.error("Error fetching daily form:", error);
       }
     };
 

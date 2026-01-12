@@ -11,7 +11,6 @@ import SplashScreen from "@/screens/SplashScreen";
 import { useToast } from "@/hooks/useToast";
 import AuthNavigator from "./AuthNavigator";
 import AppNavigator from "./AppNavigator";
-import useFormPresetNotifications from "@/hooks/useFormPresetNotifications";
 
 const RootNavigator = () => {
   const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
@@ -22,7 +21,6 @@ const RootNavigator = () => {
   const { checkUserSessionToken } = useUserApi();
   const { requestPermissions } = useNotification();
   const { handleLogout } = useLogout();
-  useFormPresetNotifications();
 
   const [loading, setLoading] = useState(true);
 

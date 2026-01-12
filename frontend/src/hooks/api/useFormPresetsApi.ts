@@ -27,7 +27,7 @@ export const useFormPresetsApi = () => {
   const getGeneralFormForToday = async () =>
     fetchData<ApiResponse<FormPreset>>(`${FORM_PRESETS_ENDPOINT}/form/one`, {
       type: "general",
-      showOn: DateUtils.formatDate(new Date(), "YYYY-MM-DD"),
+      showOn: DateUtils.getStartOfDayLocal(),
     }).then((res) => res.data);
 
   return {
