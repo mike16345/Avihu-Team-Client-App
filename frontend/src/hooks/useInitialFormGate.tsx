@@ -8,44 +8,49 @@ import { ONBOARDING_FORM_PRESET_KEY, FORM_PRESETS_KEY } from "@/constants/reactQ
 import { useFormResponseApi } from "./api/useFormResponseApi";
 import { useFormPresetsApi } from "./api/useFormPresetsApi";
 import { FormPreset } from "@/interfaces/FormPreset";
-import useGetOnboardingForm from "./queries/FormPreset/useGetOnboardingForm";
+import { getOccurrenceKeyForForm } from "@/utils/formPresets";
+import { useNotificationStore } from "@/store/notificationStore";
 
 type NavigationProp = NativeStackNavigationProp<any>;
 
 const useInitialFormGate = () => {
   const navigation = useNavigation<NavigationProp>();
-  const { currentUser } = useUserStore();
+  const currentUser = useUserStore((state) => state.currentUser);
   const { setActiveFormId, isFormCompleted } = useFormStore();
   const queryClient = useQueryClient();
   const hasNavigatedRef = useRef(false);
   const { getOnBoardingFormPreset, getFormPresets, getGeneralFormForToday } = useFormPresetsApi();
   const { getFormResponses } = useFormResponseApi();
+  const { addGeneralFormNotification, addMonthlyFormNotification } = useNotificationStore();
 
   // --- Navigation helper ---
   const navigateToForm = (formId: string) => {
     if (hasNavigatedRef.current) return;
     hasNavigatedRef.current = true;
     setActiveFormId(formId);
-    navigation.navigate("FormPreset");
+    navigation.navigate("FormPreset", { formId });
   };
 
   useEffect(() => {
     const performChecks = async () => {
       if (!currentUser || hasNavigatedRef.current) return;
 
-      console.warn("currentUser", currentUser.completedOnboarding);
+      const hasCompletedOnboarding = !!currentUser.completedOnboarding;
 
       // 1. Onboarding
-      if (!currentUser.completedOnboarding) {
-        const onboardingForm = await queryClient.fetchQuery<FormPreset>({
-          queryKey: [ONBOARDING_FORM_PRESET_KEY],
-          queryFn: getOnBoardingFormPreset,
-        });
+      if (!hasCompletedOnboarding) {
+        try {
+          const onboardingForm = await queryClient.fetchQuery<FormPreset>({
+            queryKey: [ONBOARDING_FORM_PRESET_KEY],
+            queryFn: getOnBoardingFormPreset,
+          });
 
-        console.warn("onboardingForm", onboardingForm);
-        if (onboardingForm) {
-          navigateToForm(onboardingForm._id);
-          return;
+          if (onboardingForm) {
+            navigateToForm(onboardingForm._id);
+            return;
+          }
+        } catch (error) {
+          console.error("Error fetching onboarding form:", error);
         }
       }
 
@@ -62,16 +67,29 @@ const useInitialFormGate = () => {
 
       if (!hasSubmittedThisMonth) {
         const presets = await queryClient.fetchQuery<FormPreset[]>({
-          queryKey: [FORM_PRESETS_KEY],
-          queryFn: getFormPresets,
+          queryKey: [FORM_PRESETS_KEY, "monthly"],
+          queryFn: () => getFormPresets({ type: "monthly" }),
         });
-        const latestMonthlyPreset = (presets || [])
-          .filter((fp) => fp.type === "monthly" && fp.showOn)
-          .sort((a, b) => new Date(b.showOn!).getTime() - new Date(a.showOn!).getTime())[0];
+
+        const latestMonthlyPreset = (presets || []).sort(
+          (a: FormPreset, b: FormPreset) =>
+            new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+        )[0];
 
         if (latestMonthlyPreset) {
-          navigateToForm(latestMonthlyPreset._id);
-          return;
+          const monthlyOccurrenceKey = getOccurrenceKeyForForm(latestMonthlyPreset);
+          if (!monthlyOccurrenceKey) return;
+
+          if (
+            !isFormCompleted(
+              "monthly",
+              currentUser._id,
+              latestMonthlyPreset._id,
+              monthlyOccurrenceKey
+            )
+          ) {
+            addMonthlyFormNotification(latestMonthlyPreset._id);
+          }
         }
       }
 
@@ -79,16 +97,17 @@ const useInitialFormGate = () => {
       const dailyForm = await getGeneralFormForToday();
 
       if (dailyForm) {
-        const occurrenceKey = dailyForm.showOn!.substring(0, 10);
+        const occurrenceKey = getOccurrenceKeyForForm(dailyForm);
+        if (!occurrenceKey) return;
+
         if (!isFormCompleted("general", currentUser._id, dailyForm._id, occurrenceKey)) {
-          navigateToForm(dailyForm._id);
-          return;
+          addGeneralFormNotification(dailyForm._id);
         }
       }
     };
 
     performChecks();
-  }, [currentUser, queryClient]);
+  }, [currentUser]);
 
   // Effect to invalidate onboarding form query once completed
   useEffect(() => {

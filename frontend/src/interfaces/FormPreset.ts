@@ -32,6 +32,8 @@ export interface FormPreset {
   showOn?: string;
   repeatMonthly: boolean;
   sections: FormSection[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface FormResponseQuestionPayload {

@@ -9,10 +9,14 @@ import { INVALID_OPTIONS_MESSAGE, REQUIRED_MESSAGE } from "@/constants/Constants
 import { useImageApi } from "@/hooks/api/useImageApi";
 import { useToast } from "@/hooks/useToast";
 import { errorNotificationHaptic } from "@/utils/haptics";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
+import { useNotificationStore } from "@/store/notificationStore";
 
 export type QuestionErrors = Record<string, string>;
 
 interface FormContextType {
+  formType: FormPreset["type"];
   sections: FormPreset["sections"];
   answers: Record<string, unknown>;
   errors: QuestionErrors;
@@ -62,10 +66,19 @@ const shallowEqualErrors = (a: QuestionErrors, b: QuestionErrors) => {
 
 export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, children }) => {
   const userId = useUserStore((s) => s.currentUser?._id);
-  const { progressByFormId, updateFormProgress, clearFormProgress } = useFormStore();
+  const {
+    progressByFormId,
+    updateFormProgress,
+    clearFormProgress,
+    markOnboardingCompleted,
+    markGeneralCompletion,
+    markMonthlyCompletion,
+  } = useFormStore();
   const progress = progressByFormId[form._id];
   const { handleUploadImageToS3 } = useImageApi();
   const { triggerErrorToast, triggerSuccessToast } = useToast();
+  const navigation = useNavigation<RootStackParamListNavigationProp>();
+  const { removeNotification } = useNotificationStore();
 
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [errors, setErrors] = useState<QuestionErrors>({});
@@ -77,6 +90,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
   const sections = form.sections || [];
   const lastSectionIndex = Math.max(sections.length - 1, 0);
+  const formType = form.type;
 
   /* ---------------- invalid options ---------------- */
 
@@ -261,6 +275,23 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
     return nextAnswers;
   };
 
+  const markFormCompleted = () => {
+    const occurrenceKey = getOccurrenceKeyForForm(form);
+    if (!occurrenceKey) return;
+
+    switch (form.type) {
+      case "onboarding":
+        markOnboardingCompleted(userId!);
+        break;
+      case "monthly":
+        markMonthlyCompletion(userId!, form._id, occurrenceKey);
+        break;
+      case "general":
+        markGeneralCompletion(userId!, form._id, occurrenceKey);
+        break;
+    }
+  };
+
   const handleSubmit = async () => {
     if (sections.some((_, i) => hasInvalidOptionsInSection(i))) {
       const invalid: QuestionErrors = {};
@@ -283,6 +314,9 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       finalAnswers = await uploadFileAnswers();
       setAnswers(finalAnswers);
       updateFormProgress(form._id, { answers: finalAnswers });
+      markFormCompleted();
+      removeNotification(form._id);
+      navigation.navigate("BottomTabs");
 
       triggerSuccessToast({ title: "הטופס נשלח בהצלחה" });
     } catch (error) {
@@ -323,6 +357,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
   return (
     <FormContext.Provider
       value={{
+        formType,
         sections,
         answers,
         errors,

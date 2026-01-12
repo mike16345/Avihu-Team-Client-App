@@ -9,4 +9,6 @@ export const NotificationIdentifiers = {
 export const NotificationBodies = {
   DAILY_WEIGH_IN_REMINDER: "מתזכרים אותך לעדכן את השקילה היומית שלך",
   WEEKLY_MEASUERMENT_REMINDER: "מתזכרים אותך לעדכן היקפים",
+  GENERAL_FORM_REMINDER: "שאלון חדש מחכה לך",
+  MONTHLY_FORM_REMINDER: "שאלון חודשי חדש מחכה לך",
 };

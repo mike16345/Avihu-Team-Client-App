@@ -11,7 +11,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
   useInitialFormGate();
-  
+
   return (
     <Stack.Navigator initialRouteName="BottomTabs" screenOptions={{ headerShown: false }}>
       <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
