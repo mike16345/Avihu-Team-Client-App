@@ -4,12 +4,12 @@ import { useArticleApi } from "@/hooks/api/useArticleApi";
 import { IArticleCount } from "@/interfaces/IArticle";
 import { createRetryFunction } from "@/utils/utils";
 
-const useArticleCountQuery = () => {
+const useArticleCountQuery = (planType: string) => {
   const { getPostCountByGroup } = useArticleApi();
 
   return useQuery<any, any, IArticleCount[], any>({
-    queryFn: () => getPostCountByGroup(),
-    queryKey: [ARTICLE_COUNT_KEY],
+    queryFn: () => getPostCountByGroup(planType),
+    queryKey: [ARTICLE_COUNT_KEY + planType],
     staleTime: ONE_DAY,
     retry: createRetryFunction(404, 2),
   });

@@ -19,8 +19,10 @@ export const useArticleApi = () => {
   const getOneArticle = async (id: string) =>
     fetchData<ApiResponse<IArticle>>(`${BLOGS_API_ENDPOINT}/one`, { id }).then((res) => res.data);
 
-  const getPostCountByGroup = async () =>
-    fetchData<ApiResponse<IArticleCount[]>>(`${BLOGS_API_ENDPOINT}/count`).then((res) => res.data);
+  const getPostCountByGroup = async (planType: string) =>
+    fetchData<ApiResponse<IArticleCount[]>>(`${BLOGS_API_ENDPOINT}/count`, { planType }).then(
+      (res) => res.data
+    );
 
   const changeLikedStatus = async (id: string, userId: string) =>
     await updateItem<ApiResponse<IArticle>>(`${BLOGS_API_ENDPOINT}/one/like`, { id, userId }).then(
