@@ -5,10 +5,7 @@ import { ONE_HOUR } from "@/constants/reactQuery";
 
 const FORM_RESPONSES_KEY = "form-responses";
 
-const useFormResponses = (
-  query: Partial<IFormResponse>,
-  options?: { enabled?: boolean }
-) => {
+const useFormResponses = (query: Partial<IFormResponse>, options?: { enabled?: boolean }) => {
   const { getFormResponses } = useFormResponseApi();
 
   return useQuery({
