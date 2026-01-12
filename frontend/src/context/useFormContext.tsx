@@ -12,6 +12,8 @@ import { errorNotificationHaptic } from "@/utils/haptics";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 import { useNotificationStore } from "@/store/notificationStore";
+import { useQueryClient } from "@tanstack/react-query";
+import { USER_KEY } from "@/constants/reactQuery";
 
 export type QuestionErrors = Record<string, string>;
 
@@ -80,6 +82,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
   const { triggerErrorToast, triggerSuccessToast } = useToast();
   const navigation = useNavigation<RootStackParamListNavigationProp>();
   const { removeNotification } = useNotificationStore();
+  const queryClient = useQueryClient();
 
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [errors, setErrors] = useState<QuestionErrors>({});
@@ -319,6 +322,8 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       markFormCompleted();
       removeNotification(form._id);
       if (formType == "onboarding") {
+        queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
+
         setCurrentUser({
           ...currentUser,
           completedOnboarding: true,
