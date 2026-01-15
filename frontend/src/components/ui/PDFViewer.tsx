@@ -4,7 +4,7 @@ import Pdf from "react-native-pdf";
 import SpinningIcon from "./loaders/SpinningIcon";
 
 interface Props {
-  uri: SVGStringList;
+  uri: string;
 }
 
 const PDFViewer: React.FC<Props> = ({ uri }) => {

@@ -1,4 +1,3 @@
-import React from "react";
 import AgreementPdfViewerScreen from "@/screens/Agreement/AgreementPdfViewerScreen";
 import AgreementQuestionsScreen from "@/screens/Agreement/AgreementQuestionsScreen";
 import AgreementSignatureScreen from "@/screens/Agreement/AgreementSignatureScreen";
@@ -25,7 +24,7 @@ const AgreementStack = () => {
       <Stack.Screen
         name="AgreementPdfViewer"
         component={AgreementPdfViewerScreen}
-        options={{ headerShown: false, presentation: "formSheet" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="AgreementQuestions"
@@ -35,7 +34,9 @@ const AgreementStack = () => {
       <Stack.Screen
         name="AgreementSignature"
         component={AgreementSignatureScreen}
-        options={{ headerShown: false, presentation: "formSheet" }}
+        options={{
+          headerShown: false,
+        }}
       />
     </Stack.Navigator>
   );

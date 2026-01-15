@@ -1,25 +1,21 @@
-import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import { FormProvider, useFormContext } from "@/context/useFormContext";
-import { mockAgreement } from "@/mock/agreement";
-import Button from "@/components/Button/Button";
+import { useFormContext } from "@/context/useFormContext";
 import useStyles from "@/styles/useGlobalStyles";
 import { AgreementStackParamList } from "@/navigators/AgreementStack";
-import QuestionInput from "@/components/forms/question/QuestionInput";
-import { Text } from "@/components/ui/Text";
-import { FormPreset } from "@/interfaces/FormPreset";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
+import QuestionContainer from "@/components/forms/question/QuestionContainer";
 
-type AgreementQuestionsScreenNavigationProp = StackNavigationProp<
+type AgreementQuestionsScreenNavigationProp = NativeStackNavigationProp<
   AgreementStackParamList,
   "AgreementQuestions"
 >;
 
 const AgreementQuestionsScreen = () => {
-  const { validateSection, sections, errors } = useFormContext();
+  const { validateSection, sections } = useFormContext();
   const navigation = useNavigation<AgreementQuestionsScreenNavigationProp>();
-  const { spacing } = useStyles();
+  const { spacing, layout } = useStyles();
 
   const handleContinue = () => {
     // Assuming all questions are in the first section for simplicity
@@ -31,26 +27,21 @@ const AgreementQuestionsScreen = () => {
   const section = sections[0];
 
   return (
-    <ScrollView contentContainerStyle={[spacing.pHorizontalMd, spacing.pVl]}>
-      {section.questions.map((question) => (
-        <View key={question._id} style={styles.questionContainer}>
-          <Text fontSize={16} fontVariant="semibold" style={styles.questionLabel}>
-            {question.question}
-          </Text>
-          {question.description && (
-            <Text fontSize={14} style={styles.questionDescription}>
-              {question.description}
-            </Text>
-          )}
-          <QuestionInput
+    <View style={[layout.flex1, spacing.pdStatusBar, spacing.pdBottomBar]}>
+      <ScrollView contentContainerStyle={[spacing.pdStatusBar, spacing.pdBottomBar, spacing.gap20]}>
+        {section.questions.map((question, i) => (
+          <QuestionContainer
+            key={question._id}
             question={question}
-            error={errors[question._id]}
-            inValidOptions={false} // Assuming valid options for this mock
+            isLast={i === section.questions.length - 1}
           />
-        </View>
-      ))}
-      <Button text="Continue" onPress={handleContinue} style={styles.button} />
-    </ScrollView>
+        ))}
+      </ScrollView>
+
+      <PrimaryButton onPress={handleContinue} block style={styles.button}>
+        המשך
+      </PrimaryButton>
+    </View>
   );
 };
 
@@ -66,7 +57,8 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   button: {
-    marginTop: 24,
+    margin: "auto",
+    width: "90%",
   },
 });
 
