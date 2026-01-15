@@ -1,15 +1,15 @@
-import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { useState } from "react";
+import { View, StyleSheet, useWindowDimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { StackNavigationProp } from "@react-navigation/stack";
-import AgreementPdfViewer from "@/components/Agreements/AgreementPdfViewer";
 import { mockAgreement } from "@/mock/agreement";
 import Checkbox from "@/components/ui/Checkbox";
-import Button from "@/components/Button/Button";
 import useStyles from "@/styles/useGlobalStyles";
 import { AgreementStackParamList } from "@/navigators/AgreementStack"; // This will be created later
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import PDFViewer from "@/components/ui/PDFViewer";
+import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 
-type AgreementPdfViewerScreenNavigationProp = StackNavigationProp<
+type AgreementPdfViewerScreenNavigationProp = NativeStackNavigationProp<
   AgreementStackParamList,
   "AgreementPdfViewer"
 >;
@@ -18,39 +18,39 @@ const AgreementPdfViewerScreen = () => {
   const [agreed, setAgreed] = useState(false);
   const navigation = useNavigation<AgreementPdfViewerScreenNavigationProp>();
   const { spacing, layout } = useStyles();
+  const pdfHeight = useWindowDimensions().height * 0.7;
 
   const handleContinue = () => {
     navigation.navigate("AgreementQuestions");
   };
 
   return (
-    <View style={[layout.flex, styles.container]}>
-      <AgreementPdfViewer agreement={mockAgreement} />
-      <View style={[spacing.pHorizontalMd, spacing.pVl, styles.bottomContainer]}>
+    <View style={[layout.flexRow, styles.container, spacing.pdStatusBar]}>
+      <View style={[{ height: pdfHeight }]}>
+        <PDFViewer uri={mockAgreement.pdfUrl} />
+      </View>
+      <View style={[spacing.pdHorizontalMd, spacing.pdLg, styles.bottomContainer]}>
         <Checkbox
-          label="I declare that I have read and agree to the terms above."
+          label="קראתי ואני מאשר את התקנון"
           isChecked={agreed}
           onCheck={() => setAgreed(!agreed)}
         />
-        <Button
-          text="Continue"
-          onPress={handleContinue}
-          // The button can be always enabled as per requirements, 
-          // but this is how you would disable it based on the checkbox.
-          // disabled={!agreed} 
-        />
+        <PrimaryButton onPress={handleContinue} block disabled={!agreed}>
+          המשך
+        </PrimaryButton>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#fff",
-  },
+  container: { flex: 1 },
   bottomContainer: {
-    borderTopWidth: 1,
-    borderColor: "#eee",
+    position: "absolute",
+    bottom: 20,
+    justifyContent: "center",
+    width: "100%",
+    gap: 30,
   },
 });
 
