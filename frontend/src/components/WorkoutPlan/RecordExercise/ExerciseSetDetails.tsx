@@ -41,7 +41,7 @@ const ExerciseSetDetails: FC<ExerciseSetDetailsProps> = ({ sets, exerciseMethod 
     }
     // Case 3: different per-set (use minReps only, e.g., 8 | 10 | 12 | 14)
     else {
-      details = `${prefix} ${mins.reverse().join(" | ")}`;
+      details = `${prefix} ${mins.join(" | ")}`;
     }
 
     return details.replace(/\([^)]*[A-Za-z][^)]*\)/g, "").trim();

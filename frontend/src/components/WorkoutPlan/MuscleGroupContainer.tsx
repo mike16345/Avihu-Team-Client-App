@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
 import ExerciseContainer from "./ExerciseContainer";
@@ -16,6 +16,12 @@ const MuscleGroupContainer: React.FC<MuscleGroupContainerProps> = ({
 }) => {
   const { colors, common, layout, spacing } = useStyles();
 
+  const filteredExercises = useMemo(() => exercises.filter((e) => e.exerciseId), [exercises]);
+
+  if (filteredExercises.length === 0) {
+    return null;
+  }
+
   return (
     <View style={spacing.gapMd}>
       <View
@@ -24,7 +30,7 @@ const MuscleGroupContainer: React.FC<MuscleGroupContainerProps> = ({
         <Text fontVariant="bold">{muscleGroup}</Text>
       </View>
 
-      {exercises.map((exercise, i) => (
+      {filteredExercises.map((exercise, i) => (
         <ExerciseContainer
           key={exercise._id || i}
           exercise={exercise}

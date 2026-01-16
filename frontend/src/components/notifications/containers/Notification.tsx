@@ -2,6 +2,8 @@ import React from "react";
 import Animated, { LinearTransition, FadeOutLeft } from "react-native-reanimated";
 import { INotification, useNotificationStore } from "@/store/notificationStore";
 import ReminderContainer from "./ReminderContainer";
+import { ConditionalRender } from "@/components/ui/ConditionalRender";
+import FormReminderContainer from "./FormReminderContainer";
 
 interface NotificationProps {
   notification: INotification;
@@ -10,6 +12,8 @@ interface NotificationProps {
 
 const Notification: React.FC<NotificationProps> = ({ notification, onNavigate }) => {
   const { removeNotification } = useNotificationStore();
+
+  const isFormType = notification.type === "monthlyForm" || notification.type === "generalForm";
 
   const handleRemove = () => {
     removeNotification(notification.id);
@@ -20,11 +24,21 @@ const Notification: React.FC<NotificationProps> = ({ notification, onNavigate })
       layout={LinearTransition.springify().damping(18).stiffness(180)}
       exiting={FadeOutLeft.duration(120)}
     >
-      <ReminderContainer
-        type={notification.type}
-        handleDismiss={handleRemove}
-        onNavigate={onNavigate}
-      />
+      <ConditionalRender condition={!isFormType}>
+        <ReminderContainer
+          type={notification.type as "weighIn" | "measurement"}
+          handleDismiss={handleRemove}
+          onNavigate={onNavigate}
+        />
+      </ConditionalRender>
+
+      <ConditionalRender condition={isFormType}>
+        <FormReminderContainer
+          notification={notification}
+          handleDismiss={handleRemove}
+          onNavigate={onNavigate}
+        />
+      </ConditionalRender>
     </Animated.View>
   );
 };

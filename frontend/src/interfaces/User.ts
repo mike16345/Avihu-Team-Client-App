@@ -14,6 +14,7 @@ export interface IUser {
   password?: string;
   hasAccess: boolean;
   profileImage?: string;
+  completedOnboarding?: boolean;
 }
 
 // WeighIn interface

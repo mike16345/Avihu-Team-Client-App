@@ -4,14 +4,17 @@ import ProfileScreen from "@/screens/ProfileScreen";
 import { RootStackParamList } from "@/types/navigatorTypes";
 import ChatHeader from "@/components/chat/ChatHeader";
 import ChatScreen from "@/screens/ChatScreen";
-import QuestionnaireScreen from "@/screens/QuestionnaireScreen";
+import FormPresetScreen from "@/screens/FormPresetScreen";
+import useInitialFormGate from "@/hooks/useInitialFormGate";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
+  useInitialFormGate();
+
   return (
     <Stack.Navigator initialRouteName="BottomTabs" screenOptions={{ headerShown: false }}>
-      {/*   <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
+      <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
       <Stack.Screen
         name="Profile"
         component={ProfileScreen}
@@ -25,8 +28,8 @@ export default function AppNavigator() {
           header: () => <ChatHeader />,
           headerShown: true,
         }}
-      /> */}
-      <Stack.Screen name="Questionnaire" component={QuestionnaireScreen} />
+      />
+      <Stack.Screen name="FormPreset" component={FormPresetScreen} />
     </Stack.Navigator>
   );
 }
