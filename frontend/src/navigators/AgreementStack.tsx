@@ -80,7 +80,10 @@ const AgreementStack = () => {
         <Stack.Screen
           name="AgreementPdfViewer"
           component={AgreementPdfViewerScreen}
-          options={{ headerShown: true, title: "תקנון והסכם הצטרפות" }}
+          options={{
+            headerShown: true,
+            title: "תקנון והסכם הצטרפות",
+          }}
         />
         <Stack.Screen
           name="AgreementQuestions"
