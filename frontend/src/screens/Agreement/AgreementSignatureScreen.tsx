@@ -50,8 +50,6 @@ const AgreementSignatureScreen = () => {
       value: value,
     }));
 
-    console.warn("mappedAnswer", mappedAnswers[0]);
-
     const submissionPayload: ISignedAgreement = {
       agreementId: currentAgreement?.agreementId!,
       agreementVersion: currentAgreement?.version!,
