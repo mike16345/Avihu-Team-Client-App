@@ -13,6 +13,7 @@ export type RootStackParamList = {
   Profile: undefined;
   Questionnaire: undefined;
   FormPreset: { formId: string };
+  agreements: undefined;
 };
 
 export type AuthStackParamList = {

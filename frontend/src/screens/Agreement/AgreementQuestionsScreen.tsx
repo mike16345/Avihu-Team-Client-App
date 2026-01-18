@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useFormContext } from "@/context/useFormContext";
 import useStyles from "@/styles/useGlobalStyles";
@@ -6,6 +6,7 @@ import { AgreementStackParamList } from "@/navigators/AgreementStack";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import QuestionContainer from "@/components/forms/question/QuestionContainer";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 type AgreementQuestionsScreenNavigationProp = NativeStackNavigationProp<
   AgreementStackParamList,
@@ -28,7 +29,9 @@ const AgreementQuestionsScreen = () => {
 
   return (
     <View style={[layout.flex1, spacing.pdBottomBar]}>
-      <ScrollView contentContainerStyle={[spacing.pdStatusBar, spacing.pdBottomBar, spacing.gap20]}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={[spacing.pdStatusBar, spacing.pdBottomBar, spacing.gap20]}
+      >
         {section.questions.map((question, i) => (
           <QuestionContainer
             key={question._id}
@@ -36,7 +39,7 @@ const AgreementQuestionsScreen = () => {
             isLast={i === section.questions.length - 1}
           />
         ))}
-      </ScrollView>
+      </KeyboardAwareScrollView>
 
       <PrimaryButton onPress={handleContinue} block style={styles.button}>
         המשך לחתימה

@@ -40,9 +40,10 @@ const useInitialFormGate = () => {
       if (!currentUser || hasNavigatedRef.current) return;
 
       const hasCompletedOnboarding = !!currentUser.completedOnboarding;
+      const hasSignedAgreement = !!currentUser.signedAgreement;
 
       // 1. Onboarding
-      if (hasCompletedOnboarding) {
+      if (!hasCompletedOnboarding) {
         try {
           const onboardingForm = await queryClient.fetchQuery<FormPreset>({
             queryKey: [ONBOARDING_FORM_PRESET_KEY],
@@ -56,6 +57,11 @@ const useInitialFormGate = () => {
         } catch (error) {
           console.error("Error fetching onboarding form:", error);
         }
+      }
+
+      if (!hasSignedAgreement) {
+        navigation.navigate("agreements");
+        return;
       }
 
       // 2. Monthly

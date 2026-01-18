@@ -12,7 +12,7 @@ export interface IFormResponse {
 
 export interface IAgreement {
   agreementId: string;
-  version: string;
+  version: number;
   pdfUrl: string;
   questions: FormQuestion[];
 }

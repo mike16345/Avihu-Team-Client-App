@@ -7,7 +7,8 @@ export type FormQuestionType =
   | "range"
   | "file-upload"
   | "checkboxes"
-  | "drop-down";
+  | "drop-down"
+  | "yes-no";
 
 export interface FormQuestion {
   _id: string;

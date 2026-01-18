@@ -13,6 +13,7 @@ import { useFormContext } from "@/context/useFormContext";
 import { DropDownContextProvider } from "@/context/useDropdown";
 import DropDownTrigger from "@/components/ui/dropwdown/DropDownTrigger";
 import DropDownContent from "@/components/ui/dropwdown/DropDownContent";
+import YesOrNo from "../inputs/YesOrNo";
 
 interface QuestionInputProps {
   question: FormQuestion;
@@ -64,6 +65,13 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
         return (
           <RadioGroup
             options={question.options || []}
+            value={questionValue as string}
+            onChange={(value) => updateAnswer(question._id, String(value))}
+          />
+        );
+      case "yes-no":
+        return (
+          <YesOrNo
             value={questionValue as string}
             onChange={(value) => updateAnswer(question._id, String(value))}
           />

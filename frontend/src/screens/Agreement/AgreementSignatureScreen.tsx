@@ -1,17 +1,26 @@
 import { useRef, useState } from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions, useWindowDimensions } from "react-native";
 import SignatureScreen, { SignatureViewRef } from "react-native-signature-canvas";
 import useStyles from "@/styles/useGlobalStyles";
 import { useFormContext } from "@/context/useFormContext";
-import { mockAgreement } from "@/mock/agreement";
-import { Text } from "@/components/ui/Text";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
+import { useCurrentAgreementStore } from "@/store/agreementStore";
+import { useAgreementApi } from "@/hooks/api/useAgreementApi";
+import { ISignedAgreement } from "@/interfaces/IFormResponse";
+import { useUserStore } from "@/store/userStore";
+import { useNavigation } from "@react-navigation/native";
+import { useToast } from "@/hooks/useToast";
 
 const AgreementSignatureScreen = () => {
   const ref = useRef<SignatureViewRef>(null);
   const [signature, setSignature] = useState<string | null>(null);
   const { answers } = useFormContext(); // Using FormProvider from parent, so context is available
   const { spacing } = useStyles();
+  const { currentAgreement, setCurrentAgreement } = useCurrentAgreementStore();
+  const { sendSignedAgreement } = useAgreementApi();
+  const currentUserId = useUserStore((state) => state.currentUser?._id);
+  const navigation = useNavigation();
+  const { triggerErrorToast } = useToast();
 
   const handleOK = (sig: string) => {
     setSignature(sig);
@@ -26,32 +35,43 @@ const AgreementSignatureScreen = () => {
     ref.current?.readSignature();
   };
 
-  const handleAgreeAndContinue = () => {
+  const handleAgreeAndContinue = async () => {
     if (!signature) {
-      // TODO: Show an error message to the user
       console.log("Please provide a signature.");
       return;
     }
 
-    const submissionPayload = {
-      agreementId: mockAgreement.agreementId,
-      agreementVersion: mockAgreement.version,
-      answers,
-      signatureBase64: signature,
+    const mappedAnswers = Object.entries(answers).map(([key, value]) => ({
+      questionId: key,
+      answer: value,
+    }));
+    console.warn(mappedAnswers);
+
+    const submissionPayload: ISignedAgreement = {
+      agreementId: currentAgreement?.agreementId!,
+      agreementVersion: currentAgreement?.version!,
+      answers: mappedAnswers as any,
+      signaturePngBase64: signature,
+      userId: currentUserId!,
     };
 
-    console.log("Mock Submission Payload:", submissionPayload);
+    try {
+      await sendSignedAgreement(submissionPayload);
 
-    // TODO: Implement real submission logic here
-    // e.g., call a mutation to send the data to the server
-    // After successful submission, navigate to the next screen in the app flow.
+      setCurrentAgreement(null);
+      navigation.navigate("BottomTabs");
+    } catch (error: any) {
+      triggerErrorToast({ title: error.message });
+    }
   };
 
   const webStyle = `
   .m-signature-pad {
     box-shadow: none; 
     border: 1px solid #eee;
-    height: ${Dimensions.get("window").height * 0.6}px;
+    height: ${useWindowDimensions().height * 0.6}px;
+    width: ${useWindowDimensions().width}px;
+    margin: 0 auto;
     background-color:#F8F8F8
   }
   .m-signature-pad--body {
@@ -71,7 +91,10 @@ const AgreementSignatureScreen = () => {
         webStyle={webStyle}
         onEnd={handleEnd}
         penColor={"#000"}
+        imageType="image/png"
+        trimWhitespace
       />
+
       <View style={[spacing.pdHorizontalMd, spacing.pdLg, styles.buttonContainer]}>
         <View style={styles.row}>
           <PrimaryButton mode="light" onPress={handleClear} style={styles.flex}>

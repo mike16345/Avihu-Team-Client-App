@@ -10,9 +10,16 @@ interface CheckboxProps {
   onCheck: (val: boolean) => void;
   label?: string;
   direction?: "rtl" | "ltr";
+  disabled?: boolean;
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({ onCheck, isChecked, label, direction = "rtl" }) => {
+const Checkbox: React.FC<CheckboxProps> = ({
+  onCheck,
+  isChecked,
+  label,
+  direction = "rtl",
+  disabled = false,
+}) => {
   const { colors, common, layout, spacing } = useStyles();
 
   const background = isChecked ? colors.backgroundPrimary : {};
@@ -21,7 +28,14 @@ const Checkbox: React.FC<CheckboxProps> = ({ onCheck, isChecked, label, directio
   return (
     <TouchableOpacity
       onPress={() => onCheck(!isChecked)}
-      style={[flexDirection, layout.itemsCenter, spacing.gapDefault, layout.alignSelfStart]}
+      style={[
+        flexDirection,
+        layout.itemsCenter,
+        spacing.gapDefault,
+        layout.alignSelfStart,
+        disabled && styles.disabled,
+      ]}
+      disabled={disabled}
     >
       <View
         style={[common.roundedXs, common.borderXsm, styles.checkbox, layout.center, background]}
@@ -37,6 +51,7 @@ const Checkbox: React.FC<CheckboxProps> = ({ onCheck, isChecked, label, directio
 
 const styles = StyleSheet.create({
   checkbox: { height: 20, width: 20 },
+  disabled: { opacity: 0.5 },
 });
 
 export default Checkbox;

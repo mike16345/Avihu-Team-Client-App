@@ -5,9 +5,10 @@ import SpinningIcon from "./loaders/SpinningIcon";
 
 interface Props {
   uri: string;
+  onScrollToEnd: () => void;
 }
 
-const PDFViewer: React.FC<Props> = ({ uri }) => {
+const PDFViewer: React.FC<Props> = ({ uri, onScrollToEnd }) => {
   const source = useMemo(
     () => ({
       uri,
@@ -25,13 +26,14 @@ const PDFViewer: React.FC<Props> = ({ uri }) => {
         onLoadComplete={(pages) => {
           console.log(`Loaded PDF with ${pages} pages`);
         }}
-        onPageChanged={(page) => {
-          console.log(`Current page: ${page}`);
+        onPageChanged={(page, numberOfPages) => {
+          if (page !== numberOfPages) return;
+          onScrollToEnd();
         }}
         onError={(error) => {
           console.error("PDF load error", error);
         }}
-        renderActivityIndicator={() => <SpinningIcon mode="dark" />}
+        renderActivityIndicator={() => <SpinningIcon mode="light" />}
       />
     </View>
   );
