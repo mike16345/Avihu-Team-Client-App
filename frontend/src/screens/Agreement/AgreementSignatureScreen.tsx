@@ -10,17 +10,21 @@ import { ISignedAgreement } from "@/interfaces/IFormResponse";
 import { useUserStore } from "@/store/userStore";
 import { useNavigation } from "@react-navigation/native";
 import { useToast } from "@/hooks/useToast";
+import { ConditionalRender } from "@/components/ui/ConditionalRender";
+import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
 
 const AgreementSignatureScreen = () => {
   const ref = useRef<SignatureViewRef>(null);
-  const [signature, setSignature] = useState<string | null>(null);
   const { answers } = useFormContext(); // Using FormProvider from parent, so context is available
-  const { spacing } = useStyles();
+  const { spacing, layout } = useStyles();
   const { currentAgreement, setCurrentAgreement } = useCurrentAgreementStore();
   const { sendSignedAgreement } = useAgreementApi();
   const currentUserId = useUserStore((state) => state.currentUser?._id);
   const navigation = useNavigation();
   const { triggerErrorToast } = useToast();
+
+  const [signature, setSignature] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleOK = (sig: string) => {
     setSignature(sig);
@@ -45,7 +49,6 @@ const AgreementSignatureScreen = () => {
       questionId: key,
       answer: value,
     }));
-    console.warn(mappedAnswers);
 
     const submissionPayload: ISignedAgreement = {
       agreementId: currentAgreement?.agreementId!,
@@ -56,12 +59,15 @@ const AgreementSignatureScreen = () => {
     };
 
     try {
+      setIsLoading(true);
       await sendSignedAgreement(submissionPayload);
 
       setCurrentAgreement(null);
       navigation.navigate("BottomTabs");
     } catch (error: any) {
       triggerErrorToast({ title: error.message });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -85,22 +91,39 @@ const AgreementSignatureScreen = () => {
 
   return (
     <View style={[styles.container]}>
-      <SignatureScreen
-        ref={ref}
-        onOK={handleOK}
-        webStyle={webStyle}
-        onEnd={handleEnd}
-        penColor={"#000"}
-        imageType="image/png"
-        trimWhitespace
-      />
+      <ConditionalRender condition={!isLoading}>
+        <SignatureScreen
+          ref={ref}
+          onOK={handleOK}
+          webStyle={webStyle}
+          onEnd={handleEnd}
+          penColor={"#000"}
+          imageType="image/png"
+          trimWhitespace
+        />
+      </ConditionalRender>
+      <ConditionalRender condition={isLoading}>
+        <View style={[layout.flex1, layout.center]}>
+          <SpinningIcon mode="light" />
+        </View>
+      </ConditionalRender>
 
       <View style={[spacing.pdHorizontalMd, spacing.pdLg, styles.buttonContainer]}>
         <View style={styles.row}>
-          <PrimaryButton mode="light" onPress={handleClear} style={styles.flex}>
+          <PrimaryButton
+            mode="light"
+            onPress={handleClear}
+            style={styles.flex}
+            disabled={isLoading}
+          >
             נקה
           </PrimaryButton>
-          <PrimaryButton onPress={handleAgreeAndContinue} style={styles.flex} disabled={!signature}>
+          <PrimaryButton
+            onPress={handleAgreeAndContinue}
+            style={styles.flex}
+            disabled={!signature}
+            loading={isLoading}
+          >
             חתימה ושליחה
           </PrimaryButton>
         </View>
