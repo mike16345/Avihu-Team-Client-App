@@ -16,7 +16,7 @@ const INPUT_HEIGHT = 140; // close to your textarea minHeight
 const YesOrNo: React.FC<YesOrNoProps> = ({ value, onChange }) => {
   const { layout, spacing, colors, common } = useStyles();
 
-  const [selectedOption, setSelectedOption] = useState(value);
+  const [selectedOption, setSelectedOption] = useState(value !== "לא" ? "כן" : value);
   const hasSelectedYes = selectedOption === "כן";
   const [inputValue, setInputValue] = useState(hasSelectedYes ? value : "");
 

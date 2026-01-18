@@ -47,8 +47,10 @@ const AgreementSignatureScreen = () => {
 
     const mappedAnswers = Object.entries(answers).map(([key, value]) => ({
       questionId: key,
-      answer: value,
+      value: value,
     }));
+
+    console.warn("mappedAnswer", mappedAnswers[0]);
 
     const submissionPayload: ISignedAgreement = {
       agreementId: currentAgreement?.agreementId!,
@@ -65,7 +67,7 @@ const AgreementSignatureScreen = () => {
       setCurrentAgreement(null);
       navigation.navigate("BottomTabs");
     } catch (error: any) {
-      triggerErrorToast({ title: error.message });
+      triggerErrorToast({ message: error.message });
     } finally {
       setIsLoading(false);
     }
