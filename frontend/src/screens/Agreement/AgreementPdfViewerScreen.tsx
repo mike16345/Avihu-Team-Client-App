@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { mockAgreement } from "@/mock/agreement";
 import Checkbox from "@/components/ui/Checkbox";
 import useStyles from "@/styles/useGlobalStyles";
-import { AgreementStackParamList } from "@/navigators/AgreementStack"; // This will be created later
+import { AgreementStackParamList } from "@/navigators/AgreementStack";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import PDFViewer from "@/components/ui/PDFViewer";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
@@ -25,18 +25,18 @@ const AgreementPdfViewerScreen = () => {
   };
 
   return (
-    <View style={[layout.flexRow, styles.container, spacing.pdStatusBar]}>
+    <View style={[layout.flexRow, styles.container]}>
       <View style={[{ height: pdfHeight }]}>
         <PDFViewer uri={mockAgreement.pdfUrl} />
       </View>
       <View style={[spacing.pdHorizontalMd, spacing.pdLg, styles.bottomContainer]}>
         <Checkbox
-          label="קראתי ואני מאשר את התקנון"
+          label="אני מאשר/ת כי קראתי והבנתי את מלוא תנאי ההסכם והתקנון"
           isChecked={agreed}
           onCheck={() => setAgreed(!agreed)}
         />
         <PrimaryButton onPress={handleContinue} block disabled={!agreed}>
-          המשך
+          קראתי, בואו נמשיך
         </PrimaryButton>
       </View>
     </View>

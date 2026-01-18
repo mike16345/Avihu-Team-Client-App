@@ -27,7 +27,7 @@ const AgreementQuestionsScreen = () => {
   const section = sections[0];
 
   return (
-    <View style={[layout.flex1, spacing.pdStatusBar, spacing.pdBottomBar]}>
+    <View style={[layout.flex1, spacing.pdBottomBar]}>
       <ScrollView contentContainerStyle={[spacing.pdStatusBar, spacing.pdBottomBar, spacing.gap20]}>
         {section.questions.map((question, i) => (
           <QuestionContainer
@@ -39,7 +39,7 @@ const AgreementQuestionsScreen = () => {
       </ScrollView>
 
       <PrimaryButton onPress={handleContinue} block style={styles.button}>
-        המשך
+        המשך לחתימה
       </PrimaryButton>
     </View>
   );

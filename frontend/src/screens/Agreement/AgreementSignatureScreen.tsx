@@ -64,10 +64,7 @@ const AgreementSignatureScreen = () => {
   `;
 
   return (
-    <View style={[styles.container, spacing.pdStatusBar]}>
-      <Text style={styles.title} fontVariant="semibold">
-        אנא חתמו כאן
-      </Text>
+    <View style={[styles.container]}>
       <SignatureScreen
         ref={ref}
         onOK={handleOK}
@@ -81,7 +78,7 @@ const AgreementSignatureScreen = () => {
             נקה
           </PrimaryButton>
           <PrimaryButton onPress={handleAgreeAndContinue} style={styles.flex} disabled={!signature}>
-            אישור והמשך
+            חתימה ושליחה
           </PrimaryButton>
         </View>
       </View>

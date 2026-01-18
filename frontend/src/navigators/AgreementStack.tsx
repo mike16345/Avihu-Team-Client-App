@@ -24,18 +24,20 @@ const AgreementStack = () => {
       <Stack.Screen
         name="AgreementPdfViewer"
         component={AgreementPdfViewerScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: true, title: "תקנון והסכם הצטרפות" }}
       />
       <Stack.Screen
         name="AgreementQuestions"
         component={AgreementQuestionsScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: true, title: "שאלון רפואי והצהרת בריאות", headerBackTitle: "חזור" }}
       />
       <Stack.Screen
         name="AgreementSignature"
         component={AgreementSignatureScreen}
         options={{
-          headerShown: false,
+          headerShown: true,
+          title: "חתימה ואישור התנאים",
+          headerBackTitle: "חזור",
         }}
       />
     </Stack.Navigator>
