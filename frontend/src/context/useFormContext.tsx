@@ -86,8 +86,9 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [errors, setErrors] = useState<QuestionErrors>({});
+  const [isPending, setIsPending] = useState(false);
 
-  const { mutateAsync, isPending } = useAddFormResponse();
+  const { mutateAsync } = useAddFormResponse();
 
   const didInitStackRef = useRef(false);
   const hasInitializedRef = useRef(false);
@@ -298,6 +299,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
   };
 
   const handleSubmit = async () => {
+    setIsPending(true);
     if (sections.some((_, i) => hasInvalidOptionsInSection(i))) {
       const invalid: QuestionErrors = {};
       sections.forEach((s) =>
@@ -321,6 +323,8 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       updateFormProgress(form._id, { answers: finalAnswers });
       markFormCompleted();
       removeNotification(form._id);
+      let navigationPath = "BottomTabs";
+
       if (formType == "onboarding") {
         queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
 
@@ -328,9 +332,11 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
           ...currentUser,
           completedOnboarding: true,
         });
+
+        navigationPath = "agreements";
       }
 
-      navigation.navigate("BottomTabs");
+      navigation.navigate(navigationPath as any);
 
       triggerSuccessToast({ title: "הטופס נשלח בהצלחה" });
     } catch (error) {
@@ -366,6 +372,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
     clearFormProgress(form._id);
     onComplete?.();
+    setIsPending(false);
   };
 
   return (

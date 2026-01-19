@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { FormQuestion } from "@/interfaces/FormPreset";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
@@ -12,16 +12,17 @@ interface QuestionContainerProps {
 }
 
 const QuestionContainer = ({ question, isLast }: QuestionContainerProps) => {
-  const { spacing, layout, colors } = useStyles();
+  const { spacing, layout, colors, text } = useStyles();
   const { errors, invalidOptionsByQuestionId } = useFormContext();
+  const { width } = useWindowDimensions();
 
   return (
     <View key={question._id} style={[spacing.gapMd, !isLast && styles.borderBottom]}>
-      <View style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
+      <View style={[layout.flexRow, layout.itemsStart, spacing.gapSm, { width: width * 0.9 }]}>
         <Text
           fontVariant="semibold"
           fontSize={16}
-          style={[colors.textPrimary, styles.paddingStart]}
+          style={[colors.textPrimary, styles.paddingStart, text.textLeft]}
         >
           {question.question}
         </Text>
@@ -35,7 +36,7 @@ const QuestionContainer = ({ question, isLast }: QuestionContainerProps) => {
         <Text
           fontVariant="regular"
           fontSize={14}
-          style={[styles.subtitle, styles.right, styles.paddingStart]}
+          style={[styles.subtitle, styles.right, styles.paddingStart, { width: width * 0.9 }]}
         >
           {question.description}
         </Text>

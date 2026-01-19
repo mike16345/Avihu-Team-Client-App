@@ -46,7 +46,13 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
         הקודם
       </PrimaryButton>
       {isLast ? (
-        <PrimaryButton style={layout.flex1} block onPress={handleSubmit} loading={isLoading}>
+        <PrimaryButton
+          style={layout.flex1}
+          block
+          onPress={handleSubmit}
+          disabled={isLoading}
+          loading={isLoading}
+        >
           שלח
         </PrimaryButton>
       ) : (
