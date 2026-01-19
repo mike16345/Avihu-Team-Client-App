@@ -323,22 +323,6 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       updateFormProgress(form._id, { answers: finalAnswers });
       markFormCompleted();
       removeNotification(form._id);
-      let navigationPath = "BottomTabs";
-
-      if (formType == "onboarding") {
-        queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
-
-        setCurrentUser({
-          ...currentUser,
-          completedOnboarding: true,
-        });
-
-        navigationPath = "agreements";
-      }
-
-      navigation.navigate(navigationPath as any);
-
-      triggerSuccessToast({ title: "הטופס נשלח בהצלחה" });
     } catch (error) {
       triggerErrorToast({ message: "Failed to upload files." });
     }
@@ -363,13 +347,25 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
     const occurrenceKey = getOccurrenceKeyForForm(form);
     const store = useFormStore.getState();
+    let navigationPath = "BottomTabs";
 
     if (form.type === "onboarding") {
       store.markOnboardingCompleted(userId);
+      queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
+
+      setCurrentUser({
+        ...currentUser,
+        completedOnboarding: true,
+      });
+
+      navigationPath = "agreements";
+
+      triggerSuccessToast({ title: "הטופס נשלח בהצלחה" });
     } else if (occurrenceKey) {
       store.markGeneralCompletion(userId, form._id, occurrenceKey);
     }
 
+    navigation.navigate(navigationPath as any);
     clearFormProgress(form._id);
     onComplete?.();
     setIsPending(false);

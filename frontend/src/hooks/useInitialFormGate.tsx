@@ -20,7 +20,8 @@ type NavigationProp = NativeStackNavigationProp<any>;
 const useInitialFormGate = () => {
   const navigation = useNavigation<NavigationProp>();
   const currentUser = useUserStore((state) => state.currentUser);
-  const { setActiveFormId, isFormCompleted } = useFormStore();
+  const { setActiveFormId, isFormCompleted, agreementSignedByUserId, onboardingCompletedByUserId } =
+    useFormStore();
   const queryClient = useQueryClient();
   const hasNavigatedRef = useRef(false);
   const { getOnBoardingFormPreset, getFormPresets, getGeneralFormForToday } = useFormPresetsApi();
@@ -39,8 +40,10 @@ const useInitialFormGate = () => {
     const performChecks = async () => {
       if (!currentUser || hasNavigatedRef.current) return;
 
-      const hasCompletedOnboarding = !!currentUser.completedOnboarding;
-      const hasSignedAgreement = !!currentUser.signedAgreement;
+      const markedCompleted = onboardingCompletedByUserId[currentUser._id];
+      const markedSigned = agreementSignedByUserId[currentUser._id];
+      const hasCompletedOnboarding = !!currentUser.completedOnboarding || !!markedCompleted;
+      const hasSignedAgreement = !!currentUser.signedAgreement || !!markedSigned;
 
       // 1. Onboarding
       if (!hasCompletedOnboarding) {

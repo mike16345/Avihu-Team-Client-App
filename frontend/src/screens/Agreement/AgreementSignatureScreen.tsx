@@ -12,6 +12,9 @@ import { useNavigation } from "@react-navigation/native";
 import { useToast } from "@/hooks/useToast";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
+import { useFormStore } from "@/store/formStore";
+import { useQueryClient } from "@tanstack/react-query";
+import { USER_KEY } from "@/constants/reactQuery";
 
 const AgreementSignatureScreen = () => {
   const ref = useRef<SignatureViewRef>(null);
@@ -19,9 +22,12 @@ const AgreementSignatureScreen = () => {
   const { spacing, layout } = useStyles();
   const { currentAgreement, setCurrentAgreement } = useCurrentAgreementStore();
   const { sendSignedAgreement } = useAgreementApi();
-  const currentUserId = useUserStore((state) => state.currentUser?._id);
   const navigation = useNavigation();
   const { triggerErrorToast } = useToast();
+  const { currentUser, setCurrentUser } = useUserStore();
+  const { markAgreementSigned } = useFormStore();
+  const queryClient = useQueryClient();
+  const userId = currentUser?._id!;
 
   const [signature, setSignature] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -55,13 +61,20 @@ const AgreementSignatureScreen = () => {
       agreementVersion: currentAgreement?.version!,
       answers: mappedAnswers as any,
       signaturePngBase64: signature,
-      userId: currentUserId!,
+      userId,
     };
 
     try {
       setIsLoading(true);
       await sendSignedAgreement(submissionPayload);
 
+      markAgreementSigned(userId);
+      queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
+
+      setCurrentUser({
+        ...currentUser!,
+        signedAgreement: true,
+      });
       setCurrentAgreement(null);
       navigation.navigate("BottomTabs");
     } catch (error: any) {

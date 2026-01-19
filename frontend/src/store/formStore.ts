@@ -30,6 +30,8 @@ interface FormStore {
   clearFormProgress: (formId: string) => void;
   onboardingCompletedByUserId: CompletionByUserId;
   markOnboardingCompleted: (userId: string) => void;
+  agreementSignedByUserId: CompletionByUserId;
+  markAgreementSigned: (userId: string) => void;
   monthlyCompletionByUserId: MonthlyCompletionByUserId;
   generalCompletionByUserId: GeneralCompletionByUserId;
   markMonthlyCompletion: (userId: string, formId: string, monthKey: string) => void;
@@ -83,6 +85,14 @@ export const useFormStore = create<FormStore>()(
         set((state) => ({
           onboardingCompletedByUserId: {
             ...state.onboardingCompletedByUserId,
+            [userId]: true,
+          },
+        })),
+      agreementSignedByUserId: {},
+      markAgreementSigned: (userId) =>
+        set((state) => ({
+          agreementSignedByUserId: {
+            ...state.agreementSignedByUserId,
             [userId]: true,
           },
         })),
