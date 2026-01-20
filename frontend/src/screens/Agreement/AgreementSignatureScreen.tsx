@@ -23,7 +23,7 @@ const AgreementSignatureScreen = () => {
   const { currentAgreement, setCurrentAgreement } = useCurrentAgreementStore();
   const { sendSignedAgreement } = useAgreementApi();
   const navigation = useNavigation();
-  const { triggerErrorToast } = useToast();
+  const { triggerErrorToast, triggerSuccessToast } = useToast();
   const { currentUser, setCurrentUser } = useUserStore();
   const { markAgreementSigned } = useFormStore();
   const queryClient = useQueryClient();
@@ -67,7 +67,6 @@ const AgreementSignatureScreen = () => {
     try {
       setIsLoading(true);
       await sendSignedAgreement(submissionPayload);
-
       markAgreementSigned(userId);
       queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
 
@@ -76,6 +75,7 @@ const AgreementSignatureScreen = () => {
         signedAgreement: true,
       });
       setCurrentAgreement(null);
+      triggerSuccessToast({ message: "חתימה הושלמה בהצלחה" });
       navigation.navigate("BottomTabs");
     } catch (error: any) {
       triggerErrorToast({ message: error.message });

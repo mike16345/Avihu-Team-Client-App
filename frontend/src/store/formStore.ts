@@ -164,6 +164,7 @@ export const useFormStore = create<FormStore>()(
         activeFormId: state.activeFormId,
         progressByFormId: state.progressByFormId,
         onboardingCompletedByUserId: state.onboardingCompletedByUserId,
+        agreementSignedByUserId: state.agreementSignedByUserId,
         monthlyCompletionByUserId: state.monthlyCompletionByUserId,
         generalCompletionByUserId: state.generalCompletionByUserId,
         shownNotifications: state.shownNotifications,

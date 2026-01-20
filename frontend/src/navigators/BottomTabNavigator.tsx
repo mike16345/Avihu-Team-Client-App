@@ -19,7 +19,7 @@ const TAB_BAR_HEIGHT = 70;
 const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "Home";
 
 const BottomTabNavigator = () => {
-  const { layout, colors, common, fonts, spacing } = useStyles();
+  const { layout, colors, common, spacing } = useStyles();
   const { width } = useWindowDimensions();
   const { initializeNotifications } = useNotification();
 
@@ -148,7 +148,12 @@ const BottomTabNavigator = () => {
         ]}
       >
         <Icon name={indicators[activeIndex].icon} color="white" />
-        <Text fontVariant="semibold" style={[colors.textOnPrimary, fonts.sm]}>
+        <Text
+          allowFontScaling={false}
+          fontSize={11}
+          fontVariant="semibold"
+          style={[colors.textOnPrimary]}
+        >
           {indicators[activeIndex].name}
         </Text>
       </Animated.View>
