@@ -11,6 +11,7 @@ import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
 import { View } from "react-native";
 import { useLayoutStyles } from "@/styles/useLayoutStyles";
 import { useCurrentAgreementStore } from "@/store/agreementStore";
+import { useDisableAndroidBack } from "@/hooks/useDisableAndroidBack";
 
 export type AgreementStackParamList = {
   AgreementPdfViewer: undefined;
@@ -59,6 +60,8 @@ const AgreementStack = () => {
     }
   };
 
+  useDisableAndroidBack();
+
   useEffect(() => {
     loadAgreement();
   }, []);
@@ -83,6 +86,7 @@ const AgreementStack = () => {
           options={{
             headerShown: true,
             title: "תקנון והסכם הצטרפות",
+            headerBackVisible: false,
           }}
         />
         <Stack.Screen

@@ -12,7 +12,7 @@ const URL = isPreview
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: URL,
-  timeout: 20000,
+  timeout: 60000,
 });
 
 export default axiosInstance;

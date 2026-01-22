@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 6,
     elevation: 3,
-    width: 100,
+    alignSelf: "flex-start",
   },
   stepPillText: {
     color: "#072723",

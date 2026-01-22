@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 
@@ -17,7 +17,7 @@ const YesOrNo: React.FC<YesOrNoProps> = ({ value, onChange }) => {
   const { layout, spacing, colors, common } = useStyles();
 
   const [selectedOption, setSelectedOption] = useState(value !== "לא" ? "כן" : value);
-  const hasSelectedYes = selectedOption === "כן";
+  const hasSelectedYes = useMemo(() => selectedOption === "כן", [selectedOption]);
   const [inputValue, setInputValue] = useState(hasSelectedYes ? value : "");
 
   /** 🔹 animated values */

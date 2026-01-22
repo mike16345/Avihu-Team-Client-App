@@ -62,7 +62,7 @@ const useInitialFormGate = () => {
         }
       }
 
-      if (!hasSignedAgreement) {
+      if (hasSignedAgreement) {
         navigation.navigate("agreements");
         return;
       }
