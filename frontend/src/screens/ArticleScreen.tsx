@@ -3,6 +3,7 @@ import ArticleSkeleton from "@/components/ui/loaders/skeletons/ArticleSkeleton";
 import { Text } from "@/components/ui/Text";
 import useArticleCountQuery from "@/hooks/queries/articles/useArticleCountQuery";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
+import { useUserStore } from "@/store/userStore";
 import useStyles from "@/styles/useGlobalStyles";
 import { useMemo } from "react";
 import { RefreshControl, ScrollView } from "react-native";
@@ -10,8 +11,9 @@ import { RefreshControl, ScrollView } from "react-native";
 const ArticleScreen = () => {
   const { colors, layout, spacing, text } = useStyles();
   const { isRefreshing, refresh } = usePullDownToRefresh();
+  const planType = useUserStore((state) => state.currentUser?.planType || "");
 
-  const { data, isLoading, refetch } = useArticleCountQuery();
+  const { data, isLoading, refetch } = useArticleCountQuery(planType);
 
   const articleGroups = useMemo(() => {
     if (!data)

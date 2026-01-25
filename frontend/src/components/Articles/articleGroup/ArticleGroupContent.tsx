@@ -15,6 +15,7 @@ import ErrorScreen from "@/screens/ErrorScreen";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 import { useQueryClient } from "@tanstack/react-query";
 import { ARTICLE_KEY } from "@/constants/reactQuery";
+import { useUserStore } from "@/store/userStore";
 
 interface ArticleGroupContentProps {
   groupId: string;
@@ -22,17 +23,18 @@ interface ArticleGroupContentProps {
 
 const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) => {
   const queryClient = useQueryClient();
+  const planType = useUserStore((state) => state.currentUser?.planType || "");
 
   const { layout, spacing, text } = useStyles();
-  const { isRefreshing } = usePullDownToRefresh();
 
   const {
     data: articleRes,
+    isRefetching,
     isFetchingNextPage,
     fetchNextPage,
     isLoading,
     isError,
-  } = useArticleQuery(groupId);
+  } = useArticleQuery(groupId, planType);
 
   const articles = useMemo(() => {
     const articles = articleRes?.pages.flatMap((page) => page.results) ?? [];
@@ -43,13 +45,13 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
   }, [articleRes?.pageParams, articleRes?.pages]);
 
   const handleRefresh = () => {
-    queryClient.invalidateQueries({ queryKey: [ARTICLE_KEY + groupId] });
+    queryClient.invalidateQueries({ queryKey: [ARTICLE_KEY + groupId + planType] });
   };
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
 
-    const paddingToBottom = 20; // optional buffer
+    const paddingToBottom = 20;
     const isBottom =
       layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
 
@@ -66,7 +68,7 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
         style={[layout.flex1]}
         contentContainerStyle={[spacing.gap20, spacing.pdHorizontalLg]}
         onScroll={handleScroll}
-        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+        refreshControl={<RefreshControl refreshing={isRefetching  } onRefresh={handleRefresh} />}
         topShadow={false}
       >
         {articles}
