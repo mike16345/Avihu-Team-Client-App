@@ -32,6 +32,9 @@ export const MAX_REPS = 125;
 export const MIN_WEIGHT = 0;
 export const MAX_WEIGHT = 250;
 
+export const INVALID_OPTIONS_MESSAGE = "שגיאת נתונים בטופס.";
+export const REQUIRED_MESSAGE = "אנא מלא/י את השאלה.";
+
 export const DEFAULT_SET: Omit<SetInput, "setNumber"> = {
   repsDone: 0,
   weight: 0,

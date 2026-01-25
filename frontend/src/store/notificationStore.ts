@@ -12,7 +12,7 @@ export interface INotification {
   title: string | null;
   body: string | null;
   data: any;
-  type: "weighIn" | "measurement";
+  type: "weighIn" | "measurement" | "monthlyForm" | "generalForm";
   triggerTime: Date;
   status: "pending" | "delivered";
 }
@@ -22,6 +22,9 @@ interface INotificationStore {
   getPendingNotifications: () => INotification[];
   getDeliveredNotifications: () => INotification[];
   addNotification: (notification: INotification) => void;
+  addMonthlyFormNotification: (id: string) => void;
+  addGeneralFormNotification: (id: string) => void;
+  addFormNotification: (id: string, type: "generalForm" | "monthlyForm") => void;
   addWeighInNotification: (id?: string) => void;
   addMeasurementNotification: (id?: string) => void;
   addNotificationsIfNecessary: () => void;
@@ -52,6 +55,32 @@ export const useNotificationStore = create<INotificationStore>()(
               return isPassedTriggerTime ? { ...n, status: "delivered" } : n;
             }),
           };
+        });
+      },
+
+      addMonthlyFormNotification: (id) => {
+        get().addFormNotification(id, "monthlyForm");
+      },
+
+      addGeneralFormNotification: (id) => {
+        get().addFormNotification(id, "generalForm");
+      },
+
+      addFormNotification: (id, type) => {
+        const data = { id };
+        const isGeneralForm = type === "generalForm";
+        const body = isGeneralForm
+          ? NotificationBodies.GENERAL_FORM_REMINDER
+          : NotificationBodies.MONTHLY_FORM_REMINDER;
+
+        get().addNotification({
+          id: data.id,
+          status: "delivered",
+          title: NOTIFICATION_TITLE,
+          data,
+          type,
+          triggerTime: new Date(),
+          body,
         });
       },
 

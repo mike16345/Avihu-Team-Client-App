@@ -11,6 +11,8 @@ export type RootStackParamList = {
   BottomTabs: undefined;
   Chat: undefined;
   Profile: undefined;
+  Questionnaire: undefined;
+  FormPreset: { formId: string };
 };
 
 export type AuthStackParamList = {

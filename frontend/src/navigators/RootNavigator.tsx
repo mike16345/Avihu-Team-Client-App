@@ -19,8 +19,7 @@ const RootNavigator = () => {
   const { currentUser, setCurrentUser } = useUserStore();
   const { data } = useUserQuery(currentUser?._id);
   const { checkUserSessionToken } = useUserApi();
-  const { initializeNotifications, requestPermissions, notificationReceivedListener } =
-    useNotification();
+  const { requestPermissions } = useNotification();
   const { handleLogout } = useLogout();
 
   const [loading, setLoading] = useState(true);
@@ -67,12 +66,6 @@ const RootNavigator = () => {
     checkLoginStatus().then(() => setLoading(false));
 
     requestPermissions().catch((err) => console.log(err));
-
-    const notificationListener = notificationReceivedListener();
-
-    return () => {
-      notificationListener?.remove();
-    };
   }, []);
 
   useEffect(() => {

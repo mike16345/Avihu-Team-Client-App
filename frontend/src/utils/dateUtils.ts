@@ -78,6 +78,12 @@ class DateUtils {
     return moment().tz(timezone).format(formatType);
   }
 
+  static getStartOfDayLocal(date = new Date(), timezone = "Asia/Jerusalem") {
+    const m = moment.tz(date, timezone).startOf("day");
+
+    return m.format("YYYY-MM-DD[T]HH:mm:ss.SSS");
+  }
+
   static getDay() {
     return DAYS_OF_WEEK[moment().day()];
   }
