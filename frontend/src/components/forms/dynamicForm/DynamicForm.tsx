@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import FormSectionScreen from "./formSection/FormSectionScreen";
 import { FormProvider } from "@/context/useFormContext";
 import { Platform } from "react-native";
-import { disableBackButton, useDisableAndroidBack } from "@/hooks/useDisableAndroidBack";
 
 interface DynamicFormProps {
   form: FormPreset;
@@ -60,8 +59,6 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ form, onComplete }) => {
     () => calculateAscending(),
     [progress?.currentSectionIndex, progress?.previousSectionIndex]
   );
-
-  useDisableAndroidBack();
 
   useEffect(() => {
     if (hasInitializedRef.current) return;

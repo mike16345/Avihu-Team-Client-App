@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { View, StyleSheet, useWindowDimensions } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, StyleSheet, useWindowDimensions, Platform, BackHandler } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import Checkbox from "@/components/ui/Checkbox";
 import useStyles from "@/styles/useGlobalStyles";
 import { AgreementStackParamList } from "@/navigators/AgreementStack";
@@ -17,20 +17,30 @@ type AgreementPdfViewerScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const AgreementPdfViewerScreen = () => {
+  const { height } = useWindowDimensions();
   const [agreed, setAgreed] = useState(false);
   const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
   const navigation = useNavigation<AgreementPdfViewerScreenNavigationProp>();
   const { spacing, layout } = useStyles();
-  const pdfHeight = useWindowDimensions().height * 0.7;
   const { currentAgreement } = useCurrentAgreementStore();
 
   const handleContinue = () => {
     navigation.navigate("AgreementQuestions");
   };
 
+  useFocusEffect(() => {
+    if (Platform.OS !== "android") return;
+
+    const handler = BackHandler.addEventListener("hardwareBackPress", () => true);
+
+    return () => {
+      handler.remove();
+    };
+  });
+
   return (
-    <View style={[layout.flexRow, styles.container]}>
-      <View style={[{ height: pdfHeight }]}>
+    <View style={[styles.container, { height }]}>
+      <View style={layout.flex1}>
         <ConditionalRender condition={currentAgreement?.pdfUrl}>
           <PDFViewer
             uri={currentAgreement?.pdfUrl!}
@@ -60,10 +70,8 @@ const AgreementPdfViewerScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, gap: 20 },
   bottomContainer: {
-    position: "absolute",
-    bottom: 20,
     justifyContent: "center",
     width: "100%",
     gap: 30,

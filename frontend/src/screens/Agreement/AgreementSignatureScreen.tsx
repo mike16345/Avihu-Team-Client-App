@@ -1,5 +1,12 @@
-import { useRef, useState } from "react";
-import { View, StyleSheet, Dimensions, useWindowDimensions } from "react-native";
+import { useCallback, useRef, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  useWindowDimensions,
+  Platform,
+  BackHandler,
+} from "react-native";
 import SignatureScreen, { SignatureViewRef } from "react-native-signature-canvas";
 import useStyles from "@/styles/useGlobalStyles";
 import { useFormContext } from "@/context/useFormContext";
@@ -8,7 +15,7 @@ import { useCurrentAgreementStore } from "@/store/agreementStore";
 import { useAgreementApi } from "@/hooks/api/useAgreementApi";
 import { ISignedAgreement } from "@/interfaces/IFormResponse";
 import { useUserStore } from "@/store/userStore";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useToast } from "@/hooks/useToast";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
@@ -101,6 +108,23 @@ const AgreementSignatureScreen = () => {
     height:0
   }
   `;
+
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== "android") return;
+
+      const handler = BackHandler.addEventListener("hardwareBackPress", () => {
+        if (isLoading) {
+          return true; // Prevent back when loading
+        }
+        return false; // Allow back when not loading
+      });
+
+      return () => {
+        handler.remove();
+      };
+    }, [isLoading]) // Re-register handler when isLoading changes
+  );
 
   return (
     <View style={[styles.container]}>

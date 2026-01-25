@@ -1,7 +1,7 @@
-import { View } from "react-native";
-import { useEffect } from "react";
+import { BackHandler, Platform, View } from "react-native";
+import { useCallback, useEffect } from "react";
 import useStyles from "@/styles/useGlobalStyles";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { SectionStackParamList } from "../DynamicForm";
 import FormSectionHeader from "./FormSectionHeader";
 import FormSectionFooter from "./FormSectionFooter";
@@ -61,6 +61,23 @@ const FormSectionScreen = ({
       });
     }
   }, [sectionIndex]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== "android") return;
+
+      const handler = BackHandler.addEventListener("hardwareBackPress", () => {
+        if (sectionIndex === initialSectionIndex) {
+          return true; // Prevent back when loading
+        }
+        return false; // Allow back when not loading
+      });
+
+      return () => {
+        handler.remove();
+      };
+    }, [sectionIndex, initialSectionIndex]) // Re-register handler when isLoading changes
+  );
 
   const goNext = () => {
     if (hasInvalidOptionsInSection(sectionIndex) || !validateSection(sectionIndex)) return;
