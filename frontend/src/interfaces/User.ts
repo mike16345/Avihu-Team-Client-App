@@ -14,8 +14,8 @@ export interface IUser {
   password?: string;
   hasAccess: boolean;
   profileImage?: string;
-  completedOnboarding?: boolean;
-  signedAgreement?: boolean;
+  role: "admin" | "user" | "trainer";
+  onboardingStep: "form" | "agreement" | "completed";
 }
 
 // WeighIn interface

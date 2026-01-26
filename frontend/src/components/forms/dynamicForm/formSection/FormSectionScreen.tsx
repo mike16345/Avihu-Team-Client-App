@@ -91,6 +91,12 @@ const FormSectionScreen = ({
     }
   };
 
+  const submitForm = () => {
+    if (hasInvalidOptionsInSection(sectionIndex) || !validateSection(sectionIndex)) return;
+
+    handleSubmit();
+  };
+
   return (
     <View style={[layout.flex1, spacing.pdStatusBar, spacing.pdBottomBar]}>
       <FormSectionHeader
@@ -105,7 +111,7 @@ const FormSectionScreen = ({
       <FormSectionFooter
         goBack={() => navigation.push("FormSection", { sectionIndex: sectionIndex - 1 })}
         goNext={goNext}
-        handleSubmit={handleSubmit}
+        handleSubmit={submitForm}
         isLast={isLast}
         sectionIndex={sectionIndex}
         isLoading={isPending}

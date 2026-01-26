@@ -169,12 +169,14 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
   /* ---------------- validation ---------------- */
 
   const buildQuestionSchema = (q: FormQuestion) => {
+    console.warn("question", q);
+
     if (!q.required) return z.any().optional();
 
     switch (q.type) {
       case "range":
         return z.coerce
-          .number({ required_error: REQUIRED_MESSAGE })
+          .number({ invalid_type_error: REQUIRED_MESSAGE })
           .min(1, { message: REQUIRED_MESSAGE });
       case "file-upload":
         return z

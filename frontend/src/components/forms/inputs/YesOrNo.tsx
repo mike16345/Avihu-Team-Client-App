@@ -16,7 +16,9 @@ const INPUT_HEIGHT = 140; // close to your textarea minHeight
 const YesOrNo: React.FC<YesOrNoProps> = ({ value, onChange }) => {
   const { layout, spacing, colors, common } = useStyles();
 
+  const isValueYesOrNo = useMemo(() => value === "כן" || value === "לא", [value]);
   const [selectedOption, setSelectedOption] = useState(value !== "לא" ? "כן" : value);
+  const [other, setOther] = useState<string>(isValueYesOrNo ? "" : value);
   const hasSelectedYes = useMemo(() => selectedOption === "כן", [selectedOption]);
 
   /** 🔹 animated values */
@@ -30,6 +32,21 @@ const YesOrNo: React.FC<YesOrNoProps> = ({ value, onChange }) => {
       opacity: animatedOpacity.value,
     };
   });
+
+  const handleChangeText = (text: string) => {
+    setOther(text);
+    onChange(text);
+  };
+
+  const handlePress = (option: "כן" | "לא") => {
+    setSelectedOption(option);
+
+    if (option == "כן") {
+      handleChangeText("");
+    } else {
+      onChange(option);
+    }
+  };
 
   /** 🔹 animate when selection changes */
   useEffect(() => {
@@ -51,7 +68,7 @@ const YesOrNo: React.FC<YesOrNoProps> = ({ value, onChange }) => {
           return (
             <TouchableOpacity
               key={option}
-              onPress={() => setSelectedOption(option)}
+              onPress={() => handlePress(option as any)}
               style={[layout.flexRow, layout.itemsCenter, spacing.gapDefault]}
             >
               <View
@@ -81,8 +98,8 @@ const YesOrNo: React.FC<YesOrNoProps> = ({ value, onChange }) => {
         {hasSelectedYes && (
           <Input
             placeholder="אם כן, פרט"
-            value={value}
-            onChangeText={onChange}
+            value={other}
+            onChangeText={handleChangeText}
             style={[colors.backgroundSurface, styles.textarea]}
             multiline
             numberOfLines={4}

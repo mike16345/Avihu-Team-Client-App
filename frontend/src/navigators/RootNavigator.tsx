@@ -109,15 +109,13 @@ const RootNavigator = () => {
     let cancelled = false;
 
     const runGate = async () => {
+      const onBoardingStep = currentUser.onboardingStep;
+      if (onBoardingStep == "completed") return setInitialRoute({ route: "BottomTabs" });
+
       const markedCompleted = onboardingCompletedByUserId[userId];
       const markedSigned = agreementSignedByUserId[userId];
-      const hasCompletedOnboarding = !!currentUser.completedOnboarding || !!markedCompleted;
-      const hasSignedAgreement = !!currentUser.signedAgreement || !!markedSigned;
-
-      if (!hasSignedAgreement) {
-        if (!cancelled) setInitialRoute({ route: "agreements" });
-        return;
-      }
+      const hasCompletedOnboarding = onBoardingStep !== "form" || !!markedCompleted;
+      const hasSignedAgreement = onBoardingStep !== "agreement" || !!markedSigned;
 
       if (!hasCompletedOnboarding) {
         try {
@@ -138,6 +136,11 @@ const RootNavigator = () => {
         }
 
         if (!cancelled) setInitialRoute({ route: "BottomTabs" });
+        return;
+      }
+
+      if (!hasSignedAgreement) {
+        if (!cancelled) setInitialRoute({ route: "agreements" });
         return;
       }
 

@@ -93,7 +93,7 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
           <DropDownContextProvider
             onSelect={(value) => updateAnswer(question._id, String(value))}
             items={items}
-            initialValue={undefined}
+            initialValue={items[0]}
           >
             <DropDownTrigger />
             <DropDownContent />
