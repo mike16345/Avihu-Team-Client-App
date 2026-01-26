@@ -42,7 +42,7 @@ const useInitialFormGate = () => {
       const hasCompletedOnboarding = !!currentUser.completedOnboarding;
 
       // 1. Onboarding
-      if (hasCompletedOnboarding) {
+      if (!hasCompletedOnboarding) {
         try {
           const onboardingForm = await queryClient.fetchQuery<FormPreset>({
             queryKey: [ONBOARDING_FORM_PRESET_KEY],
