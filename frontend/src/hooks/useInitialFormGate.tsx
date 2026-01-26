@@ -1,12 +1,10 @@
-import { useNavigation } from "@react-navigation/native";
 import { useUserStore } from "@/store/userStore";
 import { useFormStore } from "@/store/formStore";
 import { useEffect, useRef } from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  ONBOARDING_FORM_PRESET_KEY,
   FORM_PRESETS_KEY,
+  ONBOARDING_FORM_PRESET_KEY,
   TODAYS_GENERAL_FORM_PRESET_KEY,
 } from "@/constants/reactQuery";
 import { useFormResponseApi } from "./api/useFormResponseApi";
@@ -15,57 +13,19 @@ import { FormPreset } from "@/interfaces/FormPreset";
 import { getOccurrenceKeyForForm } from "@/utils/formPresets";
 import { useNotificationStore } from "@/store/notificationStore";
 
-type NavigationProp = NativeStackNavigationProp<any>;
-
 const useInitialFormGate = () => {
-  const navigation = useNavigation<NavigationProp>();
   const currentUser = useUserStore((state) => state.currentUser);
-  const { setActiveFormId, isFormCompleted, agreementSignedByUserId, onboardingCompletedByUserId } =
-    useFormStore();
+  const { isFormCompleted } = useFormStore();
   const queryClient = useQueryClient();
-  const hasNavigatedRef = useRef(false);
-  const { getOnBoardingFormPreset, getFormPresets, getGeneralFormForToday } = useFormPresetsApi();
+  const didRunRef = useRef(false);
+  const { getFormPresets, getGeneralFormForToday } = useFormPresetsApi();
   const { getFormResponses } = useFormResponseApi();
   const { addGeneralFormNotification, addMonthlyFormNotification } = useNotificationStore();
 
-  // --- Navigation helper ---
-  const navigateToForm = (formId: string) => {
-    if (hasNavigatedRef.current) return;
-    hasNavigatedRef.current = true;
-    setActiveFormId(formId);
-    navigation.navigate("FormPreset", { formId });
-  };
-
   useEffect(() => {
     const performChecks = async () => {
-      if (!currentUser || hasNavigatedRef.current) return;
-
-      const markedCompleted = onboardingCompletedByUserId[currentUser._id];
-      const markedSigned = agreementSignedByUserId[currentUser._id];
-      const hasCompletedOnboarding = !!currentUser.completedOnboarding || !!markedCompleted;
-      const hasSignedAgreement = !!currentUser.signedAgreement || !!markedSigned;
-
-      // 1. Onboarding
-      if (!hasCompletedOnboarding) {
-        try {
-          const onboardingForm = await queryClient.fetchQuery<FormPreset>({
-            queryKey: [ONBOARDING_FORM_PRESET_KEY],
-            queryFn: getOnBoardingFormPreset,
-          });
-
-          if (onboardingForm) {
-            navigateToForm(onboardingForm._id);
-            return;
-          }
-        } catch (error) {
-          console.error("Error fetching onboarding form:", error);
-        }
-      }
-
-      if (!hasSignedAgreement) {
-        navigation.navigate("agreements");
-        return;
-      }
+      if (!currentUser || didRunRef.current) return;
+      didRunRef.current = true;
 
       // 2. Monthly
       const monthlySubmissions = await getFormResponses({

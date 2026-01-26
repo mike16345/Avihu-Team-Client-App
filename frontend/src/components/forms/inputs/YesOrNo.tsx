@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 
 import useStyles from "@/styles/useGlobalStyles";
@@ -18,19 +18,18 @@ const YesOrNo: React.FC<YesOrNoProps> = ({ value, onChange }) => {
 
   const [selectedOption, setSelectedOption] = useState(value !== "לא" ? "כן" : value);
   const hasSelectedYes = useMemo(() => selectedOption === "כן", [selectedOption]);
-  const [inputValue, setInputValue] = useState(hasSelectedYes ? value : "");
 
   /** 🔹 animated values */
   const animatedHeight = useSharedValue(0);
   const animatedOpacity = useSharedValue(0);
 
-  const handleUpdate = () => {
-    if (hasSelectedYes) onChange(inputValue!);
-    else {
-      setInputValue("");
-      onChange(selectedOption!);
-    }
-  };
+  /** 🔹 animated styles */
+  const inputContainerStyle = useAnimatedStyle(() => {
+    return {
+      height: animatedHeight.value,
+      opacity: animatedOpacity.value,
+    };
+  });
 
   /** 🔹 animate when selection changes */
   useEffect(() => {
@@ -41,17 +40,7 @@ const YesOrNo: React.FC<YesOrNoProps> = ({ value, onChange }) => {
     animatedOpacity.value = withTiming(hasSelectedYes ? 1 : 0, {
       duration: 200,
     });
-
-    handleUpdate();
   }, [hasSelectedYes]);
-
-  /** 🔹 animated styles */
-  const inputContainerStyle = useAnimatedStyle(() => {
-    return {
-      height: animatedHeight.value,
-      opacity: animatedOpacity.value,
-    };
-  });
 
   return (
     <View style={[spacing.gapMd]}>
@@ -92,12 +81,11 @@ const YesOrNo: React.FC<YesOrNoProps> = ({ value, onChange }) => {
         {hasSelectedYes && (
           <Input
             placeholder="אם כן, פרט"
-            value={inputValue}
-            onChangeText={setInputValue}
+            value={value}
+            onChangeText={onChange}
             style={[colors.backgroundSurface, styles.textarea]}
             multiline
             numberOfLines={4}
-            onBlur={handleUpdate}
           />
         )}
       </Animated.View>
@@ -105,7 +93,7 @@ const YesOrNo: React.FC<YesOrNoProps> = ({ value, onChange }) => {
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   radioOuter: {
     height: 20,
     width: 20,
@@ -121,6 +109,6 @@ const styles = {
     minHeight: 120,
     textAlignVertical: "top",
   },
-};
+});
 
 export default YesOrNo;

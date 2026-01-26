@@ -6,16 +6,26 @@ import ChatHeader from "@/components/chat/ChatHeader";
 import ChatScreen from "@/screens/ChatScreen";
 import FormPresetScreen from "@/screens/FormPresetScreen";
 import AgreementFlow from "./AgreementStack";
-import useInitialFormGate from "@/hooks/useInitialFormGate";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function AppNavigator() {
-  useInitialFormGate();
-
+export default function AppNavigator({
+  initialRoute = { route: "BottomTabs" },
+}: {
+  initialRoute: {
+    route: keyof RootStackParamList;
+    params?: RootStackParamList[keyof RootStackParamList];
+  };
+}) {
   return (
-    <Stack.Navigator initialRouteName="BottomTabs" screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="BottomTabs" component={BottomTabNavigator} />
+    <Stack.Navigator initialRouteName={initialRoute.route} screenOptions={{ headerShown: false }}>
+      <Stack.Screen
+        name="BottomTabs"
+        component={BottomTabNavigator}
+        initialParams={
+          initialRoute.route === "BottomTabs" ? (initialRoute.params as any) : undefined
+        }
+      />
       <Stack.Screen
         name="Profile"
         component={ProfileScreen}
@@ -34,11 +44,17 @@ export default function AppNavigator() {
         name="FormPreset"
         component={FormPresetScreen}
         options={{ headerBackVisible: false, gestureEnabled: false }}
+        initialParams={
+          initialRoute.route === "FormPreset" ? (initialRoute.params as any) : undefined
+        }
       />
       <Stack.Screen
         name="agreements"
         component={AgreementFlow}
         options={{ headerBackVisible: false, gestureEnabled: false }}
+        initialParams={
+          initialRoute.route === "agreements" ? (initialRoute.params as any) : undefined
+        }
       />
     </Stack.Navigator>
   );

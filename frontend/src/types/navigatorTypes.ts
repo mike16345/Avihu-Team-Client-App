@@ -8,6 +8,7 @@ import { NavigationHelpers, ParamListBase, RouteProp } from "@react-navigation/n
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export type RootStackParamList = {
+  Gate: undefined;
   BottomTabs: undefined;
   Chat: undefined;
   Profile: undefined;
