@@ -28,7 +28,10 @@ const RootNavigator = () => {
   const { triggerErrorToast } = useToast();
 
   const { getOnBoardingFormPreset } = useFormPresetsApi();
-  const { setActiveFormId, onboardingCompletedByUserId, agreementSignedByUserId } = useFormStore();
+
+  const agreementSignedByUserId = useFormStore((state) => state.agreementSignedByUserId);
+  const onboardingCompletedByUserId = useFormStore((state) => state.onboardingCompletedByUserId);
+  const setActiveFormId = useFormStore((state) => state.setActiveFormId);
 
   const currentUser = useUserStore((state) => state.currentUser);
   const setCurrentUser = useUserStore((state) => state.setCurrentUser);
@@ -42,7 +45,6 @@ const RootNavigator = () => {
   const [loading, setLoading] = useState(true);
   const [initialRoute, setInitialRoute] = useState<InitialRoute | null>(null);
 
-  // Ensures gate runs once per user id
   const gatedForUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
