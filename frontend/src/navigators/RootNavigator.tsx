@@ -114,11 +114,6 @@ const RootNavigator = () => {
       const hasCompletedOnboarding = !!currentUser.completedOnboarding || !!markedCompleted;
       const hasSignedAgreement = !!currentUser.signedAgreement || !!markedSigned;
 
-      if (!hasSignedAgreement) {
-        if (!cancelled) setInitialRoute({ route: "agreements" });
-        return;
-      }
-
       if (!hasCompletedOnboarding) {
         try {
           const onboardingForm = await queryClient.fetchQuery<FormPreset>({
@@ -138,6 +133,11 @@ const RootNavigator = () => {
         }
 
         if (!cancelled) setInitialRoute({ route: "BottomTabs" });
+        return;
+      }
+
+      if (!hasSignedAgreement) {
+        if (!cancelled) setInitialRoute({ route: "agreements" });
         return;
       }
 
