@@ -32,6 +32,7 @@ const DietItemContent: React.FC<DietItemContentProps> = ({ name, dietItem }) => 
             customItems={dietItem.customItems}
             foodGroup={apiFoodGroup}
             servingAmount={dietItem.quantity}
+            extraItems={dietItem.extraItems}
           />
         </View>
 
