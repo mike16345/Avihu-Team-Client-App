@@ -1,98 +1,53 @@
 import useStyles from "@/styles/useGlobalStyles";
-import React, { useEffect, useRef, useState } from "react";
-import {
-  View,
-  TouchableOpacity,
-  Animated,
-  StyleSheet,
-  Dimensions,
-  Modal,
-  ImageBackground,
-} from "react-native";
-import { useNavigationState } from "@react-navigation/native";
-import workoutPage from "@assets/avihu/workoutPage.jpeg";
-import dietScreen from "@assets/avihu/dietScreen.jpeg";
-import progressPage from "@assets/avihu/progressPage.jpeg";
-import recordExercisePage from "@assets/avihu/recordExercisePage.jpeg";
-import {  softHaptic } from "@/utils/haptics";
+import React, { useEffect, useState } from "react";
+import { View, TouchableOpacity, StyleSheet, Dimensions, Modal } from "react-native";
+import { softHaptic } from "@/utils/haptics";
+import Animated, { useSharedValue, withTiming } from "react-native-reanimated";
 
-const { height } = Dimensions.get("window");
+const { height: windowHeight } = Dimensions.get("window");
+const DRAWER_HEIGHT = windowHeight * 0.7;
 
 interface BottomDrawerProps {
   open: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  heightVariant?: `auto` | `fixed`;
+  heightVariant?: "auto" | "fixed";
 }
 
 const BottomDrawer: React.FC<BottomDrawerProps> = ({
   open,
   onClose,
   children,
-  heightVariant = `fixed`,
+  heightVariant = "fixed",
 }) => {
   const { colors } = useStyles();
-
-  const activePageIndex = useNavigationState((state) => {
-    const index = state.index;
-    const isRecordSet = state?.routes[1]?.name == `RecordSet`;
-
-    if (index !== 1 || !isRecordSet) return index;
-
-    return 3;
-  });
-
-  const slideAnim = useRef(new Animated.Value(height)).current;
-
   const [isVisible, setIsVisible] = useState(open);
+  const translateY = useSharedValue(DRAWER_HEIGHT);
 
   useEffect(() => {
     if (open) {
-      softHaptic()
-      setIsVisible(true); // Show the modal when open is true
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      setIsVisible(true);
+      translateY.value = withTiming(0);
+      softHaptic();
     } else {
-      softHaptic()
-      Animated.timing(slideAnim, {
-        toValue: height, // Slide out to the right
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => setIsVisible(false)); // Hide modal after animation completes
+      softHaptic();
+      translateY.value = withTiming(DRAWER_HEIGHT);
+      setIsVisible(false);
     }
   }, [open]);
 
   return (
     <Modal onRequestClose={onClose} transparent visible={isVisible} animationType="fade">
-      <TouchableOpacity style={[styles.overlay]} onPress={onClose} activeOpacity={1}>
-        <ImageBackground
-          source={
-            activePageIndex == 0
-              ? workoutPage
-              : activePageIndex == 1
-              ? dietScreen
-              : activePageIndex == 2
-              ? progressPage
-              : recordExercisePage
-          }
-          style={styles.overlay}
-          blurRadius={50}
-        />
-      </TouchableOpacity>
+      <TouchableOpacity style={styles.overlay} onPress={onClose} activeOpacity={1} />
+
       <Animated.View
         style={[
           styles.drawerContainer,
-          colors.background,
+          colors.backgroundSurface,
           {
-            borderWidth: 2,
-            borderBottomWidth: 0,
-            height: heightVariant === `fixed` ? height * 0.6 : `auto`,
+            height: heightVariant === "fixed" ? DRAWER_HEIGHT : "auto",
+            transform: [{ translateY }],
           },
-          colors.borderSecondaryContainer,
-          { transform: [{ translateY: slideAnim }] },
         ]}
       >
         <View style={styles.drawerContent}>{children}</View>
@@ -108,7 +63,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
   },
   drawerContainer: {
     position: "absolute",

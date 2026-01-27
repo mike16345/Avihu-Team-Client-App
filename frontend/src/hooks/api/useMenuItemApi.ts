@@ -6,8 +6,13 @@ import { ApiResponse } from "@/types/ApiTypes";
 const MENU_ITEMS_ENDPOINT = `menuItems`;
 
 const useMenuItemApi = () => {
-  const getAllMenuItems = () =>
-    fetchData<ApiResponse<CustomItems>>(MENU_ITEMS_ENDPOINT).then((res) => res.data);
+  const getAllMenuItems = (dietaryTypes: string[] = []) => {
+    let dietaryRestrictions = dietaryTypes.length > 0 ? dietaryTypes : undefined;
+
+    return fetchData<ApiResponse<CustomItems>>(MENU_ITEMS_ENDPOINT, {
+      dietaryRestrictions,
+    }).then((res) => res.data);
+  };
 
   const getMenuItems = (foodGroup: string, dietaryRestrictionsArray?: string[]) => {
     let dietaryRestrictions = dietaryRestrictionsArray ? dietaryRestrictionsArray : undefined;

@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Modal, StyleSheet, TouchableOpacity, View } from "react-native";
 import * as Updates from "expo-updates";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQueryClient } from "@tanstack/react-query";
+import { Text } from "@/components/ui/Text";
+
+const UPDATE_FLAG_KEY = "pending_update";
+const UPDATE_SKIP_COUNT_KEY = "pending_update_skips";
+const MAX_SKIPS = 3; // Allow 3 times before forcing update
 
 const Update = () => {
   const [updateMessageVisible, setUpdateMessageVisible] = useState(false);
@@ -10,16 +16,18 @@ const Update = () => {
   const installUpdate = async () => {
     try {
       await Updates.fetchUpdateAsync();
-      await Updates.reloadAsync();
-
+      await AsyncStorage.multiRemove([UPDATE_FLAG_KEY, UPDATE_SKIP_COUNT_KEY]);
       queryClient.clear();
+      await Updates.reloadAsync();
     } catch (error) {
       console.error("Error installing the update:", error);
     }
   };
 
-  const closeModal = () => {
+  const closeModal = async () => {
     setUpdateMessageVisible(false);
+    const count = parseInt((await AsyncStorage.getItem(UPDATE_SKIP_COUNT_KEY)) || "0", 10);
+    await AsyncStorage.setItem(UPDATE_SKIP_COUNT_KEY, String(count + 1));
   };
 
   useEffect(() => {
@@ -30,8 +38,23 @@ const Update = () => {
           return;
         }
 
+        const pending = await AsyncStorage.getItem(UPDATE_FLAG_KEY);
+        const skips = parseInt((await AsyncStorage.getItem(UPDATE_SKIP_COUNT_KEY)) || "0", 10);
+
+        if (pending) {
+          if (skips >= MAX_SKIPS) {
+            // Force update after too many skips
+            await installUpdate();
+          } else {
+            setUpdateMessageVisible(true);
+          }
+          return;
+        }
+
         const update = await Updates.checkForUpdateAsync();
         if (update.isAvailable) {
+          await AsyncStorage.setItem(UPDATE_FLAG_KEY, "true");
+          await AsyncStorage.setItem(UPDATE_SKIP_COUNT_KEY, "0");
           setUpdateMessageVisible(true);
         }
       } catch (error) {
@@ -45,27 +68,23 @@ const Update = () => {
   return (
     <>
       {updateMessageVisible && (
-        <Modal
-          transparent
-          animationType="slide"
-          visible={updateMessageVisible}
-          onRequestClose={closeModal}
-        >
+        <Modal transparent animationType="slide" visible onRequestClose={closeModal}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Update Available</Text>
+              <Text style={styles.modalTitle}>עדכון זמין</Text>
               <Text style={styles.modalText}>
-                A new version of the app is available. Would you like to install the update now?
+                גרסה חדשה של האפליקציה זמינה. מומלץ לעדכן כדי לקבל את כל השיפורים והתיקונים
+                האחרונים.
               </Text>
               <View style={styles.buttonContainer}>
-                <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={closeModal}>
-                  <Text style={styles.buttonText}>Later</Text>
-                </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.button, styles.updateButton]}
                   onPress={installUpdate}
                 >
-                  <Text style={styles.buttonText}>Update</Text>
+                  <Text style={styles.buttonText}>עדכן עכשיו</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={closeModal}>
+                  <Text style={styles.buttonText}>אחר כך</Text>
                 </TouchableOpacity>
               </View>
             </View>

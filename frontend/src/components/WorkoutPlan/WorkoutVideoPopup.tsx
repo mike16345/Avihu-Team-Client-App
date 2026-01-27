@@ -9,8 +9,8 @@ import {
   Platform,
 } from "react-native";
 import YoutubePlayer, { PLAYER_STATES, YoutubeIframeRef } from "react-native-youtube-iframe";
-import NativeIcon from "@/components/Icon/NativeIcon";
 import { getYouTubeThumbnail } from "@/utils/utils";
+import Icon from "../Icon/Icon";
 
 interface WorkoutVideoPopupProps {
   videoId: string;
@@ -19,7 +19,8 @@ interface WorkoutVideoPopupProps {
 }
 
 const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height = 200 }) => {
-  const videoWidth = width || useWindowDimensions().width - 40; // Account for padding
+  const { width: windowWidth } = useWindowDimensions();
+  const videoWidth = width || windowWidth - 40; // Account for padding
   const videoHeight = Platform.OS === "ios" ? height + 50 : height;
   const thumbnailUrl = getYouTubeThumbnail(videoId);
 
@@ -68,12 +69,7 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
             ]}
           />
           <View style={styles.playButton}>
-            <NativeIcon
-              library="MaterialCommunityIcons"
-              name="play"
-              color="white"
-              style={styles.playIcon}
-            />
+            <Icon name="playCircle" height={50} width={50} variant="solid" />
           </View>
         </TouchableOpacity>
       ) : (
@@ -91,7 +87,7 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
             onChangeState={handleVideoStateChange}
             initialPlayerParams={{ loop: false, rel: false }}
             width={Platform.OS == `ios` ? videoWidth * 0.95 : videoWidth}
-            height={Platform.OS == `ios` ? videoHeight * 0.85 : videoHeight}
+            height={Platform.OS == `ios` ? videoHeight * 0.75 : videoHeight}
             videoId={videoId}
             webViewStyle={styles.video}
           />
@@ -123,10 +119,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   playButton: {
+    alignItems: "center",
+    width: "100%",
     position: "absolute",
+    transform: [{ translateY: -25 }],
     top: "50%",
-    left: "50%",
-    transform: [{ translateX: -25 }, { translateY: -25 }],
     zIndex: 1,
   },
   playIcon: {

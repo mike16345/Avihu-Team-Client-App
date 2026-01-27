@@ -1,8 +1,5 @@
 {
-  "cli": {
-    "version": "16.6.1",
-    "appVersionSource": "remote"
-  },
+  "cli": { "appVersionSource": "remote" },
   "build": {
     "development": {
       "developmentClient": true,
@@ -10,24 +7,21 @@
       "channel": "development",
       "environment": "development"
     },
-
     "preview": {
-      "android": {
-        "buildType": "apk"
-      },
-      "distribution": "internal",
-      "channel": "preview"
+      "android": { "credentialsSource": "local" },
+      "distribution": "store",
+      "channel": "preview",
+      "autoIncrement": true,
+      "environment": "preview",
+      "ios": { "image": "macos-sequoia-15.3-xcode-16.2" }
     },
     "production": {
-      "android": {
-        "credentialsSource": "local"
-      },
+      "android": { "credentialsSource": "local" },
+      "ios": { "image": "macos-sequoia-15.3-xcode-16.2" },
       "environment": "production",
       "channel": "production",
       "autoIncrement": true
     }
   },
-  "submit": {
-    "production": {}
-  }
+  "submit": { "production": {} }
 }

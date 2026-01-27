@@ -1,28 +1,50 @@
-import { IExercise, IRecordedSet, IRecordedSetResponse } from "@/interfaces/Workout";
-import { ParamListBase, RouteProp } from "@react-navigation/native";
+import { IArticleCount } from "@/interfaces/IArticle";
+import { IExercise, IRecordedSetResponse } from "@/interfaces/Workout";
+import {
+  BottomTabNavigationEventMap,
+  BottomTabNavigationOptions,
+} from "@react-navigation/bottom-tabs";
+import { NavigationHelpers, ParamListBase, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export type RootStackParamList = {
-  Home: undefined;
+  BottomTabs: undefined;
+  Chat: undefined;
   Profile: undefined;
-  Settings: undefined;
-  MyWorkoutPlanPage: undefined;
-  MyDietPlanPage: undefined;
-  VideoGallery: undefined;
-  MyProgressScreen: undefined;
+};
+
+export type AuthStackParamList = {
+  SuccessScreen: { title: string; message: string };
   LoginScreen: undefined;
-  BlogScreen: undefined;
+};
+
+export type BottomStackParamList = {
+  Home: { window?: number; paramId?: string } | undefined;
+  MyWorkoutPlanPage: undefined;
+  ChatTab: undefined;
+  MyDietPlanPage: undefined;
+  MyProgressScreen: undefined;
+  ArticleScreen: undefined;
   EmailScreen: undefined;
+};
+
+export type ArticleStackParamsList = {
+  Articles: undefined;
+  ArticleGroup: {
+    articleGroup: IArticleCount;
+  };
+  ViewArticle: {
+    articleId: string;
+  };
 };
 
 export type WorkoutPlanStackParamList = {
   WorkoutPlanPage: undefined;
-  RecordSet: {
-    handleRecordSet: (recordSet: Omit<IRecordedSet, "plan">, sessionId?: string) => Promise<void>;
+  RecordExercise: {
     recordedSet?: IRecordedSetResponse;
     exercise: IExercise;
     muscleGroup: string;
-    setNumber: number;
+    plan: string;
   };
   RecordedSets: {
     recordedSets: IRecordedSetResponse[];
@@ -34,19 +56,21 @@ export type TabBarIconProps = { color: string; focused: boolean };
 export type TabBarBadge = string | number | boolean | undefined;
 
 export interface NavigatorTab {
-  name: keyof RootStackParamList;
+  name: keyof BottomStackParamList;
   component: () => React.ReactNode;
-  options: {
-    title?: string;
-    tabBarButtonTestID?: string;
-    tabBarLabel?: string;
-    tabBarBadge?: TabBarBadge;
-    tabBarAccessibilityLabel?: string;
-    tabBarIcon: TabBarIcon;
-  };
+  options: BottomTabNavigationOptions;
+  listeners?: (props: {
+    navigation: NavigationHelpers<ParamListBase, BottomTabNavigationEventMap>;
+    route: any;
+  }) => object;
 }
 
 export interface StackNavigatorProps<T extends ParamListBase, S extends keyof T> {
   route?: RouteProp<T, S>;
   navigation?: NativeStackNavigationProp<T, S>;
 }
+
+export type RootStackParamListNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+export type AuthStackParamListNavigationProp = NativeStackNavigationProp<AuthStackParamList>;
+export type WorkoutStackParamListNavigationProp =
+  NativeStackNavigationProp<WorkoutPlanStackParamList>;
