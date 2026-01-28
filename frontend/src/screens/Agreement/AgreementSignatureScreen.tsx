@@ -32,7 +32,7 @@ const AgreementSignatureScreen = () => {
   const { currentAgreement, setCurrentAgreement } = useCurrentAgreementStore();
   const { sendSignedAgreement } = useAgreementApi();
   const navigation = useNavigation<any>();
-  const { triggerErrorToast, triggerSuccessToast } = useToast();
+  const { triggerErrorToast } = useToast();
   const { currentUser, setCurrentUser } = useUserStore();
   const { markAgreementSigned } = useFormStore();
   const queryClient = useQueryClient();
@@ -84,7 +84,6 @@ const AgreementSignatureScreen = () => {
         signedAgreement: true,
       });
       setCurrentAgreement(null);
-      triggerSuccessToast({ message: "חתימה הושלמה בהצלחה" });
       navigation.navigate("AgreementSigned");
     } catch (error: any) {
       triggerErrorToast({ message: error.message });
