@@ -11,6 +11,7 @@ interface FoodItemSelectionProps {
   foodGroup: FoodGroup;
   servingAmount: number;
   customItems?: ICustomItem[];
+  extraItems?: string[];
 }
 
 const START_SLICE_INDEX = 0;
@@ -20,11 +21,14 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
   foodGroup,
   servingAmount = 1,
   customItems = [],
+  extraItems = [],
 }) => {
   const { center, wrap } = useLayoutStyles();
   const { data: items, isLoading } = useFoodGroupQuery(foodGroup);
 
   const formatted = useMemo(() => {
+    if (extraItems.length > 0) return extraItems.join(" | ");
+
     if (!items) return "";
     const allItems = [...customItems, ...items];
 
@@ -49,7 +53,11 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
 };
 
 const styles = StyleSheet.create({
-  foodItemSelectionContainr: { fontFamily: "Assistant-Regular", fontSize: 16, textAlign: "right" },
+  foodItemSelectionContainr: {
+    fontFamily: "Assistant-Regular",
+    fontSize: 16,
+    textAlign: "right",
+  },
 });
 
 export default FoodItemSelection;
