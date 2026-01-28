@@ -11,11 +11,13 @@ import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
 import { View } from "react-native";
 import { useLayoutStyles } from "@/styles/useLayoutStyles";
 import { useCurrentAgreementStore } from "@/store/agreementStore";
+import AgreementSignedScreen from "@/screens/Agreement/AgreementSignedScreen";
 
 export type AgreementStackParamList = {
   AgreementPdfViewer: undefined;
   AgreementQuestions: undefined;
   AgreementSignature: undefined;
+  AgreementSigned: undefined;
 };
 
 const Stack = createNativeStackNavigator<AgreementStackParamList>();
@@ -103,6 +105,13 @@ const AgreementStack = () => {
             title: "חתימה ואישור התנאים",
             headerBackTitle: "חזור",
             headerBackVisible: false,
+          }}
+        />
+        <Stack.Screen
+          name="AgreementSigned"
+          component={AgreementSignedScreen}
+          options={{
+            headerShown: false,
           }}
         />
       </Stack.Navigator>
