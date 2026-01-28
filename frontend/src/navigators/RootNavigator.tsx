@@ -45,8 +45,6 @@ const RootNavigator = () => {
   const [loading, setLoading] = useState(true);
   const [initialRoute, setInitialRoute] = useState<InitialRoute | null>(null);
 
-  const gatedForUserIdRef = useRef<string | null>(null);
-
   useEffect(() => {
     const bootstrap = async () => {
       try {
@@ -91,6 +89,8 @@ const RootNavigator = () => {
     requestPermissions().catch((err) => console.log(err));
   }, []);
 
+  useEffect(() => {}, [loading]);
+
   useEffect(() => {
     if (!data) return;
     setCurrentUser(data);
@@ -98,13 +98,11 @@ const RootNavigator = () => {
 
   useEffect(() => {
     const userId = currentUser?._id;
+
     if (!userId) {
       setInitialRoute(null);
       return;
     }
-
-    if (gatedForUserIdRef.current === userId) return;
-    gatedForUserIdRef.current = userId;
 
     let cancelled = false;
 
@@ -114,10 +112,10 @@ const RootNavigator = () => {
 
       const markedCompleted = onboardingCompletedByUserId[userId];
       const markedSigned = agreementSignedByUserId[userId];
-      const hasCompletedOnboarding = onBoardingStep !== "form" || !!markedCompleted;
-      const hasSignedAgreement = onBoardingStep !== "agreement" || !!markedSigned;
+      const showOnboardingForm = onBoardingStep == "form" || !markedCompleted;
+      const showAgreementForm = onBoardingStep == "agreement" || !markedSigned;
 
-      if (!hasCompletedOnboarding) {
+      if (showOnboardingForm) {
         try {
           const onboardingForm = await queryClient.fetchQuery<FormPreset>({
             queryKey: [ONBOARDING_FORM_PRESET_KEY],
@@ -139,7 +137,7 @@ const RootNavigator = () => {
         return;
       }
 
-      if (!hasSignedAgreement) {
+      if (showAgreementForm) {
         if (!cancelled) setInitialRoute({ route: "agreements" });
         return;
       }

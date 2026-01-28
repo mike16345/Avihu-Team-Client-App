@@ -22,6 +22,8 @@ import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
 import { useFormStore } from "@/store/formStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { USER_KEY } from "@/constants/reactQuery";
+import { Text } from "@/components/ui/Text";
+import Icon from "@/components/Icon/Icon";
 
 const AgreementSignatureScreen = () => {
   const ref = useRef<SignatureViewRef>(null);
@@ -29,8 +31,8 @@ const AgreementSignatureScreen = () => {
   const { spacing, layout } = useStyles();
   const { currentAgreement, setCurrentAgreement } = useCurrentAgreementStore();
   const { sendSignedAgreement } = useAgreementApi();
-  const navigation = useNavigation();
-  const { triggerErrorToast, triggerSuccessToast } = useToast();
+  const navigation = useNavigation<any>();
+  const { triggerErrorToast } = useToast();
   const { currentUser, setCurrentUser } = useUserStore();
   const { markAgreementSigned } = useFormStore();
   const queryClient = useQueryClient();
@@ -82,8 +84,7 @@ const AgreementSignatureScreen = () => {
         signedAgreement: true,
       });
       setCurrentAgreement(null);
-      triggerSuccessToast({ message: "חתימה הושלמה בהצלחה" });
-      navigation.navigate("BottomTabs");
+      navigation.navigate("AgreementSigned");
     } catch (error: any) {
       triggerErrorToast({ message: error.message });
     } finally {
@@ -140,7 +141,12 @@ const AgreementSignatureScreen = () => {
         />
       </ConditionalRender>
       <ConditionalRender condition={isLoading}>
-        <View style={[layout.flex1, layout.center]}>
+        <View style={[layout.flex1, layout.center, spacing.gapDefault]}>
+          <Icon name="upload" height={30} width={30} />
+          <Text fontVariant="bold" fontSize={18}>
+            שומרים את ההסכם שלך
+          </Text>
+          <Text>התהליך עשוי לקחת מספר שניות...</Text>
           <SpinningIcon mode="light" />
         </View>
       </ConditionalRender>

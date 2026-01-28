@@ -169,8 +169,6 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
   /* ---------------- validation ---------------- */
 
   const buildQuestionSchema = (q: FormQuestion) => {
-    console.warn("question", q);
-
     if (!q.required) return z.any().optional();
 
     switch (q.type) {
@@ -312,6 +310,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
         })
       );
       setErrors(invalid);
+      errorNotificationHaptic();
       return;
     }
 
