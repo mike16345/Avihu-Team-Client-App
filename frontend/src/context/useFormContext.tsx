@@ -366,7 +366,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       store.markGeneralCompletion(userId, form._id, occurrenceKey);
     }
 
-    navigation.navigate(navigationPath as any);
+    navigation.replace(navigationPath as any);
     clearFormProgress(form._id);
     onComplete?.();
     setIsPending(false);

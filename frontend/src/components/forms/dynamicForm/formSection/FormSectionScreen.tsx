@@ -8,6 +8,8 @@ import FormSectionFooter from "./FormSectionFooter";
 import FormSectionContent from "./FormSectionContent";
 import { useFormContext } from "@/context/useFormContext";
 import { useFormStore } from "@/store/formStore";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 
 const FormSectionScreen = ({
   route,
@@ -99,14 +101,21 @@ const FormSectionScreen = ({
 
   return (
     <View style={[layout.flex1, spacing.pdStatusBar, spacing.pdBottomBar]}>
-      <FormSectionHeader
-        currentSection={sectionIndex + 1}
-        totalSections={sections.length}
-        sectionTitle={section.title}
-        sectionDescription={section.description}
-      />
+      <CustomScrollView
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[spacing.pdVerticalMd, spacing.gapXl]}
+        nestedScrollEnabled
+      >
+        <FormSectionHeader
+          currentSection={sectionIndex + 1}
+          totalSections={sections.length}
+          sectionTitle={section.title}
+          sectionDescription={section.description}
+        />
 
-      <FormSectionContent currentSection={section} />
+        <FormSectionContent currentSection={section} />
+      </CustomScrollView>
 
       <FormSectionFooter
         goBack={() => navigation.push("FormSection", { sectionIndex: sectionIndex - 1 })}

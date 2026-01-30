@@ -5,6 +5,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { useFormContext } from "@/context/useFormContext";
 import { useNotificationStore } from "@/store/notificationStore";
+import AppIcon from "@/components/Icon/AppIcon";
 
 interface FormSectionHeaderProps {
   currentSection: number;
@@ -32,7 +33,7 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
       addMonthlyFormNotification(formId);
     }
 
-    navigation.navigate("BottomTabs");
+    navigation.replace("BottomTabs");
   };
 
   return (
@@ -44,6 +45,7 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
         { borderBottomWidth: 1, borderColor: "#cccccc" },
       ]}
     >
+      <AppIcon />
       <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
         <View style={[styles.stepPill, colors.backgroundSurface]}>
           <Text fontVariant="bold" style={styles.stepPillText}>
