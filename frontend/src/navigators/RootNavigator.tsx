@@ -112,8 +112,8 @@ const RootNavigator = () => {
 
       const markedCompleted = onboardingCompletedByUserId[userId];
       const markedSigned = agreementSignedByUserId[userId];
-      const showOnboardingForm = onBoardingStep == "form" || !markedCompleted;
-      const showAgreementForm = onBoardingStep == "agreement" || !markedSigned;
+      const showOnboardingForm = onBoardingStep == "form" && !markedCompleted;
+      const showAgreementForm = onBoardingStep == "agreement" && !markedSigned;
 
       if (showOnboardingForm) {
         try {

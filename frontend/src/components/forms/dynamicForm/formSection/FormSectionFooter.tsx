@@ -20,7 +20,7 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
   goBack,
   isLoading,
 }) => {
-  const { spacing, layout } = useStyles();
+  const { spacing, layout, colors } = useStyles();
   const containerWidth = useWindowDimensions().width;
 
   return (
@@ -31,9 +31,10 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
         layout.itemsCenter,
         spacing.pdHorizontalLg,
         spacing.gapLg,
-        spacing.pdVerticalLg,
+        spacing.pdVerticalSm,
         spacing.pdBottomBar,
-        { width: containerWidth, borderTopWidth: 1, borderColor: "#cccccc" },
+        colors.background,
+        { width: containerWidth, zIndex: 100 },
       ]}
     >
       <PrimaryButton

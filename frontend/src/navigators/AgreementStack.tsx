@@ -86,6 +86,7 @@ const AgreementStack = () => {
             headerShown: true,
             title: "תקנון והסכם הצטרפות",
             headerBackVisible: false,
+            gestureEnabled: false,
           }}
         />
         <Stack.Screen
@@ -101,10 +102,7 @@ const AgreementStack = () => {
           name="AgreementSignature"
           component={AgreementSignatureScreen}
           options={{
-            headerShown: true,
-            title: "חתימה ואישור התנאים",
-            headerBackTitle: "חזור",
-            headerBackVisible: false,
+            headerShown: false,
           }}
         />
         <Stack.Screen
@@ -112,6 +110,7 @@ const AgreementStack = () => {
           component={AgreementSignedScreen}
           options={{
             headerShown: false,
+            gestureEnabled: false,
           }}
         />
       </Stack.Navigator>

@@ -24,6 +24,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { USER_KEY } from "@/constants/reactQuery";
 import { Text } from "@/components/ui/Text";
 import Icon from "@/components/Icon/Icon";
+import AppIcon from "@/components/Icon/AppIcon";
+import FrameShadow from "@/components/ui/FrameShadow";
+import ButtonShadow from "@/components/ui/buttons/ButtonShadow";
 
 const AgreementSignatureScreen = () => {
   const ref = useRef<SignatureViewRef>(null);
@@ -84,7 +87,7 @@ const AgreementSignatureScreen = () => {
         signedAgreement: true,
       });
       setCurrentAgreement(null);
-      navigation.navigate("AgreementSigned");
+      navigation.replace("AgreementSigned");
     } catch (error: any) {
       triggerErrorToast({ message: error.message });
     } finally {
@@ -96,13 +99,15 @@ const AgreementSignatureScreen = () => {
   .m-signature-pad {
     box-shadow: none; 
     border: 1px solid #eee;
-    height: ${useWindowDimensions().height * 0.6}px;
-    width: ${useWindowDimensions().width}px;
+    height: ${200}px;
+    width: ${useWindowDimensions().width - 80}px;
+    border-radius:16px;
     margin: 0 auto;
     background-color:#F8F8F8
   }
   .m-signature-pad--body {
     border: 1px solid #eee;
+       border-radius:16px;
   }
   .m-signature-pad--footer {
     display: none;
@@ -128,7 +133,19 @@ const AgreementSignatureScreen = () => {
   );
 
   return (
-    <View style={[styles.container]}>
+    <View style={[styles.container, spacing.pdStatusBar]}>
+      <View style={[layout.center, spacing.gapXl, spacing.pdVertical20]}>
+        <ButtonShadow>
+          <AppIcon />
+        </ButtonShadow>
+        <View style={[layout.center]}>
+          <Text fontVariant="bold" fontSize={25}>
+            כל מה שנשאר זה השלב האחרון
+          </Text>
+          <Text fontSize={25}>לאשר את ההסכם ומתחילים!</Text>
+        </View>
+      </View>
+
       <ConditionalRender condition={!isLoading}>
         <SignatureScreen
           ref={ref}
@@ -164,8 +181,7 @@ const AgreementSignatureScreen = () => {
           <PrimaryButton
             onPress={handleAgreeAndContinue}
             style={styles.flex}
-            disabled={!signature}
-            loading={isLoading}
+            disabled={!signature || isLoading}
           >
             חתימה ושליחה
           </PrimaryButton>
@@ -179,6 +195,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+    gap: 20,
   },
   title: {
     fontSize: 20,
