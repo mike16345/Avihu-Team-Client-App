@@ -93,7 +93,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
   const wheelPickerPropsArray: WheelPickerProps[] = [
     {
       data: decimalWeightOptions,
-      selectedValue: decimalPart.toFixed(2),
+      selectedValue: decimalPart.toFixed(2).slice(1),
       onValueChange: (value) => {
         handleValueChange([wholePart, value]);
       },
@@ -145,7 +145,7 @@ const WeightWheelPicker: React.FC<WeightWheelPickerProps> = ({
       >
         <SectionWheelPicker
           data={wheelPickerPropsArray}
-          selectedValues={[decimalPart.toFixed(2), wholePart]}
+          selectedValues={[decimalPart.toFixed(2).slice(1), wholePart]}
           onValueChange={handleValueChange}
         />
       </View>
