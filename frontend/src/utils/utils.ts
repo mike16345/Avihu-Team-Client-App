@@ -49,8 +49,6 @@ export const extractVideoId = (url: string): string => {
     videoId = url.split("shorts/")[1]?.split("?")[0];
   }
 
-  console.log("extracted videoId:", videoId);
-
   return videoId;
 };
 
@@ -291,7 +289,7 @@ export function extractValuesFromArray<T, K extends keyof T>(array: T[], key: K)
 
 export function extractValuesFromObject<
   T extends Record<string, any>,
-  K extends keyof T[keyof T] = never
+  K extends keyof T[keyof T] = never,
 >(obj: T, innerKey?: K): (K extends never ? string : T[keyof T][K])[] {
   const keys = Object.keys(obj);
 
