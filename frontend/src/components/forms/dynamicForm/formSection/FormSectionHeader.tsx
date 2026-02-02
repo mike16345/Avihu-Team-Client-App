@@ -45,7 +45,9 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
         { borderBottomWidth: 1, borderColor: "#cccccc" },
       ]}
     >
-      <AppIcon />
+      <View style={layout.center}>
+        <AppIcon />
+      </View>
       <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
         <View style={[styles.stepPill, colors.backgroundSurface]}>
           <Text fontVariant="bold" style={styles.stepPillText}>

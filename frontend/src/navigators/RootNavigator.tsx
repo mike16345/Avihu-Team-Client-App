@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { useUserApi } from "@/hooks/api/useUserApi";
 import { useUserStore } from "@/store/userStore";
@@ -98,7 +98,6 @@ const RootNavigator = () => {
 
   useEffect(() => {
     const userId = currentUser?._id;
-
     if (!userId) {
       setInitialRoute(null);
       return;

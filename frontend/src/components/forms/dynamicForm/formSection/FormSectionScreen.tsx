@@ -8,7 +8,6 @@ import FormSectionFooter from "./FormSectionFooter";
 import FormSectionContent from "./FormSectionContent";
 import { useFormContext } from "@/context/useFormContext";
 import { useFormStore } from "@/store/formStore";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 
 const FormSectionScreen = ({
@@ -18,7 +17,7 @@ const FormSectionScreen = ({
   route: RouteProp<SectionStackParamList, "FormSection">;
   navigation: any;
 }) => {
-  const { spacing, layout } = useStyles();
+  const { spacing, layout, colors } = useStyles();
   const { updateFormProgress: updateFormStoreProgress } = useFormStore();
   const {
     sections,
@@ -106,6 +105,8 @@ const FormSectionScreen = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[spacing.pdVerticalMd, spacing.gapXl]}
         nestedScrollEnabled
+        topShadowFirstColor="#F2F2F2"
+        bottomShadowFirstColor="#F2F2F2"
       >
         <FormSectionHeader
           currentSection={sectionIndex + 1}

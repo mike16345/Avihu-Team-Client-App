@@ -18,29 +18,31 @@ const QuestionContainer = ({ question, isLast }: QuestionContainerProps) => {
 
   return (
     <View key={question._id} style={[spacing.gapMd, !isLast && styles.borderBottom]}>
-      <View style={[layout.flexRow, layout.itemsStart, spacing.gapSm, { width: width * 0.9 }]}>
-        <Text
-          fontVariant="semibold"
-          fontSize={16}
-          style={[colors.textPrimary, styles.paddingStart, text.textLeft]}
-        >
-          {question.question}
-        </Text>
-        {question.required ? (
-          <Text fontVariant="bold" fontSize={14} style={colors.textDanger}>
-            *
+      <View>
+        <View style={[layout.flexRow, layout.itemsStart, spacing.gapSm, { width: width * 0.9 }]}>
+          <Text
+            fontVariant="semibold"
+            fontSize={16}
+            style={[colors.textPrimary, styles.paddingStart, text.textLeft]}
+          >
+            {question.question}
+          </Text>
+          {question.required ? (
+            <Text fontVariant="bold" fontSize={14} style={colors.textDanger}>
+              *
+            </Text>
+          ) : null}
+        </View>
+        {question.description ? (
+          <Text
+            fontVariant="regular"
+            fontSize={14}
+            style={[styles.subtitle, styles.right, styles.paddingStart, { width: width * 0.9 }]}
+          >
+            {question.description}
           </Text>
         ) : null}
       </View>
-      {question.description ? (
-        <Text
-          fontVariant="regular"
-          fontSize={14}
-          style={[styles.subtitle, styles.right, styles.paddingStart, { width: width * 0.9 }]}
-        >
-          {question.description}
-        </Text>
-      ) : null}
 
       <View style={question.type !== "range" && spacing.pdHorizontalLg}>
         <QuestionInput
