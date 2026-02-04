@@ -82,7 +82,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ form, onComplete }) => {
 
   return (
     <FormProvider form={form} onComplete={onComplete}>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator screenOptions={{ headerShown: false, gestureEnabled: false }}>
         <Stack.Screen
           name="FormSection"
           component={FormSectionScreen}

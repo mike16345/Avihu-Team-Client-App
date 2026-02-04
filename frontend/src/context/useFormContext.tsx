@@ -138,6 +138,8 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       section.questions.forEach((q) => {
         if (progress?.answers?.[q._id] !== undefined) {
           initialAnswers[q._id] = progress.answers[q._id];
+        } else if (q.type === "yes-no") {
+          initialAnswers[q._id] = "לא";
         }
       });
     });

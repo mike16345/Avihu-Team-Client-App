@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { FormQuestion } from "@/interfaces/FormPreset";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
@@ -95,8 +95,10 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
             items={items}
             initialValue={items[0]}
           >
-            <DropDownTrigger />
-            <DropDownContent />
+            <View style={{ gap: 5 }}>
+              <DropDownTrigger />
+              <DropDownContent />
+            </View>
           </DropDownContextProvider>
         );
       }
