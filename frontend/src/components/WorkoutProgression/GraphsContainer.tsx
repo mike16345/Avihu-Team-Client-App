@@ -40,6 +40,10 @@ const GraphsContainer = () => {
     const setsByDate = groupRecordedSetsByDate(selectedValue);
     const { repAverages, weightAverages } = getDataAvgPerDate(setsByDate);
 
+    if (weightAverages.length === 0 || repAverages.length === 0) {
+      return { labels, reps, weights, repsTrend, weightsTrend };
+    }
+
     repsTrend = getGrowthTrend(repAverages[repAverages.length - 1].value, repAverages[0].value);
     weightsTrend = getGrowthTrend(
       weightAverages[weightAverages.length - 1].value,
