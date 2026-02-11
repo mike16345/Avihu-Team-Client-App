@@ -111,10 +111,18 @@ const RootNavigator = () => {
 
       const markedCompleted = onboardingCompletedByUserId[userId];
       const markedSigned = agreementSignedByUserId[userId];
-      const showOnboardingForm = onBoardingStep == "form" && !markedCompleted;
-      const showAgreementForm = onBoardingStep == "agreement" && !markedSigned;
 
-      if (showOnboardingForm) {
+      if (markedSigned) {
+        setInitialRoute({ route: "BottomTabs" });
+        return;
+      }
+
+      if (markedCompleted) {
+        setInitialRoute({ route: "agreements" });
+        return;
+      }
+
+      if (onBoardingStep == "form") {
         try {
           const onboardingForm = await queryClient.fetchQuery<FormPreset>({
             queryKey: [ONBOARDING_FORM_PRESET_KEY],
@@ -125,7 +133,10 @@ const RootNavigator = () => {
 
           if (onboardingForm?._id) {
             setActiveFormId(onboardingForm._id);
-            setInitialRoute({ route: "FormPreset", params: { formId: onboardingForm._id } as any });
+            setInitialRoute({
+              route: "FormPreset",
+              params: { formId: onboardingForm._id } as any,
+            });
             return;
           }
         } catch (error) {
@@ -134,9 +145,7 @@ const RootNavigator = () => {
 
         if (!cancelled) setInitialRoute({ route: "BottomTabs" });
         return;
-      }
-
-      if (showAgreementForm) {
+      } else if (onBoardingStep == "agreement") {
         if (!cancelled) setInitialRoute({ route: "agreements" });
         return;
       }

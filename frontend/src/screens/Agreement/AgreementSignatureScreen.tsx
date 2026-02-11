@@ -25,7 +25,6 @@ import { USER_KEY } from "@/constants/reactQuery";
 import { Text } from "@/components/ui/Text";
 import Icon from "@/components/Icon/Icon";
 import AppIcon from "@/components/Icon/AppIcon";
-import FrameShadow from "@/components/ui/FrameShadow";
 import ButtonShadow from "@/components/ui/buttons/ButtonShadow";
 
 const AgreementSignatureScreen = () => {

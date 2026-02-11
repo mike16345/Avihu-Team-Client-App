@@ -5,6 +5,7 @@ import { Text } from "@/components/ui/Text";
 import { StyleSheet } from "react-native";
 import QuestionInput from "./QuestionInput";
 import { useFormContext } from "@/context/useFormContext";
+import { ConditionalRender } from "@/components/ui/ConditionalRender";
 
 interface QuestionContainerProps {
   question: FormQuestion;
@@ -17,7 +18,7 @@ const QuestionContainer = ({ question, isLast }: QuestionContainerProps) => {
   const { width } = useWindowDimensions();
 
   return (
-    <View key={question._id} style={[spacing.gapMd, !isLast && styles.borderBottom]}>
+    <View key={question._id} style={[!isLast && styles.borderBottom, spacing.gapMd]}>
       <View>
         <View style={[layout.flexRow, layout.itemsStart, spacing.gapSm, { width: width * 0.9 }]}>
           <Text
@@ -33,7 +34,7 @@ const QuestionContainer = ({ question, isLast }: QuestionContainerProps) => {
             </Text>
           ) : null}
         </View>
-        {question.description ? (
+        <ConditionalRender condition={question.description?.trim()}>
           <Text
             fontVariant="regular"
             fontSize={14}
@@ -41,7 +42,7 @@ const QuestionContainer = ({ question, isLast }: QuestionContainerProps) => {
           >
             {question.description}
           </Text>
-        ) : null}
+        </ConditionalRender>
       </View>
 
       <View style={question.type !== "range" && spacing.pdHorizontalLg}>

@@ -16,7 +16,7 @@ import Animated, {
 import { successNotificationHaptic } from "@/utils/haptics";
 
 const AgreementSignedScreen = () => {
-  const { layout, spacing, colors, common } = useStyles();
+  const { layout, spacing, colors, common, text } = useStyles();
   const navigation = useNavigation<RootStackParamListNavigationProp>();
 
   const scale = useSharedValue(0);
@@ -57,10 +57,12 @@ const AgreementSignedScreen = () => {
           <Icon color={colors.background.backgroundColor} name="check" height={80} width={80} />
         </Animated.View>
         <View style={[layout.center, spacing.gapDefault]}>
-          <Text fontVariant="bold" fontSize={40}>
-            זהו, ההסכם אצלנו
+          <Text fontVariant="bold" fontSize={25}>
+            הפרטים נשלחו בהצלחה!
           </Text>
-          <Text>סיימנו עם הטפסים, אפשר להתחיל להשתמש באפליקציה.</Text>
+          <Text fontSize={20} style={text.textCenter}>
+            אני עובר על הכל אישית ומתחיל לבנות עבורך תוכנית מדויקת - זמן בנייה 2-3 ימים.
+          </Text>
         </View>
       </View>
       <PrimaryButton onPress={handlePress} block>
