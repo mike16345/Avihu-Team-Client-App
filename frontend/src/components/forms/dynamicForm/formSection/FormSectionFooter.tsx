@@ -31,9 +31,9 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
         layout.itemsCenter,
         spacing.pdHorizontalLg,
         spacing.gapLg,
-        spacing.pdVerticalLg,
+        spacing.pdVerticalSm,
         spacing.pdBottomBar,
-        { width: containerWidth, borderTopWidth: 1, borderColor: "#cccccc" },
+        { width: containerWidth, zIndex: 100, backgroundColor: "#F2F2F2" },
       ]}
     >
       <PrimaryButton
@@ -46,7 +46,13 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
         הקודם
       </PrimaryButton>
       {isLast ? (
-        <PrimaryButton style={layout.flex1} block onPress={handleSubmit} loading={isLoading}>
+        <PrimaryButton
+          style={layout.flex1}
+          block
+          onPress={handleSubmit}
+          disabled={isLoading}
+          loading={isLoading}
+        >
           שלח
         </PrimaryButton>
       ) : (

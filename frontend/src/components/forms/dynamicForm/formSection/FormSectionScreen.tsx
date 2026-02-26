@@ -1,13 +1,14 @@
-import { View } from "react-native";
-import { useEffect } from "react";
+import { BackHandler, Platform, View } from "react-native";
+import { useCallback, useEffect } from "react";
 import useStyles from "@/styles/useGlobalStyles";
-import { RouteProp } from "@react-navigation/native";
+import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { SectionStackParamList } from "../DynamicForm";
 import FormSectionHeader from "./FormSectionHeader";
 import FormSectionFooter from "./FormSectionFooter";
 import FormSectionContent from "./FormSectionContent";
 import { useFormContext } from "@/context/useFormContext";
 import { useFormStore } from "@/store/formStore";
+import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 
 const FormSectionScreen = ({
   route,
@@ -16,7 +17,7 @@ const FormSectionScreen = ({
   route: RouteProp<SectionStackParamList, "FormSection">;
   navigation: any;
 }) => {
-  const { spacing, layout } = useStyles();
+  const { spacing, layout, colors } = useStyles();
   const { updateFormProgress: updateFormStoreProgress } = useFormStore();
   const {
     sections,
@@ -62,6 +63,23 @@ const FormSectionScreen = ({
     }
   }, [sectionIndex]);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== "android") return;
+
+      const handler = BackHandler.addEventListener("hardwareBackPress", () => {
+        if (sectionIndex === initialSectionIndex) {
+          return true; // Prevent back when loading
+        }
+        return false; // Allow back when not loading
+      });
+
+      return () => {
+        handler.remove();
+      };
+    }, [sectionIndex, initialSectionIndex]) // Re-register handler when isLoading changes
+  );
+
   const goNext = () => {
     if (hasInvalidOptionsInSection(sectionIndex) || !validateSection(sectionIndex)) return;
 
@@ -74,21 +92,36 @@ const FormSectionScreen = ({
     }
   };
 
+  const submitForm = () => {
+    if (hasInvalidOptionsInSection(sectionIndex) || !validateSection(sectionIndex)) return;
+
+    handleSubmit();
+  };
+
   return (
     <View style={[layout.flex1, spacing.pdStatusBar, spacing.pdBottomBar]}>
-      <FormSectionHeader
-        currentSection={sectionIndex + 1}
-        totalSections={sections.length}
-        sectionTitle={section.title}
-        sectionDescription={section.description}
-      />
+      <CustomScrollView
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[spacing.pdVerticalMd, spacing.gapXl]}
+        nestedScrollEnabled
+        topShadowFirstColor="#F2F2F2"
+        bottomShadowFirstColor="#F2F2F2"
+      >
+        <FormSectionHeader
+          currentSection={sectionIndex + 1}
+          totalSections={sections.length}
+          sectionTitle={section.title}
+          sectionDescription={section.description}
+        />
 
-      <FormSectionContent currentSection={section} />
+        <FormSectionContent currentSection={section} />
+      </CustomScrollView>
 
       <FormSectionFooter
         goBack={() => navigation.push("FormSection", { sectionIndex: sectionIndex - 1 })}
         goNext={goNext}
-        handleSubmit={handleSubmit}
+        handleSubmit={submitForm}
         isLast={isLast}
         sectionIndex={sectionIndex}
         isLoading={isPending}

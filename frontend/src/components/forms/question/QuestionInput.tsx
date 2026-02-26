@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { FormQuestion } from "@/interfaces/FormPreset";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
@@ -13,6 +13,7 @@ import { useFormContext } from "@/context/useFormContext";
 import { DropDownContextProvider } from "@/context/useDropdown";
 import DropDownTrigger from "@/components/ui/dropwdown/DropDownTrigger";
 import DropDownContent from "@/components/ui/dropwdown/DropDownContent";
+import YesOrNo from "../inputs/YesOrNo";
 
 interface QuestionInputProps {
   question: FormQuestion;
@@ -68,6 +69,13 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
             onChange={(value) => updateAnswer(question._id, String(value))}
           />
         );
+      case "yes-no":
+        return (
+          <YesOrNo
+            value={questionValue as string}
+            onChange={(value) => updateAnswer(question._id, String(value))}
+          />
+        );
       case "checkboxes":
         return (
           <CheckboxGroup
@@ -85,10 +93,12 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
           <DropDownContextProvider
             onSelect={(value) => updateAnswer(question._id, String(value))}
             items={items}
-            initialValue={undefined}
+            initialValue={items[0]}
           >
-            <DropDownTrigger />
-            <DropDownContent />
+            <View style={{ gap: 5 }}>
+              <DropDownTrigger />
+              <DropDownContent />
+            </View>
           </DropDownContextProvider>
         );
       }

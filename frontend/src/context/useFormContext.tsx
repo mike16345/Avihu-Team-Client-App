@@ -86,8 +86,9 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [errors, setErrors] = useState<QuestionErrors>({});
+  const [isPending, setIsPending] = useState(false);
 
-  const { mutateAsync, isPending } = useAddFormResponse();
+  const { mutateAsync } = useAddFormResponse();
 
   const didInitStackRef = useRef(false);
   const hasInitializedRef = useRef(false);
@@ -137,6 +138,8 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       section.questions.forEach((q) => {
         if (progress?.answers?.[q._id] !== undefined) {
           initialAnswers[q._id] = progress.answers[q._id];
+        } else if (q.type === "yes-no") {
+          initialAnswers[q._id] = "לא";
         }
       });
     });
@@ -173,7 +176,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
     switch (q.type) {
       case "range":
         return z.coerce
-          .number({ required_error: REQUIRED_MESSAGE })
+          .number({ invalid_type_error: REQUIRED_MESSAGE })
           .min(1, { message: REQUIRED_MESSAGE });
       case "file-upload":
         return z
@@ -298,6 +301,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
   };
 
   const handleSubmit = async () => {
+    setIsPending(true);
     if (sections.some((_, i) => hasInvalidOptionsInSection(i))) {
       const invalid: QuestionErrors = {};
       sections.forEach((s) =>
@@ -308,6 +312,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
         })
       );
       setErrors(invalid);
+      errorNotificationHaptic();
       return;
     }
 
@@ -321,18 +326,6 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       updateFormProgress(form._id, { answers: finalAnswers });
       markFormCompleted();
       removeNotification(form._id);
-      if (formType == "onboarding") {
-        queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
-
-        setCurrentUser({
-          ...currentUser,
-          completedOnboarding: true,
-        });
-      }
-
-      navigation.navigate("BottomTabs");
-
-      triggerSuccessToast({ title: "הטופס נשלח בהצלחה" });
     } catch (error) {
       triggerErrorToast({ message: "Failed to upload files." });
     }
@@ -357,15 +350,28 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
     const occurrenceKey = getOccurrenceKeyForForm(form);
     const store = useFormStore.getState();
+    let navigationPath = "BottomTabs";
 
     if (form.type === "onboarding") {
       store.markOnboardingCompleted(userId);
+      queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
+
+      setCurrentUser({
+        ...currentUser,
+        completedOnboarding: true,
+      });
+
+      navigationPath = "agreements";
+
+      triggerSuccessToast({ title: "הטופס נשלח בהצלחה" });
     } else if (occurrenceKey) {
       store.markGeneralCompletion(userId, form._id, occurrenceKey);
     }
 
+    navigation.replace(navigationPath as any);
     clearFormProgress(form._id);
     onComplete?.();
+    setIsPending(false);
   };
 
   return (
