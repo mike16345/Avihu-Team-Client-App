@@ -56,7 +56,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         backgroundColor: "#FFFFFF",
       },
       softwareKeyboardLayoutMode: "resize",
-      package: "com.avihuteam.avihuteam",
+      package: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
     },
     extra: {
       eas: {
