@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -26,6 +26,13 @@ import { Text } from "@/components/ui/Text";
 import Icon from "@/components/Icon/Icon";
 import AppIcon from "@/components/Icon/AppIcon";
 import ButtonShadow from "@/components/ui/buttons/ButtonShadow";
+import {
+  Easing,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 
 const AgreementSignatureScreen = () => {
   const ref = useRef<SignatureViewRef>(null);
@@ -39,9 +46,11 @@ const AgreementSignatureScreen = () => {
   const { markAgreementSigned } = useFormStore();
   const queryClient = useQueryClient();
   const userId = currentUser?._id!;
+  const { width } = useWindowDimensions();
 
   const [signature, setSignature] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const arrowShift = useSharedValue(0);
 
   const handleOK = (sig: string) => {
     setSignature(sig);
@@ -94,19 +103,30 @@ const AgreementSignatureScreen = () => {
     }
   };
 
+  useEffect(() => {
+    arrowShift.value = withRepeat(
+      withSequence(
+        withTiming(8, { duration: 700, easing: Easing.out(Easing.quad) }),
+        withTiming(0, { duration: 700, easing: Easing.inOut(Easing.quad) })
+      ),
+      -1,
+      true
+    );
+  }, []);
+
   const webStyle = `
   .m-signature-pad {
     box-shadow: none; 
-    border: 1px solid #eee;
+    border: 1px solid #DDE8F8;
     height: ${200}px;
-    width: ${useWindowDimensions().width - 80}px;
+    width: ${width - 80}px;
     border-radius:16px;
     margin: 0 auto;
-    background-color:#F8F8F8
+    background-color:#F7FBFF;
   }
   .m-signature-pad--body {
-    border: 1px solid #eee;
-       border-radius:16px;
+    border: 1px solid #E9F0FA;
+    border-radius:16px;
   }
   .m-signature-pad--footer {
     display: none;
@@ -138,10 +158,16 @@ const AgreementSignatureScreen = () => {
           <AppIcon />
         </ButtonShadow>
         <View style={[layout.center]}>
-          <Text fontVariant="bold" fontSize={25}>
+          <Text fontVariant="bold" fontSize={24}>
             כל מה שנשאר זה השלב האחרון
           </Text>
-          <Text fontSize={25}>לאשר את ההסכם ומתחילים!</Text>
+          <Text fontSize={24}>לאשר את ההסכם ומתחילים!</Text>
+        </View>
+      </View>
+
+      <View style={[styles.signHintContainer, spacing.pdHorizontalMd]}>
+        <View style={styles.signHintBubble}>
+          <Text fontSize={16}>לחתום כאן למטה 👇</Text>
         </View>
       </View>
 
@@ -194,7 +220,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    gap: 20,
+    gap: 12,
   },
   title: {
     fontSize: 20,
@@ -215,6 +241,25 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     paddingBottom: 30,
+  },
+  signHintContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  signHintBubble: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  signHintIconWrap: {
+    backgroundColor: "white",
+    width: 24,
+    height: 24,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
