@@ -5,7 +5,6 @@ import {
   NotificationIdentifiers,
 } from "@/constants/notifications";
 import { useNotificationStore } from "@/store/notificationStore";
-import { useUserStore } from "@/store/userStore";
 import { getNextEightAM, getNextEightAMOnSunday, toTrigger } from "@/utils/notification";
 import { generateUniqueId } from "@/utils/utils";
 import * as Notifications from "expo-notifications";
@@ -116,7 +115,7 @@ export const useNotification = () => {
         await ensureAndroidChannel();
       }
       const identifier = await Notifications.scheduleNotificationAsync({
-        content: { title: NOTIFICATION_TITLE, body, data },
+        content: { title: NOTIFICATION_TITLE, body, data: data || {} },
         trigger: toTrigger(triggerAt ?? 1, {
           channelId: Platform.OS === "android" ? DEFAULT_CHANNEL_ID : undefined,
         }),
