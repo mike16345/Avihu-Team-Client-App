@@ -16,12 +16,18 @@
       "ios": { "image": "macos-sequoia-15.3-xcode-16.2" }
     },
     "production": {
-      "android": { "credentialsSource": "local" },
+      "android": { "credentialsSource": "remote" },
       "ios": { "image": "macos-sequoia-15.3-xcode-16.2" },
       "environment": "production",
       "channel": "production",
       "autoIncrement": true
     }
   },
-  "submit": { "production": {} }
+  "submit": {
+    "production": {
+      "android": {
+        "track": "internal"
+      }
+    }
+  }
 }
