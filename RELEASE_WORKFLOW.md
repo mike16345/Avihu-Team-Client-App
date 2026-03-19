@@ -1,9 +1,10 @@
 # Release Workflow
 
-This repository uses two GitHub Actions workflows for releases to `master`:
+This repository uses the following GitHub Actions workflows for `master` release flow and PR quality checks:
 
 - [release-on-master.yml](/c:/Users/micha/Desktop/Avihu-Team-Client-App/.github/workflows/release-on-master.yml)
 - [require-version-bump.yml](/c:/Users/micha/Desktop/Avihu-Team-Client-App/.github/workflows/require-version-bump.yml)
+- [quality-checks.yml](/c:/Users/micha/Desktop/Avihu-Team-Client-App/.github/workflows/quality-checks.yml)
 
 ## Rules
 
@@ -33,6 +34,27 @@ If any of those files changed, the PR must bump `version` in [frontend/app.confi
 - `2.2.0 -> 2.1.9` fails
 
 Branch protection on `master` should require the `Verify Native Version Bump` status check.
+
+### 1.1 Quality checks
+
+`quality-checks.yml` runs on pull requests and contains:
+
+- a blocking `Unit Tests` job
+- an advisory `Advisory Typecheck` job
+
+The unit test job runs:
+
+```bash
+npm run test:unit
+```
+
+The typecheck job runs:
+
+```bash
+npm run typecheck
+```
+
+If typecheck fails, the job records the failure in the summary but does not fail the workflow. It is informational only and should not be added as a required branch protection check unless the team intentionally decides to enforce it later.
 
 ### 2. Pushes to `master`
 
@@ -64,6 +86,12 @@ The OTA job runs:
 
 ```bash
 npx eas-cli update --branch production --environment production --message "<message>" --non-interactive
+```
+
+The OTA message format is:
+
+```text
+<app-version> | <short-sha> | <commit-subject>
 ```
 
 Because [frontend/app.config.ts](/c:/Users/micha/Desktop/Avihu-Team-Client-App/frontend/app.config.ts) uses `runtimeVersion: { policy: "appVersion" }`, OTA updates only apply to installed binaries with the matching app version.
