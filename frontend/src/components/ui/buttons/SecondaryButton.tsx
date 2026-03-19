@@ -36,7 +36,7 @@ const SecondaryButton: React.FC<secondaryButtonProps> = ({
   const sizing = 20;
 
   return (
-    <ButtonShadow style={alignStart && layout.alignSelfStart} shadow={shadow}>
+    <ButtonShadow style={[alignStart && layout.alignSelfStart]} shadow={shadow}>
       <TouchableOpacity
         disabled={disabled}
         onPress={onPress}

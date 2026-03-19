@@ -6,6 +6,7 @@ import SuccessScreen from "@/screens/SuccessScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "@/types/navigatorTypes";
 import { useNotificationStore } from "@/store/notificationStore";
+import { USER_KEY } from "@/constants/reactQuery";
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -15,7 +16,7 @@ export default function AuthNavigator() {
   const { addNotificationsIfNecessary } = useNotificationStore();
 
   const onLogin = (user: IUser) => {
-    queryClient.setQueryData(["user-", user._id], user);
+    queryClient.setQueryData([USER_KEY, user._id], user);
     setCurrentUser(user);
     addNotificationsIfNecessary();
   };

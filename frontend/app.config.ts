@@ -8,7 +8,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...config,
     name: "Avihu Team",
     slug: "avihu-team",
-    version: "2.1.0",
+    version: "2.2.1",
     orientation: "portrait",
     icon: "./assets/app-logo.png",
     userInterfaceStyle: "automatic",
@@ -56,7 +56,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         backgroundColor: "#FFFFFF",
       },
       softwareKeyboardLayoutMode: "resize",
-      package: "com.avihuteam.avihuteam",
+      package: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
     },
     extra: {
       eas: {

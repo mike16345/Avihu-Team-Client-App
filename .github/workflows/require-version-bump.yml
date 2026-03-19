@@ -1,0 +1,117 @@
+name: Require Version Bump
+
+on:
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  verify-version-bump:
+    name: Verify Native Version Bump
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check app version bump for native-impacting changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t changed_files < <(git diff --name-only "${BASE_SHA}" "${HEAD_SHA}")
+
+          native_changed=false
+
+          for file in "${changed_files[@]}"; do
+            if [[ \
+              "${file}" == "frontend/package.json" || \
+              "${file}" == "frontend/package-lock.json" || \
+              "${file}" == "frontend/app.config.ts" || \
+              "${file}" == "frontend/eas.json" || \
+              "${file}" == "frontend/babel.config.js" || \
+              "${file}" == "frontend/metro.config.js" || \
+              "${file}" == "frontend/react-native.config.js" || \
+              "${file}" == frontend/android/* || \
+              "${file}" == frontend/ios/* \
+            ]]; then
+              native_changed=true
+              break
+            fi
+          done
+
+          base_version="$(
+            git show "${BASE_SHA}:frontend/app.config.ts" | \
+            sed -n 's/.*version: "\([^"]*\)".*/\1/p' | \
+            head -n 1
+          )"
+
+          head_version="$(
+            git show "${HEAD_SHA}:frontend/app.config.ts" | \
+            sed -n 's/.*version: "\([^"]*\)".*/\1/p' | \
+            head -n 1
+          )"
+
+          if [[ -z "${base_version}" || -z "${head_version}" ]]; then
+            echo "Could not determine app version from frontend/app.config.ts."
+            exit 1
+          fi
+
+          {
+            echo "### Version bump check"
+            echo ""
+            echo "- Native-affecting changes: \`${native_changed}\`"
+            echo "- Base version: \`${base_version}\`"
+            echo "- PR version: \`${head_version}\`"
+            echo ""
+            echo "### Changed files"
+            if [[ ${#changed_files[@]} -eq 0 ]]; then
+              echo ""
+              echo "_No changed files detected._"
+            else
+              printf '\n```\n%s\n```\n' "$(printf '%s\n' "${changed_files[@]}")"
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          if [[ "${native_changed}" != "true" ]]; then
+            echo "No native-affecting files changed. Version bump not required."
+            exit 0
+          fi
+
+          if ! [[ "${base_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Base version '${base_version}' is not in semantic version format (x.y.z)."
+            exit 1
+          fi
+
+          if ! [[ "${head_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "PR version '${head_version}' is not in semantic version format (x.y.z)."
+            exit 1
+          fi
+
+          IFS='.' read -r base_major base_minor base_patch <<< "${base_version}"
+          IFS='.' read -r head_major head_minor head_patch <<< "${head_version}"
+
+          if (( head_major < base_major )); then
+            echo "PR version '${head_version}' is lower than base version '${base_version}'."
+            exit 1
+          fi
+
+          if (( head_major == base_major && head_minor < base_minor )); then
+            echo "PR version '${head_version}' is lower than base version '${base_version}'."
+            exit 1
+          fi
+
+          if (( head_major == base_major && head_minor == base_minor && head_patch <= base_patch )); then
+            echo "Native-affecting changes require a semantic version increase."
+            echo "Current base version: '${base_version}'. Proposed version: '${head_version}'."
+            exit 1
+          fi
+
+          echo "Native-affecting changes detected and app version was increased semantically."

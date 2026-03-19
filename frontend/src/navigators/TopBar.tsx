@@ -6,7 +6,7 @@ import Avatar from "@/components/User/Avatar";
 import NotificationsWrapper from "@/components/notifications/NotificationsWrapper";
 
 export default function TopBar() {
-  const { colors, layout, spacing, fonts } = useStyles();
+  const { layout, spacing, fonts } = useStyles();
   const { height } = useWindowDimensions();
   const { currentUser } = useUserStore();
 

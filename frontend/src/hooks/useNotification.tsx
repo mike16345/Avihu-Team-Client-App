@@ -5,7 +5,6 @@ import {
   NotificationIdentifiers,
 } from "@/constants/notifications";
 import { useNotificationStore } from "@/store/notificationStore";
-import { useUserStore } from "@/store/userStore";
 import { getNextEightAM, getNextEightAMOnSunday, toTrigger } from "@/utils/notification";
 import { generateUniqueId } from "@/utils/utils";
 import * as Notifications from "expo-notifications";
@@ -106,13 +105,17 @@ export const useNotification = () => {
   };
 
   /** Show a one-off notification now or in N seconds, or at a Date */
-  const showNotification = async (body: string, triggerAt?: number | Date | null) => {
+  const showNotification = async (
+    body: string,
+    triggerAt?: number | Date | null,
+    data?: Record<string, any>
+  ) => {
     try {
       if (Platform.OS === "android") {
         await ensureAndroidChannel();
       }
       const identifier = await Notifications.scheduleNotificationAsync({
-        content: { title: NOTIFICATION_TITLE, body },
+        content: { title: NOTIFICATION_TITLE, body, data: data || {} },
         trigger: toTrigger(triggerAt ?? 1, {
           channelId: Platform.OS === "android" ? DEFAULT_CHANNEL_ID : undefined,
         }),
@@ -174,9 +177,21 @@ export const useNotification = () => {
   const notificationReceivedListener = () => {
     try {
       return Notifications.addNotificationReceivedListener((n) => {
-        const { data }: { data: { id: string } } = n.request.content;
+        const data = (n.request.content.data || {}) as { id?: string };
 
-        useNotificationStore.getState().updateNotificationStatus(data.id);
+        if (data.id) {
+          useNotificationStore.getState().updateNotificationStatus(data.id);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const notificationResponseListener = (handler: (data: Record<string, any>) => void) => {
+    try {
+      return Notifications.addNotificationResponseReceivedListener((response) => {
+        handler(response.notification.request.content.data || {});
       });
     } catch (error) {
       console.error(error);
@@ -191,6 +206,7 @@ export const useNotification = () => {
     scheduleDailyWeightInReminder,
     scheduleWeeklyMeasurementReminder,
     notificationReceivedListener,
+    notificationResponseListener,
   };
 };
 

@@ -33,7 +33,7 @@ const HorizontalSelector: React.FC<HorizontalSelectorProps> = ({
         showsHorizontalScrollIndicator={false}
       >
         {items.map((item, i) => {
-          const isActive = item === selected;
+          const isActive = item == selected;
 
           return (
             <PrimaryButton

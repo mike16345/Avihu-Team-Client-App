@@ -1,5 +1,5 @@
 import useStyles from "@/styles/useGlobalStyles";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import DisplayImage from "./DisplayImage";
 import { Text } from "../ui/Text";
@@ -9,8 +9,10 @@ import { UploadDrawerProps } from "../ui/UploadDrawer";
 
 const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
   handleUpload,
+  images: existingImages,
   loading,
   imageCap = 2,
+  confirmTitle = "שליחה",
 }) => {
   const { spacing, text, layout } = useStyles();
 
@@ -33,6 +35,12 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
     handleUpload(images);
   };
 
+  useEffect(() => {
+    if (!existingImages) return;
+
+    setImages(existingImages);
+  }, [existingImages]);
+
   return (
     <View style={[{ paddingVertical: 30, paddingHorizontal: 70 }, spacing.gap30, layout.flex1]}>
       <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונה</Text>
@@ -45,7 +53,7 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
 
       <View>
         <PrimaryButton
-          children="שליחה"
+          children={confirmTitle}
           block
           disabled={images.length == 0}
           onPress={uploadImage}

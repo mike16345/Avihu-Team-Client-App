@@ -6,13 +6,16 @@ import TriggerWrapper, { TriggerProps } from "./TriggerWrapper";
 export interface UploadDrawerProps {
   trigger: TriggerProps;
   handleUpload: (images: string[]) => Promise<void>;
+  images?: string[];
   loading?: boolean;
   imageCap?: number;
+  confirmTitle?: string;
 }
 
 const UploadDrawer: React.FC<UploadDrawerProps> = ({
   trigger,
   handleUpload,
+  images,
   loading,
   imageCap,
 }) => {
@@ -33,7 +36,13 @@ const UploadDrawer: React.FC<UploadDrawerProps> = ({
       <TriggerWrapper trigger={trigger} setOpen={() => setOpen(true)} />
 
       <BottomDrawer key={String(open.valueOf())} open={open} onClose={onClose}>
-        <ImagePreview loading={loading} imageCap={imageCap} handleUpload={onUpload} />
+        <ImagePreview
+          images={images}
+          loading={loading}
+          imageCap={imageCap}
+          handleUpload={onUpload}
+          confirmTitle="שמירה"
+        />
       </BottomDrawer>
     </>
   );

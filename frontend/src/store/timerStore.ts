@@ -8,8 +8,8 @@ interface ITimerStore {
   intervalId: NodeJS.Timeout | null;
   startTime: number | null;
   notificationIdentifier: string | null;
-  startCountdown: (seconds: number) => void;
-  stopCountdown: () => void;
+  startCountdown: (seconds: number) => Promise<void>;
+  stopCountdown: () => Promise<void>;
   setCountdown: (seconds: number | null) => void;
 }
 
@@ -51,12 +51,12 @@ export const useTimerStore = create<ITimerStore>((set, get) => ({
     set({ intervalId: interval });
   },
 
-  stopCountdown: () => {
+  stopCountdown: async () => {
     const { intervalId, notificationIdentifier } = get();
 
     if (intervalId) clearInterval(intervalId);
 
-    if (notificationIdentifier) cancelNotification(notificationIdentifier);
+    if (notificationIdentifier) await cancelNotification(notificationIdentifier);
 
     set({
       countdown: null,
@@ -67,13 +67,13 @@ export const useTimerStore = create<ITimerStore>((set, get) => ({
     });
   },
 
-  setCountdown: (seconds: number | null) => {
+  setCountdown: async (seconds: number | null) => {
     const { stopCountdown, startCountdown } = get();
 
-    stopCountdown();
+    await stopCountdown();
 
     if (seconds !== null) {
-      startCountdown(seconds);
+      await startCountdown(seconds);
     }
   },
 }));
