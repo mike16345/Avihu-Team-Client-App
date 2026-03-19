@@ -6,6 +6,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/__tests__/**/*.test.ts"],
+    exclude: ["node_modules/**", "dist/**", ".expo/**"],
     restoreMocks: true,
   },
 });
