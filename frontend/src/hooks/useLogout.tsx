@@ -1,18 +1,27 @@
-import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
+import { logoutRefreshSession } from "@/API/authApi";
+import { clearAuthSession, getRefreshToken } from "@/services/authSession";
 import { useNotificationStore } from "@/store/notificationStore";
 import { useUserStore } from "@/store/userStore";
-import { useAsyncStorage } from "@react-native-async-storage/async-storage";
 import { useQueryClient } from "@tanstack/react-query";
 
 const useLogout = () => {
   const queryClient = useQueryClient();
   const { setCurrentUser } = useUserStore();
-  const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
   const { clearNotifications } = useNotificationStore();
 
   const handleLogout = async () => {
+    const refreshToken = getRefreshToken();
+
+    if (refreshToken) {
+      try {
+        await logoutRefreshSession(refreshToken);
+      } catch (error) {
+        console.error("Failed to logout auth session", error);
+      }
+    }
+
     setCurrentUser(null);
-    await sessionStorage.removeItem();
+    await clearAuthSession();
     queryClient.clear();
     queryClient.invalidateQueries();
     clearNotifications();

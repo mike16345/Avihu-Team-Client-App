@@ -1,21 +1,19 @@
-import { Keyboard, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
-import useStyles from "@/styles/useGlobalStyles";
-import { Text } from "../ui/Text";
-import Input from "../ui/inputs/Input";
-import PrimaryButton from "../ui/buttons/PrimaryButton";
-import { ICredentialsErrors, IUserCredentials } from "./Login";
-import { testEmail } from "@/utils/utils";
-import { errorNotificationHaptic } from "@/utils/haptics";
+import { loginWithPassword } from "@/API/authApi";
 import { NO_ACCESS } from "@/constants/Constants";
-import { useUserApi } from "@/hooks/api/useUserApi";
-import { useUserStore } from "@/store/userStore";
-import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { SESSION_TOKEN_KEY } from "@/constants/reactQuery";
 import { useToast } from "@/hooks/useToast";
 import { IUser } from "@/interfaces/User";
-import PasswordInput from "../ui/inputs/PasswordInput";
+import { setAuthSessionFromLogin } from "@/services/authSession";
+import useStyles from "@/styles/useGlobalStyles";
+import { errorNotificationHaptic } from "@/utils/haptics";
+import { testEmail } from "@/utils/utils";
+import React, { useState } from "react";
+import { Keyboard, TouchableOpacity } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
+import { ICredentialsErrors, IUserCredentials } from "./Login";
+import PrimaryButton from "../ui/buttons/PrimaryButton";
+import Input from "../ui/inputs/Input";
+import PasswordInput from "../ui/inputs/PasswordInput";
+import { Text } from "../ui/Text";
 
 interface LoginFormProps {
   onLoginSuccess: (user: IUser) => void;
@@ -24,10 +22,7 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuccess }) => {
   const { colors, spacing, text, layout } = useStyles();
-  const { triggerErrorToast, triggerSuccessToast } = useToast();
-  const { loginUser } = useUserApi();
-  const setCurrentUser = useUserStore((state) => state.setCurrentUser);
-  const { setItem } = useAsyncStorage(SESSION_TOKEN_KEY);
+  const { triggerErrorToast } = useToast();
 
   const [inputtedCrendentials, setInputtedCredentials] = useState<IUserCredentials>({
     email: ``,
@@ -62,19 +57,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
     }
 
     setLoading(true);
-    loginUser(formattedEmail, password)
-      .then((res) => {
-        if (!res.data.data.user.hasAccess) {
+    loginWithPassword(formattedEmail, password)
+      .then(async (response) => {
+        console.log(`Login response:`, JSON.stringify(response, undefined, 2));
+        if (response.user.status == "inactive") {
           triggerErrorToast({ message: NO_ACCESS, duration: 2000 });
           return;
         }
 
-        triggerSuccessToast({ message: res.message });
-        onLoginSuccess(res.data.data.user);
-        setCurrentUser(res?.data.data.user);
-        setItem(JSON.stringify(res.data));
+        await setAuthSessionFromLogin(response);
+        onLoginSuccess(response.user as IUser);
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(`Login error:`, JSON.stringify(e));
         triggerErrorToast({ message: "מייל או סיסמה שגויים" });
       })
       .finally(() => setLoading(false));
@@ -103,7 +98,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
       />
 
       <PasswordInput
-        label="סיסמא"
+        label="סיסמה"
         placeholder="הכנס סיסמה"
         error={formErrors.password}
         value={inputtedCrendentials.password}

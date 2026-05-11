@@ -1,11 +1,5 @@
 import axiosInstance from "@/config/apiConfig";
 import { Method } from "axios";
-import Constants from "expo-constants";
-
-const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
-const API_AUTH_TOKEN = isDevMode
-  ? process.env.EXPO_PUBLIC_API_AUTH_TOKEN
-  : Constants?.expoConfig?.extra?.API_TOKEN;
 
 async function request<T>(
   method: Method,
@@ -20,7 +14,7 @@ async function request<T>(
       url: endpoint,
       data,
       params,
-      headers: { ["X-Api-Key"]: API_AUTH_TOKEN, ...headers },
+      headers,
     };
     const response = await axiosInstance.request<T>(request);
 

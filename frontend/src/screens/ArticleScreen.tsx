@@ -16,7 +16,7 @@ const ArticleScreen = () => {
   const { data, isLoading, refetch } = useArticleCountQuery(planType);
 
   const articleGroups = useMemo(() => {
-    if (!data)
+    if (!data || data.length === 0)
       return (
         <Text style={[text.textCenter, layout.widthFull, spacing.pdVertical20]}>
           אין מאמרים להצגה

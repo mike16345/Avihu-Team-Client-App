@@ -1,21 +1,27 @@
-import { useEffect, useState } from "react";
-import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { useUserApi } from "@/hooks/api/useUserApi";
-import { useUserStore } from "@/store/userStore";
-import useNotification from "@/hooks/useNotification";
+import { getCurrentAuthUser, refreshAccessToken } from "@/API/authApi";
 import { NO_ACCESS, SESSION_EXPIRED } from "@/constants/Constants";
-import { ONBOARDING_FORM_PRESET_KEY, SESSION_TOKEN_KEY } from "@/constants/reactQuery";
-import useLogout from "@/hooks/useLogout";
-import useUserQuery from "@/hooks/queries/useUserQuery";
-import SplashScreen from "@/screens/SplashScreen";
-import { useToast } from "@/hooks/useToast";
-import AuthNavigator from "./AuthNavigator";
-import AppNavigator from "./AppNavigator";
-import { useFormPresetsApi } from "@/hooks/api/useFormPresetsApi";
+import { ONBOARDING_FORM_PRESET_KEY } from "@/constants/reactQuery";
 import { FormPreset } from "@/interfaces/FormPreset";
+import { IUser } from "@/interfaces/User";
+import { useFormPresetsApi } from "@/hooks/api/useFormPresetsApi";
+import useNotification from "@/hooks/useNotification";
+import useUserQuery from "@/hooks/queries/useUserQuery";
+import useLogout from "@/hooks/useLogout";
+import AppNavigator from "@/navigators/AppNavigator";
+import AuthNavigator from "@/navigators/AuthNavigator";
+import SplashScreen from "@/screens/SplashScreen";
 import { useFormStore } from "@/store/formStore";
-import { useQueryClient } from "@tanstack/react-query";
+import { useUserStore } from "@/store/userStore";
+import {
+  getAccessToken,
+  loadPersistedAuthSession,
+  setAuthSession,
+  setAuthSessionFromRefresh,
+} from "@/services/authSession";
 import { RootStackParamList } from "@/types/navigatorTypes";
+import { useToast } from "@/hooks/useToast";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 type InitialRoute = {
   route: keyof RootStackParamList;
@@ -24,7 +30,6 @@ type InitialRoute = {
 
 const RootNavigator = () => {
   const queryClient = useQueryClient();
-  const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
   const { triggerErrorToast } = useToast();
 
   const { getOnBoardingFormPreset } = useFormPresetsApi();
@@ -38,7 +43,6 @@ const RootNavigator = () => {
 
   const { data } = useUserQuery(currentUser?._id);
 
-  const { checkUserSessionToken } = useUserApi();
   const { requestPermissions } = useNotification();
   const { handleLogout } = useLogout();
 
@@ -48,35 +52,47 @@ const RootNavigator = () => {
   useEffect(() => {
     const bootstrap = async () => {
       try {
-        const token = await sessionStorage.getItem();
-        let tokenData: any = null;
+        const session = await loadPersistedAuthSession();
+        const persistedUser = session?.user;
 
-        if (token) {
-          try {
-            tokenData = JSON.parse(token);
-          } catch {
-            tokenData = null;
+        if (persistedUser) {
+          setCurrentUser(persistedUser as IUser);
+        }
+
+        if (!session) return;
+
+        try {
+          const me = await getCurrentAuthUser();
+
+          console.log(`Current user from API:`, JSON.stringify(me, undefined, 2));
+
+          if (!me.user.hasAccess) {
+            triggerErrorToast({ message: NO_ACCESS });
+            await handleLogout();
+            return;
           }
-        }
 
-        const user = tokenData?.data?.user;
-        if (user) setCurrentUser(user);
+          await setAuthSession({ nextUser: me.user });
+          setCurrentUser(me.user as IUser);
+        } catch {
+          if (!session.refreshToken) {
+            triggerErrorToast({ message: SESSION_EXPIRED });
+            await handleLogout();
+            return;
+          }
 
-        // If no token, we're done booting (AuthNavigator will show)
-        if (!tokenData) return;
+          const refreshedSession = await refreshAccessToken(session.refreshToken);
+          await setAuthSessionFromRefresh(refreshedSession);
 
-        const { isValid, hasAccess } = await checkUserSessionToken(tokenData);
+          const nextUser = refreshedSession.user;
 
-        if (!hasAccess) {
-          triggerErrorToast({ message: NO_ACCESS });
-          await handleLogout();
-          return;
-        }
+          if (!nextUser.hasAccess || !getAccessToken()) {
+            triggerErrorToast({ message: nextUser.hasAccess ? SESSION_EXPIRED : NO_ACCESS });
+            await handleLogout();
+            return;
+          }
 
-        if (!isValid) {
-          triggerErrorToast({ message: SESSION_EXPIRED });
-          await handleLogout();
-          return;
+          setCurrentUser(nextUser as IUser);
         }
       } catch (e) {
         console.error(e);
@@ -88,8 +104,6 @@ const RootNavigator = () => {
     bootstrap();
     requestPermissions().catch((err) => console.log(err));
   }, []);
-
-  useEffect(() => {}, [loading]);
 
   useEffect(() => {
     if (!data) return;
