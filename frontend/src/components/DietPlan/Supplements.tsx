@@ -16,10 +16,9 @@ const Supplements = () => {
   const isEmpty = !data?.supplements?.length || isHtmlEmpty(data?.supplements.join(""));
 
   const supplements = useMemo(() => {
-    console.log("Supplements data:", data?.supplements);
     if (!data?.supplements) return [];
 
-    return data.supplements.map((supplement, i) => (
+    return data.supplements.map((supplement: string, i: number) => (
       <HtmlBlock key={i} source={{ html: supplement }} />
     ));
   }, [data?.supplements]);

@@ -321,7 +321,6 @@ export function isIndexOutOfBounds(arr: any[], index: number) {
 export function isHtmlEmpty(html?: string | null): boolean {
   if (!html) return true;
 
-  console.log("Checking if HTML is empty. Original HTML:", html);
   // Remove all HTML tags entirely
   const strippedTags = html.replace(/<[^>]+>/g, "");
   const strippedSpaces = strippedTags.replace(/&nbsp;/g, ""); // remove non-breaking spaces
