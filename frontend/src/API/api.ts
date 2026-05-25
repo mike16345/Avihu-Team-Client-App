@@ -16,6 +16,7 @@ async function request<T>(
       params,
       headers,
     };
+
     const response = await axiosInstance.request<T>(request);
 
     return response.data;
@@ -51,4 +52,12 @@ export async function deleteItem<T>(
   data?: any
 ): Promise<T> {
   return request<T>("delete", `${endpoint}`, data, params, headers);
+}
+
+export function getErrorStatus(error: any): number | undefined {
+  return error?.status ?? error?.response?.status;
+}
+
+export function isNotFoundError(error: any): boolean {
+  return getErrorStatus(error) === 404;
 }

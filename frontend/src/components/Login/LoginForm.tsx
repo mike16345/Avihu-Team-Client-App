@@ -59,7 +59,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
     setLoading(true);
     loginWithPassword(formattedEmail, password)
       .then(async (response) => {
-        console.log(`Login response:`, JSON.stringify(response, undefined, 2));
         if (response.user.status == "inactive") {
           triggerErrorToast({ message: NO_ACCESS, duration: 2000 });
           return;
@@ -69,7 +68,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
         onLoginSuccess(response.user as IUser);
       })
       .catch((e) => {
-        console.log(`Login error:`, JSON.stringify(e));
         triggerErrorToast({ message: "מייל או סיסמה שגויים" });
       })
       .finally(() => setLoading(false));
