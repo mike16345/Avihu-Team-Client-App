@@ -321,11 +321,11 @@ export function isIndexOutOfBounds(arr: any[], index: number) {
 export function isHtmlEmpty(html?: string | null): boolean {
   if (!html) return true;
 
+  console.log("Checking if HTML is empty. Original HTML:", html);
   // Remove all HTML tags entirely
-  const textOnly = html
-    .replace(/<[^>]+>/g, "") // remove tags
-    .replace(/&nbsp;/g, "") // remove non-breaking spaces
-    .replace(/\s+/g, ""); // remove all whitespace
+  const strippedTags = html.replace(/<[^>]+>/g, "");
+  const strippedSpaces = strippedTags.replace(/&nbsp;/g, ""); // remove non-breaking spaces
+  const textOnly = strippedSpaces.replace(/\s+/g, ""); // remove all whitespace
 
   return textOnly.length === 0;
 }
