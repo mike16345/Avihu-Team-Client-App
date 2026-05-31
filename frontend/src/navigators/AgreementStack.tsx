@@ -15,6 +15,7 @@ import { useCurrentAgreementStore } from "@/store/agreementStore";
 import AgreementSignedScreen from "@/screens/Agreement/AgreementSignedScreen";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
+import QuestionnaireExitButton from "@/components/forms/QuestionnaireExitButton";
 
 export type AgreementStackParamList = {
   AgreementPdfViewer: undefined;
@@ -107,8 +108,9 @@ const AgreementStack = () => {
           component={AgreementPdfViewerScreen}
           options={{
             headerShown: true,
-            title: "תקנון והסכם הצטרפות",
+            title: "תקנון והסכם ההצטרפות",
             headerBackVisible: false,
+            headerLeft: () => <QuestionnaireExitButton />,
             gestureEnabled: false,
           }}
         />
@@ -117,8 +119,9 @@ const AgreementStack = () => {
           component={AgreementQuestionsScreen}
           options={{
             headerShown: true,
-            title: "שאלון רפואי והצהרת בריאות",
-            headerBackTitle: "חזור",
+            title: "שאלות ההסכם",
+            headerBackVisible: false,
+            headerLeft: () => <QuestionnaireExitButton />,
           }}
         />
         <Stack.Screen

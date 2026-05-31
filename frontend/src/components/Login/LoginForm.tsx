@@ -7,8 +7,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { errorNotificationHaptic } from "@/utils/haptics";
 import { testEmail } from "@/utils/utils";
 import React, { useState } from "react";
-import { Keyboard, TouchableOpacity } from "react-native";
-import Animated, { FadeIn } from "react-native-reanimated";
+import { Keyboard, TouchableOpacity, View } from "react-native";
 import { ICredentialsErrors, IUserCredentials } from "./Login";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import Input from "../ui/inputs/Input";
@@ -74,7 +73,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
   };
 
   return (
-    <Animated.View entering={FadeIn.duration(500)} style={[spacing.gap20]}>
+    <View style={[spacing.gap20]}>
       <Input
         keyboardType="email-address"
         label="אימייל"
@@ -123,7 +122,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
       <PrimaryButton block mode="dark" onPress={handleSubmit} loading={loading}>
         כניסה
       </PrimaryButton>
-    </Animated.View>
+    </View>
   );
 };
 

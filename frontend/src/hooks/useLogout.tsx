@@ -12,6 +12,11 @@ const useLogout = () => {
   const handleLogout = async () => {
     const refreshToken = getRefreshToken();
 
+    setCurrentUser(null);
+    await clearAuthSession();
+    queryClient.clear();
+    queryClient.invalidateQueries();
+    clearNotifications();
     if (refreshToken) {
       try {
         await logoutRefreshSession(refreshToken);
@@ -19,12 +24,6 @@ const useLogout = () => {
         console.error("Failed to logout auth session", error);
       }
     }
-
-    setCurrentUser(null);
-    await clearAuthSession();
-    queryClient.clear();
-    queryClient.invalidateQueries();
-    clearNotifications();
   };
 
   return { handleLogout };

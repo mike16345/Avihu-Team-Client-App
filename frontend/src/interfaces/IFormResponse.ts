@@ -11,6 +11,7 @@ export interface IFormResponse {
 }
 
 export interface IAgreement {
+  title: string;
   agreementId: string;
   version: number;
   pdfUrl: string;
