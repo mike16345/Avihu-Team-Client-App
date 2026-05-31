@@ -1,3 +1,4 @@
+import { isNotFoundError } from "@/API/api";
 import AgreementPdfViewerScreen from "@/screens/Agreement/AgreementPdfViewerScreen";
 import AgreementQuestionsScreen from "@/screens/Agreement/AgreementQuestionsScreen";
 import AgreementSignatureScreen from "@/screens/Agreement/AgreementSignatureScreen";
@@ -12,6 +13,9 @@ import { View } from "react-native";
 import { useLayoutStyles } from "@/styles/useLayoutStyles";
 import { useCurrentAgreementStore } from "@/store/agreementStore";
 import AgreementSignedScreen from "@/screens/Agreement/AgreementSignedScreen";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
+import QuestionnaireExitButton from "@/components/forms/QuestionnaireExitButton";
 
 export type AgreementStackParamList = {
   AgreementPdfViewer: undefined;
@@ -25,7 +29,9 @@ const Stack = createNativeStackNavigator<AgreementStackParamList>();
 const AgreementStack = () => {
   const { center, flex1 } = useLayoutStyles();
   const { getCurrentAgreement } = useAgreementApi();
+  const navigation = useNavigation<RootStackParamListNavigationProp>();
   const [currentAgreement, setCurrentAgreement] = useState<IAgreement | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { setCurrentAgreement: setCurrentAgreementStore } = useCurrentAgreementStore();
 
   const formPreset: FormPreset | undefined = useMemo(() => {
@@ -49,15 +55,31 @@ const AgreementStack = () => {
   }, [currentAgreement]);
 
   const loadAgreement = async () => {
+    setIsLoading(true);
+
     try {
       const res = await getCurrentAgreement();
 
-      if (!res) return;
+      if (!res) {
+        setCurrentAgreement(null);
+        setCurrentAgreementStore(null);
+        navigation.replace("BottomTabs");
+        return;
+      }
 
       setCurrentAgreement(res);
       setCurrentAgreementStore(res);
     } catch (error) {
+      if (isNotFoundError(error)) {
+        setCurrentAgreement(null);
+        setCurrentAgreementStore(null);
+        navigation.replace("BottomTabs");
+        return;
+      }
+
       console.error("Error loading agreement:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,12 +87,14 @@ const AgreementStack = () => {
     loadAgreement();
   }, []);
 
-  if (!formPreset)
+  if (isLoading)
     return (
       <View style={[center, flex1]}>
         <SpinningIcon mode="light" />
       </View>
     );
+
+  if (!formPreset) return null;
 
   return (
     <FormProvider form={formPreset}>
@@ -84,8 +108,9 @@ const AgreementStack = () => {
           component={AgreementPdfViewerScreen}
           options={{
             headerShown: true,
-            title: "תקנון והסכם הצטרפות",
+            title: "תקנון והסכם ההצטרפות",
             headerBackVisible: false,
+            headerLeft: () => <QuestionnaireExitButton />,
             gestureEnabled: false,
           }}
         />
@@ -94,8 +119,9 @@ const AgreementStack = () => {
           component={AgreementQuestionsScreen}
           options={{
             headerShown: true,
-            title: "שאלון רפואי והצהרת בריאות",
-            headerBackTitle: "חזור",
+            title: "שאלות ההסכם",
+            headerBackVisible: false,
+            headerLeft: () => <QuestionnaireExitButton />,
           }}
         />
         <Stack.Screen

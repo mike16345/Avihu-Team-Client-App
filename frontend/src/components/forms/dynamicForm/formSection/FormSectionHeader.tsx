@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useFormContext } from "@/context/useFormContext";
 import { useNotificationStore } from "@/store/notificationStore";
 import AppIcon from "@/components/Icon/AppIcon";
+import QuestionnaireExitButton from "@/components/forms/QuestionnaireExitButton";
 
 interface FormSectionHeaderProps {
   currentSection: number;
@@ -22,7 +23,7 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
 }) => {
   const { colors, spacing, layout, text } = useStyles();
   const { formType, formId } = useFormContext();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const { addGeneralFormNotification, addMonthlyFormNotification } = useNotificationStore();
 
   const goHome = () => {
@@ -48,14 +49,24 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
       <View style={layout.center}>
         <AppIcon />
       </View>
-      <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
+
+      <View
+        style={[
+          layout.flexRow,
+          layout.itemsCenter,
+          layout.justifyBetween,
+          formType === "onboarding" && styles.rowReverse,
+        ]}
+      >
         <View style={[styles.stepPill, colors.backgroundSurface]}>
           <Text fontVariant="bold" style={styles.stepPillText}>
             {`שלב ${currentSection} מתוך ${totalSections}`}
           </Text>
         </View>
 
-        {formType !== "onboarding" && (
+        {formType === "onboarding" ? (
+          <QuestionnaireExitButton />
+        ) : (
           <TouchableOpacity onPress={goHome}>
             <Text fontVariant="bold" style={[text.textUnderline]}>
               סגור ומלא אחר כך
@@ -99,6 +110,9 @@ const styles = StyleSheet.create({
   },
   stepPillText: {
     color: "#072723",
+  },
+  rowReverse: {
+    flexDirection: "row",
   },
 });
 

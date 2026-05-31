@@ -1,21 +1,29 @@
-import { useEffect, useState } from "react";
-import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-import { useUserApi } from "@/hooks/api/useUserApi";
-import { useUserStore } from "@/store/userStore";
-import useNotification from "@/hooks/useNotification";
+import { isNotFoundError } from "@/API/api";
+import { getCurrentAuthUser, refreshAccessToken } from "@/API/authApi";
 import { NO_ACCESS, SESSION_EXPIRED } from "@/constants/Constants";
-import { ONBOARDING_FORM_PRESET_KEY, SESSION_TOKEN_KEY } from "@/constants/reactQuery";
-import useLogout from "@/hooks/useLogout";
-import useUserQuery from "@/hooks/queries/useUserQuery";
-import SplashScreen from "@/screens/SplashScreen";
-import { useToast } from "@/hooks/useToast";
-import AuthNavigator from "./AuthNavigator";
-import AppNavigator from "./AppNavigator";
-import { useFormPresetsApi } from "@/hooks/api/useFormPresetsApi";
+import { ONBOARDING_FORM_PRESET_KEY } from "@/constants/reactQuery";
 import { FormPreset } from "@/interfaces/FormPreset";
+import { IUser } from "@/interfaces/User";
+import { useAgreementApi } from "@/hooks/api/useAgreementApi";
+import { useFormPresetsApi } from "@/hooks/api/useFormPresetsApi";
+import useNotification from "@/hooks/useNotification";
+import useUserQuery from "@/hooks/queries/useUserQuery";
+import useLogout from "@/hooks/useLogout";
+import AppNavigator from "@/navigators/AppNavigator";
+import AuthNavigator from "@/navigators/AuthNavigator";
+import SplashScreen from "@/screens/SplashScreen";
 import { useFormStore } from "@/store/formStore";
-import { useQueryClient } from "@tanstack/react-query";
+import { useUserStore } from "@/store/userStore";
+import {
+  getAccessToken,
+  loadPersistedAuthSession,
+  setAuthSession,
+  setAuthSessionFromRefresh,
+} from "@/services/authSession";
 import { RootStackParamList } from "@/types/navigatorTypes";
+import { useToast } from "@/hooks/useToast";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 type InitialRoute = {
   route: keyof RootStackParamList;
@@ -24,9 +32,9 @@ type InitialRoute = {
 
 const RootNavigator = () => {
   const queryClient = useQueryClient();
-  const sessionStorage = useAsyncStorage(SESSION_TOKEN_KEY);
   const { triggerErrorToast } = useToast();
 
+  const { getCurrentAgreement } = useAgreementApi();
   const { getOnBoardingFormPreset } = useFormPresetsApi();
 
   const agreementSignedByUserId = useFormStore((state) => state.agreementSignedByUserId);
@@ -38,45 +46,59 @@ const RootNavigator = () => {
 
   const { data } = useUserQuery(currentUser?._id);
 
-  const { checkUserSessionToken } = useUserApi();
   const { requestPermissions } = useNotification();
   const { handleLogout } = useLogout();
 
   const [loading, setLoading] = useState(true);
   const [initialRoute, setInitialRoute] = useState<InitialRoute | null>(null);
+  const currentUserId = currentUser?._id;
+  const markedAgreementSigned = currentUserId ? agreementSignedByUserId[currentUserId] : undefined;
+  const markedOnboardingCompleted = currentUserId
+    ? onboardingCompletedByUserId[currentUserId]
+    : undefined;
 
   useEffect(() => {
     const bootstrap = async () => {
       try {
-        const token = await sessionStorage.getItem();
-        let tokenData: any = null;
+        const session = await loadPersistedAuthSession();
+        const persistedUser = session?.user;
 
-        if (token) {
-          try {
-            tokenData = JSON.parse(token);
-          } catch {
-            tokenData = null;
+        if (persistedUser) {
+          setCurrentUser(persistedUser as IUser);
+        }
+
+        if (!session) return;
+
+        try {
+          const me = await getCurrentAuthUser();
+
+          if (!me.user.hasAccess) {
+            triggerErrorToast({ message: NO_ACCESS });
+            await handleLogout();
+            return;
           }
-        }
 
-        const user = tokenData?.data?.user;
-        if (user) setCurrentUser(user);
+          await setAuthSession({ nextUser: me.user });
+          setCurrentUser(me.user as IUser);
+        } catch {
+          if (!session.refreshToken) {
+            triggerErrorToast({ message: SESSION_EXPIRED });
+            await handleLogout();
+            return;
+          }
 
-        // If no token, we're done booting (AuthNavigator will show)
-        if (!tokenData) return;
+          const refreshedSession = await refreshAccessToken(session.refreshToken);
+          await setAuthSessionFromRefresh(refreshedSession);
 
-        const { isValid, hasAccess } = await checkUserSessionToken(tokenData);
+          const nextUser = refreshedSession.user;
 
-        if (!hasAccess) {
-          triggerErrorToast({ message: NO_ACCESS });
-          await handleLogout();
-          return;
-        }
+          if (!nextUser.hasAccess || !getAccessToken()) {
+            triggerErrorToast({ message: nextUser.hasAccess ? SESSION_EXPIRED : NO_ACCESS });
+            await handleLogout();
+            return;
+          }
 
-        if (!isValid) {
-          triggerErrorToast({ message: SESSION_EXPIRED });
-          await handleLogout();
-          return;
+          setCurrentUser(nextUser as IUser);
         }
       } catch (e) {
         console.error(e);
@@ -89,15 +111,13 @@ const RootNavigator = () => {
     requestPermissions().catch((err) => console.log(err));
   }, []);
 
-  useEffect(() => {}, [loading]);
-
   useEffect(() => {
     if (!data) return;
     setCurrentUser(data);
   }, [data]);
 
   useEffect(() => {
-    const userId = currentUser?._id;
+    const userId = currentUserId;
     if (!userId) {
       setInitialRoute(null);
       return;
@@ -107,50 +127,85 @@ const RootNavigator = () => {
 
     const runGate = async () => {
       const onBoardingStep = currentUser.onboardingStep;
-      if (onBoardingStep == "completed") return setInitialRoute({ route: "BottomTabs" });
+      const markedCompleted = markedOnboardingCompleted;
+      const markedSigned = markedAgreementSigned;
+      const hasCompletedOnboarding = onBoardingStep === "completed" || markedSigned;
+      const shouldResolveAgreementOnly = onBoardingStep === "agreement" || markedCompleted;
 
-      const markedCompleted = onboardingCompletedByUserId[userId];
-      const markedSigned = agreementSignedByUserId[userId];
+      const resolveOnboardingForm = async () => {
+        try {
+          const onboardingForm = await queryClient.fetchQuery<FormPreset>({
+            queryKey: [ONBOARDING_FORM_PRESET_KEY, userId],
+            queryFn: getOnBoardingFormPreset,
+          });
 
-      if (markedSigned) {
+          return onboardingForm ?? null;
+        } catch (error) {
+          if (isNotFoundError(error)) {
+            return null;
+          }
+
+          return null;
+        }
+      };
+
+      const resolveAgreement = async () => {
+        try {
+          const agreement = await getCurrentAgreement();
+
+          return agreement ?? null;
+        } catch (error) {
+          if (isNotFoundError(error)) {
+            return null;
+          }
+
+          console.error("Error fetching current agreement:", error);
+          return null;
+        }
+      };
+
+      if (hasCompletedOnboarding) {
+        console.log("User has completed onboarding, navigating to main app");
         setInitialRoute({ route: "BottomTabs" });
         return;
       }
 
-      if (markedCompleted) {
+      if (shouldResolveAgreementOnly) {
+        console.log("Resolving agreement only");
+        const agreement = await resolveAgreement();
+        if (cancelled) return;
+
+        if (agreement?.agreementId) {
+          setInitialRoute({ route: "agreements" });
+          return;
+        }
+
+        setInitialRoute({ route: "BottomTabs" });
+        return;
+      }
+
+      const onboardingForm = await resolveOnboardingForm();
+      if (cancelled) return;
+
+      console.log("Resolved onboarding form:", onboardingForm);
+      if (onboardingForm?._id) {
+        setActiveFormId(onboardingForm._id);
+        setInitialRoute({
+          route: "FormPreset",
+          params: { formId: onboardingForm._id } as any,
+        });
+        return;
+      }
+
+      const agreement = await resolveAgreement();
+      if (cancelled) return;
+
+      if (agreement?.agreementId) {
         setInitialRoute({ route: "agreements" });
         return;
       }
 
-      if (onBoardingStep == "form") {
-        try {
-          const onboardingForm = await queryClient.fetchQuery<FormPreset>({
-            queryKey: [ONBOARDING_FORM_PRESET_KEY],
-            queryFn: getOnBoardingFormPreset,
-          });
-
-          if (cancelled) return;
-
-          if (onboardingForm?._id) {
-            setActiveFormId(onboardingForm._id);
-            setInitialRoute({
-              route: "FormPreset",
-              params: { formId: onboardingForm._id } as any,
-            });
-            return;
-          }
-        } catch (error) {
-          console.error("Error fetching onboarding form:", error);
-        }
-
-        if (!cancelled) setInitialRoute({ route: "BottomTabs" });
-        return;
-      } else if (onBoardingStep == "agreement") {
-        if (!cancelled) setInitialRoute({ route: "agreements" });
-        return;
-      }
-
-      if (!cancelled) setInitialRoute({ route: "BottomTabs" });
+      setInitialRoute({ route: "BottomTabs" });
     };
 
     runGate();
@@ -158,10 +213,14 @@ const RootNavigator = () => {
     return () => {
       cancelled = true;
     };
-  }, [currentUser?._id]);
+  }, [
+    currentUser?.onboardingStep,
+    currentUserId,
+    markedAgreementSigned,
+    markedOnboardingCompleted,
+  ]);
 
   if (loading) return <SplashScreen />;
-
   if (!currentUser) return <AuthNavigator />;
 
   if (!initialRoute) return <SplashScreen />;

@@ -9,6 +9,7 @@ import DateUtils from "@/utils/dateUtils";
 import DropDownContent from "../ui/dropwdown/DropDownContent";
 import DropDownTrigger from "../ui/dropwdown/DropDownTrigger";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
+import { ConditionalRender } from "../ui/ConditionalRender";
 
 interface WorkoutPlanSelectorProps {
   selectedPlan: string;
@@ -31,15 +32,17 @@ const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan,
     <>
       <View style={[spacing.gapDefault]}>
         <Card variant="gray" shadow={false} style={[spacing.gapLg, common.roundedMd]}>
-          <Card.Header>
+          <Card.Header style={[spacing.pdVerticalDefault]}>
             <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter]}>
               <Text fontVariant="bold">
                 יום {DateUtils.getDay()} | {selectedPlan}
               </Text>
 
-              <SecondaryButton rightIcon="info" onPress={() => setShowTips(true)}>
-                דגשים לאימון
-              </SecondaryButton>
+              <ConditionalRender condition={tips.length > 0}>
+                <SecondaryButton rightIcon="info" onPress={() => setShowTips(true)}>
+                  דגשים לאימון
+                </SecondaryButton>
+              </ConditionalRender>
             </View>
           </Card.Header>
           <Card.Content style={{ zIndex: 2000, elevation: 2000 }}>

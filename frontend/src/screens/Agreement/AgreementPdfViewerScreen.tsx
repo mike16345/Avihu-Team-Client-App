@@ -23,9 +23,10 @@ const AgreementPdfViewerScreen = () => {
   const navigation = useNavigation<AgreementPdfViewerScreenNavigationProp>();
   const { spacing, layout } = useStyles();
   const { currentAgreement } = useCurrentAgreementStore();
+  const hasAgreementQuestions = (currentAgreement?.questions?.length ?? 0) > 0;
 
   const handleContinue = () => {
-    navigation.navigate("AgreementQuestions");
+    navigation.navigate(hasAgreementQuestions ? "AgreementQuestions" : "AgreementSignature");
   };
 
   useFocusEffect(() => {
