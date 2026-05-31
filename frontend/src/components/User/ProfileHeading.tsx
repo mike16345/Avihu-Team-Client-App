@@ -9,12 +9,13 @@ import { useUserApi } from "@/hooks/api/useUserApi";
 import { useToast } from "@/hooks/useToast";
 import { buildPhotoUrl } from "@/utils/utils";
 import { useNavigation } from "@react-navigation/native";
+import { Text } from "../ui/Text";
 
 const ICON_SIZE = 30;
 const HALF_OF_ICON_SIZE = ICON_SIZE / 2;
 
 const ProfileHeading = () => {
-  const { colors, common, layout } = useStyles();
+  const { colors, common, fonts, layout } = useStyles();
   const { currentUser } = useUserStore();
   const { updateProfilePhoto } = useUserApi();
   const { triggerErrorToast } = useToast();
@@ -29,6 +30,17 @@ const ProfileHeading = () => {
 
     return { iconEndPosition, iconTopPosition };
   }, [profileHeight]);
+
+  const profileInitials = useMemo(() => {
+    const firstInitial = currentUser?.firstName?.trim().charAt(0).toUpperCase() || "";
+    const lastInitial = currentUser?.lastName?.trim().charAt(0).toUpperCase() || "";
+
+    if (firstInitial && lastInitial) {
+      return `${firstInitial}${lastInitial}`;
+    }
+
+    return firstInitial || lastInitial;
+  }, [currentUser?.firstName, currentUser?.lastName]);
 
   const handleLayoutChange = (e: LayoutChangeEvent) => {
     const height = e.nativeEvent.layout.height;
@@ -76,6 +88,14 @@ const ProfileHeading = () => {
             style={[layout.sizeFull, common.roundedMd]}
             resizeMode="cover"
           />
+        </ConditionalRender>
+
+        <ConditionalRender condition={!currentUser?.profileImage && !!profileInitials}>
+          <View style={[layout.center, layout.sizeFull]}>
+            <Text fontVariant="bold" style={fonts.xxxl}>
+              {profileInitials}
+            </Text>
+          </View>
         </ConditionalRender>
 
         <UploadDrawer

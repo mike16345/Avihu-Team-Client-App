@@ -23,9 +23,6 @@ const PDFViewer: React.FC<Props> = ({ uri, onScrollToEnd }) => {
         source={source}
         trustAllCerts={false}
         style={styles.pdf}
-        onLoadComplete={(pages) => {
-          console.log(`Loaded PDF with ${pages} pages`);
-        }}
         onPageChanged={(page, numberOfPages) => {
           if (page !== numberOfPages) return;
           onScrollToEnd();
