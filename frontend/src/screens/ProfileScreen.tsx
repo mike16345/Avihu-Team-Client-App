@@ -5,17 +5,21 @@ import { Text } from "@/components/ui/Text";
 import { AuthStackParamListNavigationProp } from "@/types/navigatorTypes";
 import ProfileHeading from "@/components/User/ProfileHeading";
 import UserDetailsWrapper from "@/components/User/UserDetailsWrapper";
-import { ScrollView, View } from "react-native";
+import { View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
+import { useState } from "react";
 
 const ProfileScreen = () => {
   const { layout, spacing } = useStyles();
   const { handleLogout } = useLogout();
 
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
   const navigation = useNavigation<AuthStackParamListNavigationProp>();
 
   const onLogOut = async () => {
+    setIsLoggingOut(true);
     await handleLogout();
     navigation?.navigate("LoginScreen");
   };
@@ -28,7 +32,13 @@ const ProfileScreen = () => {
         </View>
         <UserDetailsWrapper />
         <View style={spacing.pdHorizontalLg}>
-          <PrimaryButton style={{ marginTop: 20 }} block mode="light" onPress={onLogOut}>
+          <PrimaryButton
+            style={{ marginTop: 20 }}
+            block
+            mode="light"
+            onPress={onLogOut}
+            loading={isLoggingOut}
+          >
             <Text fontVariant="bold">התנתק</Text>
           </PrimaryButton>
         </View>

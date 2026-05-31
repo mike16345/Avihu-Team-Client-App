@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useFormContext } from "@/context/useFormContext";
@@ -17,6 +18,8 @@ const AgreementQuestionsScreen = () => {
   const { validateSection, sections } = useFormContext();
   const navigation = useNavigation<AgreementQuestionsScreenNavigationProp>();
   const { spacing, layout } = useStyles();
+  const section = sections[0];
+  const questions = section?.questions ?? [];
 
   const handleContinue = () => {
     // Assuming all questions are in the first section for simplicity
@@ -25,18 +28,22 @@ const AgreementQuestionsScreen = () => {
     }
   };
 
-  const section = sections[0];
+  useEffect(() => {
+    if (questions.length === 0) {
+      navigation.replace("AgreementSignature");
+    }
+  }, [navigation, questions.length]);
 
   return (
     <View style={[layout.flex1, spacing.pdBottomBar]}>
       <KeyboardAwareScrollView
         contentContainerStyle={[spacing.pdStatusBar, spacing.pdBottomBar, spacing.gap20]}
       >
-        {section.questions.map((question, i) => (
+        {questions.map((question, i) => (
           <QuestionContainer
             key={question._id}
             question={question}
-            isLast={i === section.questions.length - 1}
+            isLast={i === questions.length - 1}
           />
         ))}
       </KeyboardAwareScrollView>

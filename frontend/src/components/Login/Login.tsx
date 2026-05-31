@@ -17,10 +17,6 @@ import ForgotPassword from "./ForgotPassword";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import LoginForm from "./LoginForm";
 import { useToast } from "@/hooks/useToast";
-import { getRegisterOrLoginPrompt, getRegisterOrLoginPromptLabel } from "@/utils/auth";
-import RegisterForm from "./RegisterForm";
-import { Tabs, TabsList } from "../ui/Tabs";
-import { useTabs } from "@/hooks/useTabs";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, { useSharedValue, Easing, withTiming } from "react-native-reanimated";
 
@@ -36,7 +32,6 @@ export interface ICredentialsErrors {
   validPassword?: boolean;
 }
 
-type TabNames = "התחברות" | "חשבון חדש";
 interface ILoginProps {
   onLogin: (user: IUser) => void;
 }
@@ -49,53 +44,16 @@ export default function Login({ onLogin }: ILoginProps) {
   const translateY = useSharedValue(0);
 
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<TabNames>("התחברות");
-  const isRegistering = selectedTab == "חשבון חדש";
-  const registerOrLoginPrompt = getRegisterOrLoginPrompt(isRegistering, isChangingPassword);
-
-  const { tabTriggers, tabContent } = useTabs([
-    {
-      label: "התחברות",
-      value: "התחברות",
-      content: (
-        <LoginForm
-          onForgotPasswordPress={() => {
-            setIsForgotPassword(true);
-            setIsChangingPassword(true);
-          }}
-          onLoginSuccess={(user) => onLogin(user)}
-        />
-      ),
-    },
-    {
-      label: "חשבון חדש",
-      value: "חשבון חדש",
-      content: <RegisterForm />,
-    },
-  ]);
 
   const handleChangePasswordSuccess = () => {
     setIsForgotPassword(false);
-    setIsChangingPassword(false);
     triggerSuccessToast({ message: `סיסמה עודכנה בהצלחה` });
   };
 
-  const handleClickRegister = () => {
-    setSelectedTab("חשבון חדש");
-    setIsChangingPassword(false);
-    setIsForgotPassword(false);
-  };
-
   const handleBackPress = () => {
-    setSelectedTab("התחברות");
     setIsForgotPassword(false);
-    setIsChangingPassword(false);
     setIsForgotPassword(false);
   };
-
-  const bottomPromptHandler =
-    isRegistering || isChangingPassword ? handleBackPress : handleClickRegister;
 
   useEffect(() => {
     Keyboard.addListener("keyboardWillShow", () => {
@@ -130,6 +88,7 @@ export default function Login({ onLogin }: ILoginProps) {
           layout.itemsCenter,
           spacing.gapXl,
           Platform.OS == "ios" && spacing.pdBottomBar,
+          !isForgotPassword && { paddingBottom: 80 },
           { height: height, width: width },
         ]}
       >
@@ -148,12 +107,12 @@ export default function Login({ onLogin }: ILoginProps) {
           style={[{ zIndex: 30, width: width * 0.9 }, spacing.gapXxl, spacing.pdSm]}
         >
           <ConditionalRender condition={!isForgotPassword}>
-            <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value)}>
-              <View style={[spacing.gapXxl]}>
-                <TabsList>{tabTriggers}</TabsList>
-                {tabContent}
-              </View>
-            </Tabs>
+            <LoginForm
+              onForgotPasswordPress={() => {
+                setIsForgotPassword(true);
+              }}
+              onLoginSuccess={(user) => onLogin(user)}
+            />
           </ConditionalRender>
 
           <ConditionalRender condition={isForgotPassword}>
@@ -163,28 +122,30 @@ export default function Login({ onLogin }: ILoginProps) {
             />
           </ConditionalRender>
 
-          <View
-            style={[
-              layout.flexRow,
-              layout.center,
-              spacing.gapSm,
-              { zIndex: 30, paddingBottom: 32 },
-            ]}
-          >
-            <Text fontSize={16} style={[colors.textPrimary]}>
-              {registerOrLoginPrompt}
-            </Text>
-
-            <TouchableOpacity onPress={bottomPromptHandler}>
-              <Text
-                fontVariant="semibold"
-                fontSize={16}
-                style={[colors.textPrimary, text.textBold]}
-              >
-                {getRegisterOrLoginPromptLabel(isRegistering, isChangingPassword)}
+          <ConditionalRender condition={isForgotPassword}>
+            <View
+              style={[
+                layout.flexRow,
+                layout.center,
+                spacing.gapSm,
+                { zIndex: 30, paddingBottom: 32 },
+              ]}
+            >
+              <Text fontSize={16} style={[colors.textPrimary]}>
+                נזכרתם?
               </Text>
-            </TouchableOpacity>
-          </View>
+
+              <TouchableOpacity onPress={handleBackPress}>
+                <Text
+                  fontVariant="semibold"
+                  fontSize={16}
+                  style={[colors.textPrimary, text.textBold]}
+                >
+                  התחברו
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </ConditionalRender>
         </KeyboardAvoidingView>
       </View>
     </TouchableWithoutFeedback>

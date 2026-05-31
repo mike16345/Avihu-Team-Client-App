@@ -1,4 +1,5 @@
 import { deleteItem } from "@/API/api";
+import { applyApiKeyToHeaders } from "@/services/apiKey";
 import Constants from "expo-constants";
 
 const S3_IMAGES_ENDPOINT = "s3/photos/one";
@@ -6,12 +7,10 @@ const S3_IMAGES_ENDPOINT = "s3/photos/one";
 export const useImageApi = () => {
   const fetchSignedUrl = async (url: string) => {
     try {
+      const headers = applyApiKeyToHeaders(new Headers());
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          "X-Api-Key":
-            process.env.EXPO_PUBLIC_API_AUTH_TOKEN || Constants.expoConfig?.extra?.API_TOKEN,
-        },
+        headers,
       });
       const { data } = await response.json();
       return data;

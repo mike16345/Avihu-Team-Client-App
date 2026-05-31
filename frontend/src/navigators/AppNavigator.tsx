@@ -7,6 +7,7 @@ import ChatScreen from "@/screens/ChatScreen";
 import FormPresetScreen from "@/screens/FormPresetScreen";
 import AgreementFlow from "./AgreementStack";
 import useInitialFormNotifications from "@/hooks/useInitFormNotifications";
+import useStartupPrefetch from "@/hooks/useStartupPrefetch";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -19,6 +20,7 @@ export default function AppNavigator({
   };
 }) {
   useInitialFormNotifications();
+  useStartupPrefetch();
 
   return (
     <Stack.Navigator initialRouteName={initialRoute.route} screenOptions={{ headerShown: false }}>

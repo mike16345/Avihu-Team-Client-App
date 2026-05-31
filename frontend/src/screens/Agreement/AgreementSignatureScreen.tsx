@@ -67,7 +67,6 @@ const AgreementSignatureScreen = () => {
 
   const handleAgreeAndContinue = async () => {
     if (!signature) {
-      console.log("Please provide a signature.");
       return;
     }
 

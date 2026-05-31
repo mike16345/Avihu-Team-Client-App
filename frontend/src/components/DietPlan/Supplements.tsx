@@ -7,15 +7,18 @@ import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { useMemo } from "react";
 import HtmlBlock from "../ui/HTMLBlock";
+import { isHtmlEmpty } from "@/utils/utils";
 
 const Supplements = () => {
   const { layout, spacing } = useStyles();
   const { height } = useWindowDimensions();
   const { data } = useDietPlanQuery();
+  const isEmpty = !data?.supplements?.length || isHtmlEmpty(data?.supplements.join(""));
+
   const supplements = useMemo(() => {
     if (!data?.supplements) return [];
 
-    return data.supplements.map((supplement, i) => (
+    return data.supplements.map((supplement: string, i: number) => (
       <HtmlBlock key={i} source={{ html: supplement }} />
     ));
   }, [data?.supplements]);
@@ -24,7 +27,7 @@ const Supplements = () => {
     <View style={spacing.pdHorizontalMd}>
       <Card style={{ maxHeight: height / 1.8 - (BOTTOM_BAR_HEIGHT + 20) }} variant="gray">
         <ScrollView contentContainerStyle={[spacing.gapDefault]}>
-          <ConditionalRender condition={!data?.supplements?.length}>
+          <ConditionalRender condition={isEmpty}>
             <View style={[layout.center]}>
               <Text>אין תוספים</Text>
             </View>
