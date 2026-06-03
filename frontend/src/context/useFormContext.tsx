@@ -1,4 +1,3 @@
-import { isNotFoundError } from "@/API/api";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { FormPreset, FormQuestion } from "@/interfaces/FormPreset";
@@ -8,7 +7,6 @@ import { getOccurrenceKeyForForm, isOptionQuestionType } from "@/utils/formPrese
 import useAddFormResponse from "@/hooks/mutations/forms/useAddFormResponse";
 import { INVALID_OPTIONS_MESSAGE, REQUIRED_MESSAGE } from "@/constants/Constants";
 import { useImageApi } from "@/hooks/api/useImageApi";
-import { useAgreementApi } from "@/hooks/api/useAgreementApi";
 import { useToast } from "@/hooks/useToast";
 import { errorNotificationHaptic } from "@/utils/haptics";
 import { useNavigation } from "@react-navigation/native";
@@ -81,7 +79,6 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
   } = useFormStore();
   const progress = progressByFormId[form._id];
   const { handleUploadImageToS3 } = useImageApi();
-  const { getCurrentAgreement } = useAgreementApi();
   const { triggerErrorToast, triggerSuccessToast } = useToast();
   const navigation = useNavigation<RootStackParamListNavigationProp>();
   const { removeNotification } = useNotificationStore();
@@ -327,8 +324,6 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       finalAnswers = await uploadFileAnswers();
       setAnswers(finalAnswers);
       updateFormProgress(form._id, { answers: finalAnswers });
-      markFormCompleted();
-      removeNotification(form._id);
     } catch (error) {
       triggerErrorToast({ message: "Failed to upload files." });
     }
@@ -351,12 +346,9 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
     await mutateAsync(payload);
 
-    const occurrenceKey = getOccurrenceKeyForForm(form);
-    const store = useFormStore.getState();
-    let navigationPath: "BottomTabs" | "agreements" = "BottomTabs";
+    let navigationPath = "BottomTabs";
 
     if (form.type === "onboarding") {
-      store.markOnboardingCompleted(userId);
       queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
 
       setCurrentUser({
@@ -366,25 +358,11 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
       navigationPath = "agreements";
 
-      try {
-        const agreement = await getCurrentAgreement();
-
-        if (!agreement?.agreementId) {
-          navigationPath = "BottomTabs";
-        }
-      } catch (error) {
-        if (isNotFoundError(error)) {
-          navigationPath = "BottomTabs";
-        } else {
-          console.error("Error resolving agreement after onboarding submission:", error);
-        }
-      }
-
       triggerSuccessToast({ title: "הטופס נשלח בהצלחה" });
-    } else if (occurrenceKey) {
-      store.markGeneralCompletion(userId, form._id, occurrenceKey);
     }
 
+    markFormCompleted();
+    removeNotification(form._id);
     navigation.replace(navigationPath as any);
     clearFormProgress(form._id);
     onComplete?.();
