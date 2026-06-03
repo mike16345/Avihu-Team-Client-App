@@ -326,6 +326,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       updateFormProgress(form._id, { answers: finalAnswers });
     } catch (error) {
       triggerErrorToast({ message: "Failed to upload files." });
+      return;
     }
 
     const payload = {
