@@ -1,11 +1,5 @@
 import axiosInstance from "@/config/apiConfig";
 import { Method } from "axios";
-import Constants from "expo-constants";
-
-const isDevMode = process.env.EXPO_PUBLIC_MODE == "development";
-const API_AUTH_TOKEN = isDevMode
-  ? process.env.EXPO_PUBLIC_API_AUTH_TOKEN
-  : Constants?.expoConfig?.extra?.API_TOKEN;
 
 async function request<T>(
   method: Method,
@@ -20,8 +14,9 @@ async function request<T>(
       url: endpoint,
       data,
       params,
-      headers: { ["X-Api-Key"]: API_AUTH_TOKEN, ...headers },
+      headers,
     };
+
     const response = await axiosInstance.request<T>(request);
 
     return response.data;
@@ -57,4 +52,12 @@ export async function deleteItem<T>(
   data?: any
 ): Promise<T> {
   return request<T>("delete", `${endpoint}`, data, params, headers);
+}
+
+export function getErrorStatus(error: any): number | undefined {
+  return error?.status ?? error?.response?.status;
+}
+
+export function isNotFoundError(error: any): boolean {
+  return getErrorStatus(error) === 404;
 }

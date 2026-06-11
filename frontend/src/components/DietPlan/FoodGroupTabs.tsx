@@ -15,6 +15,7 @@ const FoodGroupTabs = () => {
   const { layout, spacing } = useStyles();
   const { data, isLoading } = useMenuItemsQuery();
 
+  const minMaxHeight = height / 2 - (BOTTOM_BAR_HEIGHT + 70);
   const [selectedTab, setSelectedTab] = useState<string>("");
 
   const { tabTriggers, tabContent, tabNames } = useTabsFromData({
@@ -22,7 +23,13 @@ const FoodGroupTabs = () => {
     getLabel: (foodGroup) => foodGroupToName(foodGroup),
     getContent: (_, items) => {
       return (
-        <Card style={{ maxHeight: height / 2 - (BOTTOM_BAR_HEIGHT + 20) }} variant="gray">
+        <Card
+          style={{
+            minHeight: minMaxHeight,
+            maxHeight: minMaxHeight,
+          }}
+          variant="gray"
+        >
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={[spacing.gapDefault]}
