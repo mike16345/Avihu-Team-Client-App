@@ -1,4 +1,3 @@
-import { isNotFoundError } from "@/API/api";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { FormPreset, FormQuestion } from "@/interfaces/FormPreset";
@@ -8,7 +7,6 @@ import { getOccurrenceKeyForForm, isOptionQuestionType } from "@/utils/formPrese
 import useAddFormResponse from "@/hooks/mutations/forms/useAddFormResponse";
 import { INVALID_OPTIONS_MESSAGE, REQUIRED_MESSAGE } from "@/constants/Constants";
 import { useImageApi } from "@/hooks/api/useImageApi";
-import { useAgreementApi } from "@/hooks/api/useAgreementApi";
 import { useToast } from "@/hooks/useToast";
 import { errorNotificationHaptic } from "@/utils/haptics";
 import { useNavigation } from "@react-navigation/native";
@@ -16,6 +14,7 @@ import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 import { useNotificationStore } from "@/store/notificationStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { USER_KEY } from "@/constants/reactQuery";
+import { useGetCurrentAgreement } from "@/hooks/queries/agreements/useGetCurrentAgreement";
 
 export type QuestionErrors = Record<string, string>;
 
@@ -25,7 +24,7 @@ interface FormContextType {
   answers: Record<string, unknown>;
   errors: QuestionErrors;
   updateAnswer: (questionId: string, value: unknown) => void;
-  handleSubmit: () => void;
+  handleSubmit: () => Promise<void>;
   isPending: boolean;
   validateSection: (index: number) => boolean;
   hasInvalidOptionsInSection: (index: number) => boolean;
@@ -75,13 +74,12 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
     progressByFormId,
     updateFormProgress,
     clearFormProgress,
-    markOnboardingCompleted,
     markGeneralCompletion,
     markMonthlyCompletion,
   } = useFormStore();
   const progress = progressByFormId[form._id];
+  const { resolveAgreement } = useGetCurrentAgreement();
   const { handleUploadImageToS3 } = useImageApi();
-  const { getCurrentAgreement } = useAgreementApi();
   const { triggerErrorToast, triggerSuccessToast } = useToast();
   const navigation = useNavigation<RootStackParamListNavigationProp>();
   const { removeNotification } = useNotificationStore();
@@ -291,9 +289,6 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
     if (!occurrenceKey) return;
 
     switch (form.type) {
-      case "onboarding":
-        markOnboardingCompleted(userId!);
-        break;
       case "monthly":
         markMonthlyCompletion(userId!, form._id, occurrenceKey);
         break;
@@ -304,7 +299,6 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
   };
 
   const handleSubmit = async () => {
-    setIsPending(true);
     if (sections.some((_, i) => hasInvalidOptionsInSection(i))) {
       const invalid: QuestionErrors = {};
       sections.forEach((s) =>
@@ -319,76 +313,78 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       return;
     }
 
-    if (!userId) return;
+    if (isPending) return;
+
+    if (!userId) {
+      triggerErrorToast({
+        message: "לא ניתן לשלוח את הטופס כרגע. נסה להתחבר מחדש.",
+      });
+      return;
+    }
+
+    setIsPending(true);
 
     let finalAnswers = answers;
 
     try {
-      finalAnswers = await uploadFileAnswers();
-      setAnswers(finalAnswers);
-      updateFormProgress(form._id, { answers: finalAnswers });
-      markFormCompleted();
-      removeNotification(form._id);
-    } catch (error) {
-      triggerErrorToast({ message: "Failed to upload files." });
-    }
-
-    const payload = {
-      formId: form._id,
-      userId,
-      submittedAt: new Date().toISOString(),
-      sections: sections.map((s) => ({
-        _id: s._id,
-        title: s.title,
-        questions: s.questions.map((q) => ({
-          _id: q._id,
-          type: q.type,
-          question: q.question,
-          answer: finalAnswers[q._id],
-        })),
-      })),
-    };
-
-    await mutateAsync(payload);
-
-    const occurrenceKey = getOccurrenceKeyForForm(form);
-    const store = useFormStore.getState();
-    let navigationPath: "BottomTabs" | "agreements" = "BottomTabs";
-
-    if (form.type === "onboarding") {
-      store.markOnboardingCompleted(userId);
-      queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
-
-      setCurrentUser({
-        ...currentUser,
-        completedOnboarding: true,
-      });
-
-      navigationPath = "agreements";
-
       try {
-        const agreement = await getCurrentAgreement();
-
-        if (!agreement?.agreementId) {
-          navigationPath = "BottomTabs";
-        }
+        finalAnswers = await uploadFileAnswers();
+        setAnswers(finalAnswers);
+        updateFormProgress(form._id, { answers: finalAnswers });
       } catch (error) {
-        if (isNotFoundError(error)) {
-          navigationPath = "BottomTabs";
+        console.error("Error uploading form files:", error);
+        triggerErrorToast({ message: "אירעה שגיאה בהעלאת הקבצים. נסה שוב." });
+        return;
+      }
+
+      const payload = {
+        formId: form._id,
+        userId,
+        submittedAt: new Date().toISOString(),
+        sections: sections.map((s) => ({
+          _id: s._id,
+          title: s.title,
+          questions: s.questions.map((q) => ({
+            _id: q._id,
+            type: q.type,
+            question: q.question,
+            answer: finalAnswers[q._id],
+          })),
+        })),
+      };
+
+      await mutateAsync(payload);
+
+      let navigationPath: "BottomTabs" | "agreements" = "BottomTabs";
+
+      if (form.type === "onboarding") {
+        setCurrentUser({
+          ...currentUser!,
+          onboardingStep: "agreement",
+        });
+        await queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
+        triggerSuccessToast({ title: "הטופס נשלח בהצלחה" });
+
+        const agreement = await resolveAgreement();
+
+        if (agreement?.agreementId) {
+          navigationPath = "agreements";
         } else {
-          console.error("Error resolving agreement after onboarding submission:", error);
+          navigationPath = "BottomTabs";
         }
       }
 
-      triggerSuccessToast({ title: "הטופס נשלח בהצלחה" });
-    } else if (occurrenceKey) {
-      store.markGeneralCompletion(userId, form._id, occurrenceKey);
+      markFormCompleted();
+      removeNotification(form._id);
+      clearFormProgress(form._id);
+      onComplete?.();
+      navigation.replace(navigationPath);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      triggerErrorToast({ message: "אירעה שגיאה בשליחת הטופס. נסה שוב." });
+    } finally {
+      setIsPending(false);
     }
-
-    navigation.replace(navigationPath as any);
-    clearFormProgress(form._id);
-    onComplete?.();
-    setIsPending(false);
   };
 
   return (

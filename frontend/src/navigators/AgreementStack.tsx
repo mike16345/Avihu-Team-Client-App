@@ -8,14 +8,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAgreementApi } from "@/hooks/api/useAgreementApi";
 import { useEffect, useMemo, useState } from "react";
 import { IAgreement } from "@/interfaces/IFormResponse";
-import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
-import { View } from "react-native";
-import { useLayoutStyles } from "@/styles/useLayoutStyles";
 import { useCurrentAgreementStore } from "@/store/agreementStore";
 import AgreementSignedScreen from "@/screens/Agreement/AgreementSignedScreen";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 import QuestionnaireExitButton from "@/components/forms/QuestionnaireExitButton";
+import SplashScreen from "@/screens/SplashScreen";
 
 export type AgreementStackParamList = {
   AgreementPdfViewer: undefined;
@@ -27,7 +25,6 @@ export type AgreementStackParamList = {
 const Stack = createNativeStackNavigator<AgreementStackParamList>();
 
 const AgreementStack = () => {
-  const { center, flex1 } = useLayoutStyles();
   const { getCurrentAgreement } = useAgreementApi();
   const navigation = useNavigation<RootStackParamListNavigationProp>();
   const [currentAgreement, setCurrentAgreement] = useState<IAgreement | null>(null);
@@ -87,12 +84,7 @@ const AgreementStack = () => {
     loadAgreement();
   }, []);
 
-  if (isLoading)
-    return (
-      <View style={[center, flex1]}>
-        <SpinningIcon mode="light" />
-      </View>
-    );
+  if (isLoading) return <SplashScreen />;
 
   if (!formPreset) return null;
 
