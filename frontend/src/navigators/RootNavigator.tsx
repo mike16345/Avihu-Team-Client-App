@@ -4,7 +4,6 @@ import { NO_ACCESS, SESSION_EXPIRED } from "@/constants/Constants";
 import { ONBOARDING_FORM_PRESET_KEY } from "@/constants/reactQuery";
 import { FormPreset } from "@/interfaces/FormPreset";
 import { IUser } from "@/interfaces/User";
-import { useAgreementApi } from "@/hooks/api/useAgreementApi";
 import { useFormPresetsApi } from "@/hooks/api/useFormPresetsApi";
 import useNotification from "@/hooks/useNotification";
 import useUserQuery from "@/hooks/queries/useUserQuery";
@@ -24,6 +23,7 @@ import { RootStackParamList } from "@/types/navigatorTypes";
 import { useToast } from "@/hooks/useToast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { useGetCurrentAgreement } from "@/hooks/queries/agreements/useGetCurrentAgreement";
 
 type InitialRoute = {
   route: keyof RootStackParamList;
@@ -34,11 +34,9 @@ const RootNavigator = () => {
   const queryClient = useQueryClient();
   const { triggerErrorToast } = useToast();
 
-  const { getCurrentAgreement } = useAgreementApi();
   const { getOnBoardingFormPreset } = useFormPresetsApi();
 
-  const agreementSignedByUserId = useFormStore((state) => state.agreementSignedByUserId);
-  const onboardingCompletedByUserId = useFormStore((state) => state.onboardingCompletedByUserId);
+  const { resolveAgreement } = useGetCurrentAgreement();
   const setActiveFormId = useFormStore((state) => state.setActiveFormId);
 
   const currentUser = useUserStore((state) => state.currentUser);
@@ -52,10 +50,6 @@ const RootNavigator = () => {
   const [loading, setLoading] = useState(true);
   const [initialRoute, setInitialRoute] = useState<InitialRoute | null>(null);
   const currentUserId = currentUser?._id;
-  const markedAgreementSigned = currentUserId ? agreementSignedByUserId[currentUserId] : undefined;
-  const markedOnboardingCompleted = currentUserId
-    ? onboardingCompletedByUserId[currentUserId]
-    : undefined;
 
   useEffect(() => {
     const bootstrap = async () => {
@@ -127,10 +121,8 @@ const RootNavigator = () => {
 
     const runGate = async () => {
       const onBoardingStep = currentUser.onboardingStep;
-      const markedCompleted = markedOnboardingCompleted;
-      const markedSigned = markedAgreementSigned;
-      const hasCompletedOnboarding = onBoardingStep === "completed" || markedSigned;
-      const shouldResolveAgreementOnly = onBoardingStep === "agreement" || markedCompleted;
+      const hasCompletedOnboarding = onBoardingStep === "completed";
+      const shouldResolveAgreementOnly = onBoardingStep === "agreement";
 
       const resolveOnboardingForm = async () => {
         try {
@@ -145,21 +137,6 @@ const RootNavigator = () => {
             return null;
           }
 
-          return null;
-        }
-      };
-
-      const resolveAgreement = async () => {
-        try {
-          const agreement = await getCurrentAgreement();
-
-          return agreement ?? null;
-        } catch (error) {
-          if (isNotFoundError(error)) {
-            return null;
-          }
-
-          console.error("Error fetching current agreement:", error);
           return null;
         }
       };
@@ -213,12 +190,7 @@ const RootNavigator = () => {
     return () => {
       cancelled = true;
     };
-  }, [
-    currentUser?.onboardingStep,
-    currentUserId,
-    markedAgreementSigned,
-    markedOnboardingCompleted,
-  ]);
+  }, [currentUser?.onboardingStep, currentUserId]);
 
   if (loading) return <SplashScreen />;
   if (!currentUser) return <AuthNavigator />;

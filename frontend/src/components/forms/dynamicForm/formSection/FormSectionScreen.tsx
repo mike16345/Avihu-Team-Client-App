@@ -92,10 +92,11 @@ const FormSectionScreen = ({
     }
   };
 
-  const submitForm = () => {
+  const submitForm = async () => {
+    if (isPending) return;
     if (hasInvalidOptionsInSection(sectionIndex) || !validateSection(sectionIndex)) return;
 
-    handleSubmit();
+    await handleSubmit();
   };
 
   return (

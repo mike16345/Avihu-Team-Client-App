@@ -19,7 +19,6 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useToast } from "@/hooks/useToast";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
-import { useFormStore } from "@/store/formStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { USER_KEY } from "@/constants/reactQuery";
 import { Text } from "@/components/ui/Text";
@@ -43,7 +42,6 @@ const AgreementSignatureScreen = () => {
   const navigation = useNavigation<any>();
   const { triggerErrorToast } = useToast();
   const { currentUser, setCurrentUser } = useUserStore();
-  const { markAgreementSigned } = useFormStore();
   const queryClient = useQueryClient();
   const userId = currentUser?._id!;
   const { width } = useWindowDimensions();
@@ -86,17 +84,19 @@ const AgreementSignatureScreen = () => {
     try {
       setIsLoading(true);
       await sendSignedAgreement(submissionPayload);
-      markAgreementSigned(userId);
-      queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
-
       setCurrentUser({
         ...currentUser!,
-        signedAgreement: true,
+        onboardingStep: "completed",
       });
+      await queryClient.invalidateQueries({ queryKey: [USER_KEY, userId] });
       setCurrentAgreement(null);
       navigation.replace("AgreementSigned");
     } catch (error: any) {
-      triggerErrorToast({ message: error.message });
+      if (error.message.includes("Network Error")) {
+        triggerErrorToast({ message: "אין חיבור לאינטרנט" });
+      } else {
+        triggerErrorToast({ message: "אירעה שגיאה בשליחת ההסכם החתום" });
+      }
     } finally {
       setIsLoading(false);
     }

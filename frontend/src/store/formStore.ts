@@ -12,7 +12,6 @@ type FormProgress = {
   lastUpdatedAt: string;
 };
 
-type CompletionByUserId = Record<string, boolean>;
 type MonthlyCompletionByUserId = Record<string, Record<string, Record<string, boolean>>>;
 type GeneralCompletionByUserId = Record<string, Record<string, Record<string, boolean>>>;
 
@@ -28,10 +27,6 @@ interface FormStore {
   setFormProgress: (formId: string, progress: FormProgress) => void;
   updateFormProgress: (formId: string, updates: Partial<FormProgress>) => void;
   clearFormProgress: (formId: string) => void;
-  onboardingCompletedByUserId: CompletionByUserId;
-  markOnboardingCompleted: (userId: string) => void;
-  agreementSignedByUserId: CompletionByUserId;
-  markAgreementSigned: (userId: string) => void;
   monthlyCompletionByUserId: MonthlyCompletionByUserId;
   generalCompletionByUserId: GeneralCompletionByUserId;
   markMonthlyCompletion: (userId: string, formId: string, monthKey: string) => void;
@@ -80,22 +75,6 @@ export const useFormStore = create<FormStore>()(
           delete next[formId];
           return { progressByFormId: next };
         }),
-      onboardingCompletedByUserId: {},
-      markOnboardingCompleted: (userId) =>
-        set((state) => ({
-          onboardingCompletedByUserId: {
-            ...state.onboardingCompletedByUserId,
-            [userId]: true,
-          },
-        })),
-      agreementSignedByUserId: {},
-      markAgreementSigned: (userId) =>
-        set((state) => ({
-          agreementSignedByUserId: {
-            ...state.agreementSignedByUserId,
-            [userId]: true,
-          },
-        })),
       monthlyCompletionByUserId: {},
       generalCompletionByUserId: {},
       markMonthlyCompletion: (userId, formId, monthKey) =>
@@ -144,10 +123,6 @@ export const useFormStore = create<FormStore>()(
       hasShownNotification: (userId, formId, occurrenceKey) =>
         !!get().shownNotifications[userId]?.[formId]?.[occurrenceKey],
       isFormCompleted: (formType, userId, formId, occurrenceKey) => {
-        if (formType === "onboarding") {
-          return !!get().onboardingCompletedByUserId[userId];
-        }
-
         if (formType === "monthly") {
           if (!occurrenceKey) return false;
           return !!get().monthlyCompletionByUserId[userId]?.[formId]?.[occurrenceKey];
@@ -163,8 +138,6 @@ export const useFormStore = create<FormStore>()(
       partialize: (state) => ({
         activeFormId: state.activeFormId,
         progressByFormId: state.progressByFormId,
-        onboardingCompletedByUserId: state.onboardingCompletedByUserId,
-        agreementSignedByUserId: state.agreementSignedByUserId,
         monthlyCompletionByUserId: state.monthlyCompletionByUserId,
         generalCompletionByUserId: state.generalCompletionByUserId,
         shownNotifications: state.shownNotifications,
