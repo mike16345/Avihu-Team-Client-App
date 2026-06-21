@@ -15,9 +15,9 @@ import { DropDownContextProvider } from "@/context/useDropdown";
 import { mapToDropDownItems } from "@/utils/utils";
 import queryClient from "@/QueryClient/queryClient";
 import { WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
-import { Text } from "@/components/ui/Text";
 import { useShadowStyles } from "@/styles/useShadowStyles";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
+import PlanPendingState from "@/components/ui/PlanPendingState";
 
 const MyWorkoutPlanScreen = () => {
   const { colors, layout, spacing, common } = useStyles();
@@ -34,6 +34,9 @@ const MyWorkoutPlanScreen = () => {
     await refetch();
   };
 
+  const hasCardioPlan = Boolean(data?.cardio?.type && data?.cardio?.plan);
+  const hasWorkoutPlanContent = (data?.workoutPlans?.length ?? 0) > 0 || hasCardioPlan;
+
   const handleSelect = (val: any) => {
     if (val == CARDIO_VALUE) return setShowCardio(true);
     const selected = data?.workoutPlans.find((plan) => plan._id === val);
@@ -47,25 +50,31 @@ const MyWorkoutPlanScreen = () => {
   const plans = useMemo(() => {
     if (!data) return [];
 
-    const plans = mapToDropDownItems(data.workoutPlans, {
+    const nextPlans = mapToDropDownItems(data.workoutPlans, {
       labelKey: "planName",
       valueKey: "_id",
     });
 
-    plans.push({ label: CARDIO_VALUE, value: CARDIO_VALUE });
+    nextPlans.push({ label: CARDIO_VALUE, value: CARDIO_VALUE });
     setSelectedPlan(data.workoutPlans[0]);
 
-    return plans;
+    return nextPlans;
   }, [data]);
 
-  if (error?.status == 404)
+  if (error?.status === 404 || (!isLoading && !isError && !hasWorkoutPlanContent)) {
     return (
-      <View style={[layout.flex1, layout.center]}>
-        <Text>אין תוכנית אימונים זמינה</Text>
-      </View>
+      <PlanPendingState
+        title="תוכנית האימונים שלך עדיין בהכנה"
+        description="אנחנו משלימים עבורך את התוכנית. אפשר לרענן בעוד רגע ולבדוק אם היא כבר מוכנה."
+        isFetching={isRefetching}
+        onRefresh={() => void refresh(handleRefetch)}
+      />
     );
-  if (isError)
+  }
+
+  if (isError) {
     return <ErrorScreen refetchFunc={() => refresh(handleRefetch)} isFetching={isRefetching} />;
+  }
 
   if (isLoading) return <WorkoutPlanSkeletonLoader />;
 
