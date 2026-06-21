@@ -1,6 +1,15 @@
+import Icon from "@/components/Icon/Icon";
 import useStyles from "@/styles/useGlobalStyles";
-import React from "react";
+import React, { useEffect } from "react";
 import { TouchableOpacity, View } from "react-native";
+import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 import { Card } from "./Card";
 import { Text } from "./Text";
 
@@ -11,6 +20,43 @@ interface PlanPendingStateProps {
   onRefresh: () => void;
   title: string;
 }
+
+const SPIN_DURATION = 800;
+const SPIN_EASING = Easing.bezier(0.25, -0.5, 0.25, 1);
+
+const RefreshIcon: React.FC<{ isFetching: boolean }> = ({ isFetching }) => {
+  const rotation = useSharedValue(0);
+
+  useEffect(() => {
+    if (!isFetching) {
+      cancelAnimation(rotation);
+      rotation.value = 0;
+      return;
+    }
+
+    rotation.value = withRepeat(
+      withTiming(1, {
+        duration: SPIN_DURATION,
+        easing: SPIN_EASING,
+      }),
+      -1
+    );
+
+    return () => {
+      cancelAnimation(rotation);
+    };
+  }, [isFetching, rotation]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${rotation.value * 360}deg` }],
+  }));
+
+  return (
+    <Animated.View style={animatedStyle}>
+      <Icon name="loader" color="#F8F8F8" />
+    </Animated.View>
+  );
+};
 
 const PlanPendingState: React.FC<PlanPendingStateProps> = ({
   buttonLabel = "רענן",
@@ -38,7 +84,7 @@ const PlanPendingState: React.FC<PlanPendingStateProps> = ({
             {title}
           </Text>
 
-          <Text fontSize={16} style={[text.textCenter]}>
+          <Text fontSize={16} style={[text.textCenter, colors.textOnSurfaceVariant]}>
             {description}
           </Text>
         </View>
@@ -60,6 +106,7 @@ const PlanPendingState: React.FC<PlanPendingStateProps> = ({
           { opacity: isFetching ? 0.8 : 1 },
         ]}
       >
+        <RefreshIcon isFetching={isFetching} />
         <Text fontVariant="bold" fontSize={16} style={colors.textOnPrimary}>
           {buttonLabel}
         </Text>

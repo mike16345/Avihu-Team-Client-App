@@ -20,8 +20,8 @@ const MyDietPlanScreen = () => {
   if (error?.status === 404 || (!isLoading && !isError && !hasDietPlanContent)) {
     return (
       <PlanPendingState
-        title="תוכנית התזונה שלך עדיין בהכנה"
-        description="אנחנו משלימים עבורך את התוכנית. אפשר לרענן בעוד רגע ולבדוק אם היא כבר מוכנה."
+        title="תפריט תזונה בבנייה"
+        description="ברגע שהמאמן יסיים לבנות לך את התפריט הוא יופיע לך כאן."
         isFetching={isFetching}
         onRefresh={() => void refetch()}
       />

@@ -7,9 +7,10 @@ import useStyles from "@/styles/useGlobalStyles";
 interface FileUploadInputProps {
   value: string[];
   onChange: (value: string[]) => void;
+  maxImages: number;
 }
 
-const FileUploadInput: React.FC<FileUploadInputProps> = ({ value, onChange }) => {
+const FileUploadInput: React.FC<FileUploadInputProps> = ({ maxImages, value, onChange }) => {
   const { spacing, layout, common } = useStyles();
 
   const handleUpload = async (images: string[]) => {
@@ -48,7 +49,7 @@ const FileUploadInput: React.FC<FileUploadInputProps> = ({ value, onChange }) =>
         handleUpload={handleUpload}
         trigger={renderTrigger}
         images={value}
-        imageCap={4}
+        imageCap={maxImages}
       />
     </View>
   );

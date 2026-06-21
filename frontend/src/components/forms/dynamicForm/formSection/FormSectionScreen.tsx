@@ -1,5 +1,5 @@
 import { BackHandler, Platform, View } from "react-native";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { SectionStackParamList } from "../DynamicForm";
@@ -10,6 +10,8 @@ import { useFormContext } from "@/context/useFormContext";
 import { useFormStore } from "@/store/formStore";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 import { SectionTransitionDirection } from "../DynamicForm";
+import useLogout from "@/hooks/useLogout";
+import FormExitConfirmationModal from "@/components/forms/FormExitConfirmationModal";
 
 const FormSectionScreen = ({
   route,
@@ -20,6 +22,7 @@ const FormSectionScreen = ({
 }) => {
   const { spacing, layout } = useStyles();
   const { updateFormProgress: updateFormStoreProgress } = useFormStore();
+  const { handleLogout } = useLogout();
   const {
     sections,
     handleSubmit,
@@ -27,9 +30,12 @@ const FormSectionScreen = ({
     validateSection,
     hasInvalidOptionsInSection,
     formId,
+    formType,
     progress,
     updateFormProgress,
   } = useFormContext();
+  const [isExiting, setIsExiting] = useState(false);
+  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
 
   const { sectionIndex } = route.params;
   const section = sections[sectionIndex];
@@ -86,6 +92,39 @@ const FormSectionScreen = ({
     }
   };
 
+  const handleExit = async () => {
+    if (isExiting) return;
+
+    if (formType === "onboarding") {
+      try {
+        setIsExiting(true);
+        await handleLogout();
+      } finally {
+        setIsExiting(false);
+      }
+      return;
+    }
+
+    const parentNavigation = navigation.getParent();
+    if (parentNavigation?.canGoBack()) {
+      parentNavigation.goBack();
+      return;
+    }
+
+    parentNavigation?.navigate("BottomTabs");
+  };
+
+  const closeExitModal = () => {
+    if (isExiting) return;
+
+    setIsExitModalOpen(false);
+  };
+
+  const confirmExit = async () => {
+    await handleExit();
+    setIsExitModalOpen(false);
+  };
+
   const submitForm = async () => {
     if (isPending) return;
     if (hasInvalidOptionsInSection(sectionIndex) || !validateSection(sectionIndex)) return;
@@ -120,6 +159,15 @@ const FormSectionScreen = ({
         isLast={isLast}
         sectionIndex={sectionIndex}
         isLoading={isPending}
+        onExit={() => setIsExitModalOpen(true)}
+        isExiting={isExiting}
+      />
+
+      <FormExitConfirmationModal
+        visible={isExitModalOpen}
+        isLoading={isExiting}
+        onDismiss={closeExitModal}
+        onConfirm={() => void confirmExit()}
       />
     </View>
   );

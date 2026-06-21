@@ -23,6 +23,7 @@ const ProgressImageUpload = () => {
   return (
     <>
       <UploadDrawer
+        imageCap={4}
         trigger={
           <PrimaryButton mode="light" block icon="camera">
             <Text fontSize={16} fontVariant="bold">

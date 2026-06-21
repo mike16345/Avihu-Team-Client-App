@@ -64,8 +64,8 @@ const MyWorkoutPlanScreen = () => {
   if (error?.status === 404 || (!isLoading && !isError && !hasWorkoutPlanContent)) {
     return (
       <PlanPendingState
-        title="תוכנית האימונים שלך עדיין בהכנה"
-        description="אנחנו משלימים עבורך את התוכנית. אפשר לרענן בעוד רגע ולבדוק אם היא כבר מוכנה."
+        title="תוכנית אימונים בבנייה"
+        description="ברגע שהמאמן יסיים לבנות לך את האימונים הם יופיעו לך כאן."
         isFetching={isRefetching}
         onRefresh={() => void refresh(handleRefetch)}
       />
