@@ -19,6 +19,7 @@ import {
   setAuthSession,
   setAuthSessionFromRefresh,
 } from "@/services/authSession";
+import { shouldForceLogout } from "@/services/authErrors";
 import { RootStackParamList } from "@/types/navigatorTypes";
 import { useToast } from "@/hooks/useToast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -74,14 +75,29 @@ const RootNavigator = () => {
 
           await setAuthSession({ nextUser: me.user });
           setCurrentUser(me.user as IUser);
-        } catch {
+        } catch (error) {
+          if (shouldForceLogout(error)) {
+            return;
+          }
+
           if (!session.refreshToken) {
             triggerErrorToast({ message: SESSION_EXPIRED });
             await handleLogout();
             return;
           }
 
-          const refreshedSession = await refreshAccessToken(session.refreshToken);
+          let refreshedSession;
+
+          try {
+            refreshedSession = await refreshAccessToken(session.refreshToken);
+          } catch (refreshError) {
+            if (shouldForceLogout(refreshError)) {
+              return;
+            }
+
+            throw refreshError;
+          }
+
           await setAuthSessionFromRefresh(refreshedSession);
 
           const nextUser = refreshedSession.user;

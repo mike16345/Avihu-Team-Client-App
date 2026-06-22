@@ -1,22 +1,12 @@
 import { logoutRefreshSession } from "@/API/authApi";
-import { clearAuthSession, getRefreshToken } from "@/services/authSession";
-import { useNotificationStore } from "@/store/notificationStore";
-import { useUserStore } from "@/store/userStore";
-import { useQueryClient } from "@tanstack/react-query";
+import { getRefreshToken } from "@/services/authSession";
+import { clearLocalAuthState } from "@/services/authLogout";
 
 const useLogout = () => {
-  const queryClient = useQueryClient();
-  const { setCurrentUser } = useUserStore();
-  const { clearNotifications } = useNotificationStore();
-
   const handleLogout = async () => {
     const refreshToken = getRefreshToken();
 
-    setCurrentUser(null);
-    await clearAuthSession();
-    queryClient.clear();
-    queryClient.invalidateQueries();
-    clearNotifications();
+    await clearLocalAuthState();
     if (refreshToken) {
       try {
         await logoutRefreshSession(refreshToken);
