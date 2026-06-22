@@ -1,7 +1,6 @@
 import { getApiBaseUrl } from "@/config/apiConfig";
 import { LoginResponse, MeResponse, RefreshResponse } from "@/interfaces/IAuth";
 import { getAccessToken } from "@/services/authSession";
-import { attachAuthErrorInterceptor } from "@/services/authInterceptors";
 import { API_KEY_HEADER, getApiKey } from "@/services/apiKey";
 import { ApiResponse } from "@/types/ApiTypes";
 import axios from "axios";
@@ -24,8 +23,6 @@ authClient.interceptors.request.use((config) => {
 
   return config;
 });
-
-attachAuthErrorInterceptor(authClient);
 
 const unwrapAuthResponse = <T>(responseBody: T | ApiResponse<T>) => {
   if (
