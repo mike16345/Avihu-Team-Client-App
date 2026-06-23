@@ -20,26 +20,20 @@ export interface UseStepsDataResult {
   isNativeAvailable: boolean;
 }
 
-// MIKE: After running `eas build --profile development` with the new HealthKit /
-// Health Connect native modules linked, uncomment the require lines below and
-// delete the `return null` lines. Until then, the hook gracefully reports
-// isNativeAvailable=false and the screen falls back to demo data.
 const loadNativeIOS = () => {
-  return null;
-  // try {
-  //   return require("react-native-health");
-  // } catch {
-  //   return null;
-  // }
+  try {
+    return require("react-native-health");
+  } catch {
+    return null;
+  }
 };
 
 const loadNativeAndroid = () => {
-  return null;
-  // try {
-  //   return require("react-native-health-connect");
-  // } catch {
-  //   return null;
-  // }
+  try {
+    return require("react-native-health-connect");
+  } catch {
+    return null;
+  }
 };
 
 const startOfDay = (d: Date) => {
