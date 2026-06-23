@@ -1,6 +1,7 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
+import { useToast } from "@/hooks/useToast";
 import DisplayImage from "./DisplayImage";
 import { Text } from "../ui/Text";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
@@ -15,14 +16,35 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
   confirmTitle = "שליחה",
 }) => {
   const { spacing, text, layout } = useStyles();
+  const { triggerErrorToast } = useToast();
 
   const [images, setImages] = useState<string[]>([]);
-  const addImage = (image: string) => {
-    const newImagesArr = [...images];
+  const hadExistingImages = (existingImages?.length || 0) > 0;
 
-    newImagesArr.push(image);
+  const showMaxImagesReachedError = () => {
+    triggerErrorToast({
+      title: "הגעת למגבלת התמונות",
+      message: `ניתן להעלות עד ${imageCap} תמונות.`,
+    });
+  };
 
-    setImages(newImagesArr.slice(-imageCap));
+  const addImages = (newImages: string[]) => {
+    const remainingSlots = imageCap - images.length;
+
+    if (remainingSlots <= 0) {
+      showMaxImagesReachedError();
+      return;
+    }
+
+    if (newImages.length > remainingSlots) {
+      showMaxImagesReachedError();
+    }
+
+    const imagesToAdd = newImages.slice(0, remainingSlots);
+
+    if (imagesToAdd.length === 0) return;
+
+    setImages([...images, ...imagesToAdd]);
   };
 
   const deleteImageByIndex = (index: number) => {
@@ -32,7 +54,7 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
   };
 
   const uploadImage = async () => {
-    handleUpload(images);
+    await handleUpload(images);
   };
 
   useEffect(() => {
@@ -42,11 +64,15 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
   }, [existingImages]);
 
   return (
-    <View style={[{ paddingVertical: 30, paddingHorizontal: 70 }, spacing.gap30, layout.flex1]}>
-      <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונה</Text>
+    <View style={[{ paddingVertical: 30, paddingHorizontal: 24 }, spacing.gap30, layout.flex1]}>
+      <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונות</Text>
 
       <View style={[spacing.gap30, !images.length && { gap: 226 }]}>
-        <SelectUploadType returnImage={(image: string) => addImage(image)} />
+        <SelectUploadType
+          imageCap={imageCap}
+          selectedImagesCount={images.length}
+          returnImages={addImages}
+        />
 
         <DisplayImage images={images} removeImage={(index) => deleteImageByIndex(index)} />
       </View>
@@ -55,7 +81,7 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
         <PrimaryButton
           children={confirmTitle}
           block
-          disabled={images.length == 0}
+          disabled={images.length === 0 && !hadExistingImages}
           onPress={uploadImage}
           loading={loading}
         />

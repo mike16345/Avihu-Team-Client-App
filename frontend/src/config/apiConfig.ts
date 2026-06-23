@@ -1,5 +1,6 @@
 import { API_KEY_HEADER, getApiKey } from "@/services/apiKey";
 import { getAccessToken, loadPersistedAuthSession } from "@/services/authSession";
+import { attachAuthErrorInterceptor } from "@/services/authInterceptors";
 import axios, { AxiosInstance } from "axios";
 import Constants from "expo-constants";
 
@@ -64,5 +65,7 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+attachAuthErrorInterceptor(axiosInstance);
 
 export default axiosInstance;

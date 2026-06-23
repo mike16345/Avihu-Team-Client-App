@@ -1,5 +1,5 @@
 import { BackHandler, Platform, View } from "react-native";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { RouteProp, useFocusEffect } from "@react-navigation/native";
 import { SectionStackParamList } from "../DynamicForm";
@@ -9,6 +9,9 @@ import FormSectionContent from "./FormSectionContent";
 import { useFormContext } from "@/context/useFormContext";
 import { useFormStore } from "@/store/formStore";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
+import { SectionTransitionDirection } from "../DynamicForm";
+import useLogout from "@/hooks/useLogout";
+import FormExitConfirmationModal from "@/components/forms/FormExitConfirmationModal";
 
 const FormSectionScreen = ({
   route,
@@ -17,8 +20,9 @@ const FormSectionScreen = ({
   route: RouteProp<SectionStackParamList, "FormSection">;
   navigation: any;
 }) => {
-  const { spacing, layout, colors } = useStyles();
+  const { spacing, layout } = useStyles();
   const { updateFormProgress: updateFormStoreProgress } = useFormStore();
+  const { handleLogout } = useLogout();
   const {
     sections,
     handleSubmit,
@@ -26,11 +30,12 @@ const FormSectionScreen = ({
     validateSection,
     hasInvalidOptionsInSection,
     formId,
-    initialSectionIndex,
+    formType,
     progress,
     updateFormProgress,
-    didInitStackRef,
   } = useFormContext();
+  const [isExiting, setIsExiting] = useState(false);
+  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
 
   const { sectionIndex } = route.params;
   const section = sections[sectionIndex];
@@ -38,23 +43,6 @@ const FormSectionScreen = ({
   const isLast = sectionIndex === lastSectionIndex;
 
   useEffect(() => {
-    if (!didInitStackRef.current && initialSectionIndex > 0 && !navigation.canGoBack()) {
-      const routes = Array.from({ length: initialSectionIndex + 1 }, (_, index) => ({
-        name: "FormSection",
-        params: { sectionIndex: index },
-      }));
-
-      navigation.reset({
-        index: initialSectionIndex,
-        routes,
-      });
-
-      didInitStackRef.current = true;
-      return;
-    }
-
-    didInitStackRef.current = true;
-
     if (progress?.currentSectionIndex !== sectionIndex) {
       updateFormProgress(formId, {
         currentSectionIndex: sectionIndex,
@@ -63,33 +51,78 @@ const FormSectionScreen = ({
     }
   }, [sectionIndex]);
 
+  const goToSection = (nextSectionIndex: number, direction: SectionTransitionDirection) => {
+    updateFormStoreProgress(formId, {
+      previousSectionId: section._id,
+      previousSectionIndex: sectionIndex,
+      currentSectionId: sections[nextSectionIndex]?._id,
+      currentSectionIndex: nextSectionIndex,
+    });
+
+    navigation.replace("FormSection", {
+      sectionIndex: nextSectionIndex,
+      direction,
+    });
+  };
+
   useFocusEffect(
     useCallback(() => {
       if (Platform.OS !== "android") return;
 
       const handler = BackHandler.addEventListener("hardwareBackPress", () => {
-        if (sectionIndex === initialSectionIndex) {
-          return true; // Prevent back when loading
+        if (sectionIndex > 0) {
+          goToSection(sectionIndex - 1, "backward");
+          return true;
         }
-        return false; // Allow back when not loading
+
+        return true;
       });
 
       return () => {
         handler.remove();
       };
-    }, [sectionIndex, initialSectionIndex]) // Re-register handler when isLoading changes
+    }, [sectionIndex])
   );
 
   const goNext = () => {
     if (hasInvalidOptionsInSection(sectionIndex) || !validateSection(sectionIndex)) return;
 
     if (!isLast) {
-      navigation.push("FormSection", { sectionIndex: sectionIndex + 1 });
-      updateFormStoreProgress(formId, {
-        previousSectionId: section._id,
-        previousSectionIndex: sectionIndex,
-      });
+      goToSection(sectionIndex + 1, "forward");
     }
+  };
+
+  const handleExit = async () => {
+    if (isExiting) return;
+
+    if (formType === "onboarding") {
+      try {
+        setIsExiting(true);
+        await handleLogout();
+      } finally {
+        setIsExiting(false);
+      }
+      return;
+    }
+
+    const parentNavigation = navigation.getParent();
+    if (parentNavigation?.canGoBack()) {
+      parentNavigation.goBack();
+      return;
+    }
+
+    parentNavigation?.navigate("BottomTabs");
+  };
+
+  const closeExitModal = () => {
+    if (isExiting) return;
+
+    setIsExitModalOpen(false);
+  };
+
+  const confirmExit = async () => {
+    await handleExit();
+    setIsExitModalOpen(false);
   };
 
   const submitForm = async () => {
@@ -120,12 +153,21 @@ const FormSectionScreen = ({
       </CustomScrollView>
 
       <FormSectionFooter
-        goBack={() => navigation.push("FormSection", { sectionIndex: sectionIndex - 1 })}
+        goBack={() => goToSection(sectionIndex - 1, "backward")}
         goNext={goNext}
         handleSubmit={submitForm}
         isLast={isLast}
         sectionIndex={sectionIndex}
         isLoading={isPending}
+        onExit={() => setIsExitModalOpen(true)}
+        isExiting={isExiting}
+      />
+
+      <FormExitConfirmationModal
+        visible={isExitModalOpen}
+        isLoading={isExiting}
+        onDismiss={closeExitModal}
+        onConfirm={() => void confirmExit()}
       />
     </View>
   );

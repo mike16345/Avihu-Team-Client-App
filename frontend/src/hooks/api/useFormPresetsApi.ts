@@ -1,4 +1,5 @@
 import { fetchData } from "@/API/api";
+import { MonthlyFormStatusResponse } from "@/interfaces/IMonthlyFormStatus";
 import { FormPreset } from "@/interfaces/FormPreset";
 import { ApiResponse } from "@/types/ApiTypes";
 import DateUtils from "@/utils/dateUtils";
@@ -30,11 +31,17 @@ export const useFormPresetsApi = () => {
       showOn: DateUtils.getStartOfDayLocal(),
     }).then((res) => res.data);
 
+  const getMonthlyFormStatus = async () =>
+    fetchData<ApiResponse<MonthlyFormStatusResponse>>(`${FORM_PRESETS_ENDPOINT}/monthly-status`).then(
+      (res) => res.data
+    );
+
   return {
     getFormPresets,
     getFormPresetById,
     getOneFormPreset,
     getOnBoardingFormPreset,
     getGeneralFormForToday,
+    getMonthlyFormStatus,
   };
 };

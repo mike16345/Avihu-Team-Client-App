@@ -7,7 +7,6 @@ import {
 import React, { useMemo } from "react";
 import useArticleQuery from "@/hooks/queries/articles/useArticleQuery";
 import useStyles from "@/styles/useGlobalStyles";
-import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import { Text } from "../../ui/Text";
 import ArticleCard from "../ArticleCard";
 import { ConditionalRender } from "../../ui/ConditionalRender";
@@ -16,6 +15,7 @@ import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 import { useQueryClient } from "@tanstack/react-query";
 import { ARTICLE_KEY } from "@/constants/reactQuery";
 import { useUserStore } from "@/store/userStore";
+import ArticleGroupContentSkeleton from "./ArticleGroupContentSkeleton";
 
 interface ArticleGroupContentProps {
   groupId: string;
@@ -37,12 +37,13 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
   } = useArticleQuery(groupId, planType);
 
   const articles = useMemo(() => {
-    const articles = articleRes?.pages.flatMap((page) => page.results) ?? [];
-    if ((!articles || !articles.length) && !isLoading)
+    const nextArticles = articleRes?.pages.flatMap((page) => page.results) ?? [];
+    if (!nextArticles.length && !isLoading) {
       return <Text style={[text.textCenter, spacing.pdXl]}>לא נמצאו מאמרים לקבוצה זו</Text>;
+    }
 
-    return articles.map((article) => <ArticleCard key={article._id} article={article} />);
-  }, [articleRes?.pageParams, articleRes?.pages]);
+    return nextArticles.map((article) => <ArticleCard key={article._id} article={article} />);
+  }, [articleRes?.pages, isLoading, spacing.pdXl, text.textCenter]);
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: [ARTICLE_KEY + groupId + planType] });
@@ -61,6 +62,7 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
   };
 
   if (isError) return <ErrorScreen />;
+  if (isLoading) return <ArticleGroupContentSkeleton />;
 
   return (
     <>
@@ -68,13 +70,13 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
         style={[layout.flex1]}
         contentContainerStyle={[spacing.gap20, spacing.pdHorizontalLg]}
         onScroll={handleScroll}
-        refreshControl={<RefreshControl refreshing={isRefetching  } onRefresh={handleRefresh} />}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} />}
         topShadow={false}
       >
         {articles}
       </CustomScrollView>
 
-      <ConditionalRender condition={isLoading || isFetchingNextPage}>
+      <ConditionalRender condition={isFetchingNextPage}>
         <ActivityIndicator />
       </ConditionalRender>
     </>
