@@ -8,7 +8,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...config,
     name: "Avihu Team",
     slug: "avihu-team",
-    version: "2.2.1",
+    version: "2.3.0",
     orientation: "portrait",
     icon: "./assets/app-logo.png",
     userInterfaceStyle: "automatic",
@@ -19,6 +19,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     plugins: [
       ["expo-localization"],
+      [
+        "expo-build-properties",
+        {
+          android: {
+            minSdkVersion: 26,
+          },
+        },
+      ],
       "expo-background-task",
 
       [
@@ -42,14 +50,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         "react-native-health",
         {
           isClinicalDataEnabled: false,
-          healthSharePermission: "כדי לעקוב אחרי הצעדים שלך, האפליקציה צריכה גישה לנתוני הצעדים והפעילות מאפליקציית הבריאות.",
+          healthSharePermission:
+            "כדי לעקוב אחרי הצעדים שלך, האפליקציה צריכה גישה לנתוני הצעדים והפעילות מאפליקציית הבריאות.",
           healthUpdatePermission: "האפליקציה לא משנה נתונים באפליקציית הבריאות.",
         },
       ],
       [
         "react-native-health-connect",
         {
-          package: "com.avihuteam.avihuteam",
+          package: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
         },
       ],
       "./native-modules/live-steps-activity/plugin/withLiveStepsActivity.js",
