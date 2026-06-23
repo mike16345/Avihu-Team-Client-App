@@ -38,6 +38,21 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           enableBackgroundRemoteNotifications: false,
         },
       ],
+      [
+        "react-native-health",
+        {
+          isClinicalDataEnabled: false,
+          healthSharePermission: "כדי לעקוב אחרי הצעדים שלך, האפליקציה צריכה גישה לנתוני הצעדים והפעילות מאפליקציית הבריאות.",
+          healthUpdatePermission: "האפליקציה לא משנה נתונים באפליקציית הבריאות.",
+        },
+      ],
+      [
+        "react-native-health-connect",
+        {
+          package: "com.avihuteam.avihuteam",
+        },
+      ],
+      "./native-modules/live-steps-activity/plugin/withLiveStepsActivity.js",
     ],
     ios: {
       bundleIdentifier: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",

@@ -80,7 +80,13 @@ const MyWorkoutPlanScreen = () => {
 
   return (
     <View style={[layout.flex1, colors.background, spacing.pdStatusBar]}>
-      <View style={[{ zIndex: 2, elevation: 5 }, frameShadow, spacing.pdHorizontalLg]}>
+      <View
+        style={[
+          { zIndex: 2, elevation: 5 },
+          showCardio ? undefined : frameShadow,
+          spacing.pdHorizontalLg,
+        ]}
+      >
         <DropDownContextProvider items={plans} onSelect={handleSelect}>
           <ScrollView style={[common.rounded]}>
             <WorkoutPlanSelector
@@ -97,7 +103,9 @@ const MyWorkoutPlanScreen = () => {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
         topShadow={true}
-        topShadowFirstColor="#F4F4F4"
+        bottomShadow={true}
+        topShadowFirstColor={showCardio ? "#FFFFFF" : "#F4F4F4"}
+        bottomShadowFirstColor={showCardio ? "#FFFFFF" : undefined}
         scrollShadowStyleTop={{ top: 0 }}
       >
         <ConditionalRender condition={showCardio}>
