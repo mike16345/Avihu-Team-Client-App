@@ -22,8 +22,21 @@ export interface UseStepsDataResult {
 
 const loadNativeIOS = () => {
   try {
-    return require("react-native-health");
-  } catch {
+    const { NativeModules } = require("react-native");
+    const NM = NativeModules?.AppleHealthKit;
+    const mod = require("react-native-health");
+    const AppleHealthKit = mod?.default ?? mod;
+    if (!AppleHealthKit?.initHealthKit) {
+      console.error(
+        "[steps] HealthKit native side is NOT linked. NativeModules.AppleHealthKit:",
+        NM ? Object.keys(NM) : "undefined",
+        "— Mike needs to run `npx expo prebuild --clean` before `eas build`."
+      );
+      return null;
+    }
+    return AppleHealthKit;
+  } catch (err) {
+    console.error("[steps] require(react-native-health) failed:", err);
     return null;
   }
 };
@@ -84,7 +97,7 @@ const readIOS = async (
   native: any,
   today: Date
 ): Promise<{ steps: number; calories: number; week: StepsDayDatum[] }> => {
-  const AppleHealthKit = native.default ?? native;
+  const AppleHealthKit = native;
   return new Promise((resolve) => {
     const weekDates = getWeekDates(today);
     const sunday = weekDates[0];
@@ -141,23 +154,26 @@ const readAndroid = async (
 };
 
 const requestIOSPermission = async (native: any): Promise<boolean> => {
-  const AppleHealthKit = native.default ?? native;
+  const AppleHealthKit = native;
+  if (!AppleHealthKit?.Constants?.Permissions) {
+    console.error("[steps] HealthKit module shape unexpected", Object.keys(AppleHealthKit ?? {}));
+    return false;
+  }
+  const Permissions = AppleHealthKit.Constants.Permissions;
+  const read = [
+    Permissions.StepCount,
+    Permissions.DistanceWalkingRunning,
+    Permissions.ActiveEnergyBurned,
+  ].filter(Boolean);
   return new Promise((resolve) => {
-    AppleHealthKit.initHealthKit(
-      {
-        permissions: {
-          read: [
-            AppleHealthKit.Constants.Permissions.Steps,
-            AppleHealthKit.Constants.Permissions.StepCount,
-            AppleHealthKit.Constants.Permissions.ActiveEnergyBurned,
-          ],
-          write: [],
-        },
-      },
-      (err: any) => {
-        resolve(!err);
+    AppleHealthKit.initHealthKit({ permissions: { read, write: [] } }, (err: any) => {
+      if (err) {
+        console.error("[steps] initHealthKit error:", err);
+        resolve(false);
+        return;
       }
-    );
+      resolve(true);
+    });
   });
 };
 
@@ -202,17 +218,23 @@ const useStepsData = (): UseStepsDataResult => {
 
   const requestPermission = useCallback(async () => {
     if (!native) {
+      console.error("[steps] requestPermission called but native module is null");
       setStatus("denied");
       return;
     }
-    const granted =
-      Platform.OS === "ios"
-        ? await requestIOSPermission(native)
-        : await requestAndroidPermission(native);
-    if (granted) {
-      setStatus("granted");
-      await refresh();
-    } else {
+    try {
+      const granted =
+        Platform.OS === "ios"
+          ? await requestIOSPermission(native)
+          : await requestAndroidPermission(native);
+      if (granted) {
+        setStatus("granted");
+        await refresh();
+      } else {
+        setStatus("denied");
+      }
+    } catch (err) {
+      console.error("[steps] requestPermission threw:", err);
       setStatus("denied");
     }
   }, [native, refresh]);

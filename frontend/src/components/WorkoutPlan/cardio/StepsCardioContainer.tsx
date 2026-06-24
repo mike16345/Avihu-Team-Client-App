@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import {
+  Linking,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { IStepsCardioType } from "@/interfaces/Workout";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
@@ -78,7 +85,7 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
   const sizes = useMemo(() => responsiveSizes(isSmall), [isSmall]);
 
   const useNativeData = steps.isNativeAvailable && steps.status === "granted";
-  const effectiveStatus: HealthStatus = useNativeData ? "granted" : demoStatus;
+  const effectiveStatus: HealthStatus = steps.isNativeAvailable ? steps.status : demoStatus;
 
   const weekData: DayData[] = useMemo(() => {
     if (useNativeData) {
@@ -117,10 +124,24 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
   const isGranted = effectiveStatus === "granted";
 
   const handleConnectPress = async () => {
+    console.log("[steps] handleConnectPress", {
+      isNativeAvailable: steps.isNativeAvailable,
+      currentStatus: steps.status,
+    });
     if (steps.isNativeAvailable) {
-      await steps.requestPermission();
-      if (notifications.isAvailable) {
-        await notifications.requestPermission();
+      if (steps.status === "denied") {
+        Linking.openURL("app-settings:").catch((err) =>
+          console.error("[steps] failed to open settings:", err)
+        );
+        return;
+      }
+      try {
+        await steps.requestPermission();
+        if (notifications.isAvailable) {
+          await notifications.requestPermission();
+        }
+      } catch (err) {
+        console.error("[steps] handleConnectPress threw:", err);
       }
       return;
     }
