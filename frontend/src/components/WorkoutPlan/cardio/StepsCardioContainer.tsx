@@ -101,7 +101,7 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
     return MOCK_WEEK.map((d) => ({ ...d, steps: 0, calories: 0 }));
   }, [useNativeData, steps.week, effectiveStatus]);
 
-  const todaySteps = useNativeData ? steps.todaySteps : 8500;
+  const todaySteps = useNativeData ? steps.todaySteps : 0;
   const weeklyBalance = useMemo(
     () => computeWeeklyBalance(weekData, goalsByDay, todayIndex),
     [weekData, goalsByDay, todayIndex]
