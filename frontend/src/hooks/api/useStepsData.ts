@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
+  aggregateGroupByPeriod as aggregateHealthConnectGroupByPeriod,
   getGrantedPermissions as getHealthConnectGrantedPermissions,
   initialize as initializeHealthConnect,
   readRecords as readHealthConnectRecords,
@@ -67,6 +68,7 @@ const loadNativeIOS = () => {
 };
 
 const loadNativeAndroid = () => ({
+  aggregateGroupByPeriod: aggregateHealthConnectGroupByPeriod,
   getGrantedPermissions: getHealthConnectGrantedPermissions,
   initialize: initializeHealthConnect,
   readRecords: readHealthConnectRecords,
@@ -241,21 +243,71 @@ const readAndroid = async (
 ): Promise<{ steps: number; calories: number; week: StepsDayDatum[]; weeks: StepsWeekDatum[] }> => {
   const recentWeekStarts = getRecentWeekStarts(today);
   const firstSunday = recentWeekStarts[0];
+  const timeRangeFilter = {
+    operator: "between" as const,
+    startTime: firstSunday.toISOString(),
+    endTime: today.toISOString(),
+  };
+  const byDay: Record<string, number> = {};
+
+  try {
+    const aggregateGroups = await native.aggregateGroupByPeriod?.({
+      recordType: "Steps",
+      timeRangeFilter,
+      timeRangeSlicer: { period: "DAYS", length: 1 },
+    });
+
+    if (Array.isArray(aggregateGroups)) {
+      console.log(
+        "[steps] Android Health Connect aggregate groups:",
+        aggregateGroups.map((group: any) => ({
+          startTime: group?.startTime,
+          endTime: group?.endTime,
+          countTotal: group?.result?.COUNT_TOTAL ?? 0,
+          dataOrigins: group?.result?.dataOrigins ?? [],
+        }))
+      );
+
+      for (const group of aggregateGroups) {
+        const k = dayKey(new Date(group.startTime));
+        byDay[k] = Math.round(group?.result?.COUNT_TOTAL ?? 0);
+      }
+    }
+  } catch (err) {
+    console.error("[steps] Android Health Connect aggregateGroupByPeriod failed:", err);
+  }
 
   const records = await native.readRecords("Steps", {
-    timeRangeFilter: {
-      operator: "between",
-      startTime: firstSunday.toISOString(),
-      endTime: today.toISOString(),
-    },
+    timeRangeFilter,
+    pageSize: 500,
   });
+  console.log("[STEPS DATA] RECORDS:", records);
 
-  const list: Array<{ startTime: string; count: number }> = records?.records ?? [];
-  const byDay: Record<string, number> = {};
-  for (const r of list) {
-    const k = dayKey(new Date(r.startTime));
-    byDay[k] = (byDay[k] ?? 0) + r.count;
+  const list: Array<{ startTime: string; count: number; metadata?: { dataOrigin?: string } }> =
+    records?.records ?? [];
+
+  // console.log(
+  //   "[steps] Android Health Connect step records:",
+  //   list.slice(0, 10).map((record) => ({
+  //     startTime: record.startTime,
+  //     count: record.count,
+  //     dataOrigin: record.metadata?.dataOrigin,
+  //   }))
+  // );
+
+  if (Object.keys(byDay).length === 0) {
+    for (const record of list) {
+      const k = dayKey(new Date(record.startTime));
+      byDay[k] = (byDay[k] ?? 0) + record.count;
+    }
   }
+
+  if (Object.keys(byDay).length === 0) {
+    console.log(
+      "[steps] Android Health Connect returned no step aggregates or step records for the requested range."
+    );
+  }
+
   const { todaySteps, week } = buildWeekFromMap(today, byDay);
   const weeks = buildWeeksFromMap(today, byDay);
   return { steps: todaySteps, calories: stepsToCalories(todaySteps), week, weeks };
@@ -323,8 +375,7 @@ const initializeAndroidExistingConnection = async (native: any): Promise<boolean
     console.log("[steps] Android Health Connect granted permissions:", grantedPermissions);
     return Array.isArray(grantedPermissions)
       ? grantedPermissions.some(
-          (permission) =>
-            permission?.accessType === "read" && permission?.recordType === "Steps"
+          (permission) => permission?.accessType === "read" && permission?.recordType === "Steps"
         )
       : false;
   } catch (err) {
@@ -334,10 +385,8 @@ const initializeAndroidExistingConnection = async (native: any): Promise<boolean
 };
 
 const useStepsData = (): UseStepsDataResult => {
-  const native = useMemo(
-    () => (Platform.OS === "ios" ? loadNativeIOS() : loadNativeAndroid()),
-    []
-  );
+  const native = useMemo(() => (Platform.OS === "ios" ? loadNativeIOS() : loadNativeAndroid()), []);
+
   const isNativeAvailable = native != null;
 
   const [status, setStatus] = useState<StepsPermissionStatus>("needsPermission");

@@ -5,14 +5,12 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
 import { IStepsCardioType } from "@/interfaces/Workout";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
-import { useShadowStyles } from "@/styles/useShadowStyles";
 import { useStepsTracking } from "@/context/StepsTrackingContext";
 import {
   DAY_LABELS,
@@ -22,7 +20,6 @@ import {
   MOCK_WEEK,
   MUTED_TEXT_FAINT,
   SMALL_SCREEN_BREAKPOINT,
-  SURFACE_WHITE,
   responsiveSizes,
 } from "./steps/stepsConstants";
 import HealthOnboardingCard from "./steps/HealthOnboardingCard";
@@ -35,18 +32,10 @@ interface StepsCardioContainerProps {
   plan?: IStepsCardioType;
 }
 
-const computeWeeklyBalance = (
-  weekData: DayData[],
-  goalsByDay: number[],
-  todayIndex: number
-) => {
+const computeWeeklyBalance = (weekData: DayData[], goalsByDay: number[], todayIndex: number) => {
   const daysElapsed = todayIndex + 1;
-  const actualSoFar = weekData
-    .slice(0, daysElapsed)
-    .reduce((sum, d) => sum + (d.steps ?? 0), 0);
-  const expectedSoFar = goalsByDay
-    .slice(0, daysElapsed)
-    .reduce((sum, g) => sum + g, 0);
+  const actualSoFar = weekData.slice(0, daysElapsed).reduce((sum, d) => sum + (d.steps ?? 0), 0);
+  const expectedSoFar = goalsByDay.slice(0, daysElapsed).reduce((sum, g) => sum + g, 0);
   return actualSoFar - expectedSoFar;
 };
 
@@ -70,15 +59,8 @@ const formatWeekRange = (startDate?: string, endDate?: string) => {
   return `${formatDate(startDate)} - ${formatDate(endDate)}`;
 };
 
-const nextDemoStatus = (current: HealthStatus): HealthStatus => {
-  if (current === "needsPermission") return "denied";
-  if (current === "denied") return "granted";
-  return "needsPermission";
-};
-
 const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => {
   const { colors, common, layout, spacing } = useStyles();
-  const { frameShadow } = useShadowStyles();
   const { width: screenWidth } = useWindowDimensions();
   const { steps, notifications, refreshSteps } = useStepsTracking();
 
@@ -99,7 +81,7 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
   const useNativeData = steps.isNativeAvailable && steps.status === "granted";
   const latestWeekIndex = Math.max(0, steps.weeks.length - 1);
   const selectedStepWeek = useNativeData
-    ? steps.weeks[selectedWeekIndex] ?? steps.weeks[latestWeekIndex]
+    ? (steps.weeks[selectedWeekIndex] ?? steps.weeks[latestWeekIndex])
     : undefined;
   const isSelectedCurrentWeek = useNativeData ? selectedWeekIndex === latestWeekIndex : true;
   const effectiveStatus: HealthStatus = steps.isNativeAvailable
@@ -195,10 +177,6 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
     setDemoStatus(demoStatus === "needsPermission" ? "denied" : "granted");
   };
 
-  const handleDemoTogglePress = () => {
-    setDemoStatus(nextDemoStatus);
-  };
-
   const handlePreviousWeek = useCallback(() => {
     if (!canGoPreviousWeek) return;
     setSelectedWeekIndex((current) => current - 1);
@@ -211,8 +189,8 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
 
   return (
     <ScrollView
-      style={[styles.scroll, layout.flex1]}
-      contentContainerStyle={[spacing.pdBottomBar]}
+      style={[layout.flex1]}
+      contentContainerStyle={[spacing.pdBottomBar, spacing.gap20]}
       showsVerticalScrollIndicator={false}
       refreshControl={
         isGranted ? (
@@ -220,15 +198,7 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
         ) : undefined
       }
     >
-      <View
-        style={[
-          colors.backgroundSurface,
-          common.roundedXl,
-          spacing.pdMd,
-          frameShadow,
-          styles.heroCard,
-        ]}
-      >
+      <View style={[colors.backgroundSurface, common.roundedXl, spacing.pdMd]}>
         {isGranted ? (
           <StepsRingHero
             todaySteps={todaySteps}
@@ -245,17 +215,8 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
             onPressConnect={handleConnectPress}
           />
         )}
-
         {isGranted && <WeeklyBalanceRow balance={weeklyBalance} />}
       </View>
-
-      {canUseDemoData && (
-        <TouchableOpacity onPress={handleDemoTogglePress} style={styles.demoToggle}>
-          <Text fontSize={10} style={styles.demoToggleText}>
-            ⚙ דמו: {demoStatus === "granted" ? "מחובר" : demoStatus === "denied" ? "נדחה" : "טרם חיבור"}
-          </Text>
-        </TouchableOpacity>
-      )}
 
       <View style={[styles.sectionTitleRow, layout.itemsCenter]}>
         <Text fontVariant="bold" fontSize={17} style={colors.textPrimary}>
@@ -284,9 +245,6 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
 };
 
 const styles = StyleSheet.create({
-  scroll: {
-    backgroundColor: SURFACE_WHITE,
-  },
   heroCard: {
     marginBottom: 20,
   },

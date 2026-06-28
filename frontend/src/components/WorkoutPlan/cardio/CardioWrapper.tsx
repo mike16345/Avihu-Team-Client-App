@@ -23,7 +23,7 @@ const CardioWrapper: React.FC<CardioWrapperProps> = ({ cardioPlan }) => {
     return null;
   };
 
-  return <View style={[layout.flex1, { backgroundColor: "#FFFFFF" }]}>{renderCardio()}</View>;
+  return <View style={[layout.flex1]}>{renderCardio()}</View>;
 };
 
 export default CardioWrapper;

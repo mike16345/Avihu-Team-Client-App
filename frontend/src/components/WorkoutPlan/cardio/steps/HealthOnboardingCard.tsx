@@ -95,13 +95,16 @@ const styles = StyleSheet.create({
   title: {
     textAlign: "center",
     marginBottom: 6,
+    maxWidth: 320,
   },
   description: {
     color: MUTED_TEXT_SOFT,
     textAlign: "center",
     marginBottom: 18,
-    lineHeight: 19,
+    lineHeight: 21,
     paddingHorizontal: 8,
+    maxWidth: 320,
+    minHeight: 62,
   },
   cta: {
     borderRadius: 12,
@@ -109,6 +112,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignSelf: "stretch",
     alignItems: "center",
+    minHeight: 48,
   },
   ctaDisabled: {
     opacity: 0.55,

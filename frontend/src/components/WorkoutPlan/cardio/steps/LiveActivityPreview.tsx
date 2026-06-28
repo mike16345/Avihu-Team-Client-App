@@ -47,7 +47,8 @@ const LiveActivityPreview: React.FC<LiveActivityPreviewProps> = ({ todaySteps, d
                 {formatSteps(todaySteps)}
               </Text>
               <Text fontSize={13} style={styles.goal}>
-                {" "}/ מתוך {formatSteps(dailyGoal)}
+                {" "}
+                / מתוך {formatSteps(dailyGoal)}
               </Text>
             </View>
             <Text fontSize={13} style={styles.distance}>
@@ -64,7 +65,14 @@ const LiveActivityPreview: React.FC<LiveActivityPreviewProps> = ({ todaySteps, d
                   <Stop offset="1" stopColor={RING_GRAD_END} />
                 </LinearGradient>
               </Defs>
-              <Circle cx="36" cy="36" r={RING_RADIUS} stroke={RING_TRACK} strokeWidth="9" fill="none" />
+              <Circle
+                cx="36"
+                cy="36"
+                r={RING_RADIUS}
+                stroke={RING_TRACK}
+                strokeWidth="9"
+                fill="none"
+              />
               <Circle
                 cx="36"
                 cy="36"
@@ -133,7 +141,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 14,
-    paddingStart: 24,
+    paddingEnd: 24,
   },
   sectionTitle: {
     color: "rgba(7,39,35,0.55)",
@@ -190,19 +198,24 @@ const styles = StyleSheet.create({
     color: "#2EB94D",
   },
   textColumn: {
-    alignItems: "flex-start",
+    flex: 1,
+    alignItems: "flex-end",
   },
   stepsLine: {
-    flexDirection: "row",
+    flexDirection: "row-reverse",
     alignItems: "baseline",
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
   },
   stepsLabel: {
     color: "rgba(7,39,35,0.55)",
-    marginEnd: 8,
+    marginStart: 8,
+    textAlign: "right",
   },
   distance: {
     color: "rgba(7,39,35,0.55)",
     marginTop: 4,
+    textAlign: "right",
   },
   label: {
     color: MUTED_TEXT,
@@ -214,6 +227,7 @@ const styles = StyleSheet.create({
   goal: {
     color: MUTED_TEXT,
     marginTop: 1,
+    textAlign: "right",
   },
 });
 

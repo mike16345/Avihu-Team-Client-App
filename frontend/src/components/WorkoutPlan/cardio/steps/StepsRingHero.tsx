@@ -47,8 +47,7 @@ const StepsRingHero: React.FC<StepsRingHeroProps> = ({
 
   const targetProgress = Math.min(todaySteps / dailyGoal, 1);
   const remaining = Math.max(dailyGoal - todaySteps, 0);
-  const subtitleText =
-    remaining > 0 ? `עוד ${formatSteps(remaining)} צעדים` : "השגת את היעד! 🎯";
+  const subtitleText = remaining > 0 ? `עוד ${formatSteps(remaining)} צעדים` : "השגת את היעד! 🎯";
 
   useFocusEffect(
     useCallback(() => {
@@ -68,9 +67,20 @@ const StepsRingHero: React.FC<StepsRingHeroProps> = ({
   }));
 
   return (
-    <View
-      style={[layout.flexRowReverse, layout.itemsCenter, layout.justifyCenter, { gap: ringTextGap }]}
-    >
+    <View style={[layout.flexRow, layout.itemsCenter, layout.justifyCenter, { gap: ringTextGap }]}>
+      <View style={styles.titleColumn}>
+        <Text
+          fontVariant="bold"
+          fontSize={titleFont}
+          numberOfLines={2}
+          style={[colors.textPrimary, styles.title]}
+        >
+          מטרה צעדים יומית
+        </Text>
+        <Text fontSize={14} style={styles.subtitle}>
+          {subtitleText}
+        </Text>
+      </View>
       <View style={{ width: ringSize, height: ringSize }}>
         <Svg viewBox="0 0 120 120" width="100%" height="100%">
           <Defs>
@@ -80,7 +90,14 @@ const StepsRingHero: React.FC<StepsRingHeroProps> = ({
               <Stop offset="1" stopColor={RING_GRAD_END} />
             </LinearGradient>
           </Defs>
-          <Circle cx="60" cy="60" r={RING_RADIUS} stroke={RING_TRACK} strokeWidth="11" fill="none" />
+          <Circle
+            cx="60"
+            cy="60"
+            r={RING_RADIUS}
+            stroke={RING_TRACK}
+            strokeWidth="11"
+            fill="none"
+          />
           <AnimatedCircle
             cx="60"
             cy="60"
@@ -96,28 +113,18 @@ const StepsRingHero: React.FC<StepsRingHeroProps> = ({
         </Svg>
 
         <View style={[layout.absolute, styles.ringValueOverlay, layout.center]}>
-          <Text fontVariant="bold" fontSize={ringValueFont} style={colors.textPrimary}>
+          <Text
+            fontVariant="bold"
+            fontSize={ringValueFont}
+            numberOfLines={1}
+            style={colors.textPrimary}
+          >
             {formatSteps(todaySteps)}
           </Text>
           <Text fontSize={12} style={styles.ringSubvalue}>
             / {formatSteps(dailyGoal)}
           </Text>
         </View>
-      </View>
-
-      <View style={styles.titleColumn}>
-        <Text
-          fontVariant="bold"
-          fontSize={titleFont}
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          style={colors.textPrimary}
-        >
-          מטרה צעדים יומית
-        </Text>
-        <Text fontSize={14} style={styles.subtitle}>
-          {subtitleText}
-        </Text>
       </View>
     </View>
   );
@@ -134,11 +141,16 @@ const styles = StyleSheet.create({
     color: MUTED_TEXT,
   },
   titleColumn: {
-    alignItems: "flex-start",
+    flexShrink: 1,
+    alignItems: "flex-end",
+  },
+  title: {
+    textAlign: "right",
   },
   subtitle: {
     color: MUTED_TEXT,
     marginTop: 6,
+    textAlign: "right",
   },
 });
 

@@ -58,13 +58,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   startColumn: {
-    alignItems: "flex-start",
+    alignItems: "flex-end",
   },
   endColumn: {
-    alignItems: "flex-end",
+    alignItems: "flex-start",
   },
   unit: {
     color: MUTED_TEXT,
+    textAlign: "center",
   },
 });
 

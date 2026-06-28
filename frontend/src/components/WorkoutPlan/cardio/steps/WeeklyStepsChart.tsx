@@ -325,26 +325,32 @@ const useChartStyles = () => {
 const styles = StyleSheet.create({
   headerRow: {
     marginBottom: 10,
+    width: "100%",
   },
   weeklyTotal: {
     color: "rgba(7,39,35,0.4)",
+    textAlign: "right",
   },
   headerInfo: {
     alignItems: "flex-end",
     flex: 1,
+    flexShrink: 1,
   },
   weekRange: {
     color: MUTED_TEXT_FAINT,
     marginTop: 2,
+    textAlign: "right",
   },
   weeklyCompleted: {
     color: GREEN_DARK,
     marginTop: 2,
+    textAlign: "right",
   },
   weekNavRow: {
     flexDirection: "row-reverse",
     alignItems: "center",
     gap: 6,
+    flexShrink: 0,
   },
   weekNavButton: {
     alignItems: "center",
@@ -388,6 +394,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 6,
     paddingHorizontal: 2,
+    width: "100%",
   },
   dayLabelCell: {
     flex: 1,

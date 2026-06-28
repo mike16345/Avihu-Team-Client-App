@@ -18,12 +18,14 @@ interface WeeklyBalanceRowProps {
 const formatBalance = (balance: number) => {
   if (balance === 0) return "בדיוק על המסלול";
   if (balance > 0) return `+${formatSteps(balance)}`;
+
   return `-${formatSteps(Math.abs(balance))}`;
 };
 
 const getBalanceColor = (balance: number) => {
   if (balance > 0) return GREEN_DARK;
   if (balance < 0) return RED_DARK;
+
   return PRIMARY_DARK;
 };
 
@@ -37,14 +39,14 @@ const WeeklyBalanceRow: React.FC<WeeklyBalanceRowProps> = ({ balance }) => {
         השלמה לימים שעברו השבוע
       </Text>
       <View style={styles.valueGroup}>
-        <Text fontVariant="bold" fontSize={15} style={{ color }}>
-          {label}
-        </Text>
         {balance !== 0 && (
           <Text fontSize={12} style={[styles.unit, styles.unitSpacing]}>
             צעדים
           </Text>
         )}
+        <Text fontVariant="bold" fontSize={15} style={{ color }}>
+          {label}
+        </Text>
       </View>
     </View>
   );
@@ -69,10 +71,11 @@ const styles = StyleSheet.create({
     color: MUTED_TEXT,
   },
   unitSpacing: {
-    marginLeft: 6,
+    marginRight: 6,
   },
   heading: {
     color: MUTED_TEXT_SOFT,
+    textAlign: "right",
   },
 });
 
