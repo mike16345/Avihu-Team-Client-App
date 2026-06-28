@@ -60,6 +60,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           package: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
         },
       ],
+      "./plugins/withHealthConnectPermissionDelegate",
     ],
     ios: {
       bundleIdentifier: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",

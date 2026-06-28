@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Linking,
-  Platform,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -12,9 +12,7 @@ import { IStepsCardioType } from "@/interfaces/Workout";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { useShadowStyles } from "@/styles/useShadowStyles";
-import useStepsData from "@/hooks/api/useStepsData";
-import useStepsNotifications from "@/hooks/api/useStepsNotifications";
-import { useStepsProgressApi } from "@/hooks/api/useStepsProgressApi";
+import { useStepsTracking } from "@/context/StepsTrackingContext";
 import {
   DAY_LABELS,
   DEFAULT_DAILY_GOAL,
@@ -61,12 +59,14 @@ const buildGoalsByDay = (plan: IStepsCardioType | undefined): number[] => {
   return Array.from({ length: 7 }, () => plan.daily);
 };
 
-const SERVER_SYNC_INTERVAL_MS = 30 * 60 * 1000;
-const ESTIMATED_STEP_STRIDE_METERS = 0.762;
-
-const getLocalDayKey = (date: Date) => {
-  const offsetMs = date.getTimezoneOffset() * 60 * 1000;
-  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 10);
+const formatWeekRange = (startDate?: string, endDate?: string) => {
+  if (!startDate || !endDate) return undefined;
+  const formatDate = (value: string) => {
+    const [year, month, day] = value.split("-");
+    if (!year || !month || !day) return value;
+    return `${day}.${month}.${year}`;
+  };
+  return `${formatDate(startDate)} - ${formatDate(endDate)}`;
 };
 
 const nextDemoStatus = (current: HealthStatus): HealthStatus => {
@@ -79,14 +79,13 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
   const { colors, common, layout, spacing } = useStyles();
   const { frameShadow } = useShadowStyles();
   const { width: screenWidth } = useWindowDimensions();
-  const steps = useStepsData();
-  const notifications = useStepsNotifications();
-  const { syncStepsProgress } = useStepsProgressApi();
+  const { steps, notifications, refreshSteps } = useStepsTracking();
 
   const [demoStatus, setDemoStatus] = useState<HealthStatus>("needsPermission");
   const [selectedDay, setSelectedDay] = useState<number>(new Date().getDay());
-  const lastServerSyncAtRef = useRef(0);
-  const syncedAfterOpenRef = useRef(false);
+  const [selectedWeekIndex, setSelectedWeekIndex] = useState(0);
+  const [isRefreshingSteps, setIsRefreshingSteps] = useState(false);
+  const hasSelectedInitialWeekRef = useRef(false);
 
   const todayIndex = new Date().getDay();
   const goalsByDay = useMemo(() => buildGoalsByDay(plan), [plan]);
@@ -95,12 +94,22 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
   const isSmall = screenWidth < SMALL_SCREEN_BREAKPOINT;
   const sizes = useMemo(() => responsiveSizes(isSmall), [isSmall]);
 
+  const canUseDemoData = __DEV__ && !steps.isNativeAvailable;
   const useNativeData = steps.isNativeAvailable && steps.status === "granted";
-  const effectiveStatus: HealthStatus = steps.isNativeAvailable ? steps.status : demoStatus;
+  const latestWeekIndex = Math.max(0, steps.weeks.length - 1);
+  const selectedStepWeek = useNativeData
+    ? steps.weeks[selectedWeekIndex] ?? steps.weeks[latestWeekIndex]
+    : undefined;
+  const isSelectedCurrentWeek = useNativeData ? selectedWeekIndex === latestWeekIndex : true;
+  const effectiveStatus: HealthStatus = steps.isNativeAvailable
+    ? steps.status
+    : canUseDemoData
+      ? demoStatus
+      : "unavailable";
 
   const weekData: DayData[] = useMemo(() => {
-    if (useNativeData) {
-      return steps.week.map((d, i) => ({
+    if (useNativeData && selectedStepWeek) {
+      return selectedStepWeek.days.map((d, i) => ({
         label: DAY_LABELS[i],
         steps: d.steps,
         calories: d.calories,
@@ -110,80 +119,54 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
       return MOCK_WEEK;
     }
     return MOCK_WEEK.map((d) => ({ ...d, steps: 0, calories: 0 }));
-  }, [useNativeData, steps.week, effectiveStatus]);
+  }, [useNativeData, selectedStepWeek, effectiveStatus]);
 
   const todaySteps = useNativeData ? steps.todaySteps : 0;
+  const chartTodayIndex = isSelectedCurrentWeek ? todayIndex : -1;
+  const canGoPreviousWeek = useNativeData && selectedWeekIndex > 0;
+  const canGoNextWeek = useNativeData && selectedWeekIndex < latestWeekIndex;
+  const weekRangeLabel = formatWeekRange(selectedStepWeek?.startDate, selectedStepWeek?.endDate);
   const weeklyBalance = useMemo(
     () => computeWeeklyBalance(weekData, goalsByDay, todayIndex),
     [weekData, goalsByDay, todayIndex]
   );
 
   useEffect(() => {
-    if (!useNativeData) return;
-    notifications.scheduleDaily(todaySteps, dailyGoal);
-  }, [useNativeData, todaySteps, dailyGoal, notifications]);
+    if (!useNativeData || steps.weeks.length === 0) {
+      hasSelectedInitialWeekRef.current = false;
+      return;
+    }
 
-  const syncCurrentSteps = useCallback(
-    async (force = false) => {
-      if (!useNativeData || !steps.syncedAt) return;
+    if (!hasSelectedInitialWeekRef.current) {
+      setSelectedWeekIndex(latestWeekIndex);
+      hasSelectedInitialWeekRef.current = true;
+      return;
+    }
 
-      const now = Date.now();
-      if (!force && now - lastServerSyncAtRef.current < SERVER_SYNC_INTERVAL_MS) return;
-
-      try {
-        await syncStepsProgress({
-          date: getLocalDayKey(new Date()),
-          steps: todaySteps,
-          calories: steps.todayCalories,
-          distanceKm: Number(
-            ((todaySteps * ESTIMATED_STEP_STRIDE_METERS) / 1000).toFixed(2)
-          ),
-          dailyGoal,
-          source: Platform.OS === "ios" ? "healthkit" : "health_connect",
-        });
-        lastServerSyncAtRef.current = now;
-      } catch (err) {
-        console.error("[steps] failed to sync steps progress:", err);
-      }
-    },
-    [
-      dailyGoal,
-      steps.syncedAt,
-      steps.todayCalories,
-      syncStepsProgress,
-      todaySteps,
-      useNativeData,
-    ]
-  );
+    setSelectedWeekIndex((current) => Math.min(current, latestWeekIndex));
+  }, [latestWeekIndex, steps.weeks.length, useNativeData]);
 
   useEffect(() => {
-    if (!useNativeData || !steps.syncedAt) return;
+    setSelectedDay(isSelectedCurrentWeek ? todayIndex : 6);
+  }, [isSelectedCurrentWeek, selectedWeekIndex, todayIndex]);
 
-    const force = !syncedAfterOpenRef.current;
-    syncedAfterOpenRef.current = true;
-    syncCurrentSteps(force);
-  }, [useNativeData, steps.syncedAt, syncCurrentSteps]);
-
-  useEffect(() => {
+  const handleStepsRefresh = useCallback(async () => {
     if (!useNativeData) return;
 
-    const intervalId = setInterval(() => {
-      steps.refresh();
-    }, SERVER_SYNC_INTERVAL_MS);
-
-    return () => clearInterval(intervalId);
-  }, [useNativeData, steps.refresh]);
+    setIsRefreshingSteps(true);
+    try {
+      await refreshSteps();
+    } finally {
+      setIsRefreshingSteps(false);
+    }
+  }, [refreshSteps, useNativeData]);
 
   const isGranted = effectiveStatus === "granted";
 
   const handleConnectPress = async () => {
-    console.log("[steps] handleConnectPress", {
-      isNativeAvailable: steps.isNativeAvailable,
-      currentStatus: steps.status,
-    });
     if (steps.isNativeAvailable) {
       if (steps.status === "denied") {
-        Linking.openURL("app-settings:").catch((err) =>
+        Linking.openSettings().catch((err) =>
           console.error("[steps] failed to open settings:", err)
         );
         return;
@@ -198,6 +181,14 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
       }
       return;
     }
+
+    if (!canUseDemoData) {
+      console.error(
+        "[steps] native health module is unavailable in this installed binary; install a new EAS/dev-client build."
+      );
+      return;
+    }
+
     setDemoStatus(demoStatus === "needsPermission" ? "denied" : "granted");
   };
 
@@ -205,11 +196,26 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
     setDemoStatus(nextDemoStatus);
   };
 
+  const handlePreviousWeek = useCallback(() => {
+    if (!canGoPreviousWeek) return;
+    setSelectedWeekIndex((current) => current - 1);
+  }, [canGoPreviousWeek]);
+
+  const handleNextWeek = useCallback(() => {
+    if (!canGoNextWeek) return;
+    setSelectedWeekIndex((current) => current + 1);
+  }, [canGoNextWeek]);
+
   return (
     <ScrollView
       style={[styles.scroll, layout.flex1]}
       contentContainerStyle={[spacing.pdBottomBar]}
       showsVerticalScrollIndicator={false}
+      refreshControl={
+        isGranted ? (
+          <RefreshControl refreshing={isRefreshingSteps} onRefresh={handleStepsRefresh} />
+        ) : undefined
+      }
     >
       <View
         style={[
@@ -240,7 +246,7 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
         {isGranted && <WeeklyBalanceRow balance={weeklyBalance} />}
       </View>
 
-      {__DEV__ && !steps.isNativeAvailable && (
+      {canUseDemoData && (
         <TouchableOpacity onPress={handleDemoTogglePress} style={styles.demoToggle}>
           <Text fontSize={10} style={styles.demoToggleText}>
             ⚙ דמו: {demoStatus === "granted" ? "מחובר" : demoStatus === "denied" ? "נדחה" : "טרם חיבור"}
@@ -258,11 +264,15 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
         weekData={weekData}
         dailyGoal={dailyGoal}
         goalsByDay={goalsByDay}
-        weeklyBalance={weeklyBalance}
-        todayIndex={todayIndex}
+        todayIndex={chartTodayIndex}
         selectedDay={selectedDay}
         onSelectDay={setSelectedDay}
         detailValueFont={sizes.detailValueFont}
+        weekRangeLabel={weekRangeLabel}
+        canGoPreviousWeek={canGoPreviousWeek}
+        canGoNextWeek={canGoNextWeek}
+        onPreviousWeek={handlePreviousWeek}
+        onNextWeek={handleNextWeek}
       />
 
       {isGranted && <LiveActivityPreview todaySteps={todaySteps} dailyGoal={dailyGoal} />}

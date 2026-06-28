@@ -25,15 +25,22 @@ const HealthOnboardingCard: React.FC<HealthOnboardingCardProps> = ({
   const { colors, layout, spacing } = useStyles();
 
   const isNeedsPermission = status === "needsPermission";
-  const title = isNeedsPermission
-    ? "חבר את הצעדים שלך"
-    : `החיבור ל${PLATFORM_HEALTH_NAME} לא הופעל`;
-  const description = isNeedsPermission
-    ? `כדי לעקוב אחרי הצעדים שלך,\nנתחבר ל${PLATFORM_HEALTH_NAME}. הסנכרון יהיה אוטומטי.`
-    : `ללא חיבור, הצעדים לא יסונכרנו אוטומטית.\nניתן לאשר ידנית: ${PLATFORM_SETTINGS_HINT}`;
-  const ctaLabel = isNeedsPermission
-    ? `חבר ל${PLATFORM_HEALTH_NAME}`
-    : "פתח הגדרות";
+  const isUnavailable = status === "unavailable";
+  const title = isUnavailable
+    ? "חיבור הצעדים לא זמין בגרסה הזו"
+    : isNeedsPermission
+      ? "חבר את הצעדים שלך"
+      : `החיבור ל${PLATFORM_HEALTH_NAME} לא הופעל`;
+  const description = isUnavailable
+    ? "צריך להתקין גרסת EAS חדשה שכוללת את חיבור הבריאות המקורי. אי אפשר לתקן את זה דרך ההגדרות."
+    : isNeedsPermission
+      ? `כדי לעקוב אחרי הצעדים שלך,\nנתחבר ל${PLATFORM_HEALTH_NAME}. הסנכרון יהיה אוטומטי.`
+      : `ללא חיבור, הצעדים לא יסונכרנו אוטומטית.\nניתן לאשר ידנית: ${PLATFORM_SETTINGS_HINT}`;
+  const ctaLabel = isUnavailable
+    ? "לא זמין בגרסה זו"
+    : isNeedsPermission
+      ? `חבר ל${PLATFORM_HEALTH_NAME}`
+      : "פתח הגדרות";
 
   return (
     <View style={[layout.itemsCenter, spacing.pdSm]}>
@@ -55,8 +62,9 @@ const HealthOnboardingCard: React.FC<HealthOnboardingCardProps> = ({
 
       <TouchableOpacity
         onPress={onPressConnect}
+        disabled={isUnavailable}
         activeOpacity={0.85}
-        style={[colors.backgroundPrimary, styles.cta]}
+        style={[colors.backgroundPrimary, styles.cta, isUnavailable && styles.ctaDisabled]}
       >
         <Text fontVariant="bold" fontSize={15} style={colors.textOnPrimary}>
           {ctaLabel}
@@ -101,6 +109,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignSelf: "stretch",
     alignItems: "center",
+  },
+  ctaDisabled: {
+    opacity: 0.55,
   },
 });
 

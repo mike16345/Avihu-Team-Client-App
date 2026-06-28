@@ -47,11 +47,15 @@ interface WeeklyStepsChartProps {
   weekData: DayData[];
   dailyGoal: number;
   goalsByDay?: number[];
-  weeklyBalance: number;
   todayIndex: number;
   selectedDay: number;
   onSelectDay: (index: number) => void;
   detailValueFont: number;
+  weekRangeLabel?: string;
+  canGoPreviousWeek?: boolean;
+  canGoNextWeek?: boolean;
+  onPreviousWeek?: () => void;
+  onNextWeek?: () => void;
   onPressHistory?: () => void;
 }
 
@@ -98,11 +102,15 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
   weekData,
   dailyGoal,
   goalsByDay,
-  weeklyBalance,
   todayIndex,
   selectedDay,
   onSelectDay,
   detailValueFont,
+  weekRangeLabel,
+  canGoPreviousWeek = false,
+  canGoNextWeek = false,
+  onPreviousWeek,
+  onNextWeek,
   onPressHistory,
 }) => {
   const { colors, common, frameShadow, spacing, layout } = useChartStyles();
@@ -117,22 +125,14 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
   const targetY = BAR_AREA_BOTTOM - (selectedGoal / maxValue) * BAR_AREA_HEIGHT;
   const barSlot = CHART_WIDTH / weekData.length;
 
-  const todayStepsValue = weekData[todayIndex].steps;
-  const showTodayBaselineDot = todayStepsValue == null || todayStepsValue === 0;
+  const todayStepsValue = todayIndex >= 0 ? weekData[todayIndex]?.steps : null;
+  const showTodayBaselineDot = todayIndex >= 0 && (todayStepsValue == null || todayStepsValue === 0);
 
   const totalSteps = weekData.reduce((sum, d) => sum + (d.steps ?? 0), 0);
   const weeklyGoalTotal = (goalsByDay ?? Array(weekData.length).fill(dailyGoal)).reduce(
     (s, g) => s + g,
     0
   );
-  const balanceColor =
-    weeklyBalance > 0 ? GREEN_DARK : weeklyBalance < 0 ? RED_DARK : "rgba(7,39,35,0.4)";
-  const balanceLabel =
-    weeklyBalance === 0
-      ? "בדיוק על המסלול"
-      : weeklyBalance > 0
-        ? `+${formatSteps(weeklyBalance)} צעדים`
-        : `-${formatSteps(Math.abs(weeklyBalance))} צעדים`;
 
   useFocusEffect(
     useCallback(() => {
@@ -156,13 +156,45 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
           <Text fontSize={12} fontVariant="semibold" style={styles.weeklyTotal}>
             סה״כ השבוע: {formatSteps(weeklyGoalTotal)} צעדים
           </Text>
-          <Text fontSize={11} fontVariant="semibold" style={[styles.weeklyDelta, { color: balanceColor }]}>
-            {balanceLabel}
+          {weekRangeLabel && (
+            <Text fontSize={10} fontVariant="semibold" style={styles.weekRange}>
+              {weekRangeLabel}
+            </Text>
+          )}
+          <Text fontSize={11} fontVariant="semibold" style={styles.weeklyCompleted}>
+            נעשו: {formatSteps(totalSteps)} צעדים
           </Text>
         </View>
-        <TouchableOpacity activeOpacity={0.6} hitSlop={8} onPress={onPressHistory}>
-          <Icon name="chevronRightSoft" width={22} height={22} />
-        </TouchableOpacity>
+        <View style={styles.weekNavRow}>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            hitSlop={8}
+            disabled={!canGoPreviousWeek}
+            onPress={onPreviousWeek}
+            style={[styles.weekNavButton, !canGoPreviousWeek && styles.weekNavButtonDisabled]}
+          >
+            <Icon
+              name="chevronRightSoft"
+              width={20}
+              height={20}
+              color={canGoPreviousWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            hitSlop={8}
+            disabled={!canGoNextWeek}
+            onPress={onNextWeek ?? onPressHistory}
+            style={[styles.weekNavButton, !canGoNextWeek && styles.weekNavButtonDisabled]}
+          >
+            <Icon
+              name="chevronLeftSoft"
+              width={20}
+              height={20}
+              color={canGoNextWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.chartArea}>
@@ -253,7 +285,7 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
 
       <View style={styles.dayLabelsRow}>
         {weekData.map((day, i) => {
-          const isToday = i === todayIndex;
+          const isToday = todayIndex >= 0 && i === todayIndex;
           const isSelected = selectedDay === i;
           return (
             <View key={i} style={styles.dayLabelCell}>
@@ -297,9 +329,31 @@ const styles = StyleSheet.create({
   },
   headerInfo: {
     alignItems: "flex-end",
+    flex: 1,
   },
-  weeklyDelta: {
+  weekRange: {
+    color: MUTED_TEXT_FAINT,
     marginTop: 2,
+  },
+  weeklyCompleted: {
+    color: GREEN_DARK,
+    marginTop: 2,
+  },
+  weekNavRow: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 6,
+  },
+  weekNavButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: 30,
+    height: 30,
+    borderRadius: 999,
+    backgroundColor: "rgba(7,39,35,0.06)",
+  },
+  weekNavButtonDisabled: {
+    opacity: 0.35,
   },
   chartArea: {
     width: "100%",

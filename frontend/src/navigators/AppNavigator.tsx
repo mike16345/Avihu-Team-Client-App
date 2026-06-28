@@ -8,6 +8,7 @@ import FormPresetScreen from "@/screens/FormPresetScreen";
 import AgreementFlow from "./AgreementStack";
 import useInitialFormNotifications from "@/hooks/useInitFormNotifications";
 import useStartupPrefetch from "@/hooks/useStartupPrefetch";
+import { StepsTrackingProvider } from "@/context/StepsTrackingContext";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -23,44 +24,46 @@ export default function AppNavigator({
   useStartupPrefetch();
 
   return (
-    <Stack.Navigator initialRouteName={initialRoute.route} screenOptions={{ headerShown: false }}>
-      <Stack.Screen
-        name="BottomTabs"
-        component={BottomTabNavigator}
-        initialParams={
-          initialRoute.route === "BottomTabs" ? (initialRoute.params as any) : undefined
-        }
-      />
-      <Stack.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{ animation: "slide_from_left" }}
-      />
-      <Stack.Screen
-        name="Chat"
-        component={ChatScreen}
-        options={{
-          presentation: "containedModal",
-          header: () => <ChatHeader />,
-          headerShown: true,
-        }}
-      />
-      <Stack.Screen
-        name="FormPreset"
-        component={FormPresetScreen}
-        options={{ headerBackVisible: false, gestureEnabled: false }}
-        initialParams={
-          initialRoute.route === "FormPreset" ? (initialRoute.params as any) : undefined
-        }
-      />
-      <Stack.Screen
-        name="agreements"
-        component={AgreementFlow}
-        options={{ headerBackVisible: false, gestureEnabled: false }}
-        initialParams={
-          initialRoute.route === "agreements" ? (initialRoute.params as any) : undefined
-        }
-      />
-    </Stack.Navigator>
+    <StepsTrackingProvider>
+      <Stack.Navigator initialRouteName={initialRoute.route} screenOptions={{ headerShown: false }}>
+        <Stack.Screen
+          name="BottomTabs"
+          component={BottomTabNavigator}
+          initialParams={
+            initialRoute.route === "BottomTabs" ? (initialRoute.params as any) : undefined
+          }
+        />
+        <Stack.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{ animation: "slide_from_left" }}
+        />
+        <Stack.Screen
+          name="Chat"
+          component={ChatScreen}
+          options={{
+            presentation: "containedModal",
+            header: () => <ChatHeader />,
+            headerShown: true,
+          }}
+        />
+        <Stack.Screen
+          name="FormPreset"
+          component={FormPresetScreen}
+          options={{ headerBackVisible: false, gestureEnabled: false }}
+          initialParams={
+            initialRoute.route === "FormPreset" ? (initialRoute.params as any) : undefined
+          }
+        />
+        <Stack.Screen
+          name="agreements"
+          component={AgreementFlow}
+          options={{ headerBackVisible: false, gestureEnabled: false }}
+          initialParams={
+            initialRoute.route === "agreements" ? (initialRoute.params as any) : undefined
+          }
+        />
+      </Stack.Navigator>
+    </StepsTrackingProvider>
   );
 }

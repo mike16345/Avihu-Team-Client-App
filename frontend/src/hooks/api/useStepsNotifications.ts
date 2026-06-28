@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 const STEPS_NOTIFICATION_IDENTIFIER = "avihu-team-daily-steps";
 const NOTIFICATION_HOUR = 8;
@@ -13,6 +13,12 @@ const loadNotifications = () => {
 };
 
 const formatSteps = (n: number): string => Math.round(n).toLocaleString("he-IL");
+
+const getLocalDayKey = () => {
+  const now = new Date();
+  const offsetMs = now.getTimezoneOffset() * 60 * 1000;
+  return new Date(now.getTime() - offsetMs).toISOString().slice(0, 10);
+};
 
 const buildBody = (todaySteps: number, dailyGoal: number) => {
   const remaining = Math.max(dailyGoal - todaySteps, 0);
@@ -31,6 +37,7 @@ export interface UseStepsNotificationsResult {
 
 const useStepsNotifications = (): UseStepsNotificationsResult => {
   const notifModuleRef = useRef(loadNotifications());
+  const scheduledKeyRef = useRef<string | null>(null);
   const isAvailable = notifModuleRef.current != null;
 
   useEffect(() => {
@@ -38,7 +45,8 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
     if (!Notifications) return;
     Notifications.setNotificationHandler?.({
       handleNotification: async () => ({
-        shouldShowAlert: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
         shouldPlaySound: false,
         shouldSetBadge: false,
       }),
@@ -63,6 +71,7 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
   const cancel = useCallback(async (): Promise<void> => {
     const Notifications = notifModuleRef.current;
     if (!Notifications) return;
+    scheduledKeyRef.current = null;
     try {
       await Notifications.cancelScheduledNotificationAsync(STEPS_NOTIFICATION_IDENTIFIER);
     } catch {
@@ -74,12 +83,20 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
     async (todaySteps: number, dailyGoal: number): Promise<void> => {
       const Notifications = notifModuleRef.current;
       if (!Notifications) return;
+
+      const permission = await Notifications.getPermissionsAsync();
+      if (permission?.status !== "granted") return;
+
+      const scheduleKey = `${getLocalDayKey()}:${dailyGoal}`;
+      if (scheduledKeyRef.current === scheduleKey) return;
+
       try {
         await Notifications.cancelScheduledNotificationAsync(STEPS_NOTIFICATION_IDENTIFIER);
       } catch {
         // ignore
       }
       try {
+        const calendarTriggerType = Notifications.SchedulableTriggerInputTypes?.CALENDAR;
         await Notifications.scheduleNotificationAsync({
           identifier: STEPS_NOTIFICATION_IDENTIFIER,
           content: {
@@ -87,12 +104,20 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
             body: buildBody(todaySteps, dailyGoal),
             data: { type: "daily-steps" },
           },
-          trigger: {
-            hour: NOTIFICATION_HOUR,
-            minute: NOTIFICATION_MINUTE,
-            repeats: true,
-          },
+          trigger: calendarTriggerType
+            ? {
+                type: calendarTriggerType,
+                hour: NOTIFICATION_HOUR,
+                minute: NOTIFICATION_MINUTE,
+                repeats: true,
+              }
+            : {
+                hour: NOTIFICATION_HOUR,
+                minute: NOTIFICATION_MINUTE,
+                repeats: true,
+              },
         });
+        scheduledKeyRef.current = scheduleKey;
       } catch {
         // schedule failure is non-fatal
       }
@@ -100,7 +125,10 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
     []
   );
 
-  return { isAvailable, requestPermission, scheduleDaily, cancel };
+  return useMemo(
+    () => ({ isAvailable, requestPermission, scheduleDaily, cancel }),
+    [cancel, isAvailable, requestPermission, scheduleDaily]
+  );
 };
 
 export default useStepsNotifications;

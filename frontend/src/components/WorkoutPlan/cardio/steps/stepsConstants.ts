@@ -4,7 +4,7 @@ export interface DayData {
   calories: number;
 }
 
-export type HealthStatus = "needsPermission" | "denied" | "granted";
+export type HealthStatus = "needsPermission" | "denied" | "granted" | "unavailable";
 
 export const DAY_LABELS = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
 
