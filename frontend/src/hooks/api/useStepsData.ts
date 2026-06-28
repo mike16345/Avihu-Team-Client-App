@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  getGrantedPermissions as getHealthConnectGrantedPermissions,
+  initialize as initializeHealthConnect,
+  readRecords as readHealthConnectRecords,
+  requestPermission as requestHealthConnectPermission,
+} from "react-native-health-connect";
 
 export type StepsPermissionStatus = "needsPermission" | "denied" | "granted";
 
@@ -23,7 +29,7 @@ export interface UseStepsDataResult {
   week: StepsDayDatum[];
   weeks: StepsWeekDatum[];
   syncedAt: Date | null;
-  requestPermission: () => Promise<void>;
+  requestPermission: () => Promise<boolean>;
   refresh: () => Promise<void>;
   isNativeAvailable: boolean;
 }
@@ -60,13 +66,12 @@ const loadNativeIOS = () => {
   }
 };
 
-const loadNativeAndroid = () => {
-  try {
-    return require("react-native-health-connect");
-  } catch {
-    return null;
-  }
-};
+const loadNativeAndroid = () => ({
+  getGrantedPermissions: getHealthConnectGrantedPermissions,
+  initialize: initializeHealthConnect,
+  readRecords: readHealthConnectRecords,
+  requestPermission: requestHealthConnectPermission,
+});
 
 const startOfDay = (d: Date) => {
   const x = new Date(d);
@@ -303,8 +308,10 @@ const requestAndroidPermission = async (native: any): Promise<boolean> => {
     const grantedPermissions = await native.requestPermission([
       { accessType: "read", recordType: "Steps" },
     ]);
+    console.log("[steps] Android Health Connect permission result:", grantedPermissions);
     return grantedPermissions.length > 0;
-  } catch {
+  } catch (err) {
+    console.error("[steps] Android Health Connect requestPermission failed:", err);
     return false;
   }
 };
@@ -313,13 +320,15 @@ const initializeAndroidExistingConnection = async (native: any): Promise<boolean
   try {
     await native.initialize();
     const grantedPermissions = await native.getGrantedPermissions?.();
+    console.log("[steps] Android Health Connect granted permissions:", grantedPermissions);
     return Array.isArray(grantedPermissions)
       ? grantedPermissions.some(
           (permission) =>
             permission?.accessType === "read" && permission?.recordType === "Steps"
         )
       : false;
-  } catch {
+  } catch (err) {
+    console.error("[steps] Android Health Connect initialize/getGrantedPermissions failed:", err);
     return false;
   }
 };
@@ -383,18 +392,18 @@ const useStepsData = (): UseStepsDataResult => {
       setWeeks(data.weeks);
       setSyncedAt(new Date());
       setStatus("granted");
-    } catch {
-      // leave existing state in place
+    } catch (err) {
+      console.error("[steps] refresh failed:", err);
     } finally {
       refreshInFlightRef.current = false;
     }
   }, [native]);
 
-  const requestPermission = useCallback(async () => {
+  const requestPermission = useCallback(async (): Promise<boolean> => {
     if (!native) {
       console.error("[steps] requestPermission called but native module is null");
       setStatus("denied");
-      return;
+      return false;
     }
     try {
       const granted =
@@ -405,12 +414,15 @@ const useStepsData = (): UseStepsDataResult => {
         await markHealthConnected();
         setStatus("granted");
         await refresh();
+        return true;
       } else {
         setStatus("denied");
+        return false;
       }
     } catch (err) {
       console.error("[steps] requestPermission threw:", err);
       setStatus("denied");
+      return false;
     }
   }, [native, refresh]);
 

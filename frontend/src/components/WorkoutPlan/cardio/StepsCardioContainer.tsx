@@ -167,24 +167,16 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
   const handleConnectPress = async () => {
     if (steps.isNativeAvailable) {
       if (steps.status === "denied") {
-        if (Platform.OS === "android") {
-          try {
-            const healthConnect = require("react-native-health-connect");
-            if (healthConnect?.openHealthConnectSettings) {
-              await healthConnect.openHealthConnectSettings();
-              return;
-            }
-          } catch (err) {
-            console.error("[steps] failed to open Health Connect settings:", err);
-          }
+        if (Platform.OS === "ios") {
+          Linking.openSettings().catch((err) =>
+            console.error("[steps] failed to open settings:", err)
+          );
+          return;
         }
-
-        Linking.openSettings().catch((err) => console.error("[steps] failed to open settings:", err));
-        return;
       }
       try {
-        await steps.requestPermission();
-        if (notifications.isAvailable) {
+        const granted = await steps.requestPermission();
+        if (granted && notifications.isAvailable) {
           await notifications.requestPermission();
         }
       } catch (err) {

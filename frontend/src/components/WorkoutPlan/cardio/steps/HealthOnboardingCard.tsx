@@ -8,8 +8,8 @@ import { HealthStatus, MUTED_TEXT_SOFT, SURFACE_WHITE } from "./stepsConstants";
 const isIOS = Platform.OS === "ios";
 const PLATFORM_HEALTH_NAME = isIOS ? "אפליקציית הבריאות של אפל" : "Health Connect של גוגל";
 const PLATFORM_SETTINGS_HINT = isIOS
-  ? "הגדרות → פרטיות ואבטחה → בריאות"
-  : "הגדרות → אפליקציות → הרשאות → Health Connect";
+  ? "הגדרות -> פרטיות ואבטחה -> בריאות"
+  : "הגדרות -> אפליקציות -> הרשאות -> Health Connect";
 
 interface HealthOnboardingCardProps {
   status: Exclude<HealthStatus, "granted">;
@@ -35,12 +35,16 @@ const HealthOnboardingCard: React.FC<HealthOnboardingCardProps> = ({
     ? "צריך להתקין גרסת EAS חדשה שכוללת את חיבור הבריאות המקורי. אי אפשר לתקן את זה דרך ההגדרות."
     : isNeedsPermission
       ? `כדי לעקוב אחרי הצעדים שלך,\nנתחבר ל${PLATFORM_HEALTH_NAME}. הסנכרון יהיה אוטומטי.`
-      : `ללא חיבור, הצעדים לא יסונכרנו אוטומטית.\nניתן לאשר ידנית: ${PLATFORM_SETTINGS_HINT}`;
+      : isIOS
+        ? `ללא חיבור, הצעדים לא יסונכרנו אוטומטית.\nניתן לאשר ידנית: ${PLATFORM_SETTINGS_HINT}`
+        : `ללא חיבור, הצעדים לא יסונכרנו אוטומטית.\nנסה שוב לאשר גישה ל${PLATFORM_HEALTH_NAME}.`;
   const ctaLabel = isUnavailable
     ? "לא זמין בגרסה זו"
     : isNeedsPermission
       ? `חבר ל${PLATFORM_HEALTH_NAME}`
-      : "פתח הגדרות";
+      : isIOS
+        ? "פתח הגדרות"
+        : `נסה שוב ל${PLATFORM_HEALTH_NAME}`;
 
   return (
     <View style={[layout.itemsCenter, spacing.pdSm]}>
@@ -48,11 +52,7 @@ const HealthOnboardingCard: React.FC<HealthOnboardingCardProps> = ({
         <Image source={appLogo} style={styles.logo} resizeMode="contain" />
       </View>
 
-      <Text
-        fontVariant="bold"
-        fontSize={titleFont}
-        style={[colors.textPrimary, styles.title]}
-      >
+      <Text fontVariant="bold" fontSize={titleFont} style={[colors.textPrimary, styles.title]}>
         {title}
       </Text>
 

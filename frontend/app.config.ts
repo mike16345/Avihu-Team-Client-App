@@ -76,6 +76,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         foregroundImage: "./assets/app-logo.png",
         backgroundColor: "#FFFFFF",
       },
+      permissions: [
+        "android.permission.health.READ_STEPS",
+        "android.permission.health.READ_DISTANCE",
+        "android.permission.health.READ_ACTIVE_CALORIES_BURNED",
+      ],
       softwareKeyboardLayoutMode: "resize",
       package: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
     },
