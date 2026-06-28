@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Linking,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -166,9 +167,19 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
   const handleConnectPress = async () => {
     if (steps.isNativeAvailable) {
       if (steps.status === "denied") {
-        Linking.openSettings().catch((err) =>
-          console.error("[steps] failed to open settings:", err)
-        );
+        if (Platform.OS === "android") {
+          try {
+            const healthConnect = require("react-native-health-connect");
+            if (healthConnect?.openHealthConnectSettings) {
+              await healthConnect.openHealthConnectSettings();
+              return;
+            }
+          } catch (err) {
+            console.error("[steps] failed to open Health Connect settings:", err);
+          }
+        }
+
+        Linking.openSettings().catch((err) => console.error("[steps] failed to open settings:", err));
         return;
       }
       try {

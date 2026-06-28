@@ -58,12 +58,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
       ["expo-health-connect"],
-      [
-        "react-native-health-connect",
-        {
-          package: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
-        },
-      ],
       "./plugins/withHealthConnectPermissionDelegate",
     ],
     ios: {
