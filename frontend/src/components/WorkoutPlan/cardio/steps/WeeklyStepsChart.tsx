@@ -95,8 +95,7 @@ const getDayLabelPillStyle = (isToday: boolean, isSelected: boolean) => {
   return styles.plainPill;
 };
 
-const getDayLabelTextColor = (isToday: boolean) =>
-  isToday ? LIGHT_TEXT_ON_DARK : DAY_LABEL_TEXT;
+const getDayLabelTextColor = (isToday: boolean) => (isToday ? LIGHT_TEXT_ON_DARK : DAY_LABEL_TEXT);
 
 const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
   weekData,
@@ -126,7 +125,8 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
   const barSlot = CHART_WIDTH / weekData.length;
 
   const todayStepsValue = todayIndex >= 0 ? weekData[todayIndex]?.steps : null;
-  const showTodayBaselineDot = todayIndex >= 0 && (todayStepsValue == null || todayStepsValue === 0);
+  const showTodayBaselineDot =
+    todayIndex >= 0 && (todayStepsValue == null || todayStepsValue === 0);
 
   const totalSteps = weekData.reduce((sum, d) => sum + (d.steps ?? 0), 0);
   const weeklyGoalTotal = (goalsByDay ?? Array(weekData.length).fill(dailyGoal)).reduce(
@@ -151,7 +151,9 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
 
   return (
     <View style={[colors.backgroundSurface, common.roundedXl, spacing.pdMd, frameShadow]}>
-      <View style={[layout.flexRowReverse, layout.justifyBetween, layout.itemsCenter, styles.headerRow]}>
+      <View
+        style={[layout.flexRowReverse, layout.justifyBetween, layout.itemsCenter, styles.headerRow]}
+      >
         <View style={styles.headerInfo}>
           <Text fontSize={12} fontVariant="semibold" style={styles.weeklyTotal}>
             סה״כ השבוע: {formatSteps(weeklyGoalTotal)} צעדים
@@ -169,20 +171,6 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
           <TouchableOpacity
             activeOpacity={0.6}
             hitSlop={8}
-            disabled={!canGoPreviousWeek}
-            onPress={onPreviousWeek}
-            style={[styles.weekNavButton, !canGoPreviousWeek && styles.weekNavButtonDisabled]}
-          >
-            <Icon
-              name="chevronRightSoft"
-              width={20}
-              height={20}
-              color={canGoPreviousWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            hitSlop={8}
             disabled={!canGoNextWeek}
             onPress={onNextWeek ?? onPressHistory}
             style={[styles.weekNavButton, !canGoNextWeek && styles.weekNavButtonDisabled]}
@@ -192,6 +180,20 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
               width={20}
               height={20}
               color={canGoNextWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            hitSlop={8}
+            disabled={!canGoPreviousWeek}
+            onPress={onPreviousWeek}
+            style={[styles.weekNavButton, !canGoPreviousWeek && styles.weekNavButtonDisabled]}
+          >
+            <Icon
+              name="chevronRightSoft"
+              width={20}
+              height={20}
+              color={canGoPreviousWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
             />
           </TouchableOpacity>
         </View>
