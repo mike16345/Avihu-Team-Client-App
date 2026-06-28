@@ -20,6 +20,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     plugins: [
       ["expo-localization"],
       "expo-background-task",
+      [
+        "expo-build-properties",
+        {
+          android: {
+            minSdkVersion: 26,
+          },
+        },
+      ],
 
       [
         "expo-image-picker",
@@ -49,10 +57,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         "react-native-health-connect",
         {
-          package: "com.avihuteam.avihuteam",
+          package: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
         },
       ],
-      "./native-modules/live-steps-activity/plugin/withLiveStepsActivity.js",
     ],
     ios: {
       bundleIdentifier: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",

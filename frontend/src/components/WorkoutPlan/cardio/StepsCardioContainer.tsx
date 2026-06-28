@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -13,7 +14,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { useShadowStyles } from "@/styles/useShadowStyles";
 import useStepsData from "@/hooks/api/useStepsData";
 import useStepsNotifications from "@/hooks/api/useStepsNotifications";
-import useLiveStepsActivity from "@/hooks/api/useLiveStepsActivity";
+import { useStepsProgressApi } from "@/hooks/api/useStepsProgressApi";
 import {
   DAY_LABELS,
   DEFAULT_DAILY_GOAL,
@@ -60,6 +61,14 @@ const buildGoalsByDay = (plan: IStepsCardioType | undefined): number[] => {
   return Array.from({ length: 7 }, () => plan.daily);
 };
 
+const SERVER_SYNC_INTERVAL_MS = 30 * 60 * 1000;
+const ESTIMATED_STEP_STRIDE_METERS = 0.762;
+
+const getLocalDayKey = (date: Date) => {
+  const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 10);
+};
+
 const nextDemoStatus = (current: HealthStatus): HealthStatus => {
   if (current === "needsPermission") return "denied";
   if (current === "denied") return "granted";
@@ -72,10 +81,12 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
   const { width: screenWidth } = useWindowDimensions();
   const steps = useStepsData();
   const notifications = useStepsNotifications();
-  const liveActivity = useLiveStepsActivity();
+  const { syncStepsProgress } = useStepsProgressApi();
 
   const [demoStatus, setDemoStatus] = useState<HealthStatus>("needsPermission");
   const [selectedDay, setSelectedDay] = useState<number>(new Date().getDay());
+  const lastServerSyncAtRef = useRef(0);
+  const syncedAfterOpenRef = useRef(false);
 
   const todayIndex = new Date().getDay();
   const goalsByDay = useMemo(() => buildGoalsByDay(plan), [plan]);
@@ -112,14 +123,56 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
     notifications.scheduleDaily(todaySteps, dailyGoal);
   }, [useNativeData, todaySteps, dailyGoal, notifications]);
 
+  const syncCurrentSteps = useCallback(
+    async (force = false) => {
+      if (!useNativeData || !steps.syncedAt) return;
+
+      const now = Date.now();
+      if (!force && now - lastServerSyncAtRef.current < SERVER_SYNC_INTERVAL_MS) return;
+
+      try {
+        await syncStepsProgress({
+          date: getLocalDayKey(new Date()),
+          steps: todaySteps,
+          calories: steps.todayCalories,
+          distanceKm: Number(
+            ((todaySteps * ESTIMATED_STEP_STRIDE_METERS) / 1000).toFixed(2)
+          ),
+          dailyGoal,
+          source: Platform.OS === "ios" ? "healthkit" : "health_connect",
+        });
+        lastServerSyncAtRef.current = now;
+      } catch (err) {
+        console.error("[steps] failed to sync steps progress:", err);
+      }
+    },
+    [
+      dailyGoal,
+      steps.syncedAt,
+      steps.todayCalories,
+      syncStepsProgress,
+      todaySteps,
+      useNativeData,
+    ]
+  );
+
   useEffect(() => {
-    if (!useNativeData || !liveActivity.isAvailable) return;
-    if (liveActivity.activityId) {
-      liveActivity.update(todaySteps, dailyGoal);
-    } else {
-      liveActivity.start(todaySteps, dailyGoal);
-    }
-  }, [useNativeData, todaySteps, dailyGoal, liveActivity]);
+    if (!useNativeData || !steps.syncedAt) return;
+
+    const force = !syncedAfterOpenRef.current;
+    syncedAfterOpenRef.current = true;
+    syncCurrentSteps(force);
+  }, [useNativeData, steps.syncedAt, syncCurrentSteps]);
+
+  useEffect(() => {
+    if (!useNativeData) return;
+
+    const intervalId = setInterval(() => {
+      steps.refresh();
+    }, SERVER_SYNC_INTERVAL_MS);
+
+    return () => clearInterval(intervalId);
+  }, [useNativeData, steps.refresh]);
 
   const isGranted = effectiveStatus === "granted";
 

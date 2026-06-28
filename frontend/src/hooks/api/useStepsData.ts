@@ -56,7 +56,8 @@ const startOfDay = (d: Date) => {
 };
 
 const dayKey = (d: Date) => {
-  return new Date(d).toISOString().slice(0, 10);
+  const offsetMs = d.getTimezoneOffset() * 60 * 1000;
+  return new Date(d.getTime() - offsetMs).toISOString().slice(0, 10);
 };
 
 const stepsToCalories = (steps: number) => Math.round(steps * 0.04);
@@ -204,13 +205,12 @@ const useStepsData = (): UseStepsDataResult => {
     try {
       const today = new Date();
       const data =
-        Platform.OS === "ios"
-          ? await readIOS(native, today)
-          : await readAndroid(native, today);
+        Platform.OS === "ios" ? await readIOS(native, today) : await readAndroid(native, today);
       setTodaySteps(data.steps);
       setTodayCalories(data.calories);
       setWeek(data.week);
       setSyncedAt(new Date());
+      setStatus("granted");
     } catch {
       // leave existing state in place
     }
