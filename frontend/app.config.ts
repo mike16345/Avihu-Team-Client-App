@@ -24,6 +24,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         "expo-build-properties",
         {
           android: {
+            compileSdkVersion: 35,
+            targetSdkVersion: 35,
             minSdkVersion: 26,
           },
         },
@@ -50,10 +52,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         "react-native-health",
         {
           isClinicalDataEnabled: false,
-          healthSharePermission: "כדי לעקוב אחרי הצעדים שלך, האפליקציה צריכה גישה לנתוני הצעדים והפעילות מאפליקציית הבריאות.",
+          healthSharePermission:
+            "כדי לעקוב אחרי הצעדים שלך, האפליקציה צריכה גישה לנתוני הצעדים והפעילות מאפליקציית הבריאות.",
           healthUpdatePermission: "האפליקציה לא משנה נתונים באפליקציית הבריאות.",
         },
       ],
+      ["expo-health-connect"],
       [
         "react-native-health-connect",
         {

@@ -28,8 +28,8 @@ const addDelegateToExistingOnCreate = (contents) => {
   }
 
   return contents.replace(
-    /(override fun onCreate\(savedInstanceState: Bundle\?\)\s*\{\s*super\.onCreate\([^)]+\)\s*)/,
-    `$1\n    HealthConnectPermissionDelegate.setPermissionDelegate(this)\n`
+    /(override fun onCreate\(savedInstanceState: Bundle\?\)\s*\{[\s\S]*?super\.onCreate\([^\n]+\)\s*\n)/,
+    `$1    HealthConnectPermissionDelegate.setPermissionDelegate(this)\n`
   );
 };
 
