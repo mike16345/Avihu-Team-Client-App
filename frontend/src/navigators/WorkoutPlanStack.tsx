@@ -1,8 +1,9 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { stacks } from "./stacks/WorkoutPlanStacks";
 import RecordExercise from "@/components/WorkoutPlan/RecordExercise/RecordExercise";
+import { WorkoutPlanStackParamList } from "@/types/navigatorTypes";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<WorkoutPlanStackParamList>();
 
 const WorkoutPlanStack = () => {
   return (
@@ -16,7 +17,7 @@ const WorkoutPlanStack = () => {
         <Stack.Screen
           key={stack.name}
           options={{ title: stack.title }}
-          name={stack.name}
+          name={stack.name as keyof WorkoutPlanStackParamList}
           component={stack.component}
         />
       ))}

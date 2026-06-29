@@ -5,6 +5,7 @@ import useStepsData, { UseStepsDataResult } from "@/hooks/api/useStepsData";
 import useStepsNotifications, {
   UseStepsNotificationsResult,
 } from "@/hooks/api/useStepsNotifications";
+import useLiveStepsActivity from "@/hooks/api/useLiveStepsActivity";
 import { useStepsProgressApi } from "@/hooks/api/useStepsProgressApi";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
 import { buildGoalsByDay, getLocalDateKey, stepsToDistanceKm } from "@/utils/stepsUtils";
@@ -23,11 +24,20 @@ const SERVER_SYNC_INTERVAL_MS = 15 * 60 * 1000;
 export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const steps = useStepsData();
   const notifications = useStepsNotifications();
+  const {
+    activityId: liveStepsActivityId,
+    isAvailable: isLiveStepsAvailable,
+    isEnabled: isLiveStepsEnabled,
+    start: startLiveSteps,
+    stop: stopLiveSteps,
+    update: updateLiveSteps,
+  } = useLiveStepsActivity();
   const { syncStepsProgress } = useStepsProgressApi();
   const { data: workoutPlan } = useWorkoutPlanQuery();
 
   const lastServerSyncAtRef = useRef(0);
   const lastServerSyncPayloadRef = useRef<string | null>(null);
+  const lastLiveStepsPayloadRef = useRef<string | null>(null);
   const syncedAfterOpenRef = useRef(false);
 
   const stepsPlan = useMemo(() => {
@@ -115,6 +125,50 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
     syncedAfterOpenRef.current = true;
     syncCurrentSteps(force);
   }, [canUseNativeSteps, isStepsTrackingEnabled, steps.syncedAt, syncCurrentSteps]);
+
+  useEffect(() => {
+    if (!isLiveStepsAvailable || !isLiveStepsEnabled) {
+      return;
+    }
+
+    if (!isStepsTrackingEnabled || !canUseNativeSteps || !steps.syncedAt) {
+      stopLiveSteps();
+      lastLiveStepsPayloadRef.current = null;
+      return;
+    }
+
+    const payloadKey = `${steps.todaySteps}:${dailyGoal}`;
+    if (lastLiveStepsPayloadRef.current === payloadKey) {
+      return;
+    }
+
+    const syncLiveSteps = async () => {
+      if (liveStepsActivityId) {
+        await updateLiveSteps(steps.todaySteps, dailyGoal);
+        lastLiveStepsPayloadRef.current = payloadKey;
+        return;
+      }
+
+      const activityId = await startLiveSteps(steps.todaySteps, dailyGoal);
+      if (activityId) {
+        lastLiveStepsPayloadRef.current = payloadKey;
+      }
+    };
+
+    syncLiveSteps().catch((err) => console.error("[steps] failed to sync live steps:", err));
+  }, [
+    canUseNativeSteps,
+    dailyGoal,
+    isLiveStepsAvailable,
+    isLiveStepsEnabled,
+    isStepsTrackingEnabled,
+    liveStepsActivityId,
+    startLiveSteps,
+    stopLiveSteps,
+    steps.syncedAt,
+    steps.todaySteps,
+    updateLiveSteps,
+  ]);
 
   useEffect(() => {
     if (!isStepsTrackingEnabled || !canUseNativeSteps) return;

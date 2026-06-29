@@ -13,9 +13,19 @@ const NATIVE_ROOT = path.join(PLUGIN_DIR, "..");
 const IOS_SRC = path.join(NATIVE_ROOT, "ios");
 const ANDROID_SRC = path.join(NATIVE_ROOT, "android");
 
-const ANDROID_PACKAGE = "com.avihuteam.avihuteam.livesteps";
-const ANDROID_JAVA_SUBPATH = "app/src/main/java/com/avihuteam/avihuteam/livesteps";
-const SERVICE_FQN = `${ANDROID_PACKAGE}.LiveStepsService`;
+const LIVE_STEPS_PACKAGE_SUFFIX = "livesteps";
+
+function getAndroidAppPackage(config) {
+  return config.android?.package || "com.avihuteam.avihuteam";
+}
+
+function getLiveStepsPackage(config) {
+  return `${getAndroidAppPackage(config)}.${LIVE_STEPS_PACKAGE_SUFFIX}`;
+}
+
+function getAndroidJavaSubpath(config) {
+  return `app/src/main/java/${getLiveStepsPackage(config).replace(/\./g, "/")}`;
+}
 
 function copyFile(from, to) {
   fs.mkdirSync(path.dirname(to), { recursive: true });
@@ -31,6 +41,13 @@ function copyDir(from, to) {
     if (entry.isDirectory()) copyDir(src, dest);
     else fs.copyFileSync(src, dest);
   }
+}
+
+function patchAndroidSource(filePath, appPackage, liveStepsPackage) {
+  let body = fs.readFileSync(filePath, "utf8");
+  body = body.replace(/^package\s+[\w.]+/m, `package ${liveStepsPackage}`);
+  body = body.replace(/import\s+[\w.]+\.R/m, `import ${appPackage}.R`);
+  fs.writeFileSync(filePath, body);
 }
 
 // ─── iOS: Info.plist — flip Live Activities on ───────────────────────────
@@ -101,11 +118,16 @@ const withAndroidSources = (config) =>
     "android",
     async (cfg) => {
       const root = cfg.modRequest.platformProjectRoot;
-      const javaDir = path.join(root, ANDROID_JAVA_SUBPATH);
+      const appPackage = getAndroidAppPackage(cfg);
+      const liveStepsPackage = getLiveStepsPackage(cfg);
+      const javaDir = path.join(root, getAndroidJavaSubpath(cfg));
 
       copyFile(path.join(ANDROID_SRC, "LiveStepsService.kt"), path.join(javaDir, "LiveStepsService.kt"));
       copyFile(path.join(ANDROID_SRC, "LiveStepsModule.kt"), path.join(javaDir, "LiveStepsModule.kt"));
       copyFile(path.join(ANDROID_SRC, "LiveStepsPackage.kt"), path.join(javaDir, "LiveStepsPackage.kt"));
+      patchAndroidSource(path.join(javaDir, "LiveStepsService.kt"), appPackage, liveStepsPackage);
+      patchAndroidSource(path.join(javaDir, "LiveStepsModule.kt"), appPackage, liveStepsPackage);
+      patchAndroidSource(path.join(javaDir, "LiveStepsPackage.kt"), appPackage, liveStepsPackage);
 
       copyDir(path.join(ANDROID_SRC, "res"), path.join(root, "app/src/main/res"));
       return cfg;
@@ -116,7 +138,7 @@ const withAndroidSources = (config) =>
 const withAndroidPackageRegistration = (config) =>
   withMainApplication(config, (cfg) => {
     let src = cfg.modResults.contents;
-    const importLine = `import ${ANDROID_PACKAGE}.LiveStepsPackage`;
+    const importLine = `import ${getLiveStepsPackage(cfg)}.LiveStepsPackage`;
 
     if (!src.includes(importLine)) {
       // Insert after the package declaration
@@ -149,12 +171,13 @@ const withAndroidPackageRegistration = (config) =>
 const withAndroidManifestEntries = (config) =>
   withAndroidManifest(config, (cfg) => {
     const manifest = cfg.modResults.manifest;
+    const serviceFqn = `${getLiveStepsPackage(cfg)}.LiveStepsService`;
 
     if (!manifest["uses-permission"]) manifest["uses-permission"] = [];
     const wanted = [
       "android.permission.POST_NOTIFICATIONS",
       "android.permission.FOREGROUND_SERVICE",
-      "android.permission.FOREGROUND_SERVICE_HEALTH",
+      "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
     ];
     for (const name of wanted) {
       const exists = manifest["uses-permission"].some(
@@ -168,15 +191,18 @@ const withAndroidManifestEntries = (config) =>
     const app = manifest.application && manifest.application[0];
     if (app) {
       if (!app.service) app.service = [];
-      const already = app.service.some(
-        (s) => s.$ && s.$["android:name"] === SERVICE_FQN
+      const existingService = app.service.find(
+        (service) => service.$ && service.$["android:name"] === serviceFqn
       );
-      if (!already) {
+      if (existingService) {
+        existingService.$["android:exported"] = "false";
+        existingService.$["android:foregroundServiceType"] = "dataSync";
+      } else {
         app.service.push({
           $: {
-            "android:name": SERVICE_FQN,
+            "android:name": serviceFqn,
             "android:exported": "false",
-            "android:foregroundServiceType": "health",
+            "android:foregroundServiceType": "dataSync",
           },
         });
       }

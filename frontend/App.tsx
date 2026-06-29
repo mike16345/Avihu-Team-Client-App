@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { HtmlRenderProvider } from "@/navigators/providers/HTMLRendererProvider";
 import { useWorkoutSessionExpiryWatcher } from "@/hooks/useWorkoutSessionExpiryWatcher";
+import { linking } from "@/navigators/linking";
 import { navigationRef } from "@/navigators/navigationRef";
 
 export default function App() {
@@ -46,7 +47,7 @@ export default function App() {
                   client={queryClient}
                   persistOptions={{ persister: persister }}
                 >
-                  <NavigationContainer ref={navigationRef}>
+                  <NavigationContainer ref={navigationRef} linking={linking}>
                     <RootNavigator />
                     <StatusBar key={colorScheme} style={"dark"} />
                     <ToastContainer />

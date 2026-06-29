@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.widget.RemoteViews
@@ -26,6 +27,7 @@ class LiveStepsService : Service() {
         const val ACTION_START = "com.avihuteam.livesteps.START"
         const val ACTION_UPDATE = "com.avihuteam.livesteps.UPDATE"
         const val ACTION_STOP = "com.avihuteam.livesteps.STOP"
+        const val CARDIO_DEEP_LINK = "avihuteam://cardio?openCardio=true"
 
         fun buildStartIntent(context: Context, todaySteps: Int, dailyGoal: Int, distanceKm: Double): Intent =
             Intent(context, LiveStepsService::class.java).apply {
@@ -102,8 +104,11 @@ class LiveStepsService : Service() {
             setProgressBar(R.id.ringProgress, 100, percent, false)
         }
 
-        val openAppIntent = packageManager.getLaunchIntentForPackage(packageName)
-        val pendingIntent = openAppIntent?.let {
+        val openCardioIntent = Intent(Intent.ACTION_VIEW, Uri.parse(CARDIO_DEEP_LINK)).apply {
+            setPackage(packageName)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pendingIntent = openCardioIntent.let {
             PendingIntent.getActivity(
                 this, 0, it,
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT

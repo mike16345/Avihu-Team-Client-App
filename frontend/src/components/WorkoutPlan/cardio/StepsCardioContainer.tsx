@@ -14,7 +14,6 @@ import { IStepsCardioType } from "@/interfaces/Workout";
 import useStyles from "@/styles/useGlobalStyles";
 import { buildGoalsByDay, formatWeekRange } from "@/utils/stepsUtils";
 import HealthOnboardingCard from "./steps/HealthOnboardingCard";
-import LiveActivityPreview from "./steps/LiveActivityPreview";
 import StepsRingHero from "./steps/StepsRingHero";
 import {
   DAY_LABELS,
@@ -284,7 +283,6 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
         onNextWeek={handleNextWeek}
       />
 
-      {isGranted ? <LiveActivityPreview todaySteps={todaySteps} dailyGoal={dailyGoal} /> : null}
     </ScrollView>
   );
 };

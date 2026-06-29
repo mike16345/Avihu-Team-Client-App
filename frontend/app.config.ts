@@ -59,7 +59,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       ["expo-health-connect"],
       "./plugins/withHealthConnectPermissionDelegate",
+      "./native-modules/live-steps-activity/plugin/withLiveStepsActivity",
     ],
+    scheme: "avihuteam",
     ios: {
       bundleIdentifier: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
       supportsTablet: false,
