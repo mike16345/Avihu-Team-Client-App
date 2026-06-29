@@ -26,46 +26,49 @@ const WeeklyStepsChartHeader: React.FC<WeeklyStepsChartHeaderProps> = ({
 }) => {
   return (
     <View style={styles.headerRow}>
-      <View style={styles.weekNavRow}>
-        <TouchableOpacity
-          activeOpacity={0.6}
-          hitSlop={8}
-          disabled={!canGoNextWeek}
-          onPress={onNextWeek}
-          style={[!canGoNextWeek && styles.weekNavButtonDisabled]}
-        >
-          <Icon
-            name="chevronLeftSoft"
-            width={20}
-            height={20}
-            color={canGoNextWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.6}
-          hitSlop={8}
-          disabled={!canGoPreviousWeek}
-          onPress={onPreviousWeek}
-          style={[!canGoPreviousWeek && styles.weekNavButtonDisabled]}
-        >
-          <Icon
-            name="chevronRightSoft"
-            width={20}
-            height={20}
-            color={canGoPreviousWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
-          />
-        </TouchableOpacity>
+      <View>
+        {weekRangeLabel ? (
+          <Text fontSize={10} fontVariant="semibold" style={styles.weekRange}>
+            {weekRangeLabel}
+          </Text>
+        ) : null}
+        <View style={styles.weekNavRow}>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            hitSlop={8}
+            disabled={!canGoPreviousWeek}
+            onPress={onPreviousWeek}
+            style={[!canGoPreviousWeek && styles.weekNavButtonDisabled]}
+          >
+            <Icon
+              name="chevronRightSoft"
+              width={20}
+              height={20}
+              color={canGoPreviousWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            hitSlop={8}
+            disabled={!canGoNextWeek}
+            onPress={onNextWeek}
+            style={[!canGoNextWeek && styles.weekNavButtonDisabled]}
+          >
+            <Icon
+              name="chevronLeftSoft"
+              width={20}
+              height={20}
+              color={canGoNextWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.headerInfo}>
         <Text fontSize={12} fontVariant="semibold" style={styles.weeklyTotal}>
           סה״כ השבוע: {formatSteps(weeklyGoalTotal)} צעדים
         </Text>
-        {weekRangeLabel ? (
-          <Text fontSize={10} fontVariant="semibold" style={styles.weekRange}>
-            {weekRangeLabel}
-          </Text>
-        ) : null}
+
         <Text fontSize={11} fontVariant="semibold" style={styles.weeklyCompleted}>
           נעשו: {formatSteps(totalSteps)} צעדים
         </Text>
@@ -89,7 +92,7 @@ const styles = StyleSheet.create({
   },
   weekNavRow: {
     alignItems: "center",
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     flexShrink: 0,
     gap: 6,
   },

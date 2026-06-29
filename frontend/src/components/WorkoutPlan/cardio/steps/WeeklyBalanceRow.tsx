@@ -40,14 +40,14 @@ const WeeklyBalanceRow: React.FC<WeeklyBalanceRowProps> = ({ balance }) => {
         השלמה לימים שעברו השבוע
       </Text>
       <View style={styles.valueGroup}>
+        <Text fontVariant="bold" fontSize={15} style={{ color }}>
+          {label}
+        </Text>
         {balance !== 0 && (
           <Text fontSize={12} style={[styles.unit]}>
             צעדים
           </Text>
         )}
-        <Text fontVariant="bold" fontSize={15} style={{ color }}>
-          {label}
-        </Text>
       </View>
     </View>
   );

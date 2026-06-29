@@ -46,12 +46,12 @@ const StepsRingHero: React.FC<StepsRingHeroProps> = ({
 
   return (
     <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
-      <View style={styles.titleColumn}>
+      <View>
         <Text
           fontVariant="bold"
           fontSize={titleFont}
           numberOfLines={2}
-          style={[colors.textPrimary, styles.title]}
+          style={[colors.textPrimary]}
         >
           מטרה צעדים יומית
         </Text>
@@ -71,16 +71,12 @@ const StepsRingHero: React.FC<StepsRingHeroProps> = ({
 };
 
 const styles = StyleSheet.create({
-  titleColumn: {
-    alignItems: "flex-end",
-  },
   title: {
     textAlign: "right",
   },
   subtitle: {
     color: MUTED_TEXT,
     marginTop: 6,
-    textAlign: "right",
   },
 });
 
