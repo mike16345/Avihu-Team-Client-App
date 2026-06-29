@@ -1,9 +1,6 @@
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
-import Animated, {
-  SharedValue,
-  useAnimatedProps,
-} from "react-native-reanimated";
+import Animated, { SharedValue, useAnimatedProps } from "react-native-reanimated";
 import Svg, { Circle, Defs, LinearGradient, Line, Rect, Stop } from "react-native-svg";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
