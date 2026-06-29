@@ -143,40 +143,6 @@ const styles = StyleSheet.create({
     gap: 14,
     paddingEnd: 24,
   },
-  sectionTitle: {
-    color: "rgba(7,39,35,0.55)",
-    textAlign: "right",
-    marginStart: 32,
-  },
-  titleColumn: {
-    flex: 1,
-    alignItems: "flex-end",
-  },
-  titleSpacer: {
-    height: 14,
-    marginTop: 1,
-  },
-  logoBox: {
-    position: "absolute",
-    top: 14,
-    right: 14,
-    width: 28,
-    height: 28,
-    borderRadius: 7,
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 2,
-    shadowColor: "#072723",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.45,
-    shadowRadius: 6,
-    elevation: 6,
-  },
-  logo: {
-    width: 22,
-    height: 22,
-  },
   ringWrap: {
     width: 72,
     height: 72,
@@ -216,9 +182,6 @@ const styles = StyleSheet.create({
     color: "rgba(7,39,35,0.55)",
     marginTop: 4,
     textAlign: "right",
-  },
-  label: {
-    color: MUTED_TEXT,
   },
   value: {
     color: "#1a1d24",

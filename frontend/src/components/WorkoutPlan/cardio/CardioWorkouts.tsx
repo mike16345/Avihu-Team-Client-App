@@ -1,23 +1,23 @@
 import { View } from "react-native";
-import useStyles from "@/styles/useGlobalStyles";
 import { Card } from "@/components/ui/Card";
-import { Text } from "@/components/ui/Text";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
+import { Text } from "@/components/ui/Text";
 import useCardioWorkoutQuery from "@/hooks/queries/useCardioWorkoutQuery";
+import useStyles from "@/styles/useGlobalStyles";
 
 const CardioWorkouts = () => {
   const { colors, common, fonts, layout, spacing, text } = useStyles();
-
   const { data: cardioWorkouts, isLoading } = useCardioWorkoutQuery();
+  const workoutCount = cardioWorkouts?.data.length;
 
   return (
     <Card variant="gray">
       <Text style={[colors.textPrimary, text.textCenter]}>רשימת תרגילים:</Text>
 
-      <ConditionalRender condition={cardioWorkouts}>
+      <ConditionalRender condition={typeof workoutCount === "number"}>
         <Text fontVariant="bold" style={[text.textCenter, fonts.lg]}>
-          {cardioWorkouts?.data.length}
+          {workoutCount}
         </Text>
       </ConditionalRender>
 
@@ -37,9 +37,9 @@ const CardioWorkouts = () => {
         </ConditionalRender>
 
         <ConditionalRender condition={!isLoading}>
-          {cardioWorkouts?.data.map((activity, i) => (
+          {cardioWorkouts?.data.map((activity) => (
             <View
-              key={i}
+              key={activity.name}
               style={[
                 colors.background,
                 spacing.pdHorizontalSm,
@@ -49,7 +49,7 @@ const CardioWorkouts = () => {
                 colors.outline,
               ]}
             >
-              <Text style={[colors.textPrimary]}>{activity.name}</Text>
+              <Text style={colors.textPrimary}>{activity.name}</Text>
             </View>
           ))}
         </ConditionalRender>

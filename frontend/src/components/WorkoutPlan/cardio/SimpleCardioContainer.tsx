@@ -17,12 +17,15 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
   const cardioData = useCardioData(plan);
 
   return (
-    <View style={[common.rounded, , spacing.gapLg]}>
-      <View style={[spacing.gapLg]}>
-        {cardioData?.map(({ title, value }, i) => (
-          <Card variant="gray" style={[layout.itemsCenter, spacing.pdDefault]} key={i}>
+    <View style={[common.rounded, spacing.gapLg]}>
+      <View style={spacing.gapLg}>
+        {cardioData.map(({ title, value }) => (
+          <Card
+            key={title}
+            variant="gray"
+            style={[layout.itemsCenter, spacing.pdDefault]}
+          >
             <Text style={colors.textPrimary}>{title}</Text>
-
             {value}
           </Card>
         ))}

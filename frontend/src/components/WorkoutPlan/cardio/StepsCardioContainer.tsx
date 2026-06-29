@@ -18,7 +18,6 @@ import {
   DayData,
   HealthStatus,
   MOCK_WEEK,
-  MUTED_TEXT_FAINT,
   SMALL_SCREEN_BREAKPOINT,
   responsiveSizes,
 } from "./steps/stepsConstants";
@@ -245,17 +244,6 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
 };
 
 const styles = StyleSheet.create({
-  heroCard: {
-    marginBottom: 20,
-  },
-  demoToggle: {
-    alignSelf: "flex-start",
-    marginBottom: 8,
-    marginTop: -10,
-  },
-  demoToggleText: {
-    color: MUTED_TEXT_FAINT,
-  },
   sectionTitleRow: {
     flexDirection: "row",
     justifyContent: "flex-start",
