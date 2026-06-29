@@ -7,6 +7,7 @@ import useStepsNotifications, {
 } from "@/hooks/api/useStepsNotifications";
 import { useStepsProgressApi } from "@/hooks/api/useStepsProgressApi";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
+import { buildGoalsByDay, getLocalDateKey, stepsToDistanceKm } from "@/utils/stepsUtils";
 
 interface StepsTrackingContextValue {
   steps: UseStepsDataResult;
@@ -18,23 +19,6 @@ const StepsTrackingContext = createContext<StepsTrackingContextValue | null>(nul
 
 const HEALTH_REFRESH_INTERVAL_MS = 15 * 1000;
 const SERVER_SYNC_INTERVAL_MS = 15 * 60 * 1000;
-const DEFAULT_DAILY_GOAL = 10000;
-const ESTIMATED_STEP_STRIDE_METERS = 0.762;
-
-const getLocalDayKey = (date: Date) => {
-  const offsetMs = date.getTimezoneOffset() * 60 * 1000;
-  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 10);
-};
-
-const buildGoalsByDay = (plan: IStepsCardioType | undefined): number[] => {
-  if (!plan) {
-    return Array.from({ length: 7 }, () => DEFAULT_DAILY_GOAL);
-  }
-  if (plan.mode === "custom" && plan.perDay && plan.perDay.length === 7) {
-    return plan.perDay;
-  }
-  return Array.from({ length: 7 }, () => plan.daily);
-};
 
 export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const steps = useStepsData();
@@ -66,7 +50,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
       const now = Date.now();
       if (!force && now - lastServerSyncAtRef.current < SERVER_SYNC_INTERVAL_MS) return;
 
-      const date = getLocalDayKey(new Date());
+      const date = getLocalDateKey(new Date());
       const source = Platform.OS === "ios" ? "healthkit" : "health_connect";
       const payloadKey = `${date}:${steps.todaySteps}:${steps.todayCalories}:${dailyGoal}:${source}`;
       if (!force && lastServerSyncPayloadRef.current === payloadKey) return;
@@ -76,9 +60,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
           date,
           steps: steps.todaySteps,
           calories: steps.todayCalories,
-          distanceKm: Number(
-            ((steps.todaySteps * ESTIMATED_STEP_STRIDE_METERS) / 1000).toFixed(2)
-          ),
+          distanceKm: stepsToDistanceKm(steps.todaySteps, 2),
           dailyGoal,
           source,
         });

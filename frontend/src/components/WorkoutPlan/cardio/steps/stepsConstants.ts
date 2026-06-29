@@ -28,10 +28,6 @@ export const MOCK_WEEK: DayData[] = [
   { label: DAY_LABELS[6], steps: 8500, calories: 258 },
 ];
 
-export const DEFAULT_DAILY_GOAL = 12000;
-export const TODAY_STEPS = 8500;
-export const TODAY_INDEX = 6;
-
 export const GREEN_DARK = "#2EB94D";
 export const GREEN_MID = "#4ED167";
 export const GREEN_LIGHT = "#C7F0CB";
@@ -54,10 +50,6 @@ export const DAY_LABEL_TEXT = "rgba(7,39,35,0.75)";
 export const SELECTED_PILL_BG = "rgba(7,39,35,0.08)";
 
 export const SMALL_SCREEN_BREAKPOINT = 360;
-
-export const formatSteps = (n: number): string => {
-  return Math.round(n).toLocaleString("he-IL");
-};
 
 export const responsiveSizes = (isSmall: boolean) => ({
   ringSize: isSmall ? 100 : 120,

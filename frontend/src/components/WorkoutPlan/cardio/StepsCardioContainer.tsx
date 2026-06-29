@@ -12,9 +12,9 @@ import { IStepsCardioType } from "@/interfaces/Workout";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { useStepsTracking } from "@/context/StepsTrackingContext";
+import { buildGoalsByDay, formatWeekRange } from "@/utils/stepsUtils";
 import {
   DAY_LABELS,
-  DEFAULT_DAILY_GOAL,
   DayData,
   HealthStatus,
   MOCK_WEEK,
@@ -36,26 +36,6 @@ const computeWeeklyBalance = (weekData: DayData[], goalsByDay: number[], todayIn
   const actualSoFar = weekData.slice(0, daysElapsed).reduce((sum, d) => sum + (d.steps ?? 0), 0);
   const expectedSoFar = goalsByDay.slice(0, daysElapsed).reduce((sum, g) => sum + g, 0);
   return actualSoFar - expectedSoFar;
-};
-
-const buildGoalsByDay = (plan: IStepsCardioType | undefined): number[] => {
-  if (!plan) {
-    return Array.from({ length: 7 }, () => DEFAULT_DAILY_GOAL);
-  }
-  if (plan.mode === "custom" && plan.perDay && plan.perDay.length === 7) {
-    return plan.perDay;
-  }
-  return Array.from({ length: 7 }, () => plan.daily);
-};
-
-const formatWeekRange = (startDate?: string, endDate?: string) => {
-  if (!startDate || !endDate) return undefined;
-  const formatDate = (value: string) => {
-    const [year, month, day] = value.split("-");
-    if (!year || !month || !day) return value;
-    return `${day}.${month}.${year}`;
-  };
-  return `${formatDate(startDate)} - ${formatDate(endDate)}`;
 };
 
 const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => {

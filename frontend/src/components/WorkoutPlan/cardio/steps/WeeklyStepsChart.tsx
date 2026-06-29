@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import Animated, {
   Easing,
   SharedValue,
@@ -8,12 +9,10 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { useFocusEffect } from "@react-navigation/native";
 import Svg, { Circle, Defs, LinearGradient, Line, Rect, Stop } from "react-native-svg";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { useShadowStyles } from "@/styles/useShadowStyles";
-import Icon from "@/components/Icon/Icon";
 import {
   BASELINE_LINE,
   DAY_LABEL_TEXT,
@@ -29,9 +28,9 @@ import {
   RED_MID,
   SELECTED_PILL_BG,
   TARGET_LINE,
-  formatSteps,
 } from "./stepsConstants";
 import DayDetailPanel from "./DayDetailPanel";
+import WeeklyStepsChartHeader from "./WeeklyStepsChartHeader";
 
 const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
@@ -56,7 +55,6 @@ interface WeeklyStepsChartProps {
   canGoNextWeek?: boolean;
   onPreviousWeek?: () => void;
   onNextWeek?: () => void;
-  onPressHistory?: () => void;
 }
 
 interface AnimatedBarProps {
@@ -69,10 +67,11 @@ interface AnimatedBarProps {
 
 const AnimatedBar: React.FC<AnimatedBarProps> = ({ progress, x, barH, fill, opacity }) => {
   const animatedProps = useAnimatedProps(() => {
-    const h = barH * progress.value;
+    const height = barH * progress.value;
+
     return {
-      height: h,
-      y: BAR_AREA_BOTTOM - h,
+      height,
+      y: BAR_AREA_BOTTOM - height,
     };
   });
 
@@ -90,12 +89,27 @@ const AnimatedBar: React.FC<AnimatedBarProps> = ({ progress, x, barH, fill, opac
 };
 
 const getDayLabelPillStyle = (isToday: boolean, isSelected: boolean) => {
-  if (isToday) return styles.todayPill;
-  if (isSelected) return styles.selectedPill;
+  if (isToday) {
+    return styles.todayPill;
+  }
+
+  if (isSelected) {
+    return styles.selectedPill;
+  }
+
   return styles.plainPill;
 };
 
 const getDayLabelTextColor = (isToday: boolean) => (isToday ? LIGHT_TEXT_ON_DARK : DAY_LABEL_TEXT);
+
+const getSelectedGoal = (selectedDay: number, dailyGoal: number, goalsByDay?: number[]) =>
+  goalsByDay?.[selectedDay] ?? dailyGoal;
+
+const getWeeklyGoalTotal = (weekLength: number, dailyGoal: number, goalsByDay?: number[]) =>
+  (goalsByDay ?? Array(weekLength).fill(dailyGoal)).reduce((sum, goal) => sum + goal, 0);
+
+const getChartMaxValue = (weekData: DayData[], dailyGoal: number, goalsByDay?: number[]) =>
+  Math.max(...(goalsByDay ?? [dailyGoal]), dailyGoal, ...weekData.map((day) => day.steps ?? 0));
 
 const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
   weekData,
@@ -110,29 +124,20 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
   canGoNextWeek = false,
   onPreviousWeek,
   onNextWeek,
-  onPressHistory,
 }) => {
-  const { colors, common, frameShadow, spacing, layout } = useChartStyles();
+  const { colors, common, frameShadow, layout, spacing } = useChartStyles();
   const barProgress = useSharedValue(0);
 
-  const selectedGoal = goalsByDay?.[selectedDay] ?? dailyGoal;
-  const maxValue = Math.max(
-    ...(goalsByDay ?? [dailyGoal]),
-    dailyGoal,
-    ...weekData.map((d) => d.steps ?? 0)
-  );
+  const selectedGoal = getSelectedGoal(selectedDay, dailyGoal, goalsByDay);
+  const weeklyGoalTotal = getWeeklyGoalTotal(weekData.length, dailyGoal, goalsByDay);
+  const totalSteps = weekData.reduce((sum, day) => sum + (day.steps ?? 0), 0);
+  const maxValue = getChartMaxValue(weekData, dailyGoal, goalsByDay);
   const targetY = BAR_AREA_BOTTOM - (selectedGoal / maxValue) * BAR_AREA_HEIGHT;
   const barSlot = CHART_WIDTH / weekData.length;
-
+  const selectedDetail = weekData[selectedDay];
   const todayStepsValue = todayIndex >= 0 ? weekData[todayIndex]?.steps : null;
   const showTodayBaselineDot =
     todayIndex >= 0 && (todayStepsValue == null || todayStepsValue === 0);
-
-  const totalSteps = weekData.reduce((sum, d) => sum + (d.steps ?? 0), 0);
-  const weeklyGoalTotal = (goalsByDay ?? Array(weekData.length).fill(dailyGoal)).reduce(
-    (s, g) => s + g,
-    0
-  );
 
   useFocusEffect(
     useCallback(() => {
@@ -141,61 +146,24 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
         duration: 1700,
         easing: Easing.bezier(0.16, 1, 0.3, 1),
       });
+
       return () => {
         cancelAnimation(barProgress);
       };
     }, [barProgress, totalSteps])
   );
 
-  const detail = weekData[selectedDay];
-
   return (
     <View style={[colors.backgroundSurface, common.roundedXl, spacing.pdMd, frameShadow]}>
-      <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter, styles.headerRow]}>
-        <View style={styles.weekNavRow}>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            hitSlop={8}
-            disabled={!canGoNextWeek}
-            onPress={onNextWeek ?? onPressHistory}
-            style={[!canGoNextWeek && styles.weekNavButtonDisabled]}
-          >
-            <Icon
-              name="chevronLeftSoft"
-              width={20}
-              height={20}
-              color={canGoNextWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.6}
-            hitSlop={8}
-            disabled={!canGoPreviousWeek}
-            onPress={onPreviousWeek}
-            style={[!canGoPreviousWeek && styles.weekNavButtonDisabled]}
-          >
-            <Icon
-              name="chevronRightSoft"
-              width={20}
-              height={20}
-              color={canGoPreviousWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.headerInfo}>
-          <Text fontSize={12} fontVariant="semibold" style={styles.weeklyTotal}>
-            סה״כ השבוע: {formatSteps(weeklyGoalTotal)} צעדים
-          </Text>
-          {weekRangeLabel && (
-            <Text fontSize={10} fontVariant="semibold" style={styles.weekRange}>
-              {weekRangeLabel}
-            </Text>
-          )}
-          <Text fontSize={11} fontVariant="semibold" style={styles.weeklyCompleted}>
-            נעשו: {formatSteps(totalSteps)} צעדים
-          </Text>
-        </View>
-      </View>
+      <WeeklyStepsChartHeader
+        totalSteps={totalSteps}
+        weeklyGoalTotal={weeklyGoalTotal}
+        weekRangeLabel={weekRangeLabel}
+        canGoPreviousWeek={canGoPreviousWeek}
+        canGoNextWeek={canGoNextWeek}
+        onPreviousWeek={onPreviousWeek}
+        onNextWeek={onNextWeek}
+      />
 
       <View style={styles.chartArea}>
         <Svg
@@ -236,32 +204,36 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
             strokeWidth="1"
           />
 
-          {weekData.map((day, i) => {
-            if (day.steps == null || day.steps === 0) return null;
-            const dayGoal = goalsByDay?.[i] ?? dailyGoal;
+          {weekData.map((day, index) => {
+            if (day.steps == null || day.steps === 0) {
+              return null;
+            }
+
+            const dayGoal = goalsByDay?.[index] ?? dailyGoal;
             const isLow = day.steps < dayGoal * LOW_THRESHOLD_RATIO;
-            const cx = CHART_WIDTH - (i + 0.5) * barSlot;
-            const barH = Math.max((day.steps / maxValue) * BAR_AREA_HEIGHT, 6);
+            const centerX = CHART_WIDTH - (index + 0.5) * barSlot;
+            const barHeight = Math.max((day.steps / maxValue) * BAR_AREA_HEIGHT, 6);
+
             return (
               <AnimatedBar
-                key={i}
+                key={index}
                 progress={barProgress}
-                x={cx - BAR_WIDTH / 2}
-                barH={barH}
+                x={centerX - BAR_WIDTH / 2}
+                barH={barHeight}
                 fill={isLow ? "url(#weeklyRedBar)" : "url(#weeklyGreenBar)"}
-                opacity={selectedDay === i ? 1 : 0.5}
+                opacity={selectedDay === index ? 1 : 0.5}
               />
             );
           })}
 
-          {showTodayBaselineDot && (
+          {showTodayBaselineDot ? (
             <Circle
               cx={CHART_WIDTH - (todayIndex + 0.5) * barSlot}
               cy={BAR_AREA_BOTTOM - 4}
               r="3"
               fill={PRIMARY_DARK}
             />
-          )}
+          ) : null}
         </Svg>
 
         <View style={[styles.targetPill, { top: targetY - 9 }]} pointerEvents="none">
@@ -271,12 +243,12 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
         </View>
 
         <View style={[layout.absolute, styles.barHitArea]}>
-          {weekData.map((_, i) => (
+          {weekData.map((_, index) => (
             <TouchableOpacity
-              key={i}
+              key={index}
               activeOpacity={0.6}
               hitSlop={{ top: 8, bottom: 4, left: 2, right: 2 }}
-              onPress={() => onSelectDay(i)}
+              onPress={() => onSelectDay(index)}
               style={styles.barHitItem}
             />
           ))}
@@ -284,11 +256,12 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
       </View>
 
       <View style={styles.dayLabelsRow}>
-        {weekData.map((day, i) => {
-          const isToday = todayIndex >= 0 && i === todayIndex;
-          const isSelected = selectedDay === i;
+        {weekData.map((day, index) => {
+          const isToday = todayIndex >= 0 && index === todayIndex;
+          const isSelected = selectedDay === index;
+
           return (
-            <View key={i} style={styles.dayLabelCell}>
+            <View key={index} style={styles.dayLabelCell}>
               <View style={getDayLabelPillStyle(isToday, isSelected)}>
                 <Text
                   fontSize={11}
@@ -303,8 +276,8 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
         })}
       </View>
 
-      {detail ? (
-        <DayDetailPanel detail={detail} detailValueFont={detailValueFont} />
+      {selectedDetail ? (
+        <DayDetailPanel detail={selectedDetail} detailValueFont={detailValueFont} />
       ) : (
         <Text fontSize={11} style={styles.tapHint}>
           לחץ על יום לפרטים
@@ -317,72 +290,33 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
 const useChartStyles = () => {
   const { colors, common, layout, spacing } = useStyles();
   const { frameShadow } = useShadowStyles();
-  return { colors, common, layout, spacing, frameShadow };
+
+  return { colors, common, frameShadow, layout, spacing };
 };
 
 const styles = StyleSheet.create({
-  headerRow: {
-    marginBottom: 10,
-    width: "100%",
-  },
-  weeklyTotal: {
-    color: "rgba(7,39,35,0.4)",
-    textAlign: "right",
-  },
-  headerInfo: {
-    alignItems: "flex-end",
-    flex: 1,
-    flexShrink: 1,
-  },
-  weekRange: {
-    color: MUTED_TEXT_FAINT,
-    marginTop: 2,
-    textAlign: "right",
-  },
-  weeklyCompleted: {
-    color: GREEN_DARK,
-    marginTop: 2,
-    textAlign: "right",
-  },
-  weekNavRow: {
-    flexDirection: "row-reverse",
-    alignItems: "center",
-    gap: 6,
-    flexShrink: 0,
-  },
-  weekNavButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: 30,
-    height: 30,
-    borderRadius: 999,
-    backgroundColor: "rgba(7,39,35,0.06)",
-  },
-  weekNavButtonDisabled: {
-    opacity: 0.35,
-  },
   chartArea: {
-    width: "100%",
     height: CHART_HEIGHT,
     position: "relative",
+    width: "100%",
   },
   targetPill: {
-    position: "absolute",
-    right: 4,
     backgroundColor: PRIMARY_DARK,
+    borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 1,
-    borderRadius: 999,
+    position: "absolute",
+    right: 4,
   },
   targetPillText: {
     color: LIGHT_TEXT_ON_DARK,
   },
   barHitArea: {
-    top: 0,
-    left: 0,
-    right: 0,
     bottom: 22,
     flexDirection: "row",
+    left: 0,
+    right: 0,
+    top: 0,
   },
   barHitItem: {
     flex: 1,
@@ -395,20 +329,20 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   dayLabelCell: {
-    flex: 1,
     alignItems: "center",
+    flex: 1,
   },
   todayPill: {
     backgroundColor: PRIMARY_DARK,
+    borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 1,
-    borderRadius: 999,
   },
   selectedPill: {
     backgroundColor: SELECTED_PILL_BG,
+    borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 1,
-    borderRadius: 999,
   },
   plainPill: {
     paddingHorizontal: 8,
@@ -416,8 +350,8 @@ const styles = StyleSheet.create({
   },
   tapHint: {
     color: MUTED_TEXT_FAINT,
-    textAlign: "center",
     marginTop: 10,
+    textAlign: "center",
   },
 });
 

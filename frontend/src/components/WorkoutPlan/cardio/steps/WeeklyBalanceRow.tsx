@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
+import { formatSteps } from "@/utils/stepsUtils";
 import {
   GREEN_DARK,
   HAIRLINE,
@@ -8,7 +9,6 @@ import {
   MUTED_TEXT_SOFT,
   PRIMARY_DARK,
   RED_DARK,
-  formatSteps,
 } from "./stepsConstants";
 
 interface WeeklyBalanceRowProps {

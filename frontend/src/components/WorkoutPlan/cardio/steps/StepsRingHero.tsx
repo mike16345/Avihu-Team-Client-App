@@ -11,13 +11,13 @@ import { useFocusEffect } from "@react-navigation/native";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
+import { formatSteps } from "@/utils/stepsUtils";
 import {
   GREEN_DARK,
   MUTED_TEXT,
   RING_GRAD_END,
   RING_GRAD_START,
   RING_TRACK,
-  formatSteps,
 } from "./stepsConstants";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);

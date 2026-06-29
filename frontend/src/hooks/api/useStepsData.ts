@@ -8,6 +8,7 @@ import {
   readRecords as readHealthConnectRecords,
   requestPermission as requestHealthConnectPermission,
 } from "react-native-health-connect";
+import { getLocalDateKey, stepsToCalories } from "@/utils/stepsUtils";
 
 export type StepsPermissionStatus = "needsPermission" | "denied" | "granted";
 
@@ -27,7 +28,6 @@ export interface UseStepsDataResult {
   status: StepsPermissionStatus;
   todaySteps: number;
   todayCalories: number;
-  week: StepsDayDatum[];
   weeks: StepsWeekDatum[];
   syncedAt: Date | null;
   requestPermission: () => Promise<boolean>;
@@ -81,12 +81,7 @@ const startOfDay = (d: Date) => {
   return x;
 };
 
-const dayKey = (d: Date) => {
-  const offsetMs = d.getTimezoneOffset() * 60 * 1000;
-  return new Date(d.getTime() - offsetMs).toISOString().slice(0, 10);
-};
-
-const stepsToCalories = (steps: number) => Math.round(steps * 0.04);
+const dayKey = (date: Date) => getLocalDateKey(date);
 
 const getWeekDates = (today: Date): Date[] => {
   const todayDow = today.getDay();
@@ -129,6 +124,15 @@ const buildEmptyWeeks = (today: Date): StepsWeekDatum[] =>
     };
   });
 
+const buildEmptyResult = (
+  today: Date
+): { steps: number; calories: number; week: StepsDayDatum[]; weeks: StepsWeekDatum[] } => ({
+  steps: 0,
+  calories: 0,
+  week: buildEmptyWeek(today),
+  weeks: buildEmptyWeeks(today),
+});
+
 const buildWeekFromMap = (
   today: Date,
   byDay: Record<string, number>
@@ -163,6 +167,27 @@ const buildWeeksFromMap = (today: Date, byDay: Record<string, number>): StepsWee
   });
 };
 
+const applyTodayStepsFallback = (
+  data: { steps: number; calories: number; week: StepsDayDatum[]; weeks: StepsWeekDatum[] },
+  today: Date,
+  fallbackTodaySteps: number
+) => {
+  const todayKey = dayKey(today);
+  const fallbackCalories = stepsToCalories(fallbackTodaySteps);
+
+  data.steps = fallbackTodaySteps;
+  data.calories = fallbackCalories;
+  data.week = data.week.map((day) =>
+    day.date === todayKey ? { ...day, steps: fallbackTodaySteps, calories: fallbackCalories } : day
+  );
+  data.weeks = data.weeks.map((weekDatum) => ({
+    ...weekDatum,
+    days: weekDatum.days.map((day) =>
+      day.date === todayKey ? { ...day, steps: fallbackTodaySteps, calories: fallbackCalories } : day
+    ),
+  }));
+};
+
 const readIOS = async (
   native: any,
   today: Date
@@ -180,21 +205,11 @@ const readIOS = async (
       (err: any, results: Array<{ startDate: string; value: number }>) => {
         if (err) {
           console.error("[steps] getDailyStepCountSamples error:", err);
-          resolve({
-            steps: 0,
-            calories: 0,
-            week: buildEmptyWeek(today),
-            weeks: buildEmptyWeeks(today),
-          });
+          resolve(buildEmptyResult(today));
           return;
         }
         if (!results) {
-          resolve({
-            steps: 0,
-            calories: 0,
-            week: buildEmptyWeek(today),
-            weeks: buildEmptyWeeks(today),
-          });
+          resolve(buildEmptyResult(today));
           return;
         }
         const byDay: Record<string, number> = {};
@@ -281,19 +296,9 @@ const readAndroid = async (
     timeRangeFilter,
     pageSize: 500,
   });
-  console.log("[STEPS DATA] RECORDS:", records);
 
   const list: Array<{ startTime: string; count: number; metadata?: { dataOrigin?: string } }> =
     records?.records ?? [];
-
-  // console.log(
-  //   "[steps] Android Health Connect step records:",
-  //   list.slice(0, 10).map((record) => ({
-  //     startTime: record.startTime,
-  //     count: record.count,
-  //     dataOrigin: record.metadata?.dataOrigin,
-  //   }))
-  // );
 
   if (Object.keys(byDay).length === 0) {
     for (const record of list) {
@@ -392,7 +397,6 @@ const useStepsData = (): UseStepsDataResult => {
   const [status, setStatus] = useState<StepsPermissionStatus>("needsPermission");
   const [todaySteps, setTodaySteps] = useState(0);
   const [todayCalories, setTodayCalories] = useState(0);
-  const [week, setWeek] = useState<StepsDayDatum[]>(buildEmptyWeek(new Date()));
   const [weeks, setWeeks] = useState<StepsWeekDatum[]>(buildEmptyWeeks(new Date()));
   const [syncedAt, setSyncedAt] = useState<Date | null>(null);
   const refreshInFlightRef = useRef(false);
@@ -409,35 +413,11 @@ const useStepsData = (): UseStepsDataResult => {
       if (Platform.OS === "ios" && data.steps === 0) {
         const fallbackTodaySteps = await readIOSTodaySteps(native, today);
         if (fallbackTodaySteps !== null && fallbackTodaySteps > 0) {
-          const todayKey = dayKey(today);
-          data.steps = fallbackTodaySteps;
-          data.calories = stepsToCalories(fallbackTodaySteps);
-          data.week = data.week.map((day) =>
-            day.date === todayKey
-              ? {
-                  ...day,
-                  steps: fallbackTodaySteps,
-                  calories: stepsToCalories(fallbackTodaySteps),
-                }
-              : day
-          );
-          data.weeks = data.weeks.map((weekDatum) => ({
-            ...weekDatum,
-            days: weekDatum.days.map((day) =>
-              day.date === todayKey
-                ? {
-                    ...day,
-                    steps: fallbackTodaySteps,
-                    calories: stepsToCalories(fallbackTodaySteps),
-                  }
-                : day
-            ),
-          }));
+          applyTodayStepsFallback(data, today, fallbackTodaySteps);
         }
       }
       setTodaySteps(data.steps);
       setTodayCalories(data.calories);
-      setWeek(data.week);
       setWeeks(data.weeks);
       setSyncedAt(new Date());
       setStatus("granted");
@@ -506,7 +486,6 @@ const useStepsData = (): UseStepsDataResult => {
     status,
     todaySteps,
     todayCalories,
-    week,
     weeks,
     syncedAt,
     requestPermission,

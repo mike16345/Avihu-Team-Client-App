@@ -2,7 +2,8 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
-import { DAY_FULL_NAMES, DayData, MUTED_TEXT, formatSteps } from "./stepsConstants";
+import { formatSteps } from "@/utils/stepsUtils";
+import { DAY_FULL_NAMES, DayData, MUTED_TEXT } from "./stepsConstants";
 
 interface DayDetailPanelProps {
   detail: DayData;

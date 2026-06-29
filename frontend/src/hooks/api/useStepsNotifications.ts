@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
+import { formatSteps, getLocalDateKey } from "@/utils/stepsUtils";
 
 const STEPS_NOTIFICATION_IDENTIFIER = "avihu-team-daily-steps";
 const NOTIFICATION_HOUR = 8;
@@ -10,14 +11,6 @@ const loadNotifications = () => {
   } catch {
     return null;
   }
-};
-
-const formatSteps = (n: number): string => Math.round(n).toLocaleString("he-IL");
-
-const getLocalDayKey = () => {
-  const now = new Date();
-  const offsetMs = now.getTimezoneOffset() * 60 * 1000;
-  return new Date(now.getTime() - offsetMs).toISOString().slice(0, 10);
 };
 
 const buildBody = (todaySteps: number, dailyGoal: number) => {
@@ -87,7 +80,7 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
       const permission = await Notifications.getPermissionsAsync();
       if (permission?.status !== "granted") return;
 
-      const scheduleKey = `${getLocalDayKey()}:${dailyGoal}`;
+      const scheduleKey = `${getLocalDateKey()}:${dailyGoal}`;
       if (scheduledKeyRef.current === scheduleKey) return;
 
       try {

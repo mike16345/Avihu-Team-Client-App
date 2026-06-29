@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NativeModules } from "react-native";
+import { stepsToDistanceKm } from "@/utils/stepsUtils";
 
 const { RNLiveSteps } = NativeModules as {
   RNLiveSteps?: {
@@ -15,9 +16,6 @@ const { RNLiveSteps } = NativeModules as {
     areActivitiesEnabled: () => Promise<boolean>;
   };
 };
-
-const STEP_LENGTH_METERS = 0.76;
-const computeDistanceKm = (steps: number): number => (steps * STEP_LENGTH_METERS) / 1000;
 
 export interface UseLiveStepsActivityResult {
   isAvailable: boolean;
@@ -45,7 +43,7 @@ const useLiveStepsActivity = (): UseLiveStepsActivityResult => {
     async (todaySteps: number, dailyGoal: number): Promise<string | null> => {
       if (!isAvailable) return null;
       try {
-        const distanceKm = computeDistanceKm(todaySteps);
+        const distanceKm = stepsToDistanceKm(todaySteps, 2);
         const id = await RNLiveSteps!.start(todaySteps, dailyGoal, distanceKm);
         activityIdRef.current = id;
         setActivityId(id);
@@ -61,7 +59,7 @@ const useLiveStepsActivity = (): UseLiveStepsActivityResult => {
     async (todaySteps: number, dailyGoal: number): Promise<void> => {
       if (!isAvailable || !activityIdRef.current) return;
       try {
-        const distanceKm = computeDistanceKm(todaySteps);
+        const distanceKm = stepsToDistanceKm(todaySteps, 2);
         await RNLiveSteps!.update(activityIdRef.current, todaySteps, dailyGoal, distanceKm);
       } catch {
         // update failure is non-fatal

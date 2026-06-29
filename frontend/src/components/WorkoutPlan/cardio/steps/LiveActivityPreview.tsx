@@ -3,14 +3,8 @@ import { Image, StyleSheet, View } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import appLogo from "@assets/app-logo.png";
 import { Text } from "@/components/ui/Text";
-import {
-  GREEN_DARK,
-  MUTED_TEXT,
-  RING_GRAD_END,
-  RING_GRAD_START,
-  RING_TRACK,
-  formatSteps,
-} from "./stepsConstants";
+import { formatDistanceKm, formatSteps } from "@/utils/stepsUtils";
+import { GREEN_DARK, MUTED_TEXT, RING_GRAD_END, RING_GRAD_START, RING_TRACK } from "./stepsConstants";
 
 interface LiveActivityPreviewProps {
   todaySteps: number;
@@ -20,15 +14,13 @@ interface LiveActivityPreviewProps {
 const RING_RADIUS = 30;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
-const STEP_LENGTH_METERS = 0.76;
-
 const LiveActivityPreview: React.FC<LiveActivityPreviewProps> = ({ todaySteps, dailyGoal }) => {
   const rawProgress = dailyGoal > 0 ? todaySteps / dailyGoal : 0;
   const ringProgress = Math.min(rawProgress, 1);
   const offset = RING_CIRCUMFERENCE * (1 - ringProgress);
   const percent = Math.round(rawProgress * 100);
   const goalReached = rawProgress >= 1;
-  const distanceKm = ((todaySteps * STEP_LENGTH_METERS) / 1000).toFixed(1);
+  const distanceKm = formatDistanceKm(todaySteps, 1);
 
   return (
     <View style={styles.wrapper}>
