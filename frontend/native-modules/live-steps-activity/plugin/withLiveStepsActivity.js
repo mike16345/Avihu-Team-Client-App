@@ -172,7 +172,10 @@ const withAndroidPackageRegistration = (config) =>
       if (applyPattern.test(src)) {
         src = src.replace(applyPattern, "$1\n            add(LiveStepsPackage())");
       } else if (src.includes("val packages = PackageList(this).packages")) {
-        src = src.replace("return packages", "packages.add(LiveStepsPackage())\n            return packages");
+        src = src.replace(
+          "return packages",
+          "packages.add(LiveStepsPackage())\n            return packages"
+        );
       } else {
         // Fallback: Java-style return list
         src = src.replace(
