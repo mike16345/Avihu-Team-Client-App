@@ -10,6 +10,7 @@ import {
   PRIMARY_DARK,
   RED_DARK,
 } from "./stepsConstants";
+import { IS_IOS } from "@/constants/Constants";
 
 interface WeeklyBalanceRowProps {
   balance: number;
@@ -17,9 +18,9 @@ interface WeeklyBalanceRowProps {
 
 const formatBalance = (balance: number) => {
   if (balance === 0) return "בדיוק על המסלול";
-  if (balance > 0) return `+${formatSteps(balance)}`;
+  if (balance > 0) return IS_IOS ? `+${formatSteps(balance)}` : `${formatSteps(balance)}+`;
 
-  return `-${formatSteps(Math.abs(balance))}`;
+  return IS_IOS ? `-${formatSteps(Math.abs(balance))}` : `${formatSteps(Math.abs(balance))}-`;
 };
 
 const getBalanceColor = (balance: number) => {
@@ -40,7 +41,7 @@ const WeeklyBalanceRow: React.FC<WeeklyBalanceRowProps> = ({ balance }) => {
       </Text>
       <View style={styles.valueGroup}>
         {balance !== 0 && (
-          <Text fontSize={12} style={[styles.unit, styles.unitSpacing]}>
+          <Text fontSize={12} style={[styles.unit]}>
             צעדים
           </Text>
         )}
@@ -65,13 +66,11 @@ const styles = StyleSheet.create({
   },
   valueGroup: {
     flexDirection: "row",
+    gap: 6,
     alignItems: "baseline",
   },
   unit: {
     color: MUTED_TEXT,
-  },
-  unitSpacing: {
-    marginRight: 6,
   },
   heading: {
     color: MUTED_TEXT_SOFT,

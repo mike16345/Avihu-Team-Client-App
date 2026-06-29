@@ -32,7 +32,7 @@ const WeeklyStepsChartHeader: React.FC<WeeklyStepsChartHeaderProps> = ({
           hitSlop={8}
           disabled={!canGoNextWeek}
           onPress={onNextWeek}
-          style={[styles.weekNavButton, !canGoNextWeek && styles.weekNavButtonDisabled]}
+          style={[!canGoNextWeek && styles.weekNavButtonDisabled]}
         >
           <Icon
             name="chevronLeftSoft"
@@ -46,7 +46,7 @@ const WeeklyStepsChartHeader: React.FC<WeeklyStepsChartHeaderProps> = ({
           hitSlop={8}
           disabled={!canGoPreviousWeek}
           onPress={onPreviousWeek}
-          style={[styles.weekNavButton, !canGoPreviousWeek && styles.weekNavButtonDisabled]}
+          style={[!canGoPreviousWeek && styles.weekNavButtonDisabled]}
         >
           <Icon
             name="chevronRightSoft"
@@ -93,14 +93,7 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     gap: 6,
   },
-  weekNavButton: {
-    alignItems: "center",
-    backgroundColor: "rgba(7,39,35,0.06)",
-    borderRadius: 999,
-    height: 30,
-    justifyContent: "center",
-    width: 30,
-  },
+
   weekNavButtonDisabled: {
     opacity: 0.35,
   },
