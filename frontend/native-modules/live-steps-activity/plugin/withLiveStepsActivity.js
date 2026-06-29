@@ -47,10 +47,22 @@ function copyDir(from, to) {
 }
 
 function patchAndroidSource(filePath, appPackage, liveStepsPackage) {
-  let body = fs.readFileSync(filePath, "utf8");
-  body = body.replace(/^package\s+[\w.]+/m, `package ${liveStepsPackage}`);
-  body = body.replace(/import\s+[\w.]+\.R/m, `import ${appPackage}.R`);
-  fs.writeFileSync(filePath, body);
+  const lines = fs.readFileSync(filePath, "utf8").split(/\r?\n/);
+  const nextLines = lines.map((line) => {
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith("package ")) {
+      return `package ${liveStepsPackage}`;
+    }
+
+    if (/^import\s+[\w.]+\.R$/.test(trimmed)) {
+      return `import ${appPackage}.R`;
+    }
+
+    return line;
+  });
+
+  fs.writeFileSync(filePath, nextLines.join("\n"));
 }
 
 // ─── iOS: Info.plist — flip Live Activities on ───────────────────────────
@@ -155,10 +167,12 @@ const withAndroidPackageRegistration = (config) =>
 
     if (!src.includes("LiveStepsPackage()")) {
       // Most modern Expo templates use: PackageList(this).packages.apply { ... }
-      // Try the .apply { } pattern first
+      // Try the .apply { } pattern first.
       const applyPattern = /(PackageList\(this\)\.packages\.apply\s*\{)/;
       if (applyPattern.test(src)) {
         src = src.replace(applyPattern, "$1\n            add(LiveStepsPackage())");
+      } else if (src.includes("val packages = PackageList(this).packages")) {
+        src = src.replace("return packages", "packages.add(LiveStepsPackage())\n            return packages");
       } else {
         // Fallback: Java-style return list
         src = src.replace(
