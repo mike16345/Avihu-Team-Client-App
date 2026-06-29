@@ -34,7 +34,8 @@ const useLiveStepsActivity = (): UseLiveStepsActivityResult => {
 
   useEffect(() => {
     if (!isAvailable) return;
-    RNLiveSteps!.areActivitiesEnabled()
+    RNLiveSteps!
+      .areActivitiesEnabled()
       .then(setIsEnabled)
       .catch(() => setIsEnabled(false));
   }, [isAvailable]);

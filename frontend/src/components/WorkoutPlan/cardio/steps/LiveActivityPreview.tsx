@@ -4,7 +4,13 @@ import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import appLogo from "@assets/app-logo.png";
 import { Text } from "@/components/ui/Text";
 import { formatDistanceKm, formatSteps } from "@/utils/stepsUtils";
-import { GREEN_DARK, MUTED_TEXT, RING_GRAD_END, RING_GRAD_START, RING_TRACK } from "./stepsConstants";
+import {
+  GREEN_DARK,
+  MUTED_TEXT,
+  RING_GRAD_END,
+  RING_GRAD_START,
+  RING_TRACK,
+} from "./stepsConstants";
 
 interface LiveActivityPreviewProps {
   todaySteps: number;

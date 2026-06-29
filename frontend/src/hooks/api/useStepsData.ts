@@ -183,7 +183,9 @@ const applyTodayStepsFallback = (
   data.weeks = data.weeks.map((weekDatum) => ({
     ...weekDatum,
     days: weekDatum.days.map((day) =>
-      day.date === todayKey ? { ...day, steps: fallbackTodaySteps, calories: fallbackCalories } : day
+      day.date === todayKey
+        ? { ...day, steps: fallbackTodaySteps, calories: fallbackCalories }
+        : day
     ),
   }));
 };
