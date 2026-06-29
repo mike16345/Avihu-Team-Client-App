@@ -10,8 +10,8 @@ const path = require("path");
 
 const PLUGIN_DIR = __dirname;
 const NATIVE_ROOT = path.join(PLUGIN_DIR, "..");
-const IOS_SRC = path.join(NATIVE_ROOT, "ios");
-const ANDROID_SRC = path.join(NATIVE_ROOT, "android");
+const IOS_SRC = path.join(NATIVE_ROOT, "ios-template");
+const ANDROID_SRC = path.join(NATIVE_ROOT, "android-template");
 
 const LIVE_STEPS_PACKAGE_SUFFIX = "livesteps";
 

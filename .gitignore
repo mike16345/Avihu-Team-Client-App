@@ -52,5 +52,5 @@ yarn-error.*
 
 credentials.json
 
-android
-ios
+/android
+/ios

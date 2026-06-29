@@ -19,10 +19,10 @@ web-build/
 # Keep local native module templates in the upload context.
 !/native-modules/
 !/native-modules/live-steps-activity/
-!/native-modules/live-steps-activity/android/
-!/native-modules/live-steps-activity/android/**
-!/native-modules/live-steps-activity/ios/
-!/native-modules/live-steps-activity/ios/**
+!/native-modules/live-steps-activity/android-template/
+!/native-modules/live-steps-activity/android-template/**
+!/native-modules/live-steps-activity/ios-template/
+!/native-modules/live-steps-activity/ios-template/**
 !/native-modules/live-steps-activity/plugin/
 !/native-modules/live-steps-activity/plugin/**
 
