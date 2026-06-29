@@ -22,7 +22,7 @@ const DayDetailPanel: React.FC<DayDetailPanelProps> = ({ detail, detailValueFont
         יום {dayName}
       </Text>
       <View style={styles.row}>
-        <View style={styles.startColumn}>
+        <View>
           <Text fontVariant="bold" fontSize={detailValueFont} style={colors.textPrimary}>
             {stepsLabel}
           </Text>
@@ -30,7 +30,7 @@ const DayDetailPanel: React.FC<DayDetailPanelProps> = ({ detail, detailValueFont
             צעדים
           </Text>
         </View>
-        <View style={styles.endColumn}>
+        <View>
           <Text fontVariant="bold" fontSize={detailValueFont} style={colors.textPrimary}>
             {caloriesLabel}
           </Text>
@@ -56,12 +56,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-  startColumn: {
-    alignItems: "flex-end",
-  },
-  endColumn: {
-    alignItems: "flex-start",
   },
   unit: {
     color: MUTED_TEXT,
