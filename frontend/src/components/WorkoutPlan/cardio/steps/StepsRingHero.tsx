@@ -23,7 +23,6 @@ const StepsRingHero: React.FC<StepsRingHeroProps> = ({
   ringSize,
   ringValueFont,
   titleFont,
-  ringTextGap,
 }) => {
   const { colors, layout } = useStyles();
   const progress = useSharedValue(0);
@@ -46,7 +45,7 @@ const StepsRingHero: React.FC<StepsRingHeroProps> = ({
   );
 
   return (
-    <View style={[layout.flexRow, layout.itemsCenter, layout.justifyCenter, { gap: ringTextGap }]}>
+    <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
       <View style={styles.titleColumn}>
         <Text
           fontVariant="bold"
@@ -73,7 +72,6 @@ const StepsRingHero: React.FC<StepsRingHeroProps> = ({
 
 const styles = StyleSheet.create({
   titleColumn: {
-    flexShrink: 1,
     alignItems: "flex-end",
   },
   title: {
