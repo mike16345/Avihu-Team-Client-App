@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
   },
   unit: {
     color: MUTED_TEXT,
-    textAlign: "center",
   },
 });
 

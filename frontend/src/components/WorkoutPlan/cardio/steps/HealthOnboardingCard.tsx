@@ -8,8 +8,8 @@ import { HealthStatus, MUTED_TEXT_SOFT, SURFACE_WHITE } from "./stepsConstants";
 const isIOS = Platform.OS === "ios";
 const PLATFORM_HEALTH_NAME = isIOS ? "אפליקציית הבריאות של אפל" : "Health Connect של גוגל";
 const PLATFORM_SETTINGS_HINT = isIOS
-  ? "הגדרות -> פרטיות ואבטחה -> בריאות"
-  : "הגדרות -> אפליקציות -> הרשאות -> Health Connect";
+  ? "הגדרות > פרטיות ואבטחה > בריאות"
+  : "הגדרות > אפליקציות > הרשאות > Health Connect";
 
 interface HealthOnboardingCardProps {
   status: Exclude<HealthStatus, "granted">;
@@ -79,7 +79,7 @@ const HealthOnboardingCard: React.FC<HealthOnboardingCardProps> = ({
         {title}
       </Text>
 
-      <Text fontSize={13} style={styles.description}>
+      <Text fontSize={14} style={styles.description}>
         {description}
       </Text>
 

@@ -33,7 +33,9 @@ interface StepsCardioContainerProps {
 
 const computeWeeklyBalance = (weekData: DayData[], goalsByDay: number[], todayIndex: number) => {
   const daysElapsed = todayIndex + 1;
-  const actualSoFar = weekData.slice(0, daysElapsed).reduce((sum, day) => sum + (day.steps ?? 0), 0);
+  const actualSoFar = weekData
+    .slice(0, daysElapsed)
+    .reduce((sum, day) => sum + (day.steps ?? 0), 0);
   const expectedSoFar = goalsByDay.slice(0, daysElapsed).reduce((sum, goal) => sum + goal, 0);
 
   return actualSoFar - expectedSoFar;
@@ -58,7 +60,11 @@ const getEffectiveStatus = (
 
 const getSelectedWeek = (
   useNativeData: boolean,
-  weeks: Array<{ startDate: string; endDate: string; days: Array<{ steps: number; calories: number }> }>,
+  weeks: Array<{
+    startDate: string;
+    endDate: string;
+    days: Array<{ steps: number; calories: number }>;
+  }>,
   selectedWeekIndex: number,
   latestWeekIndex: number
 ) => {
