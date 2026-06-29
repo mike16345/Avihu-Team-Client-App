@@ -8,6 +8,7 @@ import useStepsNotifications, {
 import useLiveStepsActivity from "@/hooks/api/useLiveStepsActivity";
 import { useStepsProgressApi } from "@/hooks/api/useStepsProgressApi";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
+import { useUserStore } from "@/store/userStore";
 import { buildGoalsByDay, getLocalDateKey, stepsToDistanceKm } from "@/utils/stepsUtils";
 
 interface StepsTrackingContextValue {
@@ -20,6 +21,7 @@ const StepsTrackingContext = createContext<StepsTrackingContextValue | null>(nul
 
 const HEALTH_REFRESH_INTERVAL_MS = 15 * 1000;
 const SERVER_SYNC_INTERVAL_MS = 15 * 60 * 1000;
+const STEPS_MILESTONE_PLAN_TYPE = "חיטוב";
 
 export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const steps = useStepsData();
@@ -34,6 +36,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
   } = useLiveStepsActivity();
   const { syncStepsProgress } = useStepsProgressApi();
   const { data: workoutPlan } = useWorkoutPlanQuery();
+  const planType = useUserStore((state) => state.currentUser?.planType);
 
   const lastServerSyncAtRef = useRef(0);
   const lastServerSyncPayloadRef = useRef<string | null>(null);
@@ -52,6 +55,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
 
   const canUseNativeSteps = steps.isNativeAvailable && steps.status === "granted";
   const isStepsTrackingEnabled = workoutPlan?.cardio?.type === "steps";
+  const shouldSendMilestoneNotifications = planType === STEPS_MILESTONE_PLAN_TYPE;
 
   const syncCurrentSteps = useCallback(
     async (force = false) => {
@@ -171,15 +175,21 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
   ]);
 
   useEffect(() => {
+    void notifications.cancelLegacyDaily();
+  }, [notifications]);
+
+  useEffect(() => {
     if (!isStepsTrackingEnabled || !canUseNativeSteps) return;
     if (!steps.syncedAt || steps.todaySteps <= 0) return;
+    if (!shouldSendMilestoneNotifications) return;
 
-    notifications.scheduleDaily(steps.todaySteps, dailyGoal);
+    notifications.notifyMilestone(steps.todaySteps, dailyGoal);
   }, [
     canUseNativeSteps,
     dailyGoal,
     isStepsTrackingEnabled,
-    notifications.scheduleDaily,
+    notifications.notifyMilestone,
+    shouldSendMilestoneNotifications,
     steps.syncedAt,
     steps.todaySteps,
   ]);
