@@ -282,7 +282,6 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
         onPreviousWeek={handlePreviousWeek}
         onNextWeek={handleNextWeek}
       />
-
     </ScrollView>
   );
 };

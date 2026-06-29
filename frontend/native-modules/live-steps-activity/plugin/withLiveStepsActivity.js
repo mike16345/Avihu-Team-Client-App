@@ -86,22 +86,18 @@ const withIOSBridgeFiles = (config) =>
     "ios",
     async (cfg) => {
       const root = cfg.modRequest.platformProjectRoot;
-      const candidates = fs
-        .readdirSync(root)
-        .filter((d) => {
-          const full = path.join(root, d);
-          return (
-            fs.statSync(full).isDirectory() &&
-            !d.startsWith(".") &&
-            d !== "Pods" &&
-            d !== "build"
-          );
-        });
+      const candidates = fs.readdirSync(root).filter((d) => {
+        const full = path.join(root, d);
+        return (
+          fs.statSync(full).isDirectory() && !d.startsWith(".") && d !== "Pods" && d !== "build"
+        );
+      });
       // Main app folder = first one that contains an Info.plist or AppDelegate
-      const appDir = candidates.find((d) => {
-        const inside = fs.readdirSync(path.join(root, d));
-        return inside.some((f) => /AppDelegate|Info\.plist/.test(f));
-      }) || candidates[0];
+      const appDir =
+        candidates.find((d) => {
+          const inside = fs.readdirSync(path.join(root, d));
+          return inside.some((f) => /AppDelegate|Info\.plist/.test(f));
+        }) || candidates[0];
       if (!appDir) return cfg;
 
       const target = path.join(root, appDir);
@@ -125,9 +121,18 @@ const withAndroidSources = (config) =>
       const liveStepsPackage = getLiveStepsPackage(cfg);
       const javaDir = path.join(root, getAndroidJavaSubpath(cfg));
 
-      copyFile(path.join(ANDROID_SRC, "LiveStepsService.kt"), path.join(javaDir, "LiveStepsService.kt"));
-      copyFile(path.join(ANDROID_SRC, "LiveStepsModule.kt"), path.join(javaDir, "LiveStepsModule.kt"));
-      copyFile(path.join(ANDROID_SRC, "LiveStepsPackage.kt"), path.join(javaDir, "LiveStepsPackage.kt"));
+      copyFile(
+        path.join(ANDROID_SRC, "LiveStepsService.kt"),
+        path.join(javaDir, "LiveStepsService.kt")
+      );
+      copyFile(
+        path.join(ANDROID_SRC, "LiveStepsModule.kt"),
+        path.join(javaDir, "LiveStepsModule.kt")
+      );
+      copyFile(
+        path.join(ANDROID_SRC, "LiveStepsPackage.kt"),
+        path.join(javaDir, "LiveStepsPackage.kt")
+      );
       patchAndroidSource(path.join(javaDir, "LiveStepsService.kt"), appPackage, liveStepsPackage);
       patchAndroidSource(path.join(javaDir, "LiveStepsModule.kt"), appPackage, liveStepsPackage);
       patchAndroidSource(path.join(javaDir, "LiveStepsPackage.kt"), appPackage, liveStepsPackage);
@@ -145,10 +150,7 @@ const withAndroidPackageRegistration = (config) =>
 
     if (!src.includes(importLine)) {
       // Insert after the package declaration
-      src = src.replace(
-        /(package\s+[\w.]+\s*\n)/,
-        `$1\n${importLine}\n`
-      );
+      src = src.replace(/(package\s+[\w.]+\s*\n)/, `$1\n${importLine}\n`);
     }
 
     if (!src.includes("LiveStepsPackage()")) {
@@ -183,9 +185,7 @@ const withAndroidManifestEntries = (config) =>
       "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
     ];
     for (const name of wanted) {
-      const exists = manifest["uses-permission"].some(
-        (p) => p.$ && p.$["android:name"] === name
-      );
+      const exists = manifest["uses-permission"].some((p) => p.$ && p.$["android:name"] === name);
       if (!exists) {
         manifest["uses-permission"].push({ $: { "android:name": name } });
       }

@@ -21,12 +21,8 @@ const WorkoutPlanStack = () => {
           component={stack.component}
         />
       ))}
-      <Stack.Screen
-        name="RecordExercise"
-        component={RecordExercise}
-      />
+      <Stack.Screen name="RecordExercise" component={RecordExercise} />
     </Stack.Navigator>
-
   );
 };
 
