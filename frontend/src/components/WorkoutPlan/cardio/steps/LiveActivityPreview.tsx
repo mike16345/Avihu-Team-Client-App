@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   stepsLine: {
-    flexDirection: "row-reverse",
+    flexDirection: "row",
     alignItems: "baseline",
     flexWrap: "wrap",
     justifyContent: "flex-end",

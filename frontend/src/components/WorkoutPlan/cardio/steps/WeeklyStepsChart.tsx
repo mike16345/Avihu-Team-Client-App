@@ -151,29 +151,14 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
 
   return (
     <View style={[colors.backgroundSurface, common.roundedXl, spacing.pdMd, frameShadow]}>
-      <View
-        style={[layout.flexRowReverse, layout.justifyBetween, layout.itemsCenter, styles.headerRow]}
-      >
-        <View style={styles.headerInfo}>
-          <Text fontSize={12} fontVariant="semibold" style={styles.weeklyTotal}>
-            סה״כ השבוע: {formatSteps(weeklyGoalTotal)} צעדים
-          </Text>
-          {weekRangeLabel && (
-            <Text fontSize={10} fontVariant="semibold" style={styles.weekRange}>
-              {weekRangeLabel}
-            </Text>
-          )}
-          <Text fontSize={11} fontVariant="semibold" style={styles.weeklyCompleted}>
-            נעשו: {formatSteps(totalSteps)} צעדים
-          </Text>
-        </View>
+      <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter, styles.headerRow]}>
         <View style={styles.weekNavRow}>
           <TouchableOpacity
             activeOpacity={0.6}
             hitSlop={8}
             disabled={!canGoNextWeek}
             onPress={onNextWeek ?? onPressHistory}
-            style={[styles.weekNavButton, !canGoNextWeek && styles.weekNavButtonDisabled]}
+            style={[!canGoNextWeek && styles.weekNavButtonDisabled]}
           >
             <Icon
               name="chevronLeftSoft"
@@ -187,7 +172,7 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
             hitSlop={8}
             disabled={!canGoPreviousWeek}
             onPress={onPreviousWeek}
-            style={[styles.weekNavButton, !canGoPreviousWeek && styles.weekNavButtonDisabled]}
+            style={[!canGoPreviousWeek && styles.weekNavButtonDisabled]}
           >
             <Icon
               name="chevronRightSoft"
@@ -196,6 +181,19 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
               color={canGoPreviousWeek ? PRIMARY_DARK : MUTED_TEXT_FAINT}
             />
           </TouchableOpacity>
+        </View>
+        <View style={styles.headerInfo}>
+          <Text fontSize={12} fontVariant="semibold" style={styles.weeklyTotal}>
+            סה״כ השבוע: {formatSteps(weeklyGoalTotal)} צעדים
+          </Text>
+          {weekRangeLabel && (
+            <Text fontSize={10} fontVariant="semibold" style={styles.weekRange}>
+              {weekRangeLabel}
+            </Text>
+          )}
+          <Text fontSize={11} fontVariant="semibold" style={styles.weeklyCompleted}>
+            נעשו: {formatSteps(totalSteps)} צעדים
+          </Text>
         </View>
       </View>
 
