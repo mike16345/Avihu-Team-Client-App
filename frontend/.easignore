@@ -1,0 +1,45 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Native
+/android
+/ios
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Keep local native module templates in the upload context.
+!/native-modules/
+!/native-modules/live-steps-activity/
+!/native-modules/live-steps-activity/android/
+!/native-modules/live-steps-activity/android/**
+!/native-modules/live-steps-activity/ios/
+!/native-modules/live-steps-activity/ios/**
+!/native-modules/live-steps-activity/plugin/
+!/native-modules/live-steps-activity/plugin/**
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo

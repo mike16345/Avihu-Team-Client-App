@@ -28,6 +28,9 @@ function getAndroidJavaSubpath(config) {
 }
 
 function copyFile(from, to) {
+  if (!fs.existsSync(from)) {
+    throw new Error(`Live steps native template is missing: ${from}`);
+  }
   fs.mkdirSync(path.dirname(to), { recursive: true });
   fs.copyFileSync(from, to);
 }
