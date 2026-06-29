@@ -17,34 +17,57 @@ interface HealthOnboardingCardProps {
   onPressConnect: () => void;
 }
 
+interface HealthCardCopy {
+  title: string;
+  description: string;
+  ctaLabel: string;
+  isUnavailable: boolean;
+}
+
+const getHealthCardCopy = (status: Exclude<HealthStatus, "granted">): HealthCardCopy => {
+  if (status === "unavailable") {
+    return {
+      title: "חיבור הצעדים לא זמין בגרסה הזו",
+      description:
+        "צריך להתקין גרסת EAS חדשה שכוללת את חיבור הבריאות המקורי. אי אפשר לתקן את זה דרך ההגדרות.",
+      ctaLabel: "לא זמין בגרסה זו",
+      isUnavailable: true,
+    };
+  }
+
+  if (status === "needsPermission") {
+    return {
+      title: "חבר את הצעדים שלך",
+      description: `כדי לעקוב אחרי הצעדים שלך,\nנתחבר ל${PLATFORM_HEALTH_NAME}. הסנכרון יהיה אוטומטי.`,
+      ctaLabel: `חבר ל${PLATFORM_HEALTH_NAME}`,
+      isUnavailable: false,
+    };
+  }
+
+  if (isIOS) {
+    return {
+      title: `החיבור ל${PLATFORM_HEALTH_NAME} לא הופעל`,
+      description: `ללא חיבור, הצעדים לא יסונכרנו אוטומטית.\nניתן לאשר ידנית: ${PLATFORM_SETTINGS_HINT}`,
+      ctaLabel: "פתח הגדרות",
+      isUnavailable: false,
+    };
+  }
+
+  return {
+    title: `החיבור ל${PLATFORM_HEALTH_NAME} לא הופעל`,
+    description: `ללא חיבור, הצעדים לא יסונכרנו אוטומטית.\nנסה שוב לאשר גישה ל${PLATFORM_HEALTH_NAME}.`,
+    ctaLabel: `נסה שוב ל${PLATFORM_HEALTH_NAME}`,
+    isUnavailable: false,
+  };
+};
+
 const HealthOnboardingCard: React.FC<HealthOnboardingCardProps> = ({
   status,
   titleFont,
   onPressConnect,
 }) => {
   const { colors, layout, spacing } = useStyles();
-
-  const isNeedsPermission = status === "needsPermission";
-  const isUnavailable = status === "unavailable";
-  const title = isUnavailable
-    ? "חיבור הצעדים לא זמין בגרסה הזו"
-    : isNeedsPermission
-      ? "חבר את הצעדים שלך"
-      : `החיבור ל${PLATFORM_HEALTH_NAME} לא הופעל`;
-  const description = isUnavailable
-    ? "צריך להתקין גרסת EAS חדשה שכוללת את חיבור הבריאות המקורי. אי אפשר לתקן את זה דרך ההגדרות."
-    : isNeedsPermission
-      ? `כדי לעקוב אחרי הצעדים שלך,\nנתחבר ל${PLATFORM_HEALTH_NAME}. הסנכרון יהיה אוטומטי.`
-      : isIOS
-        ? `ללא חיבור, הצעדים לא יסונכרנו אוטומטית.\nניתן לאשר ידנית: ${PLATFORM_SETTINGS_HINT}`
-        : `ללא חיבור, הצעדים לא יסונכרנו אוטומטית.\nנסה שוב לאשר גישה ל${PLATFORM_HEALTH_NAME}.`;
-  const ctaLabel = isUnavailable
-    ? "לא זמין בגרסה זו"
-    : isNeedsPermission
-      ? `חבר ל${PLATFORM_HEALTH_NAME}`
-      : isIOS
-        ? "פתח הגדרות"
-        : `נסה שוב ל${PLATFORM_HEALTH_NAME}`;
+  const { ctaLabel, description, isUnavailable, title } = getHealthCardCopy(status);
 
   return (
     <View style={[layout.itemsCenter, spacing.pdSm]}>
