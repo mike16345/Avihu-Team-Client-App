@@ -8,18 +8,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layoutDirection="rtl"
+        android:layoutDirection="ltr"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingLeft="16dp"
-        android:paddingTop="16dp"
+        android:paddingTop="18dp"
         android:paddingRight="44dp"
-        android:paddingBottom="16dp">
+        android:paddingBottom="18dp">
 
         <FrameLayout
-            android:layout_width="76dp"
-            android:layout_height="76dp"
-            android:layout_marginStart="16dp">
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginEnd="16dp">
 
             <ProgressBar
                 android:id="@+id/ringProgressExpanded"
@@ -35,7 +35,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textColor="#1A1D24"
-                android:textSize="17sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 tools:text="29%" />
         </FrameLayout>
@@ -44,28 +44,45 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="end"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/expandedSummary"
-                android:layout_width="wrap_content"
+                android:id="@+id/expandedTitle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
+                android:gravity="end"
                 android:maxLines="1"
-                android:textColor="#1A1D24"
-                android:textSize="19sp"
+                android:textAlignment="viewEnd"
+                android:textColor="#6E837C"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                tools:text="3,540 / מתוך 12,000 צעדים שנעשו" />
+                tools:text="Weekly steps" />
+
+            <TextView
+                android:id="@+id/expandedSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:maxLines="1"
+                android:textAlignment="viewEnd"
+                android:textColor="#1A1D24"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                tools:text="3,540 / 12,000" />
 
             <TextView
                 android:id="@+id/distance"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:gravity="end"
+                android:textAlignment="viewEnd"
                 android:textColor="#6E837C"
-                android:textSize="15sp"
-                tools:text="מרחק קילומטר: 2.7" />
+                android:textSize="14sp"
+                tools:text="Distance km: 2.7" />
         </LinearLayout>
     </LinearLayout>
 

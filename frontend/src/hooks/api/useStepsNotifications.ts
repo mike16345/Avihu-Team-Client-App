@@ -4,6 +4,8 @@ import { formatSteps, getLocalDateKey } from "@/utils/stepsUtils";
 
 const LEGACY_STEPS_NOTIFICATION_IDENTIFIER = "avihu-team-daily-steps";
 const MILESTONE_STORAGE_KEY = "steps-milestone-notifications";
+const RTL_EMBED = "\u202B";
+const RTL_RESET = "\u202C";
 
 type StepsMilestoneId = "quarter" | "half" | "twoThirds" | "complete";
 
@@ -24,30 +26,30 @@ const MILESTONES: StepsMilestone[] = [
   {
     id: "quarter",
     level: 1,
-    emoji: "👣",
+    emoji: "\uD83D\uDC63",
     shouldTrigger: (ratio) => ratio >= 0.25,
-    buildBody: () => "התחלה טובה, ממשיכים לזוז.",
+    buildBody: () => "\u05D4\u05EA\u05D7\u05DC\u05D4 \u05D8\u05D5\u05D1\u05D4, \u05DE\u05DE\u05E9\u05D9\u05DB\u05D9\u05DD \u05DC\u05D6\u05D5\u05D6.",
   },
   {
     id: "half",
     level: 2,
-    emoji: "🚀",
+    emoji: "\uD83D\uDE80",
     shouldTrigger: (ratio) => ratio > 0.5,
-    buildBody: () => "כבר עברת את חצי הדרך.",
+    buildBody: () => "\u05DB\u05D1\u05E8 \u05E2\u05D1\u05E8\u05EA \u05D0\u05EA \u05D7\u05E6\u05D9 \u05D4\u05D3\u05E8\u05DA.",
   },
   {
     id: "twoThirds",
     level: 3,
-    emoji: "🔥",
+    emoji: "\uD83D\uDD25",
     shouldTrigger: (ratio) => ratio >= 2 / 3,
-    buildBody: () => "עוד קצת ואתה סוגר את היעד.",
+    buildBody: () => "\u05E2\u05D5\u05D3 \u05E7\u05E6\u05EA \u05D5\u05D0\u05EA\u05D4 \u05E1\u05D5\u05D2\u05E8 \u05D0\u05EA \u05D4\u05D9\u05E2\u05D3.",
   },
   {
     id: "complete",
     level: 4,
-    emoji: "🏆",
+    emoji: "\uD83C\uDFC6",
     shouldTrigger: (ratio) => ratio >= 1,
-    buildBody: () => "יעד הושלם להיום.",
+    buildBody: () => "\u05D9\u05E2\u05D3 \u05D4\u05D5\u05E9\u05DC\u05DD \u05DC\u05D4\u05D9\u05D5\u05DD.",
   },
 ];
 
@@ -58,6 +60,8 @@ const loadNotifications = () => {
     return null;
   }
 };
+
+const toRtlNotificationText = (text: string) => `${RTL_EMBED}${text}${RTL_RESET}`;
 
 const getReachedMilestone = (todaySteps: number, dailyGoal: number): StepsMilestone | null => {
   if (dailyGoal <= 0 || todaySteps <= 0) {
@@ -77,7 +81,9 @@ const getReachedMilestone = (todaySteps: number, dailyGoal: number): StepsMilest
 };
 
 const buildMilestoneTitle = (todaySteps: number, dailyGoal: number, emoji: string) =>
-  `${formatSteps(todaySteps)} / ${formatSteps(dailyGoal)} צעדים ${emoji}`;
+  toRtlNotificationText(
+    `${formatSteps(todaySteps)} / ${formatSteps(dailyGoal)} \u05E6\u05E2\u05D3\u05D9\u05DD ${emoji}`
+  );
 
 export interface UseStepsNotificationsResult {
   isAvailable: boolean;
@@ -190,7 +196,7 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
         await Notifications.scheduleNotificationAsync({
           content: {
             title: buildMilestoneTitle(todaySteps, dailyGoal, milestone.emoji),
-            body: milestone.buildBody(),
+            body: toRtlNotificationText(milestone.buildBody()),
             data: {
               type: "steps-milestone",
               milestone: milestone.id,

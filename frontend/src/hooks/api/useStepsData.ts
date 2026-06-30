@@ -11,6 +11,22 @@ import {
 import { getLocalDateKey, stepsToCalories } from "@/utils/stepsUtils";
 
 export type StepsPermissionStatus = "needsPermission" | "denied" | "granted";
+type StepsByDay = Record<string, number>;
+
+interface NativeAndroidModule {
+  aggregateGroupByPeriod: typeof aggregateHealthConnectGroupByPeriod;
+  getGrantedPermissions: typeof getHealthConnectGrantedPermissions;
+  initialize: typeof initializeHealthConnect;
+  readRecords: typeof readHealthConnectRecords;
+  requestPermission: typeof requestHealthConnectPermission;
+}
+
+interface StepsReadResult {
+  steps: number;
+  calories: number;
+  week: StepsDayDatum[];
+  weeks: StepsWeekDatum[];
+}
 
 export interface StepsDayDatum {
   date: string;
@@ -60,6 +76,7 @@ const loadNativeIOS = () => {
       );
       return null;
     }
+
     return AppleHealthKit;
   } catch (err) {
     console.error("[steps] require(react-native-health) failed:", err);
@@ -67,56 +84,69 @@ const loadNativeIOS = () => {
   }
 };
 
-const loadNativeAndroid = () => ({
-  aggregateGroupByPeriod: aggregateHealthConnectGroupByPeriod,
-  getGrantedPermissions: getHealthConnectGrantedPermissions,
-  initialize: initializeHealthConnect,
-  readRecords: readHealthConnectRecords,
-  requestPermission: requestHealthConnectPermission,
-});
+const loadNativeAndroid = () =>
+  ({
+    aggregateGroupByPeriod: aggregateHealthConnectGroupByPeriod,
+    getGrantedPermissions: getHealthConnectGrantedPermissions,
+    initialize: initializeHealthConnect,
+    readRecords: readHealthConnectRecords,
+    requestPermission: requestHealthConnectPermission,
+  }) satisfies NativeAndroidModule;
 
-const startOfDay = (d: Date) => {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  return x;
+const startOfDay = (date: Date) => {
+  const normalized = new Date(date);
+  normalized.setHours(0, 0, 0, 0);
+  return normalized;
 };
 
 const dayKey = (date: Date) => getLocalDateKey(date);
 
-const getWeekDates = (today: Date): Date[] => {
-  const todayDow = today.getDay();
-  const sunday = startOfDay(today);
-  sunday.setDate(sunday.getDate() - todayDow);
-  const out: Date[] = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(sunday);
-    d.setDate(d.getDate() + i);
-    out.push(d);
-  }
-  return out;
+const getWeekDates = (date: Date): Date[] => {
+  const start = startOfDay(date);
+  start.setDate(start.getDate() - start.getDay());
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const nextDate = new Date(start);
+    nextDate.setDate(start.getDate() + index);
+    return nextDate;
+  });
 };
 
 const getWeekStart = (date: Date) => getWeekDates(date)[0];
 
 const getRecentWeekStarts = (today: Date): Date[] => {
   const currentWeekStart = getWeekStart(today);
-  return Array.from({ length: RECENT_WEEKS_TO_READ }, (_, i) => {
+
+  return Array.from({ length: RECENT_WEEKS_TO_READ }, (_, index) => {
     const weekStart = new Date(currentWeekStart);
-    weekStart.setDate(currentWeekStart.getDate() - (RECENT_WEEKS_TO_READ - 1 - i) * 7);
+    weekStart.setDate(currentWeekStart.getDate() - (RECENT_WEEKS_TO_READ - 1 - index) * 7);
     return weekStart;
   });
 };
 
+const buildDayDatum = (date: Date, todayKey: string, byDay: StepsByDay): StepsDayDatum => {
+  const key = dayKey(date);
+  const isFuture = key > todayKey;
+  const steps = isFuture ? 0 : Math.round(byDay[key] ?? 0);
+
+  return {
+    date: key,
+    steps,
+    calories: stepsToCalories(steps),
+  };
+};
+
 const buildEmptyWeek = (today: Date): StepsDayDatum[] =>
-  getWeekDates(today).map((d) => ({ date: dayKey(d), steps: 0, calories: 0 }));
+  getWeekDates(today).map((date) => ({ date: dayKey(date), steps: 0, calories: 0 }));
 
 const buildEmptyWeeks = (today: Date): StepsWeekDatum[] =>
   getRecentWeekStarts(today).map((weekStart) => {
-    const days = getWeekDates(weekStart).map((d) => ({
-      date: dayKey(d),
+    const days = getWeekDates(weekStart).map((date) => ({
+      date: dayKey(date),
       steps: 0,
       calories: 0,
     }));
+
     return {
       startDate: days[0].date,
       endDate: days[days.length - 1].date,
@@ -124,9 +154,7 @@ const buildEmptyWeeks = (today: Date): StepsWeekDatum[] =>
     };
   });
 
-const buildEmptyResult = (
-  today: Date
-): { steps: number; calories: number; week: StepsDayDatum[]; weeks: StepsWeekDatum[] } => ({
+const buildEmptyResult = (today: Date): StepsReadResult => ({
   steps: 0,
   calories: 0,
   week: buildEmptyWeek(today),
@@ -135,29 +163,23 @@ const buildEmptyResult = (
 
 const buildWeekFromMap = (
   today: Date,
-  byDay: Record<string, number>
+  byDay: StepsByDay
 ): { todaySteps: number; week: StepsDayDatum[] } => {
-  const weekDates = getWeekDates(today);
   const todayKey = dayKey(today);
-  const week: StepsDayDatum[] = weekDates.map((d) => {
-    const k = dayKey(d);
-    const isFuture = k > todayKey;
-    const steps = isFuture ? 0 : Math.round(byDay[k] ?? 0);
-    return { date: k, steps, calories: stepsToCalories(steps) };
-  });
-  const todayDatum = week.find((w) => w.date === todayKey);
-  return { todaySteps: todayDatum?.steps ?? 0, week };
+  const week = getWeekDates(today).map((date) => buildDayDatum(date, todayKey, byDay));
+  const todayDatum = week.find((entry) => entry.date === todayKey);
+
+  return {
+    todaySteps: todayDatum?.steps ?? 0,
+    week,
+  };
 };
 
-const buildWeeksFromMap = (today: Date, byDay: Record<string, number>): StepsWeekDatum[] => {
+const buildWeeksFromMap = (today: Date, byDay: StepsByDay): StepsWeekDatum[] => {
   const todayKey = dayKey(today);
+
   return getRecentWeekStarts(today).map((weekStart) => {
-    const days = getWeekDates(weekStart).map((d) => {
-      const k = dayKey(d);
-      const isFuture = k > todayKey;
-      const steps = isFuture ? 0 : Math.round(byDay[k] ?? 0);
-      return { date: k, steps, calories: stepsToCalories(steps) };
-    });
+    const days = getWeekDates(weekStart).map((date) => buildDayDatum(date, todayKey, byDay));
 
     return {
       startDate: days[0].date,
@@ -167,8 +189,19 @@ const buildWeeksFromMap = (today: Date, byDay: Record<string, number>): StepsWee
   });
 };
 
+const buildResultFromByDay = (today: Date, byDay: StepsByDay): StepsReadResult => {
+  const { todaySteps, week } = buildWeekFromMap(today, byDay);
+
+  return {
+    steps: todaySteps,
+    calories: stepsToCalories(todaySteps),
+    week,
+    weeks: buildWeeksFromMap(today, byDay),
+  };
+};
+
 const applyTodayStepsFallback = (
-  data: { steps: number; calories: number; week: StepsDayDatum[]; weeks: StepsWeekDatum[] },
+  data: StepsReadResult,
   today: Date,
   fallbackTodaySteps: number
 ) => {
@@ -190,18 +223,15 @@ const applyTodayStepsFallback = (
   }));
 };
 
-const readIOS = async (
-  native: any,
-  today: Date
-): Promise<{ steps: number; calories: number; week: StepsDayDatum[]; weeks: StepsWeekDatum[] }> => {
+const readIOS = async (native: any, today: Date): Promise<StepsReadResult> => {
   const AppleHealthKit = native;
+
   return new Promise((resolve) => {
-    const recentWeekStarts = getRecentWeekStarts(today);
-    const firstSunday = recentWeekStarts[0];
+    const firstWeekStart = getRecentWeekStarts(today)[0];
 
     AppleHealthKit.getDailyStepCountSamples(
       {
-        startDate: firstSunday.toISOString(),
+        startDate: firstWeekStart.toISOString(),
         endDate: today.toISOString(),
       },
       (err: any, results: Array<{ startDate: string; value: number }>) => {
@@ -210,23 +240,20 @@ const readIOS = async (
           resolve(buildEmptyResult(today));
           return;
         }
+
         if (!results) {
           resolve(buildEmptyResult(today));
           return;
         }
-        const byDay: Record<string, number> = {};
-        for (const r of results) {
-          const k = dayKey(new Date(r.startDate));
-          byDay[k] = (byDay[k] ?? 0) + r.value;
+
+        const byDay: StepsByDay = {};
+
+        for (const result of results) {
+          const key = dayKey(new Date(result.startDate));
+          byDay[key] = (byDay[key] ?? 0) + result.value;
         }
-        const { todaySteps, week } = buildWeekFromMap(today, byDay);
-        const weeks = buildWeeksFromMap(today, byDay);
-        resolve({
-          steps: todaySteps,
-          calories: stepsToCalories(todaySteps),
-          week,
-          weeks,
-        });
+
+        resolve(buildResultFromByDay(today, byDay));
       }
     );
   });
@@ -254,18 +281,14 @@ const readIOSTodaySteps = async (native: any, today: Date): Promise<number | nul
   });
 };
 
-const readAndroid = async (
-  native: any,
-  today: Date
-): Promise<{ steps: number; calories: number; week: StepsDayDatum[]; weeks: StepsWeekDatum[] }> => {
-  const recentWeekStarts = getRecentWeekStarts(today);
-  const firstSunday = recentWeekStarts[0];
+const readAndroid = async (native: NativeAndroidModule, today: Date): Promise<StepsReadResult> => {
+  const firstWeekStart = getRecentWeekStarts(today)[0];
   const timeRangeFilter = {
     operator: "between" as const,
-    startTime: firstSunday.toISOString(),
+    startTime: firstWeekStart.toISOString(),
     endTime: today.toISOString(),
   };
-  const byDay: Record<string, number> = {};
+  const byDay: StepsByDay = {};
 
   try {
     const aggregateGroups = await native.aggregateGroupByPeriod?.({
@@ -286,8 +309,8 @@ const readAndroid = async (
       );
 
       for (const group of aggregateGroups) {
-        const k = dayKey(new Date(group.startTime));
-        byDay[k] = Math.round(group?.result?.COUNT_TOTAL ?? 0);
+        const key = dayKey(new Date(group.startTime));
+        byDay[key] = Math.round(group?.result?.COUNT_TOTAL ?? 0);
       }
     }
   } catch (err) {
@@ -304,8 +327,8 @@ const readAndroid = async (
 
   if (Object.keys(byDay).length === 0) {
     for (const record of list) {
-      const k = dayKey(new Date(record.startTime));
-      byDay[k] = (byDay[k] ?? 0) + record.count;
+      const key = dayKey(new Date(record.startTime));
+      byDay[key] = (byDay[key] ?? 0) + record.count;
     }
   }
 
@@ -315,9 +338,7 @@ const readAndroid = async (
     );
   }
 
-  const { todaySteps, week } = buildWeekFromMap(today, byDay);
-  const weeks = buildWeeksFromMap(today, byDay);
-  return { steps: todaySteps, calories: stepsToCalories(todaySteps), week, weeks };
+  return buildResultFromByDay(today, byDay);
 };
 
 const requestIOSPermission = async (native: any): Promise<boolean> => {
@@ -326,6 +347,7 @@ const requestIOSPermission = async (native: any): Promise<boolean> => {
     console.error("[steps] HealthKit module shape unexpected", Object.keys(AppleHealthKit ?? {}));
     return false;
   }
+
   const Permissions = AppleHealthKit.Constants.Permissions;
   const read = [
     Permissions.StepCount,
@@ -333,6 +355,7 @@ const requestIOSPermission = async (native: any): Promise<boolean> => {
     Permissions.DistanceWalkingRunning,
     Permissions.ActiveEnergyBurned,
   ].filter(Boolean);
+
   return new Promise((resolve) => {
     AppleHealthKit.initHealthKit({ permissions: { read, write: [] } }, (err: any) => {
       if (err) {
@@ -340,6 +363,7 @@ const requestIOSPermission = async (native: any): Promise<boolean> => {
         resolve(false);
         return;
       }
+
       resolve(true);
     });
   });
@@ -361,7 +385,7 @@ const hasConnectedHealthBefore = async () => {
   }
 };
 
-const requestAndroidPermission = async (native: any): Promise<boolean> => {
+const requestAndroidPermission = async (native: NativeAndroidModule): Promise<boolean> => {
   try {
     await native.initialize();
     const grantedPermissions = await native.requestPermission([
@@ -375,11 +399,12 @@ const requestAndroidPermission = async (native: any): Promise<boolean> => {
   }
 };
 
-const initializeAndroidExistingConnection = async (native: any): Promise<boolean> => {
+const initializeAndroidExistingConnection = async (native: NativeAndroidModule): Promise<boolean> => {
   try {
     await native.initialize();
     const grantedPermissions = await native.getGrantedPermissions?.();
     console.log("[steps] Android Health Connect granted permissions:", grantedPermissions);
+
     return Array.isArray(grantedPermissions)
       ? grantedPermissions.some(
           (permission) => permission?.accessType === "read" && permission?.recordType === "Steps"
@@ -393,7 +418,6 @@ const initializeAndroidExistingConnection = async (native: any): Promise<boolean
 
 const useStepsData = (): UseStepsDataResult => {
   const native = useMemo(() => (Platform.OS === "ios" ? loadNativeIOS() : loadNativeAndroid()), []);
-
   const isNativeAvailable = native != null;
 
   const [status, setStatus] = useState<StepsPermissionStatus>("needsPermission");
@@ -404,20 +428,24 @@ const useStepsData = (): UseStepsDataResult => {
   const refreshInFlightRef = useRef(false);
 
   const refresh = useCallback(async () => {
-    if (!native) return;
-    if (refreshInFlightRef.current) return;
+    if (!native || refreshInFlightRef.current) return;
 
     refreshInFlightRef.current = true;
+
     try {
       const today = new Date();
       const data =
-        Platform.OS === "ios" ? await readIOS(native, today) : await readAndroid(native, today);
+        Platform.OS === "ios"
+          ? await readIOS(native, today)
+          : await readAndroid(native as NativeAndroidModule, today);
+
       if (Platform.OS === "ios" && data.steps === 0) {
         const fallbackTodaySteps = await readIOSTodaySteps(native, today);
         if (fallbackTodaySteps !== null && fallbackTodaySteps > 0) {
           applyTodayStepsFallback(data, today, fallbackTodaySteps);
         }
       }
+
       setTodaySteps(data.steps);
       setTodayCalories(data.calories);
       setWeeks(data.weeks);
@@ -436,20 +464,22 @@ const useStepsData = (): UseStepsDataResult => {
       setStatus("denied");
       return false;
     }
+
     try {
       const granted =
         Platform.OS === "ios"
           ? await requestIOSPermission(native)
-          : await requestAndroidPermission(native);
-      if (granted) {
-        await markHealthConnected();
-        setStatus("granted");
-        await refresh();
-        return true;
-      } else {
+          : await requestAndroidPermission(native as NativeAndroidModule);
+
+      if (!granted) {
         setStatus("denied");
         return false;
       }
+
+      await markHealthConnected();
+      setStatus("granted");
+      await refresh();
+      return true;
     } catch (err) {
       console.error("[steps] requestPermission threw:", err);
       setStatus("denied");
@@ -469,7 +499,7 @@ const useStepsData = (): UseStepsDataResult => {
       const initialized =
         Platform.OS === "ios"
           ? await requestIOSPermission(native)
-          : await initializeAndroidExistingConnection(native);
+          : await initializeAndroidExistingConnection(native as NativeAndroidModule);
 
       if (!initialized || !isMounted) return;
 

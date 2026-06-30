@@ -20,6 +20,13 @@ class LiveStepsService : Service() {
         const val CHANNEL_ID = "avihu_team_live_steps"
         const val NOTIFICATION_ID = 1001
 
+        private const val TITLE_TEXT = "\u05e6\u05e2\u05d3\u05d9\u05dd \u05e9\u05e0\u05e2\u05e9\u05d5"
+        private const val DISTANCE_TEXT = "\u05de\u05e8\u05d7\u05e7 \u05e7\u05d9\u05dc\u05d5\u05de\u05d8\u05e8: "
+        private const val CHANNEL_NAME = "\u05de\u05e2\u05e7\u05d1 \u05e6\u05e2\u05d3\u05d9\u05dd \u05d9\u05d5\u05de\u05d9"
+        private const val CHANNEL_DESCRIPTION =
+            "\u05de\u05e6\u05d9\u05d2 \u05d0\u05ea \u05d4\u05ea\u05e7\u05d3\u05de\u05d5\u05ea \u05d4\u05e6\u05e2\u05d3\u05d9\u05dd \u05e9\u05dc\u05da \u05dc\u05d0\u05d5\u05e8\u05da \u05d4\u05d9\u05d5\u05dd"
+        private const val GOAL_REACHED_TEXT = "\u2713"
+
         const val EXTRA_TODAY_STEPS = "todaySteps"
         const val EXTRA_DAILY_GOAL = "dailyGoal"
         const val EXTRA_DISTANCE_KM = "distanceKm"
@@ -88,10 +95,10 @@ class LiveStepsService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "מעקב צעדים יומי",
+                CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "מציג את התקדמות הצעדים שלך לאורך היום"
+                description = CHANNEL_DESCRIPTION
                 setShowBadge(false)
                 enableLights(false)
                 enableVibration(false)
@@ -108,21 +115,21 @@ class LiveStepsService : Service() {
         } else {
             0
         }
-        val goalReached = todaySteps >= dailyGoal && dailyGoal > 0
-        val compactSummary = "${formatSteps(todaySteps)} / מתוך ${formatSteps(dailyGoal)}"
-        val expandedSummary = "${formatSteps(todaySteps)} / מתוך ${formatSteps(dailyGoal)} צעדים שנעשו"
+        val percentText = if (todaySteps >= dailyGoal && dailyGoal > 0) GOAL_REACHED_TEXT else "$percent%"
+        val compactSummary = "${formatSteps(todaySteps)} / ${formatSteps(dailyGoal)}"
+        val expandedSummary = compactSummary
 
         val compactView = RemoteViews(packageName, R.layout.live_steps_notification).apply {
-            setTextViewText(R.id.compactTitle, "צעדים שנעשו")
             setTextViewText(R.id.compactSummary, compactSummary)
-            setTextViewText(R.id.percentText, if (goalReached) "✓" else "$percent%")
+            setTextViewText(R.id.percentText, percentText)
             setProgressBar(R.id.ringProgress, 100, percent, false)
         }
 
         val expandedView = RemoteViews(packageName, R.layout.live_steps_notification_expanded).apply {
+            setTextViewText(R.id.expandedTitle, TITLE_TEXT)
             setTextViewText(R.id.expandedSummary, expandedSummary)
-            setTextViewText(R.id.distance, "מרחק קילומטר: ${"%.1f".format(distanceKm)}")
-            setTextViewText(R.id.percentTextExpanded, if (goalReached) "✓" else "$percent%")
+            setTextViewText(R.id.distance, DISTANCE_TEXT + "%.1f".format(distanceKm))
+            setTextViewText(R.id.percentTextExpanded, percentText)
             setProgressBar(R.id.ringProgressExpanded, 100, percent, false)
         }
 
