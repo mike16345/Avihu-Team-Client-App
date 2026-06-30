@@ -399,7 +399,9 @@ const requestAndroidPermission = async (native: NativeAndroidModule): Promise<bo
   }
 };
 
-const initializeAndroidExistingConnection = async (native: NativeAndroidModule): Promise<boolean> => {
+const initializeAndroidExistingConnection = async (
+  native: NativeAndroidModule
+): Promise<boolean> => {
   try {
     await native.initialize();
     const grantedPermissions = await native.getGrantedPermissions?.();

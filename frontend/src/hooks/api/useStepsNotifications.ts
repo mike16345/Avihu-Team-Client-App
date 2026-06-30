@@ -28,28 +28,32 @@ const MILESTONES: StepsMilestone[] = [
     level: 1,
     emoji: "\uD83D\uDC63",
     shouldTrigger: (ratio) => ratio >= 0.25,
-    buildBody: () => "\u05D4\u05EA\u05D7\u05DC\u05D4 \u05D8\u05D5\u05D1\u05D4, \u05DE\u05DE\u05E9\u05D9\u05DB\u05D9\u05DD \u05DC\u05D6\u05D5\u05D6.",
+    buildBody: () =>
+      "\u05D4\u05EA\u05D7\u05DC\u05D4 \u05D8\u05D5\u05D1\u05D4, \u05DE\u05DE\u05E9\u05D9\u05DB\u05D9\u05DD \u05DC\u05D6\u05D5\u05D6.",
   },
   {
     id: "half",
     level: 2,
     emoji: "\uD83D\uDE80",
     shouldTrigger: (ratio) => ratio > 0.5,
-    buildBody: () => "\u05DB\u05D1\u05E8 \u05E2\u05D1\u05E8\u05EA \u05D0\u05EA \u05D7\u05E6\u05D9 \u05D4\u05D3\u05E8\u05DA.",
+    buildBody: () =>
+      "\u05DB\u05D1\u05E8 \u05E2\u05D1\u05E8\u05EA \u05D0\u05EA \u05D7\u05E6\u05D9 \u05D4\u05D3\u05E8\u05DA.",
   },
   {
     id: "twoThirds",
     level: 3,
     emoji: "\uD83D\uDD25",
     shouldTrigger: (ratio) => ratio >= 2 / 3,
-    buildBody: () => "\u05E2\u05D5\u05D3 \u05E7\u05E6\u05EA \u05D5\u05D0\u05EA\u05D4 \u05E1\u05D5\u05D2\u05E8 \u05D0\u05EA \u05D4\u05D9\u05E2\u05D3.",
+    buildBody: () =>
+      "\u05E2\u05D5\u05D3 \u05E7\u05E6\u05EA \u05D5\u05D0\u05EA\u05D4 \u05E1\u05D5\u05D2\u05E8 \u05D0\u05EA \u05D4\u05D9\u05E2\u05D3.",
   },
   {
     id: "complete",
     level: 4,
     emoji: "\uD83C\uDFC6",
     shouldTrigger: (ratio) => ratio >= 1,
-    buildBody: () => "\u05D9\u05E2\u05D3 \u05D4\u05D5\u05E9\u05DC\u05DD \u05DC\u05D4\u05D9\u05D5\u05DD.",
+    buildBody: () =>
+      "\u05D9\u05E2\u05D3 \u05D4\u05D5\u05E9\u05DC\u05DD \u05DC\u05D4\u05D9\u05D5\u05DD.",
   },
 ];
 
