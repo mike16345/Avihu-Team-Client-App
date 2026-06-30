@@ -46,7 +46,7 @@ const StepsRingHero: React.FC<StepsRingHeroProps> = ({
 
   return (
     <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
-      <View>
+      <View style={[layout.itemsStart]}>
         <Text
           fontVariant="bold"
           fontSize={titleFont}

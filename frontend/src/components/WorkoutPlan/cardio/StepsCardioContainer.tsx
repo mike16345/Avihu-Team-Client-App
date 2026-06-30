@@ -4,7 +4,6 @@ import {
   Platform,
   RefreshControl,
   ScrollView,
-  StyleSheet,
   View,
   useWindowDimensions,
 } from "react-native";
@@ -262,37 +261,30 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
         {isGranted ? <WeeklyBalanceRow balance={weeklyBalance} /> : null}
       </View>
 
-      <View style={[styles.sectionTitleRow, layout.itemsCenter]}>
-        <Text fontVariant="bold" fontSize={17} style={colors.textPrimary}>
-          מעקב צעדים שבועי
-        </Text>
-      </View>
+      <View style={[spacing.gapDefault]}>
+        <View style={[layout.itemsStart]}>
+          <Text fontVariant="bold" fontSize={16} style={colors.textPrimary}>
+            מעקב צעדים שבועי
+          </Text>
+        </View>
 
-      <WeeklyStepsChart
-        weekData={weekData}
-        dailyGoal={dailyGoal}
-        goalsByDay={goalsByDay}
-        todayIndex={chartTodayIndex}
-        selectedDay={selectedDay}
-        onSelectDay={setSelectedDay}
-        detailValueFont={sizes.detailValueFont}
-        weekRangeLabel={weekRangeLabel}
-        canGoPreviousWeek={canGoPreviousWeek}
-        canGoNextWeek={canGoNextWeek}
-        onPreviousWeek={handlePreviousWeek}
-        onNextWeek={handleNextWeek}
-      />
+        <WeeklyStepsChart
+          weekData={weekData}
+          dailyGoal={dailyGoal}
+          goalsByDay={goalsByDay}
+          todayIndex={chartTodayIndex}
+          selectedDay={selectedDay}
+          onSelectDay={setSelectedDay}
+          detailValueFont={sizes.detailValueFont}
+          weekRangeLabel={weekRangeLabel}
+          canGoPreviousWeek={canGoPreviousWeek}
+          canGoNextWeek={canGoNextWeek}
+          onPreviousWeek={handlePreviousWeek}
+          onNextWeek={handleNextWeek}
+        />
+      </View>
     </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  sectionTitleRow: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    marginBottom: 12,
-    paddingHorizontal: 4,
-  },
-});
 
 export default StepsCardioContainer;
