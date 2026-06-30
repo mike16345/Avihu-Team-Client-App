@@ -229,14 +229,32 @@ export function formatServingText<K extends keyof IServingItem>(
   return serving.join(separator);
 }
 
-export function getTotalCaloriesInMeal(meal: IMeal) {
-  const proteinCalories = meal.totalProtein?.quantity * AVG_PROTEIN_CALORIES || 0;
-  const carbCalories = meal.totalCarbs?.quantity * AVG_CARB_CALORIES || 0;
-  const veggieCalories = meal.totalVeggies?.quantity * AVG_VEGGIE_CALORIES || 0;
-  const fatCalories = meal.totalFats?.quantity * AVG_FAT_CALORIES || 0;
-  const totalEaten = proteinCalories + carbCalories + veggieCalories + fatCalories;
+export function getTotalCaloriesFromServings({
+  protein = 0,
+  carbs = 0,
+  veggies = 0,
+  fats = 0,
+}: {
+  protein?: number;
+  carbs?: number;
+  veggies?: number;
+  fats?: number;
+}) {
+  return (
+    protein * AVG_PROTEIN_CALORIES +
+    carbs * AVG_CARB_CALORIES +
+    veggies * AVG_VEGGIE_CALORIES +
+    fats * AVG_FAT_CALORIES
+  );
+}
 
-  return totalEaten || 0;
+export function getTotalCaloriesInMeal(meal: IMeal) {
+  return getTotalCaloriesFromServings({
+    protein: meal.totalProtein?.quantity || 0,
+    carbs: meal.totalCarbs?.quantity || 0,
+    veggies: meal.totalVeggies?.quantity || 0,
+    fats: meal.totalFats?.quantity || 0,
+  });
 }
 
 export function removeMealFromTotalCalories(caloriesToRemove: number, totalCalories: number) {
