@@ -30,7 +30,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:textColor="#1A1D24"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:textStyle="bold"
             tools:text="29%" />
     </FrameLayout>
@@ -48,7 +48,7 @@
         android:maxLines="1"
         android:textAlignment="viewEnd"
         android:textColor="#1A1D24"
-        android:textSize="15sp"
+        android:textSize="14sp"
         android:textStyle="bold"
-        tools:text="3,540 / 12,000" />
+        tools:text="12,000 / 3,540" />
 </RelativeLayout>

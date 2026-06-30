@@ -35,7 +35,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textColor="#1A1D24"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 tools:text="29%" />
         </FrameLayout>
@@ -55,7 +55,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="#6E837C"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 tools:text="Weekly steps" />
 
@@ -69,27 +69,29 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="#1A1D24"
-                android:textSize="17sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
-                tools:text="3,540 / 12,000" />
+                tools:text="12,000 / 3,540" />
 
             <TextView
                 android:id="@+id/distance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
                 android:gravity="end"
+                android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="#6E837C"
-                android:textSize="14sp"
-                tools:text="Distance km: 2.7" />
+                android:textSize="13sp"
+                tools:text="מרחק: 2.7km" />
         </LinearLayout>
     </LinearLayout>
 
     <ImageView
         android:id="@+id/logoBadgeExpanded"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_gravity="top|right"
         android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
