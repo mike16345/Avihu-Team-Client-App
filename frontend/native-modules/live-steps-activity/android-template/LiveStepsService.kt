@@ -29,7 +29,12 @@ class LiveStepsService : Service() {
         const val ACTION_STOP = "com.avihuteam.livesteps.STOP"
         const val CARDIO_DEEP_LINK = "avihuteam://cardio?openCardio=true"
 
-        fun buildStartIntent(context: Context, todaySteps: Int, dailyGoal: Int, distanceKm: Double): Intent =
+        fun buildStartIntent(
+            context: Context,
+            todaySteps: Int,
+            dailyGoal: Int,
+            distanceKm: Double
+        ): Intent =
             Intent(context, LiveStepsService::class.java).apply {
                 action = ACTION_START
                 putExtra(EXTRA_TODAY_STEPS, todaySteps)
@@ -37,7 +42,12 @@ class LiveStepsService : Service() {
                 putExtra(EXTRA_DISTANCE_KM, distanceKm)
             }
 
-        fun buildUpdateIntent(context: Context, todaySteps: Int, dailyGoal: Int, distanceKm: Double): Intent =
+        fun buildUpdateIntent(
+            context: Context,
+            todaySteps: Int,
+            dailyGoal: Int,
+            distanceKm: Double
+        ): Intent =
             Intent(context, LiveStepsService::class.java).apply {
                 action = ACTION_UPDATE
                 putExtra(EXTRA_TODAY_STEPS, todaySteps)
@@ -58,6 +68,7 @@ class LiveStepsService : Service() {
                 stopSelf()
                 return START_NOT_STICKY
             }
+
             else -> {
                 val todaySteps = intent?.getIntExtra(EXTRA_TODAY_STEPS, 0) ?: 0
                 val dailyGoal = intent?.getIntExtra(EXTRA_DAILY_GOAL, 0) ?: 0
@@ -67,6 +78,7 @@ class LiveStepsService : Service() {
                 startForeground(NOTIFICATION_ID, notification)
             }
         }
+
         return START_STICKY
     }
 
@@ -84,6 +96,7 @@ class LiveStepsService : Service() {
                 enableLights(false)
                 enableVibration(false)
             }
+
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
         }
@@ -92,33 +105,42 @@ class LiveStepsService : Service() {
     private fun buildNotification(todaySteps: Int, dailyGoal: Int, distanceKm: Double): Notification {
         val percent = if (dailyGoal > 0) {
             (todaySteps.toDouble() / dailyGoal * 100).toInt().coerceIn(0, 100)
-        } else 0
+        } else {
+            0
+        }
         val goalReached = todaySteps >= dailyGoal && dailyGoal > 0
+        val compactSummary = "${formatSteps(todaySteps)} / מתוך ${formatSteps(dailyGoal)}"
+        val expandedSummary = "${formatSteps(todaySteps)} / מתוך ${formatSteps(dailyGoal)} צעדים שנעשו"
 
-        val customView = RemoteViews(packageName, R.layout.live_steps_notification).apply {
-            setTextViewText(R.id.stepsLabel, "צעדים שנעשו:")
-            setTextViewText(R.id.stepsValue, formatSteps(todaySteps))
-            setTextViewText(R.id.stepsGoal, " / מתוך ${formatSteps(dailyGoal)}")
-            setTextViewText(R.id.distance, "מרחק קילומטר: ${"%.1f".format(distanceKm)}")
+        val compactView = RemoteViews(packageName, R.layout.live_steps_notification).apply {
+            setTextViewText(R.id.compactTitle, "צעדים שנעשו")
+            setTextViewText(R.id.compactSummary, compactSummary)
             setTextViewText(R.id.percentText, if (goalReached) "✓" else "$percent%")
             setProgressBar(R.id.ringProgress, 100, percent, false)
+        }
+
+        val expandedView = RemoteViews(packageName, R.layout.live_steps_notification_expanded).apply {
+            setTextViewText(R.id.expandedSummary, expandedSummary)
+            setTextViewText(R.id.distance, "מרחק קילומטר: ${"%.1f".format(distanceKm)}")
+            setTextViewText(R.id.percentTextExpanded, if (goalReached) "✓" else "$percent%")
+            setProgressBar(R.id.ringProgressExpanded, 100, percent, false)
         }
 
         val openCardioIntent = Intent(Intent.ACTION_VIEW, Uri.parse(CARDIO_DEEP_LINK)).apply {
             setPackage(packageName)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
-        val pendingIntent = openCardioIntent.let {
-            PendingIntent.getActivity(
-                this, 0, it,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-        }
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            openCardioIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setCustomContentView(customView)
-            .setCustomBigContentView(customView)
+            .setCustomContentView(compactView)
+            .setCustomBigContentView(expandedView)
             .setStyle(NotificationCompat.DecoratedCustomViewStyle())
             .setOngoing(true)
             .setOnlyAlertOnce(true)
@@ -128,5 +150,5 @@ class LiveStepsService : Service() {
             .build()
     }
 
-    private fun formatSteps(n: Int): String = "%,d".format(n)
+    private fun formatSteps(value: Int): String = "%,d".format(value)
 }

@@ -1,109 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/live_steps_card_bg">
+    android:layoutDirection="rtl"
+    android:background="@drawable/live_steps_card_bg"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingLeft="14dp"
+    android:paddingTop="12dp"
+    android:paddingRight="14dp"
+    android:paddingBottom="12dp">
+
+    <FrameLayout
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="12dp">
+
+        <ProgressBar
+            android:id="@+id/ringProgress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:max="100"
+            android:progressDrawable="@drawable/live_steps_ring" />
+
+        <TextView
+            android:id="@+id/percentText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="#1A1D24"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:text="29%" />
+    </FrameLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layoutDirection="rtl"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingLeft="14dp"
-        android:paddingTop="14dp"
-        android:paddingRight="42dp"
-        android:paddingBottom="14dp">
+        android:layout_weight="1"
+        android:gravity="end"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/compactTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="14dp"
-            android:gravity="end"
-            android:orientation="vertical">
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#6E837C"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="צעדים שנעשו" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="end|bottom"
-                android:baselineAligned="false">
-
-                <TextView
-                    android:id="@+id/stepsLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:textColor="#80072723"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    tools:text="צעדים שנעשו:" />
-
-                <TextView
-                    android:id="@+id/stepsValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#1A1D24"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    tools:text="0" />
-
-                <TextView
-                    android:id="@+id/stepsGoal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="#80072723"
-                    android:textSize="13sp"
-                    tools:text=" / מתוך 10,000" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/distance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="#80072723"
-                android:textSize="13sp"
-                tools:text="מרחק קילומטר: 0.0" />
-        </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="72dp"
-            android:layout_height="72dp">
-
-            <ProgressBar
-                android:id="@+id/ringProgress"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:progressDrawable="@drawable/live_steps_ring"
-                android:max="100" />
-
-            <TextView
-                android:id="@+id/percentText"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:textColor="#1A1D24"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                tools:text="0%" />
-        </FrameLayout>
+        <TextView
+            android:id="@+id/compactSummary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#1A1D24"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            tools:text="3,540 / מתוך 12,000" />
     </LinearLayout>
 
     <ImageView
         android:id="@+id/logoBadge"
         android:layout_width="28dp"
         android:layout_height="28dp"
-        android:layout_gravity="top|right"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginStart="12dp"
         android:background="@drawable/live_steps_logo_badge_bg"
         android:elevation="4dp"
         android:padding="3dp"
-        android:src="@mipmap/ic_launcher"
         android:scaleType="centerInside"
+        android:src="@mipmap/ic_launcher"
         android:contentDescription="@null" />
-</FrameLayout>
+</LinearLayout>
