@@ -20,12 +20,12 @@ class LiveStepsService : Service() {
         const val CHANNEL_ID = "avihu_team_live_steps"
         const val NOTIFICATION_ID = 1001
 
-        private const val TITLE_TEXT = "\u05e6\u05e2\u05d3\u05d9\u05dd \u05e9\u05e0\u05e2\u05e9\u05d5"
-        private const val DISTANCE_TEXT = "\u05de\u05e8\u05d7\u05e7 \u05e7\u05d9\u05dc\u05d5\u05de\u05d8\u05e8: "
-        private const val CHANNEL_NAME = "\u05de\u05e2\u05e7\u05d1 \u05e6\u05e2\u05d3\u05d9\u05dd \u05d9\u05d5\u05de\u05d9"
+        private const val TITLE_TEXT = "צעדים שנעשו"
+        private const val DISTANCE_TEXT = "מרחק בקילומטרים: "
+        private const val CHANNEL_NAME = "מעקב צעדים יומי"
         private const val CHANNEL_DESCRIPTION =
-            "\u05de\u05e6\u05d9\u05d2 \u05d0\u05ea \u05d4\u05ea\u05e7\u05d3\u05de\u05d5\u05ea \u05d4\u05e6\u05e2\u05d3\u05d9\u05dd \u05e9\u05dc\u05da \u05dc\u05d0\u05d5\u05e8\u05da \u05d4\u05d9\u05d5\u05dd"
-        private const val GOAL_REACHED_TEXT = "\u2713"
+            "מציג את התקדמות הצעדים שלך לאורך היום"
+        private const val GOAL_REACHED_TEXT = "✓"
 
         const val EXTRA_TODAY_STEPS = "todaySteps"
         const val EXTRA_DAILY_GOAL = "dailyGoal"
@@ -115,7 +115,13 @@ class LiveStepsService : Service() {
         } else {
             0
         }
-        val percentText = if (todaySteps >= dailyGoal && dailyGoal > 0) GOAL_REACHED_TEXT else "$percent%"
+
+        val percentText = if (todaySteps >= dailyGoal && dailyGoal > 0) {
+            GOAL_REACHED_TEXT
+        } else {
+            "$percent%"
+        }
+
         val compactSummary = "${formatSteps(todaySteps)} / ${formatSteps(dailyGoal)}"
         val expandedSummary = compactSummary
 
@@ -137,6 +143,7 @@ class LiveStepsService : Service() {
             setPackage(packageName)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
+
         val pendingIntent = PendingIntent.getActivity(
             this,
             0,

@@ -22,34 +22,39 @@ interface StoredMilestoneState {
   lastSentLevel: number;
 }
 
+const ONE_QUARTER = 0.25;
+const ONE_HALF = 0.5;
+const TWO_THIRDS = 2 / 3;
+const WHOLE_GOAL = 1;
+
 const MILESTONES: StepsMilestone[] = [
   {
     id: "quarter",
     level: 1,
-    emoji: "\uD83D\uDC63",
-    shouldTrigger: (ratio) => ratio >= 0.25,
-    buildBody: () => "\u05D4\u05EA\u05D7\u05DC\u05D4 \u05D8\u05D5\u05D1\u05D4, \u05DE\u05DE\u05E9\u05D9\u05DB\u05D9\u05DD \u05DC\u05D6\u05D5\u05D6.",
+    emoji: "👣",
+    shouldTrigger: (ratio) => ratio >= ONE_QUARTER,
+    buildBody: () => "התחלה טובה, ממשיכים לזוז.",
   },
   {
     id: "half",
     level: 2,
-    emoji: "\uD83D\uDE80",
-    shouldTrigger: (ratio) => ratio > 0.5,
-    buildBody: () => "\u05DB\u05D1\u05E8 \u05E2\u05D1\u05E8\u05EA \u05D0\u05EA \u05D7\u05E6\u05D9 \u05D4\u05D3\u05E8\u05DA.",
+    emoji: "🚀",
+    shouldTrigger: (ratio) => ratio >= ONE_HALF,
+    buildBody: () => "כבר עברת את חצי הדרך.",
   },
   {
     id: "twoThirds",
     level: 3,
-    emoji: "\uD83D\uDD25",
-    shouldTrigger: (ratio) => ratio >= 2 / 3,
-    buildBody: () => "\u05E2\u05D5\u05D3 \u05E7\u05E6\u05EA \u05D5\u05D0\u05EA\u05D4 \u05E1\u05D5\u05D2\u05E8 \u05D0\u05EA \u05D4\u05D9\u05E2\u05D3.",
+    emoji: "🔥",
+    shouldTrigger: (ratio) => ratio >= TWO_THIRDS,
+    buildBody: () => "עוד קצת ואתה סוגר את היעד.",
   },
   {
     id: "complete",
     level: 4,
-    emoji: "\uD83C\uDFC6",
-    shouldTrigger: (ratio) => ratio >= 1,
-    buildBody: () => "\u05D9\u05E2\u05D3 \u05D4\u05D5\u05E9\u05DC\u05DD \u05DC\u05D4\u05D9\u05D5\u05DD.",
+    emoji: "🏆",
+    shouldTrigger: (ratio) => ratio >= WHOLE_GOAL,
+    buildBody: () => "יעד הושלם להיום.",
   },
 ];
 
@@ -72,6 +77,7 @@ const getReachedMilestone = (todaySteps: number, dailyGoal: number): StepsMilest
 
   for (let index = MILESTONES.length - 1; index >= 0; index -= 1) {
     const milestone = MILESTONES[index];
+
     if (milestone?.shouldTrigger(ratio)) {
       return milestone;
     }
@@ -81,9 +87,7 @@ const getReachedMilestone = (todaySteps: number, dailyGoal: number): StepsMilest
 };
 
 const buildMilestoneTitle = (todaySteps: number, dailyGoal: number, emoji: string) =>
-  toRtlNotificationText(
-    `${formatSteps(todaySteps)} / ${formatSteps(dailyGoal)} \u05E6\u05E2\u05D3\u05D9\u05DD ${emoji}`
-  );
+  toRtlNotificationText(`${formatSteps(todaySteps)} / ${formatSteps(dailyGoal)} צעדים ${emoji}`);
 
 export interface UseStepsNotificationsResult {
   isAvailable: boolean;
@@ -121,8 +125,10 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
 
     try {
       const raw = await AsyncStorage.getItem(MILESTONE_STORAGE_KEY);
+
       if (raw) {
         const parsed = JSON.parse(raw) as StoredMilestoneState;
+
         if (parsed?.dateKey === todayKey) {
           milestoneStateRef.current = parsed;
           return parsed;
@@ -188,6 +194,7 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
       if (!milestone) return;
 
       const state = await readMilestoneState();
+
       if (milestone.level <= state.lastSentLevel) {
         return;
       }
