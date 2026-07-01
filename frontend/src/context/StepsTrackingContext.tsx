@@ -41,6 +41,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
   const lastServerSyncAtRef = useRef(0);
   const lastServerSyncPayloadRef = useRef<string | null>(null);
   const lastLiveStepsPayloadRef = useRef<string | null>(null);
+  const requestedBackgroundAccessRef = useRef(false);
   const syncedAfterOpenRef = useRef(false);
 
   const stepsPlan = useMemo(() => {
@@ -55,6 +56,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
 
   const canUseNativeSteps = steps.isNativeAvailable && steps.status === "granted";
   const isStepsTrackingEnabled = workoutPlan?.cardio?.type === "steps";
+  const hasLiveStepsGoal = Number.isFinite(dailyGoal) && dailyGoal > 0;
   const shouldSendMilestoneNotifications = planType === STEPS_MILESTONE_PLAN_TYPE;
 
   const syncCurrentSteps = useCallback(
@@ -111,6 +113,24 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
   }, [canUseNativeSteps, steps.refresh]);
 
   useEffect(() => {
+    if (Platform.OS !== "android") return;
+    if (!isStepsTrackingEnabled || !canUseNativeSteps) return;
+    if (steps.hasBackgroundAccess) return;
+    if (requestedBackgroundAccessRef.current) return;
+
+    requestedBackgroundAccessRef.current = true;
+    steps
+      .ensureBackgroundAccess()
+      .catch((err) => console.error("[steps] failed to request background access:", err));
+  }, [
+    canUseNativeSteps,
+    isStepsTrackingEnabled,
+    steps,
+    steps.hasBackgroundAccess,
+    steps.ensureBackgroundAccess,
+  ]);
+
+  useEffect(() => {
     if (!canUseNativeSteps) return;
 
     const subscription = AppState.addEventListener("change", (nextState: AppStateStatus) => {
@@ -135,7 +155,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
       return;
     }
 
-    if (!isStepsTrackingEnabled || !canUseNativeSteps || !steps.syncedAt) {
+    if (!isStepsTrackingEnabled || !canUseNativeSteps || !steps.syncedAt || !hasLiveStepsGoal) {
       stopLiveSteps();
       lastLiveStepsPayloadRef.current = null;
       return;
@@ -166,6 +186,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
     isLiveStepsAvailable,
     isLiveStepsEnabled,
     isStepsTrackingEnabled,
+    hasLiveStepsGoal,
     liveStepsActivityId,
     startLiveSteps,
     stopLiveSteps,
@@ -179,7 +200,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
   }, [notifications]);
 
   useEffect(() => {
-    if (!isStepsTrackingEnabled || !canUseNativeSteps) return;
+    if (!isStepsTrackingEnabled || !canUseNativeSteps || !hasLiveStepsGoal) return;
     if (!steps.syncedAt || steps.todaySteps <= 0) return;
     if (!shouldSendMilestoneNotifications) return;
 
@@ -187,6 +208,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
   }, [
     canUseNativeSteps,
     dailyGoal,
+    hasLiveStepsGoal,
     isStepsTrackingEnabled,
     notifications.notifyMilestone,
     shouldSendMilestoneNotifications,

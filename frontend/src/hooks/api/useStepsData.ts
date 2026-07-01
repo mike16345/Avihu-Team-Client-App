@@ -28,6 +28,11 @@ interface StepsReadResult {
   weeks: StepsWeekDatum[];
 }
 
+interface AndroidPermissionState {
+  hasStepsRead: boolean;
+  hasBackgroundAccess: boolean;
+}
+
 export interface StepsDayDatum {
   date: string;
   steps: number;
@@ -46,7 +51,9 @@ export interface UseStepsDataResult {
   todayCalories: number;
   weeks: StepsWeekDatum[];
   syncedAt: Date | null;
+  hasBackgroundAccess: boolean;
   requestPermission: () => Promise<boolean>;
+  ensureBackgroundAccess: () => Promise<boolean>;
   refresh: () => Promise<void>;
   isNativeAvailable: boolean;
 }
@@ -385,36 +392,71 @@ const hasConnectedHealthBefore = async () => {
   }
 };
 
-const requestAndroidPermission = async (native: NativeAndroidModule): Promise<boolean> => {
+const hasAndroidReadPermission = (
+  grantedPermissions: Array<{ accessType?: string; recordType?: string }>
+) =>
+  grantedPermissions.some(
+    (permission) => permission?.accessType === "read" && permission?.recordType === "Steps"
+  );
+
+const hasAndroidBackgroundPermission = (
+  grantedPermissions: Array<{ accessType?: string; recordType?: string }>
+) =>
+  grantedPermissions.some(
+    (permission) =>
+      permission?.accessType === "read" &&
+      permission?.recordType === "BackgroundAccessPermission"
+  );
+
+const requestAndroidPermission = async (
+  native: NativeAndroidModule
+): Promise<AndroidPermissionState> => {
   try {
     await native.initialize();
     const grantedPermissions = await native.requestPermission([
       { accessType: "read", recordType: "Steps" },
+      { accessType: "read", recordType: "BackgroundAccessPermission" },
     ]);
     console.log("[steps] Android Health Connect permission result:", grantedPermissions);
-    return grantedPermissions.length > 0;
+
+    return {
+      hasStepsRead: hasAndroidReadPermission(grantedPermissions),
+      hasBackgroundAccess: hasAndroidBackgroundPermission(grantedPermissions),
+    };
   } catch (err) {
     console.error("[steps] Android Health Connect requestPermission failed:", err);
-    return false;
+    return {
+      hasStepsRead: false,
+      hasBackgroundAccess: false,
+    };
   }
 };
 
 const initializeAndroidExistingConnection = async (
   native: NativeAndroidModule
-): Promise<boolean> => {
+): Promise<AndroidPermissionState> => {
   try {
     await native.initialize();
     const grantedPermissions = await native.getGrantedPermissions?.();
     console.log("[steps] Android Health Connect granted permissions:", grantedPermissions);
 
-    return Array.isArray(grantedPermissions)
-      ? grantedPermissions.some(
-          (permission) => permission?.accessType === "read" && permission?.recordType === "Steps"
-        )
-      : false;
+    if (!Array.isArray(grantedPermissions)) {
+      return {
+        hasStepsRead: false,
+        hasBackgroundAccess: false,
+      };
+    }
+
+    return {
+      hasStepsRead: hasAndroidReadPermission(grantedPermissions),
+      hasBackgroundAccess: hasAndroidBackgroundPermission(grantedPermissions),
+    };
   } catch (err) {
     console.error("[steps] Android Health Connect initialize/getGrantedPermissions failed:", err);
-    return false;
+    return {
+      hasStepsRead: false,
+      hasBackgroundAccess: false,
+    };
   }
 };
 
@@ -427,6 +469,7 @@ const useStepsData = (): UseStepsDataResult => {
   const [todayCalories, setTodayCalories] = useState(0);
   const [weeks, setWeeks] = useState<StepsWeekDatum[]>(buildEmptyWeeks(new Date()));
   const [syncedAt, setSyncedAt] = useState<Date | null>(null);
+  const [hasBackgroundAccess, setHasBackgroundAccess] = useState(Platform.OS === "ios");
   const refreshInFlightRef = useRef(false);
 
   const refresh = useCallback(async () => {
@@ -468,12 +511,17 @@ const useStepsData = (): UseStepsDataResult => {
     }
 
     try {
-      const granted =
-        Platform.OS === "ios"
-          ? await requestIOSPermission(native)
-          : await requestAndroidPermission(native as NativeAndroidModule);
+      let isGranted = false;
 
-      if (!granted) {
+      if (Platform.OS === "ios") {
+        isGranted = await requestIOSPermission(native);
+      } else {
+        const granted = await requestAndroidPermission(native as NativeAndroidModule);
+        setHasBackgroundAccess(granted.hasBackgroundAccess);
+        isGranted = granted.hasStepsRead;
+      }
+
+      if (!isGranted) {
         setStatus("denied");
         return false;
       }
@@ -489,6 +537,35 @@ const useStepsData = (): UseStepsDataResult => {
     }
   }, [native, refresh]);
 
+  const ensureBackgroundAccess = useCallback(async (): Promise<boolean> => {
+    if (Platform.OS !== "android") {
+      return true;
+    }
+
+    if (!native) {
+      return false;
+    }
+
+    try {
+      await (native as NativeAndroidModule).initialize();
+      const grantedPermissions = await (native as NativeAndroidModule).getGrantedPermissions?.();
+      if (Array.isArray(grantedPermissions) && hasAndroidBackgroundPermission(grantedPermissions)) {
+        setHasBackgroundAccess(true);
+        return true;
+      }
+
+      const nextGrantedPermissions = await (native as NativeAndroidModule).requestPermission([
+        { accessType: "read", recordType: "BackgroundAccessPermission" },
+      ]);
+      const granted = hasAndroidBackgroundPermission(nextGrantedPermissions);
+      setHasBackgroundAccess(granted);
+      return granted;
+    } catch (err) {
+      console.error("[steps] ensureBackgroundAccess failed:", err);
+      return false;
+    }
+  }, [native]);
+
   useEffect(() => {
     if (!native) return;
 
@@ -498,12 +575,23 @@ const useStepsData = (): UseStepsDataResult => {
       const connectedBefore = await hasConnectedHealthBefore();
       if (!connectedBefore || !isMounted) return;
 
-      const initialized =
-        Platform.OS === "ios"
-          ? await requestIOSPermission(native)
-          : await initializeAndroidExistingConnection(native as NativeAndroidModule);
+      let isInitialized = false;
 
-      if (!initialized || !isMounted) return;
+      if (Platform.OS === "ios") {
+        isInitialized = await requestIOSPermission(native);
+      } else {
+        const initialized = await initializeAndroidExistingConnection(
+          native as NativeAndroidModule
+        );
+        if (!isMounted) return;
+
+        setHasBackgroundAccess(initialized.hasBackgroundAccess);
+        isInitialized = initialized.hasStepsRead;
+      }
+
+      if (!isMounted) return;
+
+      if (!isInitialized) return;
 
       setStatus("granted");
       await refresh();
@@ -522,7 +610,9 @@ const useStepsData = (): UseStepsDataResult => {
     todayCalories,
     weeks,
     syncedAt,
+    hasBackgroundAccess,
     requestPermission,
+    ensureBackgroundAccess,
     refresh,
     isNativeAvailable,
   };

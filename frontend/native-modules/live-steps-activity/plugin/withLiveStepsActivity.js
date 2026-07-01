@@ -154,6 +154,30 @@ const withAndroidSources = (config) =>
     },
   ]);
 
+const withAndroidAppDependency = (config) =>
+  withDangerousMod(config, [
+    "android",
+    async (cfg) => {
+      const buildGradlePath = path.join(cfg.modRequest.platformProjectRoot, "app", "build.gradle");
+      if (!fs.existsSync(buildGradlePath)) {
+        return cfg;
+      }
+
+      let src = fs.readFileSync(buildGradlePath, "utf8");
+      const dependencyLine = '    implementation("androidx.health.connect:connect-client:1.1.0-alpha11")';
+
+      if (!src.includes("androidx.health.connect:connect-client")) {
+        src = src.replace(
+          /dependencies\s*\{\s*\n(\s*\/\/ The version of react-native is set by the React Native Gradle Plugin\s*\n\s*implementation\("com\.facebook\.react:react-android"\))/,
+          `dependencies {\n$1\n${dependencyLine}`
+        );
+        fs.writeFileSync(buildGradlePath, src);
+      }
+
+      return cfg;
+    },
+  ]);
+
 // ─── Android: register LiveStepsPackage in MainApplication ───────────────
 const withAndroidPackageRegistration = (config) =>
   withMainApplication(config, (cfg) => {
@@ -200,6 +224,7 @@ const withAndroidManifestEntries = (config) =>
       "android.permission.POST_NOTIFICATIONS",
       "android.permission.FOREGROUND_SERVICE",
       "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+      "android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND",
     ];
     for (const name of wanted) {
       const exists = manifest["uses-permission"].some((p) => p.$ && p.$["android:name"] === name);
@@ -237,6 +262,7 @@ const withLiveStepsActivity = (config) => {
   config = withIOSDeploymentTarget(config);
   config = withIOSBridgeFiles(config);
   config = withAndroidSources(config);
+  config = withAndroidAppDependency(config);
   config = withAndroidPackageRegistration(config);
   config = withAndroidManifestEntries(config);
   return config;

@@ -87,18 +87,4 @@
                 tools:text="מרחק: 2.7km" />
         </LinearLayout>
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/logoBadgeExpanded"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="top|right"
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
-        android:background="@drawable/live_steps_logo_badge_bg"
-        android:elevation="4dp"
-        android:padding="3dp"
-        android:scaleType="centerInside"
-        android:src="@mipmap/ic_launcher"
-        android:contentDescription="@null" />
 </FrameLayout>
