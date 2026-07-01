@@ -404,8 +404,7 @@ const hasAndroidBackgroundPermission = (
 ) =>
   grantedPermissions.some(
     (permission) =>
-      permission?.accessType === "read" &&
-      permission?.recordType === "BackgroundAccessPermission"
+      permission?.accessType === "read" && permission?.recordType === "BackgroundAccessPermission"
   );
 
 const requestAndroidPermission = async (

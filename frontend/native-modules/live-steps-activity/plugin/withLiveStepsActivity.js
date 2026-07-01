@@ -164,7 +164,8 @@ const withAndroidAppDependency = (config) =>
       }
 
       let src = fs.readFileSync(buildGradlePath, "utf8");
-      const dependencyLine = '    implementation("androidx.health.connect:connect-client:1.1.0-alpha11")';
+      const dependencyLine =
+        '    implementation("androidx.health.connect:connect-client:1.1.0-alpha11")';
 
       if (!src.includes("androidx.health.connect:connect-client")) {
         src = src.replace(
