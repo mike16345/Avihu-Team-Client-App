@@ -36,10 +36,9 @@ const getCardioContent = (cardioPlan?: ICardioPlan) => {
 };
 
 const CardioWrapper: React.FC<CardioWrapperProps> = ({ cardioPlan }) => {
-  const { layout } = useStyles();
   const cardioContent = getCardioContent(cardioPlan);
 
-  return <View style={layout.flex1}>{cardioContent}</View>;
+  return cardioContent;
 };
 
 export default CardioWrapper;

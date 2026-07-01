@@ -1,10 +1,9 @@
 import React, { useCallback } from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { Easing, cancelAnimation, useSharedValue, withTiming } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
-import { useShadowStyles } from "@/styles/useShadowStyles";
 import {
   DAY_LABEL_TEXT,
   DayData,
@@ -69,7 +68,7 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
   onPreviousWeek,
   onNextWeek,
 }) => {
-  const { colors, common, frameShadow, spacing } = useChartStyles();
+  const { colors, common, spacing } = useStyles();
   const barProgress = useSharedValue(0);
 
   const weeklyGoalTotal = getWeeklyGoalTotal(weekData.length, dailyGoal, goalsByDay);
@@ -98,7 +97,7 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
   );
 
   return (
-    <View style={[colors.backgroundSurface, common.roundedXl, spacing.pdMd, frameShadow]}>
+    <View style={[colors.backgroundSurface, common.roundedXl, spacing.pdMd]}>
       <WeeklyStepsChartHeader
         totalSteps={totalSteps}
         weeklyGoalTotal={weeklyGoalTotal}
@@ -130,9 +129,11 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
           return (
             <View key={index} style={styles.dayLabelCell}>
               <View style={pillStyle}>
-                <Text fontSize={11} fontVariant={fontVariant} style={{ color: textColor }}>
-                  {day.label}
-                </Text>
+                <Pressable onPress={() => onSelectDay(index)} hitSlop={8}>
+                  <Text fontSize={11} fontVariant={fontVariant} style={{ color: textColor }}>
+                    {day.label}
+                  </Text>
+                </Pressable>
               </View>
             </View>
           );
@@ -142,13 +143,6 @@ const WeeklyStepsChart: React.FC<WeeklyStepsChartProps> = ({
       {detailContent}
     </View>
   );
-};
-
-const useChartStyles = () => {
-  const { colors, common, spacing } = useStyles();
-  const { frameShadow } = useShadowStyles();
-
-  return { colors, common, frameShadow, spacing };
 };
 
 const styles = StyleSheet.create({

@@ -46,5 +46,5 @@ export const formatWeekRange = (startDate?: string, endDate?: string): string | 
     return undefined;
   }
 
-  return `${formatDateLabel(startDate)} - ${formatDateLabel(endDate)}`;
+  return `${formatDateLabel(endDate)} - ${formatDateLabel(startDate)}`;
 };
