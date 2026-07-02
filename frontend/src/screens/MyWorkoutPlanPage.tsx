@@ -1,6 +1,6 @@
 import { RefreshControl, ScrollView, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IWorkoutPlan } from "@/interfaces/Workout";
 import MuscleGroupContainer from "@/components/WorkoutPlan/MuscleGroupContainer";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
@@ -18,16 +18,28 @@ import { WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
 import { useShadowStyles } from "@/styles/useShadowStyles";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 import PlanPendingState from "@/components/ui/PlanPendingState";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { WorkoutPlanStackParamList } from "@/types/navigatorTypes";
+
+const shouldOpenCardio = (openCardio?: boolean | string) =>
+  openCardio === true || openCardio === "true";
 
 const MyWorkoutPlanScreen = () => {
   const { colors, layout, spacing, common } = useStyles();
   const { frameShadow } = useShadowStyles();
   const { refresh } = usePullDownToRefresh();
+  const route = useRoute<RouteProp<WorkoutPlanStackParamList, "WorkoutPlan">>();
 
   const { data, isError, isLoading, error, refetch, isRefetching } = useWorkoutPlanQuery();
 
   const [selectedPlan, setSelectedPlan] = useState<IWorkoutPlan>();
-  const [showCardio, setShowCardio] = useState(false);
+  const [showCardio, setShowCardio] = useState(() => shouldOpenCardio(route.params?.openCardio));
+
+  useEffect(() => {
+    if (shouldOpenCardio(route.params?.openCardio)) {
+      setShowCardio(true);
+    }
+  }, [route.params?.openCardio]);
 
   const handleRefetch = async () => {
     queryClient.invalidateQueries({ queryKey: [WORKOUT_SESSION_KEY] });
@@ -102,11 +114,6 @@ const MyWorkoutPlanScreen = () => {
         contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg, { zIndex: 1 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
-        topShadow={true}
-        bottomShadow={true}
-        topShadowFirstColor={showCardio ? "#FFFFFF" : "#F4F4F4"}
-        bottomShadowFirstColor={showCardio ? "#FFFFFF" : undefined}
-        scrollShadowStyleTop={{ top: 0 }}
       >
         <ConditionalRender condition={showCardio}>
           <CardioWrapper cardioPlan={data?.cardio} />

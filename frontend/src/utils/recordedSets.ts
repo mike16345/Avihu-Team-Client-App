@@ -1,4 +1,4 @@
-import { IRecordedSet } from "@/interfaces/Workout";
+import { IRecordedSetRes } from "@/interfaces/Workout";
 import DateUtils from "./dateUtils";
 import { GraphData } from "@/hooks/graph/useGraphWeighIns";
 
@@ -6,8 +6,8 @@ type SetsSummaryByDate = Record<string, { totalReps: number; totalWeight: number
 
 type SetsSummaries = Record<string, GraphData[]>;
 
-export const groupRecordedSetsByDate = (recordedSets: IRecordedSet[]): SetsSummaryByDate => {
-  return recordedSets.reduce((acc: Record<any, any>, current: IRecordedSet) => {
+export const groupRecordedSetsByDate = (recordedSets: IRecordedSetRes[]): SetsSummaryByDate => {
+  return recordedSets.reduce((acc: SetsSummaryByDate, current: IRecordedSetRes) => {
     const { date, repsDone, weight } = current;
     const formattedDate = DateUtils.formatDate(date, "DD.MM");
 
@@ -20,7 +20,7 @@ export const groupRecordedSetsByDate = (recordedSets: IRecordedSet[]): SetsSumma
     acc[formattedDate].count += 1;
 
     return acc;
-  }, {} as SetsSummaryByDate);
+  }, {});
 };
 
 export const getDataAvgPerDate = (groupedSetsByDate: SetsSummaryByDate): SetsSummaries => {

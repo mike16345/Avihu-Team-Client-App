@@ -62,10 +62,10 @@ export const useFormStore = create<FormStore>()(
           progressByFormId: {
             ...state.progressByFormId,
             [formId]: {
-              answers: state.progressByFormId[formId]?.answers || {},
-              lastUpdatedAt: new Date().toISOString(),
               ...state.progressByFormId[formId],
+              answers: state.progressByFormId[formId]?.answers || {},
               ...updates,
+              lastUpdatedAt: new Date().toISOString(),
             },
           },
         })),

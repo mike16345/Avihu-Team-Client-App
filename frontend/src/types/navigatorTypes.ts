@@ -4,12 +4,17 @@ import {
   BottomTabNavigationEventMap,
   BottomTabNavigationOptions,
 } from "@react-navigation/bottom-tabs";
-import { NavigationHelpers, ParamListBase, RouteProp } from "@react-navigation/native";
+import {
+  NavigationHelpers,
+  NavigatorScreenParams,
+  ParamListBase,
+  RouteProp,
+} from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export type RootStackParamList = {
   Gate: undefined;
-  BottomTabs: undefined;
+  BottomTabs: NavigatorScreenParams<BottomStackParamList> | undefined;
   Chat: undefined;
   Profile: undefined;
   Questionnaire: undefined;
@@ -24,7 +29,7 @@ export type AuthStackParamList = {
 
 export type BottomStackParamList = {
   Home: { window?: number; paramId?: string } | undefined;
-  MyWorkoutPlanPage: undefined;
+  MyWorkoutPlanPage: NavigatorScreenParams<WorkoutPlanStackParamList> | undefined;
   ChatTab: undefined;
   MyDietPlanPage: undefined;
   MyProgressScreen: undefined;
@@ -43,6 +48,7 @@ export type ArticleStackParamsList = {
 };
 
 export type WorkoutPlanStackParamList = {
+  WorkoutPlan: { openCardio?: boolean | string } | undefined;
   WorkoutPlanPage: undefined;
   RecordExercise: {
     recordedSet?: IRecordedSetResponse;

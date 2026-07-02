@@ -1,21 +1,25 @@
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IMeal } from "@/interfaces/DietPlan";
-import {
-  generateUniqueId,
-  getTotalCaloriesInMeal,
-  removeMealFromTotalCalories,
-} from "@/utils/utils";
+import { generateUniqueId, getTotalCaloriesFromServings } from "@/utils/utils";
 import { useDietPlanStore } from "@/store/useDietPlanStore";
 
 const SESSION_KEY = "RecordedMealSession";
 const SESSION_EXPIRY_HOURS = 36;
 const MODAL_PROMPT_HOURS = 24;
 
+interface RecordedMealServings {
+  protein: number;
+  carbs: number;
+  veggies: number;
+  fats: number;
+}
+
 interface RecordedMeal {
   id: string;
   name: string;
   calories: number;
+  servings?: RecordedMealServings;
   recordedAt: string;
   synced: boolean;
 }
@@ -41,9 +45,34 @@ function needsPrompt(startedAt: string) {
   );
 }
 
+function getMealServingsSnapshot(meal: IMeal): RecordedMealServings {
+  return {
+    protein: Number(meal.totalProtein?.quantity) || 0,
+    carbs: Number(meal.totalCarbs?.quantity) || 0,
+    veggies: Number(meal.totalVeggies?.quantity) || 0,
+    fats: Number(meal.totalFats?.quantity) || 0,
+  };
+}
+
+function getRecordedMealCalories(meal: RecordedMeal) {
+  if (!meal.servings) return meal.calories || 0;
+
+  return getTotalCaloriesFromServings(meal.servings);
+}
+
+function getSessionCalories(session: RecordedMealSession) {
+  const mealCalories = session.meals.reduce((acc, meal) => acc + getRecordedMealCalories(meal), 0);
+  const freeCalories = session.freeCaloriesConsumed ? session.freeCalories : 0;
+
+  return mealCalories + freeCalories;
+}
+
+function hasLegacyRecordedMeals(session: RecordedMealSession) {
+  return session.meals.some((meal) => !meal.servings);
+}
+
 export function useRecordMeal() {
   const setTotalCaloriesEaten = useDietPlanStore((state) => state.setTotalCaloriesEaten);
-  const totalCaloriesEaten = useDietPlanStore((state) => state.totalCaloriesEaten);
 
   const [session, setSession] = useState<RecordedMealSession | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
@@ -101,42 +130,44 @@ export function useRecordMeal() {
   };
 
   const recordFreeCalorieConsumption = async (hasConsumed: boolean, calories: number) => {
-    const session = await getSessionFromStorage();
+    const storedSession = await getSessionFromStorage();
 
-    if (!session) return;
+    if (!storedSession) return;
 
-    session.freeCaloriesConsumed = hasConsumed;
-    session.freeCalories = calories;
-    await persist(session);
+    const updatedSession: RecordedMealSession = {
+      ...storedSession,
+      freeCaloriesConsumed: hasConsumed,
+      freeCalories: calories,
+    };
 
-    const newCalorieCount = hasConsumed
-      ? totalCaloriesEaten + calories
-      : totalCaloriesEaten - calories;
-
-    setTotalCaloriesEaten(newCalorieCount, true);
+    await persist(updatedSession);
+    setTotalCaloriesEaten(getSessionCalories(updatedSession), true);
   };
 
   const recordMeal = async (meal: IMeal, mealNumber: number) => {
-    const session = await getSessionFromStorage();
+    const storedSession = await getSessionFromStorage();
 
-    if (!session) return;
-    const totalCalories = getTotalCaloriesInMeal(meal);
+    if (!storedSession) return;
+
+    const servings = getMealServingsSnapshot(meal);
+    const totalCalories = getTotalCaloriesFromServings(servings);
 
     const recordedMeal: RecordedMeal = {
       id: meal._id,
       name: `ארוחה ${mealNumber + 1}`,
       calories: totalCalories,
+      servings,
       recordedAt: new Date().toLocaleTimeString(),
       synced: false,
     };
 
-    const updated: RecordedMealSession = {
-      ...session,
-      meals: [...session.meals, recordedMeal],
+    const updatedSession: RecordedMealSession = {
+      ...storedSession,
+      meals: [...storedSession.meals, recordedMeal],
     };
 
-    await persist(updated);
-    setTotalCaloriesEaten(totalCalories, false);
+    await persist(updatedSession);
+    setTotalCaloriesEaten(getSessionCalories(updatedSession), true);
 
     try {
       // TODO: Post meal to API
@@ -146,20 +177,19 @@ export function useRecordMeal() {
   };
 
   const cancelMeal = async (mealId: string) => {
-    const session = await getSessionFromStorage();
-    if (!session) return;
+    const storedSession = await getSessionFromStorage();
+    if (!storedSession) return;
 
-    const mealToCancel = session.meals.find((m) => m.id === mealId);
+    const mealToCancel = storedSession.meals.find((meal) => meal.id === mealId);
     if (!mealToCancel) return;
 
-    const caloriesToRemove = mealToCancel.calories;
-    const deducedCount = removeMealFromTotalCalories(caloriesToRemove, totalCaloriesEaten);
-    const updatedMeals = session.meals.filter((m) => m.id !== mealId);
-    const updated: RecordedMealSession = { ...session, meals: updatedMeals };
+    const updatedSession: RecordedMealSession = {
+      ...storedSession,
+      meals: storedSession.meals.filter((meal) => meal.id !== mealId),
+    };
 
-    setTotalCaloriesEaten(deducedCount);
-
-    await persist(updated);
+    setTotalCaloriesEaten(getSessionCalories(updatedSession), true);
+    await persist(updatedSession);
 
     try {
       // TODO: delete meal from API
@@ -169,22 +199,19 @@ export function useRecordMeal() {
   };
 
   const getLocalSession = async () => {
-    // return await AsyncStorage.removeItem(SESSION_KEY);
-    const session = await getSessionFromStorage();
+    const storedSession = await getSessionFromStorage();
 
-    if (!session) return await startNewSession();
+    if (!storedSession) return await startNewSession();
 
-    if (isExpired(session.startedAt)) return await startNewSession();
+    if (isExpired(storedSession.startedAt)) return await startNewSession();
+    if (hasLegacyRecordedMeals(storedSession)) return await startNewSession();
 
-    if (needsPrompt(session.startedAt)) {
+    if (needsPrompt(storedSession.startedAt)) {
       setShowPrompt(true);
     }
 
-    const totalCalories = session.meals.reduce((acc, m) => acc + m.calories, 0);
-    const freeCalories = session.freeCaloriesConsumed ? session.freeCalories : 0;
-
-    setTotalCaloriesEaten(totalCalories + freeCalories, true);
-    setSession(session);
+    setTotalCaloriesEaten(getSessionCalories(storedSession), true);
+    setSession(storedSession);
   };
 
   useEffect(() => {

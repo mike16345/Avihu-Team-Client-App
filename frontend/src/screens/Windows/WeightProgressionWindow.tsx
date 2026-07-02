@@ -6,7 +6,7 @@ import { RefreshControl } from "react-native";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 
 const WeightProgressionWindow = () => {
-  const { spacing, colors } = useStyles();
+  const { spacing } = useStyles();
   const { isRefetching, refetch } = useWeighInsQuery();
 
   return (

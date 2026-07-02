@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
 
@@ -47,7 +47,7 @@ const RadioGroup: React.FC<RadioGroupProps> = ({ options, value, onChange }) => 
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   radioOuter: {
     height: 20,
     width: 20,
@@ -59,6 +59,6 @@ const styles = {
     height: 8,
     width: 8,
   },
-};
+});
 
 export default RadioGroup;

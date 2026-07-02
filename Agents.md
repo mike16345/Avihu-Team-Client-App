@@ -35,6 +35,7 @@
 - Use strict equality and explicit branches in new or edited code. Avoid boolean/object expressions such as `condition && object` when a named branch is clearer.
 - Prefer guard clauses over deeply nested `if` blocks, especially around loading, error, missing route params, missing user/session state, and permission gates.
 - Keep files modular and easy to scan. Component, screen, hook, and utility files should generally stay under 350-400 lines; when a file grows past that range, extract focused child components, hooks, constants, or helpers before adding more logic.
+- Keep React component files narrow in responsibility. Prefer one primary component per file; a second small private component is acceptable only when it is tightly coupled to the main component and does not justify a reusable sibling file. If a file grows beyond that, extract the child component.
 - Keep React files in a predictable order: imports, local types, constants, helper functions, component declaration, export. Inside components, prefer independent hooks first, then state refs, derived values, handlers, effects, guard returns, and the main JSX return.
 - During refactors, preserve external behavior unless the task explicitly asks for a behavior change. Route names, navigation targets, query keys, mutation invalidation keys, API endpoints/params, persisted store keys, AsyncStorage keys, form field names, validation schemas, notification/task identifiers, Hebrew copy, and RTL behavior should remain unchanged.
 

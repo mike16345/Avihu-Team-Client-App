@@ -23,7 +23,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
           <View
             ref={(ref) => {
               if (ref) {
-                ref.measureInWindow((x, y, width) => {
+                ref.measureInWindow((x, _y, width) => {
                   setIconLayout("MyWorkoutPlanPage", x + width / 2);
                 });
               }
@@ -45,7 +45,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
           <View
             ref={(ref) => {
               if (ref) {
-                ref.measureInWindow((x, y, width) => {
+                ref.measureInWindow((x, _y, width) => {
                   setIconLayout("ChatTab", x + width / 2);
                 });
               }
@@ -75,7 +75,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
           <View
             ref={(ref) => {
               if (ref) {
-                ref.measureInWindow((x, y, width) => {
+                ref.measureInWindow((x, _y, width) => {
                   setIconLayout("Home", x + width / 2);
                 });
               }
@@ -98,7 +98,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
           <View
             ref={(ref) => {
               if (ref) {
-                ref.measureInWindow((x, y, width) => {
+                ref.measureInWindow((x, _y, width) => {
                   setIconLayout("MyDietPlanPage", x + width / 2);
                 });
               }
@@ -121,7 +121,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
           <View
             ref={(ref) => {
               if (ref) {
-                ref.measureInWindow((x, y, width) => {
+                ref.measureInWindow((x, _y, width) => {
                   setIconLayout("ArticleScreen", x + width / 2);
                 });
               }

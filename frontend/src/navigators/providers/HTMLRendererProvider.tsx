@@ -18,17 +18,17 @@ export const HtmlRenderProvider: React.FC<HtmlRenderProviderProps> = ({
 
   const baseStyle = useMemo(
     () => ({
-      color: textPrimary.color,
+      color: textColor ?? textPrimary.color,
       fontSize,
-      textAlign,
+      textAlign: textAlign as "left" | "right" | "center" | "justify",
     }),
     [textColor, fontSize, textAlign]
   );
 
   const tagsStyles = useMemo(
     () => ({
-      b: { fontWeight: "bold" },
-      strong: { fontWeight: "bold" },
+      b: { fontWeight: "bold" as const },
+      strong: { fontWeight: "bold" as const },
     }),
     []
   );

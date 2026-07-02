@@ -31,6 +31,8 @@ private func progressPercent(state: StepsActivityAttributes.ContentState) -> Int
     return Int((raw * 100).rounded())
 }
 
+private let cardioDeepLink = URL(string: "avihuteam://cardio?openCardio=true")
+
 @available(iOS 16.1, *)
 public struct StepsActivityWidget: Widget {
     public init() {}
@@ -39,6 +41,7 @@ public struct StepsActivityWidget: Widget {
         ActivityConfiguration(for: StepsActivityAttributes.self) { context in
             StepsLockScreenView(state: context.state)
                 .environment(\.layoutDirection, .rightToLeft)
+                .widgetURL(cardioDeepLink)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {

@@ -3,7 +3,6 @@ import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { IArticleCount } from "@/interfaces/IArticle";
 import { Text } from "../../ui/Text";
-import { ArticleStackParamsList } from "@/types/navigatorTypes";
 import BackButton from "@/components/ui/BackButton";
 
 interface ArticleGroupHeaderProps {
@@ -17,7 +16,7 @@ const ArticleGroupHeader: React.FC<ArticleGroupHeaderProps> = ({ articleGroup })
     <View style={[spacing.gapLg, spacing.pdHorizontalLg]}>
       <View style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter]}>
         <View style={[layout.flexRow, spacing.gapDefault, layout.itemsCenter]}>
-          <BackButton<ArticleStackParamsList> />
+          <BackButton />
           <Text fontSize={20} fontVariant="light">
             {articleGroup.name}
           </Text>

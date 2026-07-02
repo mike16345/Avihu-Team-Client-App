@@ -7,7 +7,7 @@ import { selectionHaptic } from "@/utils/haptics";
 interface HorizontalSelectorProps {
   selected: string;
   onSelect: (item: string) => void;
-  items: string[];
+  items: readonly string[];
   style?: StyleProp<ViewStyle>;
 }
 

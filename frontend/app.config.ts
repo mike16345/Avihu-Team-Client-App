@@ -28,6 +28,16 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
       "expo-background-task",
+      [
+        "expo-build-properties",
+        {
+          android: {
+            compileSdkVersion: 35,
+            targetSdkVersion: 35,
+            minSdkVersion: 26,
+          },
+        },
+      ],
 
       [
         "expo-image-picker",
@@ -55,14 +65,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           healthUpdatePermission: "האפליקציה לא משנה נתונים באפליקציית הבריאות.",
         },
       ],
-      [
-        "react-native-health-connect",
-        {
-          package: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
-        },
-      ],
-      "./native-modules/live-steps-activity/plugin/withLiveStepsActivity.js",
+      ["expo-health-connect"],
+      "./plugins/withHealthConnectPermissionDelegate",
+      "./native-modules/live-steps-activity/plugin/withLiveStepsActivity",
     ],
+    scheme: "avihuteam",
     ios: {
       bundleIdentifier: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
       supportsTablet: false,
@@ -79,6 +86,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         foregroundImage: "./assets/app-logo.png",
         backgroundColor: "#FFFFFF",
       },
+      permissions: [
+        "android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND",
+        "android.permission.health.READ_STEPS",
+        "android.permission.health.READ_DISTANCE",
+        "android.permission.health.READ_ACTIVE_CALORIES_BURNED",
+      ],
       softwareKeyboardLayoutMode: "resize",
       package: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
     },

@@ -7,6 +7,7 @@ import { ConditionalRender } from "../ui/ConditionalRender";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { Text } from "../ui/Text";
 import CustomScrollView from "../ui/scrollview/CustomScrollView";
+import { IMeal } from "@/interfaces/DietPlan";
 
 interface MealsListProps {}
 
@@ -32,7 +33,7 @@ const MealsList: FC<MealsListProps> = () => {
           <Text style={{ textAlign: "center" }}>אין תוכנית תזונה</Text>
         </ConditionalRender>
 
-        {meals.map((meal, i) => {
+        {meals.map((meal: IMeal, i: number) => {
           return <CollapsibleMeal key={meal._id ?? i} meal={meal} index={i} />;
         })}
       </CustomScrollView>
