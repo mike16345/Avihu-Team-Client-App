@@ -2,7 +2,6 @@ import { useWindowDimensions, StyleProp, ViewStyle, StyleSheet } from "react-nat
 import React, { useMemo } from "react";
 import { Canvas, LinearGradient, Rect, vec } from "@shopify/react-native-skia";
 import Animated from "react-native-reanimated";
-import useStyles from "@/styles/useGlobalStyles";
 import useColors from "@/styles/useColors";
 
 interface ScrollViewShadowProps {

@@ -28,6 +28,7 @@ export const useNotification = () => {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowBanner: true,
+      shouldShowList: true,
       shouldPlaySound: true,
       shouldSetBadge: true,
     }),

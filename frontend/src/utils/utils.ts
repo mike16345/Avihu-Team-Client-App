@@ -5,7 +5,6 @@ import {
   AVG_VEGGIE_CALORIES,
 } from "@/constants/Constants";
 import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
-import { ISession } from "@/interfaces/ISession";
 import Constants from "expo-constants";
 
 export const testEmail = (email: string) => {

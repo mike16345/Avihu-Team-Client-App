@@ -1,5 +1,4 @@
 import React from "react";
-import { View } from "react-native";
 import {
   ICardioPlan,
   IComplexCardioType,
@@ -9,7 +8,6 @@ import {
 import StepsCardioContainer from "./StepsCardioContainer";
 import SimpleCardioContainer from "./SimpleCardioContainer";
 import ComplexCardioWrapper from "./ComplexCardioWrapper";
-import useStyles from "@/styles/useGlobalStyles";
 
 interface CardioWrapperProps {
   cardioPlan?: ICardioPlan;
@@ -36,9 +34,7 @@ const getCardioContent = (cardioPlan?: ICardioPlan) => {
 };
 
 const CardioWrapper: React.FC<CardioWrapperProps> = ({ cardioPlan }) => {
-  const cardioContent = getCardioContent(cardioPlan);
-
-  return cardioContent;
+  return getCardioContent(cardioPlan);
 };
 
 export default CardioWrapper;

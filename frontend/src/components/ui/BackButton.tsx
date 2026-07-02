@@ -5,14 +5,14 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Icon from "../Icon/Icon";
 import { IconName } from "@/constants/iconMap";
 
-interface BackButtonProps<T extends ParamListBase> {
+interface BackButtonProps {
   backIcon?: IconName;
 }
 
-const BackButton = <T extends ParamListBase>({
+const BackButton = ({
   backIcon = "chevronRightBig",
-}: BackButtonProps<T>) => {
-  const navigation = useNavigation<NativeStackNavigationProp<T>>();
+}: BackButtonProps) => {
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const goBack = () => {
     navigation.goBack();

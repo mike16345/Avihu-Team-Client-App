@@ -5,8 +5,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Dimensions, StyleSheet, View, Pressable, LayoutChangeEvent } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
-  Extrapolation,
-  interpolate,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,

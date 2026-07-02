@@ -1,5 +1,4 @@
 import {
-  ScrollViewProps,
   ScrollView,
   NativeScrollEvent,
   NativeSyntheticEvent,

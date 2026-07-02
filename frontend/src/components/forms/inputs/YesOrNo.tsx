@@ -19,7 +19,7 @@ const YesOrNo: React.FC<YesOrNoProps> = ({ value, onChange }) => {
   const initialValue = !value ? "לא" : value !== "לא" ? "כן" : value;
   const isValueYesOrNo = useMemo(() => value === "כן" || value === "לא", [value]);
   const [selectedOption, setSelectedOption] = useState(initialValue);
-  const [other, setOther] = useState<string>(isValueYesOrNo ? "" : value);
+  const [other, setOther] = useState<string>(isValueYesOrNo ? "" : value ?? "");
   const hasSelectedYes = useMemo(() => selectedOption === "כן", [selectedOption]);
 
   /** 🔹 animated values */

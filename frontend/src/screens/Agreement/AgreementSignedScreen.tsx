@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import useStyles from "@/styles/useGlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
