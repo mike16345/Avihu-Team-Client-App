@@ -13,11 +13,11 @@
       "channel": "preview",
       "autoIncrement": true,
       "environment": "preview",
-      "ios": { "image": "macos-sequoia-15.3-xcode-16.2" }
+      "ios": { "image": "macos-sequoia-15.6-xcode-26.0" }
     },
     "production": {
       "android": { "credentialsSource": "remote" },
-      "ios": { "image": "macos-sequoia-15.3-xcode-16.2" },
+      "ios": { "image": "macos-sequoia-15.6-xcode-26.0" },
       "environment": "production",
       "channel": "production",
       "autoIncrement": true
