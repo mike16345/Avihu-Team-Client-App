@@ -2,7 +2,8 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
-import { DAY_FULL_NAMES, DayData, MUTED_TEXT, formatSteps } from "./stepsConstants";
+import { formatSteps } from "@/utils/stepsUtils";
+import { DAY_FULL_NAMES, DayData, MUTED_TEXT } from "./stepsConstants";
 
 interface DayDetailPanelProps {
   detail: DayData;
@@ -22,7 +23,7 @@ const DayDetailPanel: React.FC<DayDetailPanelProps> = ({ detail, detailValueFont
         יום {dayName}
       </Text>
       <View style={styles.row}>
-        <View style={styles.startColumn}>
+        <View>
           <Text fontVariant="bold" fontSize={detailValueFont} style={colors.textPrimary}>
             {stepsLabel}
           </Text>
@@ -30,7 +31,7 @@ const DayDetailPanel: React.FC<DayDetailPanelProps> = ({ detail, detailValueFont
             צעדים
           </Text>
         </View>
-        <View style={styles.endColumn}>
+        <View>
           <Text fontVariant="bold" fontSize={detailValueFont} style={colors.textPrimary}>
             {caloriesLabel}
           </Text>
@@ -56,12 +57,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-  startColumn: {
-    alignItems: "flex-start",
-  },
-  endColumn: {
-    alignItems: "flex-end",
   },
   unit: {
     color: MUTED_TEXT,

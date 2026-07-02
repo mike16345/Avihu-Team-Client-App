@@ -57,7 +57,7 @@ const Graph: React.FC<GraphProps> = ({
   const { layout, spacing } = useStyles();
 
   const { state: transformState } = useChartTransformState();
-  const { state, isActive } = useChartPressState({ x: 5, y: { value: 0 } });
+  const { state, isActive } = useChartPressState({ x: "", y: { value: 0 } });
 
   const k = useSharedValue(1);
   const tx = useSharedValue(0);

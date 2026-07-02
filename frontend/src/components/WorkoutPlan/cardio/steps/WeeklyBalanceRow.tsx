@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
+import { formatSteps } from "@/utils/stepsUtils";
 import {
   GREEN_DARK,
   HAIRLINE,
@@ -8,8 +9,8 @@ import {
   MUTED_TEXT_SOFT,
   PRIMARY_DARK,
   RED_DARK,
-  formatSteps,
 } from "./stepsConstants";
+import { IS_IOS } from "@/constants/Constants";
 
 interface WeeklyBalanceRowProps {
   balance: number;
@@ -17,13 +18,15 @@ interface WeeklyBalanceRowProps {
 
 const formatBalance = (balance: number) => {
   if (balance === 0) return "בדיוק על המסלול";
-  if (balance > 0) return `+${formatSteps(balance)}`;
-  return `-${formatSteps(Math.abs(balance))}`;
+  if (balance > 0) return IS_IOS ? `+${formatSteps(balance)}` : `${formatSteps(balance)}+`;
+
+  return IS_IOS ? `-${formatSteps(Math.abs(balance))}` : `${formatSteps(Math.abs(balance))}-`;
 };
 
 const getBalanceColor = (balance: number) => {
   if (balance > 0) return GREEN_DARK;
   if (balance < 0) return RED_DARK;
+
   return PRIMARY_DARK;
 };
 
@@ -41,7 +44,7 @@ const WeeklyBalanceRow: React.FC<WeeklyBalanceRowProps> = ({ balance }) => {
           {label}
         </Text>
         {balance !== 0 && (
-          <Text fontSize={12} style={[styles.unit, styles.unitSpacing]}>
+          <Text fontSize={12} style={[styles.unit]}>
             צעדים
           </Text>
         )}
@@ -63,16 +66,15 @@ const styles = StyleSheet.create({
   },
   valueGroup: {
     flexDirection: "row",
+    gap: 6,
     alignItems: "baseline",
   },
   unit: {
     color: MUTED_TEXT,
   },
-  unitSpacing: {
-    marginLeft: 6,
-  },
   heading: {
     color: MUTED_TEXT_SOFT,
+    textAlign: "right",
   },
 });
 

@@ -4,7 +4,12 @@ import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "./Text";
 import { ConditionalRender } from "./ConditionalRender";
 import ButtonShadow from "./buttons/ButtonShadow";
-import Animated, { useSharedValue, withSpring, SharedValue } from "react-native-reanimated";
+import Animated, {
+  SharedValue,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { selectionHaptic } from "@/utils/haptics";
 
 interface TabsRootProps<T extends string> {
@@ -37,13 +42,17 @@ type TabsContextValue<T extends string> = {
   translateX: SharedValue<number>;
 };
 
-const TabsContext = React.createContext<TabsContextValue<any>>({
-  value: "",
-  setValue: () => {},
-  tabWidth: 0,
-  registerTab: () => {},
-  translateX: 0,
-});
+const TabsContext = React.createContext<TabsContextValue<string> | null>(null);
+
+const useTabsContext = () => {
+  const context = React.useContext(TabsContext);
+
+  if (!context) {
+    throw new Error("Tabs components must be used within Tabs.");
+  }
+
+  return context;
+};
 
 export const Tabs = <T extends string>({
   value,
@@ -82,7 +91,6 @@ export const Tabs = <T extends string>({
 
     translateX.value = withSpring(-activeIndex * tabWidth, {
       damping: 24, // more damping = less bounce
-      duration: 1800,
       stiffness: 120, // lower stiffness = less punch / less "slam"
       mass: 1, // leave mass normal
       velocity: 0, // start speed
@@ -92,7 +100,13 @@ export const Tabs = <T extends string>({
 
   return (
     <TabsContext.Provider
-      value={{ value, setValue: onValueChange, tabWidth, registerTab, translateX }}
+      value={{
+        value,
+        setValue: onValueChange as (nextValue: string) => void,
+        tabWidth,
+        registerTab: registerTab as (tabValue: string, label: string) => void,
+        translateX,
+      }}
     >
       <View onLayout={onLayout}>{children}</View>
     </TabsContext.Provider>
@@ -101,7 +115,10 @@ export const Tabs = <T extends string>({
 
 export const TabsList = ({ children }: TabsListProps) => {
   const { colors, common, layout, spacing } = useStyles();
-  const { tabWidth, value, translateX } = React.useContext(TabsContext);
+  const { tabWidth, value, translateX } = useTabsContext();
+  const sliderStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
 
   return (
     <View
@@ -117,12 +134,14 @@ export const TabsList = ({ children }: TabsListProps) => {
       ]}
     >
       <Animated.View
-        style={{
-          position: "absolute",
-          height: "100%",
-          width: tabWidth,
-          transform: [{ translateX }],
-        }}
+        style={[
+          {
+            position: "absolute",
+            height: "100%",
+            width: tabWidth,
+          },
+          sliderStyle,
+        ]}
       >
         <ButtonShadow>
           <View
@@ -145,7 +164,7 @@ export const TabsList = ({ children }: TabsListProps) => {
 };
 
 export const TabsTrigger = ({ label, value }: TabsTriggerProps) => {
-  const { setValue, value: activeValue, registerTab } = React.useContext(TabsContext);
+  const { setValue, value: activeValue, registerTab } = useTabsContext();
   const { layout, text, colors } = useStyles();
 
   useEffect(() => {
@@ -172,7 +191,7 @@ export const TabsTrigger = ({ label, value }: TabsTriggerProps) => {
 };
 
 export const TabsContent = ({ value, children, forceMount = false }: TabsContentProps) => {
-  const { value: activeValue } = React.useContext(TabsContext);
+  const { value: activeValue } = useTabsContext();
 
   if (!forceMount) {
     return activeValue === value ? <>{children}</> : null;

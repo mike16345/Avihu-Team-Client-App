@@ -49,7 +49,8 @@ class DateUtils {
     const firstDate = recentWeighIns[0];
     const lastDate = recentWeighIns[recentWeighIns.length - 1];
 
-    const totalWeight = lastDate[keyToCalculate] - firstDate[keyToCalculate];
+    const totalWeight =
+      (lastDate[keyToCalculate] as number) - (firstDate[keyToCalculate] as number);
 
     return totalWeight;
   }

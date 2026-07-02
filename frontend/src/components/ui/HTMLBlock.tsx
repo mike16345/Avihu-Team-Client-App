@@ -12,20 +12,20 @@ const HtmlBlock: FC<RenderHTMLProps> = ({ ...props }) => {
     () => ({
       color: textPrimary.color,
       fontSize: 14,
-      textAlign: "left",
+      textAlign: "left" as const,
     }),
-    []
+    [textPrimary.color]
   );
   const tagStyle = useMemo(
     () => ({
-      ol: { direction: "rtl" },
-      li: { textAlign: "start" },
-      b: { fontWeight: "bold" },
-      strong: { fontWeight: "bold" },
-      u: { textDecorationLine: "underline" },
-      s: { textDecorationLine: "line-through" },
-      i: { fontStyle: "italic" },
-      em: { fontStyle: "italic" },
+      ol: { direction: "rtl" as const },
+      li: { textAlign: "left" as const },
+      b: { fontWeight: "bold" as const },
+      strong: { fontWeight: "bold" as const },
+      u: { textDecorationLine: "underline" as const },
+      s: { textDecorationLine: "line-through" as const },
+      i: { fontStyle: "italic" as const },
+      em: { fontStyle: "italic" as const },
     }),
     []
   );

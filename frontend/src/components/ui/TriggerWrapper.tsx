@@ -22,9 +22,9 @@ const TriggerWrapper: React.FC<Props> = ({ trigger, setOpen }) => {
   // Case 2: trigger is a valid React element
   if (React.isValidElement(trigger)) {
     // If the component supports onPress (e.g. TouchableOpacity or custom), inject it
-    return React.cloneElement(trigger, {
+    return React.cloneElement(trigger as React.ReactElement<{ onPress?: () => void }>, {
       onPress: handlePress,
-      ...trigger.props,
+      ...(trigger.props as { onPress?: () => void }),
     });
   }
 

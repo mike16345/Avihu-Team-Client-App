@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/live_steps_card_bg"
+    android:paddingLeft="14dp"
+    android:paddingTop="10dp"
+    android:paddingRight="14dp"
+    android:paddingBottom="10dp">
+
+    <FrameLayout
+        android:id="@+id/compactRingContainer"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true">
+
+        <ProgressBar
+            android:id="@+id/ringProgress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:max="100"
+            android:progressDrawable="@drawable/live_steps_ring" />
+
+        <TextView
+            android:id="@+id/percentText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="#1A1D24"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            tools:text="29%" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/compactSummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/compactRingContainer"
+        android:layout_marginStart="10dp"
+        android:ellipsize="end"
+        android:gravity="end"
+        android:maxLines="1"
+        android:textAlignment="viewEnd"
+        android:textColor="#1A1D24"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        tools:text="12,000 / 3,540" />
+</RelativeLayout>
