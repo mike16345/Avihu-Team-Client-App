@@ -20,11 +20,7 @@ const SimpleCardioContainer: React.FC<SimpleCardioContainerProps> = ({ plan }) =
     <View style={[common.rounded, spacing.gapLg]}>
       <View style={spacing.gapLg}>
         {cardioData.map(({ title, value }) => (
-          <Card
-            key={title}
-            variant="gray"
-            style={[layout.itemsCenter, spacing.pdDefault]}
-          >
+          <Card key={title} variant="gray" style={[layout.itemsCenter, spacing.pdDefault]}>
             <Text style={colors.textPrimary}>{title}</Text>
             {value}
           </Card>

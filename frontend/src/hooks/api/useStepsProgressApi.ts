@@ -7,10 +7,9 @@ const STEPS_PROGRESS_ENDPOINT = "steps";
 
 export const useStepsProgressApi = () => {
   const syncStepsProgress = useCallback((payload: StepsSyncPayload) => {
-    return sendData<ApiResponse<IStepsProgress>>(
-      `${STEPS_PROGRESS_ENDPOINT}/sync`,
-      payload
-    ).then((res) => res.data);
+    return sendData<ApiResponse<IStepsProgress>>(`${STEPS_PROGRESS_ENDPOINT}/sync`, payload).then(
+      (res) => res.data
+    );
   }, []);
 
   return {
