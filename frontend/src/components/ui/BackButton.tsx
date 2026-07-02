@@ -9,9 +9,7 @@ interface BackButtonProps {
   backIcon?: IconName;
 }
 
-const BackButton = ({
-  backIcon = "chevronRightBig",
-}: BackButtonProps) => {
+const BackButton = ({ backIcon = "chevronRightBig" }: BackButtonProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
 
   const goBack = () => {

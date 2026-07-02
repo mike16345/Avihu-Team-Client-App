@@ -85,7 +85,7 @@ export default function BottomSheetModal({
     },
     [isOpen]
   );
-  
+
   useEffect(() => {
     const target = Math.min(Math.max(sheetHeight.value, MIN_HEIGHT), MAX_HEIGHT);
 
