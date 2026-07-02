@@ -89,8 +89,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       permissions: [
         "android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND",
         "android.permission.health.READ_STEPS",
-        "android.permission.health.READ_DISTANCE",
-        "android.permission.health.READ_ACTIVE_CALORIES_BURNED",
       ],
       softwareKeyboardLayoutMode: "resize",
       package: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",

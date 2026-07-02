@@ -91,9 +91,7 @@ class LiveStepsService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_STOP -> {
-                pollingJob?.cancel()
-                stopForeground(STOP_FOREGROUND_REMOVE)
-                stopSelf()
+                stopServiceAndRemoveNotification()
                 return START_NOT_STICKY
             }
 
@@ -102,6 +100,11 @@ class LiveStepsService : Service() {
                 latestDailyGoal = intent?.getIntExtra(EXTRA_DAILY_GOAL, latestDailyGoal) ?: latestDailyGoal
                 latestDistanceKm =
                     intent?.getDoubleExtra(EXTRA_DISTANCE_KM, latestDistanceKm) ?: latestDistanceKm
+
+                if (latestDailyGoal <= 0) {
+                    stopServiceAndRemoveNotification()
+                    return START_NOT_STICKY
+                }
 
                 val notification = buildNotification(latestTodaySteps, latestDailyGoal, latestDistanceKm)
                 startForeground(NOTIFICATION_ID, notification)
@@ -119,6 +122,12 @@ class LiveStepsService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
+
+    private fun stopServiceAndRemoveNotification() {
+        pollingJob?.cancel()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
 
     private fun createChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -180,8 +189,7 @@ class LiveStepsService : Service() {
             val manager = getSystemService(NotificationManager::class.java)
             manager.notify(NOTIFICATION_ID, notification)
         } catch (err: Exception) {
-            // Background reads can fail if Health Connect background access was not granted.
-            // Keep the current notification state rather than stopping the foreground service.
+            stopServiceAndRemoveNotification()
         }
     }
 

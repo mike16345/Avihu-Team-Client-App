@@ -151,11 +151,17 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
   }, [canUseNativeSteps, isStepsTrackingEnabled, steps.syncedAt, syncCurrentSteps]);
 
   useEffect(() => {
-    if (!isLiveStepsAvailable || !isLiveStepsEnabled) {
+    if (!isLiveStepsAvailable) {
       return;
     }
 
-    if (!isStepsTrackingEnabled || !canUseNativeSteps || !steps.syncedAt || !hasLiveStepsGoal) {
+    if (
+      !isLiveStepsEnabled ||
+      !isStepsTrackingEnabled ||
+      !canUseNativeSteps ||
+      !steps.syncedAt ||
+      !hasLiveStepsGoal
+    ) {
       stopLiveSteps();
       lastLiveStepsPayloadRef.current = null;
       return;

@@ -46,7 +46,7 @@ class LiveStepsModule(reactContext: ReactApplicationContext) :
             val intent = Intent(reactApplicationContext, LiveStepsService::class.java).apply {
                 action = LiveStepsService.ACTION_STOP
             }
-            startService(intent)
+            sendStopIntent(intent)
             promise.resolve(true)
         } catch (e: Exception) {
             promise.reject("E_STOP", e.message, e)
@@ -59,7 +59,7 @@ class LiveStepsModule(reactContext: ReactApplicationContext) :
             val intent = Intent(reactApplicationContext, LiveStepsService::class.java).apply {
                 action = LiveStepsService.ACTION_STOP
             }
-            startService(intent)
+            sendStopIntent(intent)
             promise.resolve(1)
         } catch (e: Exception) {
             promise.reject("E_STOP", e.message, e)
@@ -78,5 +78,9 @@ class LiveStepsModule(reactContext: ReactApplicationContext) :
         } else {
             reactApplicationContext.startService(intent)
         }
+    }
+
+    private fun sendStopIntent(intent: Intent) {
+        reactApplicationContext.startService(intent)
     }
 }

@@ -356,12 +356,7 @@ const requestIOSPermission = async (native: any): Promise<boolean> => {
   }
 
   const Permissions = AppleHealthKit.Constants.Permissions;
-  const read = [
-    Permissions.StepCount,
-    Permissions.Steps,
-    Permissions.DistanceWalkingRunning,
-    Permissions.ActiveEnergyBurned,
-  ].filter(Boolean);
+  const read = [Permissions.StepCount, Permissions.Steps].filter(Boolean);
 
   return new Promise((resolve) => {
     AppleHealthKit.initHealthKit({ permissions: { read, write: [] } }, (err: any) => {
@@ -405,7 +400,18 @@ const hasAndroidBackgroundPermission = (
   grantedPermissions.some(
     (permission) =>
       permission?.accessType === "read" && permission?.recordType === "BackgroundAccessPermission"
+    );
+
+const isPermissionError = (err: unknown) => {
+  const message = String((err as { message?: string })?.message ?? err ?? "").toLowerCase();
+
+  return (
+    message.includes("permission") ||
+    message.includes("not granted") ||
+    message.includes("securityexception") ||
+    message.includes("authorization")
   );
+};
 
 const requestAndroidPermission = async (
   native: NativeAndroidModule
@@ -471,6 +477,20 @@ const useStepsData = (): UseStepsDataResult => {
   const [hasBackgroundAccess, setHasBackgroundAccess] = useState(Platform.OS === "ios");
   const refreshInFlightRef = useRef(false);
 
+  const resetDisconnectedState = useCallback(
+    (nextStatus: StepsPermissionStatus, today = new Date(), nextBackgroundAccess?: boolean) => {
+      setTodaySteps(0);
+      setTodayCalories(0);
+      setWeeks(buildEmptyWeeks(today));
+      setSyncedAt(null);
+      setStatus(nextStatus);
+      setHasBackgroundAccess(
+        nextBackgroundAccess ?? (Platform.OS === "ios" ? true : false)
+      );
+    },
+    []
+  );
+
   const refresh = useCallback(async () => {
     if (!native || refreshInFlightRef.current) return;
 
@@ -478,6 +498,18 @@ const useStepsData = (): UseStepsDataResult => {
 
     try {
       const today = new Date();
+      if (Platform.OS === "android") {
+        const permissionState = await initializeAndroidExistingConnection(
+          native as NativeAndroidModule
+        );
+        setHasBackgroundAccess(permissionState.hasBackgroundAccess);
+
+        if (!permissionState.hasStepsRead) {
+          resetDisconnectedState("denied", today, permissionState.hasBackgroundAccess);
+          return;
+        }
+      }
+
       const data =
         Platform.OS === "ios"
           ? await readIOS(native, today)
@@ -497,15 +529,25 @@ const useStepsData = (): UseStepsDataResult => {
       setStatus("granted");
     } catch (err) {
       console.error("[steps] refresh failed:", err);
+
+      if (Platform.OS === "android") {
+        const permissionState = await initializeAndroidExistingConnection(
+          native as NativeAndroidModule
+        );
+
+        if (!permissionState.hasStepsRead || isPermissionError(err)) {
+          resetDisconnectedState("denied", new Date(), permissionState.hasBackgroundAccess);
+        }
+      }
     } finally {
       refreshInFlightRef.current = false;
     }
-  }, [native]);
+  }, [native, resetDisconnectedState]);
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
     if (!native) {
       console.error("[steps] requestPermission called but native module is null");
-      setStatus("denied");
+      resetDisconnectedState("denied");
       return false;
     }
 
@@ -521,7 +563,7 @@ const useStepsData = (): UseStepsDataResult => {
       }
 
       if (!isGranted) {
-        setStatus("denied");
+        resetDisconnectedState("denied");
         return false;
       }
 
@@ -531,10 +573,10 @@ const useStepsData = (): UseStepsDataResult => {
       return true;
     } catch (err) {
       console.error("[steps] requestPermission threw:", err);
-      setStatus("denied");
+      resetDisconnectedState("denied");
       return false;
     }
-  }, [native, refresh]);
+  }, [native, refresh, resetDisconnectedState]);
 
   const ensureBackgroundAccess = useCallback(async (): Promise<boolean> => {
     if (Platform.OS !== "android") {
@@ -590,7 +632,10 @@ const useStepsData = (): UseStepsDataResult => {
 
       if (!isMounted) return;
 
-      if (!isInitialized) return;
+      if (!isInitialized) {
+        resetDisconnectedState("denied");
+        return;
+      }
 
       setStatus("granted");
       await refresh();
@@ -601,7 +646,7 @@ const useStepsData = (): UseStepsDataResult => {
     return () => {
       isMounted = false;
     };
-  }, [native, refresh]);
+  }, [native, refresh, resetDisconnectedState]);
 
   return {
     status,

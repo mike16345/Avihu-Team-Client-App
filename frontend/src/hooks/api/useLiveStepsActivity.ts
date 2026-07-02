@@ -70,9 +70,14 @@ const useLiveStepsActivity = (): UseLiveStepsActivityResult => {
   );
 
   const stop = useCallback(async (): Promise<void> => {
-    if (!isAvailable || !activityIdRef.current) return;
+    if (!isAvailable) return;
+
     try {
-      await RNLiveSteps!.stop(activityIdRef.current);
+      if (activityIdRef.current) {
+        await RNLiveSteps!.stop(activityIdRef.current);
+      } else {
+        await RNLiveSteps!.stopAll();
+      }
     } catch {
       // ignore
     } finally {
