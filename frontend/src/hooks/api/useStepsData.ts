@@ -400,7 +400,7 @@ const hasAndroidBackgroundPermission = (
   grantedPermissions.some(
     (permission) =>
       permission?.accessType === "read" && permission?.recordType === "BackgroundAccessPermission"
-    );
+  );
 
 const isPermissionError = (err: unknown) => {
   const message = String((err as { message?: string })?.message ?? err ?? "").toLowerCase();
@@ -484,9 +484,7 @@ const useStepsData = (): UseStepsDataResult => {
       setWeeks(buildEmptyWeeks(today));
       setSyncedAt(null);
       setStatus(nextStatus);
-      setHasBackgroundAccess(
-        nextBackgroundAccess ?? (Platform.OS === "ios" ? true : false)
-      );
+      setHasBackgroundAccess(nextBackgroundAccess ?? (Platform.OS === "ios" ? true : false));
     },
     []
   );
