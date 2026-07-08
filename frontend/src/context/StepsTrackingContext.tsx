@@ -36,6 +36,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
   } = useLiveStepsActivity();
   const { syncStepsProgress } = useStepsProgressApi();
   const { data: workoutPlan } = useWorkoutPlanQuery();
+  const currentUserId = useUserStore((state) => state.currentUser?._id);
   const planType = useUserStore((state) => state.currentUser?.planType);
 
   const lastServerSyncAtRef = useRef(0);
@@ -57,7 +58,16 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
   const canUseNativeSteps = steps.isNativeAvailable && steps.status === "granted";
   const isStepsTrackingEnabled = workoutPlan?.cardio?.type === "steps";
   const hasLiveStepsGoal = Number.isFinite(dailyGoal) && dailyGoal > 0;
-  const shouldSendMilestoneNotifications = planType === STEPS_MILESTONE_PLAN_TYPE;
+  const isCutPlanType = planType === STEPS_MILESTONE_PLAN_TYPE;
+  const shouldShowLiveStepsActivity = isCutPlanType;
+  const shouldSendMilestoneNotifications = isCutPlanType;
+
+  useEffect(() => {
+    lastServerSyncAtRef.current = 0;
+    lastServerSyncPayloadRef.current = null;
+    lastLiveStepsPayloadRef.current = null;
+    syncedAfterOpenRef.current = false;
+  }, [currentUserId]);
 
   const syncCurrentSteps = useCallback(
     async (force = false) => {
@@ -68,7 +78,14 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
 
       const date = getLocalDateKey(new Date());
       const source = Platform.OS === "ios" ? "healthkit" : "health_connect";
-      const payloadKey = `${date}:${steps.todaySteps}:${steps.todayCalories}:${dailyGoal}:${source}`;
+      const payloadKey = [
+        currentUserId ?? "anonymous",
+        date,
+        steps.todaySteps,
+        steps.todayCalories,
+        dailyGoal,
+        source,
+      ].join(":");
       if (!force && lastServerSyncPayloadRef.current === payloadKey) return;
 
       try {
@@ -88,6 +105,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
     },
     [
       canUseNativeSteps,
+      currentUserId,
       dailyGoal,
       isStepsTrackingEnabled,
       steps.syncedAt,
@@ -158,6 +176,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
     if (
       !isLiveStepsEnabled ||
       !isStepsTrackingEnabled ||
+      !shouldShowLiveStepsActivity ||
       !canUseNativeSteps ||
       !steps.syncedAt ||
       !hasLiveStepsGoal
@@ -167,7 +186,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
       return;
     }
 
-    const payloadKey = `${steps.todaySteps}:${dailyGoal}`;
+    const payloadKey = `${currentUserId ?? "anonymous"}:${steps.todaySteps}:${dailyGoal}`;
     if (lastLiveStepsPayloadRef.current === payloadKey) {
       return;
     }
@@ -193,7 +212,9 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
     isLiveStepsEnabled,
     isStepsTrackingEnabled,
     hasLiveStepsGoal,
+    currentUserId,
     liveStepsActivityId,
+    shouldShowLiveStepsActivity,
     startLiveSteps,
     stopLiveSteps,
     steps.syncedAt,
@@ -207,12 +228,14 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
 
   useEffect(() => {
     if (!isStepsTrackingEnabled || !canUseNativeSteps || !hasLiveStepsGoal) return;
+    if (!currentUserId) return;
     if (!steps.syncedAt || steps.todaySteps <= 0) return;
     if (!shouldSendMilestoneNotifications) return;
 
-    notifications.notifyMilestone(steps.todaySteps, dailyGoal);
+    notifications.notifyMilestone(steps.todaySteps, dailyGoal, currentUserId);
   }, [
     canUseNativeSteps,
+    currentUserId,
     dailyGoal,
     hasLiveStepsGoal,
     isStepsTrackingEnabled,

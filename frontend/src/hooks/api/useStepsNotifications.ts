@@ -18,6 +18,7 @@ interface StepsMilestone {
 }
 
 interface StoredMilestoneState {
+  storageKey: string;
   dateKey: string;
   lastSentLevel: number;
 }
@@ -93,8 +94,14 @@ export interface UseStepsNotificationsResult {
   isAvailable: boolean;
   requestPermission: () => Promise<boolean>;
   cancelLegacyDaily: () => Promise<void>;
-  notifyMilestone: (todaySteps: number, dailyGoal: number) => Promise<void>;
+  notifyMilestone: (
+    todaySteps: number,
+    dailyGoal: number,
+    userId: string
+  ) => Promise<void>;
 }
+
+const getMilestoneStorageKey = (userId: string) => `${MILESTONE_STORAGE_KEY}:${userId}`;
 
 const useStepsNotifications = (): UseStepsNotificationsResult => {
   const notifModuleRef = useRef(loadNotifications());
@@ -115,43 +122,57 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
     });
   }, []);
 
-  const readMilestoneState = useCallback(async (): Promise<StoredMilestoneState> => {
-    const todayKey = getLocalDateKey();
-    const cached = milestoneStateRef.current;
+  const readMilestoneState = useCallback(
+    async (userId: string): Promise<StoredMilestoneState> => {
+      const todayKey = getLocalDateKey();
+      const storageKey = getMilestoneStorageKey(userId);
+      const cached = milestoneStateRef.current;
 
-    if (cached?.dateKey === todayKey) {
-      return cached;
-    }
-
-    try {
-      const raw = await AsyncStorage.getItem(MILESTONE_STORAGE_KEY);
-
-      if (raw) {
-        const parsed = JSON.parse(raw) as StoredMilestoneState;
-
-        if (parsed?.dateKey === todayKey) {
-          milestoneStateRef.current = parsed;
-          return parsed;
-        }
+      if (cached?.storageKey === storageKey && cached.dateKey === todayKey) {
+        return cached;
       }
-    } catch {
-      // ignore malformed local state
-    }
 
-    const nextState = { dateKey: todayKey, lastSentLevel: 0 };
-    milestoneStateRef.current = nextState;
-    return nextState;
-  }, []);
+      try {
+        const raw = await AsyncStorage.getItem(storageKey);
 
-  const writeMilestoneState = useCallback(async (state: StoredMilestoneState): Promise<void> => {
-    milestoneStateRef.current = state;
+        if (raw) {
+          const parsed = JSON.parse(raw) as Omit<StoredMilestoneState, "storageKey">;
 
-    try {
-      await AsyncStorage.setItem(MILESTONE_STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      // persistence failure is non-fatal
-    }
-  }, []);
+          if (parsed?.dateKey === todayKey) {
+            const nextState = { ...parsed, storageKey };
+            milestoneStateRef.current = nextState;
+            return nextState;
+          }
+        }
+      } catch {
+        // ignore malformed local state
+      }
+
+      const nextState = { storageKey, dateKey: todayKey, lastSentLevel: 0 };
+      milestoneStateRef.current = nextState;
+      return nextState;
+    },
+    []
+  );
+
+  const writeMilestoneState = useCallback(
+    async (state: StoredMilestoneState): Promise<void> => {
+      milestoneStateRef.current = state;
+
+      try {
+        await AsyncStorage.setItem(
+          state.storageKey,
+          JSON.stringify({
+            dateKey: state.dateKey,
+            lastSentLevel: state.lastSentLevel,
+          })
+        );
+      } catch {
+        // persistence failure is non-fatal
+      }
+    },
+    []
+  );
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
     const Notifications = notifModuleRef.current;
@@ -183,9 +204,10 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
   }, []);
 
   const notifyMilestone = useCallback(
-    async (todaySteps: number, dailyGoal: number): Promise<void> => {
+    async (todaySteps: number, dailyGoal: number, userId: string): Promise<void> => {
       const Notifications = notifModuleRef.current;
       if (!Notifications) return;
+      if (!userId) return;
 
       const permission = await Notifications.getPermissionsAsync();
       if (permission?.status !== "granted") return;
@@ -193,7 +215,7 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
       const milestone = getReachedMilestone(todaySteps, dailyGoal);
       if (!milestone) return;
 
-      const state = await readMilestoneState();
+      const state = await readMilestoneState(userId);
 
       if (milestone.level <= state.lastSentLevel) {
         return;
@@ -213,6 +235,7 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
         });
 
         await writeMilestoneState({
+          storageKey: state.storageKey,
           dateKey: state.dateKey,
           lastSentLevel: milestone.level,
         });
