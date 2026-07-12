@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { ExpoConfig, ConfigContext } from "@expo/config";
 
+const APP_VERSION = "2.3.0";
 export default ({ config }: ConfigContext): ExpoConfig => {
   const isDev = !!process.env.DEV_MODE;
 
@@ -8,7 +9,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...config,
     name: "Avihu Team",
     slug: "avihu-team",
-    version: "2.3.0",
+    version: APP_VERSION,
     orientation: "portrait",
     icon: "./assets/app-logo.png",
     userInterfaceStyle: "automatic",
@@ -108,7 +109,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       DEV_MODE: process.env.DEV_MODE,
     },
     owner: "avihuteam",
-    runtimeVersion: { policy: "appVersion" },
+    runtimeVersion: APP_VERSION,
     updates: {
       enabled: true,
       url: "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2",
