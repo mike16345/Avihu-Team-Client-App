@@ -21,13 +21,23 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ items, onSelect, selectedVa
     setOpen(false);
   };
 
+  const handleSetValue = (valueOrUpdater: any) => {
+    const nextValue =
+      typeof valueOrUpdater === "function" ? valueOrUpdater(selectedValue ?? null) : valueOrUpdater;
+
+    handleSelect(nextValue);
+  };
+
   const selectedItemLabel = selectedValue || "בחר";
 
   return (
     <View style={{ position: "relative" }}>
       <DropDownPicker
+        multiple={false}
         open={open}
         setOpen={setOpen}
+        value={selectedValue ?? null}
+        setValue={handleSetValue}
         closeOnBackPressed
         items={items}
         listMode="FLATLIST"

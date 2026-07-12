@@ -8,7 +8,12 @@ export const navigateFromRoot = <T extends keyof RootStackParamList>(
 ) => {
   if (!navigationRef.isReady()) return;
 
-  navigationRef.navigate(name, params);
+  navigationRef.dispatch(
+    CommonActions.navigate({
+      name: name as string,
+      params: params as object | undefined,
+    })
+  );
 };
 
 export const resetRootTo = (name: string, params?: Record<string, any>) => {

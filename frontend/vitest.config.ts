@@ -1,12 +1,20 @@
+import path from "node:path";
 import { defineConfig } from "vitest/config";
-import tsconfigPaths from "vite-tsconfig-paths";
+
+const rootDir = __dirname;
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  resolve: {
+    alias: {
+      "@": path.resolve(rootDir, "src"),
+      "@assets": path.resolve(rootDir, "assets"),
+    },
+  },
   test: {
+    dir: "src",
     environment: "node",
-    include: ["src/**/__tests__/**/*.test.ts"],
-    exclude: ["node_modules/**", "dist/**", ".expo/**"],
+    include: ["**/__tests__/**/*.test.ts", "**/__tests__/**/*.test.tsx"],
+    exclude: ["**/node_modules/**", "**/dist/**", "**/.expo/**"],
     restoreMocks: true,
   },
 });

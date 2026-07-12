@@ -1,7 +1,6 @@
 import { IToast } from "@/interfaces/toast";
 import React, { ReactNode, useEffect, useState } from "react";
 import { StyleProp, TouchableOpacity, View, ViewStyle } from "react-native";
-import { ConditionalRender } from "./ConditionalRender";
 import Toast from "./toast/Toast";
 import { useToast } from "@/hooks/useToast";
 import Animated, {
@@ -101,9 +100,7 @@ const AsyncToastWrapper: React.FC<AsyncToastWrapperProps> = ({
         <TouchableOpacity onPress={handlePress}>{children}</TouchableOpacity>
       </Animated.View>
 
-      <ConditionalRender condition={toast}>
-        <Toast externalTranslateY={toastTranslateY} toast={toast} />
-      </ConditionalRender>
+      {toast ? <Toast toast={toast as IToast} onDismissToast={animateOutToast} /> : null}
     </View>
   );
 };

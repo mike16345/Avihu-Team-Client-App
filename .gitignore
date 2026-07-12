@@ -51,3 +51,6 @@ yarn-error.*
 .npmrc
 
 credentials.json
+
+/android
+/ios

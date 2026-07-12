@@ -3,7 +3,6 @@ import { CHAT_SESSIONS_STORAGE_KEY } from "@/constants/reactQuery";
 import {
   IChatMessage,
   IChatPausedState,
-  IChatQuotaState,
   IChatSession,
   IChatSessionMeta,
   IChatSessionsState,

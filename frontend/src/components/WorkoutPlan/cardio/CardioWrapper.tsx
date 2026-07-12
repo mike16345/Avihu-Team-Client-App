@@ -1,28 +1,40 @@
-import { View, Text } from "react-native";
 import React from "react";
-import { ICardioPlan } from "@/interfaces/Workout";
+import {
+  ICardioPlan,
+  IComplexCardioType,
+  ISimpleCardioType,
+  IStepsCardioType,
+} from "@/interfaces/Workout";
+import StepsCardioContainer from "./StepsCardioContainer";
 import SimpleCardioContainer from "./SimpleCardioContainer";
 import ComplexCardioWrapper from "./ComplexCardioWrapper";
-import useStyles from "@/styles/useGlobalStyles";
-import { ConditionalRender } from "@/components/ui/ConditionalRender";
 
 interface CardioWrapperProps {
   cardioPlan?: ICardioPlan;
 }
 
-const CardioWrapper: React.FC<CardioWrapperProps> = ({ cardioPlan }) => {
-  const { colors, layout, spacing } = useStyles();
+const getCardioContent = (cardioPlan?: ICardioPlan) => {
+  if (!cardioPlan) {
+    return null;
+  }
 
-  return (
-    <View style={[colors.background, layout.flex1]}>
-      <ConditionalRender condition={cardioPlan?.type == `simple`}>
-        <SimpleCardioContainer plan={cardioPlan?.plan} />
-      </ConditionalRender>
-      {/*   <ConditionalRender condition={cardioPlan?.type == `complex`}>
-        <ComplexCardioWrapper plan={cardioPlan?.plan?.weeks || []} />
-      </ConditionalRender> */}
-    </View>
-  );
+  if (cardioPlan.type === "steps") {
+    return <StepsCardioContainer plan={cardioPlan.plan as IStepsCardioType} />;
+  }
+
+  if (cardioPlan.type === "simple") {
+    return <SimpleCardioContainer plan={cardioPlan.plan as ISimpleCardioType} />;
+  }
+
+  if (cardioPlan.type === "complex") {
+    return <ComplexCardioWrapper plan={(cardioPlan.plan as IComplexCardioType).weeks} />;
+  }
+
+  return null;
+};
+
+const CardioWrapper: React.FC<CardioWrapperProps> = ({ cardioPlan }) => {
+  return getCardioContent(cardioPlan);
 };
 
 export default CardioWrapper;
