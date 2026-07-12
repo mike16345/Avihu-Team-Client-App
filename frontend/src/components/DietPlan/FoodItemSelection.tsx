@@ -25,28 +25,36 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
 }) => {
   const { center, wrap } = useLayoutStyles();
   const { data: items, isLoading } = useFoodGroupQuery(foodGroup);
+  const hasCustomItems = customItems.length > 0;
+  const hasExtraItems = extraItems.length > 0;
+  const shouldShowGeneralItems = !hasCustomItems && !hasExtraItems;
 
   const formatted = useMemo(() => {
-    let customFormatted = customItems.map((customItem) =>
+    const customFormatted = customItems.map((customItem) =>
       formatServingText(customItem.name, customItem.oneServing, servingAmount, 1, [], " ", true)
     );
 
-    if (extraItems.length > 0) {
-      const allItems = [...customFormatted, ...extraItems];
+    if (hasCustomItems && hasExtraItems) {
+      return [...customFormatted, ...extraItems].join(" | ");
+    }
 
-      return allItems.join(" | ");
+    if (hasCustomItems) {
+      return customFormatted.join(" | ");
+    }
+
+    if (hasExtraItems) {
+      return extraItems.join(" | ");
     }
 
     if (!items) return "";
-    const allItems = [...customItems, ...items];
 
-    return allItems
+    return items
       .slice(START_SLICE_INDEX, END_SLICE_INDEX)
       .map((item) => formatServingText(item.name, item.oneServing, servingAmount, 1, [], " ", true))
       .join(" | ");
-  }, [items, extraItems, customItems]);
+  }, [customItems, extraItems, hasCustomItems, hasExtraItems, items, servingAmount]);
 
-  if (items == undefined || isLoading)
+  if (shouldShowGeneralItems && (items == undefined || isLoading))
     return (
       <View style={[center]}>
         <SpinningIcon mode="light" />
