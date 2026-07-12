@@ -27,7 +27,15 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
   const { data: items, isLoading } = useFoodGroupQuery(foodGroup);
 
   const formatted = useMemo(() => {
-    if (extraItems.length > 0) return extraItems.join(" | ");
+    let customFormatted = customItems.map((customItem) =>
+      formatServingText(customItem.name, customItem.oneServing, servingAmount, 1, [], " ", true)
+    );
+
+    if (extraItems.length > 0) {
+      const allItems = [...customFormatted, ...extraItems];
+
+      return allItems.join(" | ");
+    }
 
     if (!items) return "";
     const allItems = [...customItems, ...items];
@@ -36,7 +44,7 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
       .slice(START_SLICE_INDEX, END_SLICE_INDEX)
       .map((item) => formatServingText(item.name, item.oneServing, servingAmount, 1, [], " ", true))
       .join(" | ");
-  }, [items, customItems]);
+  }, [items, extraItems, customItems]);
 
   if (items == undefined || isLoading)
     return (

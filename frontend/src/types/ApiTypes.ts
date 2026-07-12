@@ -9,4 +9,5 @@ export type UpdateDocumentResponse = {
 export type ApiResponse<T> = {
   data: T;
   message: string;
+  code?: string;
 };

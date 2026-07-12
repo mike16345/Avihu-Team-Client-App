@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { FormPreset } from "@/interfaces/FormPreset";
 import { useFormStore } from "@/store/formStore";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -11,8 +11,10 @@ interface DynamicFormProps {
   onComplete?: () => void;
 }
 
+export type SectionTransitionDirection = "forward" | "backward";
+
 export type SectionStackParamList = {
-  FormSection: { sectionIndex: number };
+  FormSection: { sectionIndex: number; direction?: SectionTransitionDirection };
 };
 
 const Stack = createNativeStackNavigator<SectionStackParamList>();
@@ -20,12 +22,14 @@ const Stack = createNativeStackNavigator<SectionStackParamList>();
 const DynamicForm: React.FC<DynamicFormProps> = ({ form, onComplete }) => {
   const { progressByFormId, updateFormProgress } = useFormStore();
 
-  const [isAscending, setIsAscending] = useState(true);
-
   const progress = progressByFormId[form._id];
   const hasInitializedRef = useRef(false);
   const sections = form.sections || [];
   const lastSectionIndex = Math.max(sections.length - 1, 0);
+  const isIos = Platform.OS === "ios";
+
+  const backwardsAnimation = isIos ? "ios_from_left" : "slide_from_right";
+  const forwardsAnimation = isIos ? "ios_from_right" : "slide_from_left";
 
   const initialSectionIndex = useMemo(() => {
     if (progress?.currentSectionId) {
@@ -39,26 +43,6 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ form, onComplete }) => {
 
     return 0;
   }, [progress?.currentSectionId, progress?.currentSectionIndex, sections, lastSectionIndex]);
-
-  const slideAnimation = useMemo(() => {
-    const ascendingAnimation = Platform.OS === "ios" ? "ios_from_left" : "slide_from_left";
-    const descendingAnimation = Platform.OS === "ios" ? "ios_from_right" : "slide_from_right";
-    return isAscending ? ascendingAnimation : descendingAnimation;
-  }, [isAscending]);
-
-  const calculateAscending = () => {
-    const prev = progress?.previousSectionIndex ?? 0;
-    const current = progress?.currentSectionIndex ?? 0;
-    if (prev === current) return;
-
-    const isAscending = current >= prev;
-    setIsAscending(isAscending);
-  };
-
-  useEffect(
-    () => calculateAscending(),
-    [progress?.currentSectionIndex, progress?.previousSectionIndex]
-  );
 
   useEffect(() => {
     if (hasInitializedRef.current) return;
@@ -86,8 +70,11 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ form, onComplete }) => {
         <Stack.Screen
           name="FormSection"
           component={FormSectionScreen}
-          initialParams={{ sectionIndex: initialSectionIndex }}
-          options={{ animation: slideAnimation }}
+          initialParams={{ sectionIndex: initialSectionIndex, direction: "forward" }}
+          options={({ route }) => ({
+            animation:
+              route.params.direction === "backward" ? backwardsAnimation : forwardsAnimation,
+          })}
         />
       </Stack.Navigator>
     </FormProvider>

@@ -1,6 +1,6 @@
 import { RefreshControl, ScrollView, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IWorkoutPlan } from "@/interfaces/Workout";
 import MuscleGroupContainer from "@/components/WorkoutPlan/MuscleGroupContainer";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
@@ -15,24 +15,39 @@ import { DropDownContextProvider } from "@/context/useDropdown";
 import { mapToDropDownItems } from "@/utils/utils";
 import queryClient from "@/QueryClient/queryClient";
 import { WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
-import { Text } from "@/components/ui/Text";
 import { useShadowStyles } from "@/styles/useShadowStyles";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
+import PlanPendingState from "@/components/ui/PlanPendingState";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { WorkoutPlanStackParamList } from "@/types/navigatorTypes";
+
+const shouldOpenCardio = (openCardio?: boolean | string) =>
+  openCardio === true || openCardio === "true";
 
 const MyWorkoutPlanScreen = () => {
   const { colors, layout, spacing, common } = useStyles();
   const { frameShadow } = useShadowStyles();
   const { refresh } = usePullDownToRefresh();
+  const route = useRoute<RouteProp<WorkoutPlanStackParamList, "WorkoutPlan">>();
 
   const { data, isError, isLoading, error, refetch, isRefetching } = useWorkoutPlanQuery();
 
   const [selectedPlan, setSelectedPlan] = useState<IWorkoutPlan>();
-  const [showCardio, setShowCardio] = useState(false);
+  const [showCardio, setShowCardio] = useState(() => shouldOpenCardio(route.params?.openCardio));
+
+  useEffect(() => {
+    if (shouldOpenCardio(route.params?.openCardio)) {
+      setShowCardio(true);
+    }
+  }, [route.params?.openCardio]);
 
   const handleRefetch = async () => {
     queryClient.invalidateQueries({ queryKey: [WORKOUT_SESSION_KEY] });
     await refetch();
   };
+
+  const hasCardioPlan = Boolean(data?.cardio?.type && data?.cardio?.plan);
+  const hasWorkoutPlanContent = (data?.workoutPlans?.length ?? 0) > 0 || hasCardioPlan;
 
   const handleSelect = (val: any) => {
     if (val == CARDIO_VALUE) return setShowCardio(true);
@@ -47,31 +62,43 @@ const MyWorkoutPlanScreen = () => {
   const plans = useMemo(() => {
     if (!data) return [];
 
-    const plans = mapToDropDownItems(data.workoutPlans, {
+    const nextPlans = mapToDropDownItems(data.workoutPlans, {
       labelKey: "planName",
       valueKey: "_id",
     });
 
-    plans.push({ label: CARDIO_VALUE, value: CARDIO_VALUE });
+    nextPlans.push({ label: CARDIO_VALUE, value: CARDIO_VALUE });
     setSelectedPlan(data.workoutPlans[0]);
 
-    return plans;
+    return nextPlans;
   }, [data]);
 
-  if (error?.status == 404)
+  if (error?.status === 404 || (!isLoading && !isError && !hasWorkoutPlanContent)) {
     return (
-      <View style={[layout.flex1, layout.center]}>
-        <Text>אין תוכנית אימונים זמינה</Text>
-      </View>
+      <PlanPendingState
+        title="תוכנית אימונים בבנייה"
+        description="ברגע שהמאמן יסיים לבנות לך את האימונים הם יופיעו לך כאן."
+        isFetching={isRefetching}
+        onRefresh={() => void refresh(handleRefetch)}
+      />
     );
-  if (isError)
+  }
+
+  if (isError) {
     return <ErrorScreen refetchFunc={() => refresh(handleRefetch)} isFetching={isRefetching} />;
+  }
 
   if (isLoading) return <WorkoutPlanSkeletonLoader />;
 
   return (
     <View style={[layout.flex1, colors.background, spacing.pdStatusBar]}>
-      <View style={[{ zIndex: 2, elevation: 5 }, frameShadow, spacing.pdHorizontalLg]}>
+      <View
+        style={[
+          { zIndex: 2, elevation: 5 },
+          showCardio ? undefined : frameShadow,
+          spacing.pdHorizontalLg,
+        ]}
+      >
         <DropDownContextProvider items={plans} onSelect={handleSelect}>
           <ScrollView style={[common.rounded]}>
             <WorkoutPlanSelector
@@ -87,9 +114,6 @@ const MyWorkoutPlanScreen = () => {
         contentContainerStyle={[spacing.gapXxl, spacing.pdBottomBar, spacing.pdLg, { zIndex: 1 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
-        topShadow={true}
-        topShadowFirstColor="#F4F4F4"
-        scrollShadowStyleTop={{ top: 0 }}
       >
         <ConditionalRender condition={showCardio}>
           <CardioWrapper cardioPlan={data?.cardio} />

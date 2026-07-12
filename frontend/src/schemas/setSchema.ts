@@ -1,4 +1,4 @@
-import { MAX_REPS, MAX_WEIGHT } from "@/constants/Constants";
+import { MAX_REPS, MAX_WEIGHT } from "@/constants/workoutLimits";
 import { z } from "zod";
 
 const setSchema = z

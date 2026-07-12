@@ -115,6 +115,7 @@ const QuestionInput = ({ question, inValidOptions, error }: QuestionInputProps) 
           <FileUploadInput
             value={(questionValue as string[]) || []}
             onChange={(value) => updateAnswer(question._id, value)}
+            maxImages={4}
           />
         );
       default:

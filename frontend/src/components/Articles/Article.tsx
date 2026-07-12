@@ -57,7 +57,7 @@ const Article = () => {
         layout.flex1,
       ]}
     >
-      <BackButton<ArticleStackParamsList> />
+      <BackButton />
 
       <Card style={[layout.flex1, common.roundedMd, spacing.pdMd]}>
         <Card.Header>

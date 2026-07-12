@@ -19,7 +19,25 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     plugins: [
       ["expo-localization"],
+      [
+        "expo-build-properties",
+        {
+          android: {
+            minSdkVersion: 26,
+          },
+        },
+      ],
       "expo-background-task",
+      [
+        "expo-build-properties",
+        {
+          android: {
+            compileSdkVersion: 35,
+            targetSdkVersion: 35,
+            minSdkVersion: 26,
+          },
+        },
+      ],
 
       [
         "expo-image-picker",
@@ -38,7 +56,20 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           enableBackgroundRemoteNotifications: false,
         },
       ],
+      [
+        "react-native-health",
+        {
+          isClinicalDataEnabled: false,
+          healthSharePermission:
+            "כדי לעקוב אחרי הצעדים שלך, האפליקציה צריכה גישה לנתוני הצעדים והפעילות מאפליקציית הבריאות.",
+          healthUpdatePermission: "האפליקציה לא משנה נתונים באפליקציית הבריאות.",
+        },
+      ],
+      ["expo-health-connect"],
+      "./plugins/withHealthConnectPermissionDelegate",
+      "./native-modules/live-steps-activity/plugin/withLiveStepsActivity",
     ],
+    scheme: "avihuteam",
     ios: {
       bundleIdentifier: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
       supportsTablet: false,
@@ -55,6 +86,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         foregroundImage: "./assets/app-logo.png",
         backgroundColor: "#FFFFFF",
       },
+      permissions: [
+        "android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND",
+        "android.permission.health.READ_STEPS",
+      ],
       softwareKeyboardLayoutMode: "resize",
       package: isDev ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam",
     },

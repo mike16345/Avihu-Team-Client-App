@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/live_steps_card_bg">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layoutDirection="ltr"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingTop="18dp"
+        android:paddingRight="44dp"
+        android:paddingBottom="18dp">
+
+        <FrameLayout
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginEnd="16dp">
+
+            <ProgressBar
+                android:id="@+id/ringProgressExpanded"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:max="100"
+                android:progressDrawable="@drawable/live_steps_ring" />
+
+            <TextView
+                android:id="@+id/percentTextExpanded"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="#1A1D24"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="29%" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/expandedTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:maxLines="1"
+                android:textAlignment="viewEnd"
+                android:textColor="#6E837C"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="Weekly steps" />
+
+            <TextView
+                android:id="@+id/expandedSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:maxLines="1"
+                android:textAlignment="viewEnd"
+                android:textColor="#1A1D24"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="12,000 / 3,540" />
+
+            <TextView
+                android:id="@+id/distance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:maxLines="1"
+                android:textAlignment="viewEnd"
+                android:textColor="#6E837C"
+                android:textSize="13sp"
+                tools:text="מרחק: 2.7km" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

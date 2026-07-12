@@ -15,6 +15,9 @@
 - Screens and navigators orchestrate hooks and UI; direct `axios` imports are currently confined to the shared API layer (`frontend/src/config/apiConfig.ts` and `frontend/src/API/api.ts`).
 - Navigation is layered: `RootNavigator` handles bootstrap and session gating, then hands off to `AuthNavigator` or `AppNavigator`, while deeper flows are split into stack and tab navigators.
 - App-wide providers are composed at the application root in `frontend/App.tsx`; new global providers should be added there instead of being recreated inside feature screens.
+- Keep screens as orchestration layers. Screens should compose navigation params, hooks, stores, and domain components; large headers, toolbars, cards, empty states, modal bodies, action bars, and repeated view sections should move into feature components when they obscure the screen flow.
+- Prefer feature-local components, hooks, and helpers first when an extraction only serves one screen or flow. Promote to `frontend/src/components/ui`, shared hooks, or shared utilities only after reuse is real and the API is stable.
+- Preserve navigation boundaries. Navigator files should define route structure and screen wiring, not become the home for feature logic or data transformations.
 
 ## 3. Coding Conventions
 
@@ -28,6 +31,13 @@
 - Error handling is local and lightweight: functions typically catch errors to log them with `console.error` or `console.log`, and rethrow only when a caller still needs to decide the outcome.
 - User-facing text should use the shared `Text` component where possible so font mapping and RTL writing direction stay consistent.
 - Shared visual tokens should come from `useGlobalStyles()` and related style hooks; component-specific one-off values may still use inline style objects or a local `StyleSheet.create(...)`.
+- Keep JSX declarative and easy to scan. Avoid nested ternaries in JSX; use explicit boolean renders for conditional sections and move label, icon, message, status, and style decisions into named helpers such as `getSaveLabel`, `getStatusTone`, or `getCardStyle`.
+- Use strict equality and explicit branches in new or edited code. Avoid boolean/object expressions such as `condition && object` when a named branch is clearer.
+- Prefer guard clauses over deeply nested `if` blocks, especially around loading, error, missing route params, missing user/session state, and permission gates.
+- Keep files modular and easy to scan. Component, screen, hook, and utility files should generally stay under 350-400 lines; when a file grows past that range, extract focused child components, hooks, constants, or helpers before adding more logic.
+- Keep React component files narrow in responsibility. Prefer one primary component per file; a second small private component is acceptable only when it is tightly coupled to the main component and does not justify a reusable sibling file. If a file grows beyond that, extract the child component.
+- Keep React files in a predictable order: imports, local types, constants, helper functions, component declaration, export. Inside components, prefer independent hooks first, then state refs, derived values, handlers, effects, guard returns, and the main JSX return.
+- During refactors, preserve external behavior unless the task explicitly asks for a behavior change. Route names, navigation targets, query keys, mutation invalidation keys, API endpoints/params, persisted store keys, AsyncStorage keys, form field names, validation schemas, notification/task identifiers, Hebrew copy, and RTL behavior should remain unchanged.
 
 ## 4. State & Data Flow
 
@@ -39,6 +49,7 @@
 - Ephemeral UI state remains local in components through `useState`, `useEffect`, or feature hooks instead of being promoted into a global store by default.
 - Bootstrap flow is centralized in `RootNavigator`: read the persisted session token, validate it through the API layer, hydrate the user store, then choose the first navigator route.
 - Cross-cutting side effects such as logout, background tasks, toasts, notifications, font loading, and RTL setup are encapsulated in dedicated hooks instead of being duplicated across screens.
+- Derived display state should stay close to the consuming screen/component, but repeated transformations should move into feature-local helpers or hooks. Do not copy the same filtering, label, color, or status logic across multiple screens.
 
 ## 5. Testing Standards
 
@@ -63,6 +74,10 @@
 - Shared styling is utility-like: `useGlobalStyles()` aggregates layout, spacing, text, and color style sheets so components compose style arrays from common tokens.
 - Theme tokens are centralized in `frontend/src/themes/useAppTheme.tsx`; repeated color or typography values should be added to the theme/style layer before being duplicated across multiple screens.
 - Motion and interaction feedback are part of the existing UI vocabulary through `react-native-reanimated` animations and haptic helper utilities.
+- Prefer style arrays composed from shared style hooks, theme tokens, and local `StyleSheet.create(...)` objects. Avoid large anonymous inline style objects in JSX except for genuinely dynamic one-off values such as animated styles, measured dimensions, or values derived from props.
+- When button, card, chip, empty-state, list-row, modal, or toolbar styles repeat inside a feature, extract a small feature-local component or style helper. If the pattern repeats across domains, formalize it as a shared UI primitive.
+- Keep platform differences explicit. Use React Native and Expo APIs for native behavior rather than web-only assumptions such as DOM APIs, CSS selectors, `className`, browser history, or window/document globals.
+- Respect safe-area, keyboard, and scroll behavior in mobile screens. Use the existing safe-area, keyboard-aware, modal, and scroll patterns before introducing a new layout approach.
 
 ## 8. Performance & Optimization Patterns
 
@@ -81,6 +96,8 @@
 - Do not bypass shared theme, text, and style hooks for repeated visual patterns.
 - Do not place session bootstrapping or other cross-screen side effects in unrelated feature screens when the codebase already has root-level navigators and dedicated hooks for that work.
 - Do not manually edit generated or runtime artifact folders such as `frontend/dist`, `frontend/.expo`, or `frontend/node_modules` as if they were the source of truth.
+- Do not add web-only styling or interaction patterns to React Native screens, including Tailwind class strings, CSS files, DOM event assumptions, or browser-only APIs.
+- Do not leave large blocks of visual-intent comments in UI files. Comments should explain non-obvious business rules, platform constraints, or API contracts, not routine layout or React behavior.
 
 ## 10. Agent Operating Rules
 
@@ -91,9 +108,11 @@
 - Prefer targeted patches over full-file rewrites.
 - Full-file rewrites are acceptable only when the file is generated, the change is truly structural, or a localized patch would be less safe than replacing the whole file.
 - Keep imports, naming, file placement, and style composition aligned with the nearest existing implementation before introducing a new abstraction.
+- When a screen-level task requires touching shared files, keep the shared-file edits limited to what the screen needs and avoid opportunistic broad refactors. Record or explain why the shared file had to change.
 - If evidence for a rule is ambiguous or only appears once, document it as not yet established instead of promoting it to a repository rule.
 - If during future work a repeated implementation pattern appears in 3+ places, the agent must update `Agents.md` and formalize it as a rule.
 - Agents must treat `Agents.md` as a living document.
 - Append new rules when consistency is detected across multiple files.
 - Never remove rules unless they are explicitly deprecated by the user or by an intentional repository-wide change.
 - When updating this file, preserve the existing section structure and extend it with new evidence rather than replacing concrete rules with broader, less testable language.
+- Claude, Codex, and any other coding agent must read `Agents.md` before changing code. If a separate agent-specific file exists, such as `CLAUDE.md`, it must defer to `Agents.md` rather than replacing it.

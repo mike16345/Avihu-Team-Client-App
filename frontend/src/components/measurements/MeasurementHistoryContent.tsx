@@ -15,9 +15,10 @@ import UpdateDataModal from "../ui/modals/UpdateDataModal";
 import measurementSchema from "@/schemas/measurementSchema";
 import useSaveMeasurement from "@/hooks/mutations/measurements/useSaveMeasurement";
 import useDeleteMeasurement from "@/hooks/mutations/measurements/useDeleteMeasurement";
-import { extractValuesFromObject } from "@/utils/utils";
 
 const NO_MEASUREMENT_TEXT = "אין נתוני היקף זמינים";
+type MeasurementByDate = Record<string, { value: number; _id: string }>;
+type MeasurementsByMuscle = Record<string, MeasurementByDate>;
 
 const MeasurementHistoryContent = () => {
   const { layout, spacing, text } = useStyles();
@@ -32,18 +33,18 @@ const MeasurementHistoryContent = () => {
   const measurementsByMuscle = useMemo(() => {
     if (!data) return {};
 
-    return data.measurements.reduce((acc, { date, _id, ...muscles }) => {
+    return data.measurements.reduce<MeasurementsByMuscle>((acc, { date, _id, ...muscles }) => {
       Object.entries(muscles).forEach(([muscle, value]) => {
         acc[muscle] = { ...(acc[muscle] || {}), [date]: { value, _id: _id! } };
       });
       return acc;
-    }, {} as Record<string, { value: number; _id: string }>);
+    }, {});
   }, [data]);
 
   const { selectedMeasurement, selectedMeasurementGroupDates } = useMemo(() => {
     const selectedMeasurementGroup =
       measurementsByMuscle[MEASUREMENT_GROUPS_ENGLISH[activeMuscle as MeasurementMuscle]];
-    const selectedMeasurementGroupDates = extractValuesFromObject(selectedMeasurementGroup || {});
+    const selectedMeasurementGroupDates = Object.keys(selectedMeasurementGroup || {});
     const selectedMeasurement = selectedMeasurementGroup?.[selectedDate];
 
     return { selectedMeasurement, selectedMeasurementGroupDates };

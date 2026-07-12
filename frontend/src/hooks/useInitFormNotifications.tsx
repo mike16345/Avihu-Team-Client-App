@@ -2,18 +2,16 @@ import { useUserStore } from "@/store/userStore";
 import { useFormStore } from "@/store/formStore";
 import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { FORM_PRESETS_KEY, TODAYS_GENERAL_FORM_PRESET_KEY } from "@/constants/reactQuery";
-import { useFormResponseApi } from "./api/useFormResponseApi";
-import { useFormPresetsApi } from "./api/useFormPresetsApi";
+import { TODAYS_GENERAL_FORM_PRESET_KEY } from "@/constants/reactQuery";
 import { FormPreset } from "@/interfaces/FormPreset";
+import { useFormPresetsApi } from "./api/useFormPresetsApi";
 import { getOccurrenceKeyForForm } from "@/utils/formPresets";
 import { useNotificationStore } from "@/store/notificationStore";
 
 const useInitFormNotifications = () => {
   const queryClient = useQueryClient();
 
-  const { getFormResponses } = useFormResponseApi();
-  const { getFormPresets, getGeneralFormForToday } = useFormPresetsApi();
+  const { getMonthlyFormStatus, getGeneralFormForToday } = useFormPresetsApi();
 
   const currentUser = useUserStore((state) => state.currentUser);
 
@@ -35,47 +33,15 @@ const useInitFormNotifications = () => {
       ranForUserIdRef.current = currentUser._id;
 
       try {
-        const monthlySubmissions = await getFormResponses({
-          userId: currentUser._id,
-          formType: "monthly",
-        });
+        const status = await getMonthlyFormStatus();
 
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-
-        const hasSubmittedThisMonth = (monthlySubmissions || []).some((sub) => {
-          const d = new Date(sub.submittedAt);
-          return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-        });
-
-        if (!hasSubmittedThisMonth) {
-          const presets = await queryClient.fetchQuery<FormPreset[]>({
-            queryKey: [FORM_PRESETS_KEY, "monthly"],
-            queryFn: () => getFormPresets({ type: "monthly" }),
-          });
-
-          const latestMonthlyPreset = (presets || []).sort(
-            (a: FormPreset, b: FormPreset) =>
-              new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
-          )[0];
-
-          if (latestMonthlyPreset) {
-            const monthlyOccurrenceKey = getOccurrenceKeyForForm(latestMonthlyPreset);
-
-            if (monthlyOccurrenceKey) {
-              if (
-                !isFormCompleted(
-                  "monthly",
-                  currentUser._id,
-                  latestMonthlyPreset._id,
-                  monthlyOccurrenceKey
-                )
-              ) {
-                addMonthlyFormNotification(latestMonthlyPreset._id);
-              }
-            }
-          }
+        if (
+          status.shouldShowMonthlyForm &&
+          status.presetId &&
+          status.occurrenceKey &&
+          !isFormCompleted("monthly", currentUser._id, status.presetId, status.occurrenceKey)
+        ) {
+          addMonthlyFormNotification(status.presetId);
         }
       } catch (error) {
         console.error("Error fetching monthly form notifications:", error);

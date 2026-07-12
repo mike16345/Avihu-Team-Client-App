@@ -86,7 +86,7 @@ describe("DateUtils", () => {
 
   it("detects when two dates fall on the same day", () => {
     expect(
-      DateUtils.isSameDay(new Date("2026-03-19T08:00:00.000Z"), new Date("2026-03-19T22:00:00.000Z"))
+      DateUtils.isSameDay(new Date(2026, 2, 19, 8, 0, 0), new Date(2026, 2, 19, 22, 0, 0))
     ).toBe(true);
   });
 });

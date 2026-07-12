@@ -1,12 +1,9 @@
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import React from "react";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
-import { useNavigation } from "@react-navigation/native";
 import { useFormContext } from "@/context/useFormContext";
-import { useNotificationStore } from "@/store/notificationStore";
 import AppIcon from "@/components/Icon/AppIcon";
-import QuestionnaireExitButton from "@/components/forms/QuestionnaireExitButton";
 
 interface FormSectionHeaderProps {
   currentSection: number;
@@ -21,21 +18,8 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
   sectionTitle,
   sectionDescription,
 }) => {
-  const { colors, spacing, layout, text } = useStyles();
-  const { formType, formId } = useFormContext();
-  const navigation = useNavigation<any>();
-  const { addGeneralFormNotification, addMonthlyFormNotification } = useNotificationStore();
-
-  const goHome = () => {
-    const isGeneralForm = formType === "general";
-    if (isGeneralForm) {
-      addGeneralFormNotification(formId);
-    } else {
-      addMonthlyFormNotification(formId);
-    }
-
-    navigation.replace("BottomTabs");
-  };
+  const { colors, spacing, layout } = useStyles();
+  const { formType } = useFormContext();
 
   return (
     <View
@@ -54,8 +38,7 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
         style={[
           layout.flexRow,
           layout.itemsCenter,
-          layout.justifyBetween,
-          formType === "onboarding" && styles.rowReverse,
+          formType === "onboarding" ? layout.justifyEnd : layout.justifyStart,
         ]}
       >
         <View style={[styles.stepPill, colors.backgroundSurface]}>
@@ -63,16 +46,6 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
             {`שלב ${currentSection} מתוך ${totalSections}`}
           </Text>
         </View>
-
-        {formType === "onboarding" ? (
-          <QuestionnaireExitButton />
-        ) : (
-          <TouchableOpacity onPress={goHome}>
-            <Text fontVariant="bold" style={[text.textUnderline]}>
-              סגור ומלא אחר כך
-            </Text>
-          </TouchableOpacity>
-        )}
       </View>
 
       <View style={[spacing.gapSm]}>
@@ -110,9 +83,6 @@ const styles = StyleSheet.create({
   },
   stepPillText: {
     color: "#072723",
-  },
-  rowReverse: {
-    flexDirection: "row",
   },
 });
 
