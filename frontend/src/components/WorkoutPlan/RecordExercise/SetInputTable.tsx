@@ -45,9 +45,7 @@ const SetInputTable: FC<SetInputTableProps> = ({
     [recordedSetsData, exercise.exerciseId.name]
   );
 
-  const [rows, setRows] = useState<RowState[]>(() =>
-    buildRowsFromServer(todaySets, maxSets)
-  );
+  const [rows, setRows] = useState<RowState[]>(() => buildRowsFromServer(todaySets, maxSets));
 
   const hydratedRef = useRef(false);
   useEffect(() => {
@@ -259,7 +257,10 @@ const SetRow: FC<{
         entering={FadeInDown.duration(160)}
         exiting={FadeOutUp.duration(140)}
         layout={LinearTransition.duration(200)}
-        style={[styles.row, { borderBottomColor: theme.colors.outline, backgroundColor: rowBackground }]}
+        style={[
+          styles.row,
+          { borderBottomColor: theme.colors.outline, backgroundColor: rowBackground },
+        ]}
       >
         <Cell>
           <Text fontVariant="semibold" style={{ color: setNumberColor, fontSize: 16 }}>

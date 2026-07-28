@@ -19,8 +19,10 @@ import { useWorkoutSessionStore } from "@/store/workoutSessionStore";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { DEFAULT_PAGE_TOP_PADDING } from "@/constants/Constants";
 
-interface RecordExerciseProps
-  extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordExercise"> {}
+interface RecordExerciseProps extends StackNavigatorProps<
+  WorkoutPlanStackParamList,
+  "RecordExercise"
+> {}
 
 function hasRecordedSets(data: IMuscleGroupRecordedSets[], exercise: string) {
   for (const muscleGroup of data) {
@@ -61,11 +63,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
     const windowHeight = Dimensions.get("screen").height;
     const buttonHeight = 60;
     return (
-      windowHeight -
-      containerHeight -
-      (tabBarHeight + 30) -
-      DEFAULT_PAGE_TOP_PADDING -
-      buttonHeight
+      windowHeight - containerHeight - (tabBarHeight + 30) - DEFAULT_PAGE_TOP_PADDING - buttonHeight
     );
   }, [containerHeight, tabBarHeight]);
 
@@ -85,7 +83,16 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
       setCountdown(exercise.restTime);
       return response;
     },
-    [exercise, muscleGroup, plan, userId, workoutSession, addRecordedSets, setCountdown, setWorkoutSession]
+    [
+      exercise,
+      muscleGroup,
+      plan,
+      userId,
+      workoutSession,
+      addRecordedSets,
+      setCountdown,
+      setWorkoutSession,
+    ]
   );
 
   const handleRecordSets = useCallback(

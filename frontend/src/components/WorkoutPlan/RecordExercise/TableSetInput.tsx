@@ -26,10 +26,7 @@ const TableSetInput: FC<TableSetInputProps> = ({
 }) => {
   const { layout, colors, common } = useStyles();
 
-  const handleSaveSet = useCallback(
-    (set: SetInput) => handleRecordSets([set]),
-    [handleRecordSets]
-  );
+  const handleSaveSet = useCallback((set: SetInput) => handleRecordSets([set]), [handleRecordSets]);
 
   return (
     <KeyboardAwareScrollView
