@@ -98,6 +98,7 @@ export interface IRecordedSet {
   weight: number;
   repsDone: number;
   setNumber: number;
+  rir?: number;
 }
 
 export interface IRecordedSetRes extends IRecordedSet {

@@ -7,20 +7,24 @@ import { FC, useEffect, useMemo, useState } from "react";
 import { Dimensions, ScrollView, View } from "react-native";
 import PreviousSetCard, { toLine } from "./PreviousSetCard";
 import useStyles from "@/styles/useGlobalStyles";
-import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 import DateUtils from "@/utils/dateUtils";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import UpdateSetModal from "./UpdateSetModal";
 
 interface RecordedSetsHistoryModalProps {
   exercise: string;
+  visible: boolean;
+  onDismiss: () => void;
 }
 
-const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise }) => {
+const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({
+  exercise,
+  visible,
+  onDismiss,
+}) => {
   const { layout, spacing } = useStyles();
   const { data } = useRecordedSetsQuery();
 
-  const [isVisible, setIsVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>();
 
   const { markedDates, setsByDate } = useMemo(() => {
@@ -56,64 +60,53 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
 
   useEffect(() => {
     setSelectedDate(DateUtils.formatDate(new Date(), "YYYY-MM-DD"));
-
-    return () => setIsVisible(false);
   }, []);
 
   return (
-    <>
-      <SecondaryButton
-        alignStart={false}
-        onPress={() => setIsVisible(true)}
-        rightIcon="documentText"
-      >
-        היסטוריית משקל וחזרות
-      </SecondaryButton>
-      <CustomModal visible={isVisible} onDismiss={() => setIsVisible(false)}>
-        <CustomModal.Header>
-          <Text fontSize={16} fontVariant="light">
-            היסטוריית משקל וחזרות
-          </Text>
-        </CustomModal.Header>
-        <CustomModal.Content style={[layout.flex1, layout.justifyBetween]}>
-          <View style={[spacing.gapMd]}>
-            <CustomCalendar
-              selectedDate={selectedDate}
-              onSelect={setSelectedDate}
-              dates={markedDates}
-            />
+    <CustomModal visible={visible} onDismiss={onDismiss}>
+      <CustomModal.Header>
+        <Text fontSize={16} fontVariant="light">
+          היסטוריית משקל וחזרות
+        </Text>
+      </CustomModal.Header>
+      <CustomModal.Content style={[layout.flex1, layout.justifyBetween]}>
+        <View style={[spacing.gapMd]}>
+          <CustomCalendar
+            selectedDate={selectedDate}
+            onSelect={setSelectedDate}
+            dates={markedDates}
+          />
 
-            <ConditionalRender condition={!!selectedDate}>
-              <View style={[spacing.gapMd, layout.center]}>
-                <Text fontSize={16}>{DateUtils.formatDate(selectedDate!, "DD.MM.YY")}</Text>
+          <ConditionalRender condition={!!selectedDate}>
+            <View style={[spacing.gapMd, layout.center]}>
+              <Text fontSize={16}>{DateUtils.formatDate(selectedDate!, "DD.MM.YY")}</Text>
 
-                <ScrollView
-                  style={{ maxHeight: 200 }}
-                  contentContainerStyle={[layout.center, spacing.gapDefault]}
-                  showsVerticalScrollIndicator={false}
-                >
-                  {sets.map((set, index) => (
-                    <View
-                      key={set._id ?? index}
-                      style={[
-                        layout.flexRow,
-                        layout.itemsCenter,
-                        layout.justifyBetween,
-                        { width: Dimensions.get("screen").width * 0.6 },
-                      ]}
-                    >
-                      <Text fontSize={16}>{toLine(set)}</Text>
-                      <UpdateSetModal set={set} exercise={exercise} />
-                    </View>
-                  ))}
-                </ScrollView>
-              </View>
-            </ConditionalRender>
-          </View>
-          <PreviousSetCard exercise={exercise} />
-        </CustomModal.Content>
-      </CustomModal>
-    </>
+              <ScrollView
+                style={{ maxHeight: 200 }}
+                contentContainerStyle={[layout.center, spacing.gapDefault]}
+                showsVerticalScrollIndicator={false}
+              >
+                {sets.map((set, index) => (
+                  <View
+                    key={set._id ?? index}
+                    style={[
+                      layout.flexRow,
+                      layout.itemsCenter,
+                      layout.justifyBetween,
+                      { width: Dimensions.get("screen").width * 0.6 },
+                    ]}
+                  >
+                    <Text fontSize={16}>{toLine(set)}</Text>
+                    <UpdateSetModal set={set} exercise={exercise} />
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+          </ConditionalRender>
+        </View>
+        <PreviousSetCard exercise={exercise} />
+      </CustomModal.Content>
+    </CustomModal>
   );
 };
 
