@@ -75,8 +75,24 @@ export const SunriseIcon: React.FC<IconProps> = ({ size = 22, color = GREEN }) =
       strokeLinecap="round"
     />
     <Line x1={12} y1={4} x2={12} y2={7} stroke={color} strokeWidth={1.8} strokeLinecap="round" />
-    <Line x1={4.5} y1={9.5} x2={6.5} y2={11} stroke={color} strokeWidth={1.8} strokeLinecap="round" />
-    <Line x1={19.5} y1={9.5} x2={17.5} y2={11} stroke={color} strokeWidth={1.8} strokeLinecap="round" />
+    <Line
+      x1={4.5}
+      y1={9.5}
+      x2={6.5}
+      y2={11}
+      stroke={color}
+      strokeWidth={1.8}
+      strokeLinecap="round"
+    />
+    <Line
+      x1={19.5}
+      y1={9.5}
+      x2={17.5}
+      y2={11}
+      stroke={color}
+      strokeWidth={1.8}
+      strokeLinecap="round"
+    />
   </Svg>
 );
 

@@ -2,13 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { Text } from "@/components/ui/Text";
-import {
-  DIET_V2_GREEN,
-  DIET_V2_MUTED,
-  DropIcon,
-  SproutIcon,
-  DrumstickIcon,
-} from "./dietV2Icons";
+import { DIET_V2_GREEN, DIET_V2_MUTED, DropIcon, SproutIcon, DrumstickIcon } from "./dietV2Icons";
 
 interface DailyCalorieIntakeV3Props {
   totalCalories: number;
@@ -26,10 +20,7 @@ const RING_STROKE = 11;
 const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
-const CalorieRing: React.FC<{ consumed: number; target: number }> = ({
-  consumed,
-  target,
-}) => {
+const CalorieRing: React.FC<{ consumed: number; target: number }> = ({ consumed, target }) => {
   const percent = target > 0 ? consumed / target : 0;
   const clamped = Math.max(0, Math.min(1, percent));
   const offset = RING_CIRCUMFERENCE * (1 - clamped);
@@ -122,18 +113,8 @@ const DailyCalorieIntakeV3: React.FC<DailyCalorieIntakeV3Props> = ({
           target={totalProtein}
           Icon={DrumstickIcon}
         />
-        <MacroBar
-          label="פחמימה"
-          consumed={consumedCarbs}
-          target={totalCarbs}
-          Icon={SproutIcon}
-        />
-        <MacroBar
-          label="שומן"
-          consumed={consumedFat}
-          target={totalFat}
-          Icon={DropIcon}
-        />
+        <MacroBar label="פחמימה" consumed={consumedCarbs} target={totalCarbs} Icon={SproutIcon} />
+        <MacroBar label="שומן" consumed={consumedFat} target={totalFat} Icon={DropIcon} />
       </View>
       <CalorieRing consumed={consumedCalories} target={totalCalories} />
     </View>

@@ -33,7 +33,6 @@ const computePlanTotals = (plan: DietV2Plan): DietV2OptionMacros => {
   return totals;
 };
 
-
 const V2Header: React.FC<{
   targets: DietV2OptionMacros;
   consumed: DietV2OptionMacros;
@@ -117,10 +116,7 @@ const V2TipsList: React.FC<{ tips: string[] }> = ({ tips }) => {
         contentContainerStyle={[{ flexGrow: 1 }, spacing.gapDefault, spacing.pdHorizontalMd]}
       >
         {tips.map((tip, i) => (
-          <View
-            key={i}
-            style={[layout.flexRow, spacing.gapDefault, { paddingVertical: 6 }]}
-          >
+          <View key={i} style={[layout.flexRow, spacing.gapDefault, { paddingVertical: 6 }]}>
             <Text fontSize={15}>{tip}</Text>
           </View>
         ))}
@@ -172,10 +168,7 @@ const MyDietPlanScreenV2Preview = () => {
 
   const targets = useMemo(() => computePlanTotals(DIET_V2_MOCK_PLAN), []);
   const consumedTotals = useMemo(() => sumConsumedMacros(consumed), [consumed]);
-  const mealTiles = useMemo(
-    () => buildMealTiles(DIET_V2_MOCK_PLAN.meals.length),
-    [],
-  );
+  const mealTiles = useMemo(() => buildMealTiles(DIET_V2_MOCK_PLAN.meals.length), []);
 
   const tabs: V2TabItem[] = useMemo(
     () => [
@@ -193,11 +186,7 @@ const MyDietPlanScreenV2Preview = () => {
         label: "תפריט חכם",
         value: "תפריט חכם",
         content: (
-          <V2SmartMenu
-            consumed={consumed}
-            onConsumedChange={setConsumed}
-            mealTiles={mealTiles}
-          />
+          <V2SmartMenu consumed={consumed} onConsumedChange={setConsumed} mealTiles={mealTiles} />
         ),
       },
     ],

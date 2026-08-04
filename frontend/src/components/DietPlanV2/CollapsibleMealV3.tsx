@@ -24,11 +24,7 @@ interface CollapsibleMealV3Props {
 
 const MEAL_TIME_ICONS = [SunriseIcon, SunIcon, MoonIcon] as const;
 
-const CollapsibleMealV3: React.FC<CollapsibleMealV3Props> = ({
-  meal,
-  index,
-  freeCalories = 0,
-}) => {
+const CollapsibleMealV3: React.FC<CollapsibleMealV3Props> = ({ meal, index, freeCalories = 0 }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [consumedKinds, setConsumedKinds] = useState<Set<string>>(new Set());
 
@@ -53,8 +49,7 @@ const CollapsibleMealV3: React.FC<CollapsibleMealV3Props> = ({
     ...meal.categories.filter((c) => c.options.length > 0).map((c) => c.kind),
     ...(hasFree ? ["freeCalories"] : []),
   ];
-  const allConsumed =
-    nonEmptyKinds.length > 0 && nonEmptyKinds.every((k) => consumedKinds.has(k));
+  const allConsumed = nonEmptyKinds.length > 0 && nonEmptyKinds.every((k) => consumedKinds.has(k));
 
   const handleMealPress = () => {
     selectionHaptic();
@@ -139,12 +134,7 @@ const CollapsibleMealV3: React.FC<CollapsibleMealV3Props> = ({
               </View>
             </Pressable>
           )}
-          <PrimaryButton
-            style={styles.finishBtn}
-            mode="dark"
-            onPress={handleMealPress}
-            block
-          >
+          <PrimaryButton style={styles.finishBtn} mode="dark" onPress={handleMealPress} block>
             {allConsumed ? "בטל סימון" : "אכלתי הכל"}
           </PrimaryButton>
         </Animated.View>

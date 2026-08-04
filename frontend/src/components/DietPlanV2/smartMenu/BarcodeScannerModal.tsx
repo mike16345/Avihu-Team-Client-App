@@ -1,12 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  Easing,
-  Modal,
-  Pressable,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Animated, Easing, Modal, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/Text";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
@@ -25,11 +18,7 @@ const FRAME_COLOR = "#4ADE80";
 const CARD_BG = "#FFFFFF";
 const CARD_BORDER = "#E5E7EB";
 
-const BarcodeScannerModal: FC<BarcodeScannerModalProps> = ({
-  visible,
-  onCancel,
-  onDetect,
-}) => {
+const BarcodeScannerModal: FC<BarcodeScannerModalProps> = ({ visible, onCancel, onDetect }) => {
   const insets = useSafeAreaInsets();
   const topPad = Math.max(insets.top, 12);
   const bottomPad = Math.max(insets.bottom, 12);
@@ -52,7 +41,7 @@ const BarcodeScannerModal: FC<BarcodeScannerModalProps> = ({
           easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
         }),
-      ]),
+      ])
     );
     loop.start();
     return () => loop.stop();
@@ -63,8 +52,7 @@ const BarcodeScannerModal: FC<BarcodeScannerModalProps> = ({
     selectionHaptic();
     setScanning(true);
     setTimeout(() => {
-      const food =
-        MOCK_FOOD_CATALOG[Math.floor(Math.random() * MOCK_FOOD_CATALOG.length)];
+      const food = MOCK_FOOD_CATALOG[Math.floor(Math.random() * MOCK_FOOD_CATALOG.length)];
       setScanning(false);
       onDetect(food);
     }, 900);
@@ -101,9 +89,7 @@ const BarcodeScannerModal: FC<BarcodeScannerModalProps> = ({
             <View style={styles.frameInnerHint}>
               <BarcodeIcon size={44} color="#D1D5DB" />
             </View>
-            <Animated.View
-              style={[styles.scanLine, { transform: [{ translateY }] }]}
-            />
+            <Animated.View style={[styles.scanLine, { transform: [{ translateY }] }]} />
           </View>
           <Text fontVariant="semibold" fontSize={14} style={styles.hint}>
             {scanning ? "מזהה מוצר..." : "כוון את המצלמה לברקוד"}

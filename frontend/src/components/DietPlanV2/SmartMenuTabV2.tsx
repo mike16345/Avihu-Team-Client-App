@@ -17,8 +17,7 @@ interface SmartMenuTabV2Props {
   mealTiles: MealTile[];
 }
 
-const generateEntryId = (): string =>
-  `entry-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+const generateEntryId = (): string => `entry-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
 const SmartMenuTabV2: FC<SmartMenuTabV2Props> = ({
   consumed,
@@ -81,10 +80,7 @@ const SmartMenuTabV2: FC<SmartMenuTabV2Props> = ({
   };
 
   const confirmManual = (food: MockFoodItem, mealId: string) => {
-    onConsumedChange([
-      ...consumed,
-      { entryId: generateEntryId(), food, quantity: 1, mealId },
-    ]);
+    onConsumedChange([...consumed, { entryId: generateEntryId(), food, quantity: 1, mealId }]);
     setSelectedMeal(mealId);
     setManualOpen(false);
   };
@@ -119,10 +115,7 @@ const SmartMenuTabV2: FC<SmartMenuTabV2Props> = ({
 
   return (
     <View style={styles.root}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <AddSmartFoodCard
           onOpenPicker={openPicker}
           onOpenManual={openManual}
@@ -176,11 +169,7 @@ const SmartMenuTabV2: FC<SmartMenuTabV2Props> = ({
         onDetect={barcodeDetected}
       />
 
-      <HistoryModal
-        visible={historyOpen}
-        onClose={closeHistory}
-        mealTiles={mealTiles}
-      />
+      <HistoryModal visible={historyOpen} onClose={closeHistory} mealTiles={mealTiles} />
     </View>
   );
 };

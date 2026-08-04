@@ -27,13 +27,9 @@ export const loadConsumedKinds = async (mealId: string): Promise<Set<string>> =>
   }
 };
 
-export const saveConsumedKinds = async (
-  mealId: string,
-  kinds: Set<string>,
-): Promise<void> => {
+export const saveConsumedKinds = async (mealId: string, kinds: Set<string>): Promise<void> => {
   try {
     const entry: StoredEntry = { date: todayKey(), kinds: Array.from(kinds) };
     await AsyncStorage.setItem(`${KEY_PREFIX}${mealId}`, JSON.stringify(entry));
-  } catch {
-  }
+  } catch {}
 };

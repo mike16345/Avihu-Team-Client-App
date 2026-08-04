@@ -1,8 +1,4 @@
-import {
-  DietV2Category,
-  DietV2CategoryKind,
-  DietV2OptionMacros,
-} from "@/interfaces/DietPlanV2";
+import { DietV2Category, DietV2CategoryKind, DietV2OptionMacros } from "@/interfaces/DietPlanV2";
 
 export const CATEGORY_LABELS: Record<DietV2CategoryKind, string> = {
   protein: "חלבון",

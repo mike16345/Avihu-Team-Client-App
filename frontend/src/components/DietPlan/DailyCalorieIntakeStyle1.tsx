@@ -17,8 +17,7 @@ import {
 
 const KCAL_PER_SERVING = { protein: 75, carbs: 70, fat: 45 };
 
-const formatVal = (n: number): string =>
-  Number.isInteger(n) ? String(n) : n.toFixed(1);
+const formatVal = (n: number): string => (Number.isInteger(n) ? String(n) : n.toFixed(1));
 
 const GRAD_DARK = "#047857";
 const GRAD_LIGHT = "#86EFAC";
@@ -31,10 +30,7 @@ const GradientBar: React.FC<{
   const [width, setWidth] = useState(0);
   const clamped = Math.max(0, Math.min(1, fraction));
   const fillW = Math.round(width * clamped);
-  const gradId = useMemo(
-    () => `grad-${Math.random().toString(36).slice(2, 9)}`,
-    [],
-  );
+  const gradId = useMemo(() => `grad-${Math.random().toString(36).slice(2, 9)}`, []);
 
   return (
     <View
@@ -103,10 +99,7 @@ const useCountUp = (value: number, duration = 500): number => {
   return display;
 };
 
-const CalorieHeadline: React.FC<{ consumed: number; target: number }> = ({
-  consumed,
-  target,
-}) => {
+const CalorieHeadline: React.FC<{ consumed: number; target: number }> = ({ consumed, target }) => {
   const shown = useCountUp(Math.round(consumed));
   const clamped = target > 0 ? Math.max(0, Math.min(1, consumed / target)) : 0;
 
@@ -247,7 +240,7 @@ const sumServings = (
     totalCarbs?: { quantity?: number };
     totalFats?: { quantity?: number };
   }[],
-  pick: "totalProtein" | "totalCarbs" | "totalFats",
+  pick: "totalProtein" | "totalCarbs" | "totalFats"
 ): number => meals.reduce((acc, m) => acc + (m[pick]?.quantity ?? 0), 0);
 
 const range = (from: number, to: number, step: number): number[] => {
@@ -266,7 +259,7 @@ const DailyCalorieIntakeStyle1 = () => {
       carbs: sumServings(meals, "totalCarbs"),
       fat: sumServings(meals, "totalFats"),
     }),
-    [meals],
+    [meals]
   );
 
   const proteinOptions = useMemo(() => range(0, 10, 1), []);
@@ -285,7 +278,7 @@ const DailyCalorieIntakeStyle1 = () => {
     consumed.protein * KCAL_PER_SERVING.protein +
       consumed.carbs * KCAL_PER_SERVING.carbs +
       consumed.fat * KCAL_PER_SERVING.fat +
-      consumed.free,
+      consumed.free
   );
 
   const macros: MacroDatum[] = [

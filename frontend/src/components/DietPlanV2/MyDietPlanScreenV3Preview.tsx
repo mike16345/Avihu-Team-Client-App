@@ -33,7 +33,6 @@ const computePlanTotals = (plan: DietV2Plan): DietV2OptionMacros => {
   return totals;
 };
 
-
 const V3Header: React.FC<{
   targets: DietV2OptionMacros;
   consumed: DietV2OptionMacros;
@@ -75,12 +74,7 @@ const V3MealsList: React.FC<{ meals: DietV2Meal[] }> = ({ meals }) => {
           </View>
         </ConditionalRender>
         {meals.map((meal, i) => (
-          <CollapsibleMealV3
-            key={meal.id}
-            meal={meal}
-            index={i}
-            freeCalories={i === 0 ? 150 : 0}
-          />
+          <CollapsibleMealV3 key={meal.id} meal={meal} index={i} freeCalories={i === 0 ? 150 : 0} />
         ))}
       </CustomScrollView>
     </View>
@@ -123,10 +117,7 @@ const V3TipsList: React.FC<{ tips: string[] }> = ({ tips }) => {
         contentContainerStyle={[{ flexGrow: 1 }, spacing.gapDefault, spacing.pdHorizontalMd]}
       >
         {tips.map((tip, i) => (
-          <View
-            key={i}
-            style={[layout.flexRow, spacing.gapDefault, { paddingVertical: 6 }]}
-          >
+          <View key={i} style={[layout.flexRow, spacing.gapDefault, { paddingVertical: 6 }]}>
             <Text fontSize={15}>{tip}</Text>
           </View>
         ))}
@@ -178,10 +169,7 @@ const MyDietPlanScreenV3Preview = () => {
 
   const targets = useMemo(() => computePlanTotals(DIET_V2_MOCK_PLAN), []);
   const consumedTotals = useMemo(() => sumConsumedMacros(consumed), [consumed]);
-  const mealTiles = useMemo(
-    () => buildMealTiles(DIET_V2_MOCK_PLAN.meals.length),
-    [],
-  );
+  const mealTiles = useMemo(() => buildMealTiles(DIET_V2_MOCK_PLAN.meals.length), []);
 
   const tabs: V3TabItem[] = useMemo(
     () => [
@@ -199,11 +187,7 @@ const MyDietPlanScreenV3Preview = () => {
         label: "תפריט חכם",
         value: "תפריט חכם",
         content: (
-          <V3SmartMenu
-            consumed={consumed}
-            onConsumedChange={setConsumed}
-            mealTiles={mealTiles}
-          />
+          <V3SmartMenu consumed={consumed} onConsumedChange={setConsumed} mealTiles={mealTiles} />
         ),
       },
     ],

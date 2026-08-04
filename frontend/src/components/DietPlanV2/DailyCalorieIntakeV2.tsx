@@ -2,13 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { Text } from "@/components/ui/Text";
-import {
-  DIET_V2_GREEN,
-  DropIcon,
-  SproutIcon,
-  DrumstickIcon,
-  FlameIcon,
-} from "./dietV2Icons";
+import { DIET_V2_GREEN, DropIcon, SproutIcon, DrumstickIcon, FlameIcon } from "./dietV2Icons";
 
 interface DailyCalorieIntakeV2Props {
   totalCalories: number;
@@ -34,13 +28,7 @@ const RING_STROKE = 7;
 const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
-const MacroCard: React.FC<MacroCardProps> = ({
-  label,
-  target,
-  consumed,
-  unit,
-  IconComponent,
-}) => {
+const MacroCard: React.FC<MacroCardProps> = ({ label, target, consumed, unit, IconComponent }) => {
   const percent = target > 0 ? consumed / target : 0;
   const clamped = Math.max(0, Math.min(1, percent));
   const offset = RING_CIRCUMFERENCE * (1 - clamped);

@@ -66,11 +66,7 @@ const TWO_DAYS_AGO_MOCK: MockRow[] = [
 
 const emptyMacros = (): Macros => ({ calories: 0, protein: 0, carbs: 0, fat: 0 });
 
-const buildHistoryDay = (
-  daysAgo: number,
-  mocks: MockRow[],
-  planMealIds: string[],
-): HistoryDay => {
+const buildHistoryDay = (daysAgo: number, mocks: MockRow[], planMealIds: string[]): HistoryDay => {
   const entries: HistoryEntry[] = mocks
     .map((m, idx) => {
       const food = MOCK_FOOD_CATALOG.find((f) => f.id === m.id);
@@ -127,7 +123,7 @@ const HistoryModal: FC<HistoryModalProps> = ({ visible, onClose, mealTiles }) =>
       buildHistoryDay(1, YESTERDAY_MOCK, ["meal-1", "meal-3"]),
       buildHistoryDay(2, TWO_DAYS_AGO_MOCK, ["meal-1"]),
     ],
-    [],
+    []
   );
 
   const mealLabelFor = (mealId: string): string => {
@@ -163,7 +159,7 @@ const HistoryModal: FC<HistoryModalProps> = ({ visible, onClose, mealTiles }) =>
               byMeal[entry.mealId].push(entry);
             });
             const orderedMealIds = [...mealTiles.map((t) => t.id), "unassigned"].filter(
-              (id) => byMeal[id] && byMeal[id].length > 0,
+              (id) => byMeal[id] && byMeal[id].length > 0
             );
 
             return (
@@ -197,21 +193,13 @@ const HistoryModal: FC<HistoryModalProps> = ({ visible, onClose, mealTiles }) =>
                         <View key={mealId} style={styles.mealBlock}>
                           <View style={styles.mealTitleRow}>
                             <View style={styles.mealTitleWrap}>
-                              <Text
-                                fontVariant="semibold"
-                                fontSize={13}
-                                style={styles.mealTitle}
-                              >
+                              <Text fontVariant="semibold" fontSize={13} style={styles.mealTitle}>
                                 {mealLabelFor(mealId)}
                               </Text>
                             </View>
                             {fromPlan && (
                               <View style={styles.planTag}>
-                                <Text
-                                  fontSize={9}
-                                  fontVariant="bold"
-                                  style={styles.planTagLabel}
-                                >
+                                <Text fontSize={9} fontVariant="bold" style={styles.planTagLabel}>
                                   ✓ מהתוכנית
                                 </Text>
                               </View>
@@ -220,11 +208,7 @@ const HistoryModal: FC<HistoryModalProps> = ({ visible, onClose, mealTiles }) =>
                           {byMeal[mealId].map((entry) => (
                             <View key={entry.entryId} style={styles.entryRow}>
                               <View style={styles.entryTextWrap}>
-                                <Text
-                                  fontVariant="medium"
-                                  fontSize={13}
-                                  style={styles.entryName}
-                                >
+                                <Text fontVariant="medium" fontSize={13} style={styles.entryName}>
                                   {`${formatQuantity(entry.quantity)}${entry.foodName}`}
                                 </Text>
                                 <Text fontSize={11} style={styles.entryMeta}>

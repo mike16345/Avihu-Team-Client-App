@@ -31,9 +31,7 @@ const groupByMeal = (entries: ConsumedFoodEntry[]): Record<string, ConsumedFoodE
   return groups;
 };
 
-const groupNotesByMeal = (
-  entries: NoteReminderEntry[],
-): Record<string, NoteReminderEntry[]> => {
+const groupNotesByMeal = (entries: NoteReminderEntry[]): Record<string, NoteReminderEntry[]> => {
   const groups: Record<string, NoteReminderEntry[]> = {};
   entries.forEach((entry) => {
     const key = entry.mealId ?? "unassigned";
@@ -65,7 +63,7 @@ const totalMacros = (entries: ConsumedFoodEntry[]): MealTotals => {
       a.fat += e.food.macros.fat * e.quantity;
       return a;
     },
-    { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    { calories: 0, protein: 0, carbs: 0, fat: 0 }
   );
   return {
     calories: Math.round(acc.calories),
@@ -114,12 +112,9 @@ const ConsumedTodayCard: FC<ConsumedTodayCardProps> = ({
 
   const consumedGroups = groupByMeal(consumed);
   const noteGroups = groupNotesByMeal(notes);
-  const allMealIds = new Set<string>([
-    ...Object.keys(consumedGroups),
-    ...Object.keys(noteGroups),
-  ]);
+  const allMealIds = new Set<string>([...Object.keys(consumedGroups), ...Object.keys(noteGroups)]);
   const orderedMealIds = [...mealTiles.map((t) => t.id), "unassigned"].filter((id) =>
-    allMealIds.has(id),
+    allMealIds.has(id)
   );
 
   return (
@@ -163,12 +158,8 @@ const ConsumedTodayCard: FC<ConsumedTodayCardProps> = ({
 
               <View style={styles.itemsWrap}>
                 {entries.map((entry) => {
-                  const totalGrams = Math.round(
-                    entry.quantity * entry.food.gramsPerServing,
-                  );
-                  const totalCal = Math.round(
-                    entry.food.macros.calories * entry.quantity,
-                  );
+                  const totalGrams = Math.round(entry.quantity * entry.food.gramsPerServing);
+                  const totalCal = Math.round(entry.food.macros.calories * entry.quantity);
                   return (
                     <View key={entry.entryId} style={styles.itemRow}>
                       <View style={styles.itemTextWrap}>

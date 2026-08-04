@@ -41,11 +41,8 @@ const CollapsibleMealV2: React.FC<CollapsibleMealV2Props> = ({ meal, index }) =>
     });
   };
 
-  const nonEmptyKinds = meal.categories
-    .filter((c) => c.options.length > 0)
-    .map((c) => c.kind);
-  const allConsumed =
-    nonEmptyKinds.length > 0 && nonEmptyKinds.every((k) => consumedKinds.has(k));
+  const nonEmptyKinds = meal.categories.filter((c) => c.options.length > 0).map((c) => c.kind);
+  const allConsumed = nonEmptyKinds.length > 0 && nonEmptyKinds.every((k) => consumedKinds.has(k));
 
   const handleMealPress = () => {
     selectionHaptic();
@@ -91,12 +88,7 @@ const CollapsibleMealV2: React.FC<CollapsibleMealV2Props> = ({ meal, index }) =>
               onToggle={() => toggleCategoryConsumed(category.kind)}
             />
           ))}
-          <PrimaryButton
-            style={styles.finishBtn}
-            mode="dark"
-            onPress={handleMealPress}
-            block
-          >
+          <PrimaryButton style={styles.finishBtn} mode="dark" onPress={handleMealPress} block>
             {allConsumed ? "בטל סימון" : "אכלתי הכל"}
           </PrimaryButton>
         </Animated.View>

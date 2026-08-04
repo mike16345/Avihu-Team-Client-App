@@ -7,11 +7,7 @@ export interface MealTile {
   Icon: FC<{ size?: number; color?: string }>;
 }
 
-const MEAL_ICON_CYCLE: FC<{ size?: number; color?: string }>[] = [
-  SunriseIcon,
-  SunIcon,
-  MoonIcon,
-];
+const MEAL_ICON_CYCLE: FC<{ size?: number; color?: string }>[] = [SunriseIcon, SunIcon, MoonIcon];
 
 export const buildMealTiles = (mealCount: number): MealTile[] => {
   const count = Math.max(1, mealCount);
@@ -34,4 +30,3 @@ export const nextMealTile = (existing: MealTile[]): MealTile => {
     Icon: MEAL_ICON_CYCLE[(next - 1) % MEAL_ICON_CYCLE.length],
   };
 };
-

@@ -1,10 +1,6 @@
 import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
-import {
-  DietV2Category,
-  DietV2Option,
-  formatUnitLabel,
-} from "@/interfaces/DietPlanV2";
+import { DietV2Category, DietV2Option, formatUnitLabel } from "@/interfaces/DietPlanV2";
 import { selectionHaptic } from "@/utils/haptics";
 import { CATEGORY_LABELS } from "./dietPlanV2ClientUtils";
 
@@ -19,11 +15,7 @@ const formatOption = (option: DietV2Option): string => {
   return `${option.quantity} ${unit} ${option.foodName}`;
 };
 
-const DietItemContentV2: React.FC<DietItemContentV2Props> = ({
-  category,
-  consumed,
-  onToggle,
-}) => {
+const DietItemContentV2: React.FC<DietItemContentV2Props> = ({ category, consumed, onToggle }) => {
   const label = CATEGORY_LABELS[category.kind];
   if (!category.options.length) return null;
 
@@ -36,10 +28,7 @@ const DietItemContentV2: React.FC<DietItemContentV2Props> = ({
   };
 
   return (
-    <Pressable
-      onPress={handlePress}
-      style={[styles.container, consumed && styles.consumed]}
-    >
+    <Pressable onPress={handlePress} style={[styles.container, consumed && styles.consumed]}>
       <View style={styles.headerRow}>
         <Text fontVariant="bold" fontSize={15} style={styles.header}>
           {label}
@@ -53,10 +42,7 @@ const DietItemContentV2: React.FC<DietItemContentV2Props> = ({
         )}
       </View>
       <View style={styles.rowWrap}>
-        <Text
-          fontSize={15}
-          style={[styles.body, consumed && styles.bodyConsumed]}
-        >
+        <Text fontSize={15} style={[styles.body, consumed && styles.bodyConsumed]}>
           {line}
         </Text>
       </View>

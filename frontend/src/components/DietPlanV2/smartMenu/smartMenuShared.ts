@@ -1,10 +1,5 @@
 import { StyleSheet } from "react-native";
-import {
-  DIET_V2_CARD_BORDER,
-  DIET_V2_DARK,
-  DIET_V2_MINT,
-  DIET_V2_MUTED,
-} from "../dietV2Icons";
+import { DIET_V2_CARD_BORDER, DIET_V2_DARK, DIET_V2_MINT, DIET_V2_MUTED } from "../dietV2Icons";
 
 export const smartMenuStyles = StyleSheet.create({
   card: {

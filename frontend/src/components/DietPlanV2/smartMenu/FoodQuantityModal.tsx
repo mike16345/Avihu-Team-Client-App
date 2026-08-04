@@ -143,145 +143,145 @@ const FoodQuantityModal: FC<FoodQuantityModalProps> = ({
           style={styles.avoider}
           pointerEvents="box-none"
         >
-        <Pressable style={styles.sheet} onPress={Keyboard.dismiss}>
-        <ScrollView
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.sheetInner}
-        >
-          <View style={styles.headerWrap}>
-            <Text fontVariant="bold" fontSize={17} style={styles.title}>
-              {food.name}
-            </Text>
-            <Text fontSize={12} style={styles.subtitle}>
-              {`מנה: ${food.servingLabel} · ${Math.round(food.macros.calories)} קל'`}
-            </Text>
-          </View>
+          <Pressable style={styles.sheet} onPress={Keyboard.dismiss}>
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.sheetInner}
+            >
+              <View style={styles.headerWrap}>
+                <Text fontVariant="bold" fontSize={17} style={styles.title}>
+                  {food.name}
+                </Text>
+                <Text fontSize={12} style={styles.subtitle}>
+                  {`מנה: ${food.servingLabel} · ${Math.round(food.macros.calories)} קל'`}
+                </Text>
+              </View>
 
-          <View style={styles.section}>
-            <View style={styles.headerWrap}>
-              <Text fontVariant="semibold" fontSize={14} style={styles.sectionTitle}>
-                יחידת מדידה
-              </Text>
-            </View>
-            <View style={styles.unitsRow}>
-              {food.availableUnits.map((uid) => {
-                const cfg = UNIT_CONFIGS[uid];
-                const selected = cfg.id === unit;
-                return (
-                  <Pressable
-                    key={cfg.id}
-                    onPress={() => pickUnit(cfg.id)}
-                    style={[styles.unitChip, selected && styles.unitChipSelected]}
-                  >
-                    <Text
-                      fontVariant={selected ? "bold" : "medium"}
-                      fontSize={13}
-                      style={selected ? styles.unitLabelSelected : styles.unitLabel}
-                    >
-                      {cfg.label}
+              <View style={styles.section}>
+                <View style={styles.headerWrap}>
+                  <Text fontVariant="semibold" fontSize={14} style={styles.sectionTitle}>
+                    יחידת מדידה
+                  </Text>
+                </View>
+                <View style={styles.unitsRow}>
+                  {food.availableUnits.map((uid) => {
+                    const cfg = UNIT_CONFIGS[uid];
+                    const selected = cfg.id === unit;
+                    return (
+                      <Pressable
+                        key={cfg.id}
+                        onPress={() => pickUnit(cfg.id)}
+                        style={[styles.unitChip, selected && styles.unitChipSelected]}
+                      >
+                        <Text
+                          fontVariant={selected ? "bold" : "medium"}
+                          fontSize={13}
+                          style={selected ? styles.unitLabelSelected : styles.unitLabel}
+                        >
+                          {cfg.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </View>
+
+              <View style={styles.section}>
+                <View style={styles.headerWrap}>
+                  <Text fontVariant="semibold" fontSize={14} style={styles.sectionTitle}>
+                    {`כמה ${activeUnitCfg.label}?`}
+                  </Text>
+                </View>
+                <View style={styles.quantityRow}>
+                  <Pressable onPress={() => bump(-activeUnitCfg.step)} style={styles.quantityBtn}>
+                    <Text fontVariant="bold" fontSize={20} style={styles.quantityBtnLabel}>
+                      −
                     </Text>
                   </Pressable>
-                );
-              })}
-            </View>
-          </View>
+                  <TextInput
+                    value={rawText}
+                    onChangeText={handleTextChange}
+                    keyboardType="decimal-pad"
+                    style={styles.quantityInput}
+                  />
+                  <Pressable onPress={() => bump(activeUnitCfg.step)} style={styles.quantityBtn}>
+                    <Text fontVariant="bold" fontSize={20} style={styles.quantityBtnLabel}>
+                      +
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
 
-          <View style={styles.section}>
-            <View style={styles.headerWrap}>
-              <Text fontVariant="semibold" fontSize={14} style={styles.sectionTitle}>
-                {`כמה ${activeUnitCfg.label}?`}
-              </Text>
-            </View>
-            <View style={styles.quantityRow}>
-              <Pressable onPress={() => bump(-activeUnitCfg.step)} style={styles.quantityBtn}>
-                <Text fontVariant="bold" fontSize={20} style={styles.quantityBtnLabel}>
-                  −
-                </Text>
-              </Pressable>
-              <TextInput
-                value={rawText}
-                onChangeText={handleTextChange}
-                keyboardType="decimal-pad"
-                style={styles.quantityInput}
-              />
-              <Pressable onPress={() => bump(activeUnitCfg.step)} style={styles.quantityBtn}>
-                <Text fontVariant="bold" fontSize={20} style={styles.quantityBtnLabel}>
-                  +
-                </Text>
-              </Pressable>
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <View style={styles.headerWrap}>
-              <Text fontVariant="semibold" fontSize={14} style={styles.sectionTitle}>
-                שיוך לארוחה
-              </Text>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.mealsRow}
-            >
-              {mealTiles.map((tile) => {
-                const selected = tile.id === mealId;
-                return (
+              <View style={styles.section}>
+                <View style={styles.headerWrap}>
+                  <Text fontVariant="semibold" fontSize={14} style={styles.sectionTitle}>
+                    שיוך לארוחה
+                  </Text>
+                </View>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.mealsRow}
+                >
+                  {mealTiles.map((tile) => {
+                    const selected = tile.id === mealId;
+                    return (
+                      <Pressable
+                        key={tile.id}
+                        onPress={() => {
+                          selectionHaptic();
+                          setMealId(tile.id);
+                        }}
+                        style={[styles.mealTile, selected && styles.mealTileSelected]}
+                      >
+                        <tile.Icon size={18} color={DIET_V2_GREEN} />
+                        <Text fontVariant="medium" fontSize={11} style={styles.mealLabel}>
+                          {tile.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
                   <Pressable
-                    key={tile.id}
                     onPress={() => {
                       selectionHaptic();
-                      setMealId(tile.id);
+                      const id = onAddMeal();
+                      setMealId(id);
                     }}
-                    style={[styles.mealTile, selected && styles.mealTileSelected]}
+                    style={styles.addMealTile}
                   >
-                    <tile.Icon size={18} color={DIET_V2_GREEN} />
-                    <Text fontVariant="medium" fontSize={11} style={styles.mealLabel}>
-                      {tile.label}
+                    <Text fontVariant="bold" fontSize={22} style={styles.addMealPlus}>
+                      +
+                    </Text>
+                    <Text fontVariant="medium" fontSize={11} style={styles.addMealLabel}>
+                      הוסף ארוחה
                     </Text>
                   </Pressable>
-                );
-              })}
-              <Pressable
-                onPress={() => {
-                  selectionHaptic();
-                  const id = onAddMeal();
-                  setMealId(id);
-                }}
-                style={styles.addMealTile}
-              >
-                <Text fontVariant="bold" fontSize={22} style={styles.addMealPlus}>
-                  +
-                </Text>
-                <Text fontVariant="medium" fontSize={11} style={styles.addMealLabel}>
-                  הוסף ארוחה
-                </Text>
-              </Pressable>
+                </ScrollView>
+              </View>
+
+              <View style={styles.previewBox}>
+                <View style={styles.previewInner}>
+                  <Text fontSize={12} style={styles.previewLabel}>
+                    {`סה"כ: ${Math.round(grams)} גרם · ${preview.calories} קל' · ${preview.protein} ח / ${preview.carbs} פ / ${preview.fat} ש`}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.actionsRow}>
+                <Pressable style={styles.cancelBtn} onPress={onCancel}>
+                  <Text fontVariant="semibold" fontSize={14} style={styles.cancelLabel}>
+                    ביטול
+                  </Text>
+                </Pressable>
+                <View style={styles.confirmWrap}>
+                  <PrimaryButton block onPress={handleConfirm}>
+                    הוסף
+                  </PrimaryButton>
+                </View>
+              </View>
             </ScrollView>
-          </View>
-
-          <View style={styles.previewBox}>
-            <View style={styles.previewInner}>
-              <Text fontSize={12} style={styles.previewLabel}>
-                {`סה"כ: ${Math.round(grams)} גרם · ${preview.calories} קל' · ${preview.protein} ח / ${preview.carbs} פ / ${preview.fat} ש`}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.actionsRow}>
-            <Pressable style={styles.cancelBtn} onPress={onCancel}>
-              <Text fontVariant="semibold" fontSize={14} style={styles.cancelLabel}>
-                ביטול
-              </Text>
-            </Pressable>
-            <View style={styles.confirmWrap}>
-              <PrimaryButton block onPress={handleConfirm}>
-                הוסף
-              </PrimaryButton>
-            </View>
-          </View>
-        </ScrollView>
-        </Pressable>
+          </Pressable>
         </KeyboardAvoidingView>
       </Pressable>
     </View>
