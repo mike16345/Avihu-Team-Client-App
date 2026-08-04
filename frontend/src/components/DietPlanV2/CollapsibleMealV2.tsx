@@ -66,7 +66,7 @@ const CollapsibleMealV2: React.FC<CollapsibleMealV2Props> = ({ meal, index }) =>
             ארוחה {index + 1}
           </Text>
           <Text fontSize={12} style={styles.summary}>
-            {`${totals.calories} קל'   ·   ${totals.protein} ג' חלבון   ·   ${totals.carbs} ג' פחמימה   ·   ${totals.fat} ג' שומן`}
+            {`${totals.calories} קק"ל   ·   ${totals.protein} ג' חלבון   ·   ${totals.carbs} ג' פחמימה   ·   ${totals.fat} ג' שומן`}
           </Text>
         </View>
         <View style={styles.chevron}>

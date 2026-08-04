@@ -111,7 +111,7 @@ const formatQuantity = (quantity: number): string => {
 };
 
 const macrosLine = (m: Macros): string =>
-  `${m.calories} קל'  ·  ${m.protein} ח / ${m.carbs} פ / ${m.fat} ש`;
+  `${m.calories} קק"ל  ·  ${m.protein} ח / ${m.carbs} פ / ${m.fat} ש`;
 
 const HistoryModal: FC<HistoryModalProps> = ({ visible, onClose, mealTiles }) => {
   const insets = useSafeAreaInsets();

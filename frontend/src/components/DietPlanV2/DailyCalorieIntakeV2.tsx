@@ -95,7 +95,7 @@ const DailyCalorieIntakeV2: React.FC<DailyCalorieIntakeV2Props> = ({
         label="קלוריות"
         target={totalCalories}
         consumed={consumedCalories}
-        unit="קל'"
+        unit={'קק"ל'}
         IconComponent={FlameIcon}
       />
       <MacroCard

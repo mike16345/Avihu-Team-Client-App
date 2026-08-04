@@ -21,12 +21,15 @@ const formatVal = (n: number): string => (Number.isInteger(n) ? String(n) : n.to
 
 const GRAD_DARK = "#047857";
 const GRAD_LIGHT = "#86EFAC";
+const RED_DARK = "#DC2626";
+const RED_LIGHT = "#FCA5A5";
 
 const GradientBar: React.FC<{
   fraction: number;
   height: number;
+  over?: boolean;
   style?: object;
-}> = ({ fraction, height, style }) => {
+}> = ({ fraction, height, over = false, style }) => {
   const [width, setWidth] = useState(0);
   const clamped = Math.max(0, Math.min(1, fraction));
   const fillW = Math.round(width * clamped);
@@ -50,8 +53,8 @@ const GradientBar: React.FC<{
         <Svg width={width} height={height}>
           <Defs>
             <SvgLinearGradient id={gradId} x1="0" y1="0" x2="1" y2="0">
-              <Stop offset="0" stopColor={GRAD_DARK} />
-              <Stop offset="1" stopColor={GRAD_LIGHT} />
+              <Stop offset="0" stopColor={over ? RED_DARK : GRAD_DARK} />
+              <Stop offset="1" stopColor={over ? RED_LIGHT : GRAD_LIGHT} />
             </SvgLinearGradient>
           </Defs>
           <Rect
@@ -102,21 +105,23 @@ const useCountUp = (value: number, duration = 500): number => {
 const CalorieHeadline: React.FC<{ consumed: number; target: number }> = ({ consumed, target }) => {
   const shown = useCountUp(Math.round(consumed));
   const clamped = target > 0 ? Math.max(0, Math.min(1, consumed / target)) : 0;
+  const over = target > 0 && consumed > target;
 
   return (
     <View style={styles.headline}>
-      <View style={styles.headlineNumRow}>
-        <Text fontVariant="bold" fontSize={16} style={styles.headlineUnit}>
-          קל'
+      <Text fontVariant="semibold" fontSize={60} style={styles.headlineBig}>
+        <Text fontVariant="light" fontSize={40} style={styles.headlineTarget}>
+          {`${Math.round(target)} `}
         </Text>
-        <Text fontVariant="bold" fontSize={64} style={styles.headlineBig}>
-          {shown}
+        <Text fontVariant="light" fontSize={40} style={styles.headlineTarget}>
+          {`/ `}
         </Text>
-      </View>
-      <Text fontSize={13} style={styles.headlineSub}>
-        {`מתוך ${Math.round(target)} קל' ליום`}
+        {shown}
+        <Text fontVariant="light" fontSize={18} style={styles.headlineTarget}>
+          {` קק"ל`}
+        </Text>
       </Text>
-      <GradientBar fraction={clamped} height={8} style={styles.headlineBar} />
+      <GradientBar fraction={clamped} height={8} over={over} style={styles.headlineBar} />
     </View>
   );
 };
@@ -194,6 +199,7 @@ const MacroBox: React.FC<MacroDatum> = ({
 }) => {
   const [open, setOpen] = useState(false);
   const clamped = target > 0 ? Math.max(0, Math.min(1, consumed / target)) : 0;
+  const over = target > 0 && consumed > target;
 
   const pick = (n: number) => {
     selectionHaptic();
@@ -205,21 +211,20 @@ const MacroBox: React.FC<MacroDatum> = ({
     <>
       <Pressable style={styles.box} onPress={() => setOpen(true)}>
         <View style={styles.boxLabelRow}>
-          <Icon size={13} color={DIET_V2_GREEN} />
           <Text fontSize={12} fontVariant="semibold" style={styles.boxLabel}>
             {label}
           </Text>
+          <Icon size={13} color={DIET_V2_GREEN} />
         </View>
         <View style={styles.boxValueRow}>
           <Text fontVariant="bold" fontSize={17} style={styles.boxValue}>
-            {formatVal(consumed)}
+            {`${formatVal(consumed)}/${formatVal(target)}`}
           </Text>
-          <ChevronDownIcon size={13} color={DIET_V2_GREEN} />
+          <View style={styles.boxChevron}>
+            <ChevronDownIcon size={13} color={DIET_V2_GREEN} />
+          </View>
         </View>
-        <Text fontSize={10} style={styles.boxHint}>
-          {`מתוך ${formatVal(target)} ${unit}`}
-        </Text>
-        <GradientBar fraction={clamped} height={6} />
+        <GradientBar fraction={clamped} height={6} over={over} />
       </Pressable>
       <OptionsModal
         open={open}
@@ -262,9 +267,9 @@ const DailyCalorieIntakeStyle1 = () => {
     [meals]
   );
 
-  const proteinOptions = useMemo(() => range(0, 10, 1), []);
-  const carbsOptions = useMemo(() => range(0, 30, 1), []);
-  const fatOptions = useMemo(() => range(0, 15, 1), []);
+  const proteinOptions = useMemo(() => range(0, 10, 0.5), []);
+  const carbsOptions = useMemo(() => range(0, 30, 0.5), []);
+  const fatOptions = useMemo(() => range(0, 15, 0.5), []);
   const freeOptions = useMemo(() => range(0, 900, 10), []);
 
   const [consumed, setConsumed] = useState({
@@ -314,7 +319,7 @@ const DailyCalorieIntakeStyle1 = () => {
       consumed: consumed.free,
       target: freeCalories,
       options: freeOptions,
-      unit: "קל'",
+      unit: 'קק"ל',
       onChange: (n) => setConsumed((c) => ({ ...c, free: n })),
       Icon: FlameIcon,
     },
@@ -343,22 +348,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 14,
   },
-  headlineNumRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    gap: 8,
-  },
-  headlineUnit: {
-    color: DIET_V2_MUTED,
-  },
   headlineBig: {
     color: "#0B2A22",
     lineHeight: 66,
     letterSpacing: -1.5,
+    writingDirection: "ltr",
+    textAlign: "center",
+    fontStyle: "italic",
   },
-  headlineSub: {
-    color: "#6B7280",
-    marginTop: 4,
+  headlineTarget: {
+    color: DIET_V2_MUTED,
+    letterSpacing: -1,
+    writingDirection: "ltr",
+    fontStyle: "italic",
   },
   headlineBar: {
     width: "88%",
@@ -390,15 +392,21 @@ const styles = StyleSheet.create({
     color: "#0B2A22",
   },
   boxValueRow: {
-    flexDirection: "row",
+    alignSelf: "stretch",
     alignItems: "center",
-    gap: 4,
+    justifyContent: "center",
   },
   boxValue: {
     color: "#0B2A22",
+    writingDirection: "ltr",
+    textAlign: "center",
   },
-  boxHint: {
-    color: DIET_V2_MUTED,
+  boxChevron: {
+    position: "absolute",
+    left: 4,
+    top: 0,
+    bottom: 0,
+    justifyContent: "center",
   },
   backdrop: {
     flex: 1,

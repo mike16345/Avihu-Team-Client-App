@@ -55,7 +55,7 @@ const CalorieRing: React.FC<{ consumed: number; target: number }> = ({ consumed,
             {Math.round(consumed)}
           </Text>
           <Text fontSize={12} style={styles.ringTarget}>
-            {`${Math.round(target)} קל'`}
+            {`${Math.round(target)} קק"ל`}
           </Text>
         </View>
       </View>

@@ -78,12 +78,12 @@ const CollapsibleMealV3: React.FC<CollapsibleMealV3Props> = ({ meal, index, free
             ארוחה {index + 1}
           </Text>
           <Text fontSize={12} style={styles.summary}>
-            {`${totals.calories} קל'   ·   ${totals.protein} ג' חלבון   ·   ${totals.carbs} ג' פחמימה   ·   ${totals.fat} ג' שומן`}
+            {`${totals.calories} קק"ל   ·   ${totals.protein} ג' חלבון   ·   ${totals.carbs} ג' פחמימה   ·   ${totals.fat} ג' שומן`}
           </Text>
           {hasFree && (
             <View style={styles.freeChip}>
               <Text fontSize={11} fontVariant="bold" style={styles.freeChipLabel}>
-                {`+ ${Math.round(freeCalories)} קל' חופשי`}
+                {`+ ${Math.round(freeCalories)} קק"ל חופשי`}
               </Text>
             </View>
           )}
@@ -114,7 +114,7 @@ const CollapsibleMealV3: React.FC<CollapsibleMealV3Props> = ({ meal, index, free
             >
               <View style={styles.freeCatHeaderRow}>
                 <Text fontVariant="bold" fontSize={15} style={styles.freeCatTitle}>
-                  {`קלוריות חופשיות · ${Math.round(freeCalories)} קל'`}
+                  {`קלוריות חופשיות · ${Math.round(freeCalories)} קק"ל`}
                 </Text>
                 {freeConsumed && (
                   <View style={styles.checkBadge}>

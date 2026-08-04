@@ -154,7 +154,7 @@ const FoodQuantityModal: FC<FoodQuantityModalProps> = ({
                   {food.name}
                 </Text>
                 <Text fontSize={12} style={styles.subtitle}>
-                  {`מנה: ${food.servingLabel} · ${Math.round(food.macros.calories)} קל'`}
+                  {`מנה: ${food.servingLabel} · ${Math.round(food.macros.calories)} קק"ל`}
                 </Text>
               </View>
 
@@ -263,7 +263,7 @@ const FoodQuantityModal: FC<FoodQuantityModalProps> = ({
               <View style={styles.previewBox}>
                 <View style={styles.previewInner}>
                   <Text fontSize={12} style={styles.previewLabel}>
-                    {`סה"כ: ${Math.round(grams)} גרם · ${preview.calories} קל' · ${preview.protein} ח / ${preview.carbs} פ / ${preview.fat} ש`}
+                    {`סה"כ: ${Math.round(grams)} גרם · ${preview.calories} קק"ל · ${preview.protein} ח / ${preview.carbs} פ / ${preview.fat} ש`}
                   </Text>
                 </View>
               </View>

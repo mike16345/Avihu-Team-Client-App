@@ -37,7 +37,7 @@ const FoodRow: FC<{ food: MockFoodItem; onSelect: (f: MockFoodItem) => void }> =
   onSelect,
 }) => {
   const macros = food.macros;
-  const macroLine = `${Math.round(macros.calories)} קל' · ${Math.round(macros.protein)} ח / ${Math.round(macros.carbs)} פ / ${Math.round(macros.fat)} ש`;
+  const macroLine = `${Math.round(macros.calories)} קק"ל · ${Math.round(macros.protein)} ח / ${Math.round(macros.carbs)} פ / ${Math.round(macros.fat)} ש`;
   return (
     <Pressable
       style={styles.row}

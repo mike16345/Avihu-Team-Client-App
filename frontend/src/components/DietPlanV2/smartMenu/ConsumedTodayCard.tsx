@@ -150,7 +150,7 @@ const ConsumedTodayCard: FC<ConsumedTodayCardProps> = ({
                 <View style={styles.macrosRow}>
                   <View style={styles.macrosBadge}>
                     <Text fontSize={11} fontVariant="semibold" style={styles.macrosBadgeText}>
-                      {`${totals.calories} קל'  ·  ${totals.protein} ח / ${totals.carbs} פ / ${totals.fat} ש`}
+                      {`${totals.calories} קק"ל  ·  ${totals.protein} ח / ${totals.carbs} פ / ${totals.fat} ש`}
                     </Text>
                   </View>
                 </View>
@@ -167,7 +167,7 @@ const ConsumedTodayCard: FC<ConsumedTodayCardProps> = ({
                           {entry.food.name}
                         </Text>
                         <Text fontSize={12} style={styles.itemMeta}>
-                          {`${totalGrams} גרם · ${totalCal} קל'`}
+                          {`${totalGrams} גרם · ${totalCal} קק"ל`}
                         </Text>
                       </View>
                       <Pressable
