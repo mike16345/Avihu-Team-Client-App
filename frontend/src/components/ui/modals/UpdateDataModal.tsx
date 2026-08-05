@@ -16,12 +16,7 @@ export type FieldConfig = {
   placeholder?: string;
   prefix?: string;
   keyboardType?:
-    | "default"
-    | "number-pad"
-    | "numeric"
-    | "email-address"
-    | "phone-pad"
-    | "decimal-pad";
+    "default" | "number-pad" | "numeric" | "email-address" | "phone-pad" | "decimal-pad";
   existingValue?: string;
   schemaKey?: string;
   parse?: (raw: string | undefined) => unknown;
@@ -80,10 +75,13 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
   const hasMultipleFields = fieldList.length > 1;
 
   const [values, setValues] = useState<Record<string, string | undefined>>(() =>
-    fieldList.reduce((acc, f) => {
-      acc[f.key] = f.existingValue || "";
-      return acc;
-    }, {} as Record<string, string | undefined>)
+    fieldList.reduce(
+      (acc, f) => {
+        acc[f.key] = f.existingValue || "";
+        return acc;
+      },
+      {} as Record<string, string | undefined>
+    )
   );
 
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
@@ -107,20 +105,26 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
   };
 
   const buildParsedObject = () => {
-    return fieldList.reduce((acc, f) => {
-      acc[f.key] = coerce(values[f.key], f);
-      return acc;
-    }, {} as Record<string, unknown>);
+    return fieldList.reduce(
+      (acc, f) => {
+        acc[f.key] = coerce(values[f.key], f);
+        return acc;
+      },
+      {} as Record<string, unknown>
+    );
   };
 
   const handleDismissModal = () => {
     setOpenModal(false);
     setErrors({});
     setValues(
-      fieldList.reduce((acc, f) => {
-        acc[f.key] = f.existingValue;
-        return acc;
-      }, {} as Record<string, string | undefined>)
+      fieldList.reduce(
+        (acc, f) => {
+          acc[f.key] = f.existingValue;
+          return acc;
+        },
+        {} as Record<string, string | undefined>
+      )
     );
   };
 
@@ -172,12 +176,15 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
 
   useEffect(() => {
     setValues(() =>
-      fieldList.reduce((acc, f) => {
-        const v = f.existingValue;
-        acc[f.key] = v == null ? "" : String(v);
+      fieldList.reduce(
+        (acc, f) => {
+          const v = f.existingValue;
+          acc[f.key] = v == null ? "" : String(v);
 
-        return acc;
-      }, {} as Record<string, string>)
+          return acc;
+        },
+        {} as Record<string, string>
+      )
     );
     setErrors({});
   }, [existingValue, JSON.stringify(fields)]);
