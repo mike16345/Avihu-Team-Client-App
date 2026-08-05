@@ -1,8 +1,52 @@
 import { describe, expect, it } from "vitest";
-import { getDataAvgPerDate, getGrowthTrend, groupRecordedSetsByDate } from "../recordedSets";
+import {
+  buildRecordedSetUpdate,
+  formatPreviousSetLine,
+  getDataAvgPerDate,
+  getGrowthTrend,
+  groupRecordedSetsByDate,
+  hasRecordedSetRir,
+} from "../recordedSets";
 import type { IRecordedSetRes } from "@/interfaces/Workout";
 
 describe("recordedSets helpers", () => {
+  const setWithRir: IRecordedSetRes = {
+    _id: "rir-set",
+    plan: "A",
+    weight: 80,
+    repsDone: 10,
+    setNumber: 2,
+    rir: 0,
+    date: "2026-08-05T12:00:00.000Z",
+  };
+
+  it("formats a compact previous-set line without RIR", () => {
+    expect(formatPreviousSetLine(setWithRir)).toBe("סט 2 | משקל 80 | חזרות 10");
+  });
+
+  it("recognizes zero RIR as an existing value", () => {
+    expect(hasRecordedSetRir(setWithRir)).toBe(true);
+  });
+
+  it("keeps edited RIR when the original set has RIR", () => {
+    expect(buildRecordedSetUpdate(setWithRir, { weight: 82.5, repsDone: 8, rir: 1 })).toEqual({
+      setNumber: 2,
+      weight: 82.5,
+      repsDone: 8,
+      rir: 1,
+    });
+  });
+
+  it("does not add RIR when the original set has no RIR", () => {
+    const setWithoutRir = { ...setWithRir, _id: "legacy-set", rir: undefined };
+
+    expect(buildRecordedSetUpdate(setWithoutRir, { weight: 82.5, repsDone: 8, rir: 1 })).toEqual({
+      setNumber: 2,
+      weight: 82.5,
+      repsDone: 8,
+    });
+  });
+
   it("groups recorded sets by formatted date", () => {
     const recordedSets: IRecordedSetRes[] = [
       {

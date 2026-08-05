@@ -2,10 +2,10 @@ import UpdateDataModal, { FieldConfig } from "@/components/ui/modals/UpdateDataM
 import { useRecordedSetsMutations } from "@/hooks/mutations/useRecordedSetsMutations";
 import { useToast } from "@/hooks/useToast";
 import { FC, useMemo } from "react";
-import { SetInput } from "./SetInputContainer";
 import { IRecordedSetRes } from "@/interfaces/Workout";
 import SetInputSchema from "@/schemas/setSchema";
 import { useUserStore } from "@/store/userStore";
+import { buildRecordedSetUpdate, hasRecordedSetRir } from "@/utils/recordedSets";
 
 interface UpdateSetModalProps {
   set: IRecordedSetRes;
@@ -21,11 +21,7 @@ const UpdateSetModal: FC<UpdateSetModalProps> = ({ set, exercise }) => {
 
   const handleSave = async (vals: Record<string, unknown>) => {
     try {
-      const result: SetInput = {
-        setNumber: set.setNumber,
-        weight: Number(vals.weight),
-        repsDone: Number(vals.repsDone),
-      };
+      const result = buildRecordedSetUpdate(set, vals);
 
       await updateRecordedSet.mutateAsync({ set: result, id: set._id, exercise });
       triggerSuccessToast({ message: "הסט עודכן בהצלחה" });
@@ -45,8 +41,8 @@ const UpdateSetModal: FC<UpdateSetModalProps> = ({ set, exercise }) => {
     }
   };
 
-  const fields: FieldConfig[] = useMemo(
-    () => [
+  const fields: FieldConfig[] = useMemo(() => {
+    const nextFields: FieldConfig[] = [
       {
         key: "weight",
         label: "משקל",
@@ -65,9 +61,22 @@ const UpdateSetModal: FC<UpdateSetModalProps> = ({ set, exercise }) => {
         existingValue: set.repsDone?.toString() ?? "",
         schemaKey: "repsDone",
       },
-    ],
-    [set._id, set.repsDone, set.weight]
-  );
+    ];
+
+    if (hasRecordedSetRir(set)) {
+      nextFields.push({
+        key: "rir",
+        label: "RIR",
+        placeholder: "הכניסו RIR",
+        prefix: " | RIR",
+        keyboardType: "number-pad",
+        existingValue: String(set.rir),
+        schemaKey: "rir",
+      });
+    }
+
+    return nextFields;
+  }, [set.setNumber, set.repsDone, set.rir, set.weight]);
 
   return (
     <UpdateDataModal

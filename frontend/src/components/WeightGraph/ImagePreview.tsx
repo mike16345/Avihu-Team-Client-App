@@ -1,6 +1,6 @@
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useToast } from "@/hooks/useToast";
 import DisplayImage from "./DisplayImage";
 import { Text } from "../ui/Text";
@@ -64,10 +64,10 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
   }, [existingImages]);
 
   return (
-    <View style={[{ paddingVertical: 30, paddingHorizontal: 24 }, spacing.gap30, layout.flex1]}>
-      <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונות</Text>
+    <View style={[styles.container, spacing.gap20, layout.flex1, layout.justifyBetween]}>
+      <View style={[spacing.gap20]}>
+        <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונות</Text>
 
-      <View style={[spacing.gap30, !images.length && { gap: 226 }]}>
         <SelectUploadType
           imageCap={imageCap}
           selectedImagesCount={images.length}
@@ -89,5 +89,12 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    paddingVertical: 20,
+    paddingHorizontal: 24,
+  },
+});
 
 export default ImagePreview;

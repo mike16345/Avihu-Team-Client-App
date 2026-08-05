@@ -28,7 +28,7 @@ const SetInputContainer: FC<SetInputContainerProps> = ({
   handleDeleteSet,
 }) => {
   const [style] = useState<"wheel" | "table">(
-    () => useUserStore.getState().currentUser?.setInputStyle ?? "wheel"
+    () => useUserStore.getState().currentUser?.setInputType ?? "wheel"
   );
 
   if (style === "wheel") {

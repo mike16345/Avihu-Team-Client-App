@@ -45,7 +45,7 @@ const Badge: React.FC<Badgeprops> = ({
     <TouchableOpacity
       onPress={onPress}
       onLayout={onLayout}
-      disabled={disabled}
+      disabled={disabled || !onPress}
       style={[
         colors.backgroundSurface,
         common.rounded,

@@ -1,6 +1,6 @@
 import useStyles from "@/styles/useGlobalStyles";
-import React, { useState } from "react";
-import { Image, View, TouchableOpacity, LayoutChangeEvent, StyleSheet } from "react-native";
+import React from "react";
+import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
 import Icon from "../Icon/Icon";
 import { ConditionalRender } from "../ui/ConditionalRender";
 
@@ -11,57 +11,61 @@ interface DisplayImageProps {
 
 const DisplayImage: React.FC<DisplayImageProps> = ({ images, removeImage }) => {
   const { common, layout } = useStyles();
-  const [containerWidth, setContainerWidth] = useState(0);
-  const imageCount = images?.length || 0;
-  const usesGridLayout = imageCount > 2;
-  const columns = usesGridLayout ? 2 : Math.max(imageCount, 1);
-  const gap = usesGridLayout ? 12 : 20;
-  const availableWidth = containerWidth || 240;
-  const imageWidth = Math.max(92, Math.min(110, (availableWidth - gap * (columns - 1)) / columns));
-  const imageHeight = usesGridLayout ? imageWidth * 1.2 : 156;
-
-  const onLayout = (e: LayoutChangeEvent) => {
-    const currentWidth = e.nativeEvent.layout.width;
-
-    if (currentWidth !== containerWidth) {
-      setContainerWidth(currentWidth);
-    }
-  };
 
   return (
-    <View onLayout={onLayout} style={layout.widthFull}>
+    <View style={layout.widthFull}>
       <ConditionalRender condition={images?.length !== 0}>
-        <View style={[layout.flexRow, layout.wrap, layout.justifyCenter, { gap }]}>
+        <ScrollView
+          horizontal
+          contentContainerStyle={styles.previewContent}
+          showsHorizontalScrollIndicator={false}
+        >
           {images?.map((image, i) => (
-            <View key={i} style={[styles.imageCard, { width: imageWidth }]}>
+            <View key={`${image}-${i}`} style={styles.imageCard}>
               <Image
                 source={{ uri: image }}
                 resizeMode="cover"
-                style={[{ width: imageWidth, height: imageHeight }, common.rounded]}
+                style={[styles.image, common.rounded]}
               />
               <TouchableOpacity style={styles.removeButton} onPress={() => removeImage(i)}>
-                <Icon name="close" />
+                <Icon name="close" width={14} height={14} />
               </TouchableOpacity>
             </View>
           ))}
-        </View>
+        </ScrollView>
       </ConditionalRender>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  previewContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    gap: 12,
+    paddingHorizontal: 4,
+  },
   imageCard: {
     position: "relative",
+    width: 110,
+  },
+  image: {
+    width: 110,
+    height: 146,
   },
   removeButton: {
     position: "absolute",
-    top: 8,
-    left: 8,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    top: 6,
+    left: 6,
+    width: 26,
+    height: 26,
+    borderRadius: 7,
     backgroundColor: "rgba(255, 255, 255, 0.92)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.16,
+    shadowRadius: 2,
+    elevation: 2,
     alignItems: "center",
     justifyContent: "center",
   },

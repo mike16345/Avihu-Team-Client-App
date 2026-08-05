@@ -4,18 +4,25 @@ import { Text } from "@/components/ui/Text";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import { IRecordedSetRes } from "@/interfaces/Workout";
 import { FC, useEffect, useMemo, useState } from "react";
-import { Dimensions, ScrollView, View } from "react-native";
-import PreviousSetCard, { toLine } from "./PreviousSetCard";
+import { ScrollView, StyleSheet, View } from "react-native";
+import PreviousSetCard from "./PreviousSetCard";
 import useStyles from "@/styles/useGlobalStyles";
 import DateUtils from "@/utils/dateUtils";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import UpdateSetModal from "./UpdateSetModal";
+import { hasRecordedSetRir } from "@/utils/recordedSets";
 
 interface RecordedSetsHistoryModalProps {
   exercise: string;
   visible: boolean;
   onDismiss: () => void;
 }
+
+const formatHistorySetLine = (set: IRecordedSetRes) => {
+  const base = `סט ${set.setNumber} | משקל ${set.weight} | חזרות ${set.repsDone}`;
+
+  return hasRecordedSetRir(set) ? `${base} | רזרבה ${set.rir}` : base;
+};
 
 const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({
   exercise,
@@ -83,7 +90,7 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({
 
               <ScrollView
                 style={{ maxHeight: 200 }}
-                contentContainerStyle={[layout.center, spacing.gapDefault]}
+                contentContainerStyle={[spacing.gapDefault, styles.historyList]}
                 showsVerticalScrollIndicator={false}
               >
                 {sets.map((set, index) => (
@@ -93,10 +100,18 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({
                       layout.flexRow,
                       layout.itemsCenter,
                       layout.justifyBetween,
-                      { width: Dimensions.get("screen").width * 0.6 },
+                      styles.historyRow,
                     ]}
                   >
-                    <Text fontSize={16}>{toLine(set)}</Text>
+                    <Text
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.82}
+                      numberOfLines={1}
+                      fontSize={13}
+                      style={styles.historyLine}
+                    >
+                      {formatHistorySetLine(set)}
+                    </Text>
                     <UpdateSetModal set={set} exercise={exercise} />
                   </View>
                 ))}
@@ -109,5 +124,21 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({
     </CustomModal>
   );
 };
+
+const styles = StyleSheet.create({
+  historyList: {
+    width: "100%",
+    paddingHorizontal: 2,
+  },
+  historyRow: {
+    width: "100%",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    gap: 5,
+  },
+  historyLine: {
+    flex: 1,
+  },
+});
 
 export default RecordedSetsHistoryModal;

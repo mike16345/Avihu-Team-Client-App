@@ -1,10 +1,26 @@
-import { IRecordedSetRes } from "@/interfaces/Workout";
+import { IRecordedSet, IRecordedSetRes } from "@/interfaces/Workout";
 import DateUtils from "./dateUtils";
 import { GraphData } from "@/hooks/graph/useGraphWeighIns";
 
 type SetsSummaryByDate = Record<string, { totalReps: number; totalWeight: number; count: number }>;
 
 type SetsSummaries = Record<string, GraphData[]>;
+
+export const formatPreviousSetLine = (set: IRecordedSetRes) =>
+  `סט ${set.setNumber} | משקל ${set.weight} | חזרות ${set.repsDone}`;
+
+export const hasRecordedSetRir = (set: IRecordedSetRes) =>
+  set.rir !== undefined && set.rir !== null;
+
+export const buildRecordedSetUpdate = (
+  set: IRecordedSetRes,
+  values: Record<string, unknown>
+): Omit<IRecordedSet, "plan"> => ({
+  setNumber: set.setNumber,
+  weight: Number(values.weight),
+  repsDone: Number(values.repsDone),
+  ...(hasRecordedSetRir(set) ? { rir: Number(values.rir) } : {}),
+});
 
 export const groupRecordedSetsByDate = (recordedSets: IRecordedSetRes[]): SetsSummaryByDate => {
   return recordedSets.reduce((acc: SetsSummaryByDate, current: IRecordedSetRes) => {
