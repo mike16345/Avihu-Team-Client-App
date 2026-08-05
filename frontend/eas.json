@@ -7,6 +7,12 @@
       "channel": "development",
       "environment": "development"
     },
+    "development-simulator": {
+      "extends": "development",
+      "ios": {
+        "simulator": true
+      }
+    },
     "preview": {
       "android": { "credentialsSource": "local" },
       "distribution": "store",

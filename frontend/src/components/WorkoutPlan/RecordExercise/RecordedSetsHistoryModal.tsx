@@ -85,30 +85,21 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({
           />
 
           <ConditionalRender condition={!!selectedDate}>
-            <View style={[spacing.gapMd, layout.center]}>
+            <View style={[spacing.gapMd, layout.center, layout.widthFull]}>
               <Text fontSize={16}>{DateUtils.formatDate(selectedDate!, "DD.MM.YY")}</Text>
 
               <ScrollView
-                style={{ maxHeight: 200 }}
+                style={styles.historyScroll}
                 contentContainerStyle={[spacing.gapDefault, styles.historyList]}
                 showsVerticalScrollIndicator={false}
               >
                 {sets.map((set, index) => (
-                  <View
-                    key={set._id ?? index}
-                    style={[
-                      layout.flexRow,
-                      layout.itemsCenter,
-                      layout.justifyBetween,
-                      styles.historyRow,
-                    ]}
-                  >
+                  <View key={set._id ?? index} style={styles.historyRow}>
                     <Text
                       adjustsFontSizeToFit
                       minimumFontScale={0.82}
                       numberOfLines={1}
-                      fontSize={13}
-                      style={styles.historyLine}
+                      fontSize={14}
                     >
                       {formatHistorySetLine(set)}
                     </Text>
@@ -126,18 +117,42 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({
 };
 
 const styles = StyleSheet.create({
+  historyScroll: {
+    width: "100%",
+    maxHeight: 200,
+  },
   historyList: {
     width: "100%",
+    alignItems: "stretch",
     paddingHorizontal: 2,
   },
   historyRow: {
     width: "100%",
-    paddingHorizontal: 10,
+    "flexDirection":"row",
+    minHeight: 34,
+    justifyContent: "space-between",
     paddingVertical: 8,
-    gap: 5,
+  },
+  historyTextContainer: {
+    width: "100%",
+    paddingStart: 36,
+    paddingEnd: 10,
   },
   historyLine: {
-    flex: 1,
+    maxWidth: "100%",
+    textAlign: "right",
+    writingDirection: "rtl",
+  },
+  editAction: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingStart: 10,
   },
 });
 
