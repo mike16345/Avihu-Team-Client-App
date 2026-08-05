@@ -2,6 +2,7 @@ import { IStepsCardioType } from "@/interfaces/Workout";
 
 export const DEFAULT_DAILY_GOAL = 10000;
 export const STEP_DISTANCE_METERS = 0.762;
+export const STEPS_MILESTONE_PLAN_TYPE = "חיטוב";
 
 export const formatSteps = (value: number): string => Math.round(value).toLocaleString("he-IL");
 

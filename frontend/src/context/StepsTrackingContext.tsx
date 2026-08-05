@@ -9,7 +9,12 @@ import useLiveStepsActivity from "@/hooks/api/useLiveStepsActivity";
 import { useStepsProgressApi } from "@/hooks/api/useStepsProgressApi";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
 import { useUserStore } from "@/store/userStore";
-import { buildGoalsByDay, getLocalDateKey, stepsToDistanceKm } from "@/utils/stepsUtils";
+import {
+  buildGoalsByDay,
+  getLocalDateKey,
+  STEPS_MILESTONE_PLAN_TYPE,
+  stepsToDistanceKm,
+} from "@/utils/stepsUtils";
 
 interface StepsTrackingContextValue {
   steps: UseStepsDataResult;
@@ -21,7 +26,6 @@ const StepsTrackingContext = createContext<StepsTrackingContextValue | null>(nul
 
 const HEALTH_REFRESH_INTERVAL_MS = 15 * 1000;
 const SERVER_SYNC_INTERVAL_MS = 15 * 60 * 1000;
-const STEPS_MILESTONE_PLAN_TYPE = "חיטוב";
 
 export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const steps = useStepsData();

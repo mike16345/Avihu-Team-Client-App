@@ -8,6 +8,7 @@ import {
   readRecords as readHealthConnectRecords,
   requestPermission as requestHealthConnectPermission,
 } from "react-native-health-connect";
+import type { StepsSyncSource } from "@/interfaces/StepsProgress";
 import { getLocalDateKey, stepsToCalories } from "@/utils/stepsUtils";
 
 export type StepsPermissionStatus = "needsPermission" | "denied" | "granted";
@@ -56,6 +57,12 @@ export interface UseStepsDataResult {
   ensureBackgroundAccess: () => Promise<boolean>;
   refresh: () => Promise<void>;
   isNativeAvailable: boolean;
+}
+
+export interface BackgroundStepsReadResult {
+  steps: number;
+  calories: number;
+  source: StepsSyncSource;
 }
 
 const STEPS_HEALTH_CONNECTED_KEY = "steps-health-connected";
@@ -463,6 +470,84 @@ const initializeAndroidExistingConnection = async (
       hasBackgroundAccess: false,
     };
   }
+};
+
+const readAndroidTodaySteps = async (
+  native: NativeAndroidModule,
+  today: Date,
+): Promise<number> => {
+  const timeRangeFilter = {
+    operator: "between" as const,
+    startTime: startOfDay(today).toISOString(),
+    endTime: today.toISOString(),
+  };
+
+  try {
+    const aggregateGroups = await native.aggregateGroupByPeriod({
+      recordType: "Steps",
+      timeRangeFilter,
+      timeRangeSlicer: { period: "DAYS", length: 1 },
+    });
+
+    if (Array.isArray(aggregateGroups) && aggregateGroups.length > 0) {
+      return Math.round(
+        aggregateGroups.reduce(
+          (total: number, group: any) => total + (group?.result?.COUNT_TOTAL ?? 0),
+          0,
+        ),
+      );
+    }
+  } catch (error) {
+    console.error("[steps] background Health Connect aggregate failed:", error);
+  }
+
+  const records = await native.readRecords("Steps", {
+    timeRangeFilter,
+    pageSize: 500,
+  });
+  const list: Array<{ count: number }> = records?.records ?? [];
+
+  return Math.round(list.reduce((total, record) => total + record.count, 0));
+};
+
+export const readTodayStepsForBackgroundSync = async (
+  today: Date = new Date(),
+): Promise<BackgroundStepsReadResult | null> => {
+  if (!(await hasConnectedHealthBefore())) {
+    return null;
+  }
+
+  if (Platform.OS === "ios") {
+    const native = loadNativeIOS();
+    if (!native || !(await requestIOSPermission(native))) {
+      return null;
+    }
+
+    const steps = await readIOSTodaySteps(native, today);
+    if (steps === null) {
+      return null;
+    }
+
+    return {
+      steps,
+      calories: stepsToCalories(steps),
+      source: "healthkit",
+    };
+  }
+
+  const native = loadNativeAndroid();
+  const permissionState = await initializeAndroidExistingConnection(native);
+  if (!permissionState.hasStepsRead || !permissionState.hasBackgroundAccess) {
+    return null;
+  }
+
+  const steps = await readAndroidTodaySteps(native, today);
+
+  return {
+    steps,
+    calories: stepsToCalories(steps),
+    source: "health_connect",
+  };
 };
 
 const useStepsData = (): UseStepsDataResult => {

@@ -23,6 +23,8 @@ interface StoredMilestoneState {
   lastSentLevel: number;
 }
 
+let milestoneStateCache: StoredMilestoneState | null = null;
+
 const ONE_QUARTER = 0.25;
 const ONE_HALF = 0.5;
 const TWO_THIRDS = 2 / 3;
@@ -97,15 +99,100 @@ export interface UseStepsNotificationsResult {
   notifyMilestone: (
     todaySteps: number,
     dailyGoal: number,
-    userId: string
+    userId: string,
   ) => Promise<void>;
 }
 
 const getMilestoneStorageKey = (userId: string) => `${MILESTONE_STORAGE_KEY}:${userId}`;
 
+const readMilestoneState = async (userId: string): Promise<StoredMilestoneState> => {
+  const todayKey = getLocalDateKey();
+  const storageKey = getMilestoneStorageKey(userId);
+
+  if (
+    milestoneStateCache?.storageKey === storageKey &&
+    milestoneStateCache.dateKey === todayKey
+  ) {
+    return milestoneStateCache;
+  }
+
+  try {
+    const raw = await AsyncStorage.getItem(storageKey);
+
+    if (raw) {
+      const parsed = JSON.parse(raw) as Omit<StoredMilestoneState, "storageKey">;
+
+      if (parsed?.dateKey === todayKey) {
+        milestoneStateCache = { ...parsed, storageKey };
+        return milestoneStateCache;
+      }
+    }
+  } catch {
+    // ignore malformed local state
+  }
+
+  milestoneStateCache = { storageKey, dateKey: todayKey, lastSentLevel: 0 };
+  return milestoneStateCache;
+};
+
+const writeMilestoneState = async (state: StoredMilestoneState): Promise<void> => {
+  milestoneStateCache = state;
+
+  try {
+    await AsyncStorage.setItem(
+      state.storageKey,
+      JSON.stringify({
+        dateKey: state.dateKey,
+        lastSentLevel: state.lastSentLevel,
+      })
+    );
+  } catch {
+    // persistence failure is non-fatal
+  }
+};
+
+export const notifyStepsMilestone = async (
+  todaySteps: number,
+  dailyGoal: number,
+  userId: string,
+): Promise<void> => {
+  const Notifications = loadNotifications();
+  if (!Notifications || !userId) return;
+
+  const permission = await Notifications.getPermissionsAsync();
+  if (permission?.status !== "granted") return;
+
+  const milestone = getReachedMilestone(todaySteps, dailyGoal);
+  if (!milestone) return;
+
+  const state = await readMilestoneState(userId);
+  if (milestone.level <= state.lastSentLevel) return;
+
+  try {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: buildMilestoneTitle(todaySteps, dailyGoal, milestone.emoji),
+        body: toRtlNotificationText(milestone.buildBody()),
+        data: {
+          type: "steps-milestone",
+          milestone: milestone.id,
+        },
+      },
+      trigger: null,
+    });
+
+    await writeMilestoneState({
+      storageKey: state.storageKey,
+      dateKey: state.dateKey,
+      lastSentLevel: milestone.level,
+    });
+  } catch {
+    // notification failure is non-fatal
+  }
+};
+
 const useStepsNotifications = (): UseStepsNotificationsResult => {
   const notifModuleRef = useRef(loadNotifications());
-  const milestoneStateRef = useRef<StoredMilestoneState | null>(null);
   const isAvailable = notifModuleRef.current != null;
 
   useEffect(() => {
@@ -121,58 +208,6 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
       }),
     });
   }, []);
-
-  const readMilestoneState = useCallback(
-    async (userId: string): Promise<StoredMilestoneState> => {
-      const todayKey = getLocalDateKey();
-      const storageKey = getMilestoneStorageKey(userId);
-      const cached = milestoneStateRef.current;
-
-      if (cached?.storageKey === storageKey && cached.dateKey === todayKey) {
-        return cached;
-      }
-
-      try {
-        const raw = await AsyncStorage.getItem(storageKey);
-
-        if (raw) {
-          const parsed = JSON.parse(raw) as Omit<StoredMilestoneState, "storageKey">;
-
-          if (parsed?.dateKey === todayKey) {
-            const nextState = { ...parsed, storageKey };
-            milestoneStateRef.current = nextState;
-            return nextState;
-          }
-        }
-      } catch {
-        // ignore malformed local state
-      }
-
-      const nextState = { storageKey, dateKey: todayKey, lastSentLevel: 0 };
-      milestoneStateRef.current = nextState;
-      return nextState;
-    },
-    []
-  );
-
-  const writeMilestoneState = useCallback(
-    async (state: StoredMilestoneState): Promise<void> => {
-      milestoneStateRef.current = state;
-
-      try {
-        await AsyncStorage.setItem(
-          state.storageKey,
-          JSON.stringify({
-            dateKey: state.dateKey,
-            lastSentLevel: state.lastSentLevel,
-          })
-        );
-      } catch {
-        // persistence failure is non-fatal
-      }
-    },
-    []
-  );
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
     const Notifications = notifModuleRef.current;
@@ -203,48 +238,7 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
     }
   }, []);
 
-  const notifyMilestone = useCallback(
-    async (todaySteps: number, dailyGoal: number, userId: string): Promise<void> => {
-      const Notifications = notifModuleRef.current;
-      if (!Notifications) return;
-      if (!userId) return;
-
-      const permission = await Notifications.getPermissionsAsync();
-      if (permission?.status !== "granted") return;
-
-      const milestone = getReachedMilestone(todaySteps, dailyGoal);
-      if (!milestone) return;
-
-      const state = await readMilestoneState(userId);
-
-      if (milestone.level <= state.lastSentLevel) {
-        return;
-      }
-
-      try {
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: buildMilestoneTitle(todaySteps, dailyGoal, milestone.emoji),
-            body: toRtlNotificationText(milestone.buildBody()),
-            data: {
-              type: "steps-milestone",
-              milestone: milestone.id,
-            },
-          },
-          trigger: null,
-        });
-
-        await writeMilestoneState({
-          storageKey: state.storageKey,
-          dateKey: state.dateKey,
-          lastSentLevel: milestone.level,
-        });
-      } catch {
-        // notification failure is non-fatal
-      }
-    },
-    [readMilestoneState, writeMilestoneState]
-  );
+  const notifyMilestone = useCallback(notifyStepsMilestone, []);
 
   return useMemo(
     () => ({
