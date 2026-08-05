@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   },
   historyRow: {
     width: "100%",
-    "flexDirection":"row",
+    flexDirection: "row",
     minHeight: 34,
     justifyContent: "space-between",
     paddingVertical: 8,
