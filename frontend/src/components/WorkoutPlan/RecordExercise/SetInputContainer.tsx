@@ -11,7 +11,7 @@ interface SetInputContainerProps {
   exercise: IExercise;
   sheetHeight: number;
   setNumber: number;
-  handleRecordSets: (sets: SetInput[]) => Promise<string | undefined>;
+  handleRecordSets: (sets: SetInput[]) => Promise<boolean>;
   handleRecordSetsWheel: (sets: SetInput[]) => Promise<number | undefined>;
   handleUpdateSet: (setId: string, set: SetInput) => Promise<unknown>;
   handleDeleteSet: (setId: string) => Promise<boolean>;

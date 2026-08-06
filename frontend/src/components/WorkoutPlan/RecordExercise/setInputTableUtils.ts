@@ -80,6 +80,9 @@ export const getLatestDeletableRowIndex = (rows: RowState[]): number => {
   return -1;
 };
 
+export const getSetRowKey = (row: RowState): string =>
+  row.savedSetId ? `saved-${row.savedSetId}` : `unsaved-${row.setNumber}`;
+
 export const buildRowsFromServer = (sets: IRecordedSetRes[], maxSets: number): RowState[] => {
   const byNumber = new Map<number, IRecordedSetRes>();
   for (const s of sets) {

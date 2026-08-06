@@ -19,6 +19,7 @@ import {
   findTodaySetId,
   getLatestDeletableRowIndex,
   getPlannedReps,
+  getSetRowKey,
   RowState,
 } from "./setInputTableUtils";
 
@@ -27,7 +28,7 @@ const HEADER_LABELS = ["סט", "ק״ג", "חזרות", "רזרבה"] as const;
 interface SetInputTableProps {
   exercise: IExercise;
   maxSets: number;
-  onSaveSet: (set: SetInput) => Promise<string | undefined>;
+  onSaveSet: (set: SetInput) => Promise<boolean>;
   onUpdateSet: (setId: string, set: SetInput) => Promise<unknown>;
   onDeleteSet: (setId: string) => Promise<boolean>;
 }
@@ -40,7 +41,7 @@ const SetInputTable: FC<SetInputTableProps> = ({
   onDeleteSet,
 }) => {
   const { theme } = useThemeContext();
-  const { data: recordedSetsData } = useRecordedSetsQuery();
+  const { data: recordedSetsData, refetch: refetchRecordedSets } = useRecordedSetsQuery();
 
   const todaySets = useMemo(
     () => collectTodaySets(recordedSetsData, exercise.exerciseId.name),
@@ -60,6 +61,29 @@ const SetInputTable: FC<SetInputTableProps> = ({
     hydratedRef.current = true;
     setRows(buildRowsFromServer(todaySets, maxSets));
   }, [recordedSetsData, todaySets, maxSets]);
+
+  useEffect(() => {
+    if (!recordedSetsData) return;
+
+    setRows((prev) => {
+      let changed = false;
+      const next = prev.map((row) => {
+        if (row.savedSetId || !row.completed) return row;
+
+        const savedSetId = findTodaySetId(
+          recordedSetsData,
+          exercise.exerciseId.name,
+          row.setNumber,
+        );
+        if (!savedSetId) return row;
+
+        changed = true;
+        return { ...row, savedSetId };
+      });
+
+      return changed ? next : prev;
+    });
+  }, [recordedSetsData, exercise.exerciseId.name]);
 
   const updateField = useCallback(
     (index: number, field: "weight" | "reps" | "rir", value: string) => {
@@ -158,8 +182,15 @@ const SetInputTable: FC<SetInputTableProps> = ({
         if (existingId) {
           await onUpdateSet(existingId, setPayload);
         } else {
-          const returnedSetId = await onSaveSet(setPayload);
-          if (returnedSetId) nextSavedSetId = returnedSetId;
+          const saved = await onSaveSet(setPayload);
+          if (!saved) return;
+
+          const refreshedResult = await refetchRecordedSets();
+          nextSavedSetId = findTodaySetId(
+            refreshedResult.data,
+            exercise.exerciseId.name,
+            row.setNumber,
+          );
         }
         setRows((prev) => {
           const next = [...prev];
@@ -183,7 +214,14 @@ const SetInputTable: FC<SetInputTableProps> = ({
         });
       }
     },
-    [rows, onSaveSet, onUpdateSet, exercise, recordedSetsData]
+    [
+      rows,
+      onSaveSet,
+      onUpdateSet,
+      exercise,
+      recordedSetsData,
+      refetchRecordedSets,
+    ],
   );
 
   return (
@@ -206,7 +244,7 @@ const SetInputTable: FC<SetInputTableProps> = ({
 
       {rows.map((row, index) => (
         <SetRow
-          key={row.setNumber + "-" + index}
+          key={getSetRowKey(row)}
           row={row}
           index={index}
           canDelete={index === latestDeletableRowIndex}

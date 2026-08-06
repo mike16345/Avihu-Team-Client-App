@@ -98,16 +98,15 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const handleRecordSets = useCallback(
     async (sets: SetInput[]) => {
       try {
-        const response = await postRecordedSets(sets);
-        const savedSetId = (response.recordedSet as unknown as { _id?: string })?._id;
+        await postRecordedSets(sets);
         triggerSuccessToast({
           title: "עודכן בהצלחה",
           message: "הנתונים זמינים לצפייה בהיסטוריית הביצועים",
         });
-        return savedSetId;
+        return true;
       } catch (e) {
         triggerErrorToast({ message: e instanceof Error ? e.message : "שגיאה" });
-        return undefined;
+        return false;
       }
     },
     [postRecordedSets, triggerSuccessToast, triggerErrorToast]

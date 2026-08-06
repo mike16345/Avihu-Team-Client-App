@@ -12,7 +12,7 @@ const VERTICAL_PADDING = 16;
 interface TableSetInputProps {
   maxSets: number;
   exercise: IExercise;
-  handleRecordSets: (sets: SetInput[]) => Promise<string | undefined>;
+  handleRecordSets: (sets: SetInput[]) => Promise<boolean>;
   handleUpdateSet: (setId: string, set: SetInput) => Promise<unknown>;
   handleDeleteSet: (setId: string) => Promise<boolean>;
 }
