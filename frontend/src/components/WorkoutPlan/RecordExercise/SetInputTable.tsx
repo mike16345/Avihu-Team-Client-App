@@ -5,6 +5,7 @@ import { Swipeable } from "react-native-gesture-handler";
 
 import { Text } from "@/components/ui/Text";
 import Icon from "@/components/Icon/Icon";
+import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
 import { useThemeContext } from "@/themes/useAppTheme";
 import { IExercise } from "@/interfaces/Workout";
 import { useGetLastRecordedSetForSetNumber } from "@/hooks/queries/RecordedSets/useLastRecordedSetQuery";
@@ -16,6 +17,7 @@ import {
   collectTodaySets,
   emptyRow,
   findTodaySetId,
+  getLatestDeletableRowIndex,
   getPlannedReps,
   RowState,
 } from "./setInputTableUtils";
@@ -46,8 +48,12 @@ const SetInputTable: FC<SetInputTableProps> = ({
   );
 
   const [rows, setRows] = useState<RowState[]>(() => buildRowsFromServer(todaySets, maxSets));
+  const [deletingRowIndex, setDeletingRowIndex] = useState<number | null>(null);
+  const latestDeletableRowIndex = useMemo(() => getLatestDeletableRowIndex(rows), [rows]);
 
   const hydratedRef = useRef(false);
+  const deletingRowIndexRef = useRef<number | null>(null);
+
   useEffect(() => {
     if (hydratedRef.current) return;
     if (!recordedSetsData) return;
@@ -83,18 +89,30 @@ const SetInputTable: FC<SetInputTableProps> = ({
 
   const handleDeleteRow = useCallback(
     async (index: number) => {
+      if (deletingRowIndexRef.current !== null) return;
+      if (index !== getLatestDeletableRowIndex(rows)) return;
+
       const row = rows[index];
-      if (row.savedSetId) {
+      if (!row.savedSetId) return;
+
+      deletingRowIndexRef.current = index;
+      setDeletingRowIndex(index);
+
+      try {
         const success = await onDeleteSet(row.savedSetId);
         if (!success) return;
+
+        setRows((prev) => {
+          const remaining = prev.filter((_, i) => i !== index);
+          if (remaining.length === 0) {
+            return [emptyRow(1)];
+          }
+          return remaining.map((r, i) => ({ ...r, setNumber: i + 1 }));
+        });
+      } finally {
+        deletingRowIndexRef.current = null;
+        setDeletingRowIndex(null);
       }
-      setRows((prev) => {
-        const remaining = prev.filter((_, i) => i !== index);
-        if (remaining.length === 0) {
-          return [emptyRow(1)];
-        }
-        return remaining.map((r, i) => ({ ...r, setNumber: i + 1 }));
-      });
     },
     [rows, onDeleteSet]
   );
@@ -156,7 +174,8 @@ const SetInputTable: FC<SetInputTableProps> = ({
           };
           return next;
         });
-      } catch {
+      } catch (e: any) {
+        console.log("Error saving/updating set at index:", index, "Row data:", row, "Error:", e);
         setRows((prev) => {
           const next = [...prev];
           next[index] = { ...next[index], saving: false };
@@ -190,7 +209,8 @@ const SetInputTable: FC<SetInputTableProps> = ({
           key={row.setNumber + "-" + index}
           row={row}
           index={index}
-          isLast={index === rows.length - 1}
+          canDelete={index === latestDeletableRowIndex}
+          isDeleting={index === deletingRowIndex}
           exercise={exercise}
           onChangeField={updateField}
           onTapCheck={handleTapCheck}
@@ -220,12 +240,22 @@ const SetInputTable: FC<SetInputTableProps> = ({
 const SetRow: FC<{
   row: RowState;
   index: number;
-  isLast: boolean;
+  canDelete: boolean;
+  isDeleting: boolean;
   exercise: IExercise;
   onChangeField: (index: number, field: "weight" | "reps" | "rir", value: string) => void;
   onTapCheck: (index: number) => void;
   onDelete: (index: number) => void;
-}> = ({ row, index, isLast, exercise, onChangeField, onTapCheck, onDelete }) => {
+}> = ({
+  row,
+  index,
+  canDelete,
+  isDeleting,
+  exercise,
+  onChangeField,
+  onTapCheck,
+  onDelete,
+}) => {
   const { theme } = useThemeContext();
   const previous = useGetLastRecordedSetForSetNumber(exercise.exerciseId.name, row.setNumber - 1);
 
@@ -241,15 +271,23 @@ const SetRow: FC<{
   const renderDeleteAction = () => (
     <Pressable
       onPress={() => onDelete(index)}
-      style={({ pressed }) => [styles.deleteAction, { opacity: pressed ? 0.5 : 1 }]}
+      disabled={isDeleting}
+      style={({ pressed }) => [
+        styles.deleteAction,
+        { opacity: isDeleting ? 0.7 : pressed ? 0.5 : 1 },
+      ]}
     >
-      <Icon name="trash" width={22} height={22} color={theme.colors.error} />
+      {isDeleting ? (
+        <SpinningIcon mode="light" />
+      ) : (
+        <Icon name="trash" width={22} height={22} color={theme.colors.error} />
+      )}
     </Pressable>
   );
 
   return (
     <Swipeable
-      renderLeftActions={isLast ? renderDeleteAction : undefined}
+      renderLeftActions={canDelete ? renderDeleteAction : undefined}
       overshootLeft={false}
       friction={2}
     >

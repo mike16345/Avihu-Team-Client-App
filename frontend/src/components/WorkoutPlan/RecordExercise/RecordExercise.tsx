@@ -135,6 +135,7 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const handleUpdateSet = useCallback(
     async (setId: string, set: SetInput) => {
       try {
+        console.log("Updating set with ID:", setId, "Set data:", set);
         await updateRecordedSet.mutateAsync({
           set,
           id: setId,

@@ -69,6 +69,17 @@ export const emptyRow = (setNumber: number): RowState => ({
   saving: false,
 });
 
+export const getLatestDeletableRowIndex = (rows: RowState[]): number => {
+  for (let index = rows.length - 1; index >= 0; index -= 1) {
+    const row = rows[index];
+    if (!row.savedSetId) continue;
+
+    return row.setNumber > 1 ? index : -1;
+  }
+
+  return -1;
+};
+
 export const buildRowsFromServer = (sets: IRecordedSetRes[], maxSets: number): RowState[] => {
   const byNumber = new Map<number, IRecordedSetRes>();
   for (const s of sets) {
