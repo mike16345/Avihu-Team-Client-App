@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, useWindowDimensions } from "react-native";
+import { Keyboard, StyleSheet, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import Icon from "@/components/Icon/Icon";
 import useStyles from "@/styles/useGlobalStyles";
@@ -9,7 +9,6 @@ import PrimaryButton from "../buttons/PrimaryButton";
 import DateUtils from "@/utils/dateUtils";
 import { useToast } from "@/hooks/useToast";
 import { ZodObject } from "zod";
-import { Keyboard } from "react-native";
 
 export type FieldConfig = {
   key: string;
@@ -17,12 +16,7 @@ export type FieldConfig = {
   placeholder?: string;
   prefix?: string;
   keyboardType?:
-    | "default"
-    | "number-pad"
-    | "numeric"
-    | "email-address"
-    | "phone-pad"
-    | "decimal-pad";
+    "default" | "number-pad" | "numeric" | "email-address" | "phone-pad" | "decimal-pad";
   existingValue?: string;
   schemaKey?: string;
   parse?: (raw: string | undefined) => unknown;
@@ -78,12 +72,16 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
   ];
 
   const fieldList = fields && fields.length ? fields : singleFieldFallback;
+  const hasMultipleFields = fieldList.length > 1;
 
   const [values, setValues] = useState<Record<string, string | undefined>>(() =>
-    fieldList.reduce((acc, f) => {
-      acc[f.key] = f.existingValue || "";
-      return acc;
-    }, {} as Record<string, string | undefined>)
+    fieldList.reduce(
+      (acc, f) => {
+        acc[f.key] = f.existingValue || "";
+        return acc;
+      },
+      {} as Record<string, string | undefined>
+    )
   );
 
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
@@ -107,20 +105,26 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
   };
 
   const buildParsedObject = () => {
-    return fieldList.reduce((acc, f) => {
-      acc[f.key] = coerce(values[f.key], f);
-      return acc;
-    }, {} as Record<string, unknown>);
+    return fieldList.reduce(
+      (acc, f) => {
+        acc[f.key] = coerce(values[f.key], f);
+        return acc;
+      },
+      {} as Record<string, unknown>
+    );
   };
 
   const handleDismissModal = () => {
     setOpenModal(false);
     setErrors({});
     setValues(
-      fieldList.reduce((acc, f) => {
-        acc[f.key] = f.existingValue;
-        return acc;
-      }, {} as Record<string, string | undefined>)
+      fieldList.reduce(
+        (acc, f) => {
+          acc[f.key] = f.existingValue;
+          return acc;
+        },
+        {} as Record<string, string | undefined>
+      )
     );
   };
 
@@ -172,12 +176,15 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
 
   useEffect(() => {
     setValues(() =>
-      fieldList.reduce((acc, f) => {
-        const v = f.existingValue;
-        acc[f.key] = v == null ? "" : String(v);
+      fieldList.reduce(
+        (acc, f) => {
+          const v = f.existingValue;
+          acc[f.key] = v == null ? "" : String(v);
 
-        return acc;
-      }, {} as Record<string, string>)
+          return acc;
+        },
+        {} as Record<string, string>
+      )
     );
     setErrors({});
   }, [existingValue, JSON.stringify(fields)]);
@@ -185,7 +192,7 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
   return (
     <>
       <TouchableOpacity onPress={() => setOpenModal(true)}>
-        <Icon name="pencil" />
+        <Icon name="pencil" width={18} height={18} />
       </TouchableOpacity>
 
       {openModal && (
@@ -193,16 +200,35 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
           <CustomModal.Content>
             <View style={[layout.widthFull, layout.center, spacing.gapXl]}>
               <Text fontSize={16}>{DateUtils.formatDate(date!, "DD.MM.YYYY")}</Text>
-              <View style={[layout.flexRow, layout.itemsCenter]}>
-                {fieldList.map((f, i) => (
-                  <Text key={f.key + i} fontSize={16}>
-                    {f.prefix ?? prefix}
-                    <Text style={[text.textUnderline]}>
-                      {values[f.key] ? ` ${values[f.key]}` : "_"}
+              {hasMultipleFields && (
+                <View style={styles.summaryMetrics}>
+                  {fieldList.map((f) => (
+                    <View key={f.key} style={styles.summaryMetric}>
+                      <Text fontSize={12}>{f.label}</Text>
+                      <Text
+                        fontSize={16}
+                        fontVariant="semibold"
+                        style={[text.textUnderline, styles.ltrText]}
+                      >
+                        {values[f.key] || "_"}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {!hasMultipleFields && (
+                <View style={[layout.flexRow, layout.itemsCenter]}>
+                  {fieldList.map((f, i) => (
+                    <Text key={f.key + i} fontSize={16}>
+                      {f.prefix ?? prefix}
+                      <Text style={[text.textUnderline]}>
+                        {values[f.key] ? ` ${values[f.key]}` : "_"}
+                      </Text>
                     </Text>
-                  </Text>
-                ))}
-              </View>
+                  ))}
+                </View>
+              )}
 
               <View style={[spacing.gapLg, layout.center]}>
                 {fieldList.map((f, i) => (
@@ -250,5 +276,23 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  summaryMetrics: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 8,
+  },
+  summaryMetric: {
+    minWidth: 68,
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  ltrText: {
+    writingDirection: "ltr",
+  },
+});
 
 export default UpdateDataModal;

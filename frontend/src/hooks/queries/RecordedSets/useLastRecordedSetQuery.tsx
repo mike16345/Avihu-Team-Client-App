@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import useRecordedSetsQuery from "./useRecordedSetsQuery";
-import { toLine } from "@/components/WorkoutPlan/RecordExercise/PreviousSetCard";
 import { IRecordedSetRes } from "@/interfaces/Workout";
 import DateUtils from "@/utils/dateUtils";
+import { formatPreviousSetLine } from "@/utils/recordedSets";
 
 type LastRecorded = {
   formattedSets: string[];
@@ -117,7 +117,7 @@ const useGetLastRecordedSet = (exercise: string) => {
       return perExercise.get(exercise)!;
     }
 
-    const computed = computeForExercise(data, exercise, toLine);
+    const computed = computeForExercise(data, exercise, formatPreviousSetLine);
     perExercise.set(exercise, computed);
 
     return computed;

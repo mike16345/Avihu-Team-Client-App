@@ -28,15 +28,20 @@ const setSchema = z
       .int({ message: "מספר החזרות חייב להיות שלם" })
       .min(1, { message: "מספר החזרות חייב להיות 1 ומעלה" })
       .max(MAX_REPS, { message: `מספר החזרות לא יכול לעלות על ${MAX_REPS}` }),
+
+    rir: z
+      .number({ invalid_type_error: "RIR חייב להיות מספר" })
+      .int({ message: "RIR חייב להיות שלם" })
+      .min(0, { message: "RIR לא יכול להיות שלילי" })
+      .max(20, { message: "RIR לא יכול לעלות על 20" })
+      .optional(),
   })
   .strict();
 
 export type SetInput = z.infer<typeof setSchema>;
 
-// שימושי לעדכון מתוך המודל (ללא setNumber)
 export const UpdateSetSchema = setSchema.pick({ weight: true, repsDone: true });
 
-// ייבוא בשם, אם אתה מעדיף: import { SetInputSchema } from "@schema/setSchema"
 export const SetInputSchema = setSchema;
 
 export default setSchema;

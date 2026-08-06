@@ -18,6 +18,7 @@ export interface IUser {
   onboardingStep: "form" | "agreement" | "completed";
   completedOnboarding?: boolean;
   signedAgreement?: boolean;
+  setInputType: "wheel" | "table";
 }
 
 // WeighIn interface

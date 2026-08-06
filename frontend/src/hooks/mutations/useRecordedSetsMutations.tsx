@@ -28,6 +28,7 @@ export const useRecordedSetsMutations = () => {
       updateRecordedSet({ set, setId: id, userId, exercise }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [RECORDED_SETS_BY_USER_KEY + userId] });
+      queryClient.invalidateQueries({ queryKey: [WORKOUT_SESSION_KEY] });
     },
   });
 
@@ -35,6 +36,7 @@ export const useRecordedSetsMutations = () => {
     mutationFn: deleteRecordedSet,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [RECORDED_SETS_BY_USER_KEY + userId] });
+      queryClient.invalidateQueries({ queryKey: [WORKOUT_SESSION_KEY] });
     },
   });
 

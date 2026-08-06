@@ -15,12 +15,14 @@ import RecordedSetsHistoryModal from "./RecordedSetsHistoryModal";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import { AddRecordedSets } from "@/hooks/api/useRecordedSetsApi";
 import { useTimerStore } from "@/store/timerStore";
+import { useWorkoutSessionStore } from "@/store/workoutSessionStore";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { DEFAULT_PAGE_TOP_PADDING } from "@/constants/Constants";
-import { useWorkoutSessionStore } from "@/store/workoutSessionStore";
 
-interface RecordExerciseProps
-  extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordExercise"> {}
+interface RecordExerciseProps extends StackNavigatorProps<
+  WorkoutPlanStackParamList,
+  "RecordExercise"
+> {}
 
 function hasRecordedSets(data: IMuscleGroupRecordedSets[], exercise: string) {
   for (const muscleGroup of data) {
@@ -39,7 +41,11 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const tabBarHeight = useBottomTabBarHeight();
 
   const { data } = useRecordedSetsQuery();
-  const { useAddRecordedSets: addRecordedSets } = useRecordedSetsMutations();
+  const {
+    useAddRecordedSets: addRecordedSets,
+    useUpdateRecordedSet: updateRecordedSet,
+    useDeleteRecordedSet: deleteRecordedSet,
+  } = useRecordedSetsMutations();
 
   const userId = useUserStore((state) => state.currentUser?._id);
   const setCountdown = useTimerStore((state) => state.setCountdown);
@@ -56,47 +62,118 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
   const sheetHeight = useMemo(() => {
     const windowHeight = Dimensions.get("screen").height;
     const buttonHeight = 60;
-    const availableHeight =
-      windowHeight -
-      containerHeight -
-      (tabBarHeight + 30) -
-      DEFAULT_PAGE_TOP_PADDING -
-      buttonHeight;
+    return (
+      windowHeight - containerHeight - (tabBarHeight + 30) - DEFAULT_PAGE_TOP_PADDING - buttonHeight
+    );
+  }, [containerHeight, tabBarHeight]);
 
-    return availableHeight;
-  }, [containerHeight]);
+  const postRecordedSets = useCallback(
+    async (sets: SetInput[]) => {
+      const recordedSetsToPost: AddRecordedSets = {
+        userId: userId!,
+        muscleGroup: muscleGroup!,
+        exercise: exercise.exerciseId.name,
+        recordedSets: sets.map((set) => ({ ...set, plan })),
+      };
+      const response = await addRecordedSets.mutateAsync({
+        recordedSets: recordedSetsToPost,
+        sessionId: workoutSession?._id,
+      });
+      setWorkoutSession({ ...response.session });
+      setCountdown(exercise.restTime);
+      return response;
+    },
+    [
+      exercise,
+      muscleGroup,
+      plan,
+      userId,
+      workoutSession,
+      addRecordedSets,
+      setCountdown,
+      setWorkoutSession,
+    ]
+  );
 
   const handleRecordSets = useCallback(
     async (sets: SetInput[]) => {
       try {
-        const recordedSetsToPost: AddRecordedSets = {
-          userId: userId!,
-          muscleGroup: muscleGroup!,
-          exercise: exercise.exerciseId.name,
-          recordedSets: sets.map((set) => {
-            return { ...set, plan };
-          }),
-        };
-        const response = await addRecordedSets.mutateAsync({
-          recordedSets: recordedSetsToPost,
-          sessionId: workoutSession?._id,
-        });
-        const nextSet = getNextSetNumber(plan, exercise?.exerciseId.name, response.session);
-
-        setCurrentSet(nextSet);
-        setWorkoutSession({ ...response.session });
+        await postRecordedSets(sets);
         triggerSuccessToast({
           title: "עודכן בהצלחה",
           message: "הנתונים זמינים לצפייה בהיסטוריית הביצועים",
         });
-        setCountdown(exercise.restTime);
-
-        return nextSet;
-      } catch (e: any) {
-        triggerErrorToast({ message: e.message });
+        return true;
+      } catch (e) {
+        triggerErrorToast({ message: e instanceof Error ? e.message : "שגיאה" });
+        return false;
       }
     },
-    [exercise, muscleGroup, plan, workoutSession, addRecordedSets, setCountdown, setWorkoutSession]
+    [postRecordedSets, triggerSuccessToast, triggerErrorToast]
+  );
+
+  const handleRecordSetsWheel = useCallback(
+    async (sets: SetInput[]) => {
+      try {
+        const response = await postRecordedSets(sets);
+        const nextSet = getNextSetNumber(plan, exercise.exerciseId.name, response.session);
+        setCurrentSet(nextSet);
+        triggerSuccessToast({
+          title: "עודכן בהצלחה",
+          message: "הנתונים זמינים לצפייה בהיסטוריית הביצועים",
+        });
+        return nextSet;
+      } catch (e) {
+        triggerErrorToast({ message: e instanceof Error ? e.message : "שגיאה" });
+        return undefined;
+      }
+    },
+    [postRecordedSets, plan, exercise, getNextSetNumber, triggerSuccessToast, triggerErrorToast]
+  );
+
+  const handleUpdateSet = useCallback(
+    async (setId: string, set: SetInput) => {
+      try {
+        console.log("Updating set with ID:", setId, "Set data:", set);
+        await updateRecordedSet.mutateAsync({
+          set,
+          id: setId,
+          exercise: exercise.exerciseId.name,
+        });
+        triggerSuccessToast({
+          title: "עודכן בהצלחה",
+          message: "הסט עודכן בהיסטוריה",
+        });
+        return { setId };
+      } catch (e) {
+        triggerErrorToast({ message: e instanceof Error ? e.message : "שגיאה" });
+        return undefined;
+      }
+    },
+    [exercise, updateRecordedSet, triggerSuccessToast, triggerErrorToast]
+  );
+
+  const handleDeleteSet = useCallback(
+    async (setId: string) => {
+      if (!userId) return false;
+      try {
+        await deleteRecordedSet.mutateAsync({
+          setId,
+          userId,
+          exercise: exercise.exerciseId.name,
+          muscleGroup: muscleGroup!,
+        });
+        triggerSuccessToast({
+          title: "נמחק בהצלחה",
+          message: "הסט נמחק מההיסטוריה",
+        });
+        return true;
+      } catch (e) {
+        triggerErrorToast({ message: e instanceof Error ? e.message : "שגיאה" });
+        return false;
+      }
+    },
+    [userId, muscleGroup, exercise, deleteRecordedSet, triggerSuccessToast, triggerErrorToast]
   );
 
   const hasRecordedSetsHistory = useMemo(() => {
@@ -104,6 +181,10 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
 
     return hasRecordedSets(data, exercise.exerciseId.name);
   }, [data, exercise]);
+
+  const [isHistoryVisible, setIsHistoryVisible] = useState(false);
+  const openHistory = () => setIsHistoryVisible(true);
+  const closeHistory = () => setIsHistoryVisible(false);
 
   return (
     <View style={[layout.flex1, colors.background, spacing.gapLg, spacing.pdHorizontalMd]}>
@@ -120,19 +201,26 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
           <ExerciseVideo exercise={exercise!} />
           <ConditionalRender condition={hasRecordedSetsHistory}>
             <View style={[layout.center, spacing.gap20]}>
-              <PreviousSetCard exercise={exercise.exerciseId.name} />
-              <RecordedSetsHistoryModal exercise={exercise.exerciseId.name} />
+              <PreviousSetCard exercise={exercise.exerciseId.name} onPress={openHistory} />
+              <RecordedSetsHistoryModal
+                exercise={exercise.exerciseId.name}
+                visible={isHistoryVisible}
+                onDismiss={closeHistory}
+              />
             </View>
           </ConditionalRender>
         </View>
       </View>
       <View style={{ flex: 1 }}>
         <SetInputContainer
-          sheetHeight={sheetHeight}
           handleRecordSets={handleRecordSets}
+          handleRecordSetsWheel={handleRecordSetsWheel}
+          handleUpdateSet={handleUpdateSet}
+          handleDeleteSet={handleDeleteSet}
           maxSets={exercise?.sets?.length!}
-          setNumber={currentSet}
           exercise={exercise}
+          sheetHeight={sheetHeight}
+          setNumber={currentSet}
         />
       </View>
     </View>

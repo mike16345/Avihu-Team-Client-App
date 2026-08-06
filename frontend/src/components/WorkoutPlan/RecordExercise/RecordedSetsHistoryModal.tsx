@@ -4,23 +4,34 @@ import { Text } from "@/components/ui/Text";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
 import { IRecordedSetRes } from "@/interfaces/Workout";
 import { FC, useEffect, useMemo, useState } from "react";
-import { Dimensions, ScrollView, View } from "react-native";
-import PreviousSetCard, { toLine } from "./PreviousSetCard";
+import { ScrollView, StyleSheet, View } from "react-native";
+import PreviousSetCard from "./PreviousSetCard";
 import useStyles from "@/styles/useGlobalStyles";
-import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
 import DateUtils from "@/utils/dateUtils";
 import { ConditionalRender } from "@/components/ui/ConditionalRender";
 import UpdateSetModal from "./UpdateSetModal";
+import { hasRecordedSetRir } from "@/utils/recordedSets";
 
 interface RecordedSetsHistoryModalProps {
   exercise: string;
+  visible: boolean;
+  onDismiss: () => void;
 }
 
-const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise }) => {
+const formatHistorySetLine = (set: IRecordedSetRes) => {
+  const base = `סט ${set.setNumber} | משקל ${set.weight} | חזרות ${set.repsDone}`;
+
+  return hasRecordedSetRir(set) ? `${base} | רזרבה ${set.rir}` : base;
+};
+
+const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({
+  exercise,
+  visible,
+  onDismiss,
+}) => {
   const { layout, spacing } = useStyles();
   const { data } = useRecordedSetsQuery();
 
-  const [isVisible, setIsVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>();
 
   const { markedDates, setsByDate } = useMemo(() => {
@@ -56,65 +67,93 @@ const RecordedSetsHistoryModal: FC<RecordedSetsHistoryModalProps> = ({ exercise 
 
   useEffect(() => {
     setSelectedDate(DateUtils.formatDate(new Date(), "YYYY-MM-DD"));
-
-    return () => setIsVisible(false);
   }, []);
 
   return (
-    <>
-      <SecondaryButton
-        alignStart={false}
-        onPress={() => setIsVisible(true)}
-        rightIcon="documentText"
-      >
-        היסטוריית משקל וחזרות
-      </SecondaryButton>
-      <CustomModal visible={isVisible} onDismiss={() => setIsVisible(false)}>
-        <CustomModal.Header>
-          <Text fontSize={16} fontVariant="light">
-            היסטוריית משקל וחזרות
-          </Text>
-        </CustomModal.Header>
-        <CustomModal.Content style={[layout.flex1, layout.justifyBetween]}>
-          <View style={[spacing.gapMd]}>
-            <CustomCalendar
-              selectedDate={selectedDate}
-              onSelect={setSelectedDate}
-              dates={markedDates}
-            />
+    <CustomModal visible={visible} onDismiss={onDismiss}>
+      <CustomModal.Header>
+        <Text fontSize={16} fontVariant="light">
+          היסטוריית משקל וחזרות
+        </Text>
+      </CustomModal.Header>
+      <CustomModal.Content style={[layout.flex1, layout.justifyBetween]}>
+        <View style={[spacing.gapMd]}>
+          <CustomCalendar
+            selectedDate={selectedDate}
+            onSelect={setSelectedDate}
+            dates={markedDates}
+          />
 
-            <ConditionalRender condition={!!selectedDate}>
-              <View style={[spacing.gapMd, layout.center]}>
-                <Text fontSize={16}>{DateUtils.formatDate(selectedDate!, "DD.MM.YY")}</Text>
+          <ConditionalRender condition={!!selectedDate}>
+            <View style={[spacing.gapMd, layout.center, layout.widthFull]}>
+              <Text fontSize={16}>{DateUtils.formatDate(selectedDate!, "DD.MM.YY")}</Text>
 
-                <ScrollView
-                  style={{ maxHeight: 200 }}
-                  contentContainerStyle={[layout.center, spacing.gapDefault]}
-                  showsVerticalScrollIndicator={false}
-                >
-                  {sets.map((set, index) => (
-                    <View
-                      key={set._id ?? index}
-                      style={[
-                        layout.flexRow,
-                        layout.itemsCenter,
-                        layout.justifyBetween,
-                        { width: Dimensions.get("screen").width * 0.6 },
-                      ]}
+              <ScrollView
+                style={styles.historyScroll}
+                contentContainerStyle={[spacing.gapDefault, styles.historyList]}
+                showsVerticalScrollIndicator={false}
+              >
+                {sets.map((set, index) => (
+                  <View key={set._id ?? index} style={styles.historyRow}>
+                    <Text
+                      adjustsFontSizeToFit
+                      minimumFontScale={0.82}
+                      numberOfLines={1}
+                      fontSize={14}
                     >
-                      <Text fontSize={16}>{toLine(set)}</Text>
-                      <UpdateSetModal set={set} exercise={exercise} />
-                    </View>
-                  ))}
-                </ScrollView>
-              </View>
-            </ConditionalRender>
-          </View>
-          <PreviousSetCard exercise={exercise} />
-        </CustomModal.Content>
-      </CustomModal>
-    </>
+                      {formatHistorySetLine(set)}
+                    </Text>
+                    <UpdateSetModal set={set} exercise={exercise} />
+                  </View>
+                ))}
+              </ScrollView>
+            </View>
+          </ConditionalRender>
+        </View>
+        <PreviousSetCard exercise={exercise} />
+      </CustomModal.Content>
+    </CustomModal>
   );
 };
+
+const styles = StyleSheet.create({
+  historyScroll: {
+    width: "100%",
+    maxHeight: 200,
+  },
+  historyList: {
+    width: "100%",
+    alignItems: "stretch",
+    paddingHorizontal: 2,
+  },
+  historyRow: {
+    width: "100%",
+    flexDirection: "row",
+    minHeight: 34,
+    justifyContent: "space-between",
+    paddingVertical: 8,
+  },
+  historyTextContainer: {
+    width: "100%",
+    paddingStart: 36,
+    paddingEnd: 10,
+  },
+  historyLine: {
+    maxWidth: "100%",
+    textAlign: "right",
+    writingDirection: "rtl",
+  },
+  editAction: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingStart: 10,
+  },
+});
 
 export default RecordedSetsHistoryModal;
