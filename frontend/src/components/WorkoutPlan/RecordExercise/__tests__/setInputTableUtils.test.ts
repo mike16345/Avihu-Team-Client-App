@@ -27,21 +27,13 @@ describe("getLatestDeletableRowIndex", () => {
 
   it("allows the latest recorded set before every planned row is completed", () => {
     expect(
-      getLatestDeletableRowIndex([
-        buildRow(1, "set-1"),
-        buildRow(2, "set-2"),
-        buildRow(3),
-      ]),
+      getLatestDeletableRowIndex([buildRow(1, "set-1"), buildRow(2, "set-2"), buildRow(3)])
     ).toBe(1);
   });
 
   it("allows only the latest set when all planned rows are recorded", () => {
     expect(
-      getLatestDeletableRowIndex([
-        buildRow(1, "set-1"),
-        buildRow(2, "set-2"),
-        buildRow(3, "set-3"),
-      ]),
+      getLatestDeletableRowIndex([buildRow(1, "set-1"), buildRow(2, "set-2"), buildRow(3, "set-3")])
     ).toBe(2);
   });
 });

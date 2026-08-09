@@ -73,7 +73,7 @@ const SetInputTable: FC<SetInputTableProps> = ({
         const savedSetId = findTodaySetId(
           recordedSetsData,
           exercise.exerciseId.name,
-          row.setNumber,
+          row.setNumber
         );
         if (!savedSetId) return row;
 
@@ -189,7 +189,7 @@ const SetInputTable: FC<SetInputTableProps> = ({
           nextSavedSetId = findTodaySetId(
             refreshedResult.data,
             exercise.exerciseId.name,
-            row.setNumber,
+            row.setNumber
           );
         }
         setRows((prev) => {
@@ -214,14 +214,7 @@ const SetInputTable: FC<SetInputTableProps> = ({
         });
       }
     },
-    [
-      rows,
-      onSaveSet,
-      onUpdateSet,
-      exercise,
-      recordedSetsData,
-      refetchRecordedSets,
-    ],
+    [rows, onSaveSet, onUpdateSet, exercise, recordedSetsData, refetchRecordedSets]
   );
 
   return (
@@ -284,16 +277,7 @@ const SetRow: FC<{
   onChangeField: (index: number, field: "weight" | "reps" | "rir", value: string) => void;
   onTapCheck: (index: number) => void;
   onDelete: (index: number) => void;
-}> = ({
-  row,
-  index,
-  canDelete,
-  isDeleting,
-  exercise,
-  onChangeField,
-  onTapCheck,
-  onDelete,
-}) => {
+}> = ({ row, index, canDelete, isDeleting, exercise, onChangeField, onTapCheck, onDelete }) => {
   const { theme } = useThemeContext();
   const previous = useGetLastRecordedSetForSetNumber(exercise.exerciseId.name, row.setNumber - 1);
 
