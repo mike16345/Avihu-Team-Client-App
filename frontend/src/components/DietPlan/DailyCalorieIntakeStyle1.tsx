@@ -1,17 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, ScrollView, Pressable, Linking } from "react-native";
-import Svg, { Circle, Defs, LinearGradient as SvgLinearGradient, Stop, Path, Rect } from "react-native-svg";
+import Svg, {
+  Circle,
+  Defs,
+  LinearGradient as SvgLinearGradient,
+  Stop,
+  Path,
+  Rect,
+} from "react-native-svg";
 import { Text } from "../ui/Text";
 import { useDietServingsStore } from "@/store/dietServingsStore";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { IMeal } from "@/interfaces/DietPlan";
 import { DIET_CALORIES_PER_SERVING } from "@/constants/dietCalories";
-import {
-  DIET_V2_MUTED,
-  DropIcon,
-  SproutIcon,
-  ChevronLeftIcon,
-} from "../DietPlanV2/dietV2Icons";
+import { DIET_V2_MUTED, DropIcon, SproutIcon, ChevronLeftIcon } from "../DietPlanV2/dietV2Icons";
 
 const DARK = "#0B2A22";
 
@@ -154,19 +156,13 @@ interface MacroCol {
 
 const MACRO_BAR_H = 6;
 
-const MacroGradientBar: React.FC<{ fraction: number; gradId: string }> = ({
-  fraction,
-  gradId,
-}) => {
+const MacroGradientBar: React.FC<{ fraction: number; gradId: string }> = ({ fraction, gradId }) => {
   const [width, setWidth] = useState(0);
   const clamped = useAnimatedFloat(Math.max(0, Math.min(1, fraction)));
   const fillW = Math.round(width * clamped);
 
   return (
-    <View
-      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
-      style={styles.macroBar}
-    >
+    <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)} style={styles.macroBar}>
       {width > 0 && fillW > 0 && (
         <Svg width={width} height={MACRO_BAR_H}>
           <Defs>
@@ -238,10 +234,28 @@ const DailyCalorieIntakeStyle1 = () => {
   );
 
   const macros: MacroCol[] = [
-    { id: "protein", label: "חלבון", consumed: consumed.protein, target: targets.protein, color: "#047857" },
-    { id: "carbs", label: "פחמימות", consumed: consumed.carbs, target: targets.carbs, color: "#10B981" },
+    {
+      id: "protein",
+      label: "חלבון",
+      consumed: consumed.protein,
+      target: targets.protein,
+      color: "#047857",
+    },
+    {
+      id: "carbs",
+      label: "פחמימות",
+      consumed: consumed.carbs,
+      target: targets.carbs,
+      color: "#10B981",
+    },
     { id: "fat", label: "שומן", consumed: consumed.fat, target: targets.fat, color: "#34D399" },
-    { id: "free", label: "חופשיות", consumed: consumed.free, target: targets.free, color: "#6EE7B7" },
+    {
+      id: "free",
+      label: "חופשיות",
+      consumed: consumed.free,
+      target: targets.free,
+      color: "#6EE7B7",
+    },
     { id: "veg", label: "ירקות", consumed: consumed.veg, target: targets.veg, color: "#22C55E" },
   ].filter((m) => m.target > 0);
 
@@ -265,6 +279,7 @@ const DailyCalorieIntakeStyle1 = () => {
           </View>
           <Pressable
             style={styles.tipRow}
+            // TODO : Use trainer phone number based off User's trainer, not env variable.
             onPress={() =>
               Linking.openURL(`https://wa.me/${process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER || ""}`)
             }
