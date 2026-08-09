@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export type ServingKey = "protein" | "carbs" | "fat" | "free" | "veg";
 
@@ -40,30 +42,47 @@ const emptyDay = () => ({
   eatenCategories: {},
 });
 
-export const useDietServingsStore = create<DietServingsState>((set, get) => ({
-  ...emptyDay(),
-  currentDayKey: getLogicalDayKey(),
-  bump: (key, delta) =>
-    set((state) => ({ ...state, [key]: Math.max(0, round2(state[key] + delta)) })),
-  setValue: (key, value) =>
-    set((state) => ({ ...state, [key]: Math.max(0, round2(value)) })),
-  toggleMealCategory: (mealId, key, quantity) =>
-    set((state) => {
-      const k = mealCatKey(mealId, key);
-      const wasEaten = !!state.eatenCategories[k];
-      const delta = wasEaten ? -quantity : quantity;
-      return {
-        ...state,
-        [key]: Math.max(0, round2(state[key] + delta)),
-        eatenCategories: { ...state.eatenCategories, [k]: !wasEaten },
-      };
+export const useDietServingsStore = create<DietServingsState>()(
+  persist(
+    (set, get) => ({
+      ...emptyDay(),
+      currentDayKey: getLogicalDayKey(),
+      bump: (key, delta) =>
+        set((state) => ({ ...state, [key]: Math.max(0, round2(state[key] + delta)) })),
+      setValue: (key, value) =>
+        set((state) => ({ ...state, [key]: Math.max(0, round2(value)) })),
+      toggleMealCategory: (mealId, key, quantity) =>
+        set((state) => {
+          const k = mealCatKey(mealId, key);
+          const wasEaten = !!state.eatenCategories[k];
+          const delta = wasEaten ? -quantity : quantity;
+          return {
+            ...state,
+            [key]: Math.max(0, round2(state[key] + delta)),
+            eatenCategories: { ...state.eatenCategories, [k]: !wasEaten },
+          };
+        }),
+      isCategoryEaten: (mealId, key) => !!get().eatenCategories[mealCatKey(mealId, key)],
+      resetIfNewDay: () => {
+        const nowKey = getLogicalDayKey();
+        if (nowKey !== get().currentDayKey) {
+          set({ ...emptyDay(), currentDayKey: nowKey });
+        }
+      },
+      reset: () => set({ ...emptyDay(), currentDayKey: getLogicalDayKey() }),
     }),
-  isCategoryEaten: (mealId, key) => !!get().eatenCategories[mealCatKey(mealId, key)],
-  resetIfNewDay: () => {
-    const nowKey = getLogicalDayKey();
-    if (nowKey !== get().currentDayKey) {
-      set({ ...emptyDay(), currentDayKey: nowKey });
+    {
+      name: "diet-servings-store",
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        protein: state.protein,
+        carbs: state.carbs,
+        fat: state.fat,
+        free: state.free,
+        veg: state.veg,
+        eatenCategories: state.eatenCategories,
+        currentDayKey: state.currentDayKey,
+      }),
     }
-  },
-  reset: () => set({ ...emptyDay(), currentDayKey: getLogicalDayKey() }),
-}));
+  )
+);

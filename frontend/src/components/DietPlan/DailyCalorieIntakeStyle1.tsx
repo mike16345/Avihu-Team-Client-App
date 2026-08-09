@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, ScrollView, Pressable, Linking } from "react-native";
-import Svg, { Circle, Defs, LinearGradient as SvgLinearGradient, Stop, Path } from "react-native-svg";
+import Svg, { Circle, Defs, LinearGradient as SvgLinearGradient, Stop, Path, Rect } from "react-native-svg";
 import { Text } from "../ui/Text";
 import { useDietServingsStore } from "@/store/dietServingsStore";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
@@ -32,8 +32,8 @@ const WhatsAppIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
 );
 
 const useCountUp = (value: number, duration = 500): number => {
-  const [display, setDisplay] = useState(value);
-  const displayRef = useRef(value);
+  const [display, setDisplay] = useState(0);
+  const displayRef = useRef(0);
 
   useEffect(() => {
     const from = displayRef.current;
@@ -63,8 +63,8 @@ const useCountUp = (value: number, duration = 500): number => {
 };
 
 const useAnimatedFloat = (value: number, duration = 650): number => {
-  const [display, setDisplay] = useState(value);
-  const ref = useRef(value);
+  const [display, setDisplay] = useState(0);
+  const ref = useRef(0);
 
   useEffect(() => {
     const from = ref.current;
@@ -152,14 +152,51 @@ interface MacroCol {
   color: string;
 }
 
+const MACRO_BAR_H = 6;
+
+const MacroGradientBar: React.FC<{ fraction: number; gradId: string }> = ({
+  fraction,
+  gradId,
+}) => {
+  const [width, setWidth] = useState(0);
+  const clamped = useAnimatedFloat(Math.max(0, Math.min(1, fraction)));
+  const fillW = Math.round(width * clamped);
+
+  return (
+    <View
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      style={styles.macroBar}
+    >
+      {width > 0 && fillW > 0 && (
+        <Svg width={width} height={MACRO_BAR_H}>
+          <Defs>
+            <SvgLinearGradient id={gradId} x1="0" y1="0" x2="1" y2="0">
+              <Stop offset="0" stopColor={GRAD_LIGHT} />
+              <Stop offset="1" stopColor={GRAD_DARK} />
+            </SvgLinearGradient>
+          </Defs>
+          <Rect
+            x={width - fillW}
+            y={0}
+            width={fillW}
+            height={MACRO_BAR_H}
+            rx={MACRO_BAR_H / 2}
+            fill={`url(#${gradId})`}
+          />
+        </Svg>
+      )}
+    </View>
+  );
+};
+
 const MacroColumn: React.FC<MacroCol & { width: number }> = ({
+  id,
   label,
   consumed,
   target,
-  color,
   width,
 }) => {
-  const clamped = target > 0 ? Math.max(0, Math.min(1, consumed / target)) : 0;
+  const fraction = target > 0 ? consumed / target : 0;
 
   return (
     <View style={[styles.macroCol, { width }]}>
@@ -172,11 +209,7 @@ const MacroColumn: React.FC<MacroCol & { width: number }> = ({
           {` / ${formatVal(target)}`}
         </Text>
       </Text>
-      <View style={styles.macroBar}>
-        <View
-          style={[styles.macroBarFill, { width: `${Math.round(clamped * 100)}%`, backgroundColor: color }]}
-        />
-      </View>
+      <MacroGradientBar fraction={fraction} gradId={`macro-grad-${id}`} />
     </View>
   );
 };
@@ -383,9 +416,9 @@ const styles = StyleSheet.create({
   macroBar: {
     alignSelf: "stretch",
     marginHorizontal: 6,
-    height: 6,
+    height: MACRO_BAR_H,
     borderRadius: 999,
-    backgroundColor: "#E9EBEA",
+    backgroundColor: "rgba(11, 94, 55, 0.10)",
     overflow: "hidden",
     marginTop: 2,
   },

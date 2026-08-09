@@ -9,9 +9,7 @@ import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { Text } from "../ui/Text";
 import { IMeal } from "@/interfaces/DietPlan";
 
-interface MealsListProps {}
-
-const MealsList: FC<MealsListProps> = () => {
+const MealsList: FC = () => {
   const { spacing, layout } = useStyles();
   const { data, isLoading } = useDietPlanQuery();
   const meals = data?.meals || [];

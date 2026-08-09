@@ -37,6 +37,7 @@ const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({
         onPress={() => setIsOpen(true)}
         rightIcon="info"
         size="sm"
+        shadow={false}
         style={{ paddingHorizontal: 14 }}
       >
         <Text fontVariant="semibold" fontSize={13}>

@@ -147,6 +147,12 @@ const WheelModal: React.FC<WheelModalProps> = ({
   onPick,
   onClose,
 }) => {
+  const [pending, setPending] = useState(value);
+
+  useEffect(() => {
+    if (visible) setPending(value);
+  }, [visible, value]);
+
   const options = useMemo(() => {
     const count = Math.max(1, Math.round(max / step)) + 1;
     return Array.from({ length: count }).map((_, i) => {
@@ -154,6 +160,11 @@ const WheelModal: React.FC<WheelModalProps> = ({
       return { value: v, label: formatVal(v) };
     });
   }, [max, step]);
+
+  const handleConfirm = () => {
+    onPick(pending);
+    onClose();
+  };
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -171,15 +182,73 @@ const WheelModal: React.FC<WheelModalProps> = ({
             <View pointerEvents="none" style={styles.selectionBand} />
             <WheelPicker
               data={options}
-              selectedValue={value}
-              onValueChange={(v: number) => onPick(v)}
-              height={144}
+              selectedValue={pending}
+              onValueChange={(v: number) => setPending(v)}
+              height={108}
               itemHeight={36}
               activeItemColor={DIET_V2_DARK}
               inactiveItemColor="#B7BEBB"
             />
           </View>
-          <ConfirmButton onPress={onClose} />
+          <ConfirmButton onPress={handleConfirm} />
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+};
+
+interface TextInputModalProps {
+  visible: boolean;
+  title: string;
+  unit: string;
+  value: number;
+  onPick: (v: number) => void;
+  onClose: () => void;
+}
+
+const TextInputModal: React.FC<TextInputModalProps> = ({
+  visible,
+  title,
+  unit,
+  value,
+  onPick,
+  onClose,
+}) => {
+  const [pending, setPending] = useState(value ? String(value) : "");
+
+  useEffect(() => {
+    if (visible) setPending(value ? String(value) : "");
+  }, [visible, value]);
+
+  const handleConfirm = () => {
+    onPick(Number(pending) || 0);
+    onClose();
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <Pressable style={styles.backdrop} onPress={onClose}>
+        <Pressable style={styles.sheet} onPress={() => {}}>
+          <View style={styles.sheetHeader}>
+            <Text fontVariant="bold" fontSize={16} style={styles.sheetTitle}>
+              {title}
+            </Text>
+            <Text fontSize={12} style={styles.sheetUnit}>
+              {unit}
+            </Text>
+          </View>
+          <View style={styles.textInputStage}>
+            <TextInput
+              value={pending}
+              onChangeText={(t) => setPending(t.replace(/[^0-9]/g, ""))}
+              keyboardType="number-pad"
+              placeholder="0"
+              placeholderTextColor={DIET_V2_MUTED}
+              style={styles.freeInputBig}
+              autoFocus
+            />
+          </View>
+          <ConfirmButton onPress={handleConfirm} />
         </Pressable>
       </Pressable>
     </Modal>
@@ -198,7 +267,11 @@ const ConfirmButton: React.FC<{ onPress: () => void }> = ({ onPress }) => {
       }
     >
       {dims.w > 0 && (
-        <Svg width={dims.w} height={dims.h} style={StyleSheet.absoluteFill}>
+        <Svg
+          width={dims.w}
+          height={dims.h}
+          style={[StyleSheet.absoluteFill, { borderRadius: 10 }]}
+        >
           <Defs>
             <SvgLinearGradient id="confirmGrad" x1="0" y1="0" x2="1" y2="0">
               <Stop offset="0" stopColor={GRAD_LIGHT} />
@@ -228,8 +301,11 @@ const ServingsTracker = () => {
 
   const servings = useDietServingsStore();
   const [open, setOpen] = useState(false);
+  const [freeModalOpen, setFreeModalOpen] = useState(false);
   const [activeWheel, setActiveWheel] = useState<CatKey | null>(null);
-  const activeCat = CATS.find((c) => c.key === activeWheel);
+
+  const visibleCats = CATS.filter((c) => targets[c.key] > 0);
+  const activeCat = visibleCats.find((c) => c.key === activeWheel);
 
   return (
     <View style={[styles.wrap, !open && styles.wrapClosed]}>
@@ -242,9 +318,16 @@ const ServingsTracker = () => {
         </View>
       </Pressable>
 
-      {open && (
+      {open && visibleCats.length === 0 && (
         <View style={styles.panel}>
-          {CATS.map((cat) => {
+          <Text fontSize={13} style={styles.emptyPanelText}>
+            אין יעדים לתיעוד בתוכנית הנוכחית
+          </Text>
+        </View>
+      )}
+      {open && visibleCats.length > 0 && (
+        <View style={styles.panel}>
+          {visibleCats.map((cat) => {
             const value = servings[cat.key];
             const target = targets[cat.key];
             const fraction = target > 0 ? Math.max(0, Math.min(1, value / target)) : 0;
@@ -259,28 +342,17 @@ const ServingsTracker = () => {
                       {cat.label}
                     </Text>
                   </View>
-                  {cat.key === "free" ? (
-                    <View style={styles.freeGroup}>
-                      <Text fontVariant="semibold" fontSize={17} style={styles.freeTarget}>
-                        {`/ ${formatVal(target)}`}
-                      </Text>
-                      <TextInput
-                        value={value ? String(value) : ""}
-                        onChangeText={(t) => servings.setValue("free", Number(t.replace(/[^0-9]/g, "")) || 0)}
-                        keyboardType="number-pad"
-                        placeholder="0"
-                        placeholderTextColor={DIET_V2_MUTED}
-                        style={styles.freeInput}
-                      />
-                    </View>
-                  ) : (
-                    <View style={styles.wheelGroup}>
-                      <Text fontVariant="semibold" fontSize={17} style={styles.freeTarget}>
-                        {`/ ${formatVal(target)}`}
-                      </Text>
-                      <WheelButton value={value} onPress={() => setActiveWheel(cat.key)} />
-                    </View>
-                  )}
+                  <View style={styles.wheelGroup}>
+                    <Text fontVariant="semibold" fontSize={17} style={styles.freeTarget}>
+                      {`/ ${formatVal(target)}`}
+                    </Text>
+                    <WheelButton
+                      value={value}
+                      onPress={() =>
+                        cat.key === "free" ? setFreeModalOpen(true) : setActiveWheel(cat.key)
+                      }
+                    />
+                  </View>
                 </View>
                 <GradientBar fraction={fraction} over={over} />
               </View>
@@ -300,6 +372,14 @@ const ServingsTracker = () => {
           onClose={() => setActiveWheel(null)}
         />
       )}
+      <TextInputModal
+        visible={freeModalOpen}
+        title="חופשיות"
+        unit={'קק"ל'}
+        value={servings.free}
+        onPick={(v) => servings.setValue("free", v)}
+        onClose={() => setFreeModalOpen(false)}
+      />
     </View>
   );
 };
@@ -308,17 +388,17 @@ const styles = StyleSheet.create({
   wrap: {
     alignSelf: "stretch",
     marginTop: 12,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "transparent",
+    borderColor: "#D0D5DD",
+    backgroundColor: "#FFFFFF",
     paddingHorizontal: 18,
-    paddingVertical: 10,
+    paddingVertical: 12,
     gap: 8,
   },
   wrapClosed: {
-    backgroundColor: "rgba(134, 239, 172, 0.22)",
-    borderColor: "rgba(134, 239, 172, 0.55)",
+    backgroundColor: "#EDFFEB",
+    borderColor: "#D0D5DD",
   },
   bar: {
     flexDirection: "row",
@@ -326,7 +406,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    color: DIET_V2_DARK,
+    color: "#000000",
   },
   chevronOpen: {
     transform: [{ rotate: "180deg" }],
@@ -388,6 +468,11 @@ const styles = StyleSheet.create({
     color: DIET_V2_MUTED,
     writingDirection: "ltr",
   },
+  emptyPanelText: {
+    color: DIET_V2_MUTED,
+    textAlign: "center",
+    paddingVertical: 12,
+  },
   freeInput: {
     width: 78,
     height: ITEM_H,
@@ -435,26 +520,49 @@ const styles = StyleSheet.create({
   },
   wheelStage: {
     position: "relative",
-    height: 144,
+    height: 108,
     justifyContent: "center",
+  },
+  textInputStage: {
+    paddingVertical: 24,
+    paddingHorizontal: 24,
+    alignItems: "center",
+  },
+  freeInputBig: {
+    width: "100%",
+    height: 56,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#0B5E37",
+    backgroundColor: "#FFFFFF",
+    textAlign: "center",
+    color: DIET_V2_DARK,
+    fontSize: 24,
+    fontWeight: "bold",
+    writingDirection: "ltr",
   },
   selectionBand: {
     position: "absolute",
     left: 12,
     right: 12,
-    top: 54,
+    top: 36,
     height: 36,
     borderRadius: 8,
     backgroundColor: "rgba(0, 0, 0, 0.05)",
   },
   confirmBtn: {
-    marginTop: 6,
+    marginTop: 10,
     marginHorizontal: 12,
+    marginBottom: 4,
     paddingVertical: 10,
     borderRadius: 10,
-    overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    elevation: 3,
   },
   confirmTxt: {
     color: "#FFFFFF",

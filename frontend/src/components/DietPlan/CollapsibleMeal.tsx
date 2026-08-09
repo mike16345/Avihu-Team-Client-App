@@ -42,7 +42,12 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
   const toggleMealCategory = useDietServingsStore((s) => s.toggleMealCategory);
 
   const dietItems = useMemo(() => {
-    return Object.keys(meal).filter((key) => key !== "_id");
+    return Object.keys(meal)
+      .filter((key) => key !== "_id")
+      .filter((key) => {
+        const item = meal[key as keyof IMeal] as IDietItem;
+        return item?.quantity && item.quantity > 0;
+      });
   }, [meal]);
 
   const relevantServingItems = useMemo(

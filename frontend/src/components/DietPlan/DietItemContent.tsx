@@ -41,11 +41,11 @@ const DietItemContent: React.FC<DietItemContentProps> = ({
     toggleMealCategory(mealId!, servingKey!, dietItem.quantity);
   };
 
-  const Wrapper: any = canToggle ? Pressable : View;
-  const wrapperProps = canToggle ? { onPress: handleToggle } : {};
-
   return (
-    <Wrapper {...wrapperProps} style={[isEaten && styles.eatenWrap]}>
+    <Pressable
+      onPress={canToggle ? handleToggle : undefined}
+      style={[isEaten && styles.eatenWrap]}
+    >
       <View style={[spacing.gapDefault]}>
         <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
           <View style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
@@ -80,7 +80,7 @@ const DietItemContent: React.FC<DietItemContentProps> = ({
           servingSize={dietItem.quantity}
         />
       </View>
-    </Wrapper>
+    </Pressable>
   );
 };
 
