@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, View } from "react-native";
 import DietPlanContentTabs from "@/components/DietPlan/DietPlanContentTabs";
 import DietPlanScreenHeader from "@/components/DietPlan/DietPlanScreenHeader";
 import MyDietPlanScreenV2Preview from "@/components/DietPlanV2/MyDietPlanScreenV2Preview";
@@ -118,10 +118,17 @@ const V1Body = () => {
   if (isLoading) return <DietPlanSkeleton />;
 
   return (
-    <View style={[spacing.gap34, spacing.pdBottomBar, layout.flex1]}>
+    <ScrollView
+      style={[layout.flex1]}
+      contentContainerStyle={[spacing.gap34, spacing.pdBottomBar]}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={isFetching} onRefresh={() => void refetch()} />
+      }
+    >
       <DietPlanScreenHeader />
       <DietPlanContentTabs />
-    </View>
+    </ScrollView>
   );
 };
 

@@ -41,7 +41,7 @@ const DietPlanContentTabs = () => {
   const { tabTriggers, tabContent } = useTabs(filteredTabs);
 
   return (
-    <View style={[{ flex: 1 }]}>
+    <View>
       <Tabs
         horizontalPadding={spacing.pdHorizontalMd.paddingHorizontal}
         value={selectedTab}

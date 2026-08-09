@@ -1,7 +1,8 @@
-import { FC, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState, Fragment } from "react";
 import Collapsible from "../ui/Collapsible";
 import { IDietItem, IMeal } from "@/interfaces/DietPlan";
-import { View } from "react-native";
+import { ServingKey, useDietServingsStore } from "@/store/dietServingsStore";
+import { StyleSheet, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import DietItemContent from "./DietItemContent";
@@ -15,6 +16,13 @@ interface CollapsibleMealProps {
   meal: IMeal;
   index: number;
 }
+
+const dietItemKeyToServing: Record<string, ServingKey> = {
+  totalProtein: "protein",
+  totalCarbs: "carbs",
+  totalFats: "fat",
+  totalVeggies: "veg",
+};
 
 const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
   const { session, recordMeal, cancelMeal } = useRecordMeal();
@@ -30,14 +38,65 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
     return !!isEaten;
   }, [session?.meals]);
 
+  const eatenCategories = useDietServingsStore((s) => s.eatenCategories);
+  const toggleMealCategory = useDietServingsStore((s) => s.toggleMealCategory);
+
+  const dietItems = useMemo(() => {
+    return Object.keys(meal).filter((key) => key !== "_id");
+  }, [meal]);
+
+  const relevantServingItems = useMemo(
+    () =>
+      dietItems
+        .map((key) => {
+          const item = meal[key as keyof IMeal] as IDietItem;
+          const sk = dietItemKeyToServing[key];
+          if (!sk || !item || item.quantity <= 0) return null;
+          return { key: sk, quantity: item.quantity };
+        })
+        .filter((x): x is { key: ServingKey; quantity: number } => x !== null),
+    [dietItems, meal]
+  );
+
+  const allCategoriesEaten = useMemo(() => {
+    if (relevantServingItems.length === 0) return false;
+    return relevantServingItems.every(
+      ({ key }) => !!eatenCategories[`${meal._id}::${key}`]
+    );
+  }, [relevantServingItems, eatenCategories, meal._id]);
+
+  const syncingRef = useRef(false);
+
+  useEffect(() => {
+    if (syncingRef.current) return;
+    if (allCategoriesEaten && !isEaten) {
+      recordMeal(meal, index);
+    } else if (!allCategoriesEaten && isEaten) {
+      cancelMeal(meal._id);
+    }
+  }, [allCategoriesEaten, isEaten]);
+
   const handleMealPress = () => {
+    selectionHaptic();
+    syncingRef.current = true;
     if (isEaten) {
       cancelMeal(meal._id);
+      relevantServingItems.forEach(({ key, quantity }) => {
+        if (eatenCategories[`${meal._id}::${key}`]) {
+          toggleMealCategory(meal._id, key, quantity);
+        }
+      });
     } else {
       recordMeal(meal, index);
+      relevantServingItems.forEach(({ key, quantity }) => {
+        if (!eatenCategories[`${meal._id}::${key}`]) {
+          toggleMealCategory(meal._id, key, quantity);
+        }
+      });
     }
-
-    selectionHaptic();
+    setTimeout(() => {
+      syncingRef.current = false;
+    }, 100);
   };
 
   const toggleCollapse = () => {
@@ -48,10 +107,6 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
     () => (!isEaten ? "סיום ארוחה" : "ביטול סימון"),
     [isEaten]
   );
-
-  const dietItems = useMemo(() => {
-    return Object.keys(meal).filter((key) => key !== "_id");
-  }, [meal]);
 
   return (
     <Collapsible
@@ -73,7 +128,7 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
       variant={isEaten ? "success" : "gray"}
       isCollapsed={isCollapsed}
       onCollapseChange={toggleCollapse}
-      style={{ padding: 0 }}
+      style={[{ padding: 0 }, !isEaten && styles.mealCard]}
     >
       <View
         style={[
@@ -85,11 +140,15 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
       >
         {dietItems.map((dietItem, i) => {
           return (
-            <DietItemContent
-              key={`${dietItem}-${i}`}
-              name={foodGroupToName(dietItem)}
-              dietItem={meal[dietItem as keyof IMeal] as IDietItem}
-            />
+            <Fragment key={`${dietItem}-${i}`}>
+              {i > 0 && <View style={styles.categoryDivider} />}
+              <DietItemContent
+                name={foodGroupToName(dietItem)}
+                dietItem={meal[dietItem as keyof IMeal] as IDietItem}
+                mealId={meal._id}
+                servingKey={dietItemKeyToServing[dietItem]}
+              />
+            </Fragment>
           );
         })}
         <PrimaryButton
@@ -104,5 +163,16 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
     </Collapsible>
   );
 };
+
+const styles = StyleSheet.create({
+  mealCard: {
+    backgroundColor: "#F7F8F9",
+  },
+  categoryDivider: {
+    height: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    marginVertical: 8,
+  },
+});
 
 export default CollapsibleMeal;

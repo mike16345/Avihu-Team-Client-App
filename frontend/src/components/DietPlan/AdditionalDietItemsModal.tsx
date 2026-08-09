@@ -33,8 +33,15 @@ const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({
 
   return (
     <>
-      <SecondaryButton onPress={() => setIsOpen(true)} rightIcon="info">
-        <Text fontVariant="semibold">הצגת תחליף לארוחה ב{name}</Text>
+      <SecondaryButton
+        onPress={() => setIsOpen(true)}
+        rightIcon="info"
+        size="sm"
+        style={{ paddingHorizontal: 14 }}
+      >
+        <Text fontVariant="semibold" fontSize={13}>
+          הצגת תחליף לארוחה ב{name}
+        </Text>
       </SecondaryButton>
       <CustomModal visible={isOpen} onDismiss={onDismiss}>
         <CustomModal.Header dismissIcon="chevronRightBig">

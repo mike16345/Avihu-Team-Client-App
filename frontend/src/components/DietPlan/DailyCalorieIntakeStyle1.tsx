@@ -1,75 +1,35 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { View, StyleSheet, Pressable, Modal, ScrollView } from "react-native";
-import Svg, { Defs, LinearGradient as SvgLinearGradient, Stop, Rect } from "react-native-svg";
+import React, { useEffect, useRef, useState } from "react";
+import { View, StyleSheet, ScrollView, Pressable, Linking } from "react-native";
+import Svg, { Circle, Defs, LinearGradient as SvgLinearGradient, Stop, Path } from "react-native-svg";
 import { Text } from "../ui/Text";
+import { useDietServingsStore } from "@/store/dietServingsStore";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
-import { selectionHaptic } from "@/utils/haptics";
+import { IMeal } from "@/interfaces/DietPlan";
+import { DIET_CALORIES_PER_SERVING } from "@/constants/dietCalories";
 import {
-  ChevronDownIcon,
-  DIET_V2_CARD_BORDER,
-  DIET_V2_GREEN,
   DIET_V2_MUTED,
   DropIcon,
-  FlameIcon,
   SproutIcon,
-  DrumstickIcon,
+  ChevronLeftIcon,
 } from "../DietPlanV2/dietV2Icons";
 
-const KCAL_PER_SERVING = { protein: 75, carbs: 70, fat: 45 };
+const DARK = "#0B2A22";
+
+const sumMealField = (
+  meals: IMeal[],
+  field: "totalProtein" | "totalCarbs" | "totalFats" | "totalVeggies"
+): number => meals.reduce((acc, m) => acc + (m[field]?.quantity ?? 0), 0);
 
 const formatVal = (n: number): string => (Number.isInteger(n) ? String(n) : n.toFixed(1));
 
-const GRAD_DARK = "#047857";
-const GRAD_LIGHT = "#86EFAC";
-const RED_DARK = "#DC2626";
-const RED_LIGHT = "#FCA5A5";
-
-const GradientBar: React.FC<{
-  fraction: number;
-  height: number;
-  over?: boolean;
-  style?: object;
-}> = ({ fraction, height, over = false, style }) => {
-  const [width, setWidth] = useState(0);
-  const clamped = Math.max(0, Math.min(1, fraction));
-  const fillW = Math.round(width * clamped);
-  const gradId = useMemo(() => `grad-${Math.random().toString(36).slice(2, 9)}`, []);
-
-  return (
-    <View
-      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
-      style={[
-        {
-          height,
-          borderRadius: 999,
-          backgroundColor: "#E5E7EB",
-          overflow: "hidden",
-          alignSelf: "stretch",
-        },
-        style,
-      ]}
-    >
-      {width > 0 && fillW > 0 && (
-        <Svg width={width} height={height}>
-          <Defs>
-            <SvgLinearGradient id={gradId} x1="0" y1="0" x2="1" y2="0">
-              <Stop offset="0" stopColor={over ? RED_DARK : GRAD_DARK} />
-              <Stop offset="1" stopColor={over ? RED_LIGHT : GRAD_LIGHT} />
-            </SvgLinearGradient>
-          </Defs>
-          <Rect
-            x={width - fillW}
-            y={0}
-            width={fillW}
-            height={height}
-            rx={height / 2}
-            fill={`url(#${gradId})`}
-          />
-        </Svg>
-      )}
-    </View>
-  );
-};
+const WhatsAppIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24">
+    <Path
+      d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.9-4.44 9.9-9.9S17.5 2 12.04 2zm5.8 14.16c-.24.68-1.2 1.25-1.97 1.42-.53.11-1.22.2-3.55-.76-2.98-1.23-4.9-4.27-5.05-4.47-.15-.2-1.2-1.6-1.2-3.05s.76-2.16 1.03-2.46c.27-.3.58-.37.78-.37.2 0 .39 0 .56.01.18.01.42-.07.66.5.24.58.82 2 .89 2.15.07.15.12.32.02.52-.1.2-.15.32-.3.5-.15.18-.31.4-.44.53-.15.15-.3.31-.13.6.17.3.76 1.25 1.63 2.03 1.12 1 2.06 1.31 2.35 1.46.29.15.46.12.63-.07.17-.2.73-.85.92-1.14.2-.29.39-.24.66-.15.27.1 1.7.8 2 .95.29.15.48.22.55.34.07.12.07.7-.17 1.38z"
+      fill="#25D366"
+    />
+  </Svg>
+);
 
 const useCountUp = (value: number, duration = 500): number => {
   const [display, setDisplay] = useState(value);
@@ -102,346 +62,339 @@ const useCountUp = (value: number, duration = 500): number => {
   return display;
 };
 
-const CalorieHeadline: React.FC<{ consumed: number; target: number }> = ({ consumed, target }) => {
+const useAnimatedFloat = (value: number, duration = 650): number => {
+  const [display, setDisplay] = useState(value);
+  const ref = useRef(value);
+
+  useEffect(() => {
+    const from = ref.current;
+    const to = value;
+    if (from === to) return;
+
+    const start = Date.now();
+    let raf = 0;
+    const tick = () => {
+      const t = Math.min(1, (Date.now() - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const cur = from + (to - from) * eased;
+      ref.current = cur;
+      setDisplay(cur);
+      if (t < 1) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        ref.current = to;
+        setDisplay(to);
+      }
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [value, duration]);
+
+  return display;
+};
+
+const GRAD_LIGHT = "#86EFAC";
+const GRAD_DARK = "#0B5E37";
+
+const DONUT_SIZE = 130;
+const DONUT_STROKE = 11;
+const DONUT_R = (DONUT_SIZE - DONUT_STROKE) / 2;
+const DONUT_C = 2 * Math.PI * DONUT_R;
+
+const CalorieDonut: React.FC<{ consumed: number; target: number }> = ({ consumed, target }) => {
   const shown = useCountUp(Math.round(consumed));
-  const clamped = target > 0 ? Math.max(0, Math.min(1, consumed / target)) : 0;
-  const over = target > 0 && consumed > target;
+  const fraction = target > 0 ? Math.max(0, Math.min(1, consumed / target)) : 0;
+  const clamped = useAnimatedFloat(fraction);
+  const dash = DONUT_C * clamped;
+  const c = DONUT_SIZE / 2;
 
   return (
-    <View style={styles.headline}>
-      <Text fontVariant="semibold" fontSize={60} style={styles.headlineBig}>
-        <Text fontVariant="light" fontSize={40} style={styles.headlineTarget}>
-          {`${Math.round(target)} `}
+    <View style={styles.donutWrap}>
+      <Svg width={DONUT_SIZE} height={DONUT_SIZE}>
+        <Defs>
+          <SvgLinearGradient id="donutGrad" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor={GRAD_LIGHT} />
+            <Stop offset="1" stopColor={GRAD_DARK} />
+          </SvgLinearGradient>
+        </Defs>
+        <Circle cx={c} cy={c} r={DONUT_R} stroke="#D6DAD8" strokeWidth={DONUT_STROKE} fill="none" />
+        {clamped > 0 && (
+          <Circle
+            cx={c}
+            cy={c}
+            r={DONUT_R}
+            stroke="url(#donutGrad)"
+            strokeWidth={DONUT_STROKE}
+            strokeLinecap="round"
+            strokeDasharray={`${dash} ${DONUT_C}`}
+            fill="none"
+            transform={`rotate(-90 ${c} ${c})`}
+          />
+        )}
+      </Svg>
+      <View style={styles.donutCenter} pointerEvents="none">
+        <Text fontVariant="bold" fontSize={28} style={styles.donutNum}>
+          {shown}
         </Text>
-        <Text fontVariant="light" fontSize={40} style={styles.headlineTarget}>
-          {`/ `}
+        <Text fontSize={11} style={styles.donutSub}>
+          {`יעד ${Math.round(target)} קלוריות`}
         </Text>
-        {shown}
-        <Text fontVariant="light" fontSize={18} style={styles.headlineTarget}>
-          {` קק"ל`}
-        </Text>
-      </Text>
-      <GradientBar fraction={clamped} height={8} over={over} style={styles.headlineBar} />
+      </View>
     </View>
   );
 };
 
-interface OptionsModalProps {
-  open: boolean;
-  title: string;
-  value: number;
-  options: number[];
-  unit: string;
-  onPick: (n: number) => void;
-  onClose: () => void;
-}
-
-const OptionsModal: React.FC<OptionsModalProps> = ({
-  open,
-  title,
-  value,
-  options,
-  unit,
-  onPick,
-  onClose,
-}) => (
-  <Modal visible={open} transparent animationType="fade" onRequestClose={onClose}>
-    <Pressable style={styles.backdrop} onPress={onClose}>
-      <Pressable style={styles.sheet} onPress={() => {}}>
-        <View style={styles.sheetHeader}>
-          <Text fontVariant="bold" fontSize={14} style={styles.sheetTitle}>
-            {title}
-          </Text>
-        </View>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {options.map((opt) => {
-            const selected = opt === value;
-            return (
-              <Pressable
-                key={opt}
-                onPress={() => onPick(opt)}
-                style={[styles.option, selected && styles.optionSelected]}
-              >
-                <Text
-                  fontVariant={selected ? "bold" : "medium"}
-                  fontSize={15}
-                  style={selected ? styles.optionTextSelected : styles.optionText}
-                >
-                  {`${formatVal(opt)} ${unit}`}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </Pressable>
-    </Pressable>
-  </Modal>
-);
-
-interface MacroDatum {
+interface MacroCol {
+  id: string;
   label: string;
   consumed: number;
   target: number;
-  options: number[];
-  unit: string;
-  onChange: (next: number) => void;
-  Icon: React.FC<{ size?: number; color?: string }>;
+  color: string;
 }
 
-const MacroBox: React.FC<MacroDatum> = ({
+const MacroColumn: React.FC<MacroCol & { width: number }> = ({
   label,
   consumed,
   target,
-  options,
-  unit,
-  onChange,
-  Icon,
+  color,
+  width,
 }) => {
-  const [open, setOpen] = useState(false);
   const clamped = target > 0 ? Math.max(0, Math.min(1, consumed / target)) : 0;
-  const over = target > 0 && consumed > target;
-
-  const pick = (n: number) => {
-    selectionHaptic();
-    onChange(n);
-    setOpen(false);
-  };
 
   return (
-    <>
-      <Pressable style={styles.box} onPress={() => setOpen(true)}>
-        <View style={styles.boxLabelRow}>
-          <Text fontSize={12} fontVariant="semibold" style={styles.boxLabel}>
-            {label}
-          </Text>
-          <Icon size={13} color={DIET_V2_GREEN} />
-        </View>
-        <View style={styles.boxValueRow}>
-          <Text fontVariant="bold" fontSize={17} style={styles.boxValue}>
-            {`${formatVal(consumed)}/${formatVal(target)}`}
-          </Text>
-          <View style={styles.boxChevron}>
-            <ChevronDownIcon size={13} color={DIET_V2_GREEN} />
-          </View>
-        </View>
-        <GradientBar fraction={clamped} height={6} over={over} />
-      </Pressable>
-      <OptionsModal
-        open={open}
-        title={label}
-        value={consumed}
-        options={options}
-        unit={unit}
-        onPick={pick}
-        onClose={() => setOpen(false)}
-      />
-    </>
+    <View style={[styles.macroCol, { width }]}>
+      <Text fontSize={12} style={styles.macroLabel}>
+        {label}
+      </Text>
+      <Text fontVariant="bold" fontSize={20} style={styles.macroBig}>
+        {formatVal(consumed)}
+        <Text fontVariant="regular" fontSize={11} style={styles.macroTarget}>
+          {` / ${formatVal(target)}`}
+        </Text>
+      </Text>
+      <View style={styles.macroBar}>
+        <View
+          style={[styles.macroBarFill, { width: `${Math.round(clamped * 100)}%`, backgroundColor: color }]}
+        />
+      </View>
+    </View>
   );
-};
-
-const sumServings = (
-  meals: {
-    totalProtein?: { quantity?: number };
-    totalCarbs?: { quantity?: number };
-    totalFats?: { quantity?: number };
-  }[],
-  pick: "totalProtein" | "totalCarbs" | "totalFats"
-): number => meals.reduce((acc, m) => acc + (m[pick]?.quantity ?? 0), 0);
-
-const range = (from: number, to: number, step: number): number[] => {
-  const out: number[] = [];
-  for (let v = from; v <= to; v += step) out.push(Math.round(v * 100) / 100);
-  return out;
 };
 
 const DailyCalorieIntakeStyle1 = () => {
-  const { data } = useDietPlanQuery();
-  const { totalCalories = 0, freeCalories = 0, meals = [] } = data || {};
+  const consumed = useDietServingsStore();
+  const { data: plan } = useDietPlanQuery();
+  const [rowW, setRowW] = useState(0);
 
-  const targets = useMemo(
-    () => ({
-      protein: sumServings(meals, "totalProtein"),
-      carbs: sumServings(meals, "totalCarbs"),
-      fat: sumServings(meals, "totalFats"),
-    }),
-    [meals]
-  );
-
-  const proteinOptions = useMemo(() => range(0, 10, 0.5), []);
-  const carbsOptions = useMemo(() => range(0, 30, 0.5), []);
-  const fatOptions = useMemo(() => range(0, 15, 0.5), []);
-  const freeOptions = useMemo(() => range(0, 900, 10), []);
-
-  const [consumed, setConsumed] = useState({
-    protein: 0,
-    carbs: 0,
-    fat: 0,
-    free: 0,
-  });
+  const meals: IMeal[] = plan?.meals ?? [];
+  const targets = {
+    calories: plan?.totalCalories ?? 0,
+    protein: sumMealField(meals, "totalProtein"),
+    carbs: sumMealField(meals, "totalCarbs"),
+    fat: sumMealField(meals, "totalFats"),
+    veg: plan?.veggiesPerDay ?? sumMealField(meals, "totalVeggies"),
+    free: plan?.freeCalories ?? 0,
+  };
 
   const consumedCalories = Math.round(
-    consumed.protein * KCAL_PER_SERVING.protein +
-      consumed.carbs * KCAL_PER_SERVING.carbs +
-      consumed.fat * KCAL_PER_SERVING.fat +
+    consumed.protein * DIET_CALORIES_PER_SERVING.protein +
+      consumed.carbs * DIET_CALORIES_PER_SERVING.carbs +
+      consumed.fat * DIET_CALORIES_PER_SERVING.fats +
+      consumed.veg * DIET_CALORIES_PER_SERVING.veggies +
       consumed.free
   );
 
-  const macros: MacroDatum[] = [
-    {
-      label: "חלבון",
-      consumed: consumed.protein,
-      target: targets.protein,
-      options: proteinOptions,
-      unit: "מנות",
-      onChange: (n) => setConsumed((c) => ({ ...c, protein: n })),
-      Icon: DrumstickIcon,
-    },
-    {
-      label: "פחמימה",
-      consumed: consumed.carbs,
-      target: targets.carbs,
-      options: carbsOptions,
-      unit: "מנות",
-      onChange: (n) => setConsumed((c) => ({ ...c, carbs: n })),
-      Icon: SproutIcon,
-    },
-    {
-      label: "שומן",
-      consumed: consumed.fat,
-      target: targets.fat,
-      options: fatOptions,
-      unit: "מנות",
-      onChange: (n) => setConsumed((c) => ({ ...c, fat: n })),
-      Icon: DropIcon,
-    },
-    {
-      label: "חופשיות",
-      consumed: consumed.free,
-      target: freeCalories,
-      options: freeOptions,
-      unit: 'קק"ל',
-      onChange: (n) => setConsumed((c) => ({ ...c, free: n })),
-      Icon: FlameIcon,
-    },
-  ];
+  const macros: MacroCol[] = [
+    { id: "protein", label: "חלבון", consumed: consumed.protein, target: targets.protein, color: "#047857" },
+    { id: "carbs", label: "פחמימות", consumed: consumed.carbs, target: targets.carbs, color: "#10B981" },
+    { id: "fat", label: "שומן", consumed: consumed.fat, target: targets.fat, color: "#34D399" },
+    { id: "free", label: "חופשיות", consumed: consumed.free, target: targets.free, color: "#6EE7B7" },
+    { id: "veg", label: "ירקות", consumed: consumed.veg, target: targets.veg, color: "#22C55E" },
+  ].filter((m) => m.target > 0);
+
+  const colW = rowW > 0 && macros.length > 0 ? rowW / Math.min(macros.length, 4) : 82;
 
   return (
-    <View style={styles.wrap}>
-      <CalorieHeadline consumed={consumedCalories} target={totalCalories} />
-      <View style={styles.boxesRow}>
-        {macros.map((m) => (
-          <MacroBox key={`box-${m.label}`} {...m} />
-        ))}
+    <View style={styles.card}>
+      <View style={styles.topRow}>
+        <View style={styles.tipsPanel}>
+          <View style={styles.tipRow}>
+            <DropIcon size={16} color="#3B82F6" />
+            <Text fontSize={14} style={styles.tipText}>
+              לשתות 3 ליטר מים
+            </Text>
+          </View>
+          <View style={styles.tipRow}>
+            <SproutIcon size={16} color="#22C55E" />
+            <Text fontSize={14} style={styles.tipText}>
+              לאכול 5-3 ירקות בתפריט
+            </Text>
+          </View>
+          <Pressable
+            style={styles.tipRow}
+            onPress={() =>
+              Linking.openURL(`https://wa.me/${process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER || ""}`)
+            }
+          >
+            <WhatsAppIcon size={16} />
+            <Text fontSize={14} style={styles.tipText}>
+              אשמח לעדכון בווטסאפ
+            </Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.topDivider} />
+
+        <CalorieDonut consumed={consumedCalories} target={targets.calories} />
+      </View>
+
+      <View style={styles.macroWrap}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.macroScroll}
+          contentContainerStyle={styles.macroRow}
+          onLayout={(e) => setRowW(e.nativeEvent.layout.width)}
+        >
+          {macros.map((m, i) => (
+            <React.Fragment key={m.id}>
+              {i > 0 && <View style={styles.vDivider} />}
+              <MacroColumn {...m} width={colW} />
+            </React.Fragment>
+          ))}
+        </ScrollView>
+        {macros.length > 4 && (
+          <View pointerEvents="none" style={styles.scrollHintLeft}>
+            <ChevronLeftIcon size={16} color={DIET_V2_MUTED} />
+          </View>
+        )}
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  wrap: {
-    width: "100%",
-    alignItems: "center",
-    gap: 16,
-  },
-  headline: {
+  card: {
     alignSelf: "stretch",
-    alignItems: "center",
-    paddingVertical: 14,
-  },
-  headlineBig: {
-    color: "#0B2A22",
-    lineHeight: 66,
-    letterSpacing: -1.5,
-    writingDirection: "ltr",
-    textAlign: "center",
-    fontStyle: "italic",
-  },
-  headlineTarget: {
-    color: DIET_V2_MUTED,
-    letterSpacing: -1,
-    writingDirection: "ltr",
-    fontStyle: "italic",
-  },
-  headlineBar: {
-    width: "88%",
-    alignSelf: "center",
-    marginTop: 10,
-  },
-  boxesRow: {
-    flexDirection: "row",
-    alignSelf: "stretch",
-    gap: 8,
-  },
-  box: {
-    flex: 1,
-    gap: 4,
-    paddingVertical: 8,
-    paddingHorizontal: 6,
-    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
     borderWidth: 1,
-    borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#F8FAF9",
-    alignItems: "center",
+    borderColor: "rgba(15, 94, 59, 0.08)",
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    gap: 14,
   },
-  boxLabelRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  boxLabel: {
-    color: "#0B2A22",
-  },
-  boxValueRow: {
-    alignSelf: "stretch",
+  donutWrap: {
+    width: DONUT_SIZE,
+    height: DONUT_SIZE,
+    alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
   },
-  boxValue: {
-    color: "#0B2A22",
+  donutCenter: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
+  },
+  donutNum: {
+    color: DARK,
     writingDirection: "ltr",
+  },
+  donutSub: {
+    color: DIET_V2_MUTED,
     textAlign: "center",
   },
-  boxChevron: {
+  topRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  tipsPanel: {
+    flex: 1,
+    gap: 14,
+    justifyContent: "center",
+  },
+  tipRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    gap: 6,
+  },
+  tipText: {
+    flexShrink: 1,
+    color: "#374151",
+    lineHeight: 17,
+    textAlign: "right",
+  },
+  tipWhatsapp: {
+    flexShrink: 1,
+    color: "#0F7A52",
+    lineHeight: 17,
+    textAlign: "right",
+  },
+  topDivider: {
+    width: StyleSheet.hairlineWidth,
+    alignSelf: "stretch",
+    backgroundColor: "rgba(0, 0, 0, 0.08)",
+    marginVertical: 8,
+  },
+  macroWrap: {
+    alignSelf: "stretch",
+    position: "relative",
+  },
+  macroScroll: {
+    alignSelf: "stretch",
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "rgba(0, 0, 0, 0.06)",
+  },
+  scrollHintLeft: {
     position: "absolute",
-    left: 4,
+    right: 2,
     top: 0,
     bottom: 0,
     justifyContent: "center",
+    opacity: 0.55,
   },
-  backdrop: {
-    flex: 1,
-    backgroundColor: "rgba(11, 42, 34, 0.4)",
-    justifyContent: "center",
-    paddingHorizontal: 60,
+  macroRow: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    paddingTop: 18,
   },
-  sheet: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    maxHeight: 340,
-    paddingBottom: 6,
+  vDivider: {
+    width: StyleSheet.hairlineWidth,
+    alignSelf: "stretch",
+    backgroundColor: "rgba(0, 0, 0, 0.08)",
   },
-  sheetHeader: {
-    paddingVertical: 10,
+  macroCol: {
     alignItems: "center",
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: DIET_V2_CARD_BORDER,
+    gap: 6,
   },
-  sheetTitle: {
-    color: "#0B2A22",
+  macroLabel: {
+    color: DIET_V2_MUTED,
   },
-  option: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    alignItems: "center",
+  macroBig: {
+    color: DARK,
+    writingDirection: "ltr",
   },
-  optionSelected: {
-    backgroundColor: "#F0FDF4",
+  macroTarget: {
+    color: DIET_V2_MUTED,
   },
-  optionText: {
-    color: "#4B5563",
+  macroBar: {
+    alignSelf: "stretch",
+    marginHorizontal: 6,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: "#E9EBEA",
+    overflow: "hidden",
+    marginTop: 2,
   },
-  optionTextSelected: {
-    color: DIET_V2_GREEN,
+  macroBarFill: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    borderRadius: 999,
   },
 });
 
