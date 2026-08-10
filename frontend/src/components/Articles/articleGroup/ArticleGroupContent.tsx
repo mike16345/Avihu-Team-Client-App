@@ -15,6 +15,7 @@ import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 import { useQueryClient } from "@tanstack/react-query";
 import { ARTICLE_KEY } from "@/constants/reactQuery";
 import { useUserStore } from "@/store/userStore";
+import { usePinnedArticlesStore } from "@/store/pinnedArticlesStore";
 import ArticleGroupContentSkeleton from "./ArticleGroupContentSkeleton";
 
 interface ArticleGroupContentProps {
@@ -36,14 +37,21 @@ const ArticleGroupContent: React.FC<ArticleGroupContentProps> = ({ groupId }) =>
     isError,
   } = useArticleQuery(groupId, planType);
 
+  const pinnedIds = usePinnedArticlesStore((s) => s.pinnedIds);
+
   const articles = useMemo(() => {
     const nextArticles = articleRes?.pages.flatMap((page) => page.results) ?? [];
     if (!nextArticles.length && !isLoading) {
       return <Text style={[text.textCenter, spacing.pdXl]}>לא נמצאו מאמרים לקבוצה זו</Text>;
     }
 
-    return nextArticles.map((article) => <ArticleCard key={article._id} article={article} />);
-  }, [articleRes?.pages, isLoading, spacing.pdXl, text.textCenter]);
+    const pinnedSet = new Set(pinnedIds);
+    const pinned = nextArticles.filter((a) => pinnedSet.has(a._id));
+    const rest = nextArticles.filter((a) => !pinnedSet.has(a._id));
+    const ordered = [...pinned, ...rest];
+
+    return ordered.map((article) => <ArticleCard key={article._id} article={article} />);
+  }, [articleRes?.pages, isLoading, spacing.pdXl, text.textCenter, pinnedIds]);
 
   const handleRefresh = () => {
     queryClient.invalidateQueries({ queryKey: [ARTICLE_KEY + groupId + planType] });
