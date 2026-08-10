@@ -168,8 +168,9 @@ const WheelModal: React.FC<WheelModalProps> = ({
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={styles.sheet} onPress={() => {}}>
+      <View style={styles.modalRoot}>
+        <Pressable style={styles.backdrop} onPress={onClose} />
+        <View style={styles.sheet}>
           <View style={styles.sheetHeader}>
             <Text fontVariant="bold" fontSize={16} style={styles.sheetTitle}>
               {title}
@@ -191,8 +192,8 @@ const WheelModal: React.FC<WheelModalProps> = ({
             />
           </View>
           <ConfirmButton onPress={handleConfirm} />
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 };
@@ -227,8 +228,9 @@ const TextInputModal: React.FC<TextInputModalProps> = ({
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <Pressable style={styles.sheet} onPress={() => {}}>
+      <View style={styles.modalRoot}>
+        <Pressable style={styles.backdrop} onPress={onClose} />
+        <View style={styles.sheet}>
           <View style={styles.sheetHeader}>
             <Text fontVariant="bold" fontSize={16} style={styles.sheetTitle}>
               {title}
@@ -249,8 +251,8 @@ const TextInputModal: React.FC<TextInputModalProps> = ({
             />
           </View>
           <ConfirmButton onPress={handleConfirm} />
-        </Pressable>
-      </Pressable>
+        </View>
+      </View>
     </Modal>
   );
 };
@@ -344,7 +346,7 @@ const ServingsTracker = () => {
                   </View>
                   <View style={styles.wheelGroup}>
                     <Text fontVariant="semibold" fontSize={17} style={styles.freeTarget}>
-                      {`/ ${formatVal(target)}`}
+                      {`‭/ ${formatVal(target)}‬`}
                     </Text>
                     <WheelButton
                       value={value}
@@ -492,11 +494,14 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignSelf: "stretch",
   },
-  backdrop: {
+  modalRoot: {
     flex: 1,
-    backgroundColor: "rgba(11, 42, 34, 0.45)",
     justifyContent: "center",
     paddingHorizontal: 60,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(11, 42, 34, 0.45)",
   },
   sheet: {
     backgroundColor: "#FFFFFF",

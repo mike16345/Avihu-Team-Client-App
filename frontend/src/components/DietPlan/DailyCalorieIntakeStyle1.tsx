@@ -268,26 +268,31 @@ const DailyCalorieIntakeStyle1 = () => {
       <View style={styles.topRow}>
         <View style={styles.tipsPanel}>
           <View style={styles.tipRow}>
-            <DropIcon size={16} color="#3B82F6" />
-            <Text fontSize={14} style={styles.tipText}>
+            <View style={styles.tipIconWrap}>
+              <DropIcon size={14} color="#3B82F6" />
+            </View>
+            <Text fontSize={13} style={styles.tipText}>
               לשתות 3 ליטר מים
             </Text>
           </View>
           <View style={styles.tipRow}>
-            <SproutIcon size={16} color="#22C55E" />
-            <Text fontSize={14} style={styles.tipText}>
-              לאכול 5-3 ירקות בתפריט
+            <View style={styles.tipIconWrap}>
+              <SproutIcon size={14} color="#22C55E" />
+            </View>
+            <Text fontSize={13} style={styles.tipText}>
+              לאכול 5-3 ירקות ביום
             </Text>
           </View>
           <Pressable
             style={styles.tipRow}
-            // TODO : Use trainer phone number based off User's trainer, not env variable.
             onPress={() =>
               Linking.openURL(`https://wa.me/${process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER || ""}`)
             }
           >
-            <WhatsAppIcon size={16} />
-            <Text fontSize={14} style={styles.tipText}>
+            <View style={styles.tipIconWrap}>
+              <WhatsAppIcon size={14} />
+            </View>
+            <Text fontSize={13} style={styles.tipText}>
               אשמח לעדכון בווטסאפ
             </Text>
           </Pressable>
@@ -371,10 +376,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     gap: 6,
   },
+  tipIconWrap: {
+    height: 18,
+    justifyContent: "center",
+  },
   tipText: {
     flexShrink: 1,
     color: "#374151",
-    lineHeight: 17,
+    lineHeight: 18,
     textAlign: "right",
   },
   tipWhatsapp: {
