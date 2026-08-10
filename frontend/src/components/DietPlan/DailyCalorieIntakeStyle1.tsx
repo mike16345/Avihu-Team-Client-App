@@ -200,10 +200,12 @@ const MacroColumn: React.FC<MacroCol & { width: number }> = ({
         {label}
       </Text>
       <Text fontVariant="bold" fontSize={20} style={styles.macroBig}>
+        {"‭"}
         {formatVal(consumed)}
         <Text fontVariant="regular" fontSize={11} style={styles.macroTarget}>
           {` / ${formatVal(target)}`}
         </Text>
+        {"‬"}
       </Text>
       <MacroGradientBar fraction={fraction} gradId={`macro-grad-${id}`} />
     </View>

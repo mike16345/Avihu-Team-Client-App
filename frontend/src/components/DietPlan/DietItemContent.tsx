@@ -44,7 +44,7 @@ const DietItemContent: React.FC<DietItemContentProps> = ({
   return (
     <Pressable
       onPress={canToggle ? handleToggle : undefined}
-      style={[isEaten && styles.eatenWrap]}
+      style={[styles.wrap, isEaten && styles.eatenWrap]}
     >
       <View style={[spacing.gapDefault]}>
         <View style={[layout.flexRow, layout.itemsCenter, layout.justifyBetween]}>
@@ -85,13 +85,17 @@ const DietItemContent: React.FC<DietItemContentProps> = ({
 };
 
 const styles = StyleSheet.create({
-  eatenWrap: {
-    backgroundColor: "#EDFFEB",
+  wrap: {
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "rgba(23, 178, 106, 0.28)",
+    borderColor: "transparent",
+    backgroundColor: "transparent",
     padding: 12,
     marginHorizontal: -4,
+  },
+  eatenWrap: {
+    backgroundColor: "#EDFFEB",
+    borderColor: "rgba(23, 178, 106, 0.28)",
   },
   chip: {
     width: 96,
