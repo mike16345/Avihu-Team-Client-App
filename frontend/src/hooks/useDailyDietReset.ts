@@ -28,25 +28,45 @@ const planHasAnyTarget = (plan: IDietPlan | undefined): boolean => {
 export const useDailyDietReset = () => {
   const resetIfNewDay = useDietServingsStore((s) => s.resetIfNewDay);
   const reset = useDietServingsStore((s) => s.reset);
+  const reconcileEaten = useDietServingsStore((s) => s.reconcileEaten);
+  const reconcileWithTargets = useDietServingsStore((s) => s.reconcileWithTargets);
   const { data: plan, isLoading, isError } = useDietPlanQuery();
 
   useEffect(() => {
     resetIfNewDay();
+    reconcileEaten();
 
-    const interval = setInterval(resetIfNewDay, RESET_CHECK_INTERVAL_MS);
+    const interval = setInterval(() => {
+      resetIfNewDay();
+      reconcileEaten();
+    }, RESET_CHECK_INTERVAL_MS);
 
     const sub = AppState.addEventListener("change", (state) => {
-      if (state === "active") resetIfNewDay();
+      if (state === "active") {
+        resetIfNewDay();
+        reconcileEaten();
+      }
     });
 
     return () => {
       clearInterval(interval);
       sub.remove();
     };
-  }, [resetIfNewDay]);
+  }, [resetIfNewDay, reconcileEaten]);
 
   useEffect(() => {
     if (isLoading || isError) return;
-    if (!planHasAnyTarget(plan)) reset();
-  }, [plan, isLoading, isError, reset]);
+    if (!planHasAnyTarget(plan)) {
+      reset();
+      return;
+    }
+    const meals = plan?.meals ?? [];
+    reconcileWithTargets({
+      protein: sumMealField(meals, "totalProtein"),
+      carbs: sumMealField(meals, "totalCarbs"),
+      fat: sumMealField(meals, "totalFats"),
+      veg: plan?.veggiesPerDay ?? sumMealField(meals, "totalVeggies"),
+      free: plan?.freeCalories ?? 0,
+    });
+  }, [plan, isLoading, isError, reset, reconcileWithTargets]);
 };

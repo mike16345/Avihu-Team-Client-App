@@ -18,6 +18,8 @@ interface DietServingsState {
   isCategoryEaten: (mealId: string, key: ServingKey) => boolean;
   resetIfNewDay: () => void;
   reset: () => void;
+  reconcileEaten: () => void;
+  reconcileWithTargets: (targets: Partial<Record<ServingKey, number>>) => void;
 }
 
 const round2 = (n: number): number => Math.round(n * 100) / 100;
@@ -50,7 +52,17 @@ export const useDietServingsStore = create<DietServingsState>()(
       bump: (key, delta) =>
         set((state) => ({ ...state, [key]: Math.max(0, round2(state[key] + delta)) })),
       setValue: (key, value) =>
-        set((state) => ({ ...state, [key]: Math.max(0, round2(value)) })),
+        set((state) => {
+          const suffix = `::${key}`;
+          const clearedEaten = Object.fromEntries(
+            Object.entries(state.eatenCategories).filter(([k]) => !k.endsWith(suffix))
+          );
+          return {
+            ...state,
+            [key]: Math.max(0, round2(value)),
+            eatenCategories: clearedEaten,
+          };
+        }),
       toggleMealCategory: (mealId, key, quantity) =>
         set((state) => {
           const k = mealCatKey(mealId, key);
@@ -70,6 +82,42 @@ export const useDietServingsStore = create<DietServingsState>()(
         }
       },
       reset: () => set({ ...emptyDay(), currentDayKey: getLogicalDayKey() }),
+      reconcileEaten: () =>
+        set((state) => {
+          const zeroKeys = new Set<string>();
+          (["protein", "carbs", "fat", "veg"] as ServingKey[]).forEach((k) => {
+            if ((state[k] as number) <= 0) zeroKeys.add(`::${k}`);
+          });
+          if (zeroKeys.size === 0) return state;
+          const filtered = Object.fromEntries(
+            Object.entries(state.eatenCategories).filter(
+              ([k]) => ![...zeroKeys].some((suffix) => k.endsWith(suffix))
+            )
+          );
+          if (Object.keys(filtered).length === Object.keys(state.eatenCategories).length) return state;
+          return { ...state, eatenCategories: filtered };
+        }),
+      reconcileWithTargets: (targets) =>
+        set((state) => {
+          const keys: ServingKey[] = ["protein", "carbs", "fat", "veg", "free"];
+          const patch: Partial<DietServingsState> = {};
+          const suffixesToStrip: string[] = [];
+          keys.forEach((k) => {
+            const target = targets[k];
+            if (target != null && target <= 0 && (state[k] as number) > 0) {
+              (patch as any)[k] = 0;
+              suffixesToStrip.push(`::${k}`);
+            }
+          });
+          const patchedKeys = Object.keys(patch);
+          if (patchedKeys.length === 0) return state;
+          const filtered = Object.fromEntries(
+            Object.entries(state.eatenCategories).filter(
+              ([k]) => !suffixesToStrip.some((suffix) => k.endsWith(suffix))
+            )
+          );
+          return { ...state, ...patch, eatenCategories: filtered };
+        }),
     }),
     {
       name: "diet-servings-store",

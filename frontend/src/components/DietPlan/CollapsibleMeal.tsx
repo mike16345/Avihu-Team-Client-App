@@ -11,6 +11,7 @@ import { useRecordMeal } from "@/hooks/useRecordMeal";
 import { Text } from "../ui/Text";
 import Icon from "../Icon/Icon";
 import { selectionHaptic } from "@/utils/haptics";
+import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 
 interface CollapsibleMealProps {
   meal: IMeal;
@@ -23,6 +24,16 @@ const dietItemKeyToServing: Record<string, ServingKey> = {
   totalFats: "fat",
   totalVeggies: "veg",
 };
+
+const TOLERANCE = 0.001;
+
+type MacroKey = "protein" | "carbs" | "fat" | "veg";
+
+const sumMealField = (meals: IMeal[], field: keyof IMeal): number =>
+  meals.reduce((acc, m) => {
+    const item = m[field] as IDietItem | undefined;
+    return acc + (item?.quantity ?? 0);
+  }, 0);
 
 const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
   const { session, recordMeal, cancelMeal } = useRecordMeal();
@@ -40,6 +51,55 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
 
   const eatenCategories = useDietServingsStore((s) => s.eatenCategories);
   const toggleMealCategory = useDietServingsStore((s) => s.toggleMealCategory);
+  const consumedProtein = useDietServingsStore((s) => s.protein);
+  const consumedCarbs = useDietServingsStore((s) => s.carbs);
+  const consumedFat = useDietServingsStore((s) => s.fat);
+  const consumedVeg = useDietServingsStore((s) => s.veg);
+
+  const { data: plan } = useDietPlanQuery();
+
+  const dailyTargets = useMemo<Record<MacroKey, number>>(() => {
+    const allMeals = plan?.meals ?? [];
+    return {
+      protein: sumMealField(allMeals, "totalProtein"),
+      carbs: sumMealField(allMeals, "totalCarbs"),
+      fat: sumMealField(allMeals, "totalFats"),
+      veg: plan?.veggiesPerDay ?? sumMealField(allMeals, "totalVeggies"),
+    };
+  }, [plan]);
+
+  const mealQtys = useMemo<Record<MacroKey, number>>(
+    () => ({
+      protein: meal.totalProtein?.quantity ?? 0,
+      carbs: meal.totalCarbs?.quantity ?? 0,
+      fat: meal.totalFats?.quantity ?? 0,
+      veg: meal.totalVeggies?.quantity ?? 0,
+    }),
+    [meal]
+  );
+
+  const consumed = useMemo<Record<MacroKey, number>>(
+    () => ({
+      protein: consumedProtein,
+      carbs: consumedCarbs,
+      fat: consumedFat,
+      veg: consumedVeg,
+    }),
+    [consumedProtein, consumedCarbs, consumedFat, consumedVeg]
+  );
+
+  const canMarkMeal = useMemo(() => {
+    const keys: MacroKey[] = ["protein", "carbs", "fat", "veg"];
+    return keys.every((cat) => {
+      const q = mealQtys[cat];
+      if (q <= 0) return true;
+      const target = dailyTargets[cat];
+      if (target <= 0) return true;
+      const alreadyOn = !!eatenCategories[`${meal._id}::${cat}`];
+      const addOnMark = alreadyOn ? 0 : q;
+      return consumed[cat] + addOnMark <= target + TOLERANCE;
+    });
+  }, [mealQtys, dailyTargets, eatenCategories, meal._id, consumed]);
 
   const dietItems = useMemo(() => {
     return Object.keys(meal)
@@ -81,27 +141,31 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
     }
   }, [allCategoriesEaten, isEaten]);
 
-  const handleMealPress = () => {
+  const handleMealPress = async () => {
+    if (!isEaten && !canMarkMeal) return;
     selectionHaptic();
     syncingRef.current = true;
-    if (isEaten) {
-      cancelMeal(meal._id);
-      relevantServingItems.forEach(({ key, quantity }) => {
-        if (eatenCategories[`${meal._id}::${key}`]) {
-          toggleMealCategory(meal._id, key, quantity);
-        }
-      });
-    } else {
-      recordMeal(meal, index);
-      relevantServingItems.forEach(({ key, quantity }) => {
-        if (!eatenCategories[`${meal._id}::${key}`]) {
-          toggleMealCategory(meal._id, key, quantity);
-        }
-      });
+    try {
+      if (isEaten) {
+        relevantServingItems.forEach(({ key, quantity }) => {
+          if (eatenCategories[`${meal._id}::${key}`]) {
+            toggleMealCategory(meal._id, key, quantity);
+          }
+        });
+        await cancelMeal(meal._id);
+      } else {
+        relevantServingItems.forEach(({ key, quantity }) => {
+          if (!eatenCategories[`${meal._id}::${key}`]) {
+            toggleMealCategory(meal._id, key, quantity);
+          }
+        });
+        await recordMeal(meal, index);
+      }
+    } finally {
+      setTimeout(() => {
+        syncingRef.current = false;
+      }, 50);
     }
-    setTimeout(() => {
-      syncingRef.current = false;
-    }, 100);
   };
 
   const toggleCollapse = () => {
@@ -157,13 +221,19 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
           );
         })}
         <PrimaryButton
-          style={{ marginBottom: 20 }}
+          style={{ marginBottom: !isEaten && !canMarkMeal ? 4 : 20 }}
           mode={isEaten ? "light" : "dark"}
           onPress={handleMealPress}
+          disabled={!isEaten && !canMarkMeal}
           block
         >
           {mealEatenIndicatorText}
         </PrimaryButton>
+        {!isEaten && !canMarkMeal && (
+          <Text fontSize={12} style={styles.blockedHint}>
+            אין מספיק מנות פנויות היום
+          </Text>
+        )}
       </View>
     </Collapsible>
   );
@@ -177,6 +247,13 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "rgba(0, 0, 0, 0.1)",
     marginVertical: 8,
+  },
+  blockedHint: {
+    color: "#0F5E3B",
+    textAlign: "center",
+    marginBottom: 16,
+    paddingHorizontal: 6,
+    lineHeight: 16,
   },
 });
 
