@@ -115,13 +115,18 @@ const ITEM_H = 36;
 const WheelButton: React.FC<{
   value: number;
   onPress: () => void;
-}> = ({ value, onPress }) => (
-  <Pressable style={styles.wheel} onPress={onPress}>
-    <Text fontVariant="bold" fontSize={16} style={styles.value}>
+  over?: boolean;
+}> = ({ value, onPress, over }) => (
+  <Pressable style={[styles.wheel, over && styles.wheelOver]} onPress={onPress}>
+    <Text
+      fontVariant="bold"
+      fontSize={16}
+      style={[styles.value, over && { color: RED_DARK }]}
+    >
       {formatVal(value)}
     </Text>
     <View style={styles.wheelChevron}>
-      <ChevronDownIcon size={11} color="#0B5E37" />
+      <ChevronDownIcon size={11} color={over ? RED_DARK : "#0B5E37"} />
     </View>
   </Pressable>
 );
@@ -154,12 +159,13 @@ const WheelModal: React.FC<WheelModalProps> = ({
   }, [visible, value]);
 
   const options = useMemo(() => {
-    const count = Math.max(1, Math.round(max / step)) + 1;
+    const upper = Math.max(max, value);
+    const count = Math.max(1, Math.round(upper / step)) + 1;
     return Array.from({ length: count }).map((_, i) => {
       const v = Math.round(i * step * 100) / 100;
       return { value: v, label: formatVal(v) };
     });
-  }, [max, step]);
+  }, [max, step, value]);
 
   const handleConfirm = () => {
     onPick(pending);
@@ -189,6 +195,8 @@ const WheelModal: React.FC<WheelModalProps> = ({
               itemHeight={36}
               activeItemColor={DIET_V2_DARK}
               inactiveItemColor="#B7BEBB"
+              dangerThreshold={max}
+              dangerColor={RED_DARK}
             />
           </View>
           <ConfirmButton onPress={handleConfirm} />
@@ -350,6 +358,7 @@ const ServingsTracker = () => {
                     </Text>
                     <WheelButton
                       value={value}
+                      over={over}
                       onPress={() =>
                         cat.key === "free" ? setFreeModalOpen(true) : setActiveWheel(cat.key)
                       }
@@ -460,6 +469,9 @@ const styles = StyleSheet.create({
   },
   wheelChevron: {
     opacity: 0.55,
+  },
+  wheelOver: {
+    borderColor: RED_DARK,
   },
   freeGroup: {
     flexDirection: "row",
