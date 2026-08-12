@@ -151,7 +151,6 @@ interface MacroCol {
   label: string;
   consumed: number;
   target: number;
-  color: string;
 }
 
 const MACRO_BAR_H = 6;
@@ -212,7 +211,7 @@ const MacroColumn: React.FC<MacroCol & { width: number }> = ({
   );
 };
 
-const DailyCalorieIntakeStyle1 = () => {
+const DietPlanV1Summary = () => {
   const consumed = useDietServingsStore();
   const { data: plan } = useDietPlanQuery();
   const [rowW, setRowW] = useState(0);
@@ -241,24 +240,21 @@ const DailyCalorieIntakeStyle1 = () => {
       label: "חלבון",
       consumed: consumed.protein,
       target: targets.protein,
-      color: "#047857",
     },
     {
       id: "carbs",
       label: "פחמימות",
       consumed: consumed.carbs,
       target: targets.carbs,
-      color: "#10B981",
     },
-    { id: "fat", label: "שומן", consumed: consumed.fat, target: targets.fat, color: "#34D399" },
+    { id: "fat", label: "שומן", consumed: consumed.fat, target: targets.fat },
     {
       id: "free",
       label: "חופשיות",
       consumed: consumed.free,
       target: targets.free,
-      color: "#6EE7B7",
     },
-    { id: "veg", label: "ירקות", consumed: consumed.veg, target: targets.veg, color: "#22C55E" },
+    { id: "veg", label: "ירקות", consumed: consumed.veg, target: targets.veg },
   ].filter((m) => m.target > 0);
 
   const colW = rowW > 0 && macros.length > 0 ? rowW / Math.min(macros.length, 4) : 82;
@@ -386,12 +382,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     textAlign: "right",
   },
-  tipWhatsapp: {
-    flexShrink: 1,
-    color: "#0F7A52",
-    lineHeight: 17,
-    textAlign: "right",
-  },
   topDivider: {
     width: StyleSheet.hairlineWidth,
     alignSelf: "stretch",
@@ -448,13 +438,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginTop: 2,
   },
-  macroBarFill: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
-    borderRadius: 999,
-  },
 });
 
-export default DailyCalorieIntakeStyle1;
+export default DietPlanV1Summary;

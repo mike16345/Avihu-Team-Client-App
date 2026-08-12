@@ -1,10 +1,8 @@
 import { RefreshControl, ScrollView } from "react-native";
-import DietPlanContentTabs from "@/components/DietPlan/DietPlanContentTabs";
-import DietPlanScreenHeader from "@/components/DietPlan/DietPlanScreenHeader";
+import DietPlanV1View from "@/components/DietPlan/DietPlanV1View";
 import PlanPendingState from "@/components/ui/PlanPendingState";
 import DietPlanSkeleton from "@/components/ui/loaders/skeletons/DietPlanSkeleton";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
-import { useDailyDietReset } from "@/hooks/useDailyDietReset";
 import ErrorScreen from "@/screens/ErrorScreen";
 import useStyles from "@/styles/useGlobalStyles";
 import { isHtmlEmpty } from "@/utils/utils";
@@ -12,7 +10,6 @@ import { isHtmlEmpty } from "@/utils/utils";
 const MyDietPlanScreen = () => {
   const { spacing, layout } = useStyles();
   const { data, error, isError, isFetching, isLoading, refetch } = useDietPlanQuery();
-  useDailyDietReset();
 
   const hasMeals = (data?.meals?.length ?? 0) > 0;
   const hasSupplements = !isHtmlEmpty(data?.supplements?.join("") || "");
@@ -45,8 +42,7 @@ const MyDietPlanScreen = () => {
         <RefreshControl refreshing={isFetching} onRefresh={() => void refetch()} />
       }
     >
-      <DietPlanScreenHeader />
-      <DietPlanContentTabs />
+      <DietPlanV1View />
     </ScrollView>
   );
 };
