@@ -9,7 +9,7 @@ import { FoodGroup } from "@/types/foodTypes";
 import AdditionalDietItemsModal from "./AdditionalDietItemsModal";
 import { selectionHaptic } from "@/utils/haptics";
 import { ServingKey, useDietServingsStore } from "@/store/dietServingsStore";
-import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 import { useMemo } from "react";
 
 const TOLERANCE = 0.001;
@@ -44,7 +44,7 @@ const DietItemContent: React.FC<DietItemContentProps> = ({
     servingKey && servingKey !== "free" ? s[servingKey] : 0
   );
 
-  const { data: plan } = useDietPlanQuery();
+  const { data: plan } = useDietPlanV1Query();
 
   const dailyTarget = useMemo(() => {
     if (!servingKey || servingKey === "free") return 0;

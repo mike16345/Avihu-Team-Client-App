@@ -11,7 +11,7 @@ import { useRecordMeal } from "@/hooks/useRecordMeal";
 import { Text } from "../ui/Text";
 import Icon from "../Icon/Icon";
 import { selectionHaptic } from "@/utils/haptics";
-import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 
 interface CollapsibleMealProps {
   meal: IMeal;
@@ -56,7 +56,7 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
   const consumedFat = useDietServingsStore((s) => s.fat);
   const consumedVeg = useDietServingsStore((s) => s.veg);
 
-  const { data: plan } = useDietPlanQuery();
+  const { data: plan } = useDietPlanV1Query();
 
   const dailyTargets = useMemo<Record<MacroKey, number>>(() => {
     const allMeals = plan?.meals ?? [];
@@ -125,9 +125,7 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
 
   const allCategoriesEaten = useMemo(() => {
     if (relevantServingItems.length === 0) return false;
-    return relevantServingItems.every(
-      ({ key }) => !!eatenCategories[`${meal._id}::${key}`]
-    );
+    return relevantServingItems.every(({ key }) => !!eatenCategories[`${meal._id}::${key}`]);
   }, [relevantServingItems, eatenCategories, meal._id]);
 
   const syncingRef = useRef(false);

@@ -1,9 +1,8 @@
 import { DIET_PLAN_KEY, ONE_DAY } from "@/constants/reactQuery";
-import type { IDietPlan } from "@/interfaces/DietPlan";
 import type { AnyDietPlan } from "@/interfaces/DietPlanTypes";
 import { useUserStore } from "@/store/userStore";
 import { createRetryFunction } from "@/utils/utils";
-import { UseQueryOptions, UseQueryResult, useQuery } from "@tanstack/react-query";
+import { UseQueryOptions, useQuery } from "@tanstack/react-query";
 import { useDietPlanApi } from "../api/useDietPlanApi";
 
 export const getDietPlanQueryOptions = (
@@ -16,17 +15,14 @@ export const getDietPlanQueryOptions = (
   retry: createRetryFunction(404, 2),
 });
 
-const useDietPlanQuery = <TPlan extends AnyDietPlan = IDietPlan>(): UseQueryResult<
-  TPlan,
-  unknown
-> => {
+const useDietPlanQuery = () => {
   const currentUser = useUserStore((store) => store.currentUser);
   const { getDietPlanByUserId } = useDietPlanApi();
 
   return useQuery({
     ...getDietPlanQueryOptions(currentUser?._id || "", getDietPlanByUserId),
     enabled: !!currentUser?._id,
-  }) as UseQueryResult<TPlan, unknown>;
+  });
 };
 
 export default useDietPlanQuery;

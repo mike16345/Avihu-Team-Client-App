@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { IDietPlan } from "@/interfaces/DietPlan";
 import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
 import {
   computeDietPlanV2Totals,
@@ -7,7 +8,13 @@ import {
   getVisibleDietV2Categories,
   isDietPlanV2,
   resolveDietPlanVersion,
+  selectDietPlanV1,
 } from "../dietPlanV2Utils";
+
+const v1Plan: IDietPlan = {
+  meals: [],
+  freeCalories: 0,
+};
 
 const plan: IDietPlanV2 = {
   version: 2,
@@ -53,6 +60,11 @@ describe("diet plan version resolution", () => {
     expect(isDietPlanV2({ version: 2, meals: [], highlights: "" })).toBe(true);
     expect(isDietPlanV2({ version: 2, meals: [{ name: "broken" }], highlights: "" })).toBe(false);
   });
+
+  it("selects only resolved V1 plans for legacy consumers", () => {
+    expect(selectDietPlanV1(v1Plan)).toBe(v1Plan);
+    expect(selectDietPlanV1(plan)).toBeUndefined();
+  });
 });
 
 describe("V2 display derivation", () => {
@@ -83,5 +95,16 @@ describe("V2 display derivation", () => {
     expect(getDietPlanContentState(plan)).toBe("ready");
     expect(getDietPlanContentState({ ...plan, meals: [], highlights: "" })).toBe("empty");
     expect(getDietPlanContentState({ ...plan, meals: [], highlights: "דגש" })).toBe("ready");
+  });
+
+  it("treats HTML-only V1 instructions and supplements as empty", () => {
+    expect(
+      getDietPlanContentState({
+        meals: [],
+        freeCalories: 0,
+        customInstructions: ["<p><br></p>"],
+        supplements: ["&nbsp;"],
+      })
+    ).toBe("empty");
   });
 });

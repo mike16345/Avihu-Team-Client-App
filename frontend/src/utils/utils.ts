@@ -6,6 +6,7 @@ import {
 } from "@/constants/Constants";
 import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
 import Constants from "expo-constants";
+export { isHtmlEmpty } from "./htmlUtils";
 
 export const testEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -333,15 +334,4 @@ export function isIndexOutOfBounds(arr: any[], index: number) {
   if (!Array.isArray(arr)) return true;
 
   return index < 0 || index >= arr.length;
-}
-
-export function isHtmlEmpty(html?: string | null): boolean {
-  if (!html) return true;
-
-  // Remove all HTML tags entirely
-  const strippedTags = html.replace(/<[^>]+>/g, "");
-  const strippedSpaces = strippedTags.replace(/&nbsp;/g, ""); // remove non-breaking spaces
-  const textOnly = strippedSpaces.replace(/\s+/g, ""); // remove all whitespace
-
-  return textOnly.length === 0;
 }
