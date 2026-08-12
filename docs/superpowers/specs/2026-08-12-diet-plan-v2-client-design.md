@@ -11,6 +11,23 @@ This milestone establishes truthful version-aware fetching and rendering. It int
 not define category-level consumption because the current V2 contract contains macros per meal,
 not per category.
 
+## Style 3 Restoration Addendum
+
+The production V2 presentation now uses `MyDietPlanScreenV3Preview` from commit
+`1e6c8792cf7ab3cfbb9ae00908d26896b4afe166` as its visual and interaction source. The historical
+mock plan and Smart Menu data are not restored. Real `IDietPlanV2` API data feeds the Style 3
+calorie ring, macro bars, tab bar, expandable meal cards, category rows, free-calorie row, and
+highlights.
+
+V2 completion state is persisted locally per plan and logical day. Category selections remain
+visual completion markers because the server contract still has macros only at meal level. Once
+all visible rows in a meal are selected, or the user presses “אכלתי הכל”, the whole meal becomes
+complete and its trainer-entered macros plus free calories contribute to the header. Undoing the
+completed meal removes the same values. Partial selections never fabricate category macro totals.
+
+This addendum supersedes the earlier read-only presentation constraint while preserving the API
+version boundary and every unresolved contract decision.
+
 ## Approved Implementation Order
 
 1. Remove obsolete V2 mock contracts, mock plans and catalogs, preview-only branches, fake populated
