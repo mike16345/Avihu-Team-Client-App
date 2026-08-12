@@ -4,6 +4,7 @@ import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
 import {
   computeDietPlanV2Totals,
   formatDietV2CategoryItems,
+  formatDietPlanV2Number,
   getDietPlanContentState,
   getVisibleDietV2Categories,
   isDietPlanV2,
@@ -95,6 +96,20 @@ describe("V2 display derivation", () => {
     });
   });
 
+  it("preserves a fractional daily target for display", () => {
+    const fractionalPlan: IDietPlanV2 = {
+      ...plan,
+      meals: [
+        {
+          ...plan.meals[0],
+          macros: { ...plan.meals[0].macros, calories: 448.5 },
+        },
+      ],
+    };
+
+    expect(formatDietPlanV2Number(computeDietPlanV2Totals(fractionalPlan).calories)).toBe("448.5");
+  });
+
   it("keeps literal item text and joins it with slashes", () => {
     expect(formatDietV2CategoryItems(plan.meals[0].categories[0])).toBe(
       "100 גרם חזה עוף / 2 ביצים"
@@ -160,5 +175,32 @@ describe("V2 display derivation", () => {
         supplements: ["&nbsp;"],
       })
     ).toBe("empty");
+  });
+
+  it("treats a V1 meal as meaningful content", () => {
+    expect(
+      getDietPlanContentState({
+        ...v1Plan,
+        meals: [
+          {
+            _id: "legacy-meal",
+            totalProtein: { quantity: 0, extraItems: [] },
+            totalCarbs: { quantity: 0, extraItems: [] },
+            totalVeggies: { quantity: 0, extraItems: [] },
+            totalFats: { quantity: 0, extraItems: [] },
+          },
+        ],
+      })
+    ).toBe("ready");
+  });
+
+  it("treats a nonempty V1 instruction as meaningful content", () => {
+    expect(getDietPlanContentState({ ...v1Plan, customInstructions: ["<p>לשתות מים</p>"] })).toBe(
+      "ready"
+    );
+  });
+
+  it("treats a nonempty V1 supplement as meaningful content", () => {
+    expect(getDietPlanContentState({ ...v1Plan, supplements: ["ויטמין D"] })).toBe("ready");
   });
 });

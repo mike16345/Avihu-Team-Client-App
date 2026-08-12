@@ -135,6 +135,9 @@ export const computeDietPlanV2Totals = (plan: IDietPlanV2): DietPlanV2Totals =>
     { calories: 0, protein: 0, carbs: 0, fat: 0, freeCalories: 0 }
   );
 
+export const formatDietPlanV2Number = (value: number): string =>
+  Object.is(value, -0) ? "0" : value.toString();
+
 export const getVisibleDietV2Categories = (meal: DietV2Meal): DietV2Category[] =>
   meal.categories.filter((category) => category.items.some(({ name }) => hasNonblankString(name)));
 
