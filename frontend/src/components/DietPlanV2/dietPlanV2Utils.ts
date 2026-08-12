@@ -140,6 +140,6 @@ export const getVisibleDietV2Categories = (meal: DietV2Meal): DietV2Category[] =
 
 export const formatDietV2CategoryItems = (category: DietV2Category): string =>
   category.items
-    .map(({ name }) => name)
+    .map(({ name }) => name.trim())
     .filter(hasNonblankString)
     .join(" / ");
