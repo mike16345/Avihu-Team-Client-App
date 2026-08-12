@@ -1,7 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
-import { DIET_V2_CARD_BORDER, DIET_V2_DARK, DIET_V2_MUTED } from "./dietV2Icons";
+import { DIET_V2_MUTED } from "./dietV2Icons";
 
 interface DietPlanV2HighlightsProps {
   highlights: string;
@@ -9,34 +9,42 @@ interface DietPlanV2HighlightsProps {
 
 const DietPlanV2Highlights = ({ highlights }: DietPlanV2HighlightsProps) => {
   const { spacing } = useStyles();
-  const displayText = highlights.trim().length > 0 ? highlights : "אין דגשים";
+  const lines = highlights
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (lines.length === 0) {
+    return (
+      <View style={[spacing.pdHorizontalMd, styles.empty]}>
+        <Text style={styles.emptyText}>אין דגשים</Text>
+      </View>
+    );
+  }
 
   return (
-    <View style={spacing.pdHorizontalMd}>
-      <View style={styles.card}>
-        <Text
-          fontSize={16}
-          style={[styles.text, highlights.trim().length === 0 && styles.emptyText]}
-        >
-          {displayText}
+    <View style={[spacing.pdHorizontalMd, styles.list]}>
+      {lines.map((line, index) => (
+        <Text key={`${index}-${line}`} fontSize={15} style={styles.line}>
+          {line}
         </Text>
-      </View>
+      ))}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: DIET_V2_CARD_BORDER,
-    borderRadius: 18,
-    padding: 20,
+  list: {
+    gap: 12,
   },
-  text: {
-    color: DIET_V2_DARK,
-    lineHeight: 25,
+  line: {
+    color: "#0B2A22",
+    lineHeight: 23,
     textAlign: "right",
+  },
+  empty: {
+    paddingVertical: 40,
+    alignItems: "center",
   },
   emptyText: {
     color: DIET_V2_MUTED,

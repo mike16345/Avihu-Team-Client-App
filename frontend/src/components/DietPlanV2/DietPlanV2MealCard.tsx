@@ -1,170 +1,203 @@
-import { Fragment, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import Icon from "@/components/Icon/Icon";
-import Collapsible from "@/components/ui/Collapsible";
+import { useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
+import Animated, { FadeInDown, FadeOutUp, LinearTransition } from "react-native-reanimated";
+import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import { Text } from "@/components/ui/Text";
 import type { DietV2Meal } from "@/interfaces/IDietPlanV2";
-import useStyles from "@/styles/useGlobalStyles";
+import { selectionHaptic } from "@/utils/haptics";
 import DietPlanV2CategoryRow from "./DietPlanV2CategoryRow";
 import DietPlanV2FreeCalories from "./DietPlanV2FreeCalories";
-import { DIET_V2_DARK, DIET_V2_GREEN, DIET_V2_MINT } from "./dietV2Icons";
-import { getVisibleDietV2Categories } from "./dietPlanV2Utils";
+import type { DietPlanV2MealCompletion } from "./dietPlanV2Consumption";
+import { formatDietPlanV2Number } from "./dietPlanV2Utils";
+import {
+  ChevronDownIcon,
+  DIET_V2_GREEN,
+  DIET_V2_MINT,
+  MoonIcon,
+  SunriseIcon,
+  SunIcon,
+} from "./dietV2Icons";
 
 interface DietPlanV2MealCardProps {
   meal: DietV2Meal;
   index: number;
+  completion?: DietPlanV2MealCompletion;
+  disabled?: boolean;
+  onToggleRow: (rowKey: string) => void;
+  onToggleMeal: () => void;
 }
 
-const DietPlanV2MealCard = ({ meal, index }: DietPlanV2MealCardProps) => {
-  const { layout, spacing } = useStyles();
+const MEAL_TIME_ICONS = [SunriseIcon, SunIcon, MoonIcon] as const;
+
+const DietPlanV2MealCard = ({
+  meal,
+  index,
+  completion,
+  disabled,
+  onToggleRow,
+  onToggleMeal,
+}: DietPlanV2MealCardProps) => {
   const [isCollapsed, setIsCollapsed] = useState(index !== 0);
-  const visibleCategories = getVisibleDietV2Categories(meal);
-  const displayName = meal.name.trim().length > 0 ? meal.name : `ארוחה ${index + 1}`;
+  const selectedRows = new Set(completion?.selectedRows ?? []);
+  const allConsumed = completion?.completed ?? false;
+  const displayName = meal.name.trim() || `ארוחה ${index + 1}`;
+  const MealTimeIcon = MEAL_TIME_ICONS[index % MEAL_TIME_ICONS.length];
 
   return (
-    <Collapsible
-      trigger={
-        <View style={styles.trigger}>
-          <View style={styles.triggerCopy}>
-            <Text fontSize={17} fontVariant="semibold" style={styles.mealName}>
-              {displayName}
-            </Text>
-            <View style={styles.badgeRow}>
-              <Text fontSize={12} style={styles.calorieBadge}>
-                {`${meal.macros.calories} קק״ל`}
-              </Text>
-              {meal.freeCalories && (
-                <Text fontSize={12} fontVariant="semibold" style={styles.freeBadge}>
-                  {`+ ${meal.freeCalories.calories} קק״ל חופשי`}
-                </Text>
-              )}
-            </View>
-          </View>
-          <Icon name="chevronDown" rotation={isCollapsed ? 0 : 180} />
-        </View>
-      }
-      variant="white"
-      isCollapsed={isCollapsed}
-      onCollapseChange={() => setIsCollapsed((current) => !current)}
-      style={styles.card}
+    <Animated.View
+      layout={LinearTransition.springify().damping(20).stiffness(180)}
+      style={[styles.card, allConsumed && styles.cardConsumed]}
     >
-      <View style={[layout.flex1, spacing.gapLg, styles.content]}>
-        <View style={styles.macrosRow}>
-          <View style={styles.macroItem}>
-            <Text fontSize={12} style={styles.macroLabel}>
-              קלוריות
-            </Text>
-            <Text fontSize={16} fontVariant="bold" style={styles.macroValue}>
-              {meal.macros.calories}
-            </Text>
-          </View>
-          <View style={styles.macroItem}>
-            <Text fontSize={12} style={styles.macroLabel}>
-              חלבון
-            </Text>
-            <Text fontSize={16} fontVariant="bold" style={styles.macroValue}>
-              {`${meal.macros.protein} גר׳`}
-            </Text>
-          </View>
-          <View style={styles.macroItem}>
-            <Text fontSize={12} style={styles.macroLabel}>
-              פחמימות
-            </Text>
-            <Text fontSize={16} fontVariant="bold" style={styles.macroValue}>
-              {`${meal.macros.carbs} גר׳`}
-            </Text>
-          </View>
-          <View style={styles.macroItem}>
-            <Text fontSize={12} style={styles.macroLabel}>
-              שומן
-            </Text>
-            <Text fontSize={16} fontVariant="bold" style={styles.macroValue}>
-              {`${meal.macros.fat} גר׳`}
-            </Text>
-          </View>
+      <Pressable
+        onPress={() => {
+          selectionHaptic();
+          setIsCollapsed((current) => !current);
+        }}
+        style={styles.header}
+      >
+        <View style={styles.iconCircle}>
+          <MealTimeIcon size={22} color={DIET_V2_GREEN} />
         </View>
-
-        <View>
-          {visibleCategories.map((category, categoryIndex) => (
-            <Fragment key={`${category.category}-${categoryIndex}`}>
-              {categoryIndex > 0 && <View style={styles.divider} />}
-              <DietPlanV2CategoryRow category={category} />
-            </Fragment>
-          ))}
+        <View style={styles.headerText}>
+          <Text fontSize={16} fontVariant="bold" style={styles.mealTitle}>
+            {displayName}
+          </Text>
+          <Text fontSize={12} style={styles.summary}>
+            {`${formatDietPlanV2Number(meal.macros.calories)} קק"ל   ·   ${formatDietPlanV2Number(meal.macros.protein)} ג' חלבון   ·   ${formatDietPlanV2Number(meal.macros.carbs)} ג' פחמימה   ·   ${formatDietPlanV2Number(meal.macros.fat)} ג' שומן`}
+          </Text>
+          {meal.freeCalories && (
+            <View style={styles.freeChip}>
+              <Text fontSize={11} fontVariant="bold" style={styles.freeChipLabel}>
+                {`+ ${formatDietPlanV2Number(meal.freeCalories.calories)} קק"ל חופשי`}
+              </Text>
+            </View>
+          )}
         </View>
+        <View style={[styles.chevron, !isCollapsed && styles.chevronExpanded]}>
+          <ChevronDownIcon size={20} color={DIET_V2_GREEN} />
+        </View>
+      </Pressable>
 
-        <DietPlanV2FreeCalories freeCalories={meal.freeCalories} />
-      </View>
-    </Collapsible>
+      {!isCollapsed && (
+        <Animated.View
+          entering={FadeInDown.duration(220).springify().damping(18).stiffness(160)}
+          exiting={FadeOutUp.duration(150)}
+          style={styles.body}
+        >
+          {meal.categories.map((category, categoryIndex) => {
+            if (!category.items.some(({ name }) => name.trim().length > 0)) return null;
+            const rowKey = `category:${category.category}:${categoryIndex}`;
+            return (
+              <DietPlanV2CategoryRow
+                key={rowKey}
+                category={category}
+                consumed={selectedRows.has(rowKey)}
+                disabled={disabled}
+                onToggle={() => onToggleRow(rowKey)}
+              />
+            );
+          })}
+
+          <DietPlanV2FreeCalories
+            freeCalories={meal.freeCalories}
+            consumed={selectedRows.has("free-calories")}
+            disabled={disabled}
+            onToggle={() => onToggleRow("free-calories")}
+          />
+
+          <PrimaryButton
+            style={styles.finishButton}
+            mode="dark"
+            disabled={disabled}
+            onPress={() => {
+              selectionHaptic();
+              onToggleMeal();
+            }}
+            block
+          >
+            {allConsumed ? "בטל סימון" : "אכלתי הכל"}
+          </PrimaryButton>
+        </Animated.View>
+      )}
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    padding: 0,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(15, 94, 59, 0.08)",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
     overflow: "hidden",
   },
-  trigger: {
+  cardConsumed: {
+    backgroundColor: "#F0FDF4",
+    borderColor: "#BBF7D0",
+  },
+  header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 18,
-    paddingVertical: 15,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    gap: 10,
+  },
+  iconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: DIET_V2_MINT,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerText: {
+    flex: 1,
+    alignItems: "flex-start",
+  },
+  mealTitle: {
+    color: "#0B2A22",
+    textAlign: "right",
+  },
+  summary: {
+    color: "#4B5563",
+    marginTop: 2,
+    textAlign: "right",
+  },
+  freeChip: {
+    marginTop: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: "#86EFAC",
+    backgroundColor: "#F0FDF4",
+  },
+  freeChipLabel: {
+    color: "#166534",
+  },
+  chevron: {
+    width: 22,
+    height: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  chevronExpanded: {
+    transform: [{ rotate: "180deg" }],
+  },
+  body: {
+    paddingTop: 4,
+    paddingBottom: 16,
+    paddingHorizontal: 14,
     gap: 12,
   },
-  triggerCopy: {
-    flex: 1,
-    gap: 7,
-  },
-  mealName: {
-    color: DIET_V2_DARK,
-  },
-  badgeRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: 8,
-  },
-  calorieBadge: {
-    color: "#4B5563",
-  },
-  freeBadge: {
-    color: DIET_V2_GREEN,
-    backgroundColor: DIET_V2_MINT,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    overflow: "hidden",
-  },
-  content: {
-    paddingHorizontal: 18,
-    paddingTop: 12,
-    paddingBottom: 20,
-  },
-  macrosRow: {
-    flexDirection: "row",
-    alignItems: "stretch",
-    backgroundColor: "#F7F8F9",
-    borderRadius: 14,
-    paddingVertical: 12,
-  },
-  macroItem: {
-    flex: 1,
-    alignItems: "center",
-    gap: 4,
-  },
-  macroLabel: {
-    color: "#6B7280",
-  },
-  macroValue: {
-    color: DIET_V2_DARK,
-    writingDirection: "ltr",
-    fontVariant: ["tabular-nums"],
-  },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-    marginVertical: 14,
+  finishButton: {
+    marginTop: 8,
   },
 });
 

@@ -138,6 +138,9 @@ export const computeDietPlanV2Totals = (plan: IDietPlanV2): DietPlanV2Totals =>
 export const formatDietPlanV2Number = (value: number): string =>
   Object.is(value, -0) ? "0" : value.toString();
 
+export const getDietPlanV2CalorieTarget = (totals: DietPlanV2Totals): number =>
+  totals.calories + totals.freeCalories;
+
 export const getVisibleDietV2Categories = (meal: DietV2Meal): DietV2Category[] =>
   meal.categories.filter((category) => category.items.some(({ name }) => hasNonblankString(name)));
 
