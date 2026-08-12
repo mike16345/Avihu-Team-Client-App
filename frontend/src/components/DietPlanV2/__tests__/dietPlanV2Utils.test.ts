@@ -56,9 +56,22 @@ describe("diet plan version resolution", () => {
     expect(resolveDietPlanVersion({ version: 3, meals: [] })).toBeNull();
   });
 
+  it.each([0, 1.5, 3, "1", "2", null])(
+    "never resolves malformed or unsupported version %j to V1",
+    (version) => {
+      expect(resolveDietPlanVersion({ version, meals: [] })).toBeNull();
+    }
+  );
+
   it("rejects a malformed V2 payload at the V2 type boundary", () => {
     expect(isDietPlanV2({ version: 2, meals: [], highlights: "" })).toBe(true);
     expect(isDietPlanV2({ version: 2, meals: [{ name: "broken" }], highlights: "" })).toBe(false);
+  });
+
+  it("accepts a displayable meal without an _id", () => {
+    const mealWithoutId = { ...plan.meals[0], _id: undefined };
+
+    expect(isDietPlanV2({ ...plan, meals: [mealWithoutId] })).toBe(true);
   });
 
   it("selects only resolved V1 plans for legacy consumers", () => {
@@ -84,10 +97,43 @@ describe("V2 display derivation", () => {
     );
   });
 
+  it("trims only the outside of long literal item strings", () => {
+    expect(
+      formatDietV2CategoryItems({
+        category: "protein",
+        items: [{ name: "  100 גרם חזה עוף בגריל עם תיבול לימון ושום  " }],
+      })
+    ).toBe("100 גרם חזה עוף בגריל עם תיבול לימון ושום");
+  });
+
   it("hides categories without item names", () => {
     expect(getVisibleDietV2Categories(plan.meals[0]).map(({ category }) => category)).toEqual([
       "protein",
     ]);
+  });
+
+  it("keeps a meal with empty categories and calorie data meaningful", () => {
+    const calorieOnlyPlan: IDietPlanV2 = {
+      ...plan,
+      meals: [
+        {
+          name: "ארוחה ללא פריטים",
+          categories: [],
+          macros: { calories: 320, protein: 20, carbs: 30, fat: 8 },
+          freeCalories: { calories: 75, description: "בחירה חופשית" },
+        },
+      ],
+    };
+
+    expect(isDietPlanV2(calorieOnlyPlan)).toBe(true);
+    expect(getDietPlanContentState(calorieOnlyPlan)).toBe("ready");
+    expect(computeDietPlanV2Totals(calorieOnlyPlan)).toEqual({
+      calories: 320,
+      protein: 20,
+      carbs: 30,
+      fat: 8,
+      freeCalories: 75,
+    });
   });
 
   it("detects meaningful V1 and V2 content", () => {
@@ -95,6 +141,10 @@ describe("V2 display derivation", () => {
     expect(getDietPlanContentState(plan)).toBe("ready");
     expect(getDietPlanContentState({ ...plan, meals: [], highlights: "" })).toBe("empty");
     expect(getDietPlanContentState({ ...plan, meals: [], highlights: "דגש" })).toBe("ready");
+  });
+
+  it("treats blank-only V2 highlights without meals as empty", () => {
+    expect(getDietPlanContentState({ ...plan, meals: [], highlights: " \n\t " })).toBe("empty");
   });
 
   it("treats HTML-only V1 instructions and supplements as empty", () => {
