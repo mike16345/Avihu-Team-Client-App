@@ -85,7 +85,7 @@ export const resolveDietPlanVersion = (plan: unknown): 1 | 2 | null => {
     return null;
   }
 
-  if (plan.version === undefined || plan.version === 1) {
+  if (!Object.prototype.hasOwnProperty.call(plan, "version") || plan.version === 1) {
     return 1;
   }
 

@@ -146,7 +146,8 @@ V2 components live under `frontend/src/components/DietPlanV2` and remain narrow 
   out with a concise explanation that its barcode/manual logging contract is deferred.
 - `DietPlanV2MealsList` renders the plan's meals.
 - `DietPlanV2MealCard` renders one expandable meal and its trainer-entered macros.
-- `DietPlanV2CategoryRow` renders a category label and literal item snapshots joined by `/`.
+- `DietPlanV2CategoryRow` renders a category label and literal item snapshots joined by the exact
+  separator string " / ".
 - `DietPlanV2FreeCalories` renders a meal's free-calorie amount and description separately from food
   categories.
 - `DietPlanV2Highlights` renders the plan-level plain string and a truthful empty state.
@@ -260,7 +261,7 @@ derivation logic. Tests must demonstrate:
 - an unsupported version is rejected;
 - V2 macro totals sum meal values correctly;
 - V2 free calories sum independently;
-- literal category item names format with `/`;
+- literal category item names format with the exact separator string " / ";
 - empty categories are excluded from display data;
 - V1 content detection still recognizes legacy meals, instructions, and supplements;
 - V2 content detection recognizes real meals and highlights; and
