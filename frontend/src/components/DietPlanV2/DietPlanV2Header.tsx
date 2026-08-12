@@ -2,7 +2,7 @@ import { Linking, Pressable, StyleSheet, View } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "@/components/ui/Text";
-import type { DietPlanV2Totals } from "./dietPlanV2Utils";
+import { formatDietPlanV2Number, type DietPlanV2Totals } from "./dietPlanV2Utils";
 import {
   DIET_V2_CARD_BORDER,
   DIET_V2_DARK,
@@ -52,7 +52,7 @@ const CalorieSummary = ({ target }: { target: number }) => (
         0
       </Text>
       <Text fontSize={11} style={styles.donutTarget}>
-        {`יעד ${Math.round(target)} קלוריות`}
+        {`יעד ${formatDietPlanV2Number(target)} קלוריות`}
       </Text>
     </View>
   </View>
@@ -64,7 +64,7 @@ const MacroTarget = ({ label, target }: MacroTargetProps) => (
       {label}
     </Text>
     <Text fontSize={18} fontVariant="bold" style={styles.ltrNumber}>
-      {`0 / ${target}`}
+      {`0 / ${formatDietPlanV2Number(target)}`}
     </Text>
     <View style={styles.macroBar} />
   </View>
@@ -124,7 +124,7 @@ const DietPlanV2Header = ({ totals }: DietPlanV2HeaderProps) => {
         {totals.freeCalories > 0 && (
           <View style={styles.freeAllowance}>
             <Text fontSize={13} fontVariant="semibold" style={styles.freeAllowanceText}>
-              {`מכסת קלוריות חופשיות · ${totals.freeCalories} קק״ל`}
+              {`מכסת קלוריות חופשיות · ${formatDietPlanV2Number(totals.freeCalories)} קק״ל`}
             </Text>
           </View>
         )}
