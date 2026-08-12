@@ -4,12 +4,14 @@ import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import MealsList from "./MealsList";
 import FoodGroupTabs from "./FoodGroupTabs";
+import HighlightsTab from "./HighlightsTab";
 import { TabItem, useTabs } from "@/hooks/useTabs";
 import Supplements from "./Supplements";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { isHtmlEmpty } from "@/utils/utils";
 
 const tabs: TabItem[] = [
+  { label: "דגשים", value: "דגשים", content: <HighlightsTab />, forceMount: true },
   {
     label: "הארוחות שלי",
     value: "הארוחות שלי",
@@ -30,7 +32,7 @@ const DietPlanContentTabs = () => {
     return hasSupplements ? tabs : tabs.filter((tab) => tab.value !== "תוספים");
   }, [data]);
 
-  const [selectedTab, setSelectedTab] = useState(tabs[0].label);
+  const [selectedTab, setSelectedTab] = useState("הארוחות שלי");
 
   const onTabChange = (value: string) => {
     setSelectedTab(value);
@@ -39,7 +41,7 @@ const DietPlanContentTabs = () => {
   const { tabTriggers, tabContent } = useTabs(filteredTabs);
 
   return (
-    <View style={[{ flex: 1 }]}>
+    <View>
       <Tabs
         horizontalPadding={spacing.pdHorizontalMd.paddingHorizontal}
         value={selectedTab}

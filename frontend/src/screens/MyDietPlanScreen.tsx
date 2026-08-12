@@ -1,16 +1,18 @@
+import { RefreshControl, ScrollView } from "react-native";
 import DietPlanContentTabs from "@/components/DietPlan/DietPlanContentTabs";
 import DietPlanScreenHeader from "@/components/DietPlan/DietPlanScreenHeader";
 import PlanPendingState from "@/components/ui/PlanPendingState";
 import DietPlanSkeleton from "@/components/ui/loaders/skeletons/DietPlanSkeleton";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import { useDailyDietReset } from "@/hooks/useDailyDietReset";
 import ErrorScreen from "@/screens/ErrorScreen";
 import useStyles from "@/styles/useGlobalStyles";
 import { isHtmlEmpty } from "@/utils/utils";
-import { View } from "react-native";
 
 const MyDietPlanScreen = () => {
   const { spacing, layout } = useStyles();
   const { data, error, isError, isFetching, isLoading, refetch } = useDietPlanQuery();
+  useDailyDietReset();
 
   const hasMeals = (data?.meals?.length ?? 0) > 0;
   const hasSupplements = !isHtmlEmpty(data?.supplements?.join("") || "");
@@ -35,10 +37,17 @@ const MyDietPlanScreen = () => {
   if (isLoading) return <DietPlanSkeleton />;
 
   return (
-    <View style={[spacing.gap34, spacing.pdStatusBar, spacing.pdBottomBar, layout.flex1]}>
+    <ScrollView
+      style={[layout.flex1]}
+      contentContainerStyle={[spacing.gap34, spacing.pdBottomBar, spacing.pdStatusBar]}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={isFetching} onRefresh={() => void refetch()} />
+      }
+    >
       <DietPlanScreenHeader />
       <DietPlanContentTabs />
-    </View>
+    </ScrollView>
   );
 };
 

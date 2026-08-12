@@ -13,6 +13,8 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
   itemHeight = 40,
   activeItemColor,
   inactiveItemColor,
+  dangerThreshold,
+  dangerColor,
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(
     data.findIndex((item) => String(item.value) == String(selectedValue))
@@ -108,29 +110,25 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
           })}
           data={data}
           keyExtractor={(_, index) => index?.toString()}
-          renderItem={({ item, index }) => (
-            <View
-              style={[
-                styles.item,
-                {
-                  height: itemHeight,
-                },
-              ]}
-            >
-              <Text
-                fontSize={24}
-                fontVariant="brutalist"
-                style={[
-                  index === selectedIndex
-                    ? { color: activeItemColor }
-                    : { color: inactiveItemColor },
-                  { direction: Platform.OS == "android" ? "ltr" : "rtl" },
-                ]}
-              >
-                {item.value}
-              </Text>
-            </View>
-          )}
+          renderItem={({ item, index }) => {
+            const isOver =
+              dangerThreshold != null &&
+              typeof item.value === "number" &&
+              item.value > dangerThreshold;
+            const baseColor = index === selectedIndex ? activeItemColor : inactiveItemColor;
+            const color = isOver && dangerColor ? dangerColor : baseColor;
+            return (
+              <View style={[styles.item, { height: itemHeight }]}>
+                <Text
+                  fontSize={24}
+                  fontVariant="brutalist"
+                  style={[{ color }, { direction: Platform.OS == "android" ? "ltr" : "rtl" }]}
+                >
+                  {item.value}
+                </Text>
+              </View>
+            );
+          }}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: (height - itemHeight) / 2 }}
         />
