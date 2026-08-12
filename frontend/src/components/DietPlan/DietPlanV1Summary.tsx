@@ -10,7 +10,7 @@ import Svg, {
 } from "react-native-svg";
 import { Text } from "../ui/Text";
 import { useDietServingsStore } from "@/store/dietServingsStore";
-import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 import { IMeal } from "@/interfaces/DietPlan";
 import { DIET_CALORIES_PER_SERVING } from "@/constants/dietCalories";
 import { DIET_V2_MUTED, DropIcon, SproutIcon, ChevronLeftIcon } from "../DietPlanV2/dietV2Icons";
@@ -213,7 +213,7 @@ const MacroColumn: React.FC<MacroCol & { width: number }> = ({
 
 const DietPlanV1Summary = () => {
   const consumed = useDietServingsStore();
-  const { data: plan } = useDietPlanQuery();
+  const { data: plan } = useDietPlanV1Query();
   const [rowW, setRowW] = useState(0);
 
   const meals: IMeal[] = plan?.meals ?? [];

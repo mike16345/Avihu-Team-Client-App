@@ -9,13 +9,12 @@ import {
 import PlanPendingState from "@/components/ui/PlanPendingState";
 import DietPlanSkeleton from "@/components/ui/loaders/skeletons/DietPlanSkeleton";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
-import type { AnyDietPlan } from "@/interfaces/DietPlanTypes";
 import ErrorScreen from "@/screens/ErrorScreen";
 import useStyles from "@/styles/useGlobalStyles";
 
 const MyDietPlanScreen = () => {
   const { spacing, layout } = useStyles();
-  const { data, error, isError, isFetching, isLoading, refetch } = useDietPlanQuery<AnyDietPlan>();
+  const { data, error, isError, isFetching, isLoading, refetch } = useDietPlanQuery();
   const errorStatus = (error as { status?: number } | null)?.status;
 
   if (errorStatus === 404) {

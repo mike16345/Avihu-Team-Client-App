@@ -4,7 +4,7 @@ import Svg, { Defs, LinearGradient as SvgLinearGradient, Stop, Rect } from "reac
 import { Text } from "../ui/Text";
 import WheelPicker from "../ui/WheelPicker";
 import { useDietServingsStore } from "@/store/dietServingsStore";
-import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 import { IMeal } from "@/interfaces/DietPlan";
 import {
   SproutIcon,
@@ -289,7 +289,7 @@ const ConfirmButton: React.FC<{ onPress: () => void }> = ({ onPress }) => {
 };
 
 const ServingsTracker = () => {
-  const { data: plan } = useDietPlanQuery();
+  const { data: plan } = useDietPlanV1Query();
   const meals: IMeal[] = plan?.meals ?? [];
   const targets: Record<CatKey, number> = {
     protein: sumMealField(meals, "totalProtein"),

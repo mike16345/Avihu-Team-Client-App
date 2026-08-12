@@ -7,7 +7,7 @@ import FoodGroupTabs from "./FoodGroupTabs";
 import HighlightsTab from "./HighlightsTab";
 import { TabItem, useTabs } from "@/hooks/useTabs";
 import Supplements from "./Supplements";
-import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 import { isHtmlEmpty } from "@/utils/utils";
 
 const tabs: TabItem[] = [
@@ -23,7 +23,7 @@ const tabs: TabItem[] = [
 ];
 
 const DietPlanContentTabs = () => {
-  const { data } = useDietPlanQuery();
+  const { data } = useDietPlanV1Query();
   const { spacing } = useStyles();
   const filteredTabs = useMemo(() => {
     if (!data) return [];

@@ -1,3 +1,4 @@
+import type { IDietPlan } from "@/interfaces/DietPlan";
 import type { AnyDietPlan } from "@/interfaces/DietPlanTypes";
 import {
   DIET_V2_MEAL_CATEGORIES,
@@ -6,6 +7,7 @@ import {
   type DietV2MealCategory,
   type IDietPlanV2,
 } from "@/interfaces/IDietPlanV2";
+import { isHtmlEmpty } from "@/utils/htmlUtils";
 
 export const DIET_V2_CATEGORY_LABELS: Record<DietV2MealCategory, string> = {
   protein: "חלבון",
@@ -100,6 +102,12 @@ export const isDietPlanV2 = (plan: unknown): plan is IDietPlanV2 =>
   plan.meals.every(isDietV2Meal) &&
   typeof plan.highlights === "string";
 
+export const isDietPlanV1 = (plan: AnyDietPlan): plan is IDietPlan =>
+  resolveDietPlanVersion(plan) === 1;
+
+export const selectDietPlanV1 = (plan: AnyDietPlan): IDietPlan | undefined =>
+  isDietPlanV1(plan) ? plan : undefined;
+
 export const getDietPlanContentState = (plan: AnyDietPlan): "empty" | "ready" => {
   if (plan.meals.length > 0) {
     return "ready";
@@ -109,8 +117,8 @@ export const getDietPlanContentState = (plan: AnyDietPlan): "empty" | "ready" =>
     return hasNonblankString(plan.highlights) ? "ready" : "empty";
   }
 
-  const hasInstructions = plan.customInstructions?.some(hasNonblankString) ?? false;
-  const hasSupplements = plan.supplements?.some(hasNonblankString) ?? false;
+  const hasInstructions = plan.customInstructions?.some((value) => !isHtmlEmpty(value)) ?? false;
+  const hasSupplements = plan.supplements?.some((value) => !isHtmlEmpty(value)) ?? false;
 
   return hasInstructions || hasSupplements ? "ready" : "empty";
 };
