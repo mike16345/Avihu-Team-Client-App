@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Fetch a trainee's real active diet plan, preserve the existing V1 experience, and render the stored V2 contract through a truthful read-only mobile UI with no preview or mock-plan behavior.
+**Goal:** Fetch a trainee's real active diet plan, preserve the existing V1 experience, and render the stored V2 contract through the approved Style 3 mobile UI with locally persisted whole-meal completion.
 
-**Architecture:** Keep the existing active-plan endpoint and React Query cache, type its response as a strict V1/V2 union, and resolve the stored version once in `MyDietPlanScreen`. Move the legacy serving/reset behavior behind a V1-only view and give V2 a separate prop-driven component tree that derives display totals from trainer-entered meal macros without creating consumption state.
+**Architecture:** Keep the existing active-plan endpoint and React Query cache, type its response as a strict V1/V2 union, and resolve the stored version once in `MyDietPlanScreen`. Move the legacy serving/reset behavior behind a V1-only view and give V2 a separate Style 3 component tree fed by real plan data. Persist plan-scoped completion locally and derive consumed totals only from fully completed meals.
 
 **Tech Stack:** Expo 53, React Native 0.79, React 19, TypeScript 5.8, TanStack Query 5, Zustand, React Native Reanimated, React Native SVG, Vitest.
 
@@ -13,7 +13,7 @@
 - The stored plan version is authoritative: missing or `1` is V1, `2` is V2, and every other value is unsupported.
 - Keep `GET /dietPlans/user?userId=<id>&populate=true`, the existing query key, one-day stale time, retry behavior, startup prefetch, and pull-to-refresh flow.
 - Do not convert V2 data into legacy serving fields or run V1 serving/reset/session behavior for V2.
-- V2 is read-only in this milestone. Do not add category tapping, `I ate everything`, consumed progress, or a V2 persistence store.
+- Restore Style 3 category tapping and `I ate everything`; only fully completed meals contribute their real meal-level macros to consumed progress.
 - Preserve the hydration, vegetable, and WhatsApp header prompts. Keep the current WhatsApp destination temporarily and mark its real trainer/subtrainer phone source as unresolved at the integration boundary.
 - Keep Smart Menu commented out with a concise reason; do not restore its historical mock implementation.
 - Render trainer-authored item names literally and join items within a category with `/`.
@@ -23,6 +23,19 @@
 - Follow `AGENTS.md`: focused files, path aliases, shared `Text`, theme/style hooks, no direct Axios outside the shared layer, and no opportunistic refactors.
 - Use test-first development for new contract and derivation behavior.
 - Baseline verification is `npm run typecheck` and `TZ=UTC npm run test:unit`. The unqualified unit command has one pre-existing New York timezone failure in `formPresets.test.ts`.
+
+---
+
+### Style 3 Restoration
+
+- [ ] Add pure RED/GREEN coverage for plan-scoped meal keys, trackable rows, whole-meal toggling,
+      and consumed totals.
+- [ ] Add a V2-only persisted completion store scoped by plan and logical day.
+- [ ] Adapt the Style 3 header, tabs, expandable cards, category rows, and free calories from commit
+      `1e6c8792cf7ab3cfbb9ae00908d26896b4afe166` to `IDietPlanV2`.
+- [ ] Keep Smart Menu disabled and preserve the current API-backed V1/V2 screen boundary.
+- [ ] Verify focused tests, the full UTC suite, TypeScript, changed-file Prettier, isolation, and Git
+      whitespace.
 
 ---
 
