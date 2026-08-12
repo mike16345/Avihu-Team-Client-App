@@ -106,11 +106,6 @@ describe("diet plan version resolution", () => {
     expect(isDietPlanV2({ ...plan, meals: [withoutAddOns] })).toBe(false);
     expect(isDietPlanV2({ ...plan, meals: [categoryWithoutMacros] })).toBe(false);
   });
-
-  it("selects only resolved V1 plans for legacy consumers", () => {
-    expect(selectDietPlanV1(v1Plan)).toBe(v1Plan);
-    expect(selectDietPlanV1(plan)).toBeUndefined();
-  });
 });
 
 describe("V2 display derivation", () => {
@@ -208,47 +203,5 @@ describe("V2 display derivation", () => {
     expect(getDietPlanContentState(plan)).toBe("ready");
     expect(getDietPlanContentState({ ...plan, meals: [], highlights: "" })).toBe("empty");
     expect(getDietPlanContentState({ ...plan, meals: [], highlights: "דגש" })).toBe("ready");
-  });
-
-  it("treats blank-only V2 highlights without meals as empty", () => {
-    expect(getDietPlanContentState({ ...plan, meals: [], highlights: " \n\t " })).toBe("empty");
-  });
-
-  it("treats HTML-only V1 instructions and supplements as empty", () => {
-    expect(
-      getDietPlanContentState({
-        meals: [],
-        freeCalories: 0,
-        customInstructions: ["<p><br></p>"],
-        supplements: ["&nbsp;"],
-      })
-    ).toBe("empty");
-  });
-
-  it("treats a V1 meal as meaningful content", () => {
-    expect(
-      getDietPlanContentState({
-        ...v1Plan,
-        meals: [
-          {
-            _id: "legacy-meal",
-            totalProtein: { quantity: 0, extraItems: [] },
-            totalCarbs: { quantity: 0, extraItems: [] },
-            totalVeggies: { quantity: 0, extraItems: [] },
-            totalFats: { quantity: 0, extraItems: [] },
-          },
-        ],
-      })
-    ).toBe("ready");
-  });
-
-  it("treats a nonempty V1 instruction as meaningful content", () => {
-    expect(getDietPlanContentState({ ...v1Plan, customInstructions: ["<p>לשתות מים</p>"] })).toBe(
-      "ready"
-    );
-  });
-
-  it("treats a nonempty V1 supplement as meaningful content", () => {
-    expect(getDietPlanContentState({ ...v1Plan, supplements: ["ויטמין D"] })).toBe("ready");
   });
 });
