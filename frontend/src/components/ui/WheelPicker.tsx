@@ -115,18 +115,14 @@ const WheelPicker: React.FC<WheelPickerProps> = ({
               dangerThreshold != null &&
               typeof item.value === "number" &&
               item.value > dangerThreshold;
-            const baseColor =
-              index === selectedIndex ? activeItemColor : inactiveItemColor;
+            const baseColor = index === selectedIndex ? activeItemColor : inactiveItemColor;
             const color = isOver && dangerColor ? dangerColor : baseColor;
             return (
               <View style={[styles.item, { height: itemHeight }]}>
                 <Text
                   fontSize={24}
                   fontVariant="brutalist"
-                  style={[
-                    { color },
-                    { direction: Platform.OS == "android" ? "ltr" : "rtl" },
-                  ]}
+                  style={[{ color }, { direction: Platform.OS == "android" ? "ltr" : "rtl" }]}
                 >
                   {item.value}
                 </Text>

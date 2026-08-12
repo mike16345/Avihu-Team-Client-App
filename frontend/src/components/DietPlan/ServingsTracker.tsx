@@ -118,11 +118,7 @@ const WheelButton: React.FC<{
   over?: boolean;
 }> = ({ value, onPress, over }) => (
   <Pressable style={[styles.wheel, over && styles.wheelOver]} onPress={onPress}>
-    <Text
-      fontVariant="bold"
-      fontSize={16}
-      style={[styles.value, over && { color: RED_DARK }]}
-    >
+    <Text fontVariant="bold" fontSize={16} style={[styles.value, over && { color: RED_DARK }]}>
       {formatVal(value)}
     </Text>
     <View style={styles.wheelChevron}>
@@ -272,16 +268,10 @@ const ConfirmButton: React.FC<{ onPress: () => void }> = ({ onPress }) => {
     <Pressable
       style={styles.confirmBtn}
       onPress={onPress}
-      onLayout={(e) =>
-        setDims({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })
-      }
+      onLayout={(e) => setDims({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height })}
     >
       {dims.w > 0 && (
-        <Svg
-          width={dims.w}
-          height={dims.h}
-          style={[StyleSheet.absoluteFill, { borderRadius: 10 }]}
-        >
+        <Svg width={dims.w} height={dims.h} style={[StyleSheet.absoluteFill, { borderRadius: 10 }]}>
           <Defs>
             <SvgLinearGradient id="confirmGrad" x1="0" y1="0" x2="1" y2="0">
               <Stop offset="0" stopColor={GRAD_LIGHT} />
