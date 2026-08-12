@@ -6,6 +6,7 @@ import {
   formatDietV2CategoryItems,
   formatDietPlanV2Number,
   getDietPlanContentState,
+  getDietPlanV2CalorieTarget,
   getVisibleDietV2Categories,
   isDietPlanV2,
   resolveDietPlanVersion,
@@ -94,6 +95,10 @@ describe("V2 display derivation", () => {
       fat: 22,
       freeCalories: 150,
     });
+  });
+
+  it("includes free calories in the Style 3 daily calorie target", () => {
+    expect(getDietPlanV2CalorieTarget(computeDietPlanV2Totals(plan))).toBe(1188);
   });
 
   it("preserves a fractional daily target for display", () => {
