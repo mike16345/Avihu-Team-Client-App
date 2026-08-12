@@ -6,6 +6,7 @@ import {
 } from "@/constants/Constants";
 import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
 import Constants from "expo-constants";
+export { isHtmlEmpty } from "./htmlUtils";
 import { encodeCloudFrontPath } from "./imageUrls";
 export { isHtmlEmpty } from "./htmlUtils";
 
