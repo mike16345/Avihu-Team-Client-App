@@ -13,7 +13,6 @@ import {
   isDietPlanV2,
   resolveDietPlanVersion,
   selectDietPlanV1,
-  selectDietPlanV1,
 } from "../dietPlanV2Utils";
 
 const v1Plan: IDietPlan = {
