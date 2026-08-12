@@ -35,11 +35,6 @@ const DietPlanV2Tabs = ({
   const [selectedTab, setSelectedTab] = useState("הארוחות שלי");
   const tabs: TabItem[] = [
     {
-      label: "דגשים",
-      value: "דגשים",
-      content: <DietPlanV2Highlights highlights={plan.highlights} />,
-    },
-    {
       label: "הארוחות שלי",
       value: "הארוחות שלי",
       content: (
@@ -54,33 +49,40 @@ const DietPlanV2Tabs = ({
     },
     // Smart Menu stays disabled until barcode/manual logging has a real Server contract.
     // { label: "תפריט חכם", value: "תפריט חכם", content: <DietPlanV2SmartMenu /> },
+    {
+      label: "דגשים",
+      value: "דגשים",
+      content: <DietPlanV2Highlights highlights={plan.highlights} />,
+    },
   ];
   const activeTab = tabs.find(({ value }) => value === selectedTab) ?? tabs[0];
 
   return (
-    <View style={styles.content}>
-      <View style={[spacing.pdHorizontalMd, styles.tabBar]}>
-        {tabs.map((tab) => {
-          const active = tab.value === selectedTab;
-          return (
-            <Pressable
-              key={tab.value}
-              onPress={() => {
-                selectionHaptic();
-                setSelectedTab(tab.value);
-              }}
-              style={[styles.tab, active && styles.tabActive]}
-            >
-              <Text
-                fontVariant={active ? "semibold" : "medium"}
-                fontSize={13}
-                style={active ? styles.labelActive : styles.labelIdle}
+    <View style={[styles.content]}>
+      <View style={[spacing.pdHorizontalMd]}>
+        <View style={[styles.tabBar]}>
+          {tabs.map((tab) => {
+            const active = tab.value === selectedTab;
+            return (
+              <Pressable
+                key={tab.value}
+                onPress={() => {
+                  selectionHaptic();
+                  setSelectedTab(tab.value);
+                }}
+                style={[styles.tab, active && styles.tabActive]}
               >
-                {tab.label}
-              </Text>
-            </Pressable>
-          );
-        })}
+                <Text
+                  fontVariant={active ? "semibold" : "medium"}
+                  fontSize={13}
+                  style={active ? styles.labelActive : styles.labelIdle}
+                >
+                  {tab.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
       <Animated.View key={selectedTab} entering={FadeIn.duration(220)}>
         {activeTab.content}
