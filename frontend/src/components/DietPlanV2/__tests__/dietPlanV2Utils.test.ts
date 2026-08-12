@@ -48,6 +48,10 @@ describe("diet plan version resolution", () => {
     expect(resolveDietPlanVersion({ version: 1, meals: [] })).toBe(1);
   });
 
+  it("rejects an explicit undefined version instead of treating it as legacy V1", () => {
+    expect(resolveDietPlanVersion({ version: undefined, meals: [] })).toBeNull();
+  });
+
   it("selects V2 only for literal version 2", () => {
     expect(resolveDietPlanVersion(plan)).toBe(2);
   });
