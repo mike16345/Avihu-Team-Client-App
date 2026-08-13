@@ -6,9 +6,10 @@ import { Text } from "@/components/ui/Text";
 import type { DietV2Meal } from "@/interfaces/IDietPlanV2";
 import { selectionHaptic } from "@/utils/haptics";
 import DietPlanV2CategoryRow from "./DietPlanV2CategoryRow";
+import DietPlanV2AddOns from "./DietPlanV2AddOns";
 import DietPlanV2FreeCalories from "./DietPlanV2FreeCalories";
 import type { DietPlanV2MealCompletion } from "./dietPlanV2Consumption";
-import { formatDietPlanV2Number } from "./dietPlanV2Utils";
+import { deriveDietPlanV2MealMacros, formatDietPlanV2Number } from "./dietPlanV2Utils";
 import {
   ChevronDownIcon,
   DIET_V2_GREEN,
@@ -41,6 +42,7 @@ const DietPlanV2MealCard = ({
   const selectedRows = new Set(completion?.selectedRows ?? []);
   const allConsumed = completion?.completed ?? false;
   const displayName = meal.name.trim() || `ארוחה ${index + 1}`;
+  const macros = deriveDietPlanV2MealMacros(meal);
   const MealTimeIcon = MEAL_TIME_ICONS[index % MEAL_TIME_ICONS.length];
 
   return (
@@ -63,7 +65,7 @@ const DietPlanV2MealCard = ({
             {displayName}
           </Text>
           <Text fontSize={12} style={styles.summary}>
-            {`${formatDietPlanV2Number(meal.macros.calories)} קק"ל   ·   ${formatDietPlanV2Number(meal.macros.protein)} ג' חלבון   ·   ${formatDietPlanV2Number(meal.macros.carbs)} ג' פחמימה   ·   ${formatDietPlanV2Number(meal.macros.fat)} ג' שומן`}
+            {`${formatDietPlanV2Number(macros.calories)} קק"ל   ·   ${formatDietPlanV2Number(macros.protein)} ג' חלבון   ·   ${formatDietPlanV2Number(macros.carbs)} ג' פחמימה   ·   ${formatDietPlanV2Number(macros.fat)} ג' שומן`}
           </Text>
           {meal.freeCalories && (
             <View style={styles.freeChip}>
@@ -97,6 +99,8 @@ const DietPlanV2MealCard = ({
               />
             );
           })}
+
+          <DietPlanV2AddOns addOns={meal.addOns} />
 
           <DietPlanV2FreeCalories
             freeCalories={meal.freeCalories}

@@ -14,7 +14,6 @@ export const DIET_V2_CATEGORY_LABELS: Record<DietV2MealCategory, string> = {
   carbs: "פחמימה",
   fat: "שומן",
   vegetables: "ירקות",
-  addon: "תוספות",
 };
 
 export interface DietPlanV2Totals {
@@ -48,9 +47,16 @@ const isDietV2Category = (value: unknown): value is DietV2Category => {
     return false;
   }
 
-  return value.items.every(
+  const hasValidItems = value.items.every(
     (item) =>
       isRecord(item) && typeof item.name === "string" && isOptionalString(item.catalogItemId)
+  );
+
+  return (
+    hasValidItems &&
+    (value.items.length === 0
+      ? value.macros === undefined || hasValidMacros(value.macros)
+      : hasValidMacros(value.macros))
   );
 };
 
@@ -71,6 +77,11 @@ const isDietV2Meal = (value: unknown): value is DietV2Meal =>
   typeof value.name === "string" &&
   Array.isArray(value.categories) &&
   value.categories.every(isDietV2Category) &&
+  Array.isArray(value.addOns) &&
+  value.addOns.every(
+    (item) =>
+      isRecord(item) && typeof item.name === "string" && isOptionalString(item.catalogItemId)
+  ) &&
   hasValidMacros(value.macros) &&
   hasValidFreeCalories(value.freeCalories) &&
   (value.supplements === undefined || isStringArray(value.supplements));
@@ -125,13 +136,16 @@ export const getDietPlanContentState = (plan: AnyDietPlan): "empty" | "ready" =>
 
 export const computeDietPlanV2Totals = (plan: IDietPlanV2): DietPlanV2Totals =>
   plan.meals.reduce<DietPlanV2Totals>(
-    (totals, meal) => ({
-      calories: totals.calories + getFiniteValue(meal.macros.calories),
-      protein: totals.protein + getFiniteValue(meal.macros.protein),
-      carbs: totals.carbs + getFiniteValue(meal.macros.carbs),
-      fat: totals.fat + getFiniteValue(meal.macros.fat),
-      freeCalories: totals.freeCalories + getFiniteValue(meal.freeCalories?.calories ?? 0),
-    }),
+    (totals, meal) => {
+      const mealMacros = deriveDietPlanV2MealMacros(meal);
+      return {
+        calories: totals.calories + mealMacros.calories,
+        protein: totals.protein + mealMacros.protein,
+        carbs: totals.carbs + mealMacros.carbs,
+        fat: totals.fat + mealMacros.fat,
+        freeCalories: totals.freeCalories + getFiniteValue(meal.freeCalories?.calories ?? 0),
+      };
+    },
     { calories: 0, protein: 0, carbs: 0, fat: 0, freeCalories: 0 }
   );
 
@@ -149,3 +163,26 @@ export const formatDietV2CategoryItems = (category: DietV2Category): string =>
     .map(({ name }) => name.trim())
     .filter(hasNonblankString)
     .join(" / ");
+
+export const formatDietV2Items = (items: DietV2Category["items"]): string =>
+  items
+    .map(({ name }) => name.trim())
+    .filter(hasNonblankString)
+    .join(" / ");
+
+export const deriveDietPlanV2MealMacros = (meal: DietV2Meal) =>
+  meal.categories.reduce(
+    (totals, category) => {
+      if (!category.items.some(({ name }) => hasNonblankString(name)) || !category.macros) {
+        return totals;
+      }
+
+      return {
+        calories: totals.calories + getFiniteValue(category.macros.calories),
+        protein: totals.protein + getFiniteValue(category.macros.protein),
+        carbs: totals.carbs + getFiniteValue(category.macros.carbs),
+        fat: totals.fat + getFiniteValue(category.macros.fat),
+      };
+    },
+    { calories: 0, protein: 0, carbs: 0, fat: 0 }
+  );

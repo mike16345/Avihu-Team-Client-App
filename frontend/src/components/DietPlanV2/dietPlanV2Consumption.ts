@@ -106,14 +106,28 @@ export const computeDietPlanV2ConsumedTotals = (
 ): DietPlanV2Totals =>
   plan.meals.reduce<DietPlanV2Totals>(
     (totals, meal, index) => {
-      if (!completion[getDietPlanV2MealKey(meal, index)]?.completed) return totals;
+      const selected = new Set(completion[getDietPlanV2MealKey(meal, index)]?.selectedRows ?? []);
+      const categoryTotals = meal.categories.reduce(
+        (mealTotals, category, categoryIndex) => {
+          const rowKey = `category:${category.category}:${categoryIndex}`;
+          if (!selected.has(rowKey) || !category.macros) return mealTotals;
 
-      const freeCalories = meal.freeCalories?.calories ?? 0;
+          return {
+            calories: mealTotals.calories + category.macros.calories,
+            protein: mealTotals.protein + category.macros.protein,
+            carbs: mealTotals.carbs + category.macros.carbs,
+            fat: mealTotals.fat + category.macros.fat,
+          };
+        },
+        { calories: 0, protein: 0, carbs: 0, fat: 0 }
+      );
+      const freeCalories = selected.has("free-calories") ? (meal.freeCalories?.calories ?? 0) : 0;
+
       return {
-        calories: totals.calories + meal.macros.calories + freeCalories,
-        protein: totals.protein + meal.macros.protein,
-        carbs: totals.carbs + meal.macros.carbs,
-        fat: totals.fat + meal.macros.fat,
+        calories: totals.calories + categoryTotals.calories + freeCalories,
+        protein: totals.protein + categoryTotals.protein,
+        carbs: totals.carbs + categoryTotals.carbs,
+        fat: totals.fat + categoryTotals.fat,
         freeCalories: totals.freeCalories + freeCalories,
       };
     },
