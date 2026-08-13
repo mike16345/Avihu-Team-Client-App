@@ -23,16 +23,32 @@ const plan: IDietPlanV2 = {
       _id: "meal-1",
       name: "ארוחה 1",
       categories: [
-        { category: "protein", items: [{ name: "100 גרם חזה עוף" }] },
-        { category: "carbs", items: [{ name: "200 גרם אורז" }] },
+        {
+          category: "protein",
+          items: [{ name: "100 גרם חזה עוף" }],
+          macros: { calories: 200, protein: 25, carbs: 0, fat: 4 },
+        },
+        {
+          category: "carbs",
+          items: [{ name: "200 גרם אורז" }],
+          macros: { calories: 248.5, protein: 0, carbs: 45, fat: 8 },
+        },
         { category: "vegetables", items: [] },
       ],
+      addOns: [{ name: "קפה" }],
       macros: { calories: 448.5, protein: 25, carbs: 45, fat: 12 },
       freeCalories: { calories: 150, description: "פרי / חטיף" },
     },
     {
       name: "ארוחה 2",
-      categories: [{ category: "protein", items: [{ name: "טונה" }] }],
+      categories: [
+        {
+          category: "protein",
+          items: [{ name: "טונה" }],
+          macros: { calories: 300, protein: 30, carbs: 0, fat: 5 },
+        },
+      ],
+      addOns: [],
       macros: { calories: 300, protein: 30, carbs: 0, fat: 5 },
     },
   ],
@@ -61,7 +77,7 @@ describe("V2 meal completion", () => {
     ]);
   });
 
-  it("keeps a partial category selection visual without adding meal macros", () => {
+  it("adds only the selected category macros for partial completion", () => {
     const mealKey = getDietPlanV2MealKey(plan.meals[0], 0);
     const rows = getDietPlanV2TrackableRows(plan.meals[0]);
     const completion = toggleDietPlanV2Row({}, mealKey, rows[0], rows);
@@ -71,10 +87,10 @@ describe("V2 meal completion", () => {
       completed: false,
     });
     expect(computeDietPlanV2ConsumedTotals(plan, completion)).toEqual({
-      calories: 0,
-      protein: 0,
+      calories: 200,
+      protein: 25,
       carbs: 0,
-      fat: 0,
+      fat: 4,
       freeCalories: 0,
     });
   });
@@ -109,16 +125,16 @@ describe("V2 meal completion", () => {
     expect(undone[mealKey]).toEqual({ selectedRows: [], completed: false });
   });
 
-  it("allows a macro-only meal to be completed from its whole-meal action", () => {
+  it("does not invent macros for a meal without populated categories", () => {
     const macroOnlyPlan: IDietPlanV2 = {
       ...plan,
-      meals: [{ ...plan.meals[1], categories: [] }],
+      meals: [{ ...plan.meals[1], categories: [], addOns: [] }],
     };
     const mealKey = getDietPlanV2MealKey(macroOnlyPlan.meals[0], 0);
     const completion = toggleDietPlanV2Meal({}, mealKey, []);
 
     expect(completion[mealKey]?.completed).toBe(true);
-    expect(computeDietPlanV2ConsumedTotals(macroOnlyPlan, completion).calories).toBe(300);
+    expect(computeDietPlanV2ConsumedTotals(macroOnlyPlan, completion).calories).toBe(0);
   });
 
   it("does not keep a meal complete after the trainer adds another row", () => {

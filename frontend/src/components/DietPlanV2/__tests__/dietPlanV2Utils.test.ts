@@ -29,16 +29,25 @@ const plan: IDietPlanV2 = {
         {
           category: "protein",
           items: [{ name: "100 גרם חזה עוף" }, { name: "2 ביצים" }],
+          macros: { calories: 448, protein: 25, carbs: 45, fat: 12 },
         },
         { category: "vegetables", items: [] },
       ],
+      addOns: [{ name: "קפה" }],
       macros: { calories: 448, protein: 25, carbs: 45, fat: 12 },
       freeCalories: { calories: 150, description: "פרי / חטיף / כף ממרח" },
     },
     {
       _id: "meal-2",
       name: "ארוחה 2",
-      categories: [{ category: "carbs", items: [{ name: "200 גרם אורז" }] }],
+      categories: [
+        {
+          category: "carbs",
+          items: [{ name: "200 גרם אורז" }],
+          macros: { calories: 590, protein: 40, carbs: 60, fat: 10 },
+        },
+      ],
+      addOns: [],
       macros: { calories: 590, protein: 40, carbs: 60, fat: 10 },
     },
   ],
@@ -80,6 +89,19 @@ describe("diet plan version resolution", () => {
     expect(isDietPlanV2({ ...plan, meals: [mealWithoutId] })).toBe(true);
   });
 
+  it("requires add-ons and complete macros for every populated category", () => {
+    const withoutAddOns = { ...plan.meals[0], addOns: undefined };
+    const categoryWithoutMacros = {
+      ...plan.meals[0],
+      categories: plan.meals[0].categories.map((category) =>
+        category.category === "protein" ? { ...category, macros: undefined } : category
+      ),
+    };
+
+    expect(isDietPlanV2({ ...plan, meals: [withoutAddOns] })).toBe(false);
+    expect(isDietPlanV2({ ...plan, meals: [categoryWithoutMacros] })).toBe(false);
+  });
+
   it("selects only resolved V1 plans for legacy consumers", () => {
     expect(selectDietPlanV1(v1Plan)).toBe(v1Plan);
     expect(selectDietPlanV1(plan)).toBeUndefined();
@@ -107,7 +129,11 @@ describe("V2 display derivation", () => {
       meals: [
         {
           ...plan.meals[0],
-          macros: { ...plan.meals[0].macros, calories: 448.5 },
+          categories: plan.meals[0].categories.map((category) =>
+            category.category === "protein"
+              ? { ...category, macros: { ...category.macros!, calories: 448.5 } }
+              : category
+          ),
         },
       ],
     };
@@ -136,14 +162,15 @@ describe("V2 display derivation", () => {
     ]);
   });
 
-  it("keeps a meal with empty categories and calorie data meaningful", () => {
+  it("keeps a meal with only free calories meaningful", () => {
     const calorieOnlyPlan: IDietPlanV2 = {
       ...plan,
       meals: [
         {
           name: "ארוחה ללא פריטים",
           categories: [],
-          macros: { calories: 320, protein: 20, carbs: 30, fat: 8 },
+          addOns: [],
+          macros: { calories: 0, protein: 0, carbs: 0, fat: 0 },
           freeCalories: { calories: 75, description: "בחירה חופשית" },
         },
       ],
@@ -152,10 +179,10 @@ describe("V2 display derivation", () => {
     expect(isDietPlanV2(calorieOnlyPlan)).toBe(true);
     expect(getDietPlanContentState(calorieOnlyPlan)).toBe("ready");
     expect(computeDietPlanV2Totals(calorieOnlyPlan)).toEqual({
-      calories: 320,
-      protein: 20,
-      carbs: 30,
-      fat: 8,
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
       freeCalories: 75,
     });
   });

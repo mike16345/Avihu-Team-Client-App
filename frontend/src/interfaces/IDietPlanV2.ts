@@ -1,4 +1,4 @@
-export const DIET_V2_MEAL_CATEGORIES = ["protein", "carbs", "fat", "vegetables", "addon"] as const;
+export const DIET_V2_MEAL_CATEGORIES = ["protein", "carbs", "fat", "vegetables"] as const;
 export type DietV2MealCategory = (typeof DIET_V2_MEAL_CATEGORIES)[number];
 
 export interface DietV2PlanItem {
@@ -9,6 +9,7 @@ export interface DietV2PlanItem {
 export interface DietV2Category {
   category: DietV2MealCategory;
   items: DietV2PlanItem[];
+  macros?: DietV2MealMacros;
 }
 
 export interface DietV2MealMacros {
@@ -27,6 +28,7 @@ export interface DietV2Meal {
   _id?: string;
   name: string;
   categories: DietV2Category[];
+  addOns: DietV2PlanItem[];
   macros: DietV2MealMacros;
   freeCalories?: DietV2FreeCalories;
   supplements?: string[];
