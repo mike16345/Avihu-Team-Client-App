@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, View } from "react-native";
+import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import type { DietV2FreeCalories as DietV2FreeCaloriesValue } from "@/interfaces/IDietPlanV2";
 import { selectionHaptic } from "@/utils/haptics";
@@ -33,11 +34,15 @@ const DietPlanV2FreeCalories = ({
           {`קלוריות חופשיות · ${formatDietPlanV2Number(freeCalories.calories)} קק"ל`}
         </Text>
         {consumed && (
-          <View style={styles.checkBadge}>
+          <Animated.View
+            entering={ZoomIn.duration(180).springify().damping(16)}
+            exiting={ZoomOut.duration(120)}
+            style={styles.checkBadge}
+          >
             <Text fontVariant="bold" fontSize={11} style={styles.checkLabel}>
               ✓ נאכל
             </Text>
-          </View>
+          </Animated.View>
         )}
       </View>
       <Text fontSize={15} style={[styles.description, consumed && styles.descriptionConsumed]}>

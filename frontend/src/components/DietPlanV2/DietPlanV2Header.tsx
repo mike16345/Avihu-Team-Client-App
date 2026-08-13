@@ -1,5 +1,16 @@
+import { useEffect, type ComponentProps, type ComponentType } from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
+import Animated, {
+  Easing,
+  FadeInUp,
+  FadeOutUp,
+  useAnimatedProps,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  type AnimateProps,
+} from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import { DIET_V2_GREEN, DIET_V2_MUTED, DropIcon, DrumstickIcon, SproutIcon } from "./dietV2Icons";
 import {
@@ -24,10 +35,64 @@ const RING_SIZE = 132;
 const RING_STROKE = 11;
 const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+const PROGRESS_DURATION = 420;
+const PROGRESS_EASING = Easing.out(Easing.cubic);
+const AnimatedCircle = Animated.createAnimatedComponent(Circle) as ComponentType<
+  AnimateProps<ComponentProps<typeof Circle>>
+>;
+
+const clampProgress = (consumed: number, target: number) =>
+  target > 0 ? Math.max(0, Math.min(1, consumed / target)) : 0;
+
+const AnimatedValue = ({ value, style }: { value: number; style: object }) => {
+  const formatted = formatDietPlanV2Number(value);
+
+  return (
+    <View style={styles.animatedValueClip}>
+      <Animated.View
+        key={formatted}
+        entering={FadeInUp.duration(190).easing(PROGRESS_EASING)}
+        exiting={FadeOutUp.duration(130).easing(PROGRESS_EASING)}
+      >
+        <Text fontVariant="bold" fontSize={28} style={style}>
+          {formatted}
+        </Text>
+      </Animated.View>
+    </View>
+  );
+};
+
+const AnimatedBarValue = ({ consumed, target }: { consumed: number; target: number }) => {
+  const label = `${formatDietPlanV2Number(consumed)} / ${formatDietPlanV2Number(target)} ג'`;
+
+  return (
+    <View style={styles.barValueClip}>
+      <Animated.View
+        key={label}
+        entering={FadeInUp.duration(180).easing(PROGRESS_EASING)}
+        exiting={FadeOutUp.duration(120).easing(PROGRESS_EASING)}
+      >
+        <Text fontSize={12} style={styles.barValue}>
+          {label}
+        </Text>
+      </Animated.View>
+    </View>
+  );
+};
 
 const CalorieRing = ({ consumed, target }: { consumed: number; target: number }) => {
-  const progress = target > 0 ? Math.max(0, Math.min(1, consumed / target)) : 0;
-  const offset = RING_CIRCUMFERENCE * (1 - progress);
+  const progress = useSharedValue(clampProgress(consumed, target));
+
+  useEffect(() => {
+    progress.value = withTiming(clampProgress(consumed, target), {
+      duration: PROGRESS_DURATION,
+      easing: PROGRESS_EASING,
+    });
+  }, [consumed, progress, target]);
+
+  const animatedProps = useAnimatedProps(() => ({
+    strokeDashoffset: RING_CIRCUMFERENCE * (1 - progress.value),
+  }));
 
   return (
     <View style={styles.ringWrap}>
@@ -40,7 +105,7 @@ const CalorieRing = ({ consumed, target }: { consumed: number; target: number })
           strokeWidth={RING_STROKE}
           fill="transparent"
         />
-        <Circle
+        <AnimatedCircle
           cx={RING_SIZE / 2}
           cy={RING_SIZE / 2}
           r={RING_RADIUS}
@@ -48,15 +113,13 @@ const CalorieRing = ({ consumed, target }: { consumed: number; target: number })
           strokeWidth={RING_STROKE}
           fill="transparent"
           strokeDasharray={`${RING_CIRCUMFERENCE} ${RING_CIRCUMFERENCE}`}
-          strokeDashoffset={offset}
+          animatedProps={animatedProps}
           strokeLinecap="round"
           transform={`rotate(-90 ${RING_SIZE / 2} ${RING_SIZE / 2})`}
         />
       </Svg>
       <View style={styles.ringCenter}>
-        <Text fontVariant="bold" fontSize={28} style={styles.ringValue}>
-          {formatDietPlanV2Number(consumed)}
-        </Text>
+        <AnimatedValue value={consumed} style={styles.ringValue} />
         <Text fontSize={12} style={styles.ringTarget}>
           {`${formatDietPlanV2Number(target)} קק"ל`}
         </Text>
@@ -66,7 +129,18 @@ const CalorieRing = ({ consumed, target }: { consumed: number; target: number })
 };
 
 const MacroBar = ({ label, consumed, target, Icon }: MacroBarProps) => {
-  const progress = target > 0 ? Math.max(0, Math.min(1, consumed / target)) : 0;
+  const progress = useSharedValue(clampProgress(consumed, target));
+
+  useEffect(() => {
+    progress.value = withTiming(clampProgress(consumed, target), {
+      duration: PROGRESS_DURATION,
+      easing: PROGRESS_EASING,
+    });
+  }, [consumed, progress, target]);
+
+  const fillStyle = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%`,
+  }));
 
   return (
     <View style={styles.bar}>
@@ -77,12 +151,10 @@ const MacroBar = ({ label, consumed, target, Icon }: MacroBarProps) => {
             {label}
           </Text>
         </View>
-        <Text fontSize={12} style={styles.barValue}>
-          {`${formatDietPlanV2Number(consumed)} / ${formatDietPlanV2Number(target)} ג'`}
-        </Text>
+        <AnimatedBarValue consumed={consumed} target={target} />
       </View>
       <View style={styles.track}>
-        <View style={[styles.fill, { width: `${progress * 100}%` }]} />
+        <Animated.View style={[styles.fill, fillStyle]} />
       </View>
     </View>
   );
@@ -130,6 +202,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  animatedValueClip: {
+    minWidth: 76,
+    height: 31,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
   ringValue: {
     color: "#0B2A22",
     lineHeight: 30,
@@ -168,6 +247,13 @@ const styles = StyleSheet.create({
     color: DIET_V2_MUTED,
     writingDirection: "ltr",
     fontVariant: ["tabular-nums"],
+  },
+  barValueClip: {
+    minWidth: 88,
+    height: 18,
+    alignItems: "flex-end",
+    justifyContent: "center",
+    overflow: "hidden",
   },
   track: {
     height: 8,
