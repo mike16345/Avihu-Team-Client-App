@@ -39,8 +39,11 @@ export const getDietPlanV2TrackableRows = (meal: DietV2Meal): string[] => {
       ? [`category:${category.category}:${index}`]
       : []
   );
+  const mealRows = meal.addOns.some(({ name }) => name.trim().length > 0)
+    ? [...categoryRows, "add-ons"]
+    : categoryRows;
 
-  return meal.freeCalories ? [...categoryRows, "free-calories"] : categoryRows;
+  return meal.freeCalories ? [...mealRows, "free-calories"] : mealRows;
 };
 
 export const reconcileDietPlanV2Completion = (

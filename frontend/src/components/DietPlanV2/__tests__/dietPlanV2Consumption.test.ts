@@ -69,12 +69,28 @@ describe("V2 meal completion", () => {
     expect(getDietPlanV2MealKey(plan.meals[1], 1)).toBe("meal-index:1");
   });
 
-  it("tracks visible categories and free calories without inventing empty rows", () => {
+  it("tracks visible categories, add-ons, and free calories without inventing empty rows", () => {
     expect(getDietPlanV2TrackableRows(plan.meals[0])).toEqual([
       "category:protein:0",
       "category:carbs:1",
+      "add-ons",
       "free-calories",
     ]);
+  });
+
+  it("lets add-ons participate in meal completion without inventing macros", () => {
+    const mealKey = getDietPlanV2MealKey(plan.meals[0], 0);
+    const rows = getDietPlanV2TrackableRows(plan.meals[0]);
+    const completion = toggleDietPlanV2Row({}, mealKey, "add-ons", rows);
+
+    expect(completion[mealKey]?.selectedRows).toEqual(["add-ons"]);
+    expect(computeDietPlanV2ConsumedTotals(plan, completion)).toEqual({
+      calories: 0,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+      freeCalories: 0,
+    });
   });
 
   it("adds only the selected category macros for partial completion", () => {

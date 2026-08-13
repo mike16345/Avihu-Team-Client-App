@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, View } from "react-native";
+import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import type { DietV2Category } from "@/interfaces/IDietPlanV2";
 import { selectionHaptic } from "@/utils/haptics";
@@ -30,11 +31,15 @@ const DietPlanV2CategoryRow = ({
         {DIET_V2_CATEGORY_LABELS[category.category]}
       </Text>
       {consumed && (
-        <View style={styles.checkBadge}>
+        <Animated.View
+          entering={ZoomIn.duration(180).springify().damping(16)}
+          exiting={ZoomOut.duration(120)}
+          style={styles.checkBadge}
+        >
           <Text fontVariant="bold" fontSize={11} style={styles.checkLabel}>
             ✓ נאכל
           </Text>
-        </View>
+        </Animated.View>
       )}
     </View>
     <Text fontSize={15} style={[styles.body, consumed && styles.bodyConsumed]}>

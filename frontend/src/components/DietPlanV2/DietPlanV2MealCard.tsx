@@ -100,7 +100,12 @@ const DietPlanV2MealCard = ({
             );
           })}
 
-          <DietPlanV2AddOns addOns={meal.addOns} />
+          <DietPlanV2AddOns
+            addOns={meal.addOns}
+            consumed={selectedRows.has("add-ons")}
+            disabled={disabled}
+            onToggle={() => onToggleRow("add-ons")}
+          />
 
           <DietPlanV2FreeCalories
             freeCalories={meal.freeCalories}
