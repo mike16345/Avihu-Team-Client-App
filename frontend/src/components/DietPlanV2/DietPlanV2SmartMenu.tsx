@@ -265,8 +265,8 @@ const styles = StyleSheet.create({
   },
   cardHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
   headerCopy: { flex: 1, gap: 3, alignItems: "flex-start" },
-  title: { color: DIET_V2_DARK, textAlign: "right" },
-  description: { color: DIET_V2_MUTED, textAlign: "right" },
+  title: { color: DIET_V2_DARK },
+  description: { color: DIET_V2_MUTED },
   iconCircle: {
     width: 44,
     height: 44,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8FAF9",
   },
   searchIcon: { width: 22, alignItems: "center" },
-  searchPlaceholder: { width: "100%", color: DIET_V2_MUTED, textAlign: "right" },
+  searchPlaceholder: { width: "100%", color: DIET_V2_MUTED },
   quickActions: { flexDirection: "row", gap: 8 },
   quickAction: {
     flex: 1,
@@ -335,9 +335,9 @@ const styles = StyleSheet.create({
     borderTopColor: "#EEF1EF",
   },
   entryCopy: { flex: 1, alignItems: "flex-start" },
-  entryName: { color: DIET_V2_DARK, textAlign: "right" },
-  entryMeta: { color: DIET_V2_MUTED, textAlign: "right" },
-  editLabel: { color: DIET_V2_GREEN, textAlign: "right", paddingTop: 2 },
+  entryName: { color: DIET_V2_DARK },
+  entryMeta: { color: DIET_V2_MUTED },
+  editLabel: { color: DIET_V2_GREEN, paddingTop: 2 },
   entryDot: { width: 9, height: 9, borderRadius: 5, backgroundColor: DIET_V2_GREEN },
   removeButton: {
     width: 28,

@@ -171,12 +171,10 @@ const styles = StyleSheet.create({
   },
   mealTitle: {
     color: "#0B2A22",
-    textAlign: "right",
   },
   summary: {
     color: "#4B5563",
     marginTop: 2,
-    textAlign: "right",
   },
   freeChip: {
     marginTop: 6,

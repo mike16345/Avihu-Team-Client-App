@@ -75,13 +75,11 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     color: DIET_V2_DARK,
-    textAlign: "right",
   },
   line: {
     flex: 1,
     color: DIET_V2_DARK,
     lineHeight: 24,
-    textAlign: "right",
   },
   tipRow: { width: "100%", flexDirection: "row", alignItems: "flex-start", gap: 10 },
   tipDot: {

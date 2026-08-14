@@ -76,11 +76,9 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "#0B2A22",
-    textAlign: "right",
   },
   description: {
     color: "#4B5563",
-    textAlign: "right",
     lineHeight: 22,
   },
   descriptionConsumed: {
