@@ -4,6 +4,7 @@ import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
 import {
   computeDietPlanV2Totals,
   formatDietV2CategoryItems,
+  formatDietPlanV2MealMacroSummary,
   formatDietPlanV2Number,
   getDietPlanContentState,
   getDietPlanV2CalorieTarget,
@@ -109,6 +110,12 @@ describe("diet plan version resolution", () => {
 });
 
 describe("V2 display derivation", () => {
+  it("formats the meal macro summary compactly for a single mobile line", () => {
+    expect(
+      formatDietPlanV2MealMacroSummary({ calories: 448.5, protein: 25, carbs: 45, fat: 12 })
+    ).toBe('448.5 קק"ל · 25 חלב׳ · 45 פחמ׳ · 12 ש׳');
+  });
+
   it("sums meal macros and free calories without merging them", () => {
     expect(computeDietPlanV2Totals(plan)).toEqual({
       calories: 1038,

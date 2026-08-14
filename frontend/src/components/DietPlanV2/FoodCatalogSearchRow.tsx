@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Image, Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import type { FoodCatalogProduct } from "@/interfaces/IFoodCatalog";
@@ -81,13 +81,9 @@ const FoodCatalogSearchRow = ({ product, index, onSelect }: FoodCatalogSearchRow
             </Text>
           ) : null}
         </View>
-        {product.imageUrl ? (
-          <Image source={{ uri: product.imageUrl }} resizeMode="cover" style={styles.image} />
-        ) : (
-          <View style={styles.imageFallback}>
-            <BarcodeIcon size={21} color={DIET_V2_GREEN} />
-          </View>
-        )}
+        <View style={styles.productIcon}>
+          <BarcodeIcon size={21} color={DIET_V2_GREEN} />
+        </View>
       </Pressable>
     </Animated.View>
   );
@@ -121,8 +117,7 @@ const styles = StyleSheet.create({
   brand: { color: DIET_V2_GREEN, paddingTop: 1 },
   meta: { color: DIET_V2_MUTED, paddingTop: 2 },
   serving: { color: DIET_V2_MUTED, paddingTop: 2, opacity: 0.8 },
-  image: { width: 54, height: 54, borderRadius: 12, backgroundColor: "#F2F4F3" },
-  imageFallback: {
+  productIcon: {
     width: 54,
     height: 54,
     borderRadius: 12,

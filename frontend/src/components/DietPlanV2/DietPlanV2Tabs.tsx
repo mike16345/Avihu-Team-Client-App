@@ -67,6 +67,7 @@ const DietPlanV2Tabs = ({
       content: (
         <DietPlanV2SmartMenu
           plan={plan}
+          completion={completion}
           entries={smartFoodEntries}
           isReady={smartFoodsReady}
           onRecord={onRecordSmartFood}
