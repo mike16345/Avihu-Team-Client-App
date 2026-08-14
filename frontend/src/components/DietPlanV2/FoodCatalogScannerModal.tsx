@@ -25,7 +25,13 @@ import {
   successNotificationHaptic,
 } from "@/utils/haptics";
 import { BarcodeIcon, DIET_V2_DARK, DIET_V2_GREEN } from "./dietV2Icons";
-import { getRemainingScanFeedbackMs } from "./foodCatalogScanner";
+import {
+  BARCODE_HOLD_DURATION_MS,
+  getRemainingScanFeedbackMs,
+  isBarcodeHoldReady,
+  updateBarcodeHoldCandidate,
+  type BarcodeHoldCandidate,
+} from "./foodCatalogScanner";
 
 interface FoodCatalogScannerModalProps {
   visible: boolean;
@@ -54,26 +60,45 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
   const [status, setStatus] = useState<ScannerStatus>("scanning");
   const [errorMessage, setErrorMessage] = useState("");
   const [torchEnabled, setTorchEnabled] = useState(false);
+  const [isHoldingBarcode, setIsHoldingBarcode] = useState(false);
+  const cameraRef = useRef<CameraView>(null);
   const scanLocked = useRef(false);
   const scanAttempt = useRef(0);
+  const holdCandidate = useRef<BarcodeHoldCandidate | null>(null);
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestedPermissionForOpen = useRef(false);
   const scanLineProgress = useSharedValue(0);
+  const holdProgress = useSharedValue(0);
+
+  const clearHoldCandidate = useCallback(() => {
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+    holdTimer.current = null;
+    holdCandidate.current = null;
+    setIsHoldingBarcode(false);
+    cancelAnimation(holdProgress);
+    holdProgress.value = 0;
+  }, [holdProgress]);
 
   const resetScanner = useCallback(() => {
     scanAttempt.current += 1;
     scanLocked.current = false;
+    clearHoldCandidate();
     setStatus("scanning");
     setErrorMessage("");
-  }, []);
+    void cameraRef.current?.resumePreview().catch(() => undefined);
+  }, [clearHoldCandidate]);
 
   useEffect(() => {
     if (!visible) {
       requestedPermissionForOpen.current = false;
+      clearHoldCandidate();
       return;
     }
     resetScanner();
     setTorchEnabled(false);
-  }, [resetScanner, visible]);
+  }, [clearHoldCandidate, resetScanner, visible]);
+
+  useEffect(() => () => clearHoldCandidate(), [clearHoldCandidate]);
 
   useEffect(() => {
     if (!visible || requestedPermissionForOpen.current) return;
@@ -99,23 +124,31 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
     transform: [{ translateY: interpolate(scanLineProgress.value, [0, 1], [-74, 74]) }],
   }));
 
+  const holdProgressStyle = useAnimatedStyle(() => ({
+    transform: [{ scaleX: holdProgress.value }],
+  }));
+
+  const holdGlowStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(holdProgress.value, [0, 0.65, 1], [0.08, 0.18, 0.3]),
+  }));
+
   const handleClose = () => {
     scanAttempt.current += 1;
+    clearHoldCandidate();
     selectionHaptic();
     onClose();
   };
 
-  const handleBarcode = useCallback(
-    async ({ data }: BarcodeScanningResult) => {
-      const barcode = data.trim();
-      if (scanLocked.current || barcode.length === 0) return;
-
+  const confirmBarcode = useCallback(
+    async (barcode: string) => {
       const startedAt = Date.now();
       const attempt = scanAttempt.current + 1;
       scanAttempt.current = attempt;
       scanLocked.current = true;
+      clearHoldCandidate();
       setStatus("looking-up");
       selectionHaptic();
+      await cameraRef.current?.pausePreview().catch(() => undefined);
 
       try {
         const result = await lookupBarcode(barcode);
@@ -134,7 +167,40 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
         void errorNotificationHaptic().catch(() => undefined);
       }
     },
-    [lookupBarcode, onProduct]
+    [clearHoldCandidate, lookupBarcode, onProduct]
+  );
+
+  const handleBarcode = useCallback(
+    ({ data }: BarcodeScanningResult) => {
+      const barcode = data.trim();
+      if (scanLocked.current || barcode.length === 0) return;
+
+      const now = Date.now();
+      const candidate = updateBarcodeHoldCandidate(holdCandidate.current, barcode, now);
+      const isNewHold = candidate.startedAt !== holdCandidate.current?.startedAt;
+      holdCandidate.current = candidate;
+
+      if (!isNewHold) return;
+
+      if (holdTimer.current) clearTimeout(holdTimer.current);
+      setIsHoldingBarcode(true);
+      cancelAnimation(holdProgress);
+      holdProgress.value = 0;
+      holdProgress.value = withTiming(1, {
+        duration: BARCODE_HOLD_DURATION_MS,
+        easing: Easing.out(Easing.cubic),
+      });
+
+      holdTimer.current = setTimeout(() => {
+        const current = holdCandidate.current;
+        if (!current || !isBarcodeHoldReady(current, Date.now())) {
+          clearHoldCandidate();
+          return;
+        }
+        void confirmBarcode(current.barcode);
+      }, BARCODE_HOLD_DURATION_MS);
+    },
+    [clearHoldCandidate, confirmBarcode, holdProgress]
   );
 
   const retry = () => {
@@ -149,6 +215,7 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
       <View style={styles.container}>
         {visible && permission?.granted ? (
           <CameraView
+            ref={cameraRef}
             style={StyleSheet.absoluteFill}
             facing="back"
             enableTorch={torchEnabled}
@@ -194,6 +261,19 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
               <View style={[styles.corner, styles.bottomLeft]} />
               {status === "scanning" ? (
                 <Animated.View style={[styles.scanLine, scanLineStyle]} />
+              ) : null}
+              {status === "scanning" && isHoldingBarcode ? (
+                <>
+                  <Animated.View style={[styles.holdGlow, holdGlowStyle]} />
+                  <Animated.View entering={FadeIn.duration(140)} style={styles.holdFeedback}>
+                    <Text fontVariant="semibold" fontSize={13} style={styles.holdLabel}>
+                      החזק יציב...
+                    </Text>
+                    <View style={styles.holdTrack}>
+                      <Animated.View style={[styles.holdFill, holdProgressStyle]} />
+                    </View>
+                  </Animated.View>
+                </>
               ) : null}
               {status === "looking-up" ? (
                 <View style={styles.lookupOverlay}>
@@ -248,10 +328,12 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
           {permission?.granted && status === "scanning" ? (
             <View style={styles.panelTextWrap}>
               <Text fontVariant="semibold" fontSize={15} style={styles.panelTitle}>
-                מקם את הברקוד בתוך המסגרת
+                {isHoldingBarcode ? "מעולה, המשך להחזיק יציב" : "מקם את הברקוד בתוך המסגרת"}
               </Text>
               <Text fontSize={12} style={styles.panelDescription}>
-                הזיהוי יתבצע אוטומטית
+                {isHoldingBarcode
+                  ? "נקלוט אותו לאחר רגע קצר"
+                  : "יש להחזיק את הברקוד במסגרת לרגע"}
               </Text>
             </View>
           ) : null}
@@ -340,6 +422,37 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 0 },
+  },
+  holdGlow: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: 4,
+    borderRadius: 24,
+    borderColor: "#5BE29B",
+    backgroundColor: "#5BE29B",
+  },
+  holdFeedback: {
+    position: "absolute",
+    left: 22,
+    right: 22,
+    bottom: 18,
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 14,
+    backgroundColor: "rgba(7, 17, 14, 0.78)",
+  },
+  holdLabel: { color: "#FFFFFF", textAlign: "center" },
+  holdTrack: {
+    height: 5,
+    overflow: "hidden",
+    borderRadius: 3,
+    backgroundColor: "rgba(255, 255, 255, 0.22)",
+  },
+  holdFill: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 3,
+    backgroundColor: "#5BE29B",
   },
   topRight: { top: 0, right: 0, borderTopWidth: 4, borderRightWidth: 4, borderTopRightRadius: 22 },
   topLeft: { top: 0, left: 0, borderTopWidth: 4, borderLeftWidth: 4, borderTopLeftRadius: 22 },
