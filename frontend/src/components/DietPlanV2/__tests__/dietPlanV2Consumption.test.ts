@@ -6,6 +6,7 @@ import {
   getDietPlanV2ContextKey,
   getDietPlanV2DayKey,
   getDietPlanV2MealKey,
+  getMillisecondsUntilDietPlanV2DayChange,
   getDietPlanV2TrackableRows,
   reconcileDietPlanV2Completion,
   toggleDietPlanV2Meal,
@@ -60,6 +61,13 @@ describe("V2 meal completion", () => {
     expect(getDietPlanV2DayKey(new Date("2026-08-12T03:00:00Z"))).toBe("2026-08-12");
     expect(getDietPlanV2ConsumptionStorageKey(plan, "2026-08-12")).toBe(
       "diet-plan-v2-consumption:plan:plan-1:2026-08-12"
+    );
+  });
+
+  it("schedules persisted daily state to roll over at the next 3am boundary", () => {
+    expect(getMillisecondsUntilDietPlanV2DayChange(new Date("2026-08-12T02:59:59Z"))).toBe(1_000);
+    expect(getMillisecondsUntilDietPlanV2DayChange(new Date("2026-08-12T03:00:01Z"))).toBe(
+      86_399_000
     );
   });
 

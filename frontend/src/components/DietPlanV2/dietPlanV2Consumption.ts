@@ -18,6 +18,15 @@ export const getDietPlanV2DayKey = (now = new Date()): string => {
   return `${year}-${month}-${day}`;
 };
 
+export const getMillisecondsUntilDietPlanV2DayChange = (now = new Date()): number => {
+  const nextBoundary = new Date(now);
+  nextBoundary.setHours(DAY_START_HOUR, 0, 0, 0);
+  if (nextBoundary.getTime() <= now.getTime()) {
+    nextBoundary.setDate(nextBoundary.getDate() + 1);
+  }
+  return nextBoundary.getTime() - now.getTime();
+};
+
 export const getDietPlanV2ContextKey = (plan: IDietPlanV2): string => {
   if (plan._id) return `plan:${plan._id}`;
   if (plan.userId) return `user:${plan.userId}`;

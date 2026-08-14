@@ -2,8 +2,10 @@ import "dotenv/config";
 import { ExpoConfig, ConfigContext } from "@expo/config";
 
 const APP_VERSION = "2.3.0";
+const CAMERA_PERMISSION =
+  "אפשר ל-$(PRODUCT_NAME) להשתמש במצלמה כדי לסרוק ברקודים ולצלם תמונות באפליקציה.";
 export default ({ config }: ConfigContext): ExpoConfig => {
-  const isDev = !!process.env.DEV_MODE;
+  const isDev = process.env.DEV_MODE === "true" || process.env.EXPO_PUBLIC_MODE === "development";
 
   return {
     ...config,
@@ -30,6 +32,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       "expo-background-task",
       [
+        "expo-camera",
+        {
+          cameraPermission: CAMERA_PERMISSION,
+          recordAudioAndroid: false,
+        },
+      ],
+      [
         "expo-build-properties",
         {
           android: {
@@ -43,7 +52,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         "expo-image-picker",
         {
-          cameraPermission: "Allow $(PRODUCT_NAME) to access the camera.",
+          cameraPermission: CAMERA_PERMISSION,
           photosPermission: "The app accesses your photos to let you share them with your friends.",
         },
       ],

@@ -11,6 +11,7 @@ import {
   toggleDietPlanV2Row,
   type DietPlanV2CompletionMap,
 } from "./dietPlanV2Consumption";
+import useDietPlanV2DayKey from "./useDietPlanV2DayKey";
 
 const readCompletion = async (storageKey: string): Promise<unknown> => {
   try {
@@ -22,7 +23,11 @@ const readCompletion = async (storageKey: string): Promise<unknown> => {
 };
 
 const useDietPlanV2Consumption = (plan: IDietPlanV2) => {
-  const storageKey = useMemo(() => getDietPlanV2ConsumptionStorageKey(plan), [plan]);
+  const dayKey = useDietPlanV2DayKey();
+  const storageKey = useMemo(
+    () => getDietPlanV2ConsumptionStorageKey(plan, dayKey),
+    [dayKey, plan]
+  );
   const [completion, setCompletion] = useState<DietPlanV2CompletionMap>({});
   const [isReady, setIsReady] = useState(false);
 
