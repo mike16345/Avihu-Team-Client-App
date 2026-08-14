@@ -1,27 +1,32 @@
 import { useMemo, useState } from "react";
-import { Alert, Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown, FadeOut, LinearTransition } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
-import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import { useFoodCatalogApi } from "@/hooks/api/useFoodCatalogApi";
 import type { FoodCatalogProduct } from "@/interfaces/IFoodCatalog";
+import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
 import useStyles from "@/styles/useGlobalStyles";
 import { selectionHaptic } from "@/utils/haptics";
 import FoodCatalogResultCard from "./FoodCatalogResultCard";
 import FoodCatalogScannerModal from "./FoodCatalogScannerModal";
+import SmartFoodDeleteModal from "./SmartFoodDeleteModal";
+import SmartFoodHistoryModal from "./SmartFoodHistoryModal";
 import { createSmartFoodEntryDraft, sumSmartFoodMacros, type SmartFoodEntry } from "./foodCatalog";
 import {
   BarcodeIcon,
+  ClockIcon,
   DIET_V2_CARD_BORDER,
   DIET_V2_DARK,
   DIET_V2_GREEN,
   DIET_V2_MINT,
   DIET_V2_MUTED,
+  SearchIcon,
   SparkleIcon,
 } from "./dietV2Icons";
 import { formatDietPlanV2Number } from "./dietPlanV2Utils";
 
 interface DietPlanV2SmartMenuProps {
+  plan: IDietPlanV2;
   entries: SmartFoodEntry[];
   isReady: boolean;
   onRecord: (entry: SmartFoodEntry) => void;
@@ -30,6 +35,7 @@ interface DietPlanV2SmartMenuProps {
 }
 
 const DietPlanV2SmartMenu = ({
+  plan,
   entries,
   isReady,
   onRecord,
@@ -41,6 +47,8 @@ const DietPlanV2SmartMenu = ({
   const [scannerOpen, setScannerOpen] = useState(false);
   const [product, setProduct] = useState<FoodCatalogProduct | null>(null);
   const [editingEntry, setEditingEntry] = useState<SmartFoodEntry | null>(null);
+  const [deleteEntry, setDeleteEntry] = useState<SmartFoodEntry | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const totals = useMemo(() => sumSmartFoodMacros(entries), [entries]);
   const editingDraft = useMemo(
     () => (editingEntry ? createSmartFoodEntryDraft(editingEntry) : null),
@@ -55,25 +63,18 @@ const DietPlanV2SmartMenu = ({
     });
   };
 
-  const confirmRemove = (entry: SmartFoodEntry) => {
+  const requestRemove = (entry: SmartFoodEntry) => {
     selectionHaptic();
-    Alert.alert("הסרת מוצר", `להסיר את \"${entry.name}\" מהרישומים של היום?`, [
-      { text: "ביטול", style: "cancel" },
-      {
-        text: "הסר",
-        style: "destructive",
-        onPress: () => {
-          onRemove(entry.id);
-          if (editingEntry?.id === entry.id) setEditingEntry(null);
-        },
-      },
-    ]);
+    setDeleteEntry(entry);
   };
 
   return (
     <View style={[spacing.pdHorizontalMd, styles.content]}>
       <View style={styles.addCard}>
         <View style={styles.cardHeader}>
+          <View style={styles.iconCircle}>
+            <SparkleIcon size={21} color={DIET_V2_GREEN} />
+          </View>
           <View style={styles.headerCopy}>
             <Text fontVariant="bold" fontSize={17} style={styles.title}>
               הוספה חכמה
@@ -82,26 +83,49 @@ const DietPlanV2SmartMenu = ({
               סרוק מוצר וקבל את הערכים התזונתיים אוטומטית
             </Text>
           </View>
-          <View style={styles.iconCircle}>
-            <SparkleIcon size={21} color={DIET_V2_GREEN} />
+        </View>
+
+        <View style={styles.searchWrap}>
+          <View style={styles.searchIcon}>
+            <SearchIcon size={17} color={DIET_V2_MUTED} />
+          </View>
+          <View style={styles.searchCopy}>
+            <Text fontSize={13} style={styles.searchPlaceholder}>
+              חפש מוצר שנסרק בעבר...
+            </Text>
           </View>
         </View>
 
-        <PrimaryButton
-          block
-          onPress={() => {
-            selectionHaptic();
-            setEditingEntry(null);
-            setScannerOpen(true);
-          }}
-        >
-          <View style={styles.scanButtonContent}>
-            <BarcodeIcon size={19} color="#FFFFFF" />
-            <Text fontVariant="bold" fontSize={16} style={styles.scanButtonLabel}>
+        <View style={styles.quickActions}>
+          <Pressable
+            style={styles.quickAction}
+            onPress={() => {
+              selectionHaptic();
+              setEditingEntry(null);
+              setScannerOpen(true);
+            }}
+          >
+            <BarcodeIcon size={17} color={DIET_V2_GREEN} />
+            <Text fontVariant="semibold" fontSize={12} style={styles.quickActionLabel}>
               סרוק ברקוד
             </Text>
-          </View>
-        </PrimaryButton>
+          </Pressable>
+          <Pressable
+            style={styles.quickAction}
+            onPress={() => {
+              selectionHaptic();
+              setHistoryOpen(true);
+            }}
+          >
+            <ClockIcon size={17} color={DIET_V2_GREEN} />
+            <Text fontVariant="semibold" fontSize={12} style={styles.quickActionLabel}>
+              היסטוריה
+            </Text>
+          </Pressable>
+        </View>
+        <Text fontSize={11} style={styles.searchHint}>
+          לא מצאת את המוצר? סרוק אותו כדי להוסיף אותו לרישומים.
+        </Text>
       </View>
 
       {product ? (
@@ -173,7 +197,7 @@ const DietPlanV2SmartMenu = ({
             layout={LinearTransition.duration(180)}
             style={styles.entryRow}
           >
-            <Pressable onPress={() => confirmRemove(entry)} hitSlop={8} style={styles.removeButton}>
+            <Pressable onPress={() => requestRemove(entry)} hitSlop={8} style={styles.removeButton}>
               <Text fontVariant="bold" fontSize={16} style={styles.removeLabel}>
                 ×
               </Text>
@@ -210,6 +234,21 @@ const DietPlanV2SmartMenu = ({
           setScannerOpen(false);
         }}
       />
+      <SmartFoodHistoryModal
+        visible={historyOpen}
+        plan={plan}
+        currentEntries={entries}
+        onClose={() => setHistoryOpen(false)}
+      />
+      <SmartFoodDeleteModal
+        entry={deleteEntry}
+        onDismiss={() => setDeleteEntry(null)}
+        onConfirm={(entry) => {
+          onRemove(entry.id);
+          if (editingEntry?.id === entry.id) setEditingEntry(null);
+          setDeleteEntry(null);
+        }}
+      />
     </View>
   );
 };
@@ -236,8 +275,36 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: DIET_V2_MINT,
   },
-  scanButtonContent: { flexDirection: "row", alignItems: "center", gap: 9 },
-  scanButtonLabel: { color: "#FFFFFF" },
+  searchWrap: {
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 11,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: DIET_V2_CARD_BORDER,
+    backgroundColor: "#F8FAF9",
+  },
+  searchIcon: { width: 22, alignItems: "center" },
+  searchCopy: { flex: 1, alignItems: "flex-start" },
+  searchPlaceholder: { width: "100%", color: DIET_V2_MUTED, textAlign: "right" },
+  quickActions: { flexDirection: "row", gap: 8 },
+  quickAction: {
+    flex: 1,
+    minHeight: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    paddingHorizontal: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: DIET_V2_CARD_BORDER,
+    backgroundColor: "#FFFFFF",
+  },
+  quickActionLabel: { color: DIET_V2_DARK, textAlign: "center" },
+  searchHint: { width: "100%", color: DIET_V2_MUTED, textAlign: "right" },
   todayCard: {
     padding: 16,
     gap: 12,
@@ -270,7 +337,7 @@ const styles = StyleSheet.create({
   },
   entryCopy: { flex: 1, alignItems: "flex-start" },
   entryName: { color: DIET_V2_DARK, textAlign: "right" },
-  entryMeta: { color: DIET_V2_MUTED, textAlign: "right", writingDirection: "rtl" },
+  entryMeta: { color: DIET_V2_MUTED, textAlign: "right" },
   editLabel: { color: DIET_V2_GREEN, textAlign: "right", paddingTop: 2 },
   entryDot: { width: 9, height: 9, borderRadius: 5, backgroundColor: DIET_V2_GREEN },
   removeButton: {

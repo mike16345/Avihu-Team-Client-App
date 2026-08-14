@@ -36,9 +36,12 @@ const DietPlanV2Highlights = ({ highlights }: DietPlanV2HighlightsProps) => {
           </Text>
         </View>
         {lines.map((line, index) => (
-          <Text key={`${index}-${line}`} fontSize={15} style={styles.line}>
-            {`•  ${line}`}
-          </Text>
+          <View key={`${index}-${line}`} style={styles.tipRow}>
+            <View style={styles.tipDot} />
+            <Text fontSize={15} style={styles.line}>
+              {line}
+            </Text>
+          </View>
         ))}
       </View>
     </View>
@@ -73,14 +76,20 @@ const styles = StyleSheet.create({
     flex: 1,
     color: DIET_V2_DARK,
     textAlign: "right",
-    writingDirection: "rtl",
   },
   line: {
-    width: "100%",
+    flex: 1,
     color: DIET_V2_DARK,
     lineHeight: 24,
     textAlign: "right",
-    writingDirection: "rtl",
+  },
+  tipRow: { width: "100%", flexDirection: "row", alignItems: "flex-start", gap: 10 },
+  tipDot: {
+    width: 7,
+    height: 7,
+    marginTop: 8,
+    borderRadius: 4,
+    backgroundColor: DIET_V2_GREEN,
   },
   empty: {
     minHeight: 104,
@@ -91,7 +100,6 @@ const styles = StyleSheet.create({
     width: "100%",
     color: DIET_V2_MUTED,
     textAlign: "center",
-    writingDirection: "rtl",
   },
 });
 

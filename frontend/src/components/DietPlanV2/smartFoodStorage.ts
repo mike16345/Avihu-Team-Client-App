@@ -34,3 +34,22 @@ export const getDietPlanV2SmartFoodsStorageKey = (
 
 export const reconcileSmartFoodEntries = (stored: unknown): SmartFoodEntry[] =>
   Array.isArray(stored) ? stored.filter(isSmartFoodEntry) : [];
+
+export const getDietPlanV2SmartFoodsHistoryDayKeys = (
+  now = new Date(),
+  weekOffset = 0
+): string[] => {
+  const currentDayKey = getDietPlanV2DayKey(now);
+  const [year, month, day] = currentDayKey.split("-").map(Number);
+  const currentLogicalDay = new Date(year, month - 1, day, 12);
+  const firstDayOffset = Math.max(0, Math.floor(weekOffset)) * 7;
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(currentLogicalDay);
+    date.setDate(date.getDate() - firstDayOffset - index);
+    const dateYear = date.getFullYear();
+    const dateMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const dateDay = String(date.getDate()).padStart(2, "0");
+    return `${dateYear}-${dateMonth}-${dateDay}`;
+  });
+};

@@ -7,7 +7,9 @@ import { selectionHaptic, successNotificationHaptic } from "@/utils/haptics";
 import {
   createFoodCatalogDraft,
   createSmartFoodEntry,
+  validateSmartFoodDraft,
   type SmartFoodDraft,
+  type SmartFoodDraftErrors,
   type SmartFoodEntry,
 } from "./foodCatalog";
 import {
@@ -34,10 +36,11 @@ interface FoodCatalogResultCardProps {
 interface MacroInputProps {
   label: string;
   value: string;
+  error?: string;
   onChange: (value: string) => void;
 }
 
-const MacroInput = ({ label, value, onChange }: MacroInputProps) => (
+const MacroInput = ({ label, value, error, onChange }: MacroInputProps) => (
   <View style={styles.macroField}>
     <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
       {label}
@@ -49,7 +52,7 @@ const MacroInput = ({ label, value, onChange }: MacroInputProps) => (
       placeholder="0"
       placeholderTextColor="#A0A7B0"
       selectTextOnFocus
-      style={styles.macroInput}
+      style={[styles.macroInput, error ? styles.inputError : null]}
     />
   </View>
 );
@@ -77,11 +80,11 @@ const FoodCatalogResultCard = ({
   const [draft, setDraft] = useState<SmartFoodDraft>(() =>
     resolveInitialDraft(product, initialDraft)
   );
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<SmartFoodDraftErrors>({});
 
   useEffect(() => {
     setDraft(resolveInitialDraft(product, initialDraft));
-    setError("");
+    setErrors({});
   }, [initialDraft, product]);
 
   const preview = useMemo(
@@ -90,20 +93,26 @@ const FoodCatalogResultCard = ({
   );
 
   const update = (field: keyof SmartFoodDraft, value: string) => {
-    setError("");
+    setErrors((current) => {
+      if (!current[field]) return current;
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
     setDraft((current) => ({ ...current, [field]: value }));
   };
 
   const record = () => {
+    const nextErrors = validateSmartFoodDraft(draft);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
     const entry = createSmartFoodEntry(
       draft,
       entryIdentity?.id ?? `smart-food-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
       entryIdentity?.recordedAt ?? new Date().toISOString()
     );
-    if (!entry) {
-      setError("יש להזין שם, מספר מנות חיובי וערכים תזונתיים תקינים.");
-      return;
-    }
+    if (!entry) return;
 
     void successNotificationHaptic();
     onSubmit(entry);
@@ -148,7 +157,7 @@ const FoodCatalogResultCard = ({
           onChangeText={(value) => update("name", value)}
           placeholder="שם המוצר"
           placeholderTextColor="#A0A7B0"
-          style={styles.nameInput}
+          style={[styles.nameInput, errors.name ? styles.inputError : null]}
         />
         {product?.brand ? (
           <Text fontSize={11} style={styles.brand}>
@@ -175,7 +184,7 @@ const FoodCatalogResultCard = ({
             onChangeText={(value) => update("servingCount", value)}
             keyboardType="decimal-pad"
             selectTextOnFocus
-            style={styles.servingInput}
+            style={[styles.servingInput, errors.servingCount ? styles.inputError : null]}
           />
         </View>
       </View>
@@ -188,19 +197,27 @@ const FoodCatalogResultCard = ({
           <MacroInput
             label="קלוריות"
             value={draft.calories}
+            error={errors.calories}
             onChange={(value) => update("calories", value)}
           />
           <MacroInput
             label="חלבון"
             value={draft.protein}
+            error={errors.protein}
             onChange={(value) => update("protein", value)}
           />
           <MacroInput
             label="פחמימה"
             value={draft.carbs}
+            error={errors.carbs}
             onChange={(value) => update("carbs", value)}
           />
-          <MacroInput label="שומן" value={draft.fat} onChange={(value) => update("fat", value)} />
+          <MacroInput
+            label="שומן"
+            value={draft.fat}
+            error={errors.fat}
+            onChange={(value) => update("fat", value)}
+          />
         </View>
       </View>
 
@@ -212,10 +229,20 @@ const FoodCatalogResultCard = ({
         </View>
       ) : null}
 
-      {error ? (
-        <Text selectable fontVariant="medium" fontSize={12} style={styles.error}>
-          {error}
-        </Text>
+      {Object.keys(errors).length > 0 ? (
+        <View style={styles.errorSummary}>
+          <Text selectable fontVariant="semibold" fontSize={12} style={styles.error}>
+            יש לתקן את השדות המסומנים:
+          </Text>
+          {Object.values(errors).map((message) => (
+            <View key={message} style={styles.errorDetailRow}>
+              <View style={styles.errorDot} />
+              <Text selectable fontSize={12} style={styles.errorDetail}>
+                {message}
+              </Text>
+            </View>
+          ))}
+        </View>
       ) : null}
 
       <PrimaryButton block disabled={disabled} onPress={record}>
@@ -262,8 +289,8 @@ const styles = StyleSheet.create({
     borderColor: DIET_V2_CARD_BORDER,
   },
   closeLabel: { color: DIET_V2_MUTED, lineHeight: 20 },
-  nameSection: { gap: 5, alignItems: "flex-start" },
-  fieldLabel: { color: DIET_V2_MUTED, textAlign: "right" },
+  nameSection: { gap: 5, alignItems: "stretch" },
+  fieldLabel: { width: "100%", color: DIET_V2_MUTED, textAlign: "right" },
   nameInput: {
     width: "100%",
     minHeight: 44,
@@ -321,7 +348,19 @@ const styles = StyleSheet.create({
   },
   preview: { padding: 10, borderRadius: 11, backgroundColor: DIET_V2_MINT },
   previewText: { color: DIET_V2_GREEN, textAlign: "center", writingDirection: "rtl" },
-  error: { color: "#B42318", textAlign: "right" },
+  inputError: { borderColor: "#DC2626", borderWidth: 1.5, backgroundColor: "#FFF7F7" },
+  errorSummary: {
+    width: "100%",
+    paddingHorizontal: 11,
+    paddingVertical: 9,
+    gap: 3,
+    borderRadius: 10,
+    backgroundColor: "#FFF1F2",
+  },
+  error: { width: "100%", color: "#B42318", textAlign: "right" },
+  errorDetailRow: { width: "100%", flexDirection: "row", alignItems: "flex-start", gap: 6 },
+  errorDot: { width: 5, height: 5, marginTop: 7, borderRadius: 3, backgroundColor: "#DC2626" },
+  errorDetail: { flex: 1, color: "#B42318", textAlign: "right" },
 });
 
 export default FoodCatalogResultCard;

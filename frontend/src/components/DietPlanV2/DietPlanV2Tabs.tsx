@@ -64,6 +64,7 @@ const DietPlanV2Tabs = ({
       value: "תפריט חכם",
       content: (
         <DietPlanV2SmartMenu
+          plan={plan}
           entries={smartFoodEntries}
           isReady={smartFoodsReady}
           onRecord={onRecordSmartFood}

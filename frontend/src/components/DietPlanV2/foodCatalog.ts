@@ -29,6 +29,8 @@ export interface SmartFoodEntry {
   recordedAt: string;
 }
 
+export type SmartFoodDraftErrors = Partial<Record<keyof SmartFoodDraft, string>>;
+
 const roundNutritionValue = (value: number): number =>
   Math.round((value + Number.EPSILON) * 100) / 100;
 
@@ -40,6 +42,35 @@ const parseNumber = (value: string, allowBlank: boolean): number | null => {
   if (allowBlank && normalized.length === 0) return 0;
   const parsed = Number(normalized);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+};
+
+export const validateSmartFoodDraft = (draft: SmartFoodDraft): SmartFoodDraftErrors => {
+  const errors: SmartFoodDraftErrors = {};
+
+  if (draft.name.trim().length === 0) errors.name = "יש להזין שם מוצר.";
+
+  const servingCount = parseNumber(draft.servingCount, false);
+  if (draft.servingCount.trim().length === 0) {
+    errors.servingCount = "יש להזין מספר מנות.";
+  } else if (servingCount === null || servingCount <= 0) {
+    errors.servingCount = "מספר המנות חייב להיות גדול מאפס.";
+  }
+
+  const macroFields: Array<
+    [keyof Pick<SmartFoodDraft, "calories" | "protein" | "carbs" | "fat">, string]
+  > = [
+    ["calories", "הקלוריות חייבות להיות מספר חיובי או אפס."],
+    ["protein", "החלבון חייב להיות מספר חיובי או אפס."],
+    ["carbs", "הפחמימה חייבת להיות מספר חיובי או אפס."],
+    ["fat", "השומן חייב להיות מספר חיובי או אפס."],
+  ];
+  macroFields.forEach(([field, message]) => {
+    if (draft[field].trim().length > 0 && parseNumber(draft[field], true) === null) {
+      errors[field] = message;
+    }
+  });
+
+  return errors;
 };
 
 export const createFoodCatalogDraft = (product: FoodCatalogProduct): SmartFoodDraft => ({
@@ -71,6 +102,8 @@ export const createSmartFoodEntry = (
   id: string,
   recordedAt: string
 ): SmartFoodEntry | null => {
+  if (Object.keys(validateSmartFoodDraft(draft)).length > 0) return null;
+
   const servingCount = parseNumber(draft.servingCount, false);
   const calories = parseNumber(draft.calories, true);
   const protein = parseNumber(draft.protein, true);
@@ -78,9 +111,7 @@ export const createSmartFoodEntry = (
   const fat = parseNumber(draft.fat, true);
 
   if (
-    draft.name.trim().length === 0 ||
     servingCount === null ||
-    servingCount <= 0 ||
     calories === null ||
     protein === null ||
     carbs === null ||
