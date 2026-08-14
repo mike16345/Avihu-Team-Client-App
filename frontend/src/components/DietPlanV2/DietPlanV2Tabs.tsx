@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
+import type { SmartFoodEntry } from "./foodCatalog";
 import useStyles from "@/styles/useGlobalStyles";
 import { selectionHaptic } from "@/utils/haptics";
 import type { DietPlanV2CompletionMap } from "./dietPlanV2Consumption";
@@ -17,6 +18,11 @@ interface DietPlanV2TabsProps {
   disabled?: boolean;
   onToggleRow: (mealIndex: number, rowKey: string) => void;
   onToggleMeal: (mealIndex: number) => void;
+  smartFoodEntries: SmartFoodEntry[];
+  smartFoodsReady: boolean;
+  onRecordSmartFood: (entry: SmartFoodEntry) => void;
+  onUpdateSmartFood: (entry: SmartFoodEntry) => void;
+  onRemoveSmartFood: (entryId: string) => void;
 }
 
 interface TabItem {
@@ -31,6 +37,11 @@ const DietPlanV2Tabs = ({
   disabled,
   onToggleRow,
   onToggleMeal,
+  smartFoodEntries,
+  smartFoodsReady,
+  onRecordSmartFood,
+  onUpdateSmartFood,
+  onRemoveSmartFood,
 }: DietPlanV2TabsProps) => {
   const { spacing } = useStyles();
   const [selectedTab, setSelectedTab] = useState("הארוחות שלי");
@@ -48,7 +59,19 @@ const DietPlanV2Tabs = ({
         />
       ),
     },
-    { label: "תפריט חכם", value: "תפריט חכם", content: <DietPlanV2SmartMenu /> },
+    {
+      label: "תפריט חכם",
+      value: "תפריט חכם",
+      content: (
+        <DietPlanV2SmartMenu
+          entries={smartFoodEntries}
+          isReady={smartFoodsReady}
+          onRecord={onRecordSmartFood}
+          onUpdate={onUpdateSmartFood}
+          onRemove={onRemoveSmartFood}
+        />
+      ),
+    },
     {
       label: "דגשים",
       value: "דגשים",
