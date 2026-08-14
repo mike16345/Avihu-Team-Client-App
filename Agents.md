@@ -70,6 +70,7 @@
 ## 7. UI/UX Conventions (if applicable)
 
 - The app is RTL-first: the root tree sets RTL direction, and the shared `Text` primitive applies `writingDirection: "rtl"`.
+- In RTL layouts, keep children in their intended right-to-left source order and rely on the root direction. Do not use `row-reverse` or force `textAlign: "right"`; omit alignment, or use `textAlign: "start"` only when explicit alignment is necessary.
 - Reusable UI primitives live in `frontend/src/components/ui`, while feature-specific UI is organized under `frontend/src/components/<Feature>`.
 - Shared styling is utility-like: `useGlobalStyles()` aggregates layout, spacing, text, and color style sheets so components compose style arrays from common tokens.
 - Theme tokens are centralized in `frontend/src/themes/useAppTheme.tsx`; repeated color or typography values should be added to the theme/style layer before being duplicated across multiple screens.

@@ -72,11 +72,9 @@ const styles = StyleSheet.create({
   },
   header: {
     color: "#0B2A22",
-    textAlign: "right",
   },
   body: {
     color: "#4B5563",
-    textAlign: "right",
     lineHeight: 22,
   },
   bodyConsumed: {

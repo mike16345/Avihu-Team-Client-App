@@ -331,9 +331,7 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
                 {isHoldingBarcode ? "מעולה, המשך להחזיק יציב" : "מקם את הברקוד בתוך המסגרת"}
               </Text>
               <Text fontSize={12} style={styles.panelDescription}>
-                {isHoldingBarcode
-                  ? "נקלוט אותו לאחר רגע קצר"
-                  : "יש להחזיק את הברקוד במסגרת לרגע"}
+                {isHoldingBarcode ? "נקלוט אותו לאחר רגע קצר" : "יש להחזיק את הברקוד במסגרת לרגע"}
               </Text>
             </View>
           ) : null}

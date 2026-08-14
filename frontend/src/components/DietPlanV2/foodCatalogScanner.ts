@@ -1,6 +1,6 @@
 const MINIMUM_SCAN_FEEDBACK_MS = 650;
 
-export const BARCODE_HOLD_DURATION_MS = 1_500;
+export const BARCODE_HOLD_DURATION_MS = 750;
 export const BARCODE_HOLD_MAX_GAP_MS = 750;
 
 export interface BarcodeHoldCandidate {
@@ -26,7 +26,8 @@ export const updateBarcodeHoldCandidate = (
 
 export const isBarcodeHoldReady = (candidate: BarcodeHoldCandidate, now: number): boolean =>
   now - candidate.startedAt >= BARCODE_HOLD_DURATION_MS &&
-  now - candidate.lastSeenAt <= BARCODE_HOLD_MAX_GAP_MS;
+  now - candidate.lastSeenAt <= BARCODE_HOLD_MAX_GAP_MS &&
+  candidate.lastSeenAt > candidate.startedAt;
 
 export const getRemainingScanFeedbackMs = (startedAt: number, now: number): number =>
   Math.max(0, MINIMUM_SCAN_FEEDBACK_MS - (now - startedAt));

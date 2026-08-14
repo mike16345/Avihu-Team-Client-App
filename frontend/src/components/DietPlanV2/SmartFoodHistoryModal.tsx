@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: DIET_V2_MINT,
   },
-  totalLabel: { color: DIET_V2_GREEN, textAlign: "right" },
+  totalLabel: { color: DIET_V2_GREEN },
   entryRow: {
     flexDirection: "row",
     alignItems: "center",

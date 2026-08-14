@@ -191,10 +191,14 @@ describe("Food Catalog recording", () => {
       startedAt: 1_000,
       lastSeenAt: 1_600,
     });
-    expect(isBarcodeHoldReady(continued, 2_499)).toBe(false);
+    expect(isBarcodeHoldReady(continued, 1_749)).toBe(false);
+    expect(isBarcodeHoldReady(continued, 1_750)).toBe(true);
+  });
 
-    const ready = updateBarcodeHoldCandidate(continued, "7290000000000", 2_500);
-    expect(isBarcodeHoldReady(ready, 2_500)).toBe(true);
+  it("does not accept a barcode seen in only one passing frame", () => {
+    const passingFrame = updateBarcodeHoldCandidate(null, "7290000000000", 1_000);
+
+    expect(isBarcodeHoldReady(passingFrame, 1_750)).toBe(false);
   });
 
   it("restarts the hold when the camera passes over another barcode", () => {
