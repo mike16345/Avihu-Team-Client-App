@@ -39,6 +39,7 @@ const DietPlanV2MealCard = ({
   onToggleMeal,
 }: DietPlanV2MealCardProps) => {
   const [isCollapsed, setIsCollapsed] = useState(index !== 0);
+
   const selectedRows = new Set(completion?.selectedRows ?? []);
   const allConsumed = completion?.completed ?? false;
   const displayName = meal.name.trim() || `ארוחה ${index + 1}`;

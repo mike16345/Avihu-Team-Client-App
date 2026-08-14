@@ -44,7 +44,9 @@ const DietPlanV2Tabs = ({
   onRemoveSmartFood,
 }: DietPlanV2TabsProps) => {
   const { spacing } = useStyles();
+
   const [selectedTab, setSelectedTab] = useState("הארוחות שלי");
+
   const tabs: TabItem[] = [
     {
       label: "הארוחות שלי",

@@ -89,7 +89,7 @@ const DietPlanV2SmartMenu = ({
           <View style={styles.searchIcon}>
             <SearchIcon size={17} color={DIET_V2_MUTED} />
           </View>
-          <View style={styles.searchCopy}>
+          <View>
             <Text fontSize={13} style={styles.searchPlaceholder}>
               חפש מוצר שנסרק בעבר...
             </Text>
@@ -287,7 +287,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8FAF9",
   },
   searchIcon: { width: 22, alignItems: "center" },
-  searchCopy: { flex: 1, alignItems: "flex-start" },
   searchPlaceholder: { width: "100%", color: DIET_V2_MUTED, textAlign: "right" },
   quickActions: { flexDirection: "row", gap: 8 },
   quickAction: {
@@ -304,7 +303,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   quickActionLabel: { color: DIET_V2_DARK, textAlign: "center" },
-  searchHint: { width: "100%", color: DIET_V2_MUTED, textAlign: "right" },
+  searchHint: { width: "100%", color: DIET_V2_MUTED },
   todayCard: {
     padding: 16,
     gap: 12,
