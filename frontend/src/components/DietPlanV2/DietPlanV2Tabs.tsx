@@ -9,6 +9,7 @@ import type { DietPlanV2CompletionMap } from "./dietPlanV2Consumption";
 import { DIET_V2_CARD_BORDER, DIET_V2_DARK } from "./dietV2Icons";
 import DietPlanV2Highlights from "./DietPlanV2Highlights";
 import DietPlanV2MealsList from "./DietPlanV2MealsList";
+import DietPlanV2SmartMenu from "./DietPlanV2SmartMenu";
 
 interface DietPlanV2TabsProps {
   plan: IDietPlanV2;
@@ -47,8 +48,7 @@ const DietPlanV2Tabs = ({
         />
       ),
     },
-    // Smart Menu stays disabled until barcode/manual logging has a real Server contract.
-    // { label: "תפריט חכם", value: "תפריט חכם", content: <DietPlanV2SmartMenu /> },
+    { label: "תפריט חכם", value: "תפריט חכם", content: <DietPlanV2SmartMenu /> },
     {
       label: "דגשים",
       value: "דגשים",

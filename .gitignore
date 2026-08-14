@@ -54,3 +54,7 @@ credentials.json
 
 /android
 /ios
+
+# Local Codex/Superpowers design and implementation notes
+docs/superpowers/
+.superpowers/
