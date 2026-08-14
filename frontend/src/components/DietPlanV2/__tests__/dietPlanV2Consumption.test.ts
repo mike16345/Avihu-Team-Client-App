@@ -13,6 +13,7 @@ import {
   toggleDietPlanV2Row,
   type DietPlanV2CompletionMap,
 } from "../dietPlanV2Consumption";
+import { getDietPlanV2MealRowVisualState } from "../dietPlanV2MealRowVisualState";
 
 const plan: IDietPlanV2 = {
   _id: "plan-1",
@@ -56,6 +57,16 @@ const plan: IDietPlanV2 = {
 };
 
 describe("V2 meal completion", () => {
+  it("keeps row geometry identical when its recorded style is applied", () => {
+    const pending = getDietPlanV2MealRowVisualState(false);
+    const recorded = getDietPlanV2MealRowVisualState(true);
+
+    expect(pending.layout).toEqual({ borderWidth: 1, badgeWidth: 62, badgeHeight: 23 });
+    expect(recorded.layout).toEqual(pending.layout);
+    expect(pending.badgeOpacity).toBe(0);
+    expect(recorded.badgeOpacity).toBe(1);
+  });
+
   it("scopes persisted completion by plan and the 3am logical day", () => {
     expect(getDietPlanV2DayKey(new Date("2026-08-12T02:59:00Z"))).toBe("2026-08-11");
     expect(getDietPlanV2DayKey(new Date("2026-08-12T03:00:00Z"))).toBe("2026-08-12");

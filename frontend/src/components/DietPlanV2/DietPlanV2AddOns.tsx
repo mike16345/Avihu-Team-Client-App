@@ -1,9 +1,10 @@
 import { Pressable, StyleSheet, View } from "react-native";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import type { DietV2PlanItem } from "@/interfaces/IDietPlanV2";
 import { selectionHaptic } from "@/utils/haptics";
 import { formatDietV2Items } from "./dietPlanV2Utils";
+import DietPlanV2ConsumedBadge from "./DietPlanV2ConsumedBadge";
+import { getDietPlanV2MealRowVisualState } from "./dietPlanV2MealRowVisualState";
 
 interface DietPlanV2AddOnsProps {
   addOns: DietV2PlanItem[];
@@ -14,6 +15,7 @@ interface DietPlanV2AddOnsProps {
 
 const DietPlanV2AddOns = ({ addOns, consumed, disabled, onToggle }: DietPlanV2AddOnsProps) => {
   const description = formatDietV2Items(addOns);
+  const visualState = getDietPlanV2MealRowVisualState(consumed);
   if (!description) return null;
 
   return (
@@ -25,6 +27,7 @@ const DietPlanV2AddOns = ({ addOns, consumed, disabled, onToggle }: DietPlanV2Ad
       }}
       style={({ pressed }) => [
         styles.container,
+        { borderWidth: visualState.layout.borderWidth },
         consumed && styles.consumed,
         pressed && !disabled && styles.pressed,
       ]}
@@ -33,17 +36,7 @@ const DietPlanV2AddOns = ({ addOns, consumed, disabled, onToggle }: DietPlanV2Ad
         <Text fontVariant="bold" fontSize={15} style={styles.heading}>
           תוספות
         </Text>
-        {consumed && (
-          <Animated.View
-            entering={ZoomIn.duration(180).springify().damping(16)}
-            exiting={ZoomOut.duration(120)}
-            style={styles.checkBadge}
-          >
-            <Text fontVariant="bold" fontSize={11} style={styles.checkLabel}>
-              ✓ נאכל
-            </Text>
-          </Animated.View>
-        )}
+        <DietPlanV2ConsumedBadge consumed={consumed} />
       </View>
       <Text fontSize={15} style={[styles.description, consumed && styles.descriptionConsumed]}>
         {description}
@@ -60,7 +53,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 8,
     marginHorizontal: -8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: "transparent",
     borderBottomColor: "rgba(15, 94, 59, 0.10)",
   },
   consumed: {
@@ -89,17 +82,6 @@ const styles = StyleSheet.create({
     color: "#4B7A62",
     textDecorationLine: "line-through",
     textDecorationColor: "#86EFAC",
-  },
-  checkBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 999,
-    backgroundColor: "#DCFCE7",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
-  },
-  checkLabel: {
-    color: "#166534",
   },
 });
 

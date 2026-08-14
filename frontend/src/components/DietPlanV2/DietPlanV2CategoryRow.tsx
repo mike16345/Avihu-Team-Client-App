@@ -1,9 +1,10 @@
 import { Pressable, StyleSheet, View } from "react-native";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import type { DietV2Category } from "@/interfaces/IDietPlanV2";
 import { selectionHaptic } from "@/utils/haptics";
 import { DIET_V2_CATEGORY_LABELS, formatDietV2CategoryItems } from "./dietPlanV2Utils";
+import DietPlanV2ConsumedBadge from "./DietPlanV2ConsumedBadge";
+import { getDietPlanV2MealRowVisualState } from "./dietPlanV2MealRowVisualState";
 
 interface DietPlanV2CategoryRowProps {
   category: DietV2Category;
@@ -17,36 +18,34 @@ const DietPlanV2CategoryRow = ({
   consumed,
   disabled,
   onToggle,
-}: DietPlanV2CategoryRowProps) => (
-  <Pressable
-    disabled={disabled}
-    onPress={() => {
-      selectionHaptic();
-      onToggle();
-    }}
-    style={[styles.container, consumed && styles.consumed]}
-  >
-    <View style={styles.headerRow}>
-      <Text fontVariant="bold" fontSize={15} style={styles.header}>
-        {DIET_V2_CATEGORY_LABELS[category.category]}
+}: DietPlanV2CategoryRowProps) => {
+  const visualState = getDietPlanV2MealRowVisualState(consumed);
+
+  return (
+    <Pressable
+      disabled={disabled}
+      onPress={() => {
+        selectionHaptic();
+        onToggle();
+      }}
+      style={[
+        styles.container,
+        { borderWidth: visualState.layout.borderWidth },
+        consumed && styles.consumed,
+      ]}
+    >
+      <View style={styles.headerRow}>
+        <Text fontVariant="bold" fontSize={15} style={styles.header}>
+          {DIET_V2_CATEGORY_LABELS[category.category]}
+        </Text>
+        <DietPlanV2ConsumedBadge consumed={consumed} />
+      </View>
+      <Text fontSize={15} style={[styles.body, consumed && styles.bodyConsumed]}>
+        {formatDietV2CategoryItems(category)}
       </Text>
-      {consumed && (
-        <Animated.View
-          entering={ZoomIn.duration(180).springify().damping(16)}
-          exiting={ZoomOut.duration(120)}
-          style={styles.checkBadge}
-        >
-          <Text fontVariant="bold" fontSize={11} style={styles.checkLabel}>
-            ✓ נאכל
-          </Text>
-        </Animated.View>
-      )}
-    </View>
-    <Text fontSize={15} style={[styles.body, consumed && styles.bodyConsumed]}>
-      {formatDietV2CategoryItems(category)}
-    </Text>
-  </Pressable>
-);
+    </Pressable>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -56,7 +55,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 8,
     marginHorizontal: -8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: "transparent",
     borderBottomColor: "rgba(15, 94, 59, 0.10)",
   },
   consumed: {
@@ -81,17 +80,6 @@ const styles = StyleSheet.create({
     color: "#4B7A62",
     textDecorationLine: "line-through",
     textDecorationColor: "#86EFAC",
-  },
-  checkBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 999,
-    backgroundColor: "#DCFCE7",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
-  },
-  checkLabel: {
-    color: "#166534",
   },
 });
 
