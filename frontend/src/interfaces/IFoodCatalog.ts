@@ -66,3 +66,7 @@ export interface FoodCatalogLookupResult {
     status: "created" | "hit" | "refreshed" | "stale_fallback";
   };
 }
+
+export interface FoodCatalogSearchResult {
+  products: FoodCatalogProduct[];
+}

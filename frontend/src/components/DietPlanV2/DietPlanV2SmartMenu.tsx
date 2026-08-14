@@ -8,6 +8,7 @@ import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
 import useStyles from "@/styles/useGlobalStyles";
 import { selectionHaptic } from "@/utils/haptics";
 import FoodCatalogResultCard from "./FoodCatalogResultCard";
+import FoodCatalogSearchModal from "./FoodCatalogSearchModal";
 import FoodCatalogScannerModal from "./FoodCatalogScannerModal";
 import SmartFoodDeleteModal from "./SmartFoodDeleteModal";
 import SmartFoodHistoryModal from "./SmartFoodHistoryModal";
@@ -45,6 +46,7 @@ const DietPlanV2SmartMenu = ({
   const { spacing } = useStyles();
   const { reportConsumption } = useFoodCatalogApi();
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [product, setProduct] = useState<FoodCatalogProduct | null>(null);
   const [editingEntry, setEditingEntry] = useState<SmartFoodEntry | null>(null);
   const [deleteEntry, setDeleteEntry] = useState<SmartFoodEntry | null>(null);
@@ -85,7 +87,15 @@ const DietPlanV2SmartMenu = ({
           </View>
         </View>
 
-        <View style={styles.searchWrap}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="חיפוש מוצר במאגר"
+          onPress={() => {
+            selectionHaptic();
+            setSearchOpen(true);
+          }}
+          style={({ pressed }) => [styles.searchWrap, pressed && styles.searchWrapPressed]}
+        >
           <View style={styles.searchIcon}>
             <SearchIcon size={17} color={DIET_V2_MUTED} />
           </View>
@@ -94,7 +104,7 @@ const DietPlanV2SmartMenu = ({
               חפש מוצר שנסרק בעבר...
             </Text>
           </View>
-        </View>
+        </Pressable>
 
         <View style={styles.quickActions}>
           <Pressable
@@ -234,6 +244,22 @@ const DietPlanV2SmartMenu = ({
           setScannerOpen(false);
         }}
       />
+      <FoodCatalogSearchModal
+        visible={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onSelect={(nextProduct) => {
+          setEditingEntry(null);
+          setProduct(nextProduct);
+          setSearchOpen(false);
+        }}
+        onScan={() => {
+          setSearchOpen(false);
+          setTimeout(() => {
+            setEditingEntry(null);
+            setScannerOpen(true);
+          }, 220);
+        }}
+      />
       <SmartFoodHistoryModal
         visible={historyOpen}
         plan={plan}
@@ -287,6 +313,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8FAF9",
   },
   searchIcon: { width: 22, alignItems: "center" },
+  searchWrapPressed: { backgroundColor: "#F0F8F4", borderColor: "#BFDCCB" },
   searchPlaceholder: { width: "100%", color: DIET_V2_MUTED },
   quickActions: { flexDirection: "row", gap: 8 },
   quickAction: {
