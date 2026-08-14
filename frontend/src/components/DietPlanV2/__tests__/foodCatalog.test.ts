@@ -5,9 +5,14 @@ import {
   createSmartFoodEntryDraft,
   replaceSmartFoodEntry,
   sumSmartFoodMacros,
+  validateSmartFoodDraft,
 } from "../foodCatalog";
 import { getRemainingScanFeedbackMs } from "../foodCatalogScanner";
-import { getDietPlanV2SmartFoodsStorageKey, reconcileSmartFoodEntries } from "../smartFoodStorage";
+import {
+  getDietPlanV2SmartFoodsHistoryDayKeys,
+  getDietPlanV2SmartFoodsStorageKey,
+  reconcileSmartFoodEntries,
+} from "../smartFoodStorage";
 import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
 import type { FoodCatalogProduct } from "@/interfaces/IFoodCatalog";
 
@@ -191,6 +196,24 @@ describe("Food Catalog recording", () => {
     ).toBeNull();
   });
 
+  it("identifies each invalid draft field with a specific user-facing reason", () => {
+    expect(
+      validateSmartFoodDraft({
+        ...createFoodCatalogDraft(product),
+        name: "   ",
+        servingCount: "0",
+        calories: "-1",
+        protein: "not-a-number",
+        carbs: "",
+      })
+    ).toEqual({
+      name: "יש להזין שם מוצר.",
+      servingCount: "מספר המנות חייב להיות גדול מאפס.",
+      calories: "הקלוריות חייבות להיות מספר חיובי או אפס.",
+      protein: "החלבון חייב להיות מספר חיובי או אפס.",
+    });
+  });
+
   it("adds recorded foods to the V2 progress totals", () => {
     const first = createSmartFoodEntry(
       createFoodCatalogDraft(product),
@@ -225,5 +248,29 @@ describe("Food Catalog recording", () => {
     );
     expect(reconcileSmartFoodEntries([valid, { id: "broken" }, null])).toEqual([valid]);
     expect(reconcileSmartFoodEntries("not-an-array")).toEqual([]);
+  });
+
+  it("builds one seven-day history page at a time from the logical diet day", () => {
+    expect(getDietPlanV2SmartFoodsHistoryDayKeys(new Date("2026-08-14T12:00:00Z"), 0)).toEqual([
+      "2026-08-14",
+      "2026-08-13",
+      "2026-08-12",
+      "2026-08-11",
+      "2026-08-10",
+      "2026-08-09",
+      "2026-08-08",
+    ]);
+    expect(getDietPlanV2SmartFoodsHistoryDayKeys(new Date("2026-08-14T12:00:00Z"), 1)).toEqual([
+      "2026-08-07",
+      "2026-08-06",
+      "2026-08-05",
+      "2026-08-04",
+      "2026-08-03",
+      "2026-08-02",
+      "2026-08-01",
+    ]);
+    expect(getDietPlanV2SmartFoodsHistoryDayKeys(new Date("2026-08-14T02:59:00Z"), 0)[0]).toBe(
+      "2026-08-13"
+    );
   });
 });
