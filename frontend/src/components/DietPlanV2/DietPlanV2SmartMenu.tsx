@@ -5,6 +5,7 @@ import { Text } from "@/components/ui/Text";
 import { useFoodCatalogApi } from "@/hooks/api/useFoodCatalogApi";
 import type { FoodCatalogProduct } from "@/interfaces/IFoodCatalog";
 import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
+import type { DietPlanV2CompletionMap } from "./dietPlanV2Consumption";
 import useStyles from "@/styles/useGlobalStyles";
 import { selectionHaptic } from "@/utils/haptics";
 import FoodCatalogResultCard from "./FoodCatalogResultCard";
@@ -28,6 +29,7 @@ import { formatDietPlanV2Number } from "./dietPlanV2Utils";
 
 interface DietPlanV2SmartMenuProps {
   plan: IDietPlanV2;
+  completion: DietPlanV2CompletionMap;
   entries: SmartFoodEntry[];
   isReady: boolean;
   onRecord: (entry: SmartFoodEntry) => void;
@@ -37,6 +39,7 @@ interface DietPlanV2SmartMenuProps {
 
 const DietPlanV2SmartMenu = ({
   plan,
+  completion,
   entries,
   isReady,
   onRecord,
@@ -264,6 +267,7 @@ const DietPlanV2SmartMenu = ({
         visible={historyOpen}
         plan={plan}
         currentEntries={entries}
+        currentCompletion={completion}
         onClose={() => setHistoryOpen(false)}
       />
       <SmartFoodDeleteModal

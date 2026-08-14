@@ -9,7 +9,11 @@ import DietPlanV2CategoryRow from "./DietPlanV2CategoryRow";
 import DietPlanV2AddOns from "./DietPlanV2AddOns";
 import DietPlanV2FreeCalories from "./DietPlanV2FreeCalories";
 import type { DietPlanV2MealCompletion } from "./dietPlanV2Consumption";
-import { deriveDietPlanV2MealMacros, formatDietPlanV2Number } from "./dietPlanV2Utils";
+import {
+  deriveDietPlanV2MealMacros,
+  formatDietPlanV2MealMacroSummary,
+  formatDietPlanV2Number,
+} from "./dietPlanV2Utils";
 import {
   ChevronDownIcon,
   DIET_V2_GREEN,
@@ -65,8 +69,14 @@ const DietPlanV2MealCard = ({
           <Text fontSize={16} fontVariant="bold" style={styles.mealTitle}>
             {displayName}
           </Text>
-          <Text fontSize={12} style={styles.summary}>
-            {`${formatDietPlanV2Number(macros.calories)} קק"ל   ·   ${formatDietPlanV2Number(macros.protein)} ג' חלבון   ·   ${formatDietPlanV2Number(macros.carbs)} ג' פחמימה   ·   ${formatDietPlanV2Number(macros.fat)} ג' שומן`}
+          <Text
+            fontSize={12}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.78}
+            style={styles.summary}
+          >
+            {formatDietPlanV2MealMacroSummary(macros)}
           </Text>
           {meal.freeCalories && (
             <View style={styles.freeChip}>

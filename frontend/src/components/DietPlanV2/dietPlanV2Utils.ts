@@ -152,6 +152,11 @@ export const computeDietPlanV2Totals = (plan: IDietPlanV2): DietPlanV2Totals =>
 export const formatDietPlanV2Number = (value: number): string =>
   Object.is(value, -0) ? "0" : value.toString();
 
+export const formatDietPlanV2MealMacroSummary = (
+  macros: Pick<DietPlanV2Totals, "calories" | "protein" | "carbs" | "fat">
+): string =>
+  `${formatDietPlanV2Number(macros.calories)} קק"ל · ${formatDietPlanV2Number(macros.protein)} חלב׳ · ${formatDietPlanV2Number(macros.carbs)} פחמ׳ · ${formatDietPlanV2Number(macros.fat)} ש׳`;
+
 export const getDietPlanV2CalorieTarget = (totals: DietPlanV2Totals): number =>
   totals.calories + totals.freeCalories;
 

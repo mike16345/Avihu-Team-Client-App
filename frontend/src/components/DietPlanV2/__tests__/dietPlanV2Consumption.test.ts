@@ -14,6 +14,7 @@ import {
   type DietPlanV2CompletionMap,
 } from "../dietPlanV2Consumption";
 import { getDietPlanV2MealRowVisualState } from "../dietPlanV2MealRowVisualState";
+import { buildDietPlanV2HistoryEntries, sumDietPlanV2HistoryMacros } from "../dietPlanV2History";
 
 const plan: IDietPlanV2 = {
   _id: "plan-1",
@@ -65,6 +66,46 @@ describe("V2 meal completion", () => {
     expect(recorded.layout).toEqual(pending.layout);
     expect(pending.badgeOpacity).toBe(0);
     expect(recorded.badgeOpacity).toBe(1);
+  });
+
+  it("includes recorded meal rows alongside scanned foods in history", () => {
+    const mealKey = getDietPlanV2MealKey(plan.meals[0], 0);
+    const completion: DietPlanV2CompletionMap = {
+      [mealKey]: {
+        selectedRows: ["category:protein:0", "add-ons", "free-calories"],
+        completed: false,
+      },
+    };
+    const entries = buildDietPlanV2HistoryEntries(plan, completion, [
+      {
+        id: "scan-1",
+        catalogItemId: "catalog-1",
+        barcode: "7290000000000",
+        name: "יוגורט",
+        servingDescription: "100 גרם",
+        servingCount: 1,
+        macros: { calories: 90, protein: 10, carbs: 5, fat: 3 },
+        recordedAt: "2026-08-14T12:00:00.000Z",
+      },
+    ]);
+
+    expect(entries.map(({ name }) => name)).toEqual([
+      "100 גרם חזה עוף",
+      "קפה",
+      "פרי / חטיף",
+      "יוגורט",
+    ]);
+    expect(entries[0]).toMatchObject({
+      detail: "ארוחה 1 · חלבון",
+      macros: { calories: 200, protein: 25, carbs: 0, fat: 4 },
+    });
+    expect(sumDietPlanV2HistoryMacros(entries)).toEqual({
+      calories: 440,
+      protein: 35,
+      carbs: 5,
+      fat: 7,
+      freeCalories: 0,
+    });
   });
 
   it("scopes persisted completion by plan and the 3am logical day", () => {

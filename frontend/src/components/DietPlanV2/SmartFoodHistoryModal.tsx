@@ -5,12 +5,22 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/Text";
 import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
 import { selectionHaptic } from "@/utils/haptics";
-import { sumSmartFoodMacros, type SmartFoodEntry } from "./foodCatalog";
+import type { SmartFoodEntry } from "./foodCatalog";
 import {
   getDietPlanV2SmartFoodsHistoryDayKeys,
   getDietPlanV2SmartFoodsStorageKey,
   reconcileSmartFoodEntries,
 } from "./smartFoodStorage";
+import {
+  getDietPlanV2ConsumptionStorageKey,
+  reconcileDietPlanV2Completion,
+  type DietPlanV2CompletionMap,
+} from "./dietPlanV2Consumption";
+import {
+  buildDietPlanV2HistoryEntries,
+  sumDietPlanV2HistoryMacros,
+  type DietPlanV2HistoryEntry,
+} from "./dietPlanV2History";
 import {
   ClockIcon,
   DIET_V2_CARD_BORDER,
@@ -25,12 +35,13 @@ interface SmartFoodHistoryModalProps {
   visible: boolean;
   plan: IDietPlanV2;
   currentEntries: SmartFoodEntry[];
+  currentCompletion: DietPlanV2CompletionMap;
   onClose: () => void;
 }
 
 interface SmartFoodHistoryDay {
   dayKey: string;
-  entries: SmartFoodEntry[];
+  entries: DietPlanV2HistoryEntry[];
 }
 
 const parseDayKey = (dayKey: string): Date => {
@@ -59,6 +70,7 @@ const SmartFoodHistoryModal = ({
   visible,
   plan,
   currentEntries,
+  currentCompletion,
   onClose,
 }: SmartFoodHistoryModalProps) => {
   const insets = useSafeAreaInsets();
@@ -82,22 +94,44 @@ const SmartFoodHistoryModal = ({
     let active = true;
     setLoading(true);
 
-    const keys = dayKeys.map((dayKey) => getDietPlanV2SmartFoodsStorageKey(plan, dayKey));
+    const keys = dayKeys.flatMap((dayKey) => [
+      getDietPlanV2SmartFoodsStorageKey(plan, dayKey),
+      getDietPlanV2ConsumptionStorageKey(plan, dayKey),
+    ]);
     void AsyncStorage.multiGet(keys)
       .then((rows) => {
         if (!active) return;
+        const storedByKey = new Map(rows);
         setDays(
-          rows.map(([, stored], index) => {
+          dayKeys.map((dayKey, index) => {
             if (weekOffset === 0 && index === 0) {
-              return { dayKey: dayKeys[index], entries: currentEntries };
+              return {
+                dayKey,
+                entries: buildDietPlanV2HistoryEntries(plan, currentCompletion, currentEntries),
+              };
             }
-            let parsed: unknown = [];
+            let parsedSmartFoods: unknown = [];
+            let parsedCompletion: unknown = {};
             try {
-              parsed = stored ? JSON.parse(stored) : [];
+              const stored = storedByKey.get(getDietPlanV2SmartFoodsStorageKey(plan, dayKey));
+              parsedSmartFoods = stored ? JSON.parse(stored) : [];
             } catch {
-              parsed = [];
+              parsedSmartFoods = [];
             }
-            return { dayKey: dayKeys[index], entries: reconcileSmartFoodEntries(parsed) };
+            try {
+              const stored = storedByKey.get(getDietPlanV2ConsumptionStorageKey(plan, dayKey));
+              parsedCompletion = stored ? JSON.parse(stored) : {};
+            } catch {
+              parsedCompletion = {};
+            }
+            return {
+              dayKey,
+              entries: buildDietPlanV2HistoryEntries(
+                plan,
+                reconcileDietPlanV2Completion(plan, parsedCompletion),
+                reconcileSmartFoodEntries(parsedSmartFoods)
+              ),
+            };
           })
         );
       })
@@ -111,7 +145,7 @@ const SmartFoodHistoryModal = ({
     return () => {
       active = false;
     };
-  }, [currentEntries, dayKeys, plan, visible, weekOffset]);
+  }, [currentCompletion, currentEntries, dayKeys, plan, visible, weekOffset]);
 
   const populatedDays = days.filter(({ entries }) => entries.length > 0);
 
@@ -203,7 +237,7 @@ const SmartFoodHistoryModal = ({
           {!loading
             ? populatedDays.map((day) => {
                 const dayIndex = dayKeys.indexOf(day.dayKey);
-                const totals = sumSmartFoodMacros(day.entries);
+                const totals = sumDietPlanV2HistoryMacros(day.entries);
                 return (
                   <View key={day.dayKey} style={styles.dayCard}>
                     <View style={styles.dayHeader}>
@@ -224,7 +258,7 @@ const SmartFoodHistoryModal = ({
                             {entry.name}
                           </Text>
                           <Text fontSize={11} style={styles.entryMeta}>
-                            {`${formatDietPlanV2Number(entry.servingCount)} × ${entry.servingDescription} · ${formatDietPlanV2Number(entry.macros.calories)} קק"ל`}
+                            {`${entry.detail}${entry.macros.calories > 0 ? ` · ${formatDietPlanV2Number(entry.macros.calories)} קק"ל` : ""}`}
                           </Text>
                         </View>
                         <View style={styles.entryDot} />
