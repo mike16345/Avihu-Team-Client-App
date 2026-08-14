@@ -7,7 +7,11 @@ import {
   sumSmartFoodMacros,
   validateSmartFoodDraft,
 } from "../foodCatalog";
-import { getRemainingScanFeedbackMs } from "../foodCatalogScanner";
+import {
+  getRemainingScanFeedbackMs,
+  isBarcodeHoldReady,
+  updateBarcodeHoldCandidate,
+} from "../foodCatalogScanner";
 import {
   getDietPlanV2SmartFoodsHistoryDayKeys,
   getDietPlanV2SmartFoodsStorageKey,
@@ -176,6 +180,41 @@ describe("Food Catalog recording", () => {
   it("keeps scan feedback visible for a minimum perceptible duration", () => {
     expect(getRemainingScanFeedbackMs(1_000, 1_100)).toBe(550);
     expect(getRemainingScanFeedbackMs(1_000, 1_800)).toBe(0);
+  });
+
+  it("requires continuous sightings of the same barcode before accepting a scan", () => {
+    const first = updateBarcodeHoldCandidate(null, "7290000000000", 1_000);
+    const continued = updateBarcodeHoldCandidate(first, "7290000000000", 1_600);
+
+    expect(continued).toEqual({
+      barcode: "7290000000000",
+      startedAt: 1_000,
+      lastSeenAt: 1_600,
+    });
+    expect(isBarcodeHoldReady(continued, 2_499)).toBe(false);
+
+    const ready = updateBarcodeHoldCandidate(continued, "7290000000000", 2_500);
+    expect(isBarcodeHoldReady(ready, 2_500)).toBe(true);
+  });
+
+  it("restarts the hold when the camera passes over another barcode", () => {
+    const first = updateBarcodeHoldCandidate(null, "barcode-a", 1_000);
+    const replacement = updateBarcodeHoldCandidate(first, "barcode-b", 1_400);
+
+    expect(replacement).toEqual({
+      barcode: "barcode-b",
+      startedAt: 1_400,
+      lastSeenAt: 1_400,
+    });
+    expect(isBarcodeHoldReady(replacement, 2_500)).toBe(false);
+  });
+
+  it("restarts the hold after the barcode leaves the frame", () => {
+    const first = updateBarcodeHoldCandidate(null, "7290000000000", 1_000);
+    const staleReturn = updateBarcodeHoldCandidate(first, "7290000000000", 1_751);
+
+    expect(staleReturn.startedAt).toBe(1_751);
+    expect(isBarcodeHoldReady(first, 2_500)).toBe(false);
   });
 
   it("allows blank optional macros as zero but rejects a missing name or invalid serving count", () => {

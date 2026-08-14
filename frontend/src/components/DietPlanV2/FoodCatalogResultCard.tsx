@@ -268,8 +268,8 @@ const styles = StyleSheet.create({
   },
   headerRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   headerText: { flex: 1, alignItems: "flex-start" },
-  title: { color: DIET_V2_DARK, textAlign: "right" },
-  subtitle: { color: DIET_V2_MUTED, textAlign: "right" },
+  title: { color: DIET_V2_DARK },
+  subtitle: { color: DIET_V2_MUTED },
   successDot: {
     width: 36,
     height: 36,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   },
   closeLabel: { color: DIET_V2_MUTED, lineHeight: 20 },
   nameSection: { gap: 5, alignItems: "stretch" },
-  fieldLabel: { width: "100%", color: DIET_V2_MUTED, textAlign: "right" },
+  fieldLabel: { width: "100%", color: DIET_V2_MUTED },
   nameInput: {
     width: "100%",
     minHeight: 44,
@@ -303,10 +303,9 @@ const styles = StyleSheet.create({
     color: DIET_V2_DARK,
     fontFamily: "Assistant-SemiBold",
     fontSize: 15,
-    textAlign: "right",
     writingDirection: "rtl",
   },
-  brand: { color: DIET_V2_MUTED, textAlign: "right" },
+  brand: { color: DIET_V2_MUTED },
   servingRow: { flexDirection: "row", gap: 10, alignItems: "stretch" },
   servingDescription: {
     flex: 1,
@@ -316,7 +315,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F8F6",
     alignItems: "flex-start",
   },
-  servingText: { color: DIET_V2_DARK, textAlign: "right" },
+  servingText: { color: DIET_V2_DARK },
   servingCountField: { width: 92, gap: 5, alignItems: "flex-start" },
   servingInput: {
     width: "100%",
@@ -327,11 +326,10 @@ const styles = StyleSheet.create({
     color: DIET_V2_DARK,
     fontFamily: "Assistant-Bold",
     fontSize: 17,
-    textAlign: "center",
     writingDirection: "ltr",
   },
   macrosSection: { gap: 7 },
-  sectionTitle: { color: DIET_V2_DARK, textAlign: "right", alignSelf: "flex-start" },
+  sectionTitle: { color: DIET_V2_DARK, alignSelf: "flex-start" },
   macrosRow: { flexDirection: "row", gap: 7 },
   macroField: { flex: 1, gap: 4, alignItems: "center" },
   macroInput: {
@@ -357,10 +355,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "#FFF1F2",
   },
-  error: { width: "100%", color: "#B42318", textAlign: "right" },
+  error: { width: "100%", color: "#B42318" },
   errorDetailRow: { width: "100%", flexDirection: "row", alignItems: "flex-start", gap: 6 },
   errorDot: { width: 5, height: 5, marginTop: 7, borderRadius: 3, backgroundColor: "#DC2626" },
-  errorDetail: { flex: 1, color: "#B42318", textAlign: "right" },
+  errorDetail: { flex: 1, color: "#B42318" },
 });
 
 export default FoodCatalogResultCard;
