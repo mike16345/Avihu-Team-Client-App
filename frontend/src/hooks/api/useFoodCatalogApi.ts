@@ -1,5 +1,5 @@
 import { fetchData, sendData } from "@/API/api";
-import type { FoodCatalogLookupResult } from "@/interfaces/IFoodCatalog";
+import type { FoodCatalogLookupResult, FoodCatalogSearchResult } from "@/interfaces/IFoodCatalog";
 import type { ApiResponse } from "@/types/ApiTypes";
 
 const FOOD_CATALOG_ENDPOINT = "foodCatalog";
@@ -16,5 +16,10 @@ export const useFoodCatalogApi = () => {
       {}
     ).then(({ data }) => data);
 
-  return { lookupBarcode, reportConsumption };
+  const searchCatalog = (query: string) =>
+    fetchData<ApiResponse<FoodCatalogSearchResult>>(`${FOOD_CATALOG_ENDPOINT}/search`, {
+      q: query,
+    }).then(({ data }) => data);
+
+  return { lookupBarcode, reportConsumption, searchCatalog };
 };

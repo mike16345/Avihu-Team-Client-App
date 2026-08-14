@@ -17,6 +17,10 @@ import {
   getDietPlanV2SmartFoodsStorageKey,
   reconcileSmartFoodEntries,
 } from "../smartFoodStorage";
+import {
+  normalizeFoodCatalogSearchQuery,
+  shouldRequestFoodCatalogSearch,
+} from "../foodCatalogSearch";
 import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
 import type { FoodCatalogProduct } from "@/interfaces/IFoodCatalog";
 
@@ -66,6 +70,12 @@ const product: FoodCatalogProduct = {
 };
 
 describe("Food Catalog recording", () => {
+  it("normalizes search input and waits for two meaningful characters", () => {
+    expect(normalizeFoodCatalogSearchQuery("  Chicken   Breast ")).toBe("Chicken Breast");
+    expect(shouldRequestFoodCatalogSearch("")).toBe(true);
+    expect(shouldRequestFoodCatalogSearch("ח")).toBe(false);
+    expect(shouldRequestFoodCatalogSearch("חז")).toBe(true);
+  });
   it("prefills exactly one serving from the normalized catalog response", () => {
     expect(createFoodCatalogDraft(product)).toEqual({
       catalogItemId: "catalog-1",
