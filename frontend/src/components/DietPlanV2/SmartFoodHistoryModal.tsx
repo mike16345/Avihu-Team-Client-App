@@ -219,7 +219,6 @@ const SmartFoodHistoryModal = ({
                     </View>
                     {day.entries.map((entry) => (
                       <View key={entry.id} style={styles.entryRow}>
-                        <View style={styles.entryDot} />
                         <View style={styles.entryCopy}>
                           <Text fontVariant="semibold" fontSize={14} style={styles.entryName}>
                             {entry.name}
@@ -228,6 +227,7 @@ const SmartFoodHistoryModal = ({
                             {`${formatDietPlanV2Number(entry.servingCount)} × ${entry.servingDescription} · ${formatDietPlanV2Number(entry.macros.calories)} קק"ל`}
                           </Text>
                         </View>
+                        <View style={styles.entryDot} />
                       </View>
                     ))}
                   </View>
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   dayHeader: { flexDirection: "row", alignItems: "center", gap: 7 },
-  dayTitle: { flex: 1, color: DIET_V2_DARK, textAlign: "right" },
+  dayTitle: { flex: 1, color: DIET_V2_DARK },
   totalBadge: {
     alignSelf: "flex-start",
     paddingHorizontal: 10,
@@ -330,8 +330,8 @@ const styles = StyleSheet.create({
   },
   entryDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: DIET_V2_GREEN },
   entryCopy: { flex: 1, alignItems: "flex-start" },
-  entryName: { width: "100%", color: DIET_V2_DARK, textAlign: "right" },
-  entryMeta: { width: "100%", color: DIET_V2_MUTED, textAlign: "right" },
+  entryName: { width: "100%", color: DIET_V2_DARK },
+  entryMeta: { width: "100%", color: DIET_V2_MUTED },
 });
 
 export default SmartFoodHistoryModal;
