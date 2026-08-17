@@ -6,6 +6,7 @@ export interface SmartFoodDraft {
   barcode: string;
   name: string;
   servingDescription: string;
+  servingId: string;
   servingCount: string;
   calories: string;
   protein: string;
@@ -73,23 +74,35 @@ export const validateSmartFoodDraft = (draft: SmartFoodDraft): SmartFoodDraftErr
   return errors;
 };
 
-export const createFoodCatalogDraft = (product: FoodCatalogProduct): SmartFoodDraft => ({
-  catalogItemId: product.id,
-  barcode: product.identifiers.barcode ?? "",
-  name: product.displayName ?? product.names.he ?? product.names.en ?? product.names.original ?? "",
-  servingDescription: product.serving?.description ?? "מנה אחת",
-  servingCount: "1",
-  calories: toInputValue(product.nutrition.perServing.calories),
-  protein: toInputValue(product.nutrition.perServing.protein),
-  carbs: toInputValue(product.nutrition.perServing.carbohydrates),
-  fat: toInputValue(product.nutrition.perServing.fat),
-});
+export const createFoodCatalogDraft = (
+  product: FoodCatalogProduct,
+  servingId?: string
+): SmartFoodDraft => {
+  const selectedServing =
+    product.servings?.find((serving) => serving.id === servingId) ?? product.servings?.[0];
+  const nutrition = selectedServing?.nutrition ?? product.nutrition.perServing;
+
+  return {
+    catalogItemId: product.id,
+    barcode: product.identifiers.barcode ?? "",
+    name:
+      product.displayName ?? product.names.he ?? product.names.en ?? product.names.original ?? "",
+    servingId: selectedServing?.id ?? "",
+    servingDescription: selectedServing?.description ?? product.serving?.description ?? "מנה אחת",
+    servingCount: "1",
+    calories: toInputValue(nutrition.calories),
+    protein: toInputValue(nutrition.protein),
+    carbs: toInputValue(nutrition.carbohydrates),
+    fat: toInputValue(nutrition.fat),
+  };
+};
 
 export const createSmartFoodEntryDraft = (entry: SmartFoodEntry): SmartFoodDraft => ({
   catalogItemId: entry.catalogItemId,
   barcode: entry.barcode,
   name: entry.name,
   servingDescription: entry.servingDescription,
+  servingId: "",
   servingCount: toInputValue(entry.servingCount),
   calories: toInputValue(entry.macros.calories / entry.servingCount),
   protein: toInputValue(entry.macros.protein / entry.servingCount),

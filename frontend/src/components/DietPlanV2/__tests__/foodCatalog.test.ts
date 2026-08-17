@@ -32,6 +32,44 @@ const product: FoodCatalogProduct = {
   imageUrl: null,
   package: { description: "200 g", quantity: 200, unit: "g" },
   serving: { description: "100 g", quantity: 100, unit: "g", source: "open_food_facts" },
+  servings: [
+    {
+      id: "off-serving",
+      description: "100 g",
+      quantity: 100,
+      unit: "g",
+      nutrition: {
+        calories: 150,
+        protein: 20,
+        carbohydrates: 5,
+        fat: 4,
+        saturatedFat: 2,
+        sugars: 3,
+        fiber: 0,
+        sodium: 0.1,
+        salt: 0.25,
+      },
+      source: "open_food_facts",
+    },
+    {
+      id: "admin-cup",
+      description: "כוס אחת",
+      quantity: 1,
+      unit: "cup",
+      nutrition: {
+        calories: 225,
+        protein: 30,
+        carbohydrates: 7.5,
+        fat: 6,
+        saturatedFat: 3,
+        sugars: 4.5,
+        fiber: 0,
+        sodium: 0.15,
+        salt: 0.38,
+      },
+      source: "admin",
+    },
+  ],
   nutrition: {
     basisUnit: "g",
     per100: {
@@ -61,6 +99,11 @@ const product: FoodCatalogProduct = {
   displayName: "יוגורט",
   displayLanguage: "he",
   hasAdminOverrides: false,
+  provenance: {
+    provider: "open_food_facts",
+    license: "ODbL-1.0",
+    sourceUrl: "https://world.openfoodfacts.org/product/7290000000000",
+  },
   analytics: {
     lookupCount: 1,
     consumptionCount: 0,
@@ -82,6 +125,7 @@ describe("Food Catalog recording", () => {
       barcode: "7290000000000",
       name: "יוגורט",
       servingDescription: "100 g",
+      servingId: "off-serving",
       servingCount: "1",
       calories: "150",
       protein: "20",
@@ -90,9 +134,29 @@ describe("Food Catalog recording", () => {
     });
   });
 
+  it("switches between every normalized serving without requiring a gram conversion", () => {
+    expect(createFoodCatalogDraft(product, "admin-cup")).toMatchObject({
+      servingId: "admin-cup",
+      servingDescription: "כוס אחת",
+      servingCount: "1",
+      calories: "225",
+      protein: "30",
+      carbs: "7.5",
+      fat: "6",
+    });
+  });
+
   it("keeps missing nutrition editable instead of inventing values", () => {
     const draft = createFoodCatalogDraft({
       ...product,
+      servings: product.servings?.map((serving, index) =>
+        index === 0
+          ? {
+              ...serving,
+              nutrition: { ...serving.nutrition, calories: null, protein: null },
+            }
+          : serving
+      ),
       nutrition: {
         ...product.nutrition,
         perServing: {
@@ -110,6 +174,20 @@ describe("Food Catalog recording", () => {
   it("limits catalog nutrition and recorded macro totals to two decimal places", () => {
     const draft = createFoodCatalogDraft({
       ...product,
+      servings: product.servings?.map((serving, index) =>
+        index === 0
+          ? {
+              ...serving,
+              nutrition: {
+                ...serving.nutrition,
+                calories: 124.999999,
+                protein: 24.664838,
+                carbohydrates: 5.5,
+                fat: 4,
+              },
+            }
+          : serving
+      ),
       nutrition: {
         ...product.nutrition,
         perServing: {
@@ -175,6 +253,7 @@ describe("Food Catalog recording", () => {
       barcode: "7290000000000",
       name: "יוגורט",
       servingDescription: "100 g",
+      servingId: "",
       servingCount: "2",
       calories: "150.25",
       protein: "20.5",

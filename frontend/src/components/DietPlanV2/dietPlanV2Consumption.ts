@@ -126,9 +126,9 @@ export const computeDietPlanV2ConsumedTotals = (
 
           return {
             calories: mealTotals.calories + category.macros.calories,
-            protein: mealTotals.protein + category.macros.protein,
-            carbs: mealTotals.carbs + category.macros.carbs,
-            fat: mealTotals.fat + category.macros.fat,
+            protein: mealTotals.protein + (category.macros.protein ?? 0),
+            carbs: mealTotals.carbs + (category.macros.carbs ?? 0),
+            fat: mealTotals.fat + (category.macros.fat ?? 0),
           };
         },
         { calories: 0, protein: 0, carbs: 0, fat: 0 }

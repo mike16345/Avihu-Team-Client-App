@@ -38,6 +38,14 @@ export interface FoodCatalogProduct {
     unit: FoodCatalogMeasurementUnit;
     source: "open_food_facts" | "fallback_100";
   } | null;
+  servings?: Array<{
+    id: string;
+    description: string;
+    quantity: number;
+    unit: string;
+    nutrition: FoodCatalogNutritionValues;
+    source: "open_food_facts" | "fallback_100" | "admin";
+  }>;
   nutrition: {
     basisUnit: FoodCatalogMeasurementUnit | null;
     per100: FoodCatalogNutritionValues;
@@ -52,6 +60,11 @@ export interface FoodCatalogProduct {
   displayName: string | null;
   displayLanguage: "he" | "en" | "original" | null;
   hasAdminOverrides: boolean;
+  provenance: {
+    provider: "open_food_facts" | "admin" | "future_provider";
+    license: string | null;
+    sourceUrl: string | null;
+  };
   analytics: {
     lookupCount: number;
     consumptionCount: number;

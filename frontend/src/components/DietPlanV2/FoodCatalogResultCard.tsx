@@ -189,6 +189,40 @@ const FoodCatalogResultCard = ({
         </View>
       </View>
 
+      {product && (product.servings?.length ?? 0) > 1 ? (
+        <View style={styles.servingOptions}>
+          <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
+            בחר סוג מנה
+          </Text>
+          <View style={styles.servingChips}>
+            {product.servings?.map((serving) => {
+              const selected = draft.servingId === serving.id;
+              return (
+                <Pressable
+                  key={serving.id}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  onPress={() => {
+                    selectionHaptic();
+                    setDraft(createFoodCatalogDraft(product, serving.id));
+                    setErrors({});
+                  }}
+                  style={[styles.servingChip, selected && styles.servingChipSelected]}
+                >
+                  <Text
+                    fontVariant="semibold"
+                    fontSize={12}
+                    style={[styles.servingChipText, selected && styles.servingChipTextSelected]}
+                  >
+                    {serving.description}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+      ) : null}
+
       <View style={styles.macrosSection}>
         <Text fontVariant="semibold" fontSize={13} style={styles.sectionTitle}>
           ערכים למנה אחת
@@ -328,6 +362,20 @@ const styles = StyleSheet.create({
     fontSize: 17,
     writingDirection: "ltr",
   },
+  servingOptions: { gap: 7 },
+  servingChips: { flexDirection: "row", flexWrap: "wrap", gap: 7 },
+  servingChip: {
+    minHeight: 36,
+    justifyContent: "center",
+    paddingHorizontal: 12,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: DIET_V2_CARD_BORDER,
+    backgroundColor: "#FFFFFF",
+  },
+  servingChipSelected: { borderColor: "#86C9A5", backgroundColor: DIET_V2_MINT },
+  servingChipText: { color: DIET_V2_MUTED },
+  servingChipTextSelected: { color: DIET_V2_GREEN },
   macrosSection: { gap: 7 },
   sectionTitle: { color: DIET_V2_DARK, alignSelf: "flex-start" },
   macrosRow: { flexDirection: "row", gap: 7 },

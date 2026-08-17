@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Linking, Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown, FadeOut, LinearTransition } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import { useFoodCatalogApi } from "@/hooks/api/useFoodCatalogApi";
@@ -26,6 +26,8 @@ import {
   SparkleIcon,
 } from "./dietV2Icons";
 import { formatDietPlanV2Number } from "./dietPlanV2Utils";
+
+const OPEN_FOOD_FACTS_URL = "https://world.openfoodfacts.org";
 
 interface DietPlanV2SmartMenuProps {
   plan: IDietPlanV2;
@@ -238,6 +240,23 @@ const DietPlanV2SmartMenu = ({
         ))}
       </View>
 
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel="פתיחת אתר Open Food Facts, מקור נתוני המוצרים"
+        onPress={() => {
+          selectionHaptic();
+          void Linking.openURL(OPEN_FOOD_FACTS_URL).catch((error) => {
+            console.warn("Failed to open Open Food Facts website", error);
+          });
+        }}
+        style={({ pressed }) => [styles.attribution, pressed && styles.attributionPressed]}
+      >
+        <View style={styles.attributionDot} />
+        <Text fontSize={10} style={styles.attributionText}>
+          מקור נתוני המוצרים: Open Food Facts
+        </Text>
+      </Pressable>
+
       <FoodCatalogScannerModal
         visible={scannerOpen}
         onClose={() => setScannerOpen(false)}
@@ -379,6 +398,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F6F5",
   },
   removeLabel: { color: DIET_V2_MUTED, lineHeight: 18 },
+  attribution: {
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    minHeight: 28,
+    paddingHorizontal: 10,
+    borderRadius: 14,
+  },
+  attributionPressed: { backgroundColor: "#EEF4F1" },
+  attributionDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: "#A8B3AE",
+  },
+  attributionText: { color: "#7F8B85" },
 });
 
 export default DietPlanV2SmartMenu;
