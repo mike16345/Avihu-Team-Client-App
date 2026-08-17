@@ -42,7 +42,10 @@ const DietPlanV2FreeCalories = ({
         <DietPlanV2ConsumedBadge consumed={consumed} />
       </View>
       <Text fontSize={15} style={[styles.description, consumed && styles.descriptionConsumed]}>
-        {freeCalories.description}
+        {freeCalories.items
+          .map((item) => item.name.trim())
+          .filter(Boolean)
+          .join(" / ")}
       </Text>
     </Pressable>
   );

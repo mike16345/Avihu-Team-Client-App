@@ -29,18 +29,18 @@ const plan: IDietPlanV2 = {
         {
           category: "protein",
           items: [{ name: "100 גרם חזה עוף" }],
-          macros: { calories: 200, protein: 25, carbs: 0, fat: 4 },
+          macros: { calories: 200, protein: 25 },
         },
         {
           category: "carbs",
           items: [{ name: "200 גרם אורז" }],
-          macros: { calories: 248.5, protein: 0, carbs: 45, fat: 8 },
+          macros: { calories: 248.5, carbs: 45 },
         },
         { category: "vegetables", items: [] },
       ],
       addOns: [{ name: "קפה" }],
       macros: { calories: 448.5, protein: 25, carbs: 45, fat: 12 },
-      freeCalories: { calories: 150, description: "פרי / חטיף" },
+      freeCalories: { calories: 150, items: [{ name: "פרי" }, { name: "חטיף" }] },
     },
     {
       name: "ארוחה 2",
@@ -48,7 +48,7 @@ const plan: IDietPlanV2 = {
         {
           category: "protein",
           items: [{ name: "טונה" }],
-          macros: { calories: 300, protein: 30, carbs: 0, fat: 5 },
+          macros: { calories: 300, protein: 30 },
         },
       ],
       addOns: [],
@@ -97,13 +97,13 @@ describe("V2 meal completion", () => {
     ]);
     expect(entries[0]).toMatchObject({
       detail: "ארוחה 1 · חלבון",
-      macros: { calories: 200, protein: 25, carbs: 0, fat: 4 },
+      macros: { calories: 200, protein: 25, carbs: 0, fat: 0 },
     });
     expect(sumDietPlanV2HistoryMacros(entries)).toEqual({
       calories: 440,
       protein: 35,
       carbs: 5,
-      fat: 7,
+      fat: 3,
       freeCalories: 0,
     });
   });
@@ -166,7 +166,7 @@ describe("V2 meal completion", () => {
       calories: 200,
       protein: 25,
       carbs: 0,
-      fat: 4,
+      fat: 0,
       freeCalories: 0,
     });
   });
@@ -185,7 +185,7 @@ describe("V2 meal completion", () => {
       calories: 598.5,
       protein: 25,
       carbs: 45,
-      fat: 12,
+      fat: 0,
       freeCalories: 150,
     });
   });

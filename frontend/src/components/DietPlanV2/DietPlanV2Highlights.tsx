@@ -1,7 +1,9 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, useWindowDimensions, View } from "react-native";
+import RenderHtml from "react-native-render-html";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { DIET_V2_CARD_BORDER, DIET_V2_DARK, DIET_V2_GREEN, DIET_V2_MUTED } from "./dietV2Icons";
+import { isHtmlEmpty } from "@/utils/htmlUtils";
 
 interface DietPlanV2HighlightsProps {
   highlights: string;
@@ -9,12 +11,9 @@ interface DietPlanV2HighlightsProps {
 
 const DietPlanV2Highlights = ({ highlights }: DietPlanV2HighlightsProps) => {
   const { spacing } = useStyles();
-  const lines = highlights
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const { width } = useWindowDimensions();
 
-  if (lines.length === 0) {
+  if (isHtmlEmpty(highlights)) {
     return (
       <View style={spacing.pdHorizontalMd}>
         <View style={[styles.card, styles.empty]}>
@@ -35,14 +34,18 @@ const DietPlanV2Highlights = ({ highlights }: DietPlanV2HighlightsProps) => {
             דגשים מהמאמן
           </Text>
         </View>
-        {lines.map((line, index) => (
-          <View key={`${index}-${line}`} style={styles.tipRow}>
-            <View style={styles.tipDot} />
-            <Text fontSize={15} style={styles.line}>
-              {line}
-            </Text>
-          </View>
-        ))}
+        <RenderHtml
+          contentWidth={Math.max(0, width - 64)}
+          source={{ html: highlights }}
+          ignoredDomTags={["script", "style", "iframe", "object"]}
+          defaultTextProps={{ selectable: true }}
+          baseStyle={styles.richText}
+          tagsStyles={{
+            p: styles.richParagraph,
+            li: styles.richListItem,
+            a: styles.richLink,
+          }}
+        />
       </View>
     </View>
   );
@@ -76,19 +79,16 @@ const styles = StyleSheet.create({
     flex: 1,
     color: DIET_V2_DARK,
   },
-  line: {
-    flex: 1,
+  richText: {
     color: DIET_V2_DARK,
+    fontFamily: "Assistant-Regular",
+    fontSize: 15,
     lineHeight: 24,
+    writingDirection: "rtl",
   },
-  tipRow: { width: "100%", flexDirection: "row", alignItems: "flex-start", gap: 10 },
-  tipDot: {
-    width: 7,
-    height: 7,
-    marginTop: 8,
-    borderRadius: 4,
-    backgroundColor: DIET_V2_GREEN,
-  },
+  richParagraph: { marginTop: 0, marginBottom: 8 },
+  richListItem: { marginBottom: 5 },
+  richLink: { color: DIET_V2_GREEN, textDecorationLine: "underline" },
   empty: {
     minHeight: 104,
     alignItems: "center",

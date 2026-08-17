@@ -39,7 +39,12 @@ export const buildDietPlanV2HistoryEntries = (
             id: `${mealKey}:${rowKey}`,
             name,
             detail: `${mealName} · ${DIET_V2_CATEGORY_LABELS[category.category]}`,
-            macros: category.macros ?? ZERO_MACROS,
+            macros: {
+              calories: category.macros?.calories ?? 0,
+              protein: category.macros?.protein ?? 0,
+              carbs: category.macros?.carbs ?? 0,
+              fat: category.macros?.fat ?? 0,
+            },
             source: "meal",
           },
         ];
@@ -63,7 +68,7 @@ export const buildDietPlanV2HistoryEntries = (
         ? [
             {
               id: `${mealKey}:free-calories`,
-              name: meal.freeCalories.description.trim() || "קלוריות חופשיות",
+              name: formatDietV2Items(meal.freeCalories.items) || "קלוריות חופשיות",
               detail: `${mealName} · קלוריות חופשיות`,
               macros: { ...ZERO_MACROS, calories: meal.freeCalories.calories },
               source: "meal",

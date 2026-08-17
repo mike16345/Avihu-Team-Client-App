@@ -2,7 +2,11 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import type { DietV2Category } from "@/interfaces/IDietPlanV2";
 import { selectionHaptic } from "@/utils/haptics";
-import { DIET_V2_CATEGORY_LABELS, formatDietV2CategoryItems } from "./dietPlanV2Utils";
+import {
+  DIET_V2_CATEGORY_LABELS,
+  formatDietV2CategoryItems,
+  formatDietV2CategoryMacros,
+} from "./dietPlanV2Utils";
 import DietPlanV2ConsumedBadge from "./DietPlanV2ConsumedBadge";
 import { getDietPlanV2MealRowVisualState } from "./dietPlanV2MealRowVisualState";
 
@@ -35,9 +39,14 @@ const DietPlanV2CategoryRow = ({
       ]}
     >
       <View style={styles.headerRow}>
-        <Text fontVariant="bold" fontSize={15} style={styles.header}>
-          {DIET_V2_CATEGORY_LABELS[category.category]}
-        </Text>
+        <View style={styles.titleGroup}>
+          <Text fontVariant="bold" fontSize={15} style={styles.header}>
+            {DIET_V2_CATEGORY_LABELS[category.category]}
+          </Text>
+          <Text fontSize={11} numberOfLines={1} style={styles.macros}>
+            {formatDietV2CategoryMacros(category)}
+          </Text>
+        </View>
         <DietPlanV2ConsumedBadge consumed={consumed} />
       </View>
       <Text fontSize={15} style={[styles.body, consumed && styles.bodyConsumed]}>
@@ -71,6 +80,13 @@ const styles = StyleSheet.create({
   },
   header: {
     color: "#0B2A22",
+  },
+  titleGroup: {
+    flex: 1,
+    gap: 1,
+  },
+  macros: {
+    color: "#6B7280",
   },
   body: {
     color: "#4B5563",
