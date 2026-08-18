@@ -1,9 +1,9 @@
-import { StyleSheet, useWindowDimensions, View } from "react-native";
-import RenderHtml from "react-native-render-html";
+import { StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { DIET_V2_CARD_BORDER, DIET_V2_DARK, DIET_V2_GREEN, DIET_V2_MUTED } from "./dietV2Icons";
 import { isHtmlEmpty } from "@/utils/htmlUtils";
+import HtmlBlock from "../ui/HTMLBlock";
 
 interface DietPlanV2HighlightsProps {
   highlights: string;
@@ -11,7 +11,6 @@ interface DietPlanV2HighlightsProps {
 
 const DietPlanV2Highlights = ({ highlights }: DietPlanV2HighlightsProps) => {
   const { spacing } = useStyles();
-  const { width } = useWindowDimensions();
 
   if (isHtmlEmpty(highlights)) {
     return (
@@ -34,18 +33,7 @@ const DietPlanV2Highlights = ({ highlights }: DietPlanV2HighlightsProps) => {
             דגשים מהמאמן
           </Text>
         </View>
-        <RenderHtml
-          contentWidth={Math.max(0, width - 64)}
-          source={{ html: highlights }}
-          ignoredDomTags={["script", "style", "iframe", "object"]}
-          defaultTextProps={{ selectable: true }}
-          baseStyle={styles.richText}
-          tagsStyles={{
-            p: styles.richParagraph,
-            li: styles.richListItem,
-            a: styles.richLink,
-          }}
-        />
+        <HtmlBlock source={{ html: highlights }} />
       </View>
     </View>
   );
@@ -65,7 +53,6 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-end",
     gap: 8,
     paddingBottom: 2,
   },
@@ -76,7 +63,6 @@ const styles = StyleSheet.create({
     backgroundColor: DIET_V2_GREEN,
   },
   title: {
-    flex: 1,
     color: DIET_V2_DARK,
   },
   richText: {
