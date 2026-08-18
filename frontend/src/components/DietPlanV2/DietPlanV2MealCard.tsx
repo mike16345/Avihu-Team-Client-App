@@ -100,6 +100,7 @@ const DietPlanV2MealCard = ({
           {meal.categories.map((category, categoryIndex) => {
             if (!category.items.some(({ name }) => name.trim().length > 0)) return null;
             const rowKey = `category:${category.category}:${categoryIndex}`;
+
             return (
               <DietPlanV2CategoryRow
                 key={rowKey}

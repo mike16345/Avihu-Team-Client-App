@@ -59,6 +59,7 @@ const DietPlanV2CategoryRow = ({
 const styles = StyleSheet.create({
   container: {
     gap: 4,
+    alignItems: "flex-start",
     alignSelf: "stretch",
     borderRadius: 10,
     paddingVertical: 10,
@@ -73,6 +74,7 @@ const styles = StyleSheet.create({
     borderColor: "#D1FAE5",
   },
   headerRow: {
+    width: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -82,7 +84,7 @@ const styles = StyleSheet.create({
     color: "#0B2A22",
   },
   titleGroup: {
-    flex: 1,
+    alignItems: "flex-start",
     gap: 1,
   },
   macros: {

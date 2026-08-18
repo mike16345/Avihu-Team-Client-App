@@ -165,8 +165,33 @@ export const computeDietPlanV2Totals = (plan: IDietPlanV2): DietPlanV2Totals =>
     { calories: 0, protein: 0, carbs: 0, fat: 0, freeCalories: 0 }
   );
 
+export const isDecimalNumber = (value: string | number): boolean => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) && !Number.isInteger(value);
+  }
+  if (typeof value === "string") {
+    const parsedValue = parseFloat(value);
+    return !isNaN(parsedValue) && !Number.isInteger(parsedValue);
+  }
+  return false;
+};
+
+export const toFixedDecimal = (value: string | number, decimals: number) => {
+  if (typeof value === "string" && isDecimalNumber(value)) {
+    const parsedValue = parseFloat(value);
+    if (isNaN(parsedValue)) {
+      return value;
+    }
+    return parsedValue.toFixed(decimals);
+  } else if (typeof value === "number" && value !== 0 && isDecimalNumber(value)) {
+    return value.toFixed(decimals);
+  }
+
+  return value;
+};
+
 export const formatDietPlanV2Number = (value: number): string =>
-  Object.is(value, -0) ? "0" : value.toString();
+  Object.is(value, -0) ? "0" : toFixedDecimal(value.toString(), 2);
 
 export const formatDietPlanV2MealMacroSummary = (
   macros: Pick<DietPlanV2Totals, "calories" | "protein" | "carbs" | "fat">

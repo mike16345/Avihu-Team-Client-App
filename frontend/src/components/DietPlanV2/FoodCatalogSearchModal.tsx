@@ -66,6 +66,7 @@ const FoodCatalogSearchModal = ({
   const queryIsValid = shouldRequestFoodCatalogSearch(normalizedQuery);
   const queryIsSettling = normalizedQuery !== debouncedQuery;
   const search = useFoodCatalogSearchQuery(debouncedQuery, queryIsValid && !queryIsSettling);
+
   const products = search.data?.products ?? [];
   const hasQuery = normalizedQuery.length > 0;
   const showTooShort = hasQuery && !queryIsValid;
@@ -128,19 +129,6 @@ const FoodCatalogSearchModal = ({
             autoFocus={visible}
             style={styles.searchInput}
           />
-          {query.length > 0 ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="נקה חיפוש"
-              onPress={() => setQuery("")}
-              hitSlop={8}
-              style={styles.clearButton}
-            >
-              <Text fontSize={17} style={styles.clearLabel}>
-                ×
-              </Text>
-            </Pressable>
-          ) : null}
         </View>
 
         <ScrollView
@@ -267,7 +255,6 @@ const styles = StyleSheet.create({
   },
   searchIcon: { width: 20, alignItems: "center" },
   searchInput: {
-    flex: 1,
     paddingVertical: 10,
     color: DIET_V2_DARK,
     fontFamily: "Assistant-Regular",
