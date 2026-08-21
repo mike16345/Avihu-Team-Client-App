@@ -13,6 +13,8 @@ export type WheelPickerProps = {
   itemHeight?: number;
   activeItemColor?: string;
   inactiveItemColor?: string;
+  dangerThreshold?: number;
+  dangerColor?: string;
   label?: ReactNode;
   disabled?: boolean;
   onValueCommit?: (value: number | string) => void; // fires when scroll settles

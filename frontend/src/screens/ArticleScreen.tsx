@@ -5,8 +5,43 @@ import useArticleCountQuery from "@/hooks/queries/articles/useArticleCountQuery"
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import { useUserStore } from "@/store/userStore";
 import useStyles from "@/styles/useGlobalStyles";
-import { useMemo } from "react";
-import { RefreshControl, ScrollView } from "react-native";
+import { useCallback, useMemo, useRef } from "react";
+import { Animated, Easing, RefreshControl, ScrollView } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+
+const STAGGER_MS = 130;
+const ITEM_DURATION_MS = 520;
+
+const StaggeredItem: React.FC<{ index: number; playKey: number; children: React.ReactNode }> = ({
+  index,
+  playKey,
+  children,
+}) => {
+  const progress = useRef(new Animated.Value(0)).current;
+
+  useFocusEffect(
+    useCallback(() => {
+      progress.setValue(0);
+      const anim = Animated.timing(progress, {
+        toValue: 1,
+        duration: ITEM_DURATION_MS,
+        delay: index * STAGGER_MS,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      });
+      anim.start();
+      return () => anim.stop();
+    }, [progress, index, playKey])
+  );
+
+  const translateY = progress.interpolate({ inputRange: [0, 1], outputRange: [16, 0] });
+
+  return (
+    <Animated.View style={{ width: "100%", opacity: progress, transform: [{ translateY }] }}>
+      {children}
+    </Animated.View>
+  );
+};
 
 const ArticleScreen = () => {
   const { colors, layout, spacing, text } = useStyles();
@@ -23,7 +58,11 @@ const ArticleScreen = () => {
         </Text>
       );
 
-    return data.map((group) => <ArticleGroupDisplay key={group.id} articleGroup={group} />);
+    return data.map((group, idx) => (
+      <StaggeredItem key={group.id} index={idx} playKey={data.length}>
+        <ArticleGroupDisplay articleGroup={group} />
+      </StaggeredItem>
+    ));
   }, [data]);
 
   if (isLoading) return <ArticleSkeleton />;

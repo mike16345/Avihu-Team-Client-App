@@ -12,6 +12,7 @@ interface FoodItemSelectionProps {
   servingAmount: number;
   customItems?: ICustomItem[];
   extraItems?: string[];
+  struck?: boolean;
 }
 
 const START_SLICE_INDEX = 0;
@@ -22,6 +23,7 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
   servingAmount = 1,
   customItems = [],
   extraItems = [],
+  struck = false,
 }) => {
   const { center, wrap } = useLayoutStyles();
   const { data: items, isLoading } = useFoodGroupQuery(foodGroup);
@@ -62,7 +64,11 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
     );
 
   return (
-    <TextInput multiline style={[wrap, styles.foodItemSelectionContainr]} editable={false}>
+    <TextInput
+      multiline
+      style={[wrap, styles.foodItemSelectionContainr, struck && styles.struck]}
+      editable={false}
+    >
       {formatted}
     </TextInput>
   );
@@ -73,6 +79,10 @@ const styles = StyleSheet.create({
     fontFamily: "Assistant-Regular",
     fontSize: 16,
     textAlign: "right",
+  },
+  struck: {
+    textDecorationLine: "line-through",
+    opacity: 0.55,
   },
 });
 

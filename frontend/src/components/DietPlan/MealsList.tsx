@@ -1,42 +1,38 @@
 import { FC } from "react";
 import CollapsibleMeal from "./CollapsibleMeal";
-import { useWindowDimensions, View } from "react-native";
+import ServingsTracker from "./ServingsTracker";
+import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { Text } from "../ui/Text";
-import CustomScrollView from "../ui/scrollview/CustomScrollView";
 import { IMeal } from "@/interfaces/DietPlan";
 
-interface MealsListProps {}
-
-const MealsList: FC<MealsListProps> = () => {
-  const { height } = useWindowDimensions();
+const MealsList: FC = () => {
   const { spacing, layout } = useStyles();
   const { data, isLoading } = useDietPlanQuery();
   const meals = data?.meals || [];
 
   return (
-    <View style={[{ height: height * 0.5 }]}>
-      <CustomScrollView
-        style={{ flexGrow: 1 }}
-        contentContainerStyle={[{ flexGrow: 1 }, spacing.gap20, spacing.pdHorizontalMd]}
-      >
-        <ConditionalRender condition={isLoading}>
-          <View style={[layout.center]}>
-            <SpinningIcon mode="light" />
-          </View>
-        </ConditionalRender>
+    <View style={[spacing.gap20, spacing.pdHorizontalMd]}>
+      <ConditionalRender condition={isLoading}>
+        <View style={[layout.center]}>
+          <SpinningIcon mode="light" />
+        </View>
+      </ConditionalRender>
 
-        <ConditionalRender condition={!meals.length && !isLoading}>
-          <Text style={{ textAlign: "center" }}>אין תוכנית תזונה</Text>
-        </ConditionalRender>
+      <ConditionalRender condition={!meals.length && !isLoading}>
+        <Text style={{ textAlign: "center" }}>אין תוכנית תזונה</Text>
+      </ConditionalRender>
 
-        {meals.map((meal: IMeal, i: number) => {
-          return <CollapsibleMeal key={meal._id ?? i} meal={meal} index={i} />;
-        })}
-      </CustomScrollView>
+      <ConditionalRender condition={!!meals.length && !isLoading}>
+        <ServingsTracker />
+      </ConditionalRender>
+
+      {meals.map((meal: IMeal, i: number) => (
+        <CollapsibleMeal key={meal._id ?? i} meal={meal} index={i} />
+      ))}
     </View>
   );
 };
