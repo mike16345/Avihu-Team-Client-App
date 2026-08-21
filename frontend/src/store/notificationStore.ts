@@ -12,7 +12,7 @@ export interface INotification {
   title: string | null;
   body: string | null;
   data: any;
-  type: "weighIn" | "measurement" | "monthlyForm" | "generalForm";
+  type: "weighIn" | "measurement" | "weeklyFeedback" | "monthlyForm" | "generalForm";
   triggerTime: Date;
   status: "pending" | "delivered";
 }
@@ -27,6 +27,7 @@ interface INotificationStore {
   addFormNotification: (id: string, type: "generalForm" | "monthlyForm") => void;
   addWeighInNotification: (id?: string) => void;
   addMeasurementNotification: (id?: string) => void;
+  addWeeklyFeedbackNotification: (id?: string) => void;
   addNotificationsIfNecessary: () => void;
   removeNotification: (id: string) => void;
   updateNotificationStatus: (id: string) => void;
@@ -132,11 +133,37 @@ export const useNotificationStore = create<INotificationStore>()(
         });
       },
 
+      addWeeklyFeedbackNotification: (id) => {
+        const triggerTime = getNextEightAMOnSunday();
+        const data = { id: id || generateUniqueId() };
+        const pendingNotifications = get().getPendingNotifications();
+
+        if (
+          pendingNotifications.find(
+            (n) =>
+              n.type == "weeklyFeedback" &&
+              new Date(n.triggerTime).getTime() === triggerTime.getTime()
+          )
+        )
+          return;
+
+        get().addNotification({
+          id: data.id,
+          status: "pending",
+          title: NOTIFICATION_TITLE,
+          body: NotificationBodies.WEEKLY_FEEDBACK_REMINDER,
+          type: "weeklyFeedback",
+          data,
+          triggerTime,
+        });
+      },
+
       addNotificationsIfNecessary: () => {
         if (Platform.OS == "android") return;
 
         get().addWeighInNotification();
         get().addMeasurementNotification();
+        get().addWeeklyFeedbackNotification();
       },
 
       addNotification: (notification: INotification) => {

@@ -105,6 +105,34 @@ export const useNotification = () => {
     useNotificationStore.getState().addMeasurementNotification(data.id);
   };
 
+  const scheduleWeeklyFeedbackReminder = async () => {
+    const nextSunday8am = getNextEightAMOnSunday();
+
+    const trigger: Notifications.DateTriggerInput = {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: nextSunday8am,
+      channelId: DEFAULT_CHANNEL_ID,
+    };
+
+    if (Platform.OS === "android") {
+      await ensureAndroidChannel();
+    }
+
+    const data = { id: generateUniqueId() };
+
+    await Notifications.scheduleNotificationAsync({
+      identifier: NotificationIdentifiers.WEEKLY_FEEDBACK_REMINDER_ID,
+      content: {
+        title: NOTIFICATION_TITLE,
+        body: NotificationBodies.WEEKLY_FEEDBACK_REMINDER,
+        data,
+      },
+      trigger,
+    });
+
+    useNotificationStore.getState().addWeeklyFeedbackNotification(data.id);
+  };
+
   /** Show a one-off notification now or in N seconds, or at a Date */
   const showNotification = async (
     body: string,
@@ -142,6 +170,7 @@ export const useNotification = () => {
 
       let alreadyScheduledWeightIn = false;
       let alreadyScheduledMeasurement = false;
+      let alreadyScheduledWeeklyFeedback = false;
 
       for (const n of scheduled) {
         if (n.identifier === NotificationIdentifiers.NEW_DAILY_WEIGH_IN_REMINDER_ID) {
@@ -150,13 +179,20 @@ export const useNotification = () => {
         if (n.identifier === NotificationIdentifiers.WEEKLY_MEASUERMENT_REMINDER_ID) {
           alreadyScheduledMeasurement = true;
         }
+        if (n.identifier === NotificationIdentifiers.WEEKLY_FEEDBACK_REMINDER_ID) {
+          alreadyScheduledWeeklyFeedback = true;
+        }
 
-        // Early exit if both are already scheduled
-        if (alreadyScheduledWeightIn && alreadyScheduledMeasurement) break;
+        if (alreadyScheduledWeightIn && alreadyScheduledMeasurement && alreadyScheduledWeeklyFeedback)
+          break;
       }
 
       if (!alreadyScheduledMeasurement) {
         await scheduleWeeklyMeasurementReminder();
+      }
+
+      if (!alreadyScheduledWeeklyFeedback) {
+        await scheduleWeeklyFeedbackReminder();
       }
 
       if (!alreadyScheduledWeightIn) {

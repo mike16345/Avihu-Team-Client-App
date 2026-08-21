@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 40,
     zIndex: 10000,
+    justifyContent: "center",
   },
   navigationBar: {
     height: TAB_BAR_HEIGHT,

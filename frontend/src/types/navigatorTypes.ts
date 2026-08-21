@@ -30,7 +30,6 @@ export type AuthStackParamList = {
 export type BottomStackParamList = {
   Home: { window?: number; paramId?: string } | undefined;
   MyWorkoutPlanPage: NavigatorScreenParams<WorkoutPlanStackParamList> | undefined;
-  ChatTab: undefined;
   MyDietPlanPage: undefined;
   MyProgressScreen: undefined;
   ArticleScreen: undefined;

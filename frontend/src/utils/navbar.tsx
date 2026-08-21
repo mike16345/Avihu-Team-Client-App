@@ -7,7 +7,7 @@ interface IIndicator {
 
 export const indicators: IIndicator[] = [
   { name: "אימונים", icon: "dumbbell" },
-  { name: 'צ"אט', icon: "chat" },
+  { name: 'דו"ח', icon: "trendingUp" },
   { name: "דף הבית", icon: "home" },
   { name: "ארוחות", icon: "chefHat" },
   { name: "מאמרים", icon: "sideBar" },

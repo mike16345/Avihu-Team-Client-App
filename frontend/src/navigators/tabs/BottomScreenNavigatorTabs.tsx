@@ -4,6 +4,7 @@ import WorkoutPlanStack from "../WorkoutPlanStack";
 import Icon from "@/components/Icon/Icon";
 import HomeScreen from "@/screens/HomeScreen";
 import ArticleStack from "../ArticleStack";
+import WeeklyProgressScreen from "@/screens/WeeklyProgressScreen";
 import { useIconLayout } from "@/context/useiconLayout";
 import { View } from "react-native";
 
@@ -36,9 +37,11 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     },
   },
   {
-    name: "ChatTab",
-    component: HomeScreen,
+    name: "MyProgressScreen",
+    component: WeeklyProgressScreen,
     options: {
+      tabBarLabel: "",
+      tabBarAccessibilityLabel: "פידבק שבועי",
       tabBarIcon: ({ color }) => {
         const { setIconLayout } = useIconLayout();
         return (
@@ -46,23 +49,16 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
             ref={(ref) => {
               if (ref) {
                 ref.measureInWindow((x, _y, width) => {
-                  setIconLayout("ChatTab", x + width / 2);
+                  setIconLayout("MyProgressScreen", x + width / 2);
                 });
               }
             }}
           >
-            <Icon color={color} name="chat" height={ICON_HEIGHT} width={ICON_WIDTH} />
+            <Icon color={color} name="trendingUp" height={ICON_HEIGHT} width={ICON_WIDTH} />
           </View>
         );
       },
     },
-    listeners: ({ navigation }) => ({
-      tabPress: (e: any) => {
-        e.preventDefault();
-
-        navigation.navigate("Chat");
-      },
-    }),
   },
   {
     name: "Home",

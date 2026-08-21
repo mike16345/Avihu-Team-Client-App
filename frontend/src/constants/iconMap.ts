@@ -39,6 +39,7 @@ import edit from "@assets/icons/edit.svg";
 import pencil from "@assets/icons/pencil.svg";
 import trash from "@assets/icons/trash.svg";
 import playCircle from "@assets/icons/playCircle.svg";
+import trendingUp from "@assets/icons/trendingUp.svg";
 
 const icons = {
   arrowLeft,
@@ -82,6 +83,7 @@ const icons = {
   trash,
   edit,
   playCircle,
+  trendingUp,
 } as const;
 
 export type IconName = keyof typeof icons;
