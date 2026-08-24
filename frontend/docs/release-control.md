@@ -30,6 +30,10 @@ The last command still opens the device selector. Add `--device <name-or-UDID>` 
 already known. Android accepts an Expo-supported APK/AAB; iOS accepts an Expo-supported `.app` or
 `.ipa` appropriate for the selected simulator or physical device.
 
+Local Android build-and-run actions select Java 17 automatically instead of inheriting an
+unsupported global Java version. On machines where Java 17 is installed in a custom location, set
+`APP_ANDROID_JAVA_HOME` to that JDK home before running the controller.
+
 Development and internal preview binaries display a small tenant/environment badge. Production
 binaries carry `showEnvironmentBadge: false` in their resolved Expo configuration and never infer
 visibility from `NODE_ENV`.
