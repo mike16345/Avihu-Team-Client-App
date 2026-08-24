@@ -125,4 +125,34 @@ describe("preflight renderers", () => {
       results: [{ check: "one", summary: "warning" }],
     });
   });
+
+  it("removes an OSC title sequence terminated by BEL without changing surrounding text", async () => {
+    const report = await runChecks([
+      async () => ({
+        status: "warn",
+        check: "one",
+        summary: "title\u001b]0;release\u0007done",
+      }),
+    ]);
+
+    const output = renderJson(report);
+
+    expect(output).not.toContain("\u001b");
+    expect(JSON.parse(output).results[0].summary).toBe("titledone");
+  });
+
+  it("removes an OSC title sequence terminated by ST without changing surrounding text", async () => {
+    const report = await runChecks([
+      async () => ({
+        status: "warn",
+        check: "one",
+        summary: "title\u001b]0;release\u001b\\done",
+      }),
+    ]);
+
+    const output = renderJson(report);
+
+    expect(output).not.toContain("\u001b");
+    expect(JSON.parse(output).results[0].summary).toBe("titledone");
+  });
 });
