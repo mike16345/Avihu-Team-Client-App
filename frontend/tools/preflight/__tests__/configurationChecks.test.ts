@@ -33,7 +33,11 @@ const writeAndroidFixture = async (
   targetSdkVersion: number,
   packageName: string,
   icon = "@mipmap/ic_launcher",
-  roundIcon = "@mipmap/ic_launcher_round"
+  roundIcon = "@mipmap/ic_launcher_round",
+  releaseOptimization = {
+    enableProguardInReleaseBuilds: true,
+    enableShrinkResourcesInReleaseBuilds: true,
+  }
 ) => {
   const androidRoot = path.join(root, "android");
   const mainRoot = path.join(androidRoot, "app", "src", "main");
@@ -44,8 +48,8 @@ const writeAndroidFixture = async (
     [
       "android.compileSdkVersion=36",
       `android.targetSdkVersion=${targetSdkVersion}`,
-      "android.enableProguardInReleaseBuilds=false",
-      "android.enableShrinkResourcesInReleaseBuilds=false",
+      `android.enableProguardInReleaseBuilds=${String(releaseOptimization.enableProguardInReleaseBuilds)}`,
+      `android.enableShrinkResourcesInReleaseBuilds=${String(releaseOptimization.enableShrinkResourcesInReleaseBuilds)}`,
     ].join("\n")
   );
   await writeFile(
@@ -290,10 +294,38 @@ describe("generated native drift", () => {
     const result = await nativeDriftCheck.run(context);
 
     expect(result).toMatchObject({ status: "fail", check: "native.drift" });
-    expect(result.details).toContain("Android R8: expected false, generated missing");
+    expect(result.details).toContain("Android R8: expected true, generated missing");
     expect(result.details).toContain(
-      "Android resource shrinking: expected false, generated missing"
+      "Android resource shrinking: expected true, generated missing"
     );
+  });
+
+  it.each([
+    [
+      "R8 minification",
+      { enableProguardInReleaseBuilds: false, enableShrinkResourcesInReleaseBuilds: true },
+      "Android R8: expected true, generated false",
+    ],
+    [
+      "resource shrinking",
+      { enableProguardInReleaseBuilds: true, enableShrinkResourcesInReleaseBuilds: false },
+      "Android resource shrinking: expected true, generated false",
+    ],
+  ])("fails release preflight when generated %s is disabled", async (_label, flags, detail) => {
+    const context = await createContext();
+    await writeAndroidFixture(
+      context.projectRoot,
+      36,
+      "com.avihuteam.avihuteam",
+      "@mipmap/ic_launcher",
+      "@mipmap/ic_launcher_round",
+      flags
+    );
+
+    const result = await nativeDriftCheck.run(context);
+
+    expect(result).toMatchObject({ status: "fail", check: "native.drift" });
+    expect(result.details).toContain(detail);
   });
 
   it("passes absent ignored native folders with clean-generation guidance", async () => {

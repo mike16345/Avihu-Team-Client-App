@@ -136,33 +136,36 @@ describe("createExpoConfig", () => {
     expect(serializedExtra).not.toContain("not-allowlisted");
   });
 
-  it("composes one build-properties plugin with current SDK and shrinking settings", () => {
-    const production = createExpoConfig({
-      baseConfig: {},
-      tenant: getTenant("avihu"),
-      environment: "production",
-      processEnv: {},
-    });
-    const buildPropertiesPlugins = production.plugins?.filter((plugin) => {
-      if (typeof plugin === "string") return plugin === "expo-build-properties";
-      return plugin[0] === "expo-build-properties";
-    });
+  it.each(["development", "preview", "production"] as const)(
+    "composes one build-properties plugin with release-only shrinking settings for %s",
+    (environment) => {
+      const config = createExpoConfig({
+        baseConfig: {},
+        tenant: getTenant("avihu"),
+        environment,
+        processEnv: {},
+      });
+      const buildPropertiesPlugins = config.plugins?.filter((plugin) => {
+        if (typeof plugin === "string") return plugin === "expo-build-properties";
+        return plugin[0] === "expo-build-properties";
+      });
 
-    expect(buildPropertiesPlugins).toEqual([
-      [
-        "expo-build-properties",
-        {
-          android: {
-            compileSdkVersion: 36,
-            targetSdkVersion: 36,
-            minSdkVersion: 26,
-            enableProguardInReleaseBuilds: false,
-            enableShrinkResourcesInReleaseBuilds: false,
+      expect(buildPropertiesPlugins).toEqual([
+        [
+          "expo-build-properties",
+          {
+            android: {
+              compileSdkVersion: 36,
+              targetSdkVersion: 36,
+              minSdkVersion: 26,
+              enableProguardInReleaseBuilds: true,
+              enableShrinkResourcesInReleaseBuilds: true,
+            },
           },
-        },
-      ],
-    ]);
-  });
+        ],
+      ]);
+    }
+  );
 
   it("uses tenant-generated platform asset paths", () => {
     const production = createExpoConfig({

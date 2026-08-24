@@ -54,8 +54,8 @@ export const avihuTenant = {
     compileSdkVersion: 36,
     targetSdkVersion: 36,
     minSdkVersion: 26,
-    enableProguardInReleaseBuilds: false,
-    enableShrinkResourcesInReleaseBuilds: false,
+    enableProguardInReleaseBuilds: true,
+    enableShrinkResourcesInReleaseBuilds: true,
   },
   featureFlags: {
     supportsRtl: true,
