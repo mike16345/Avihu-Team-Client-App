@@ -13,6 +13,44 @@ const writeFixtureFile = async (root: string, relativePath: string, contents = "
   return filePath;
 };
 
+const createCompleteManifest = () =>
+  JSON.stringify({
+    tenantId: TENANT_ID,
+    source: { relativePath: "source/app-icon.png" },
+    outputs: {
+      appleIcon: { relativePath: "generated/apple-icon.png" },
+      androidLegacyIcon: { relativePath: "generated/android-legacy-icon.png" },
+      androidAdaptiveForeground: { relativePath: "generated/android-adaptive-foreground.png" },
+      androidAdaptiveBackground: { relativePath: "generated/android-adaptive-background.png" },
+      notificationIcon: { relativePath: "generated/notification-icon.png" },
+      splash: { relativePath: "generated/splash.png" },
+      runtimeLogo: { relativePath: "generated/runtime-logo.png" },
+      applePreview: { relativePath: "generated/previews/apple.png" },
+      androidCirclePreview: { relativePath: "generated/previews/android-circle.png" },
+      androidSquirclePreview: { relativePath: "generated/previews/android-squircle.png" },
+      notificationPreview: { relativePath: "generated/previews/notification.png" },
+    },
+  });
+
+const generatedOutputPaths = [
+  "config/tenants/assets/avihu/generated/apple-icon.png",
+  "config/tenants/assets/avihu/generated/android-legacy-icon.png",
+  "config/tenants/assets/avihu/generated/android-adaptive-foreground.png",
+  "config/tenants/assets/avihu/generated/android-adaptive-background.png",
+  "config/tenants/assets/avihu/generated/notification-icon.png",
+  "config/tenants/assets/avihu/generated/splash.png",
+  "config/tenants/assets/avihu/generated/runtime-logo.png",
+  "config/tenants/assets/avihu/generated/previews/apple.png",
+  "config/tenants/assets/avihu/generated/previews/android-circle.png",
+  "config/tenants/assets/avihu/generated/previews/android-squircle.png",
+  "config/tenants/assets/avihu/generated/previews/notification.png",
+];
+
+const cleanupCandidates = [
+  "assets/proven-unused.png",
+  "config/tenants/assets/avihu/generated/stale.png",
+];
+
 describe("auditAssets", () => {
   let projectRoot: string;
 
@@ -50,19 +88,13 @@ describe("auditAssets", () => {
       ),
       writeFixtureFile(projectRoot, "config/tenants/assets/avihu/source/app-icon.png"),
       writeFixtureFile(projectRoot, "config/tenants/assets/avihu/generated/configured.png"),
-      writeFixtureFile(projectRoot, "config/tenants/assets/avihu/generated/active.png"),
       writeFixtureFile(projectRoot, "config/tenants/assets/avihu/generated/stale.png"),
       writeFixtureFile(
         projectRoot,
         "config/tenants/assets/avihu/generated/manifest.json",
-        JSON.stringify({
-          tenantId: TENANT_ID,
-          source: { relativePath: "source/app-icon.png" },
-          outputs: {
-            active: { relativePath: "generated/active.png" },
-          },
-        })
+        createCompleteManifest()
       ),
+      ...generatedOutputPaths.map((relativePath) => writeFixtureFile(projectRoot, relativePath)),
     ]);
   });
 
@@ -84,7 +116,7 @@ describe("auditAssets", () => {
     expect(byPath.get("assets/proven-unused.png")).toBe("proven-unused");
     expect(byPath.get("config/tenants/assets/avihu/source/app-icon.png")).toBe("used");
     expect(byPath.get("config/tenants/assets/avihu/generated/configured.png")).toBe("used");
-    expect(byPath.get("config/tenants/assets/avihu/generated/active.png")).toBe("used");
+    expect(byPath.get("config/tenants/assets/avihu/generated/apple-icon.png")).toBe("used");
     expect(byPath.get("config/tenants/assets/avihu/generated/stale.png")).toBe("stale-generated");
     expect(byPath.has("dist/ignored-build-output.png")).toBe(false);
   });
@@ -92,17 +124,122 @@ describe("auditAssets", () => {
   it("removes only stale generated and proven-unused files after explicit confirmation", async () => {
     const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
 
-    expect(report.deleted).toEqual(
-      expect.arrayContaining([
-        "assets/proven-unused.png",
-        "config/tenants/assets/avihu/generated/stale.png",
-      ])
-    );
+    expect(report.deleted).toEqual(cleanupCandidates);
     await expect(readFile(path.join(projectRoot, "assets/dynamic/a.png"), "utf8")).resolves.toBe(
       "asset"
     );
     await expect(
-      readFile(path.join(projectRoot, "config/tenants/assets/avihu/generated/active.png"), "utf8")
+      readFile(
+        path.join(projectRoot, "config/tenants/assets/avihu/generated/apple-icon.png"),
+        "utf8"
+      )
+    ).resolves.toBe("asset");
+  });
+
+  it("does not modify candidates in default report-only mode", async () => {
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID });
+
+    expect(report.deleted).toEqual([]);
+    await expect(
+      readFile(path.join(projectRoot, "assets/proven-unused.png"), "utf8")
+    ).resolves.toBe("asset");
+    await expect(
+      readFile(path.join(projectRoot, "config/tenants/assets/avihu/generated/stale.png"), "utf8")
+    ).resolves.toBe("asset");
+  });
+
+  it("does not modify candidates when interactive cleanup is declined", async () => {
+    const report = await auditAssets({
+      projectRoot,
+      tenantId: TENANT_ID,
+      clean: true,
+      confirmCleanup: async () => false,
+    });
+
+    expect(report.deleted).toEqual([]);
+    await expect(
+      readFile(path.join(projectRoot, "assets/proven-unused.png"), "utf8")
+    ).resolves.toBe("asset");
+  });
+
+  it("retains static backtick asset literals during cleanup", async () => {
+    await Promise.all([
+      writeFixtureFile(projectRoot, "assets/backtick.png"),
+      writeFixtureFile(projectRoot, "src/backtick.ts", "const image = `@assets/backtick.png`;\n"),
+    ]);
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual(cleanupCandidates);
+    await expect(readFile(path.join(projectRoot, "assets/backtick.png"), "utf8")).resolves.toBe(
+      "asset"
+    );
+  });
+
+  it("retains concatenated loader candidates as ambiguous during cleanup", async () => {
+    await Promise.all([
+      writeFixtureFile(projectRoot, "assets/concatenated/a.png"),
+      writeFixtureFile(projectRoot, "assets/concatenated/b.png"),
+      writeFixtureFile(
+        projectRoot,
+        "src/concatenated.ts",
+        'const image = require("../assets/concatenated/" + name + ".png");\n'
+      ),
+    ]);
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual(cleanupCandidates);
+    await expect(
+      readFile(path.join(projectRoot, "assets/concatenated/a.png"), "utf8")
+    ).resolves.toBe("asset");
+    await expect(
+      readFile(path.join(projectRoot, "assets/concatenated/b.png"), "utf8")
+    ).resolves.toBe("asset");
+  });
+
+  it("blocks deletion when an opaque asset loader has no stable directory prefix", async () => {
+    await Promise.all([
+      writeFixtureFile(projectRoot, "assets/opaque.png"),
+      writeFixtureFile(
+        projectRoot,
+        "src/opaque.ts",
+        "const assetPath = getAssetPath();\nconst image = require(assetPath);\n"
+      ),
+    ]);
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual([]);
+    await expect(readFile(path.join(projectRoot, "assets/opaque.png"), "utf8")).resolves.toBe(
+      "asset"
+    );
+  });
+
+  it("retains native-module references and registered asset directories during cleanup", async () => {
+    await Promise.all([
+      writeFixtureFile(projectRoot, "assets/native-module.png"),
+      writeFixtureFile(projectRoot, "assets/fonts/registered.ttf"),
+      writeFixtureFile(
+        projectRoot,
+        "native-modules/asset-loader.ts",
+        'import image from "../assets/native-module.png";\n'
+      ),
+      writeFixtureFile(
+        projectRoot,
+        "react-native.config.js",
+        'module.exports = { assets: ["./assets/fonts"] };\n'
+      ),
+    ]);
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual(cleanupCandidates);
+    await expect(
+      readFile(path.join(projectRoot, "assets/native-module.png"), "utf8")
+    ).resolves.toBe("asset");
+    await expect(
+      readFile(path.join(projectRoot, "assets/fonts/registered.ttf"), "utf8")
     ).resolves.toBe("asset");
   });
 
@@ -116,17 +253,52 @@ describe("auditAssets", () => {
     );
   });
 
+  it("rejects an app asset root symlink that escapes the project", async () => {
+    const outsideRoot = await mkdtemp(path.join(tmpdir(), "outside-assets-root-"));
+    try {
+      await writeFixtureFile(outsideRoot, "escaped.png");
+      await rm(path.join(projectRoot, "assets"), { recursive: true, force: true });
+      await symlink(outsideRoot, path.join(projectRoot, "assets"));
+
+      await expect(auditAssets({ projectRoot, tenantId: TENANT_ID })).rejects.toThrow(
+        "Approved asset root escapes the real project root"
+      );
+    } finally {
+      await rm(outsideRoot, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects a tenant asset root symlink that escapes the project", async () => {
+    const outsideRoot = await mkdtemp(path.join(tmpdir(), "outside-tenant-assets-root-"));
+    try {
+      await rm(path.join(projectRoot, "config/tenants/assets/avihu"), {
+        recursive: true,
+        force: true,
+      });
+      await symlink(outsideRoot, path.join(projectRoot, "config/tenants/assets/avihu"));
+
+      await expect(auditAssets({ projectRoot, tenantId: TENANT_ID })).rejects.toThrow(
+        "Approved asset root escapes the real project root"
+      );
+    } finally {
+      await rm(outsideRoot, { recursive: true, force: true });
+    }
+  });
+
   it("rejects a tenant path that attempts to escape approved asset roots", async () => {
     await expect(auditAssets({ projectRoot, tenantId: "../../assets" })).rejects.toThrow(
       'Unknown tenant "../../assets"'
     );
   });
 
-  it("keeps generated files ambiguous when their manifest is incomplete", async () => {
+  it("keeps generated files ambiguous when their manifest is partial but nonempty", async () => {
     await writeFixtureFile(
       projectRoot,
       "config/tenants/assets/avihu/generated/manifest.json",
-      JSON.stringify({ source: { relativePath: "source/app-icon.png" }, outputs: {} })
+      JSON.stringify({
+        source: { relativePath: "source/app-icon.png" },
+        outputs: { appleIcon: { relativePath: "generated/apple-icon.png" } },
+      })
     );
 
     const report = await auditAssets({ projectRoot, tenantId: TENANT_ID });
