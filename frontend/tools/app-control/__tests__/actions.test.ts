@@ -29,7 +29,7 @@ describe("resolveAction", () => {
     });
   });
 
-  it("keeps future preflight work behind a stable package action name", () => {
+  it("maps fast preflight directly to the shared package script", () => {
     expect(
       resolveAction({
         action: "preflight",
@@ -39,10 +39,28 @@ describe("resolveAction", () => {
       })
     ).toMatchObject({
       command: "npm",
-      args: ["run", "preflight:fast"],
+      args: ["run", "preflight"],
       env: {
         APP_TENANT: "avihu",
         APP_ENV: "development",
+      },
+    });
+  });
+
+  it("maps release preflight directly to the shared package script", () => {
+    expect(
+      resolveAction({
+        action: "preflight",
+        mode: "release",
+        tenantId: "avihu",
+        environment: "production",
+      })
+    ).toMatchObject({
+      command: "npm",
+      args: ["run", "preflight:release"],
+      env: {
+        APP_TENANT: "avihu",
+        APP_ENV: "production",
       },
     });
   });
