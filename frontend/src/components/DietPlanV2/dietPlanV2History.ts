@@ -1,5 +1,5 @@
 import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
-import type { SmartFoodEntry } from "./foodCatalog";
+import { formatSmartFoodServingAmount, type SmartFoodEntry } from "./foodCatalog";
 import type { DietPlanV2CompletionMap } from "./dietPlanV2Consumption";
 import { getDietPlanV2MealKey } from "./dietPlanV2Consumption";
 import {
@@ -82,7 +82,7 @@ export const buildDietPlanV2HistoryEntries = (
   const catalogEntries = smartFoods.map<DietPlanV2HistoryEntry>((entry) => ({
     id: `catalog:${entry.id}`,
     name: entry.name,
-    detail: `${entry.servingCount} × ${entry.servingDescription}`,
+    detail: formatSmartFoodServingAmount(entry),
     macros: entry.macros,
     source: "catalog",
   }));

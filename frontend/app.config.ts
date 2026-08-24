@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { ExpoConfig, ConfigContext } from "@expo/config";
 
-const APP_VERSION = "2.3.0";
+const APP_VERSION = "2.4.0";
 const CAMERA_PERMISSION =
   "אפשר ל-$(PRODUCT_NAME) להשתמש במצלמה כדי לסרוק ברקודים ולצלם תמונות באפליקציה.";
 export default ({ config }: ConfigContext): ExpoConfig => {

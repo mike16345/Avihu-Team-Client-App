@@ -126,7 +126,9 @@ describe("Food Catalog recording", () => {
       name: "יוגורט",
       servingDescription: "100 g",
       servingId: "off-serving",
-      servingCount: "1",
+      servingQuantity: 100,
+      servingUnit: "g",
+      servingAmount: "100",
       calories: "150",
       protein: "20",
       carbs: "5",
@@ -138,11 +140,43 @@ describe("Food Catalog recording", () => {
     expect(createFoodCatalogDraft(product, "admin-cup")).toMatchObject({
       servingId: "admin-cup",
       servingDescription: "כוס אחת",
-      servingCount: "1",
+      servingQuantity: 1,
+      servingUnit: "cup",
+      servingAmount: "1",
       calories: "225",
       protein: "30",
       carbs: "7.5",
       fat: "6",
+    });
+  });
+
+  it("uses the selected serving quantity as the editable amount", () => {
+    expect(createFoodCatalogDraft(product)).toMatchObject({
+      servingId: "off-serving",
+      servingQuantity: 100,
+      servingUnit: "g",
+      servingAmount: "100",
+    });
+
+    expect(createFoodCatalogDraft(product, "admin-cup")).toMatchObject({
+      servingId: "admin-cup",
+      servingQuantity: 1,
+      servingUnit: "cup",
+      servingAmount: "1",
+    });
+  });
+
+  it("scales macros by actual unit amount instead of number of servings", () => {
+    const draft = createFoodCatalogDraft(product) as ReturnType<typeof createFoodCatalogDraft> & {
+      servingAmount: string;
+    };
+    draft.servingAmount = "150";
+
+    expect(createSmartFoodEntry(draft, "entry-amount", "2026-08-13T12:00:00.000Z")).toMatchObject({
+      servingAmount: 150,
+      servingUnit: "g",
+      servingReferenceQuantity: 100,
+      macros: { calories: 225, protein: 30, carbs: 7.5, fat: 6 },
     });
   });
 
@@ -209,18 +243,18 @@ describe("Food Catalog recording", () => {
 
     expect(
       createSmartFoodEntry(
-        { ...draft, servingCount: "1.333" },
+        { ...draft, servingAmount: "133.3" },
         "entry-rounded",
         "2026-08-13T12:00:00.000Z"
       )?.macros
     ).toEqual({ calories: 166.63, protein: 32.87, carbs: 7.33, fat: 5.33 });
   });
 
-  it("records editable per-serving macros multiplied by the serving count", () => {
+  it("records editable reference macros scaled to the entered amount", () => {
     const entry = createSmartFoodEntry(
       {
         ...createFoodCatalogDraft(product),
-        servingCount: "2.5",
+        servingAmount: "250",
         calories: "160",
       },
       "entry-1",
@@ -230,7 +264,9 @@ describe("Food Catalog recording", () => {
     expect(entry).toMatchObject({
       id: "entry-1",
       catalogItemId: "catalog-1",
-      servingCount: 2.5,
+      servingAmount: 250,
+      servingUnit: "g",
+      servingReferenceQuantity: 100,
       macros: { calories: 400, protein: 50, carbs: 12.5, fat: 10 },
       recordedAt: "2026-08-13T12:00:00.000Z",
     });
@@ -240,7 +276,7 @@ describe("Food Catalog recording", () => {
     const entry = createSmartFoodEntry(
       {
         ...createFoodCatalogDraft(product),
-        servingCount: "2",
+        servingAmount: "200",
         calories: "150.25",
         protein: "20.5",
       },
@@ -254,7 +290,9 @@ describe("Food Catalog recording", () => {
       name: "יוגורט",
       servingDescription: "100 g",
       servingId: "",
-      servingCount: "2",
+      servingQuantity: 100,
+      servingUnit: "g",
+      servingAmount: "200",
       calories: "150.25",
       protein: "20.5",
       carbs: "5",
@@ -310,7 +348,7 @@ describe("Food Catalog recording", () => {
     expect(isBarcodeHoldReady(first, 2_500)).toBe(false);
   });
 
-  it("allows blank optional macros as zero but rejects a missing name or invalid serving count", () => {
+  it("allows blank optional macros as zero but rejects a missing name or invalid amount", () => {
     const draft = createFoodCatalogDraft(product);
 
     expect(
@@ -324,7 +362,7 @@ describe("Food Catalog recording", () => {
       createSmartFoodEntry({ ...draft, name: "   " }, "entry-2", "2026-08-13T12:00:00.000Z")
     ).toBeNull();
     expect(
-      createSmartFoodEntry({ ...draft, servingCount: "0" }, "entry-3", "2026-08-13T12:00:00.000Z")
+      createSmartFoodEntry({ ...draft, servingAmount: "0" }, "entry-3", "2026-08-13T12:00:00.000Z")
     ).toBeNull();
   });
 
@@ -333,14 +371,14 @@ describe("Food Catalog recording", () => {
       validateSmartFoodDraft({
         ...createFoodCatalogDraft(product),
         name: "   ",
-        servingCount: "0",
+        servingAmount: "0",
         calories: "-1",
         protein: "not-a-number",
         carbs: "",
       })
     ).toEqual({
       name: "יש להזין שם מוצר.",
-      servingCount: "מספר המנות חייב להיות גדול מאפס.",
+      servingAmount: "הכמות חייבת להיות גדולה מאפס.",
       calories: "הקלוריות חייבות להיות מספר חיובי או אפס.",
       protein: "החלבון חייב להיות מספר חיובי או אפס.",
     });
@@ -353,7 +391,7 @@ describe("Food Catalog recording", () => {
       "2026-08-13T12:00:00.000Z"
     );
     const second = createSmartFoodEntry(
-      { ...createFoodCatalogDraft(product), servingCount: "2" },
+      { ...createFoodCatalogDraft(product), servingAmount: "200" },
       "entry-2",
       "2026-08-13T13:00:00.000Z"
     );
@@ -380,6 +418,29 @@ describe("Food Catalog recording", () => {
     );
     expect(reconcileSmartFoodEntries([valid, { id: "broken" }, null])).toEqual([valid]);
     expect(reconcileSmartFoodEntries("not-an-array")).toEqual([]);
+  });
+
+  it("upgrades stored serving-count entries to unit amounts", () => {
+    expect(
+      reconcileSmartFoodEntries([
+        {
+          id: "legacy-entry",
+          catalogItemId: "catalog-1",
+          barcode: "7290000000000",
+          name: "יוגורט",
+          servingDescription: "100 g",
+          servingCount: 1.5,
+          macros: { calories: 225, protein: 30, carbs: 7.5, fat: 6 },
+          recordedAt: "2026-08-13T12:00:00.000Z",
+        },
+      ])
+    ).toMatchObject([
+      {
+        servingAmount: 150,
+        servingUnit: "g",
+        servingReferenceQuantity: 100,
+      },
+    ]);
   });
 
   it("builds one seven-day history page at a time from the logical diet day", () => {
