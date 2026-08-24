@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { EAS_CLI_ARGS, resolveAction } from "../actions";
+import { resolveAction } from "../actions";
 
 describe("resolveAction", () => {
-  it("builds a pinned EAS command with an explicit tenant environment", () => {
+  it("maps an Avihu production build to the pinned EAS command and child environment", () => {
     expect(
       resolveAction({
         action: "build",
@@ -14,13 +14,13 @@ describe("resolveAction", () => {
     ).toMatchObject({
       command: "npx",
       args: [
-        ...EAS_CLI_ARGS,
+        "--yes",
+        "eas-cli@16.27.0",
         "build",
         "--platform",
         "android",
         "--profile",
         "production",
-        "--non-interactive",
       ],
       env: {
         APP_TENANT: "avihu",
