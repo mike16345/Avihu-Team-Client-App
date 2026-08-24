@@ -15,8 +15,12 @@ import type {
 
 const APP_AREAS = ["develop", "verify", "release", "assets"] as const;
 type AppArea = (typeof APP_AREAS)[number];
+const BACK = "__back__" as const;
+type Back = typeof BACK;
+const BACK_OPTION = { value: BACK, label: "← Back" } as const;
 
 const isPromptCancelled = <Value>(value: Value): value is Value & symbol => isCancel(value);
+const isBack = (value: unknown): value is Back => value === BACK;
 
 const formatAction = (selection: AppSelection): string => {
   switch (selection.action) {
@@ -116,7 +120,7 @@ const chooseTenant = async (initialValue?: string): Promise<string | null> => {
   return isPromptCancelled(tenantId) ? null : tenantId;
 };
 
-const chooseArea = async (): Promise<AppArea | null> => {
+const chooseArea = async (): Promise<AppArea | Back | null> => {
   const area = await select({
     message: "What do you want to do?",
     options: [
@@ -124,70 +128,81 @@ const chooseArea = async (): Promise<AppArea | null> => {
       { value: "verify" as const, label: "Verify app" },
       { value: "release" as const, label: "Release app" },
       { value: "assets" as const, label: "Manage assets" },
+      BACK_OPTION,
     ],
   });
 
   return isPromptCancelled(area) ? null : area;
 };
 
-const chooseAction = async (initialValue?: AppAction): Promise<AppAction | null> => {
+const chooseAction = async (initialValue?: AppAction): Promise<AppAction | Back | null> => {
   if (initialValue) {
     return initialValue;
   }
 
-  const area = await chooseArea();
-  if (!area) {
-    return null;
+  while (true) {
+    const area = await chooseArea();
+    if (!area || isBack(area)) {
+      return area;
+    }
+
+    if (area === "verify") {
+      return "preflight";
+    }
+
+    if (area === "assets") {
+      return "assets";
+    }
+
+    const action = await select({
+      message: area === "develop" ? "Select development action" : "Select release action",
+      options:
+        area === "develop"
+          ? [
+              { value: "start" as const, label: "Start development server" },
+              { value: "run" as const, label: "Build, install & launch" },
+              { value: "install" as const, label: "Install an existing build" },
+              BACK_OPTION,
+            ]
+          : [
+              { value: "build" as const, label: "Build with EAS" },
+              { value: "update" as const, label: "Publish an update" },
+              BACK_OPTION,
+            ],
+    });
+
+    if (isPromptCancelled(action)) {
+      return null;
+    }
+    if (!isBack(action)) {
+      return action;
+    }
   }
-
-  if (area === "verify") {
-    return "preflight";
-  }
-
-  if (area === "assets") {
-    return "assets";
-  }
-
-  const action = await select({
-    message: area === "develop" ? "Select development action" : "Select release action",
-    options:
-      area === "develop"
-        ? [
-            { value: "start" as const, label: "Start development server" },
-            { value: "run" as const, label: "Build, install & launch" },
-            { value: "install" as const, label: "Install an existing build" },
-          ]
-        : [
-            { value: "build" as const, label: "Build with EAS" },
-            { value: "update" as const, label: "Publish an update" },
-          ],
-  });
-
-  return isPromptCancelled(action) ? null : action;
 };
 
 const chooseEnvironment = async (
   initialValue: TenantEnvironment | undefined,
   releaseOnly: boolean
-): Promise<TenantEnvironment | null> => {
+): Promise<TenantEnvironment | Back | null> => {
   const environments = releaseOnly
     ? TENANT_ENVIRONMENTS.filter((environment) => environment !== "development")
     : TENANT_ENVIRONMENTS;
   const environment = await select({
     message: releaseOnly ? "Select release environment" : "Select environment",
-    options: environments.map((value) => ({ value, label: value })),
+    options: [...environments.map((value) => ({ value, label: value })), BACK_OPTION],
     initialValue,
   });
 
   return isPromptCancelled(environment) ? null : environment;
 };
 
-const choosePlatform = async (initialValue?: AppPlatform): Promise<AppPlatform | null> => {
+const choosePlatform = async (initialValue?: AppPlatform): Promise<AppPlatform | Back | null> => {
   const platform = await select({
     message: "Select platform",
     options: [
       { value: "android" as const, label: "Android" },
       { value: "ios" as const, label: "iOS" },
+      BACK_OPTION,
     ],
     initialValue,
   });
@@ -218,12 +233,15 @@ const chooseBinaryPath = async (initialValue?: string): Promise<string | null> =
   return isPromptCancelled(binaryPath) ? null : resolve(binaryPath);
 };
 
-const choosePreflightMode = async (initialValue?: PreflightMode): Promise<PreflightMode | null> => {
+const choosePreflightMode = async (
+  initialValue?: PreflightMode
+): Promise<PreflightMode | Back | null> => {
   const mode = await select({
     message: "Select preflight depth",
     options: [
       { value: "fast" as const, label: "Fast preflight" },
       { value: "release" as const, label: "Full release preflight" },
+      BACK_OPTION,
     ],
     initialValue,
   });
@@ -233,12 +251,13 @@ const choosePreflightMode = async (initialValue?: PreflightMode): Promise<Prefli
 
 const chooseAssetOperation = async (
   initialValue?: AssetOperation
-): Promise<AssetOperation | null> => {
+): Promise<AssetOperation | Back | null> => {
   const operation = await select({
     message: "Select asset action",
     options: [
       { value: "generate" as const, label: "Generate tenant assets" },
       { value: "audit" as const, label: "Audit tenant assets" },
+      BACK_OPTION,
     ],
     initialValue,
   });
@@ -249,94 +268,127 @@ const chooseAssetOperation = async (
 export const promptForSelection = async (
   parsed: ParsedAppArguments
 ): Promise<AppSelection | null> => {
-  const tenantId = parsed.tenantId ?? (await chooseTenant());
-  if (!tenantId) {
-    cancel("Operation cancelled.");
-    return null;
-  }
+  let tenantId = parsed.tenantId;
+  let actionOverride = parsed.action;
 
-  const action = parsed.action ?? (await chooseAction());
-  if (!action) {
-    cancel("Operation cancelled.");
-    return null;
-  }
-
-  if (action === "build") {
-    const platform = parsed.platform ?? (await choosePlatform());
-    const environment = await chooseEnvironment(parsed.environment, true);
-    if (!platform || !environment) {
+  while (true) {
+    if (!tenantId) {
+      tenantId = (await chooseTenant()) ?? undefined;
+    }
+    if (!tenantId) {
       cancel("Operation cancelled.");
       return null;
     }
 
-    return {
-      action,
-      tenantId,
-      platform,
-      environment: environment as ReleaseProfile,
-      profile: environment as ReleaseProfile,
-    };
-  }
-
-  const environment = await chooseEnvironment(parsed.environment, action === "update");
-  if (!environment) {
-    cancel("Operation cancelled.");
-    return null;
-  }
-
-  if (action === "run") {
-    const platform = parsed.platform ?? (await choosePlatform());
-    if (!platform) {
+    const actionResult = actionOverride ?? (await chooseAction());
+    if (!actionResult) {
       cancel("Operation cancelled.");
       return null;
     }
-
-    return { action, tenantId, environment, platform, device: parsed.device };
-  }
-
-  if (action === "install") {
-    const platform = parsed.platform ?? (await choosePlatform());
-    const binaryPath = parsed.binaryPath ?? (await chooseBinaryPath());
-    if (!platform || !binaryPath) {
-      cancel("Operation cancelled.");
-      return null;
+    if (isBack(actionResult)) {
+      tenantId = undefined;
+      actionOverride = undefined;
+      continue;
     }
 
-    return {
-      action,
-      tenantId,
-      environment,
-      platform,
-      binaryPath,
-      device: parsed.device,
-    };
-  }
+    const action = actionResult;
+    while (true) {
+      const environmentResult = await chooseEnvironment(
+        parsed.environment,
+        action === "build" || action === "update"
+      );
+      if (!environmentResult) {
+        cancel("Operation cancelled.");
+        return null;
+      }
+      if (isBack(environmentResult)) {
+        actionOverride = undefined;
+        break;
+      }
+      const environment = environmentResult;
 
-  if (action === "preflight") {
-    const mode = parsed.preflightMode ?? (await choosePreflightMode());
-    if (!mode) {
-      cancel("Operation cancelled.");
-      return null;
+      if (action === "start") {
+        return { action, tenantId, environment };
+      }
+
+      if (action === "update") {
+        return { action, tenantId, environment: environment as ReleaseProfile };
+      }
+
+      if (action === "preflight") {
+        const mode = parsed.preflightMode ?? (await choosePreflightMode());
+        if (!mode) {
+          cancel("Operation cancelled.");
+          return null;
+        }
+        if (isBack(mode)) {
+          if (parsed.environment) {
+            actionOverride = undefined;
+            break;
+          }
+          continue;
+        }
+        return { action, tenantId, environment, mode };
+      }
+
+      if (action === "assets") {
+        const operation = parsed.assetOperation ?? (await chooseAssetOperation());
+        if (!operation) {
+          cancel("Operation cancelled.");
+          return null;
+        }
+        if (isBack(operation)) {
+          if (parsed.environment) {
+            actionOverride = undefined;
+            break;
+          }
+          continue;
+        }
+        return { action, tenantId, environment, operation };
+      }
+
+      const platform = parsed.platform ?? (await choosePlatform());
+      if (!platform) {
+        cancel("Operation cancelled.");
+        return null;
+      }
+      if (isBack(platform)) {
+        if (parsed.environment) {
+          actionOverride = undefined;
+          break;
+        }
+        continue;
+      }
+
+      if (action === "run") {
+        return { action, tenantId, environment, platform, device: parsed.device };
+      }
+
+      if (action === "build") {
+        return {
+          action,
+          tenantId,
+          platform,
+          environment: environment as ReleaseProfile,
+          profile: environment as ReleaseProfile,
+        };
+      }
+
+      const binaryPath = parsed.binaryPath ?? (await chooseBinaryPath());
+      if (!binaryPath) {
+        cancel("Operation cancelled.");
+        return null;
+      }
+      return {
+        action: "install",
+        tenantId,
+        environment,
+        platform,
+        binaryPath,
+        device: parsed.device,
+      };
     }
-
-    return { action, tenantId, environment, mode };
   }
-
-  if (action === "assets") {
-    const operation = parsed.assetOperation ?? (await chooseAssetOperation());
-    if (!operation) {
-      cancel("Operation cancelled.");
-      return null;
-    }
-
-    return { action, tenantId, environment, operation };
-  }
-
-  if (action === "start") {
-    return { action, tenantId, environment };
-  }
-
-  return { action: "update", tenantId, environment: environment as ReleaseProfile };
 };
 
 export const confirmSelection = async (selection: AppSelection): Promise<boolean> => {
