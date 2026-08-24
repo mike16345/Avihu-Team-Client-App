@@ -60,18 +60,13 @@ describe("createDeveloperDiagnostics", () => {
     ).toBe("com.avihuteam.avihuteam.dev");
   });
 
-  it.each([undefined, null, "", "not a URL"])(
-    "fails closed for API value %s",
-    (apiUrl) => {
-      expect(createDeveloperDiagnostics(validInput({ apiUrl })).apiHost).toBe("Unavailable");
-    }
-  );
+  it.each([undefined, null, "", "not a URL"])("fails closed for API value %s", (apiUrl) => {
+    expect(createDeveloperDiagnostics(validInput({ apiUrl })).apiHost).toBe("Unavailable");
+  });
 
   it("fails closed when application identity and version are unavailable", () => {
     expect(
-      createDeveloperDiagnostics(
-        validInput({ iosBundleIdentifier: null, appVersion: undefined })
-      )
+      createDeveloperDiagnostics(validInput({ iosBundleIdentifier: null, appVersion: undefined }))
     ).toMatchObject({ applicationId: "Unavailable", appVersion: "Unavailable" });
   });
 });
