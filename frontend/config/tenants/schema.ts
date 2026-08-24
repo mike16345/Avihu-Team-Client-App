@@ -95,7 +95,13 @@ export const tenantConfigSchema = z
     updateUrl: z.string().url(),
     runtimeVersion: z.object({ policy: z.literal("appVersion") }).strict(),
     orientation: z.enum(["default", "portrait", "landscape"]),
-    platforms: z.array(z.enum(["ios", "android"])).min(1),
+    platforms: z
+      .array(z.enum(["ios", "android"]))
+      .min(1)
+      .max(2)
+      .refine((platforms) => new Set(platforms).size === platforms.length, {
+        message: "Supported platforms must be unique",
+      }),
     assets: z
       .object({
         legacy: z.boolean(),

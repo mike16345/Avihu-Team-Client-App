@@ -144,4 +144,19 @@ describe("platform-specific clean prebuild", () => {
       expected,
     ]);
   });
+
+  it.each([
+    [["ios", "ios"] as const, "ios"],
+    [["android", "android"] as const, "android"],
+    [["ios", "ios", "android"] as const, "all"],
+    [["android", "ios", "android"] as const, "all"],
+  ])("derives a safe platform from malformed lower-level input %j", async (platforms, expected) => {
+    const calls: ProcessSpec[] = [];
+    const context = await createContext(async (spec) => {
+      calls.push(spec);
+      return { exitCode: 0, stdout: "", stderr: "" };
+    });
+    await createCleanPrebuildCheck(platforms).run(context);
+    expect(calls[0]?.args.at(-1)).toBe(expected);
+  });
 });
