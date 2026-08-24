@@ -7,12 +7,12 @@ const buildSpec: CommandSpec = {
   command: "npx",
   args: ["--yes", "eas-cli@16.27.0", "build", "--platform", "android", "--profile", "production"],
   env: { APP_TENANT: "avihu", APP_ENV: "production" },
-  label: "Build Avihu Team (production) for android",
+  label: "Build Elevate Coach (production) for android",
   prerequisite: {
     command: "npm",
     args: ["run", "preflight:eas"],
     env: { APP_TENANT: "avihu", APP_ENV: "production" },
-    label: "EAS preflight for Avihu Team (production)",
+    label: "EAS preflight for Elevate Coach (production)",
   },
 };
 
