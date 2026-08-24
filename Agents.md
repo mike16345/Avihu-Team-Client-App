@@ -15,6 +15,8 @@
 - Screens and navigators orchestrate hooks and UI; direct `axios` imports are currently confined to the shared API layer (`frontend/src/config/apiConfig.ts` and `frontend/src/API/api.ts`).
 - Navigation is layered: `RootNavigator` handles bootstrap and session gating, then hands off to `AuthNavigator` or `AppNavigator`, while deeper flows are split into stack and tab navigators.
 - App-wide providers are composed at the application root in `frontend/App.tsx`; new global providers should be added there instead of being recreated inside feature screens.
+- Tenant records under `frontend/config/tenants` are the source of truth for public app identity, branding, permissions, supported platforms, release properties, and required environment-variable names. Runtime code consumes only the validated public snapshot in `extra.tenant`; secret values never belong in tenant TypeScript files or Expo `extra`.
+- Local and automated app commands must select both `APP_TENANT` and `APP_ENV` explicitly. `frontend/tools/app-control` and the shared preflight suites own command resolution; feature code and package scripts must not invent parallel tenant-selection logic.
 - Keep screens as orchestration layers. Screens should compose navigation params, hooks, stores, and domain components; large headers, toolbars, cards, empty states, modal bodies, action bars, and repeated view sections should move into feature components when they obscure the screen flow.
 - Prefer feature-local components, hooks, and helpers first when an extraction only serves one screen or flow. Promote to `frontend/src/components/ui`, shared hooks, or shared utilities only after reuse is real and the API is stable.
 - Preserve navigation boundaries. Navigator files should define route structure and screen wiring, not become the home for feature logic or data transformations.
@@ -103,6 +105,7 @@
 ## 10. Agent Operating Rules
 
 - Add new features by extending the existing layer boundaries: API access in `frontend/src/hooks/api`, server-state orchestration in `frontend/src/hooks/queries` or `frontend/src/hooks/mutations`, shared client state in `frontend/src/store`, and UI in `frontend/src/components`, `frontend/src/screens`, and `frontend/src/navigators`.
+- Add or change a tenant through the typed registry, deterministic asset pipeline, resolved Expo config, and shared preflight path. Never hardcode a fallback tenant, silently default a production action, or bypass the selector/preflight contract in a new build script.
 - Place new files in an existing responsibility-matched folder whenever possible, and avoid creating new top-level architectural categories unless the same need is repeated across multiple features.
 - Preserve the current separation of concerns when refactoring: screens should stay orchestration-focused, API hooks should stay transport-focused, and stores should stay state-focused.
 - Refactors should be incremental and structure-preserving; keep stable public names, existing query key prefixes, provider placement, and store entry points unless a repository-wide change intentionally replaces them.

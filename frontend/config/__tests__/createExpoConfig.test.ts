@@ -120,6 +120,7 @@ describe("createExpoConfig", () => {
     expect(production.extra?.tenant).toMatchObject({
       id: "avihu",
       environment: "production",
+      showEnvironmentBadge: false,
     });
     expect(production.extra).toMatchObject({
       API_URL: "https://api.example.com",
@@ -134,6 +135,21 @@ describe("createExpoConfig", () => {
     expect(serializedExtra).not.toContain("private-server-key");
     expect(serializedExtra).not.toContain("public-client-key");
     expect(serializedExtra).not.toContain("not-allowlisted");
+  });
+
+  it("enables the tenant badge only for non-production binary configurations", () => {
+    for (const environment of ["development", "preview", "production"] as const) {
+      const config = createExpoConfig({
+        baseConfig: {},
+        tenant: getTenant("avihu"),
+        environment,
+        processEnv: { NODE_ENV: "development" },
+      });
+
+      expect(config.extra?.tenant).toMatchObject({
+        showEnvironmentBadge: environment !== "production",
+      });
+    }
   });
 
   it.each(["development", "preview", "production"] as const)(

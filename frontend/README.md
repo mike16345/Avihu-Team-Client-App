@@ -1,9 +1,8 @@
-# Frontend developer commands
+# Frontend tenant development
 
 `npm run app` is the authoritative tenant-aware entry point for starting, validating, and
-releasing this app. The legacy package scripts remain temporarily for compatibility, but new
-developer and automation workflows should use `npm run app` so tenant and environment selection
-are explicit.
+releasing this app. It opens an explicit tenant/environment/action selector and never silently
+chooses production.
 
 `preflight` is the canonical fast preflight action. Add the optional `release` positional only
 when selecting the full release preflight.
@@ -13,4 +12,8 @@ npm run app -- preflight --tenant avihu --environment development --yes --dry-ru
 npm run app -- build android --tenant avihu --profile production --yes --dry-run
 ```
 
-Detailed EAS and operator procedures will be added with the later release-control tasks.
+Remove `--dry-run` only after reviewing the selection summary. Build actions run local
+noninteractive preflight before the pinned EAS command, and EAS repeats applicable checks remotely.
+
+See [docs/release-control.md](docs/release-control.md) for tenant onboarding, assets, EAS
+environments, fast/release preflight, R8 artifacts, edge-to-edge device checks, and recovery.
