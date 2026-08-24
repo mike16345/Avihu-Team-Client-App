@@ -50,6 +50,7 @@ const writeAndroidFixture = async (
       `android.targetSdkVersion=${targetSdkVersion}`,
       `android.enableProguardInReleaseBuilds=${String(releaseOptimization.enableProguardInReleaseBuilds)}`,
       `android.enableShrinkResourcesInReleaseBuilds=${String(releaseOptimization.enableShrinkResourcesInReleaseBuilds)}`,
+      "expo.edgeToEdgeEnabled=true",
     ].join("\n")
   );
   await writeFile(
@@ -64,14 +65,45 @@ const writeAndroidFixture = async (
   );
   await writeFile(
     path.join(valuesRoot, "styles.xml"),
+    ["<resources>", '  <style name="AppTheme">', "  </style>", "</resources>"].join("\n")
+  );
+};
+
+const writeEdgeToEdgeAndroidFixture = async (
+  root: string,
+  options: {
+    edgeToEdgeProperty?: boolean;
+    styleItems?: string[];
+    source?: string;
+  } = {}
+) => {
+  await writeAndroidFixture(root, 36, "com.avihuteam.avihuteam");
+  const properties = [
+    "android.compileSdkVersion=36",
+    "android.targetSdkVersion=36",
+    "android.enableProguardInReleaseBuilds=true",
+    "android.enableShrinkResourcesInReleaseBuilds=true",
+  ];
+  if (options.edgeToEdgeProperty !== undefined) {
+    properties.push(`expo.edgeToEdgeEnabled=${String(options.edgeToEdgeProperty)}`);
+  }
+  await writeFile(path.join(root, "android", "gradle.properties"), properties.join("\n"));
+  await writeFile(
+    path.join(root, "android", "app", "src", "main", "res", "values", "styles.xml"),
     [
       "<resources>",
       '  <style name="AppTheme">',
-      '    <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>',
+      ...(options.styleItems ?? []).map((item) => `    ${item}`),
       "  </style>",
       "</resources>",
     ].join("\n")
   );
+
+  if (options.source) {
+    const sourceRoot = path.join(root, "src");
+    await mkdir(sourceRoot, { recursive: true });
+    await writeFile(path.join(sourceRoot, "ManualInset.tsx"), options.source);
+  }
 };
 
 const writeIosFixture = async (
@@ -205,6 +237,92 @@ describe("Expo configuration checks", () => {
 });
 
 describe("generated native drift", () => {
+  it.each([
+    ["missing", undefined],
+    ["false", false],
+  ])("fails when the generated edge-to-edge property is %s", async (_label, property) => {
+    const context = await createContext();
+    await writeEdgeToEdgeAndroidFixture(context.projectRoot, {
+      edgeToEdgeProperty: property,
+    });
+
+    const result = await nativeDriftCheck.run(context);
+
+    expect(result).toMatchObject({ status: "fail", check: "native.drift" });
+    expect(result.details).toContain(
+      `Generated Android property: expected expo.edgeToEdgeEnabled=true, generated ${property === undefined ? "missing" : "false"}`
+    );
+  });
+
+  it("fails when generated styles retain the Android edge-to-edge opt-out", async () => {
+    const context = await createContext();
+    await writeEdgeToEdgeAndroidFixture(context.projectRoot, {
+      edgeToEdgeProperty: true,
+      styleItems: ['<item name="android:windowOptOutEdgeToEdgeEnforcement">false</item>'],
+    });
+
+    const result = await nativeDriftCheck.run(context);
+
+    expect(result).toMatchObject({ status: "fail", check: "native.drift" });
+    expect(result.details).toContain(
+      "Generated Android styles must not declare windowOptOutEdgeToEdgeEnforcement"
+    );
+  });
+
+  it("fails when generated styles set a fixed status-bar color", async () => {
+    const context = await createContext();
+    await writeEdgeToEdgeAndroidFixture(context.projectRoot, {
+      edgeToEdgeProperty: true,
+      styleItems: ['<item name="android:statusBarColor">#ffffff</item>'],
+    });
+
+    const result = await nativeDriftCheck.run(context);
+
+    expect(result).toMatchObject({ status: "fail", check: "native.drift" });
+    expect(result.details).toContain(
+      "Generated Android styles must not declare a fixed statusBarColor"
+    );
+  });
+
+  it("accepts the transparent status-bar color required by the edge-to-edge theme", async () => {
+    const context = await createContext();
+    await writeEdgeToEdgeAndroidFixture(context.projectRoot, {
+      edgeToEdgeProperty: true,
+      styleItems: ['<item name="android:statusBarColor">#00000000</item>'],
+    });
+
+    const result = await nativeDriftCheck.run(context);
+
+    expect(result).toMatchObject({ status: "pass", check: "native.drift" });
+  });
+
+  it("fails when application source calculates layout from StatusBar.currentHeight", async () => {
+    const context = await createContext();
+    await writeEdgeToEdgeAndroidFixture(context.projectRoot, {
+      edgeToEdgeProperty: true,
+      source: "const top = StatusBar.currentHeight ?? 0;\n",
+    });
+
+    const result = await nativeDriftCheck.run(context);
+
+    expect(result).toMatchObject({ status: "fail", check: "native.drift" });
+    expect(result.details).toContain(
+      "Application source must not use StatusBar.currentHeight: src/ManualInset.tsx"
+    );
+  });
+
+  it("accepts generated edge-to-edge configuration and inset-safe application source", async () => {
+    const context = await createContext();
+    await writeEdgeToEdgeAndroidFixture(context.projectRoot, {
+      edgeToEdgeProperty: true,
+      source: "const top = insets.top;\n",
+    });
+
+    const result = await nativeDriftCheck.run(context);
+
+    expect(result).toMatchObject({ status: "pass", check: "native.drift" });
+  });
+
   it("uses transformed resolved Expo identity and standard native asset catalogs", async () => {
     const context = await createContext();
     const expoConfig: ExpoConfig = {

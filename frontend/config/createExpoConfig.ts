@@ -101,9 +101,13 @@ export const createExpoConfig = ({
         backgroundImage: tenant.assets.adaptiveIconBackgroundImage,
         backgroundColor: tenant.assets.adaptiveIconBackgroundColor,
       },
+      edgeToEdgeEnabled: true,
       permissions: tenant.permissions.android,
       softwareKeyboardLayoutMode: "resize",
       package: identity.androidPackage,
+    },
+    androidStatusBar: {
+      backgroundColor: "#00000000",
     },
     extra: {
       eas: {

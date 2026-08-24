@@ -605,7 +605,7 @@ describe("injected process checks", () => {
     expect(getCheckIds(createReleaseSuite(android))).not.toContain("ios.release-validation");
   });
 
-  it("blocks clean prebuild when release policy promotes planned Android warnings", async () => {
+  it("blocks clean prebuild when release policy promotes an unresolved edge warning", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-policy-gate-"));
     temporaryRoots.push(root);
     const commands: string[] = [];
@@ -624,6 +624,10 @@ describe("injected process checks", () => {
     });
     const context: PreflightSuiteContext = {
       ...configuration,
+      expoConfig: {
+        ...configuration.expoConfig,
+        android: { ...configuration.expoConfig.android, edgeToEdgeEnabled: false },
+      },
       platform: "linux",
       runner: async (spec) => {
         commands.push([spec.command, ...spec.args].join(" "));

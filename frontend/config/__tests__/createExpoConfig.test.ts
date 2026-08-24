@@ -180,6 +180,20 @@ describe("createExpoConfig", () => {
     ).toEqual(["./plugins/withOptionalCameraFeature"]);
   });
 
+  it("enables Android edge-to-edge in every resolved environment", () => {
+    for (const environment of ["development", "preview", "production"] as const) {
+      const config = createExpoConfig({
+        baseConfig: {},
+        tenant: getTenant("avihu"),
+        environment,
+        processEnv: {},
+      });
+
+      expect(config.android?.edgeToEdgeEnabled).toBe(true);
+      expect(config.androidStatusBar?.backgroundColor).toBe("#00000000");
+    }
+  });
+
   it("uses tenant-generated platform asset paths", () => {
     const production = createExpoConfig({
       baseConfig: {},
