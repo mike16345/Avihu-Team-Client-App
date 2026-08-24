@@ -8,12 +8,12 @@ describe("formatDryRun", () => {
       command: "npx",
       args: ["--yes", "eas-cli@16.27.0", "build", "--platform", "android", "--profile", "preview"],
       env: { APP_TENANT: "avihu", APP_ENV: "preview" },
-      label: "Build Avihu Team (preview) for android",
+      label: "Build Elevate Coach (preview) for android",
       prerequisite: {
         command: "npm",
         args: ["run", "preflight:eas"],
         env: { APP_TENANT: "avihu", APP_ENV: "preview" },
-        label: "EAS preflight for Avihu Team (preview)",
+        label: "EAS preflight for Elevate Coach (preview)",
       },
     };
 
