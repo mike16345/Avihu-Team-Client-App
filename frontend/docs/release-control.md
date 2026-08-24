@@ -9,8 +9,26 @@ tenant or production action. For automation, make the tenant and environment exp
 npm run app
 npm run app -- start --tenant avihu --environment development --yes
 npm run app -- run android --tenant avihu --environment development --yes
+npm run app -- run ios --tenant avihu --environment production --yes
 npm run app -- preflight --tenant avihu --environment development --yes
 ```
+
+The interactive menu first asks for an intent: **Develop & run**, **Verify app**, **Release app**,
+or **Manage assets**. Detailed choices appear only inside that section. Local `run` actions always
+open Expo's device/emulator selector. Development uses a Debug native build; preview and production
+use Release and do not start an unnecessary Metro server.
+
+Supply `--device` to skip Expo's target selector, or install an existing binary without rebuilding:
+
+```sh
+npm run app -- run android --tenant avihu --environment production --device Pixel_9_API_36 --yes
+npm run app -- run ios --tenant avihu --environment production --device "iPhone 16 Pro" --yes
+npm run app -- install android --tenant avihu --environment production --binary ./app-release.apk --yes
+```
+
+The last command still opens the device selector. Add `--device <name-or-UDID>` when the target is
+already known. Android accepts an Expo-supported APK/AAB; iOS accepts an Expo-supported `.app` or
+`.ipa` appropriate for the selected simulator or physical device.
 
 Development and internal preview binaries display a small tenant/environment badge. Production
 binaries carry `showEnvironmentBadge: false` in their resolved Expo configuration and never infer

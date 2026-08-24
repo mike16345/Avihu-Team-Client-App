@@ -26,6 +26,19 @@ const selectionFromConfirmedArguments = (arguments_: ParsedAppArguments): AppSel
         tenantId: arguments_.tenantId,
         environment: arguments_.environment,
         platform: arguments_.platform,
+        device: arguments_.device,
+      };
+    case "install":
+      if (!arguments_.platform || !arguments_.binaryPath) {
+        throw new Error("platform and --binary are required for install actions");
+      }
+      return {
+        action: "install",
+        tenantId: arguments_.tenantId,
+        environment: arguments_.environment,
+        platform: arguments_.platform,
+        binaryPath: arguments_.binaryPath,
+        device: arguments_.device,
       };
     case "preflight":
       return {
