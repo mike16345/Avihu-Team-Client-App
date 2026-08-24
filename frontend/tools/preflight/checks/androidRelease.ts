@@ -35,7 +35,9 @@ const findFiles = async (root: string, extension: string): Promise<string[]> => 
         if (entry.isDirectory()) {
           return findFiles(target, extension);
         }
-        return entry.isFile() && entry.name.endsWith(extension) ? [target] : [];
+        return (entry.isFile() || entry.isSymbolicLink()) && entry.name.endsWith(extension)
+          ? [target]
+          : [];
       })
     );
     return nested.flat().sort();
@@ -167,13 +169,32 @@ export const createAndroidReleaseChecks = (
 
         const aabPath = await findReleaseAab(context.projectRoot);
         const aabStats = aabPath ? await lstat(aabPath) : undefined;
-        if (!aabPath || !aabStats?.isFile() || aabStats.isSymbolicLink() || aabStats.size === 0) {
+        if (!aabPath || !aabStats) {
           return {
             status: "fail",
             check: "android.bundle-release",
             summary: "Gradle completed without a release AAB",
             remediation:
               "Inspect android/app/build/outputs/bundle, then rerun the release bundle task.",
+          };
+        }
+        if (!aabStats.isFile() || aabStats.isSymbolicLink()) {
+          return {
+            status: "fail",
+            check: "android.bundle-release",
+            summary: "Release AAB must be a regular file",
+            details: [`Invalid: ${aabPath}`],
+            remediation: "Remove the symlink or non-file output, then rerun bundleRelease.",
+          };
+        }
+        if (aabStats.size === 0) {
+          return {
+            status: "fail",
+            check: "android.bundle-release",
+            summary: "Release AAB is empty",
+            details: [`Empty: ${aabPath}`],
+            remediation:
+              "Remove the empty AAB, then rerun bundleRelease and inspect Gradle output.",
           };
         }
 
@@ -187,7 +208,7 @@ export const createAndroidReleaseChecks = (
           }
           mappingStats = undefined;
         }
-        if (!mappingStats?.isFile() || mappingStats.isSymbolicLink() || mappingStats.size === 0) {
+        if (!mappingStats) {
           return {
             status: "fail",
             check: "android.bundle-release",
@@ -195,6 +216,26 @@ export const createAndroidReleaseChecks = (
             details: [`Expected: ${mappingPath}`],
             remediation:
               "Confirm release minification is enabled, then rerun the release bundle task.",
+          };
+        }
+        if (!mappingStats.isFile() || mappingStats.isSymbolicLink()) {
+          return {
+            status: "fail",
+            check: "android.bundle-release",
+            summary: "R8 mapping file must be a regular file",
+            details: [`Invalid: ${mappingPath}`],
+            remediation:
+              "Remove the symlink or non-file mapping, then rerun bundleRelease and retain the generated mapping.",
+          };
+        }
+        if (mappingStats.size === 0) {
+          return {
+            status: "fail",
+            check: "android.bundle-release",
+            summary: "R8 mapping file is empty",
+            details: [`Empty: ${mappingPath}`],
+            remediation:
+              "Confirm release minification is enabled, remove the empty mapping, and rerun bundleRelease.",
           };
         }
 

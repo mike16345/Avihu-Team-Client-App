@@ -39,6 +39,26 @@ const getCheckIds = (suite: ReturnType<typeof createFastSuite>) =>
       : definition.check
   );
 
+const runAndroidBundleFixture = async (root: string, writeArtifacts: () => Promise<void>) => {
+  await mkdir(path.join(root, "android"), { recursive: true });
+  await writeFile(path.join(root, "android", "gradlew"), "wrapper");
+  const context = createContext({
+    projectRoot: root,
+    runner: async (spec) => {
+      if (spec.args[0] === "bundleRelease") {
+        await writeArtifacts();
+      }
+      return { exitCode: 0, stdout: "", stderr: "" };
+    },
+  });
+
+  return createAndroidReleaseChecks(async () => ({
+    status: "pass",
+    check: "native.android-post-prebuild",
+    summary: "valid",
+  })).bundle.run(context);
+};
+
 describe("preflight suite composition", () => {
   it("covers every required fast tenant, project-health, asset, config, and policy check", () => {
     expect(getCheckIds(createFastSuite(createContext()))).toEqual([
@@ -487,6 +507,94 @@ describe("injected process checks", () => {
       summary: "Gradle completed without a nonempty R8 mapping file",
     });
   });
+
+  it("fails with targeted remediation when the release AAB is empty", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-empty-aab-"));
+    temporaryRoots.push(root);
+    const bundleRoot = path.join(root, "android", "app", "build", "outputs", "bundle", "release");
+    const result = await runAndroidBundleFixture(root, async () => {
+      await mkdir(bundleRoot, { recursive: true });
+      await writeFile(path.join(bundleRoot, "app-release.aab"), "");
+    });
+
+    expect(result).toMatchObject({
+      status: "fail",
+      summary: "Release AAB is empty",
+      remediation: expect.stringContaining("Remove the empty AAB"),
+    });
+  });
+
+  it.skipIf(process.platform === "win32")(
+    "fails with targeted remediation when the release AAB is a symlink",
+    async () => {
+      const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-symlink-aab-"));
+      temporaryRoots.push(root);
+      const bundleRoot = path.join(root, "android", "app", "build", "outputs", "bundle", "release");
+      const result = await runAndroidBundleFixture(root, async () => {
+        await mkdir(bundleRoot, { recursive: true });
+        const target = path.join(root, "real-release.aab");
+        await writeFile(target, "bundle");
+        await symlink(target, path.join(bundleRoot, "app-release.aab"));
+      });
+
+      expect(result).toMatchObject({
+        status: "fail",
+        summary: "Release AAB must be a regular file",
+        remediation: expect.stringContaining("Remove the symlink"),
+      });
+    }
+  );
+
+  it("fails with targeted remediation when the R8 mapping is empty", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-empty-mapping-"));
+    temporaryRoots.push(root);
+    const bundleRoot = path.join(root, "android", "app", "build", "outputs", "bundle", "release");
+    const mappingRoot = path.join(root, "android", "app", "build", "outputs", "mapping", "release");
+    const result = await runAndroidBundleFixture(root, async () => {
+      await mkdir(bundleRoot, { recursive: true });
+      await mkdir(mappingRoot, { recursive: true });
+      await writeFile(path.join(bundleRoot, "app-release.aab"), "bundle");
+      await writeFile(path.join(mappingRoot, "mapping.txt"), "");
+    });
+
+    expect(result).toMatchObject({
+      status: "fail",
+      summary: "R8 mapping file is empty",
+      remediation: expect.stringContaining("Confirm release minification is enabled"),
+    });
+  });
+
+  it.skipIf(process.platform === "win32")(
+    "fails with targeted remediation when the R8 mapping is a symlink",
+    async () => {
+      const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-symlink-mapping-"));
+      temporaryRoots.push(root);
+      const bundleRoot = path.join(root, "android", "app", "build", "outputs", "bundle", "release");
+      const mappingRoot = path.join(
+        root,
+        "android",
+        "app",
+        "build",
+        "outputs",
+        "mapping",
+        "release"
+      );
+      const result = await runAndroidBundleFixture(root, async () => {
+        await mkdir(bundleRoot, { recursive: true });
+        await mkdir(mappingRoot, { recursive: true });
+        await writeFile(path.join(bundleRoot, "app-release.aab"), "bundle");
+        const target = path.join(root, "real-mapping.txt");
+        await writeFile(target, "mapping");
+        await symlink(target, path.join(mappingRoot, "mapping.txt"));
+      });
+
+      expect(result).toMatchObject({
+        status: "fail",
+        summary: "R8 mapping file must be a regular file",
+        remediation: expect.stringContaining("Remove the symlink"),
+      });
+    }
+  );
 
   it("filters platform policy and release checks to the tenant's supported platforms", () => {
     const ios = createContext({ tenantConfig: { platforms: ["ios"] } as never });
