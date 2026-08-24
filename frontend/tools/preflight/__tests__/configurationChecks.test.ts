@@ -28,7 +28,13 @@ const createContext = async (processEnv: Readonly<Record<string, string | undefi
     processEnv,
   });
 
-const writeAndroidFixture = async (root: string, targetSdkVersion: number, packageName: string) => {
+const writeAndroidFixture = async (
+  root: string,
+  targetSdkVersion: number,
+  packageName: string,
+  icon = "@mipmap/ic_launcher",
+  roundIcon = "@mipmap/ic_launcher_round"
+) => {
   const androidRoot = path.join(root, "android");
   const mainRoot = path.join(androidRoot, "app", "src", "main");
   const valuesRoot = path.join(mainRoot, "res", "values");
@@ -46,7 +52,7 @@ const writeAndroidFixture = async (root: string, targetSdkVersion: number, packa
     path.join(mainRoot, "AndroidManifest.xml"),
     [
       `<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="${packageName}">`,
-      '  <application android:icon="@mipmap/ic_launcher">',
+      `  <application android:icon="${icon}" android:roundIcon="${roundIcon}">`,
       '    <activity android:name=".MainActivity" android:screenOrientation="portrait" />',
       "  </application>",
       "</manifest>",
@@ -60,6 +66,52 @@ const writeAndroidFixture = async (root: string, targetSdkVersion: number, packa
       '    <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>',
       "  </style>",
       "</resources>",
+    ].join("\n")
+  );
+};
+
+const writeIosFixture = async (
+  root: string,
+  bundleIdentifier: string,
+  scheme: string,
+  appIconName: string,
+  permissions: {
+    camera: string;
+    photos: string;
+    healthShare: string;
+    healthUpdate: string;
+  }
+) => {
+  const iosRoot = path.join(root, "ios");
+  const projectRoot = path.join(iosRoot, "Fixture.xcodeproj");
+  const appRoot = path.join(iosRoot, "Fixture");
+  await mkdir(projectRoot, { recursive: true });
+  await mkdir(appRoot, { recursive: true });
+  await writeFile(
+    path.join(projectRoot, "project.pbxproj"),
+    [
+      `PRODUCT_BUNDLE_IDENTIFIER = ${bundleIdentifier};`,
+      `ASSETCATALOG_COMPILER_APPICON_NAME = ${appIconName};`,
+      "INFOPLIST_FILE = Fixture/Info.plist;",
+    ].join("\n")
+  );
+  await writeFile(
+    path.join(appRoot, "Info.plist"),
+    [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      "<plist><dict>",
+      "<key>CFBundleURLTypes</key><array><dict>",
+      "<key>CFBundleURLSchemes</key><array>",
+      `<string>${scheme}</string>`,
+      "</array></dict></array>",
+      "<key>UISupportedInterfaceOrientations</key><array>",
+      "<string>UIInterfaceOrientationPortrait</string>",
+      "</array>",
+      `<key>NSCameraUsageDescription</key><string>${permissions.camera}</string>`,
+      `<key>NSPhotoLibraryUsageDescription</key><string>${permissions.photos}</string>`,
+      `<key>NSHealthShareUsageDescription</key><string>${permissions.healthShare}</string>`,
+      `<key>NSHealthUpdateUsageDescription</key><string>${permissions.healthUpdate}</string>`,
+      "</dict></plist>",
     ].join("\n")
   );
 };
@@ -149,6 +201,60 @@ describe("Expo configuration checks", () => {
 });
 
 describe("generated native drift", () => {
+  it("uses transformed resolved Expo identity and standard native asset catalogs", async () => {
+    const context = await createContext();
+    const expoConfig: ExpoConfig = {
+      ...context.expoConfig,
+      scheme: "resolved-scheme",
+      android: {
+        ...context.expoConfig.android,
+        package: "com.resolved.android",
+      },
+      ios: {
+        ...context.expoConfig.ios,
+        bundleIdentifier: "com.resolved.ios",
+      },
+    };
+    const resolvedContext = { ...context, expoConfig };
+    await writeAndroidFixture(context.projectRoot, 36, "com.resolved.android");
+    await writeIosFixture(
+      context.projectRoot,
+      "com.resolved.ios",
+      "resolved-scheme",
+      "AppIcon",
+      context.tenantConfig.permissions
+    );
+
+    const result = await nativeDriftCheck.run(resolvedContext);
+
+    expect(result).toMatchObject({ status: "pass", check: "native.drift" });
+  });
+
+  it("rejects wrong Android and iOS generated app-icon catalog settings", async () => {
+    const context = await createContext();
+    await writeAndroidFixture(
+      context.projectRoot,
+      36,
+      "com.avihuteam.avihuteam",
+      "@mipmap/wrong_icon"
+    );
+    await writeIosFixture(
+      context.projectRoot,
+      "com.avihuteam.avihuteam",
+      "avihuteam",
+      "WrongIcon",
+      context.tenantConfig.permissions
+    );
+
+    const result = await nativeDriftCheck.run(context);
+
+    expect(result).toMatchObject({ status: "fail", check: "native.drift" });
+    expect(result.details).toContain(
+      "Android app icon: expected @mipmap/ic_launcher, generated @mipmap/wrong_icon"
+    );
+    expect(result.details).toContain("iOS app icon: expected AppIcon, generated WrongIcon");
+  });
+
   it("fails when generated Android target SDK differs from resolved Expo config", async () => {
     const context = await createContext();
     await writeAndroidFixture(context.projectRoot, 35, "com.avihuteam.avihuteam");

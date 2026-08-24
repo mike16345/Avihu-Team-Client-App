@@ -6,6 +6,10 @@ import type { CheckDefinition, CheckResult } from "../types";
 
 type ExpoPluginEntry = NonNullable<ExpoConfig["plugins"]>[number];
 
+const EXPO_ANDROID_APP_ICON = "@mipmap/ic_launcher";
+const EXPO_ANDROID_ROUND_APP_ICON = "@mipmap/ic_launcher_round";
+const EXPO_IOS_APP_ICON_CATALOG = "AppIcon";
+
 const resolveInsideRoot = (root: string, ...segments: string[]) => {
   const resolvedRoot = path.resolve(root);
   const target = path.resolve(resolvedRoot, ...segments);
@@ -126,6 +130,17 @@ const findManifestPackage = (manifest: string, buildGradle: string | null) => {
   return gradleMatch?.[1] ?? null;
 };
 
+const getApplicationAttribute = (manifest: string, attribute: string) => {
+  const application = manifest.match(/<application\b[^>]*>/u)?.[0];
+
+  if (!application) {
+    return null;
+  }
+
+  const escapedAttribute = attribute.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  return application.match(new RegExp(`${escapedAttribute}=["']([^"']+)["']`, "u"))?.[1] ?? null;
+};
+
 const checkAndroid = async (
   context: Readonly<ConfigurationPreflightContext>,
   drift: string[],
@@ -164,7 +179,7 @@ const checkAndroid = async (
 
   const properties = parseProperties(propertiesText);
   const expectedBuild = getAndroidBuildProperties(context.expoConfig);
-  const identity = context.tenantConfig.environments[context.environment];
+  const expectedPackage = context.expoConfig.android?.package ?? "missing";
   const targetSdk = Number(properties["android.targetSdkVersion"]);
   const compileSdk = Number(properties["android.compileSdkVersion"]);
   const proguard = parseBooleanProperty(properties["android.enableProguardInReleaseBuilds"]);
@@ -173,12 +188,14 @@ const checkAndroid = async (
   );
   const orientation = manifest.match(/android:screenOrientation=["']([^"']+)["']/u)?.[1] ?? null;
   const packageName = findManifestPackage(manifest, buildGradle);
+  const appIcon = getApplicationAttribute(manifest, "android:icon");
+  const roundAppIcon = getApplicationAttribute(manifest, "android:roundIcon");
   const optOut = styles.match(
     /<item\s+name=["']android:windowOptOutEdgeToEdgeEnforcement["']\s*>(true|false)<\/item>/u
   )?.[1];
   const edgeToEdgeEnabled = Boolean(context.expoConfig.android?.edgeToEdgeEnabled);
 
-  addDrift(drift, "Android package", identity.androidPackage, packageName);
+  addDrift(drift, "Android package", expectedPackage, packageName);
   addDrift(drift, "Android target SDK", Number(expectedBuild.targetSdkVersion), targetSdk);
   addDrift(drift, "Android compile SDK", Number(expectedBuild.compileSdkVersion), compileSdk);
   addDrift(drift, "Android R8", Boolean(expectedBuild.enableProguardInReleaseBuilds), proguard);
@@ -191,14 +208,11 @@ const checkAndroid = async (
   addDrift(drift, "Android orientation", context.expoConfig.orientation ?? "default", orientation);
   addDrift(drift, "Android edge-to-edge opt-out", !edgeToEdgeEnabled, optOut === "true");
 
-  if (!/android:icon=["'][^"']+["']/u.test(manifest)) {
-    drift.push(
-      `Android app icon: configured ${context.expoConfig.icon}, generated reference missing`
-    );
-  }
+  addDrift(drift, "Android app icon", EXPO_ANDROID_APP_ICON, appIcon);
+  addDrift(drift, "Android round app icon", EXPO_ANDROID_ROUND_APP_ICON, roundAppIcon);
 
   evidence.push(
-    `Android generated config: SDK ${compileSdk}/${targetSdk}, R8 ${String(proguard ?? "missing")}, edge opt-out ${optOut ?? "missing"}`
+    `Android generated config: SDK ${compileSdk}/${targetSdk}, R8 ${String(proguard ?? "missing")}, edge opt-out ${optOut ?? "missing"}, icon ${appIcon ?? "missing"}`
   );
 };
 
@@ -226,6 +240,14 @@ const getPlistArray = (plist: string, key: string) => {
   return array
     ? [...array.matchAll(/<string>([^<]*)<\/string>/gu)].map((match) => decodeXml(match[1].trim()))
     : [];
+};
+
+const getExpectedSchemes = (config: ExpoConfig) => {
+  if (Array.isArray(config.scheme)) {
+    return config.scheme;
+  }
+
+  return config.scheme ? [config.scheme] : [];
 };
 
 const findIosProject = async (projectRoot: string) => {
@@ -283,7 +305,8 @@ const checkIos = async (
     return;
   }
 
-  const identity = context.tenantConfig.environments[context.environment];
+  const expectedBundleIdentifier = context.expoConfig.ios?.bundleIdentifier ?? "missing";
+  const expectedSchemes = getExpectedSchemes(context.expoConfig);
   const bundleIdentifiers = [
     ...project.matchAll(/PRODUCT_BUNDLE_IDENTIFIER\s*=\s*["']?([^;"']+)["']?;/gu),
   ].map((match) => match[1].trim());
@@ -301,16 +324,16 @@ const checkIos = async (
 
   if (
     bundleIdentifiers.length === 0 ||
-    bundleIdentifiers.some((identifier) => identifier !== identity.iosBundleIdentifier)
+    bundleIdentifiers.some((identifier) => identifier !== expectedBundleIdentifier)
   ) {
     drift.push(
-      `iOS bundle identifier: expected ${identity.iosBundleIdentifier}, generated ${bundleIdentifiers.join(", ") || "missing"}`
+      `iOS bundle identifier: expected ${expectedBundleIdentifier}, generated ${bundleIdentifiers.join(", ") || "missing"}`
     );
   }
 
-  if (!schemes.includes(identity.scheme)) {
+  if (expectedSchemes.length === 0 || expectedSchemes.some((scheme) => !schemes.includes(scheme))) {
     drift.push(
-      `iOS URL scheme: expected ${identity.scheme}, generated ${schemes.join(", ") || "missing"}`
+      `iOS URL scheme: expected ${expectedSchemes.join(", ") || "missing"}, generated ${schemes.join(", ") || "missing"}`
     );
   }
 
@@ -329,12 +352,10 @@ const checkIos = async (
     addDrift(drift, `iOS ${key}`, expected, getPlistString(plist, key));
   }
 
-  if (!appIconName) {
-    drift.push(`iOS app icon: configured ${context.expoConfig.icon}, generated reference missing`);
-  }
+  addDrift(drift, "iOS app icon", EXPO_IOS_APP_ICON_CATALOG, appIconName ?? null);
 
   evidence.push(
-    `iOS generated config: bundle ${identity.iosBundleIdentifier}, icon ${appIconName ?? "missing"}`
+    `iOS generated config: bundle ${expectedBundleIdentifier}, icon ${appIconName ?? "missing"}`
   );
 };
 
