@@ -1,4 +1,4 @@
-import { access, readdir } from "node:fs/promises";
+import { access, lstat, readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { createProcessCheck, type ProcessPreflightContext } from "../processCheck";
@@ -83,6 +83,11 @@ const memoize = (definition: CheckDefinition<ProcessPreflightContext>): CheckPre
   };
 };
 
+const memoizedDefinition = (definition: CheckDefinition<ProcessPreflightContext>) => {
+  const run = memoize(definition);
+  return { definition: { check: definition.check, run }, run };
+};
+
 export const createAndroidReleaseChecks = (
   ensurePrebuild: CheckPrerequisite
 ): AndroidReleaseChecks => {
@@ -113,22 +118,24 @@ export const createAndroidReleaseChecks = (
           check: "android.lint-release",
           command,
           args: ["lintRelease", "--no-daemon"],
+          cwd: (runContext) => path.join(runContext.projectRoot, "android"),
           successSummary: "Android release lint passed",
           failureSummary: "Android release lint failed",
           remediation: "Open the Android lint report, fix blocking findings, and rerun preflight.",
         }).run(context);
       }),
   };
-  const ensureLint = memoize(lint);
+  const lintNode = memoizedDefinition(lint);
 
   const bundle: CheckDefinition<ProcessPreflightContext> = {
     check: "android.bundle-release",
     run: (context) =>
-      runAfter("android.bundle-release", context, ensureLint, async () => {
+      runAfter("android.bundle-release", context, lintNode.run, async () => {
         const result = await createProcessCheck({
           check: "android.bundle-release",
           command: gradleCommand(context),
           args: ["bundleRelease", "--no-daemon"],
+          cwd: (runContext) => path.join(runContext.projectRoot, "android"),
           successSummary: "Android release bundle compiled",
           failureSummary: "Android release bundle compilation failed",
           remediation: "Fix the Gradle release build, then rerun release preflight.",
@@ -139,7 +146,8 @@ export const createAndroidReleaseChecks = (
         }
 
         const aabPath = await findReleaseAab(context.projectRoot);
-        return aabPath
+        const aabStats = aabPath ? await lstat(aabPath) : undefined;
+        return aabPath && aabStats?.isFile() && !aabStats.isSymbolicLink() && aabStats.size > 0
           ? { ...result, details: [`AAB: ${aabPath}`] }
           : {
               status: "fail",
@@ -150,12 +158,12 @@ export const createAndroidReleaseChecks = (
             };
       }),
   };
-  const ensureBundle = memoize(bundle);
+  const bundleNode = memoizedDefinition(bundle);
 
   const aabValidation: CheckDefinition<ProcessPreflightContext> = {
     check: "android.aab-validation",
     run: (context) =>
-      runAfter("android.aab-validation", context, ensureBundle, async () => {
+      runAfter("android.aab-validation", context, bundleNode.run, async () => {
         const aabPath = await findReleaseAab(context.projectRoot);
         if (!aabPath) {
           return {
@@ -202,5 +210,11 @@ export const createAndroidReleaseChecks = (
       }),
   };
 
-  return { lint, bundle, aabValidation, ensureBundle };
+  const aabNode = memoizedDefinition(aabValidation);
+  return {
+    lint: lintNode.definition,
+    bundle: bundleNode.definition,
+    aabValidation: aabNode.definition,
+    ensureBundle: bundleNode.run,
+  };
 };

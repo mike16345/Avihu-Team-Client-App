@@ -1,4 +1,8 @@
-import { createProcessCheck, type ProcessPreflightContext } from "../processCheck";
+import {
+  createProcessCheck,
+  executeProcessCheck,
+  type ProcessPreflightContext,
+} from "../processCheck";
 import type { CheckDefinition, CheckResult } from "../types";
 
 const getAndroidBuildProperties = (context: Readonly<ProcessPreflightContext>) => {
@@ -121,30 +125,52 @@ const iosPlatformPolicyCheck: CheckDefinition<ProcessPreflightContext> = {
   },
 };
 
-const expoDoctorProcess = createProcessCheck({
-  check: "expo.doctor",
-  command: "npx",
-  args: ["--yes", "expo-doctor@1.20.2"],
-  successSummary: "Expo Doctor passed",
-  failureSummary: "Expo Doctor reported project-health findings",
-  remediation: "Run npx --yes expo-doctor@1.20.2 and resolve each unacknowledged finding.",
-});
+const parsePackageList = (output: string, category: string) => {
+  const match = output.match(new RegExp(`^\\s*${category}:\\s*(.+)$`, "mu"));
+  return match
+    ? match[1]
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .sort()
+    : [];
+};
+
+const samePackages = (actual: string[], expected: string[]) =>
+  actual.length === expected.length && actual.every((value, index) => value === expected[index]);
 
 const nativeMaintenanceCheck: CheckDefinition<ProcessPreflightContext> = {
-  check: "dependencies.native-maintenance",
+  check: "expo.doctor",
   run: async (context): Promise<CheckResult> => {
-    const result = await expoDoctorProcess.run(context);
+    const execution = await executeProcessCheck(
+      {
+        check: "expo.doctor",
+        command: "npx",
+        args: ["--yes", "expo-doctor@1.20.2"],
+        successSummary: "Expo Doctor passed",
+        failureSummary: "Expo Doctor reported project-health findings",
+        remediation: "Run npx --yes expo-doctor@1.20.2 and resolve each unacknowledged finding.",
+      },
+      context
+    );
+    const result = execution.result;
     if (result.status === "pass") {
-      return { ...result, check: "dependencies.native-maintenance" };
+      return result;
     }
 
-    const evidence = result.details?.join("\n") ?? "";
+    const evidence = `${execution.sanitizedStdout}\n${execution.sanitizedStderr}`;
     const isOnlyAcknowledgedFinding =
-      evidence.includes("1 check failed") &&
+      /(?:^|\n)1 check failed(?:,|\.|\n)/u.test(evidence) &&
+      (evidence.match(/^✖/gmu)?.length ?? 0) === 1 &&
       evidence.includes("Validate packages against React Native Directory") &&
-      evidence.includes("react-native-health") &&
-      evidence.includes("react-native-infinite-wheel-picker") &&
-      evidence.includes("expo-health-connect");
+      samePackages(parsePackageList(evidence, "Untested on New Architecture"), [
+        "react-native-health",
+        "react-native-infinite-wheel-picker",
+      ]) &&
+      samePackages(parsePackageList(evidence, "Unmaintained"), [
+        "expo-health-connect",
+        "react-native-infinite-wheel-picker",
+      ]);
 
     if (!isOnlyAcknowledgedFinding) {
       return result;
@@ -153,7 +179,7 @@ const nativeMaintenanceCheck: CheckDefinition<ProcessPreflightContext> = {
     return {
       ...result,
       status: "warn",
-      check: "dependencies.native-maintenance",
+      check: "expo.doctor",
       summary: "Expo Doctor reported only acknowledged native maintenance findings",
       remediation:
         "Exercise the owned health and wheel-picker integrations during the release smoke pass.",
@@ -189,9 +215,11 @@ export const createProjectHealthChecks = (): CheckDefinition<ProcessPreflightCon
   }),
 ];
 
-export const createPlatformPolicyChecks = (): CheckDefinition<ProcessPreflightContext>[] => [
-  androidR8Check,
-  androidEdgeToEdgeCheck,
-  androidLargeScreenCheck,
-  iosPlatformPolicyCheck,
+export const createPlatformPolicyChecks = (
+  platforms: readonly ("ios" | "android")[]
+): CheckDefinition<ProcessPreflightContext>[] => [
+  ...(platforms.includes("android")
+    ? [androidR8Check, androidEdgeToEdgeCheck, androidLargeScreenCheck]
+    : []),
+  ...(platforms.includes("ios") ? [iosPlatformPolicyCheck] : []),
 ];

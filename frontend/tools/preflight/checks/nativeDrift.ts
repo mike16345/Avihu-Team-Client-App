@@ -360,24 +360,25 @@ const checkIos = async (
 };
 
 const runNativeDriftCheck = async (
-  context: Readonly<ConfigurationPreflightContext>
+  context: Readonly<ConfigurationPreflightContext>,
+  platforms: readonly ("ios" | "android")[] = context.tenantConfig.platforms
 ): Promise<CheckResult> => {
   const drift: string[] = [];
   const evidence: string[] = [];
   const androidExists = await pathExists(context.projectRoot, "android");
   const iosExists = await pathExists(context.projectRoot, "ios");
 
-  if (androidExists) {
+  if (platforms.includes("android") && androidExists) {
     await checkAndroid(context, drift, evidence);
-  } else {
+  } else if (platforms.includes("android")) {
     evidence.push(
       "Android folder absent; clean generation required before native release validation."
     );
   }
 
-  if (iosExists) {
+  if (platforms.includes("ios") && iosExists) {
     await checkIos(context, drift, evidence);
-  } else {
+  } else if (platforms.includes("ios")) {
     evidence.push("iOS folder absent; clean generation required before native release validation.");
   }
 
@@ -405,4 +406,12 @@ const runNativeDriftCheck = async (
 export const nativeDriftCheck: CheckDefinition<ConfigurationPreflightContext> = {
   check: "native.drift",
   run: runNativeDriftCheck,
+};
+
+export const androidNativeDriftCheck: CheckDefinition<ConfigurationPreflightContext> = {
+  check: "native.android-post-prebuild",
+  run: async (context) => {
+    const result = await runNativeDriftCheck(context, ["android"]);
+    return { ...result, check: "native.android-post-prebuild" };
+  },
 };

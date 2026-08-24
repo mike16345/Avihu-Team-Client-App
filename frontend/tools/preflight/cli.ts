@@ -1,7 +1,7 @@
 import "dotenv/config";
 
-import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
 import { parseTenantEnvironment } from "../../config/tenants/schema";
@@ -13,6 +13,7 @@ import { renderJson } from "./renderJson";
 import { runSpawnProcess } from "./processCheck";
 import { createEasSuite, createFastSuite, createReleaseSuite } from "./suites";
 import type { PreflightMode } from "./types";
+import { publishPreflightFile } from "./safePublication";
 
 interface CliArguments {
   mode: PreflightMode;
@@ -94,22 +95,32 @@ const resolveJsonPath = (projectRoot: string, requestedPath: string) => {
   return target;
 };
 
-const main = async () => {
-  const projectRoot = process.cwd();
-  const args = parsePreflightArguments(process.argv.slice(2));
-  const timestamp = new Date().toISOString();
+export interface PreflightCliDependencies {
+  argv: string[];
+  projectRoot: string;
+  processEnv: Readonly<Record<string, string | undefined>>;
+  platform: NodeJS.Platform;
+  runner: typeof runSpawnProcess;
+  now: () => Date;
+  writeOutput: (value: string) => void;
+}
+
+export const runPreflightCli = async (dependencies: PreflightCliDependencies) => {
+  const { projectRoot } = dependencies;
+  const args = parsePreflightArguments(dependencies.argv, dependencies.processEnv);
+  const timestamp = dependencies.now().toISOString();
   const configuration = await createPreflightContext({
     projectRoot,
     tenantId: args.tenantId,
     environment: args.environment,
-    processEnv: process.env,
+    processEnv: dependencies.processEnv,
     timestamp,
   });
-  const smokeCommand = parseSmokeCommand(process.env.PREFLIGHT_SMOKE_COMMAND_JSON);
+  const smokeCommand = parseSmokeCommand(dependencies.processEnv.PREFLIGHT_SMOKE_COMMAND_JSON);
   const context = {
     ...configuration,
-    runner: runSpawnProcess,
-    platform: process.platform,
+    runner: dependencies.runner,
+    platform: dependencies.platform,
     ...(smokeCommand ? { smokeCommand } : {}),
   };
   const suite =
@@ -123,24 +134,34 @@ const main = async () => {
   if (args.jsonPath) {
     const jsonPath = resolveJsonPath(projectRoot, args.jsonPath);
     const json = renderJson(report);
-    await mkdir(path.dirname(jsonPath), { recursive: true });
-    await writeFile(jsonPath, json, { encoding: "utf8", mode: 0o600 });
-    process.stdout.write(json);
+    await publishPreflightFile(projectRoot, jsonPath, json);
+    dependencies.writeOutput(json);
   } else {
-    process.stdout.write(`${renderHuman(report)}\n`);
+    dependencies.writeOutput(`${renderHuman(report)}\n`);
   }
 
   return report.exitCode;
 };
 
-void main()
-  .then((exitCode) => {
-    process.exitCode = exitCode;
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isMain)
+  void runPreflightCli({
+    argv: process.argv.slice(2),
+    projectRoot: process.cwd(),
+    processEnv: process.env,
+    platform: process.platform,
+    runner: runSpawnProcess,
+    now: () => new Date(),
+    writeOutput: (value) => process.stdout.write(value),
   })
-  .catch((error: unknown) => {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error(
-      `${message}\nRemediation: select a valid tenant/environment and rerun preflight.`
-    );
-    process.exitCode = 1;
-  });
+    .then((exitCode) => {
+      process.exitCode = exitCode;
+    })
+    .catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(
+        `${message}\nRemediation: select a valid tenant/environment and rerun preflight.`
+      );
+      process.exitCode = 1;
+    });

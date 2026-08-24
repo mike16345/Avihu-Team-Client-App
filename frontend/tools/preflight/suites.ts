@@ -12,8 +12,9 @@ import { createAssetsCheck } from "./checks/assets";
 import { environmentCheck } from "./checks/environment";
 import { expoConfigCheck } from "./checks/expoConfig";
 import { createIosReleaseCheck } from "./checks/iosRelease";
-import { nativeDriftCheck } from "./checks/nativeDrift";
+import { androidNativeDriftCheck, nativeDriftCheck } from "./checks/nativeDrift";
 import { createPlatformPolicyChecks, createProjectHealthChecks } from "./checks/projectHealth";
+import { applyPolicy } from "./policy";
 import { tenantConfigCheck } from "./checks/tenantConfig";
 import type { ProcessPreflightContext } from "./processCheck";
 import type { CheckDefinition, CheckInput, CheckResult } from "./types";
@@ -45,9 +46,12 @@ const normalize = (
 
 const memoizeDefinition = (
   definition: CheckDefinition<PreflightSuiteContext>
-): CheckDefinition<PreflightSuiteContext> => {
+): {
+  definition: CheckDefinition<PreflightSuiteContext>;
+  run: CheckPrerequisite;
+} => {
   const ensure = memoize(definition);
-  return { check: definition.check, run: ensure };
+  return { definition: { check: definition.check, run: ensure }, run: ensure };
 };
 
 export const createFastSuite = (context: PreflightSuiteContext): PreflightSuite => [
@@ -57,11 +61,15 @@ export const createFastSuite = (context: PreflightSuiteContext): PreflightSuite 
   createAssetsCheck(context.tenant),
   expoConfigCheck,
   nativeDriftCheck,
-  ...createPlatformPolicyChecks(),
+  ...createPlatformPolicyChecks(context.tenantConfig.platforms ?? ["ios", "android"]),
 ];
 
 export const createReleaseSuite = (context: PreflightSuiteContext): PreflightSuite => {
-  const fastSuite = createFastSuite(context).map(normalize).map(memoizeDefinition);
+  const fastSuite = createFastSuite(context)
+    .map(normalize)
+    .map(memoizeDefinition)
+    .map((node) => node.definition);
+  const platforms = context.tenantConfig.platforms ?? ["ios", "android"];
   const basePrebuild = createCleanPrebuildCheck();
   const prebuild: CheckDefinition<PreflightSuiteContext> = {
     check: basePrebuild.check,
@@ -69,7 +77,9 @@ export const createReleaseSuite = (context: PreflightSuiteContext): PreflightSui
       const fastResults = await Promise.all(
         fastSuite.map((definition) => definition.run(runContext))
       );
-      const failed = fastResults.find((result) => result.status === "fail");
+      const failed = fastResults
+        .map((result) => applyPolicy(result, { mode: "release" }))
+        .find((result) => result.status === "fail");
       if (failed) {
         return {
           status: "fail",
@@ -84,26 +94,47 @@ export const createReleaseSuite = (context: PreflightSuiteContext): PreflightSui
       return basePrebuild.run(runContext);
     },
   };
-  const ensurePrebuild = memoize(prebuild);
-  const android = createAndroidReleaseChecks(ensurePrebuild);
-  const javascriptExport = createJavaScriptExportCheck(ensurePrebuild);
-  const ensureExport = memoize(javascriptExport);
-  const ios = createIosReleaseCheck(ensurePrebuild);
-  const artifacts = createArtifactCheck(android.ensureBundle, ensureExport);
-  const ensureArtifacts = memoize(artifacts);
-  const smoke = createSmokeInfrastructureCheck(ensureArtifacts);
+  const prebuildNode = memoizeDefinition(prebuild);
+  const androidDrift = memoizeDefinition({
+    check: androidNativeDriftCheck.check,
+    run: async (runContext) => {
+      const prerequisite = await prebuildNode.run(runContext);
+      return prerequisite.status === "fail"
+        ? {
+            status: "fail",
+            check: androidNativeDriftCheck.check,
+            summary: `Skipped because ${prerequisite.check} failed`,
+            remediation: prerequisite.remediation,
+          }
+        : androidNativeDriftCheck.run(runContext);
+    },
+  });
+  const android = platforms.includes("android")
+    ? createAndroidReleaseChecks(androidDrift.run)
+    : undefined;
+  const javascriptExport = memoizeDefinition(
+    createJavaScriptExportCheck(prebuildNode.run, platforms)
+  );
+  const ios = platforms.includes("ios")
+    ? memoizeDefinition(createIosReleaseCheck(prebuildNode.run))
+    : undefined;
+  const artifacts = memoizeDefinition(
+    createArtifactCheck(android?.ensureBundle, javascriptExport.run, platforms)
+  );
+  const smoke = memoizeDefinition(createSmokeInfrastructureCheck(artifacts.run));
 
-  return [
+  const releaseSuite: CheckDefinition<PreflightSuiteContext>[] = [
     ...fastSuite,
-    prebuild,
-    android.lint,
-    android.bundle,
-    android.aabValidation,
-    javascriptExport,
-    ios,
-    artifacts,
-    smoke,
+    prebuildNode.definition,
+    ...(android
+      ? [androidDrift.definition, android.lint, android.bundle, android.aabValidation]
+      : []),
+    javascriptExport.definition,
+    ...(ios ? [ios.definition] : []),
+    artifacts.definition,
+    smoke.definition,
   ];
+  return releaseSuite;
 };
 
 export const createEasSuite = (context: PreflightSuiteContext): PreflightSuite =>

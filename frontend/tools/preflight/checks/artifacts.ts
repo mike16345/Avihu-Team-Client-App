@@ -1,4 +1,4 @@
-import { readdir, stat } from "node:fs/promises";
+import { lstat, readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 
 import { findReleaseAab, type CheckPrerequisite } from "./androidRelease";
@@ -52,7 +52,8 @@ const prerequisiteFailure = (check: string, result: CheckResult): CheckResult =>
 });
 
 export const createJavaScriptExportCheck = (
-  ensurePrebuild: CheckPrerequisite
+  ensurePrebuild: CheckPrerequisite,
+  platforms: readonly ("ios" | "android")[] = ["ios", "android"]
 ): CheckDefinition<ProcessPreflightContext> => ({
   check: "javascript.production-export",
   run: async (context) => {
@@ -69,7 +70,7 @@ export const createJavaScriptExportCheck = (
         "expo",
         "export",
         "--platform",
-        "all",
+        platforms.length === 2 ? "all" : platforms[0],
         "--source-maps",
         "--output-dir",
         outputDirectory,
@@ -84,36 +85,36 @@ export const createJavaScriptExportCheck = (
       return result;
     }
 
-    const bundles = await findFiles(outputDirectory, (name) => name.endsWith(".js"));
-    const sourceMaps = await findFiles(outputDirectory, (name) => name.endsWith(".map"));
-    if (bundles.length === 0 || sourceMaps.length === 0) {
+    const analysis = await analyzeExpoExport(outputDirectory, platforms);
+    if (!analysis.valid) {
       return {
         status: "fail",
         check: "javascript.production-export",
         summary: "Production export omitted JavaScript bundles or source maps",
-        details: [`Export directory: ${outputDirectory}`],
+        details: analysis.errors,
         remediation: "Re-run Expo export with --source-maps and inspect the export directory.",
       };
     }
 
     return {
       ...result,
-      details: [`Bundles: ${bundles.length}`, `Source maps: ${sourceMaps.length}`],
+      details: analysis.details,
     };
   },
 });
 
 export const createArtifactCheck = (
-  ensureBundle: CheckPrerequisite,
-  ensureExport: CheckPrerequisite
+  ensureBundle: CheckPrerequisite | undefined,
+  ensureExport: CheckPrerequisite,
+  platforms: readonly ("ios" | "android")[] = ["ios", "android"]
 ): CheckDefinition<ProcessPreflightContext> => ({
   check: "artifacts.release",
   run: async (context) => {
     const [bundleResult, exportResult] = await Promise.all([
-      ensureBundle(context),
+      ensureBundle?.(context),
       ensureExport(context),
     ]);
-    const failed = [bundleResult, exportResult].find((result) => result.status === "fail");
+    const failed = [bundleResult, exportResult].find((result) => result?.status === "fail");
     if (failed) {
       return prerequisiteFailure("artifacts.release", failed);
     }
@@ -133,13 +134,18 @@ export const createArtifactCheck = (
     const sourceMaps = await findFiles(exportDirectory, (name) => name.endsWith(".map"));
     const missing: string[] = [];
 
-    if (!aabPath) {
+    if (platforms.includes("android") && !aabPath) {
       missing.push("Android release AAB");
     }
-    try {
-      await stat(mappingPath);
-    } catch {
-      missing.push(`R8 mapping: ${mappingPath}`);
+    if (platforms.includes("android")) {
+      try {
+        const mapping = await lstat(mappingPath);
+        if (!mapping.isFile() || mapping.isSymbolicLink() || mapping.size === 0) {
+          throw new Error("empty");
+        }
+      } catch {
+        missing.push(`R8 mapping: ${mappingPath}`);
+      }
     }
     if (sourceMaps.length === 0) {
       missing.push(`JavaScript source maps: ${exportDirectory}`);
@@ -156,7 +162,7 @@ export const createArtifactCheck = (
       };
     }
 
-    if (!aabPath) {
+    if (platforms.includes("android") && !aabPath) {
       return {
         status: "fail",
         check: "artifacts.release",
@@ -165,7 +171,9 @@ export const createArtifactCheck = (
       };
     }
 
-    const [aabStats, mappingStats] = await Promise.all([stat(aabPath), stat(mappingPath)]);
+    const [aabStats, mappingStats] = aabPath
+      ? await Promise.all([lstat(aabPath), lstat(mappingPath)])
+      : [undefined, undefined];
     const sourceMapStats = await Promise.all(sourceMaps.map((sourceMap) => stat(sourceMap)));
     const sourceMapBytes = sourceMapStats.reduce((total, file) => total + file.size, 0);
 
@@ -174,8 +182,12 @@ export const createArtifactCheck = (
       check: "artifacts.release",
       summary: "Release artifacts and deobfuscation mappings are present",
       details: [
-        `AAB: ${aabPath} (${formatBytes(aabStats.size)})`,
-        `R8 mapping: ${mappingPath} (${formatBytes(mappingStats.size)})`,
+        ...(aabPath && aabStats && mappingStats
+          ? [
+              `AAB: ${aabPath} (${formatBytes(aabStats.size)})`,
+              `R8 mapping: ${mappingPath} (${formatBytes(mappingStats.size)})`,
+            ]
+          : []),
         `JavaScript source maps: ${sourceMaps.length} (${formatBytes(sourceMapBytes)})`,
       ],
     };
@@ -210,6 +222,62 @@ export const createSmokeInfrastructureCheck = (
       failureSummary: "Configured release smoke tests failed",
       remediation:
         "Inspect the configured device/simulator smoke-test log and fix the failed flow.",
+      redactCommand: true,
     }).run(context);
   },
 });
+
+interface ExportMetadata {
+  version?: unknown;
+  bundler?: unknown;
+  fileMetadata?: Record<string, { bundle?: unknown }>;
+}
+
+export const analyzeExpoExport = async (
+  outputDirectory: string,
+  platforms: readonly ("ios" | "android")[]
+) => {
+  const errors: string[] = [];
+  const details: string[] = [];
+  let metadata: ExportMetadata;
+  try {
+    metadata = JSON.parse(await readFile(path.join(outputDirectory, "metadata.json"), "utf8"));
+  } catch {
+    return { valid: false, errors: ["Expo Atlas metadata.json is missing or invalid"], details };
+  }
+  if (metadata.version !== 0 || metadata.bundler !== "metro" || !metadata.fileMetadata) {
+    errors.push("metadata.json is not Expo Atlas-compatible Metro metadata");
+  }
+  for (const platform of platforms) {
+    const bundle = metadata.fileMetadata?.[platform]?.bundle;
+    if (typeof bundle !== "string" || bundle.length === 0) {
+      errors.push(`metadata.json is missing the ${platform} bundle mapping`);
+      continue;
+    }
+    const bundlePath = path.resolve(outputDirectory, bundle);
+    if (!bundlePath.startsWith(`${path.resolve(outputDirectory)}${path.sep}`)) {
+      errors.push(`${platform} bundle mapping escapes the export directory`);
+      continue;
+    }
+    const mapPath = `${bundlePath}.map`;
+    try {
+      const [bundleInfo, mapInfo] = await Promise.all([lstat(bundlePath), lstat(mapPath)]);
+      if (
+        !bundleInfo.isFile() ||
+        !mapInfo.isFile() ||
+        bundleInfo.isSymbolicLink() ||
+        mapInfo.isSymbolicLink() ||
+        bundleInfo.size === 0 ||
+        mapInfo.size === 0
+      ) {
+        throw new Error("empty");
+      }
+      details.push(
+        `${platform}: bundle ${formatBytes(bundleInfo.size)}, source map ${formatBytes(mapInfo.size)}`
+      );
+    } catch {
+      errors.push(`${platform} bundle or corresponding source map is missing/empty: ${bundle}`);
+    }
+  }
+  return { valid: errors.length === 0, errors, details };
+};
