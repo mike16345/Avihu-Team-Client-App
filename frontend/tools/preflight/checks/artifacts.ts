@@ -104,17 +104,21 @@ export const createJavaScriptExportCheck = (
 });
 
 export const createArtifactCheck = (
-  ensureBundle: CheckPrerequisite | undefined,
+  ensureAndroidValidation: CheckPrerequisite | undefined,
   ensureExport: CheckPrerequisite,
-  platforms: readonly ("ios" | "android")[] = ["ios", "android"]
+  platforms: readonly ("ios" | "android")[] = ["ios", "android"],
+  ensurePlatformValidations: readonly CheckPrerequisite[] = []
 ): CheckDefinition<ProcessPreflightContext> => ({
   check: "artifacts.release",
   run: async (context) => {
-    const [bundleResult, exportResult] = await Promise.all([
-      ensureBundle?.(context),
+    const [androidResult, exportResult, ...platformResults] = await Promise.all([
+      ensureAndroidValidation?.(context),
       ensureExport(context),
+      ...ensurePlatformValidations.map((ensure) => ensure(context)),
     ]);
-    const failed = [bundleResult, exportResult].find((result) => result?.status === "fail");
+    const failed = [androidResult, exportResult, ...platformResults].find(
+      (result) => result?.status === "fail"
+    );
     if (failed) {
       return prerequisiteFailure("artifacts.release", failed);
     }
@@ -223,6 +227,7 @@ export const createSmokeInfrastructureCheck = (
       remediation:
         "Inspect the configured device/simulator smoke-test log and fix the failed flow.",
       redactCommand: true,
+      sensitiveValues: [context.smokeCommand.command, ...context.smokeCommand.args],
     }).run(context);
   },
 });
