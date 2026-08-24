@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "rules": [
+    {
+      "check": "android.large-screen-adaptability",
+      "status": "warn",
+      "modes": ["fast", "release", "eas"],
+      "acknowledgement": {
+        "reason": "Phone-first portrait product; maintain usability when Android overrides restrictions.",
+        "reviewDate": "2027-01-15"
+      }
+    },
+    {
+      "check": "dependencies.native-maintenance",
+      "status": "warn",
+      "modes": ["fast", "release", "eas"],
+      "reason": "Health integrations ownership: react-native-health and expo-health-connect. Wheel-picker ownership: react-native-infinite-wheel-picker."
+    },
+    {
+      "check": "tenant.selection",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Select and validate a tenant before a release."
+    },
+    {
+      "check": "tenant.config",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Resolve a valid tenant configuration before a release."
+    },
+    {
+      "check": "tenant.environment",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Use an explicit release environment."
+    },
+    {
+      "check": "identity.drift",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Resolve package, bundle, and scheme identity drift before a release."
+    },
+    {
+      "check": "native.drift",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Regenerate native projects when resolved configuration drifts."
+    },
+    {
+      "check": "tests",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Fix failing tests before a release."
+    },
+    {
+      "check": "tests.unit",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Fix failing tests before a release."
+    },
+    {
+      "check": "expo.compatibility",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Align Expo dependencies before a release."
+    },
+    {
+      "check": "expo.install",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Align Expo dependencies before a release."
+    },
+    {
+      "check": "assets",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Generate and validate tenant assets before a release."
+    },
+    {
+      "check": "android.r8",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Enable and validate standard R8 release optimization."
+    },
+    {
+      "check": "android.edge-to-edge",
+      "status": "fail",
+      "modes": ["release", "eas"],
+      "reason": "Resolve edge-to-edge compatibility before a release."
+    }
+  ]
+}
