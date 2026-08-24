@@ -1,5 +1,6 @@
 import { resolveAction } from "./actions";
 import { parseAppArguments } from "./arguments";
+import { formatDryRun } from "./dryRun";
 import { runCommand } from "./processRunner";
 import { confirmSelection, printSelectionSummary, promptForSelection } from "./prompts";
 import type { AppSelection, ParsedAppArguments } from "./types";
@@ -66,8 +67,6 @@ const selectionFromConfirmedArguments = (arguments_: ParsedAppArguments): AppSel
   }
 };
 
-const formatCommand = (command: string, args: string[]): string => [command, ...args].join(" ");
-
 const main = async (): Promise<number> => {
   try {
     const parsed = parseAppArguments(process.argv.slice(2));
@@ -87,9 +86,7 @@ const main = async (): Promise<number> => {
 
     const spec = resolveAction(selection);
     if (parsed.dryRun) {
-      console.log(
-        `Dry run: APP_TENANT=${selection.tenantId} APP_ENV=${selection.environment} ${formatCommand(spec.command, spec.args)}`
-      );
+      console.log(formatDryRun(spec));
       return 0;
     }
 

@@ -54,13 +54,7 @@ const parseReleaseProfile = (value: string | undefined): ReleaseProfile | undefi
     return undefined;
   }
 
-  const environment = parseTenantEnvironment(value);
-
-  if (environment === "development") {
-    throw new Error('Unsupported build profile "development"');
-  }
-
-  return environment;
+  return parseTenantEnvironment(value);
 };
 
 const parsePreflightMode = (value: string | undefined): PreflightMode | undefined => {

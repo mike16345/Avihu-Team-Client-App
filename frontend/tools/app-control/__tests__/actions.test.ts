@@ -26,6 +26,14 @@ describe("resolveAction", () => {
         APP_TENANT: "avihu",
         APP_ENV: "production",
       },
+      prerequisite: {
+        command: "npm",
+        args: ["run", "preflight:eas"],
+        env: {
+          APP_TENANT: "avihu",
+          APP_ENV: "production",
+        },
+      },
     });
   });
 
