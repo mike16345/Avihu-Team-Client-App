@@ -97,12 +97,13 @@ the tenant configuration.
 
 ## Android release shrinking
 
-Avihu enables standard R8 code shrinking, optimization, and obfuscation together with Android
-resource shrinking. Removing unreachable bytecode and unused packaged resources reduces download
-and installed size; loading less code and fewer resources can also improve startup and memory use,
-but those runtime effects must be measured on release builds. The Expo options affect only the
-Gradle `release` build type, so development/debug builds remain unminified. R8 full mode is not
-enabled.
+Avihu enables standard R8 code shrinking and obfuscation together with Android resource shrinking.
+The generated default `proguard-android.txt` includes `-dontoptimize`, so this configuration does
+not claim R8 bytecode optimization. Removing unreachable bytecode and unused packaged resources
+reduces download and installed size. A smaller artifact may reduce code/resource loading work, but
+startup and memory improvements are not guaranteed and must be measured on representative release
+builds. The Expo options affect only the Gradle `release` build type, so development/debug builds
+remain unminified. R8 full mode is not enabled.
 
 Generate and inspect the native project before a release build:
 

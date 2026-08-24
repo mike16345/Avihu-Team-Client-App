@@ -74,7 +74,7 @@
       "check": "android.r8",
       "status": "fail",
       "modes": ["release", "eas"],
-      "reason": "Enable and validate standard R8 release optimization."
+      "reason": "Enable and validate standard R8 shrinking and obfuscation."
     },
     {
       "check": "android.edge-to-edge",

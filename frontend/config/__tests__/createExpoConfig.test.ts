@@ -167,6 +167,19 @@ describe("createExpoConfig", () => {
     }
   );
 
+  it("wires the optional camera hardware feature plugin exactly once", () => {
+    const production = createExpoConfig({
+      baseConfig: {},
+      tenant: getTenant("avihu"),
+      environment: "production",
+      processEnv: {},
+    });
+
+    expect(
+      production.plugins?.filter((plugin) => plugin === "./plugins/withOptionalCameraFeature")
+    ).toEqual(["./plugins/withOptionalCameraFeature"]);
+  });
+
   it("uses tenant-generated platform asset paths", () => {
     const production = createExpoConfig({
       baseConfig: {},

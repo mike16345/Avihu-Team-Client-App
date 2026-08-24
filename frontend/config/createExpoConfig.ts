@@ -54,6 +54,7 @@ export const createExpoConfig = ({
           recordAudioAndroid: false,
         },
       ],
+      "./plugins/withOptionalCameraFeature",
       [
         "expo-image-picker",
         {
