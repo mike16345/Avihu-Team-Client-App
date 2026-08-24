@@ -125,19 +125,26 @@ const iosPlatformPolicyCheck: CheckDefinition<ProcessPreflightContext> = {
   },
 };
 
-const parsePackageList = (output: string, category: string) => {
-  const match = output.match(new RegExp(`^\\s*${category}:\\s*(.+)$`, "mu"));
-  return match
-    ? match[1]
+const samePackages = (actual: string[], expected: string[]) =>
+  actual.length === expected.length && actual.every((value, index) => value === expected[index]);
+
+const parseDoctorCategories = (output: string) => {
+  const blockStart = output.indexOf("Validate packages against React Native Directory");
+  if (blockStart < 0) return [];
+  const block = output.slice(blockStart).split(/^\s*Advice:\s*$/mu)[0];
+  return block
+    .split(/\r?\n/u)
+    .map((line) => line.match(/^\s*([^:]+):\s*(.+)$/u))
+    .filter((match): match is RegExpMatchArray => match !== null)
+    .map((match) => ({
+      category: match[1].trim(),
+      packages: match[2]
         .split(",")
         .map((value) => value.trim())
         .filter(Boolean)
-        .sort()
-    : [];
+        .sort(),
+    }));
 };
-
-const samePackages = (actual: string[], expected: string[]) =>
-  actual.length === expected.length && actual.every((value, index) => value === expected[index]);
 
 const nativeMaintenanceCheck: CheckDefinition<ProcessPreflightContext> = {
   check: "expo.doctor",
@@ -159,18 +166,27 @@ const nativeMaintenanceCheck: CheckDefinition<ProcessPreflightContext> = {
     }
 
     const evidence = `${execution.sanitizedStdout}\n${execution.sanitizedStderr}`;
+    const categories = parseDoctorCategories(evidence);
+    const expectedCategories = [
+      {
+        category: "Untested on New Architecture",
+        packages: ["react-native-health", "react-native-infinite-wheel-picker"],
+      },
+      {
+        category: "Unmaintained",
+        packages: ["expo-health-connect", "react-native-infinite-wheel-picker"],
+      },
+    ];
     const isOnlyAcknowledgedFinding =
+      !execution.outputTruncated &&
       /(?:^|\n)1 check failed(?:,|\.|\n)/u.test(evidence) &&
       (evidence.match(/^✖/gmu)?.length ?? 0) === 1 &&
       evidence.includes("Validate packages against React Native Directory") &&
-      samePackages(parsePackageList(evidence, "Untested on New Architecture"), [
-        "react-native-health",
-        "react-native-infinite-wheel-picker",
-      ]) &&
-      samePackages(parsePackageList(evidence, "Unmaintained"), [
-        "expo-health-connect",
-        "react-native-infinite-wheel-picker",
-      ]);
+      categories.length === expectedCategories.length &&
+      expectedCategories.every((expected) => {
+        const matches = categories.filter(({ category }) => category === expected.category);
+        return matches.length === 1 && samePackages(matches[0].packages, expected.packages);
+      });
 
     if (!isOnlyAcknowledgedFinding) {
       return result;

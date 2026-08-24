@@ -42,6 +42,7 @@ export interface ProcessCheckOptions {
   timeoutMs?: number;
   maxOutputBytes?: number;
   redactCommand?: boolean;
+  sensitiveValues?: readonly string[];
 }
 
 const MAX_EVIDENCE_LINES = 8;
@@ -77,9 +78,15 @@ const redactEnvironmentValues = (
 
 export const sanitizeProcessOutput = (
   value: string,
-  processEnv: Readonly<Record<string, string | undefined>>
-) =>
-  redactEnvironmentValues(value, processEnv)
+  processEnv: Readonly<Record<string, string | undefined>>,
+  sensitiveValues: readonly string[] = []
+) => {
+  const redacted = sensitiveValues
+    .filter((candidate) => candidate.length > 0)
+    .sort((left, right) => right.length - left.length)
+    .reduce((sanitized, candidate) => sanitized.replaceAll(candidate, "[REDACTED]"), value);
+
+  return redactEnvironmentValues(redacted, processEnv)
     .replace(/(Authorization\s*:\s*Bearer\s+)[^\s]+/giu, "$1[REDACTED]")
     .replace(
       /((?:--?[A-Z0-9_-]*(?:TOKEN|SECRET|PASSWORD|API_KEY|AUTH)[A-Z0-9_-]*)(?:=|\s+))[^\s]+/giu,
@@ -91,6 +98,7 @@ export const sanitizeProcessOutput = (
     )
     .replace(/(https?:\/\/)[^\s/@:]+:[^\s/@]+@/giu, "$1[REDACTED]@")
     .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/gu, "");
+};
 
 const buildFullLog = (spec: Readonly<ProcessSpec>, result: Readonly<ProcessResult>) =>
   [
@@ -233,6 +241,7 @@ export interface ProcessCheckExecution {
   result: CheckResult;
   sanitizedStdout: string;
   sanitizedStderr: string;
+  outputTruncated: boolean;
 }
 
 export const executeProcessCheck = async (
@@ -261,8 +270,16 @@ export const executeProcessCheck = async (
     stdout: "",
     stderr: error instanceof Error ? error.message : String(error),
   }));
-  const sanitizedStdout = sanitizeProcessOutput(raw.stdout, context.processEnv);
-  const sanitizedStderr = sanitizeProcessOutput(raw.stderr, context.processEnv);
+  const sanitizedStdout = sanitizeProcessOutput(
+    raw.stdout,
+    context.processEnv,
+    options.sensitiveValues
+  );
+  const sanitizedStderr = sanitizeProcessOutput(
+    raw.stderr,
+    context.processEnv,
+    options.sensitiveValues
+  );
   const displaySpec = options.redactCommand
     ? { ...spec, command: "[CONFIGURED COMMAND]", args: ["[REDACTED]"] }
     : spec;
@@ -277,6 +294,7 @@ export const executeProcessCheck = async (
       result: { status: "pass", check: options.check, summary: options.successSummary },
       sanitizedStdout,
       sanitizedStderr,
+      outputTruncated: raw.outputTruncated === true,
     };
   }
   const safeCommand = options.redactCommand
@@ -298,6 +316,7 @@ export const executeProcessCheck = async (
     },
     sanitizedStdout,
     sanitizedStderr,
+    outputTruncated: raw.outputTruncated === true,
   };
 };
 

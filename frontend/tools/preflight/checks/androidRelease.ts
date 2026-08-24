@@ -57,11 +57,20 @@ export const findReleaseAab = async (projectRoot: string) => {
   );
 };
 
-export const createCleanPrebuildCheck = (): CheckDefinition<ProcessPreflightContext> =>
+export const createCleanPrebuildCheck = (
+  platforms: readonly ("ios" | "android")[] = ["ios", "android"]
+): CheckDefinition<ProcessPreflightContext> =>
   createProcessCheck({
     check: "native.prebuild",
     command: "npx",
-    args: ["expo", "prebuild", "--clean", "--no-install"],
+    args: [
+      "expo",
+      "prebuild",
+      "--clean",
+      "--no-install",
+      "--platform",
+      platforms.length === 2 ? "all" : platforms[0],
+    ],
     env: { CI: "1" },
     successSummary: "Clean native projects were generated",
     failureSummary: "Clean Expo prebuild failed",
@@ -72,7 +81,7 @@ export interface AndroidReleaseChecks {
   lint: CheckDefinition<ProcessPreflightContext>;
   bundle: CheckDefinition<ProcessPreflightContext>;
   aabValidation: CheckDefinition<ProcessPreflightContext>;
-  ensureBundle: CheckPrerequisite;
+  ensureAabValidation: CheckPrerequisite;
 }
 
 const memoize = (definition: CheckDefinition<ProcessPreflightContext>): CheckPrerequisite => {
@@ -215,6 +224,6 @@ export const createAndroidReleaseChecks = (
     lint: lintNode.definition,
     bundle: bundleNode.definition,
     aabValidation: aabNode.definition,
-    ensureBundle: bundleNode.run,
+    ensureAabValidation: aabNode.run,
   };
 };

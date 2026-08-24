@@ -70,7 +70,7 @@ export const createReleaseSuite = (context: PreflightSuiteContext): PreflightSui
     .map(memoizeDefinition)
     .map((node) => node.definition);
   const platforms = context.tenantConfig.platforms ?? ["ios", "android"];
-  const basePrebuild = createCleanPrebuildCheck();
+  const basePrebuild = createCleanPrebuildCheck(platforms);
   const prebuild: CheckDefinition<PreflightSuiteContext> = {
     check: basePrebuild.check,
     run: async (runContext) => {
@@ -113,13 +113,15 @@ export const createReleaseSuite = (context: PreflightSuiteContext): PreflightSui
     ? createAndroidReleaseChecks(androidDrift.run)
     : undefined;
   const javascriptExport = memoizeDefinition(
-    createJavaScriptExportCheck(prebuildNode.run, platforms)
+    createJavaScriptExportCheck(android ? androidDrift.run : prebuildNode.run, platforms)
   );
   const ios = platforms.includes("ios")
     ? memoizeDefinition(createIosReleaseCheck(prebuildNode.run))
     : undefined;
   const artifacts = memoizeDefinition(
-    createArtifactCheck(android?.ensureBundle, javascriptExport.run, platforms)
+    createArtifactCheck(android?.ensureAabValidation, javascriptExport.run, platforms, [
+      ...(ios ? [ios.run] : []),
+    ])
   );
   const smoke = memoizeDefinition(createSmokeInfrastructureCheck(artifacts.run));
 

@@ -11,12 +11,6 @@
       }
     },
     {
-      "check": "dependencies.native-maintenance",
-      "status": "warn",
-      "modes": ["fast", "release", "eas"],
-      "reason": "Health integrations ownership: react-native-health and expo-health-connect. Wheel-picker ownership: react-native-infinite-wheel-picker."
-    },
-    {
       "check": "tenant.selection",
       "status": "fail",
       "modes": ["release", "eas"],

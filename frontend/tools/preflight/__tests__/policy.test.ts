@@ -81,17 +81,13 @@ describe("applyPolicy", () => {
     });
   });
 
-  it("records the known Expo Doctor native-maintenance finding as a visible warning", () => {
+  it("does not retain an orphan policy downgrade for the retired native-maintenance ID", () => {
     const result = applyPolicy(
       { status: "fail", check: "dependencies.native-maintenance", summary: "Expo Doctor finding" },
       { mode: "release", now: new Date("2026-08-24T00:00:00.000Z") }
     );
 
-    expect(result).toMatchObject({
-      status: "warn",
-      policy: {
-        reason: expect.stringContaining("react-native-health"),
-      },
-    });
+    expect(result).toMatchObject({ status: "fail" });
+    expect(result).not.toHaveProperty("policy");
   });
 });
