@@ -25,6 +25,7 @@ const writeNativeFixture = async (context: PreflightSuiteContext) => {
       "android.targetSdkVersion=36",
       "android.enableProguardInReleaseBuilds=true",
       "android.enableShrinkResourcesInReleaseBuilds=true",
+      "expo.edgeToEdgeEnabled=true",
     ].join("\n")
   );
   await writeFile(
@@ -39,13 +40,7 @@ const writeNativeFixture = async (context: PreflightSuiteContext) => {
   );
   await writeFile(
     path.join(main, "res", "values", "styles.xml"),
-    [
-      "<resources>",
-      '  <style name="AppTheme">',
-      '    <item name="android:windowOptOutEdgeToEdgeEnforcement">false</item>',
-      "  </style>",
-      "</resources>",
-    ].join("\n")
+    ["<resources>", '  <style name="AppTheme">', "  </style>", "</resources>"].join("\n")
   );
 
   const xcodeProject = path.join(context.projectRoot, "ios", "Fixture.xcodeproj");

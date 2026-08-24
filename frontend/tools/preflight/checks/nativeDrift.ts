@@ -3,6 +3,7 @@ import path from "node:path";
 import type { ExpoConfig } from "@expo/config";
 import type { ConfigurationPreflightContext } from "../contexts";
 import type { CheckDefinition, CheckResult } from "../types";
+import { auditAndroidEdgeToEdge } from "./androidRelease";
 
 type ExpoPluginEntry = NonNullable<ExpoConfig["plugins"]>[number];
 
@@ -190,11 +191,6 @@ const checkAndroid = async (
   const packageName = findManifestPackage(manifest, buildGradle);
   const appIcon = getApplicationAttribute(manifest, "android:icon");
   const roundAppIcon = getApplicationAttribute(manifest, "android:roundIcon");
-  const optOut = styles.match(
-    /<item\s+name=["']android:windowOptOutEdgeToEdgeEnforcement["']\s*>(true|false)<\/item>/u
-  )?.[1];
-  const edgeToEdgeEnabled = Boolean(context.expoConfig.android?.edgeToEdgeEnabled);
-
   addDrift(drift, "Android package", expectedPackage, packageName);
   addDrift(drift, "Android target SDK", Number(expectedBuild.targetSdkVersion), targetSdk);
   addDrift(drift, "Android compile SDK", Number(expectedBuild.compileSdkVersion), compileSdk);
@@ -206,13 +202,12 @@ const checkAndroid = async (
     shrinkResources
   );
   addDrift(drift, "Android orientation", context.expoConfig.orientation ?? "default", orientation);
-  addDrift(drift, "Android edge-to-edge opt-out", !edgeToEdgeEnabled, optOut === "true");
 
   addDrift(drift, "Android app icon", EXPO_ANDROID_APP_ICON, appIcon);
   addDrift(drift, "Android round app icon", EXPO_ANDROID_ROUND_APP_ICON, roundAppIcon);
 
   evidence.push(
-    `Android generated config: SDK ${compileSdk}/${targetSdk}, R8 ${String(proguard ?? "missing")}, edge opt-out ${optOut ?? "missing"}, icon ${appIcon ?? "missing"}`
+    `Android generated config: SDK ${compileSdk}/${targetSdk}, R8 ${String(proguard ?? "missing")}, icon ${appIcon ?? "missing"}`
   );
 };
 
@@ -368,12 +363,18 @@ const runNativeDriftCheck = async (
   const androidExists = await pathExists(context.projectRoot, "android");
   const iosExists = await pathExists(context.projectRoot, "ios");
 
-  if (platforms.includes("android") && androidExists) {
-    await checkAndroid(context, drift, evidence);
-  } else if (platforms.includes("android")) {
-    evidence.push(
-      "Android folder absent; clean generation required before native release validation."
-    );
+  if (platforms.includes("android")) {
+    const edgeToEdgeAudit = await auditAndroidEdgeToEdge(context.projectRoot, androidExists);
+    drift.push(...edgeToEdgeAudit.drift);
+    evidence.push(...edgeToEdgeAudit.evidence);
+
+    if (androidExists) {
+      await checkAndroid(context, drift, evidence);
+    } else {
+      evidence.push(
+        "Android folder absent; clean generation required before native release validation."
+      );
+    }
   }
 
   if (platforms.includes("ios") && iosExists) {

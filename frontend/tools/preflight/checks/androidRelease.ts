@@ -1,4 +1,4 @@
-import { access, lstat, readdir } from "node:fs/promises";
+import { access, lstat, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { createProcessCheck, type ProcessPreflightContext } from "../processCheck";
@@ -47,6 +47,146 @@ const findFiles = async (root: string, extension: string): Promise<string[]> => 
     }
     throw error;
   }
+};
+
+const APPLICATION_SOURCE_EXTENSIONS = new Set([".cjs", ".js", ".jsx", ".mjs", ".ts", ".tsx"]);
+
+const findRegularFiles = async (root: string): Promise<string[]> => {
+  try {
+    const entries = await readdir(root, { withFileTypes: true });
+    const nested = await Promise.all(
+      entries.map(async (entry) => {
+        const target = path.join(root, entry.name);
+        if (entry.isDirectory()) {
+          return findRegularFiles(target);
+        }
+        return entry.isFile() ? [target] : [];
+      })
+    );
+    return nested.flat().sort();
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
+};
+
+const readOptionalFile = async (target: string) => {
+  try {
+    return await readFile(target, "utf8");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return null;
+    }
+    throw error;
+  }
+};
+
+const getProperty = (contents: string, name: string) => {
+  const properties = new Map<string, string>();
+  for (const rawLine of contents.split(/\r?\n/u)) {
+    const line = rawLine.trim();
+    if (line.length === 0 || line.startsWith("#")) {
+      continue;
+    }
+    const separator = line.indexOf("=");
+    if (separator >= 0) {
+      properties.set(line.slice(0, separator).trim(), line.slice(separator + 1).trim());
+    }
+  }
+  return properties.get(name);
+};
+
+const toProjectPath = (projectRoot: string, target: string) =>
+  path.relative(projectRoot, target).split(path.sep).join("/");
+
+export interface AndroidEdgeToEdgeAudit {
+  drift: string[];
+  evidence: string[];
+}
+
+export const auditAndroidEdgeToEdge = async (
+  projectRoot: string,
+  generatedAndroidExists: boolean
+): Promise<AndroidEdgeToEdgeAudit> => {
+  const drift: string[] = [];
+  const evidence: string[] = [];
+
+  if (generatedAndroidExists) {
+    const properties = await readOptionalFile(
+      path.join(projectRoot, "android", "gradle.properties")
+    );
+    const edgeToEdgeProperty = properties
+      ? getProperty(properties, "expo.edgeToEdgeEnabled")
+      : undefined;
+    if (edgeToEdgeProperty !== "true") {
+      drift.push(
+        `Generated Android property: expected expo.edgeToEdgeEnabled=true, generated ${edgeToEdgeProperty ?? "missing"}`
+      );
+    }
+
+    const resourceFiles = (
+      await findRegularFiles(path.join(projectRoot, "android", "app", "src", "main", "res"))
+    ).filter((target) => {
+      const relative = path.relative(
+        path.join(projectRoot, "android", "app", "src", "main", "res"),
+        target
+      );
+      const [resourceDirectory] = relative.split(path.sep);
+      return resourceDirectory.startsWith("values") && path.extname(target) === ".xml";
+    });
+    const resourceContents = await Promise.all(
+      resourceFiles.map(async (target) => ({ target, contents: await readFile(target, "utf8") }))
+    );
+    if (
+      resourceContents.some(({ contents }) =>
+        contents.includes("windowOptOutEdgeToEdgeEnforcement")
+      )
+    ) {
+      drift.push("Generated Android styles must not declare windowOptOutEdgeToEdgeEnforcement");
+    }
+    const fixedStatusBarColor = resourceContents.some(({ contents }) => {
+      const declarations = [
+        ...contents.matchAll(
+          /<item\b[^>]*\bname=["']android:statusBarColor["'][^>]*>\s*([^<]+?)\s*<\/item>/gu
+        ),
+      ];
+      const hasStatusBarColor = /\b(?:android:)?statusBarColor\b/u.test(contents);
+      return (
+        hasStatusBarColor &&
+        (declarations.length === 0 ||
+          declarations.some((match) => {
+            const value = match[1].trim().toLowerCase();
+            return value !== "#00000000" && value !== "@android:color/transparent";
+          }))
+      );
+    });
+    if (fixedStatusBarColor) {
+      drift.push("Generated Android styles must not declare a fixed statusBarColor");
+    }
+
+    evidence.push(
+      `Android edge-to-edge native property: ${edgeToEdgeProperty ?? "missing"}; resource files audited: ${resourceFiles.length}`
+    );
+  }
+
+  const sourceFiles = (await findRegularFiles(path.join(projectRoot, "src"))).filter((target) =>
+    APPLICATION_SOURCE_EXTENSIONS.has(path.extname(target))
+  );
+  for (const sourceFile of sourceFiles) {
+    const contents = await readFile(sourceFile, "utf8");
+    if (/\bStatusBar\s*\.\s*currentHeight\b/u.test(contents)) {
+      drift.push(
+        `Application source must not use StatusBar.currentHeight: ${toProjectPath(projectRoot, sourceFile)}`
+      );
+    }
+  }
+  evidence.push(
+    `Application source files audited for manual status-bar height: ${sourceFiles.length}`
+  );
+
+  return { drift, evidence };
 };
 
 export const findReleaseAab = async (projectRoot: string) => {

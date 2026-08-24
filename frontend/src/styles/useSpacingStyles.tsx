@@ -1,8 +1,12 @@
-import { BOTTOM_BAR_HEIGHT, TOP_BAR_HEIGHT } from "@/constants/Constants";
-import { StatusBar } from "react-native";
-import { Platform, StyleSheet } from "react-native";
+import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
+import { getSafeAreaPadding } from "@/utils/safeAreaSpacing";
+import { StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export const useSpacingStyles = () => {
+  const insets = useSafeAreaInsets();
+  const safeAreaPadding = getSafeAreaPadding(insets, BOTTOM_BAR_HEIGHT);
+
   return StyleSheet.create({
     // Margin
     mgXs: {
@@ -145,17 +149,10 @@ export const useSpacingStyles = () => {
       paddingVertical: 48,
     },
     pdStatusBar: {
-      ...Platform.select({
-        ios: {
-          paddingTop: TOP_BAR_HEIGHT,
-        },
-        android: {
-          paddingTop: StatusBar.currentHeight || TOP_BAR_HEIGHT,
-        },
-      }),
+      paddingTop: safeAreaPadding.paddingTop,
     },
     pdBottomBar: {
-      paddingBottom: BOTTOM_BAR_HEIGHT,
+      paddingBottom: safeAreaPadding.paddingBottom,
     },
     // Gap
     gapXs: {
