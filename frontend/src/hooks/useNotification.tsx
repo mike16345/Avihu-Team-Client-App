@@ -35,7 +35,7 @@ export const useNotification = () => {
   });
 
   /** Ask for permissions (creates Android channel first) */
-  const requestPermissions = async () => {
+  const requestPermissions = async ({ showDeniedAlert = true } = {}) => {
     if (Platform.OS === "android") {
       await ensureAndroidChannel();
     }
@@ -43,9 +43,14 @@ export const useNotification = () => {
     if (status !== "granted") {
       const { status: newStatus } = await Notifications.requestPermissionsAsync();
       if (newStatus !== "granted") {
-        alert("The app will run better with notifications on!");
+        if (showDeniedAlert) {
+          alert("The app will run better with notifications on!");
+        }
       }
+      return newStatus;
     }
+
+    return status;
   };
 
   /** Schedule the daily reminder at 08:00 (idempotent) */
@@ -109,14 +114,15 @@ export const useNotification = () => {
   const showNotification = async (
     body: string,
     triggerAt?: number | Date | null,
-    data?: Record<string, any>
+    data?: Record<string, any>,
+    title = notificationTitle
   ) => {
     try {
       if (Platform.OS === "android") {
         await ensureAndroidChannel();
       }
       const identifier = await Notifications.scheduleNotificationAsync({
-        content: { title: notificationTitle, body, data: data || {} },
+        content: { title, body, data: data || {} },
         trigger: toTrigger(triggerAt ?? 1, {
           channelId: Platform.OS === "android" ? DEFAULT_CHANNEL_ID : undefined,
         }),
