@@ -20,6 +20,7 @@ import {
   DIET_V2_MUTED,
 } from "./dietV2Icons";
 import { formatDietPlanV2Number } from "./dietPlanV2Utils";
+import FoodCatalogServingSelect from "./FoodCatalogServingSelect";
 
 interface FoodCatalogResultCardProps {
   product?: FoodCatalogProduct;
@@ -81,6 +82,8 @@ const FoodCatalogResultCard = ({
     resolveInitialDraft(product, initialDraft)
   );
   const [errors, setErrors] = useState<SmartFoodDraftErrors>({});
+  const [servingSelectOpen, setServingSelectOpen] = useState(false);
+  const [macroEditorOpen, setMacroEditorOpen] = useState(false);
 
   useEffect(() => {
     setDraft(resolveInitialDraft(product, initialDraft));
@@ -105,6 +108,9 @@ const FoodCatalogResultCard = ({
   const record = () => {
     const nextErrors = validateSmartFoodDraft(draft);
     setErrors(nextErrors);
+    if (nextErrors.calories || nextErrors.protein || nextErrors.carbs || nextErrors.fat) {
+      setMacroEditorOpen(true);
+    }
     if (Object.keys(nextErrors).length > 0) return;
 
     const entry = createSmartFoodEntry(
@@ -167,93 +173,95 @@ const FoodCatalogResultCard = ({
       </View>
 
       <View style={styles.servingRow}>
-        <View style={styles.servingDescription}>
+        <View style={styles.servingTypeField}>
           <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
-            הגדרת מנה
+            סוג מנה
           </Text>
-          <Text fontVariant="semibold" fontSize={14} style={styles.servingText}>
-            {draft.servingDescription}
-          </Text>
+          {product?.servings?.length ? (
+            <FoodCatalogServingSelect
+              servings={product.servings}
+              selectedId={draft.servingId}
+              visible={servingSelectOpen}
+              onOpen={() => setServingSelectOpen(true)}
+              onClose={() => setServingSelectOpen(false)}
+              onSelect={(servingId) => {
+                const name = draft.name;
+                setDraft({ ...createFoodCatalogDraft(product, servingId), name });
+                setErrors({});
+              }}
+            />
+          ) : (
+            <View style={styles.staticServing}>
+              <Text fontVariant="semibold" fontSize={14} style={styles.servingText}>
+                {draft.servingDescription}
+              </Text>
+            </View>
+          )}
         </View>
-        <View style={styles.servingCountField}>
+        <View style={styles.servingAmountField}>
           <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
-            מספר מנות
+            כמות
           </Text>
-          <TextInput
-            value={draft.servingCount}
-            onChangeText={(value) => update("servingCount", value)}
-            keyboardType="decimal-pad"
-            selectTextOnFocus
-            style={[styles.servingInput, errors.servingCount ? styles.inputError : null]}
-          />
+          <View style={[styles.amountInputWrap, errors.servingAmount ? styles.inputError : null]}>
+            <TextInput
+              value={draft.servingAmount}
+              onChangeText={(value) => update("servingAmount", value)}
+              keyboardType="decimal-pad"
+              selectTextOnFocus
+              style={styles.servingInput}
+            />
+            <Text fontVariant="semibold" fontSize={12} style={styles.amountUnit}>
+              {draft.servingUnit}
+            </Text>
+          </View>
         </View>
       </View>
 
-      {product && (product.servings?.length ?? 0) > 1 ? (
-        <View style={styles.servingOptions}>
-          <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
-            בחר סוג מנה
+      <Pressable
+        onPress={() => setMacroEditorOpen((current) => !current)}
+        style={({ pressed }) => [styles.macroToggle, pressed && styles.macroTogglePressed]}
+      >
+        <Text fontVariant="semibold" fontSize={12} style={styles.macroToggleText}>
+          {macroEditorOpen ? "הסתר ערכים בסיסיים" : "עריכת ערכים בסיסיים"}
+        </Text>
+        <Text fontVariant="bold" fontSize={14} style={styles.macroToggleIcon}>
+          {macroEditorOpen ? "⌃" : "⌄"}
+        </Text>
+      </Pressable>
+
+      {macroEditorOpen ? (
+        <View style={styles.macrosSection}>
+          <Text fontVariant="semibold" fontSize={13} style={styles.sectionTitle}>
+            {`ערכים עבור ${draft.servingQuantity} ${draft.servingUnit}`}
           </Text>
-          <View style={styles.servingChips}>
-            {product.servings?.map((serving) => {
-              const selected = draft.servingId === serving.id;
-              return (
-                <Pressable
-                  key={serving.id}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
-                  onPress={() => {
-                    selectionHaptic();
-                    setDraft(createFoodCatalogDraft(product, serving.id));
-                    setErrors({});
-                  }}
-                  style={[styles.servingChip, selected && styles.servingChipSelected]}
-                >
-                  <Text
-                    fontVariant="semibold"
-                    fontSize={12}
-                    style={[styles.servingChipText, selected && styles.servingChipTextSelected]}
-                  >
-                    {serving.description}
-                  </Text>
-                </Pressable>
-              );
-            })}
+          <View style={styles.macrosRow}>
+            <MacroInput
+              label="קלוריות"
+              value={draft.calories}
+              error={errors.calories}
+              onChange={(value) => update("calories", value)}
+            />
+            <MacroInput
+              label="חלבון"
+              value={draft.protein}
+              error={errors.protein}
+              onChange={(value) => update("protein", value)}
+            />
+            <MacroInput
+              label="פחמימה"
+              value={draft.carbs}
+              error={errors.carbs}
+              onChange={(value) => update("carbs", value)}
+            />
+            <MacroInput
+              label="שומן"
+              value={draft.fat}
+              error={errors.fat}
+              onChange={(value) => update("fat", value)}
+            />
           </View>
         </View>
       ) : null}
-
-      <View style={styles.macrosSection}>
-        <Text fontVariant="semibold" fontSize={13} style={styles.sectionTitle}>
-          ערכים למנה אחת
-        </Text>
-        <View style={styles.macrosRow}>
-          <MacroInput
-            label="קלוריות"
-            value={draft.calories}
-            error={errors.calories}
-            onChange={(value) => update("calories", value)}
-          />
-          <MacroInput
-            label="חלבון"
-            value={draft.protein}
-            error={errors.protein}
-            onChange={(value) => update("protein", value)}
-          />
-          <MacroInput
-            label="פחמימה"
-            value={draft.carbs}
-            error={errors.carbs}
-            onChange={(value) => update("carbs", value)}
-          />
-          <MacroInput
-            label="שומן"
-            value={draft.fat}
-            error={errors.fat}
-            onChange={(value) => update("fat", value)}
-          />
-        </View>
-      </View>
 
       {preview ? (
         <View style={styles.preview}>
@@ -341,41 +349,53 @@ const styles = StyleSheet.create({
   },
   brand: { color: DIET_V2_MUTED },
   servingRow: { flexDirection: "row", gap: 10, alignItems: "stretch" },
-  servingDescription: {
+  servingTypeField: {
     flex: 1,
-    padding: 11,
-    gap: 3,
-    borderRadius: 12,
-    backgroundColor: "#F5F8F6",
+    gap: 5,
     alignItems: "flex-start",
   },
-  servingText: { color: DIET_V2_DARK },
-  servingCountField: { width: 92, gap: 5, alignItems: "flex-start" },
-  servingInput: {
+  staticServing: {
     width: "100%",
-    height: 43,
+    minHeight: 44,
+    justifyContent: "center",
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: "#F5F8F6",
+  },
+  servingText: { color: DIET_V2_DARK },
+  servingAmountField: { width: 112, gap: 5, alignItems: "flex-start" },
+  amountInputWrap: {
+    width: "100%",
+    height: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
+    backgroundColor: "#FFFFFF",
+  },
+  servingInput: {
+    flex: 1,
+    height: "100%",
     color: DIET_V2_DARK,
     fontFamily: "Assistant-Bold",
     fontSize: 17,
     writingDirection: "ltr",
   },
-  servingOptions: { gap: 7 },
-  servingChips: { flexDirection: "row", flexWrap: "wrap", gap: 7 },
-  servingChip: {
-    minHeight: 36,
-    justifyContent: "center",
-    paddingHorizontal: 12,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+  amountUnit: { color: DIET_V2_MUTED },
+  macroToggle: {
+    minHeight: 38,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 11,
+    borderRadius: 11,
+    backgroundColor: "#F5F8F6",
   },
-  servingChipSelected: { borderColor: "#86C9A5", backgroundColor: DIET_V2_MINT },
-  servingChipText: { color: DIET_V2_MUTED },
-  servingChipTextSelected: { color: DIET_V2_GREEN },
+  macroTogglePressed: { opacity: 0.7 },
+  macroToggleText: { color: DIET_V2_MUTED },
+  macroToggleIcon: { color: DIET_V2_GREEN },
   macrosSection: { gap: 7 },
   sectionTitle: { color: DIET_V2_DARK, alignSelf: "flex-start" },
   macrosRow: { flexDirection: "row", gap: 7 },

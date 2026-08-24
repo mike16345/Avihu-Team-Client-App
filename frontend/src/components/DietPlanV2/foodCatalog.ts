@@ -7,7 +7,9 @@ export interface SmartFoodDraft {
   name: string;
   servingDescription: string;
   servingId: string;
-  servingCount: string;
+  servingQuantity: number;
+  servingUnit: string;
+  servingAmount: string;
   calories: string;
   protein: string;
   carbs: string;
@@ -20,7 +22,9 @@ export interface SmartFoodEntry {
   barcode: string;
   name: string;
   servingDescription: string;
-  servingCount: number;
+  servingAmount: number;
+  servingUnit: string;
+  servingReferenceQuantity: number;
   macros: {
     calories: number;
     protein: number;
@@ -50,11 +54,11 @@ export const validateSmartFoodDraft = (draft: SmartFoodDraft): SmartFoodDraftErr
 
   if (draft.name.trim().length === 0) errors.name = "יש להזין שם מוצר.";
 
-  const servingCount = parseNumber(draft.servingCount, false);
-  if (draft.servingCount.trim().length === 0) {
-    errors.servingCount = "יש להזין מספר מנות.";
-  } else if (servingCount === null || servingCount <= 0) {
-    errors.servingCount = "מספר המנות חייב להיות גדול מאפס.";
+  const servingAmount = parseNumber(draft.servingAmount, false);
+  if (draft.servingAmount.trim().length === 0) {
+    errors.servingAmount = "יש להזין כמות.";
+  } else if (servingAmount === null || servingAmount <= 0) {
+    errors.servingAmount = "הכמות חייבת להיות גדולה מאפס.";
   }
 
   const macroFields: Array<
@@ -81,6 +85,8 @@ export const createFoodCatalogDraft = (
   const selectedServing =
     product.servings?.find((serving) => serving.id === servingId) ?? product.servings?.[0];
   const nutrition = selectedServing?.nutrition ?? product.nutrition.perServing;
+  const servingQuantity = selectedServing?.quantity ?? product.serving?.quantity ?? 1;
+  const servingUnit = selectedServing?.unit ?? product.serving?.unit ?? "serving";
 
   return {
     catalogItemId: product.id,
@@ -89,7 +95,9 @@ export const createFoodCatalogDraft = (
       product.displayName ?? product.names.he ?? product.names.en ?? product.names.original ?? "",
     servingId: selectedServing?.id ?? "",
     servingDescription: selectedServing?.description ?? product.serving?.description ?? "מנה אחת",
-    servingCount: "1",
+    servingQuantity,
+    servingUnit,
+    servingAmount: toInputValue(servingQuantity),
     calories: toInputValue(nutrition.calories),
     protein: toInputValue(nutrition.protein),
     carbs: toInputValue(nutrition.carbohydrates),
@@ -103,11 +111,17 @@ export const createSmartFoodEntryDraft = (entry: SmartFoodEntry): SmartFoodDraft
   name: entry.name,
   servingDescription: entry.servingDescription,
   servingId: "",
-  servingCount: toInputValue(entry.servingCount),
-  calories: toInputValue(entry.macros.calories / entry.servingCount),
-  protein: toInputValue(entry.macros.protein / entry.servingCount),
-  carbs: toInputValue(entry.macros.carbs / entry.servingCount),
-  fat: toInputValue(entry.macros.fat / entry.servingCount),
+  servingQuantity: entry.servingReferenceQuantity,
+  servingUnit: entry.servingUnit,
+  servingAmount: toInputValue(entry.servingAmount),
+  calories: toInputValue(
+    (entry.macros.calories * entry.servingReferenceQuantity) / entry.servingAmount
+  ),
+  protein: toInputValue(
+    (entry.macros.protein * entry.servingReferenceQuantity) / entry.servingAmount
+  ),
+  carbs: toInputValue((entry.macros.carbs * entry.servingReferenceQuantity) / entry.servingAmount),
+  fat: toInputValue((entry.macros.fat * entry.servingReferenceQuantity) / entry.servingAmount),
 });
 
 export const createSmartFoodEntry = (
@@ -117,14 +131,16 @@ export const createSmartFoodEntry = (
 ): SmartFoodEntry | null => {
   if (Object.keys(validateSmartFoodDraft(draft)).length > 0) return null;
 
-  const servingCount = parseNumber(draft.servingCount, false);
+  const servingAmount = parseNumber(draft.servingAmount, false);
   const calories = parseNumber(draft.calories, true);
   const protein = parseNumber(draft.protein, true);
   const carbs = parseNumber(draft.carbs, true);
   const fat = parseNumber(draft.fat, true);
 
   if (
-    servingCount === null ||
+    servingAmount === null ||
+    !Number.isFinite(draft.servingQuantity) ||
+    draft.servingQuantity <= 0 ||
     calories === null ||
     protein === null ||
     carbs === null ||
@@ -133,18 +149,22 @@ export const createSmartFoodEntry = (
     return null;
   }
 
+  const multiplier = servingAmount / draft.servingQuantity;
+
   return {
     id,
     catalogItemId: draft.catalogItemId,
     barcode: draft.barcode,
     name: draft.name.trim(),
     servingDescription: draft.servingDescription.trim() || "מנה אחת",
-    servingCount,
+    servingAmount,
+    servingUnit: draft.servingUnit.trim() || "serving",
+    servingReferenceQuantity: draft.servingQuantity,
     macros: {
-      calories: roundNutritionValue(calories * servingCount),
-      protein: roundNutritionValue(protein * servingCount),
-      carbs: roundNutritionValue(carbs * servingCount),
-      fat: roundNutritionValue(fat * servingCount),
+      calories: roundNutritionValue(calories * multiplier),
+      protein: roundNutritionValue(protein * multiplier),
+      carbs: roundNutritionValue(carbs * multiplier),
+      fat: roundNutritionValue(fat * multiplier),
     },
     recordedAt,
   };
@@ -169,6 +189,23 @@ export const replaceSmartFoodEntry = (
   entries.some(({ id }) => id === replacement.id)
     ? entries.map((entry) => (entry.id === replacement.id ? replacement : entry))
     : entries;
+
+const SERVING_UNIT_LABELS: Record<string, string> = {
+  g: "גרם",
+  ml: "מ״ל",
+  serving: "מנה",
+  cup: "כוס",
+  tbsp: "כף",
+  tsp: "כפית",
+  piece: "יחידה",
+  unit: "יחידה",
+  package: "אריזה",
+};
+
+export const formatSmartFoodServingAmount = (
+  entry: Pick<SmartFoodEntry, "servingAmount" | "servingUnit">
+): string =>
+  `${roundNutritionValue(entry.servingAmount)} ${SERVING_UNIT_LABELS[entry.servingUnit] ?? entry.servingUnit}`;
 
 export const addDietPlanV2Totals = (
   left: DietPlanV2Totals,

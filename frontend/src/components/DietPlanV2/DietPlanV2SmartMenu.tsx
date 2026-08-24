@@ -13,7 +13,12 @@ import FoodCatalogSearchModal from "./FoodCatalogSearchModal";
 import FoodCatalogScannerModal from "./FoodCatalogScannerModal";
 import SmartFoodDeleteModal from "./SmartFoodDeleteModal";
 import SmartFoodHistoryModal from "./SmartFoodHistoryModal";
-import { createSmartFoodEntryDraft, sumSmartFoodMacros, type SmartFoodEntry } from "./foodCatalog";
+import {
+  createSmartFoodEntryDraft,
+  formatSmartFoodServingAmount,
+  sumSmartFoodMacros,
+  type SmartFoodEntry,
+} from "./foodCatalog";
 import {
   BarcodeIcon,
   ClockIcon,
@@ -229,7 +234,7 @@ const DietPlanV2SmartMenu = ({
                 {entry.name}
               </Text>
               <Text fontSize={11} style={styles.entryMeta}>
-                {`${formatDietPlanV2Number(entry.servingCount)} × ${entry.servingDescription} · ${formatDietPlanV2Number(entry.macros.calories)} קק"ל`}
+                {`${formatSmartFoodServingAmount(entry)} · ${formatDietPlanV2Number(entry.macros.calories)} קק"ל`}
               </Text>
               <Text fontVariant="medium" fontSize={11} style={styles.editLabel}>
                 הקש לעריכה

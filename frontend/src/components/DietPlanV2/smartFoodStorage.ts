@@ -5,26 +5,61 @@ import { getDietPlanV2ContextKey, getDietPlanV2DayKey } from "./dietPlanV2Consum
 const isFiniteNonnegativeNumber = (value: unknown): value is number =>
   typeof value === "number" && Number.isFinite(value) && value >= 0;
 
-const isSmartFoodEntry = (value: unknown): value is SmartFoodEntry => {
+const getSmartFoodEntryBase = (value: unknown) => {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
   const entry = value as Record<string, unknown>;
   const macros = entry.macros as Record<string, unknown> | undefined;
 
-  return (
+  const valid =
     typeof entry.id === "string" &&
     typeof entry.catalogItemId === "string" &&
     typeof entry.barcode === "string" &&
     typeof entry.name === "string" &&
     typeof entry.servingDescription === "string" &&
     typeof entry.recordedAt === "string" &&
-    isFiniteNonnegativeNumber(entry.servingCount) &&
     typeof macros === "object" &&
     macros !== null &&
     isFiniteNonnegativeNumber(macros.calories) &&
     isFiniteNonnegativeNumber(macros.protein) &&
     isFiniteNonnegativeNumber(macros.carbs) &&
-    isFiniteNonnegativeNumber(macros.fat)
-  );
+    isFiniteNonnegativeNumber(macros.fat);
+
+  return valid ? entry : null;
+};
+
+const normalizeStoredSmartFoodEntry = (value: unknown): SmartFoodEntry | null => {
+  const entry = getSmartFoodEntryBase(value);
+  if (!entry) return null;
+
+  if (
+    isFiniteNonnegativeNumber(entry.servingAmount) &&
+    entry.servingAmount > 0 &&
+    typeof entry.servingUnit === "string" &&
+    isFiniteNonnegativeNumber(entry.servingReferenceQuantity) &&
+    entry.servingReferenceQuantity > 0
+  ) {
+    return entry as unknown as SmartFoodEntry;
+  }
+
+  if (!isFiniteNonnegativeNumber(entry.servingCount) || entry.servingCount <= 0) return null;
+
+  const description = entry.servingDescription as string;
+  const match = description.match(/^\s*(\d+(?:[.,]\d+)?)\s*(.*)$/u);
+  const servingReferenceQuantity = match ? Number(match[1].replace(",", ".")) : 1;
+  const servingUnit = match?.[2].trim() || description.trim() || "serving";
+
+  return {
+    id: entry.id as string,
+    catalogItemId: entry.catalogItemId as string,
+    barcode: entry.barcode as string,
+    name: entry.name as string,
+    servingDescription: description,
+    servingAmount: entry.servingCount * servingReferenceQuantity,
+    servingUnit,
+    servingReferenceQuantity,
+    macros: entry.macros as SmartFoodEntry["macros"],
+    recordedAt: entry.recordedAt as string,
+  };
 };
 
 export const getDietPlanV2SmartFoodsStorageKey = (
@@ -33,7 +68,12 @@ export const getDietPlanV2SmartFoodsStorageKey = (
 ): string => `diet-plan-v2-smart-foods:${getDietPlanV2ContextKey(plan)}:${dayKey}`;
 
 export const reconcileSmartFoodEntries = (stored: unknown): SmartFoodEntry[] =>
-  Array.isArray(stored) ? stored.filter(isSmartFoodEntry) : [];
+  Array.isArray(stored)
+    ? stored.flatMap((entry) => {
+        const normalized = normalizeStoredSmartFoodEntry(entry);
+        return normalized ? [normalized] : [];
+      })
+    : [];
 
 export const getDietPlanV2SmartFoodsHistoryDayKeys = (
   now = new Date(),

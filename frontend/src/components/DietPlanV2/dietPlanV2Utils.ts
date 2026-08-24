@@ -191,7 +191,7 @@ export const toFixedDecimal = (value: string | number, decimals: number) => {
 };
 
 export const formatDietPlanV2Number = (value: number): string =>
-  Object.is(value, -0) ? "0" : toFixedDecimal(value.toString(), 2);
+  Object.is(value, -0) ? "0" : value.toFixed(2).replace(/\.?0+$/, "");
 
 export const formatDietPlanV2MealMacroSummary = (
   macros: Pick<DietPlanV2Totals, "calories" | "protein" | "carbs" | "fat">
