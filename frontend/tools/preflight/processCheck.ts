@@ -1,8 +1,8 @@
 import { spawn } from "node:child_process";
-import { mkdir, realpath, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import type { ConfigurationPreflightContext } from "./contexts";
+import { publishPreflightFile } from "./safePublication";
 import type { CheckDefinition, CheckResult } from "./types";
 
 export interface ProcessSpec {
@@ -10,12 +10,16 @@ export interface ProcessSpec {
   args: string[];
   cwd: string;
   env: Record<string, string>;
+  timeoutMs?: number;
+  maxOutputBytes?: number;
 }
 
 export interface ProcessResult {
   exitCode: number;
   stdout: string;
   stderr: string;
+  timedOut?: boolean;
+  outputTruncated?: boolean;
 }
 
 export type ProcessRunner = (spec: Readonly<ProcessSpec>) => Promise<ProcessResult>;
@@ -34,6 +38,10 @@ export interface ProcessCheckOptions {
   failureSummary: string;
   remediation: string;
   env?: Readonly<Record<string, string>>;
+  cwd?: string | ((context: Readonly<ProcessPreflightContext>) => string);
+  timeoutMs?: number;
+  maxOutputBytes?: number;
+  redactCommand?: boolean;
 }
 
 const MAX_EVIDENCE_LINES = 8;
@@ -109,30 +117,6 @@ const truncateEvidence = (stdout: string, stderr: string) => {
   return evidence.length > 0 ? evidence : ["The command returned no diagnostic output."];
 };
 
-const resolveSafeLogPath = async (context: Readonly<ProcessPreflightContext>, check: string) => {
-  const configuredLogRoot = path.join(context.projectRoot, ".preflight");
-  await mkdir(configuredLogRoot, { recursive: true });
-  const canonicalProjectRoot = await realpath(context.projectRoot);
-  const canonicalLogRoot = await realpath(configuredLogRoot);
-  if (
-    canonicalLogRoot !== canonicalProjectRoot &&
-    !canonicalLogRoot.startsWith(`${canonicalProjectRoot}${path.sep}`)
-  ) {
-    throw new Error("Preflight log directory resolves outside the project root");
-  }
-
-  const configuredRunDirectory = getPreflightRunDirectory(context);
-  await mkdir(configuredRunDirectory, { recursive: true });
-  const runDirectory = await realpath(configuredRunDirectory);
-  if (
-    runDirectory !== canonicalLogRoot &&
-    !runDirectory.startsWith(`${canonicalLogRoot}${path.sep}`)
-  ) {
-    throw new Error("Preflight run directory resolves outside the log root");
-  }
-  return path.join(configuredRunDirectory, `${safePathSegment(check)}.log`);
-};
-
 const writeSanitizedLog = async (
   context: Readonly<ProcessPreflightContext>,
   logPath: string,
@@ -140,96 +124,187 @@ const writeSanitizedLog = async (
   result: Readonly<ProcessResult>
 ) => {
   const sanitized = sanitizeProcessOutput(buildFullLog(spec, result), context.processEnv);
-  await writeFile(logPath, `${sanitized.trimEnd()}\n`, { encoding: "utf8", mode: 0o600 });
+  await publishPreflightFile(context.projectRoot, logPath, `${sanitized.trimEnd()}\n`);
   return { logPath, sanitized };
 };
 
-export const runSpawnProcess: ProcessRunner = (spec) =>
-  new Promise((resolve) => {
-    const child = spawn(spec.command, spec.args, {
-      cwd: spec.cwd,
-      env: { ...process.env, ...spec.env },
-      shell: false,
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    const stdout: Buffer[] = [];
-    const stderr: Buffer[] = [];
-    let settled = false;
+export interface SpawnRunnerOptions {
+  terminateTree?: (pid: number, force: boolean) => void;
+  spawnProcess?: typeof spawn;
+}
 
-    child.stdout.on("data", (chunk: Buffer) => stdout.push(chunk));
-    child.stderr.on("data", (chunk: Buffer) => stderr.push(chunk));
-    child.once("error", (error) => {
-      if (settled) {
-        return;
-      }
-      settled = true;
-      resolve({ exitCode: 1, stdout: Buffer.concat(stdout).toString(), stderr: error.message });
+const defaultTerminateTree = (pid: number, force: boolean) => {
+  if (process.platform === "win32") {
+    spawn("taskkill.exe", ["/pid", String(pid), "/t", ...(force ? ["/f"] : [])], {
+      shell: false,
+      stdio: "ignore",
     });
-    child.once("close", (code, signal) => {
-      if (settled) {
-        return;
-      }
-      settled = true;
-      resolve({
-        exitCode: code ?? 1,
-        stdout: Buffer.concat(stdout).toString(),
-        stderr: `${Buffer.concat(stderr).toString()}${signal ? `\nTerminated by ${signal}` : ""}`,
+    return;
+  }
+  const signal = force ? "SIGKILL" : "SIGTERM";
+  try {
+    process.kill(-pid, signal);
+  } catch {
+    try {
+      process.kill(pid, signal);
+    } catch {
+      // The process may have exited between the timeout and termination.
+    }
+  }
+};
+
+export const createSpawnProcessRunner =
+  (options: SpawnRunnerOptions = {}): ProcessRunner =>
+  (spec) =>
+    new Promise((resolve) => {
+      const limit = spec.maxOutputBytes ?? 2 * 1024 * 1024;
+      const timeoutMs = spec.timeoutMs ?? 10 * 60 * 1000;
+      const child = (options.spawnProcess ?? spawn)(spec.command, spec.args, {
+        cwd: spec.cwd,
+        env: { ...process.env, ...spec.env },
+        shell: false,
+        detached: process.platform !== "win32",
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+      let stdout: Buffer<ArrayBufferLike> = Buffer.alloc(0);
+      let stderr: Buffer<ArrayBufferLike> = Buffer.alloc(0);
+      let outputTruncated = false;
+      let settled = false;
+      let timedOut = false;
+      let forceTimeout: ReturnType<typeof setTimeout> | undefined;
+
+      const append = (current: Buffer<ArrayBufferLike>, chunk: Buffer) => {
+        if (current.length >= limit) {
+          outputTruncated = true;
+          return current;
+        }
+        const remaining = limit - current.length;
+        if (chunk.length > remaining) {
+          outputTruncated = true;
+        }
+        return Buffer.concat([current, chunk.subarray(0, remaining)]);
+      };
+
+      const finish = (exitCode: number, signal?: string, errorMessage?: string) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeout);
+        if (forceTimeout) clearTimeout(forceTimeout);
+        resolve({
+          exitCode,
+          stdout: stdout.toString(),
+          stderr:
+            errorMessage ?? `${stderr.toString()}${signal ? `\nTerminated by ${signal}` : ""}`,
+          timedOut,
+          outputTruncated,
+        });
+      };
+
+      const timeout = setTimeout(() => {
+        timedOut = true;
+        const terminate = options.terminateTree ?? defaultTerminateTree;
+        terminate(child.pid ?? 0, false);
+        forceTimeout = setTimeout(() => {
+          if (!settled) {
+            terminate(child.pid ?? 0, true);
+            finish(1, "SIGKILL");
+          }
+        }, 1_000).unref();
+      }, timeoutMs);
+      timeout.unref();
+
+      child.stdout.on("data", (chunk: Buffer) => {
+        stdout = append(stdout, chunk);
+      });
+      child.stderr.on("data", (chunk: Buffer) => {
+        stderr = append(stderr, chunk);
+      });
+      child.once("error", (error) => {
+        finish(1, undefined, error.message);
+      });
+      child.once("close", (code, signal) => {
+        finish(code ?? 1, signal ?? undefined);
       });
     });
+
+export const runSpawnProcess = createSpawnProcessRunner();
+
+export interface ProcessCheckExecution {
+  result: CheckResult;
+  sanitizedStdout: string;
+  sanitizedStderr: string;
+}
+
+export const executeProcessCheck = async (
+  options: ProcessCheckOptions,
+  context: Readonly<ProcessPreflightContext>
+): Promise<ProcessCheckExecution> => {
+  const logPath = path.join(
+    getPreflightRunDirectory(context),
+    `${safePathSegment(options.check)}.log`
+  );
+  const spec: ProcessSpec = {
+    command: options.command,
+    args: [...options.args],
+    cwd:
+      typeof options.cwd === "function"
+        ? options.cwd(context)
+        : (options.cwd ?? context.projectRoot),
+    env: { APP_TENANT: context.tenant, APP_ENV: context.environment, ...options.env },
+    ...(options.timeoutMs === undefined ? {} : { timeoutMs: options.timeoutMs }),
+    ...(options.maxOutputBytes === undefined ? {} : { maxOutputBytes: options.maxOutputBytes }),
+  };
+  // Validate the destination before starting an expensive command.
+  await publishPreflightFile(context.projectRoot, logPath, "[pending]\n");
+  const raw: ProcessResult = await context.runner(spec).catch((error: unknown) => ({
+    exitCode: 1,
+    stdout: "",
+    stderr: error instanceof Error ? error.message : String(error),
+  }));
+  const sanitizedStdout = sanitizeProcessOutput(raw.stdout, context.processEnv);
+  const sanitizedStderr = sanitizeProcessOutput(raw.stderr, context.processEnv);
+  const displaySpec = options.redactCommand
+    ? { ...spec, command: "[CONFIGURED COMMAND]", args: ["[REDACTED]"] }
+    : spec;
+  await writeSanitizedLog(context, logPath, displaySpec, {
+    ...raw,
+    stdout: sanitizedStdout,
+    stderr: sanitizedStderr,
   });
+
+  if (raw.exitCode === 0 && !raw.timedOut) {
+    return {
+      result: { status: "pass", check: options.check, summary: options.successSummary },
+      sanitizedStdout,
+      sanitizedStderr,
+    };
+  }
+  const safeCommand = options.redactCommand
+    ? "[CONFIGURED COMMAND REDACTED]"
+    : sanitizeProcessOutput([options.command, ...options.args].join(" "), context.processEnv);
+  return {
+    result: {
+      status: "fail",
+      check: options.check,
+      summary: raw.timedOut ? `${options.failureSummary} (timed out)` : options.failureSummary,
+      details: [
+        `Command: ${safeCommand}`,
+        `Exit code: ${raw.exitCode}`,
+        ...(raw.outputTruncated ? ["Output was truncated at the configured safety limit."] : []),
+        ...truncateEvidence(sanitizedStdout, sanitizedStderr),
+        `Full sanitized log: ${logPath}`,
+      ],
+      remediation: `${options.remediation} Log: ${logPath}`,
+    },
+    sanitizedStdout,
+    sanitizedStderr,
+  };
+};
 
 export const createProcessCheck = (
   options: ProcessCheckOptions
 ): CheckDefinition<ProcessPreflightContext> => ({
   check: options.check,
-  run: async (context): Promise<CheckResult> => {
-    const spec: ProcessSpec = {
-      command: options.command,
-      args: [...options.args],
-      cwd: context.projectRoot,
-      env: {
-        APP_TENANT: context.tenant,
-        APP_ENV: context.environment,
-        ...options.env,
-      },
-    };
-    const logPath = await resolveSafeLogPath(context, options.check);
-    const result = await context.runner(spec).catch((error: unknown) => ({
-      exitCode: 1,
-      stdout: "",
-      stderr: error instanceof Error ? error.message : String(error),
-    }));
-    const { sanitized } = await writeSanitizedLog(context, logPath, spec, result);
-
-    if (result.exitCode === 0) {
-      return {
-        status: "pass",
-        check: options.check,
-        summary: options.successSummary,
-      };
-    }
-
-    const separator = sanitized.indexOf("[stdout]\n");
-    const streams = separator >= 0 ? sanitized.slice(separator + "[stdout]\n".length) : sanitized;
-    const stderrMarker = streams.indexOf("\n[stderr]\n");
-    const stdout = stderrMarker >= 0 ? streams.slice(0, stderrMarker) : streams;
-    const stderr = stderrMarker >= 0 ? streams.slice(stderrMarker + "\n[stderr]\n".length) : "";
-    const safeCommand = sanitizeProcessOutput(
-      [options.command, ...options.args].join(" "),
-      context.processEnv
-    );
-
-    return {
-      status: "fail",
-      check: options.check,
-      summary: options.failureSummary,
-      details: [
-        `Command: ${safeCommand}`,
-        `Exit code: ${result.exitCode}`,
-        ...truncateEvidence(stdout, stderr),
-        `Full sanitized log: ${logPath}`,
-      ],
-      remediation: `${options.remediation} Log: ${logPath}`,
-    };
-  },
+  run: async (context): Promise<CheckResult> =>
+    (await executeProcessCheck(options, context)).result,
 });

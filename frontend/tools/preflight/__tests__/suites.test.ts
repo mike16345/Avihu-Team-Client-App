@@ -7,6 +7,8 @@ import { createProcessCheck, type ProcessSpec } from "../processCheck";
 import { runChecks } from "../engine";
 import { createPreflightContext } from "../contexts";
 import { createAndroidReleaseChecks } from "../checks/androidRelease";
+import { createSmokeInfrastructureCheck } from "../checks/artifacts";
+import { createIosReleaseCheck } from "../checks/iosRelease";
 import { createEasSuite, createFastSuite, createReleaseSuite } from "../suites";
 import type { PreflightSuiteContext } from "../suites";
 
@@ -44,7 +46,7 @@ describe("preflight suite composition", () => {
       "tenant.environment",
       "project.typescript",
       "tests.unit",
-      "dependencies.native-maintenance",
+      "expo.doctor",
       "expo.install",
       "assets",
       "expo.config",
@@ -65,6 +67,7 @@ describe("preflight suite composition", () => {
     expect(new Set(releaseIds).size).toBe(releaseIds.length);
     expect(releaseIds.slice(fastIds.length)).toEqual([
       "native.prebuild",
+      "native.android-post-prebuild",
       "android.lint-release",
       "android.bundle-release",
       "android.aab-validation",
@@ -106,6 +109,71 @@ describe("preflight suite composition", () => {
       }
     );
     expect(processSpecs).toEqual([]);
+  });
+
+  it("uses xcodebuild with the generated project path on macOS", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-xcode-"));
+    temporaryRoots.push(root);
+    const configuration = await createPreflightContext({
+      projectRoot: root,
+      tenantId: "avihu",
+      environment: "development",
+      processEnv: {},
+      timestamp: "2026-08-24T00:00:00.000Z",
+    });
+    const canonicalRoot = configuration.projectRoot;
+    const project = path.join(canonicalRoot, "ios", "Fixture.xcodeproj");
+    const app = path.join(canonicalRoot, "ios", "Fixture");
+    await mkdir(project, { recursive: true });
+    await mkdir(app, { recursive: true });
+    const scheme = Array.isArray(configuration.expoConfig.scheme)
+      ? configuration.expoConfig.scheme[0]
+      : configuration.expoConfig.scheme;
+    await writeFile(
+      path.join(project, "project.pbxproj"),
+      [
+        `PRODUCT_BUNDLE_IDENTIFIER = ${configuration.expoConfig.ios?.bundleIdentifier};`,
+        "ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;",
+        "INFOPLIST_FILE = Fixture/Info.plist;",
+      ].join("\n")
+    );
+    const permissions = configuration.tenantConfig.permissions;
+    await writeFile(
+      path.join(app, "Info.plist"),
+      [
+        "<plist><dict>",
+        `<key>CFBundleURLSchemes</key><array><string>${scheme}</string></array>`,
+        "<key>UISupportedInterfaceOrientations</key><array><string>UIInterfaceOrientationPortrait</string></array>",
+        `<key>NSCameraUsageDescription</key><string>${permissions.camera}</string>`,
+        `<key>NSPhotoLibraryUsageDescription</key><string>${permissions.photos}</string>`,
+        `<key>NSHealthShareUsageDescription</key><string>${permissions.healthShare}</string>`,
+        `<key>NSHealthUpdateUsageDescription</key><string>${permissions.healthUpdate}</string>`,
+        "</dict></plist>",
+      ].join("\n")
+    );
+    const calls: ProcessSpec[] = [];
+    const context: PreflightSuiteContext = {
+      ...configuration,
+      platform: "darwin",
+      runner: async (spec) => {
+        calls.push(spec);
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+    };
+    const result = await createIosReleaseCheck(async () => ({
+      status: "pass",
+      check: "native.prebuild",
+      summary: "generated",
+    })).run(context);
+    expect(result).toMatchObject({ status: "pass", check: "ios.release-validation" });
+    expect(calls).toEqual([
+      {
+        command: "xcodebuild",
+        args: ["-list", "-json", "-project", project],
+        cwd: canonicalRoot,
+        env: { APP_TENANT: "avihu", APP_ENV: "development" },
+      },
+    ]);
   });
 
   it("warns with an install command when the optional Android analyzer is unavailable", async () => {
@@ -150,18 +218,16 @@ describe("preflight suite composition", () => {
     const knownOutput = [
       "1 check failed, indicating possible issues with the project.",
       "✖ Validate packages against React Native Directory package metadata",
-      "Untested on New Architecture: react-native-health, react-native-infinite-wheel-picker",
-      "Unmaintained: expo-health-connect, react-native-infinite-wheel-picker",
+      ...Array.from({ length: 8 }, (_, index) => `diagnostic ${index + 1}`),
+      "  Untested on New Architecture: react-native-health, react-native-infinite-wheel-picker",
+      "  Unmaintained: expo-health-connect, react-native-infinite-wheel-picker",
     ].join("\n");
     const doctor = createFastSuite(
       createContext({
         projectRoot: root,
         runner: async () => ({ exitCode: 1, stdout: knownOutput, stderr: "" }),
       })
-    ).find(
-      (definition) =>
-        typeof definition !== "function" && definition.check === "dependencies.native-maintenance"
-    );
+    ).find((definition) => typeof definition !== "function" && definition.check === "expo.doctor");
 
     const knownResult =
       doctor && typeof doctor !== "function"
@@ -185,12 +251,29 @@ describe("preflight suite composition", () => {
             })
           )
         : null;
+    const extraPackageResult =
+      doctor && typeof doctor !== "function"
+        ? await doctor.run(
+            createContext({
+              projectRoot: root,
+              runner: async () => ({
+                exitCode: 1,
+                stdout: knownOutput.replace(
+                  "react-native-health, react-native-infinite-wheel-picker",
+                  "extra-package, react-native-health, react-native-infinite-wheel-picker"
+                ),
+                stderr: "",
+              }),
+            })
+          )
+        : null;
 
     expect(knownResult).toMatchObject({
       status: "warn",
-      check: "dependencies.native-maintenance",
+      check: "expo.doctor",
     });
     expect(unexpectedResult).toMatchObject({ status: "fail", check: "expo.doctor" });
+    expect(extraPackageResult).toMatchObject({ status: "fail", check: "expo.doctor" });
   });
 
   it("does not start clean prebuild when a fast prerequisite fails", async () => {
@@ -316,6 +399,148 @@ describe("injected process checks", () => {
     expect(await readdir(external)).toEqual([]);
   });
 
+  it("uses the Android project as the exact Gradle cwd with argument arrays", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-gradle-cwd-"));
+    temporaryRoots.push(root);
+    await mkdir(path.join(root, "android"), { recursive: true });
+    await writeFile(path.join(root, "android", "gradlew"), "wrapper");
+    const calls: ProcessSpec[] = [];
+    const context = createContext({
+      projectRoot: root,
+      runner: async (spec) => {
+        calls.push(spec);
+        if (spec.args[0] === "bundleRelease") {
+          const output = path.join(root, "android", "app", "build", "outputs", "bundle", "release");
+          await mkdir(output, { recursive: true });
+          await writeFile(path.join(output, "app-release.aab"), "bundle");
+        }
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+    });
+    const android = createAndroidReleaseChecks(async () => ({
+      status: "pass",
+      check: "native.android-post-prebuild",
+      summary: "valid",
+    }));
+
+    await android.bundle.run(context);
+
+    expect(calls).toEqual([
+      {
+        command: path.join(root, "android", "gradlew"),
+        args: ["lintRelease", "--no-daemon"],
+        cwd: path.join(root, "android"),
+        env: { APP_TENANT: "avihu", APP_ENV: "development" },
+      },
+      {
+        command: path.join(root, "android", "gradlew"),
+        args: ["bundleRelease", "--no-daemon"],
+        cwd: path.join(root, "android"),
+        env: { APP_TENANT: "avihu", APP_ENV: "development" },
+      },
+    ]);
+  });
+
+  it("filters platform policy and release checks to the tenant's supported platforms", () => {
+    const ios = createContext({ tenantConfig: { platforms: ["ios"] } as never });
+    const android = createContext({ tenantConfig: { platforms: ["android"] } as never });
+    expect(getCheckIds(createFastSuite(ios))).not.toContain("android.r8");
+    expect(getCheckIds(createReleaseSuite(ios))).not.toContain("android.aab-validation");
+    expect(getCheckIds(createFastSuite(android))).not.toContain("ios.platform-policy");
+    expect(getCheckIds(createReleaseSuite(android))).not.toContain("ios.release-validation");
+  });
+
+  it("blocks clean prebuild when release policy promotes planned Android warnings", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-policy-gate-"));
+    temporaryRoots.push(root);
+    const commands: string[] = [];
+    const configuration = await createPreflightContext({
+      projectRoot: root,
+      tenantId: "avihu",
+      environment: "development",
+      processEnv: {
+        EXPO_PUBLIC_API_AUTH_TOKEN: "fixture",
+        EXPO_PUBLIC_CLOUDFRONT_URL: "https://example.com",
+        EXPO_PUBLIC_MODE: "development",
+        EXPO_PUBLIC_SERVER: "https://example.com",
+        EXPO_PUBLIC_TRAINER_PHONE_NUMBER: "1234",
+      },
+      timestamp: "2026-08-24T00:00:00.000Z",
+    });
+    const context: PreflightSuiteContext = {
+      ...configuration,
+      platform: "linux",
+      runner: async (spec) => {
+        commands.push([spec.command, ...spec.args].join(" "));
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+    };
+    const report = await runChecks(createReleaseSuite(context), context);
+    expect(report.results).toContainEqual(
+      expect.objectContaining({ check: "native.prebuild", status: "fail" })
+    );
+    expect(commands.some((command) => command.includes("expo prebuild"))).toBe(false);
+  });
+
+  it("executes successful composed release nodes exactly once and in dependency order", async () => {
+    const projectRoot = path.resolve(import.meta.dirname, "../../..");
+    const runDirectory = path.join(projectRoot, ".preflight", "2026-08-24T01-00-00-000Z");
+    const configuration = await createPreflightContext({
+      projectRoot,
+      tenantId: "avihu",
+      environment: "development",
+      processEnv: {
+        EXPO_PUBLIC_API_AUTH_TOKEN: "fixture",
+        EXPO_PUBLIC_CLOUDFRONT_URL: "https://example.com",
+        EXPO_PUBLIC_MODE: "development",
+        EXPO_PUBLIC_SERVER: "https://example.com",
+        EXPO_PUBLIC_TRAINER_PHONE_NUMBER: "1234",
+      },
+      timestamp: "2026-08-24T01:00:00.000Z",
+    });
+    const calls: ProcessSpec[] = [];
+    const context: PreflightSuiteContext = {
+      ...configuration,
+      tenantConfig: { ...configuration.tenantConfig, platforms: ["ios"] },
+      platform: "linux",
+      runner: async (spec) => {
+        calls.push(spec);
+        if (spec.command === "npx" && spec.args[0] === "expo" && spec.args[1] === "export") {
+          const outputDirectory = spec.args[spec.args.indexOf("--output-dir") + 1];
+          await mkdir(outputDirectory, { recursive: true });
+          await writeFile(path.join(outputDirectory, "ios.js"), "bundle");
+          await writeFile(path.join(outputDirectory, "ios.js.map"), "map");
+          await writeFile(
+            path.join(outputDirectory, "metadata.json"),
+            JSON.stringify({
+              version: 0,
+              bundler: "metro",
+              fileMetadata: { ios: { bundle: "ios.js", assets: [] } },
+            })
+          );
+        }
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+    };
+    try {
+      const report = await runChecks(createReleaseSuite(context), context);
+      const prebuilds = calls.filter(
+        (spec) => spec.command === "npx" && spec.args.slice(0, 2).join(" ") === "expo prebuild"
+      );
+      const exports = calls.filter(
+        (spec) => spec.command === "npx" && spec.args.slice(0, 2).join(" ") === "expo export"
+      );
+      expect(prebuilds).toHaveLength(1);
+      expect(exports).toHaveLength(1);
+      expect(calls.indexOf(prebuilds[0])).toBeLessThan(calls.indexOf(exports[0]));
+      expect(report.results.find((result) => result.check === "artifacts.release")).toMatchObject({
+        status: "pass",
+      });
+    } finally {
+      await rm(runDirectory, { recursive: true });
+    }
+  });
+
   it("redacts secret-bearing command arguments from failure evidence and full logs", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-command-secret-"));
     temporaryRoots.push(root);
@@ -350,5 +575,31 @@ describe("injected process checks", () => {
     expect(JSON.stringify(report)).not.toContain(secret);
     expect(log).not.toContain(secret);
     expect(log).toContain("--token [REDACTED]");
+  });
+
+  it("redacts the entire configured smoke command surface, including unknown and positional args", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-smoke-surface-"));
+    temporaryRoots.push(root);
+    const secrets = ["credential-secret", "-qZ", "short-secret", "positional-secret"];
+    const context = createContext({
+      projectRoot: root,
+      smokeCommand: { command: "smoke-tool", args: ["--credential", ...secrets] },
+      runner: async () => ({ exitCode: 1, stdout: "failed", stderr: "" }),
+    });
+    const check = createSmokeInfrastructureCheck(async () => ({
+      status: "pass",
+      check: "artifacts.release",
+      summary: "ready",
+    }));
+    const result = await check.run(context);
+    const log = await readFile(
+      path.join(root, ".preflight", "2026-08-24T00-00-00-000Z", "smoke.infrastructure.log"),
+      "utf8"
+    );
+    for (const secret of secrets) {
+      expect(JSON.stringify(result)).not.toContain(secret);
+      expect(log).not.toContain(secret);
+    }
+    expect(log).toContain("[CONFIGURED COMMAND] [REDACTED]");
   });
 });
