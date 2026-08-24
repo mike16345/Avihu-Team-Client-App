@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { glob } from "fast-glob";
 import { DYNAMIC_ASSET_ALLOWLIST } from "./allowlist";
+import { findLoaderCalls } from "./loaderLexer";
 
 const TEXT_FILE_PATTERNS = [
   "*.{js,jsx,ts,tsx,json,cjs,mjs,cts,mts,xml,plist,pbxproj,gradle,properties}",
@@ -29,15 +30,6 @@ const STATIC_LOADER_LITERAL = /^\s*(?:"([^"]+)"|'([^']+)'|`([^`$]+)`)\s*$/;
 const CONCATENATED_PREFIX = /^\s*(?:"([^"]*)"|'([^']*)'|`([^`$]*)`)\s*\+/;
 const DIRECTORY_ASSET_DECLARATION = /\bassets\s*:\s*\[([\s\S]*?)\]/g;
 const DIRECTORY_STRING = /"([^"]+)"|'([^']+)'|`([^`$]+)`/g;
-
-interface LoaderCall {
-  expression?: string;
-}
-
-interface BalancedExpression {
-  expression: string;
-  nextIndex: number;
-}
 
 export interface AssetReferenceCollection {
   staticPaths: Set<string>;
@@ -96,147 +88,6 @@ const getDynamicPrefix = (expression: string) => {
 
   const lastSlash = prefix.lastIndexOf("/");
   return lastSlash >= 0 ? prefix.slice(0, lastSlash + 1) : undefined;
-};
-
-const isIdentifierCharacter = (character: string | undefined) =>
-  character !== undefined && /[A-Za-z0-9_$]/.test(character);
-
-const skipTrivia = (contents: string, startIndex: number) => {
-  let index = startIndex;
-  while (index < contents.length) {
-    if (/\s/.test(contents[index])) {
-      index += 1;
-      continue;
-    }
-    if (contents.startsWith("/*", index)) {
-      const closingComment = contents.indexOf("*/", index + 2);
-      if (closingComment === -1) return undefined;
-      index = closingComment + 2;
-      continue;
-    }
-    if (contents.startsWith("//", index)) {
-      const lineEnd = contents.indexOf("\n", index + 2);
-      index = lineEnd === -1 ? contents.length : lineEnd + 1;
-      continue;
-    }
-    break;
-  }
-  return index;
-};
-
-const readBalancedExpression = (
-  contents: string,
-  openingParenthesis: number
-): BalancedExpression | undefined => {
-  let depth = 1;
-  let quote: '"' | "'" | "`" | undefined;
-  let escaped = false;
-
-  for (let index = openingParenthesis + 1; index < contents.length; index += 1) {
-    const character = contents[index];
-    if (quote) {
-      if (escaped) {
-        escaped = false;
-      } else if (character === "\\") {
-        escaped = true;
-      } else if (character === quote) {
-        quote = undefined;
-      }
-      continue;
-    }
-    if (character === '"' || character === "'" || character === "`") {
-      quote = character;
-      continue;
-    }
-    if (contents.startsWith("/*", index)) {
-      const closingComment = contents.indexOf("*/", index + 2);
-      if (closingComment === -1) return undefined;
-      index = closingComment + 1;
-      continue;
-    }
-    if (contents.startsWith("//", index)) {
-      const lineEnd = contents.indexOf("\n", index + 2);
-      if (lineEnd === -1) return undefined;
-      index = lineEnd;
-      continue;
-    }
-    if (character === "(") {
-      depth += 1;
-    } else if (character === ")") {
-      depth -= 1;
-      if (depth === 0) {
-        return {
-          expression: contents.slice(openingParenthesis + 1, index),
-          nextIndex: index + 1,
-        };
-      }
-    }
-  }
-
-  return undefined;
-};
-
-const findLoaderCalls = (contents: string): LoaderCall[] => {
-  const calls: LoaderCall[] = [];
-
-  for (let index = 0; index < contents.length; index += 1) {
-    const character = contents[index];
-    if (character === '"' || character === "'" || character === "`") {
-      let escaped = false;
-      let closed = false;
-      for (index += 1; index < contents.length; index += 1) {
-        if (escaped) {
-          escaped = false;
-        } else if (contents[index] === "\\") {
-          escaped = true;
-        } else if (contents[index] === character) {
-          closed = true;
-          break;
-        }
-      }
-      if (!closed) return [...calls, {}];
-      continue;
-    }
-    if (contents.startsWith("/*", index)) {
-      const closingComment = contents.indexOf("*/", index + 2);
-      if (closingComment === -1) return [...calls, {}];
-      index = closingComment + 1;
-      continue;
-    }
-    if (contents.startsWith("//", index)) {
-      const lineEnd = contents.indexOf("\n", index + 2);
-      index = lineEnd === -1 ? contents.length : lineEnd;
-      continue;
-    }
-    if (!isIdentifierCharacter(character)) continue;
-
-    const identifierStart = index;
-    while (isIdentifierCharacter(contents[index])) index += 1;
-    const identifier = contents.slice(identifierStart, index);
-    const previousCharacter = contents[identifierStart - 1];
-    if (
-      (identifier !== "require" && identifier !== "import") ||
-      previousCharacter === "." ||
-      isIdentifierCharacter(previousCharacter)
-    ) {
-      index -= 1;
-      continue;
-    }
-
-    const openingParenthesis = skipTrivia(contents, index);
-    if (openingParenthesis === undefined) return [...calls, {}];
-    if (contents[openingParenthesis] !== "(") {
-      index -= 1;
-      continue;
-    }
-
-    const balancedExpression = readBalancedExpression(contents, openingParenthesis);
-    if (!balancedExpression) return [...calls, {}];
-    calls.push({ expression: balancedExpression.expression });
-    index = balancedExpression.nextIndex - 1;
-  }
-
-  return calls;
 };
 
 const addStaticReferences = (
@@ -320,7 +171,7 @@ export const collectAssetReferences = async ({
       addDynamicDirectories(collection, match[1], sourceFile, resolvedProjectRoot, tenantId);
     }
 
-    for (const { expression } of findLoaderCalls(contents)) {
+    for (const { expression } of findLoaderCalls(contents, sourceFile)) {
       if (!expression) {
         collection.opaqueLoaderSources.push(toPosix(path.relative(projectRoot, sourceFile)));
         continue;

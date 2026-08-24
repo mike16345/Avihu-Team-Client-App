@@ -82,6 +82,30 @@ const nestedOpaqueLoaderCases = [
   },
 ];
 
+const templateInterpolationOpaqueLoaderCases = [
+  {
+    name: "a commented require call in an interpolation",
+    source: "const value = `asset: ${require/* comment */(getAssetPath())}`;\n",
+  },
+  {
+    name: "a require call in a nested template interpolation",
+    source: "const value = `outer ${`middle ${`inner ${require(getAssetPath())}`}`}`;\n",
+  },
+  {
+    name: "a require call after nested braces, strings, and comments",
+    source:
+      "const value = `outer ${(() => { const marker = '}'; /* } */ return require(getAssetPath()); })()}`;\n",
+  },
+  {
+    name: "an opaque loader nested inside a stable-prefix loader",
+    source: 'const value = `outer ${require("../assets/scoped/" + import(resolveAsset(name)))}`;\n',
+  },
+  {
+    name: "a require call after a brace-bearing regular expression",
+    source: 'const value = `outer ${/}/.test(name) ? require(getAssetPath()) : "safe"}`;\n',
+  },
+];
+
 describe("auditAssets", () => {
   let projectRoot: string;
 
@@ -258,6 +282,104 @@ describe("auditAssets", () => {
 
     expect(report.deleted).toEqual([]);
     await expect(readFile(path.join(projectRoot, assetPath), "utf8")).resolves.toBe("asset");
+  });
+
+  it.each(templateInterpolationOpaqueLoaderCases)(
+    "blocks deletion for $name",
+    async ({ source }, caseIndex) => {
+      await writeFixtureFile(
+        projectRoot,
+        `src/template-interpolation-opaque-${caseIndex}.ts`,
+        source
+      );
+
+      const report = await auditAssets({
+        projectRoot,
+        tenantId: TENANT_ID,
+        clean: true,
+        yes: true,
+      });
+
+      expect(report.deleted).toEqual([]);
+      await expect(
+        readFile(path.join(projectRoot, "assets/proven-unused.png"), "utf8")
+      ).resolves.toBe("asset");
+    }
+  );
+
+  it("ignores loader-like text in template literal text, strings, and comments", async () => {
+    await writeFixtureFile(
+      projectRoot,
+      "src/template-literal-text.ts",
+      'const value = `require(getAssetPath()) ${"import(resolveAsset(name))"} ${/* require(getAssetPath()) */ "safe"}`;\n'
+    );
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual(cleanupCandidates);
+  });
+
+  it("ignores loader-like text in a regular expression inside an interpolation", async () => {
+    await writeFixtureFile(
+      projectRoot,
+      "src/template-regexp-text.ts",
+      "const value = `matched: ${/require(getAssetPath())/.test(name)}`;\n"
+    );
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual(cleanupCandidates);
+  });
+
+  it("does not treat JSX closing tags as malformed regular expressions", async () => {
+    await writeFixtureFile(
+      projectRoot,
+      "src/jsx-closing-tag.tsx",
+      "export const Component = () => <View>דק' /</View>;\n"
+    );
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual(cleanupCandidates);
+  });
+
+  it("scans loader calls inside JSX expression containers", async () => {
+    await writeFixtureFile(
+      projectRoot,
+      "src/jsx-loader.tsx",
+      "export const Component = () => <View>{require(getAssetPath())}</View>;\n"
+    );
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual([]);
+  });
+
+  it("does not treat TSX generic arrow functions as JSX elements", async () => {
+    await writeFixtureFile(
+      projectRoot,
+      "src/generic-arrows.tsx",
+      "const first = <T,>(value: T) => value;\nconst second = <T extends string>(value: T) => value;\n"
+    );
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual(cleanupCandidates);
+  });
+
+  it("blocks deletion for an unterminated template interpolation", async () => {
+    await writeFixtureFile(
+      projectRoot,
+      "src/unterminated-template-interpolation.ts",
+      "const value = `asset: ${getAssetPath()`;\n"
+    );
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual([]);
+    await expect(
+      readFile(path.join(projectRoot, "assets/proven-unused.png"), "utf8")
+    ).resolves.toBe("asset");
   });
 
   it("retains native-module references and registered asset directories during cleanup", async () => {
