@@ -1,10 +1,13 @@
-import { createHash, randomUUID } from "node:crypto";
+import { createHash } from "node:crypto";
 import { access, mkdir, mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp, { type Sharp } from "sharp";
 import { getTenant } from "../../config/tenants/registry";
 import { getTenantAssetPaths, toManifestPath } from "./paths";
+import { publishGeneratedDirectory, recoverGeneratedDirectory } from "./publication";
+import { trimFullyTransparentPadding } from "./trim";
 import {
+  ADAPTIVE_MINIMUM_SAFE_ZONE_UTILIZATION,
   ADAPTIVE_SAFE_ZONE_RATIO,
   ASSET_OUTPUT_FILES,
   GENERATOR_VERSION,
@@ -104,9 +107,8 @@ const createManifestImage = async (
   };
 };
 
-const generateNotificationMask = async (sourceIcon: string, outputPath: string) => {
-  const resizedSource = await sharp(sourceIcon)
-    .rotate()
+const generateNotificationMask = async (sourceArtwork: Buffer, outputPath: string) => {
+  const resizedSource = await sharp(sourceArtwork)
     .resize(NOTIFICATION_ICON_SIZE, NOTIFICATION_ICON_SIZE, {
       fit: "contain",
       background: TRANSPARENT,
@@ -155,13 +157,12 @@ const generateNotificationMask = async (sourceIcon: string, outputPath: string) 
 };
 
 const generateOutputs = async (
-  sourceIcon: string,
+  sourceArtwork: Buffer,
   backgroundColor: string,
   outputPaths: Record<AssetOutputName, string>
 ) => {
   await writePng(
-    sharp(sourceIcon)
-      .rotate()
+    sharp(sourceArtwork)
       .resize(APPLE_ICON_SIZE, APPLE_ICON_SIZE, {
         fit: "contain",
         background: backgroundColor,
@@ -172,8 +173,7 @@ const generateOutputs = async (
   );
 
   await writePng(
-    sharp(sourceIcon)
-      .rotate()
+    sharp(sourceArtwork)
       .resize(ANDROID_LEGACY_SIZE, ANDROID_LEGACY_SIZE, {
         fit: "contain",
         background: backgroundColor,
@@ -183,8 +183,7 @@ const generateOutputs = async (
     outputPaths.androidLegacyIcon
   );
 
-  const adaptiveArtwork = await sharp(sourceIcon)
-    .rotate()
+  const adaptiveArtwork = await sharp(sourceArtwork)
     .resize(ADAPTIVE_ARTWORK_SIZE, ADAPTIVE_ARTWORK_SIZE, {
       fit: "contain",
       background: TRANSPARENT,
@@ -216,7 +215,7 @@ const generateOutputs = async (
     outputPaths.androidAdaptiveBackground
   );
 
-  await generateNotificationMask(sourceIcon, outputPaths.notificationIcon);
+  await generateNotificationMask(sourceArtwork, outputPaths.notificationIcon);
 
   await writePng(
     sharp({
@@ -229,8 +228,7 @@ const generateOutputs = async (
     })
       .composite([
         {
-          input: await sharp(sourceIcon)
-            .rotate()
+          input: await sharp(sourceArtwork)
             .resize(SPLASH_ARTWORK_SIZE, SPLASH_ARTWORK_SIZE, {
               fit: "contain",
               background: TRANSPARENT,
@@ -247,7 +245,7 @@ const generateOutputs = async (
   );
 
   await writePng(
-    sharp(sourceIcon).rotate().resize(RUNTIME_LOGO_SIZE, RUNTIME_LOGO_SIZE, {
+    sharp(sourceArtwork).resize(RUNTIME_LOGO_SIZE, RUNTIME_LOGO_SIZE, {
       fit: "contain",
       background: TRANSPARENT,
       kernel: sharp.kernel.lanczos3,
@@ -305,6 +303,7 @@ const createManifest = async (
     tenantId,
     rules: {
       adaptiveSafeZoneRatio: ADAPTIVE_SAFE_ZONE_RATIO,
+      adaptiveMinimumSafeZoneUtilization: ADAPTIVE_MINIMUM_SAFE_ZONE_UTILIZATION,
       notificationMask:
         `Source alpha >= ${NOTIFICATION_ALPHA_THRESHOLD} and grayscale luminance ` +
         `< ${NOTIFICATION_LUMINANCE_THRESHOLD} becomes opaque white; all other pixels ` +
@@ -315,26 +314,10 @@ const createManifest = async (
   };
 };
 
-const replaceGeneratedDirectory = async (temporaryDirectory: string, targetDirectory: string) => {
-  const backupDirectory = `${targetDirectory}.backup-${randomUUID()}`;
-  const targetExists = await fileExists(targetDirectory);
-
-  if (targetExists) await rename(targetDirectory, backupDirectory);
-
-  try {
-    await rename(temporaryDirectory, targetDirectory);
-    if (targetExists) await rm(backupDirectory, { recursive: true, force: true });
-  } catch (error) {
-    if (targetExists && !(await fileExists(targetDirectory))) {
-      await rename(backupDirectory, targetDirectory);
-    }
-    throw error;
-  }
-};
-
 export const generateTenantAssets = async (tenantId: string): Promise<AssetManifest> => {
   const tenant = getTenant(tenantId);
   const canonicalPaths = getTenantAssetPaths(tenantId);
+  await recoverGeneratedDirectory(canonicalPaths.generatedDirectory);
   if (!(await fileExists(canonicalPaths.sourceIcon))) {
     throw new Error(`Tenant source artwork does not exist: ${canonicalPaths.sourceIcon}`);
   }
@@ -346,11 +329,8 @@ export const generateTenantAssets = async (tenantId: string): Promise<AssetManif
   const temporaryPaths = getTenantAssetPaths(tenantId, temporaryDirectory);
 
   try {
-    await generateOutputs(
-      canonicalPaths.sourceIcon,
-      tenant.brand.backgroundColor,
-      temporaryPaths.outputs
-    );
+    const sourceArtwork = await trimFullyTransparentPadding(canonicalPaths.sourceIcon);
+    await generateOutputs(sourceArtwork, tenant.brand.backgroundColor, temporaryPaths.outputs);
     const manifest = await createManifest(
       tenantId,
       canonicalPaths.sourceIcon,
@@ -370,7 +350,7 @@ export const generateTenantAssets = async (tenantId: string): Promise<AssetManif
       );
     }
 
-    await replaceGeneratedDirectory(temporaryDirectory, canonicalPaths.generatedDirectory);
+    await publishGeneratedDirectory(temporaryDirectory, canonicalPaths.generatedDirectory);
     return manifest;
   } finally {
     await rm(temporaryDirectory, { recursive: true, force: true });

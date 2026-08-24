@@ -5,9 +5,11 @@ import path from "node:path";
 import sharp from "sharp";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { generateTenantAssets } from "../generate";
+import { trimFullyTransparentPadding } from "../trim";
 
 const TENANT_ID = "avihu";
 const SAFE_ZONE_RATIO = 0.66;
+const MINIMUM_SAFE_ZONE_UTILIZATION = 0.9;
 
 const hash = (contents: Buffer) => createHash("sha256").update(contents).digest("hex");
 
@@ -104,8 +106,14 @@ describe.sequential("generateTenantAssets", () => {
       right = Math.max(right, x);
       bottom = Math.max(bottom, y);
     }
-    expect(right - left + 1).toBeLessThanOrEqual(Math.ceil(1024 * SAFE_ZONE_RATIO));
-    expect(bottom - top + 1).toBeLessThanOrEqual(Math.ceil(1024 * SAFE_ZONE_RATIO));
+    const visibleWidth = right - left + 1;
+    const visibleHeight = bottom - top + 1;
+    const safeZoneSize = Math.ceil(1024 * SAFE_ZONE_RATIO);
+    expect(visibleWidth).toBeLessThanOrEqual(safeZoneSize);
+    expect(visibleHeight).toBeLessThanOrEqual(safeZoneSize);
+    expect(Math.max(visibleWidth, visibleHeight)).toBeGreaterThanOrEqual(
+      Math.floor(safeZoneSize * MINIMUM_SAFE_ZONE_UTILIZATION)
+    );
     expect(Math.abs(left - (1023 - right))).toBeLessThanOrEqual(1);
     expect(Math.abs(top - (1023 - bottom))).toBeLessThanOrEqual(1);
 
@@ -172,5 +180,32 @@ describe.sequential("generateTenantAssets", () => {
     for (const file of secondFiles) {
       expect(await readFile(path.join(generatedDirectory, file))).toEqual(firstContents.get(file));
     }
+  });
+});
+
+describe("trimFullyTransparentPadding", () => {
+  it("preserves every nonzero-alpha pixel while removing only transparent outer rows", async () => {
+    const pixels = Buffer.alloc(6 * 6 * 4);
+    for (let offset = 0; offset < pixels.length; offset += 4) {
+      pixels[offset] = 255;
+    }
+    for (let y = 2; y <= 3; y += 1) {
+      for (let x = 2; x <= 3; x += 1) {
+        pixels[(y * 6 + x) * 4 + 3] = 255;
+      }
+    }
+    pixels[(3 * 6 + 1) * 4 + 3] = 1;
+    const source = await sharp(pixels, {
+      raw: { width: 6, height: 6, channels: 4 },
+    })
+      .png()
+      .toBuffer();
+
+    const trimmed = await trimFullyTransparentPadding(source);
+    const metadata = await sharp(trimmed).metadata();
+    const trimmedPixels = await sharp(trimmed).ensureAlpha().raw().toBuffer();
+
+    expect(metadata).toMatchObject({ width: 3, height: 2, hasAlpha: true });
+    expect(trimmedPixels[(1 * 3 + 0) * 4 + 3]).toBe(1);
   });
 });
