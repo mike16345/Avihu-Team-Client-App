@@ -75,6 +75,7 @@ const writeEdgeToEdgeAndroidFixture = async (
     edgeToEdgeProperty?: boolean;
     styleItems?: string[];
     source?: string;
+    rootSource?: string;
   } = {}
 ) => {
   await writeAndroidFixture(root, 36, "com.avihuteam.avihuteam");
@@ -103,6 +104,10 @@ const writeEdgeToEdgeAndroidFixture = async (
     const sourceRoot = path.join(root, "src");
     await mkdir(sourceRoot, { recursive: true });
     await writeFile(path.join(sourceRoot, "ManualInset.tsx"), options.source);
+  }
+
+  if (options.rootSource) {
+    await writeFile(path.join(root, "App.tsx"), options.rootSource);
   }
 };
 
@@ -296,6 +301,21 @@ describe("generated native drift", () => {
     expect(result).toMatchObject({ status: "pass", check: "native.drift" });
   });
 
+  it("ignores edge-to-edge declarations inside generated XML comments", async () => {
+    const context = await createContext();
+    await writeEdgeToEdgeAndroidFixture(context.projectRoot, {
+      edgeToEdgeProperty: true,
+      styleItems: [
+        '<!-- <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item> -->',
+        '<!-- <item name="android:statusBarColor">#ffffff</item> -->',
+      ],
+    });
+
+    const result = await nativeDriftCheck.run(context);
+
+    expect(result).toMatchObject({ status: "pass", check: "native.drift" });
+  });
+
   it("fails when application source calculates layout from StatusBar.currentHeight", async () => {
     const context = await createContext();
     await writeEdgeToEdgeAndroidFixture(context.projectRoot, {
@@ -309,6 +329,36 @@ describe("generated native drift", () => {
     expect(result.details).toContain(
       "Application source must not use StatusBar.currentHeight: src/ManualInset.tsx"
     );
+  });
+
+  it("fails when the root App entry calculates layout from StatusBar.currentHeight", async () => {
+    const context = await createContext();
+    await writeEdgeToEdgeAndroidFixture(context.projectRoot, {
+      edgeToEdgeProperty: true,
+      rootSource: "const top = StatusBar.currentHeight ?? 0;\n",
+    });
+
+    const result = await nativeDriftCheck.run(context);
+
+    expect(result).toMatchObject({ status: "fail", check: "native.drift" });
+    expect(result.details).toContain(
+      "Application source must not use StatusBar.currentHeight: App.tsx"
+    );
+  });
+
+  it("ignores StatusBar.currentHeight text inside comments and string literals", async () => {
+    const context = await createContext();
+    await writeEdgeToEdgeAndroidFixture(context.projectRoot, {
+      edgeToEdgeProperty: true,
+      source: [
+        "// StatusBar.currentHeight is forbidden for layout.",
+        'const auditDescription = "StatusBar.currentHeight";',
+      ].join("\n"),
+    });
+
+    const result = await nativeDriftCheck.run(context);
+
+    expect(result).toMatchObject({ status: "pass", check: "native.drift" });
   });
 
   it("accepts generated edge-to-edge configuration and inset-safe application source", async () => {

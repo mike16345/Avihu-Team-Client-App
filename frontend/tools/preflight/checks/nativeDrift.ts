@@ -3,7 +3,7 @@ import path from "node:path";
 import type { ExpoConfig } from "@expo/config";
 import type { ConfigurationPreflightContext } from "../contexts";
 import type { CheckDefinition, CheckResult } from "../types";
-import { auditAndroidEdgeToEdge } from "./androidRelease";
+import { auditAndroidEdgeToEdge } from "./androidEdgeToEdge";
 
 type ExpoPluginEntry = NonNullable<ExpoConfig["plugins"]>[number];
 
