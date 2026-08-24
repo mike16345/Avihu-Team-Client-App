@@ -5,7 +5,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@assets/*": ["./assets/*"],
-      "@config/*": ["./config/*"]
+      "@config/*": ["./config/*"],
+      "tenant-assets/*": ["./config/tenants/assets/avihu/generated/*"]
     },
     /* Bundler mode */
     "moduleResolution": "bundler",

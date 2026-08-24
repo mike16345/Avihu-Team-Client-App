@@ -101,6 +101,7 @@ export const tenantConfigSchema = z
         legacy: z.boolean(),
         icon: assetPathSchema,
         adaptiveIconForeground: assetPathSchema,
+        adaptiveIconBackgroundImage: assetPathSchema,
         adaptiveIconBackgroundColor: hexColorSchema,
         notificationIcon: assetPathSchema,
         notificationColor: hexColorSchema,
