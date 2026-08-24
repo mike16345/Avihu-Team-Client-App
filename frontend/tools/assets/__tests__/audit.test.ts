@@ -68,6 +68,18 @@ const nestedOpaqueLoaderCases = [
     name: "an unbalanced loader call",
     source: "const image = require(getAssetPath();\n",
   },
+  {
+    name: "a block-comment require call",
+    source: "const image = require/* asset resolver */(getAssetPath());\n",
+  },
+  {
+    name: "a block-comment dynamic import call",
+    source: "const image = import/* asset resolver */(resolveAsset(name));\n",
+  },
+  {
+    name: "a line-comment loader call",
+    source: "const image = require // asset resolver\n(getAssetPath());\n",
+  },
 ];
 
 describe("auditAssets", () => {
@@ -285,11 +297,12 @@ describe("auditAssets", () => {
     );
   });
 
-  it("retains Kotlin, Swift, and plist native-module asset references during cleanup", async () => {
+  it("retains Kotlin, Swift, plist, and XML native-module asset references during cleanup", async () => {
     await Promise.all([
       writeFixtureFile(projectRoot, "assets/native-kotlin.png"),
       writeFixtureFile(projectRoot, "assets/native-swift.png"),
       writeFixtureFile(projectRoot, "assets/native-plist.png"),
+      writeFixtureFile(projectRoot, "assets/native-xml.png"),
       writeFixtureFile(
         projectRoot,
         "native-modules/android/Assets.kt",
@@ -305,6 +318,11 @@ describe("auditAssets", () => {
         "native-modules/ios/Info.plist",
         "<string>../../assets/native-plist.png</string>\n"
       ),
+      writeFixtureFile(
+        projectRoot,
+        "native-modules/android/assets.xml",
+        "<string>../../assets/native-xml.png</string>\n"
+      ),
     ]);
 
     const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
@@ -317,6 +335,9 @@ describe("auditAssets", () => {
       "asset"
     );
     await expect(readFile(path.join(projectRoot, "assets/native-plist.png"), "utf8")).resolves.toBe(
+      "asset"
+    );
+    await expect(readFile(path.join(projectRoot, "assets/native-xml.png"), "utf8")).resolves.toBe(
       "asset"
     );
   });
