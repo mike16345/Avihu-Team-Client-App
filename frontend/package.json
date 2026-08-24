@@ -6,6 +6,7 @@
     "app": "tsx tools/app-control/cli.ts",
     "assets:generate": "tsx tools/assets/cli.ts generate",
     "assets:check": "tsx tools/assets/cli.ts check",
+    "assets:audit": "tsx tools/assets/cli.ts audit",
     "start": "expo start -c",
     "start-no-clear": "expo start",
     "android": "expo run:android",
