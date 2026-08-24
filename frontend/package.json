@@ -83,6 +83,7 @@
     "expo-system-ui": "~5.0.11",
     "expo-task-manager": "~13.1.6",
     "expo-updates": "~0.28.18",
+    "getenv": "2.0.0",
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.45",
     "react": "19.0.0",
