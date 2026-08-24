@@ -9,6 +9,7 @@ const TEXT_FILE_PATTERNS = [
   "config/**/*.{js,jsx,ts,tsx,json}",
   "tools/**/*.{js,jsx,ts,tsx,json}",
   "plugins/**/*.{js,jsx,ts,tsx,json}",
+  "native-modules/**/*.{js,jsx,ts,tsx,json}",
   "android/**/*.{java,kt,kts,xml,gradle,properties,json}",
   "ios/**/*.{m,mm,swift,h,plist,pbxproj,json}",
 ];
@@ -21,12 +22,19 @@ const EXCLUDED_DIRECTORIES = [
   "**/build/**",
 ];
 const STATIC_ASSET_STRING = /["']([^"'\n]+\.(?:png|jpe?g|svg|webp|gif|ttf|otf))["']/gi;
+const STATIC_TEMPLATE_ASSET_STRING = /`([^`$\n]+\.(?:png|jpe?g|svg|webp|gif|ttf|otf))`/gi;
 const TEMPLATE_STRING = /`([^`]*\$\{[^}]+\}[^`]*)`/g;
-const DYNAMIC_REQUIRE = /(?:require|import)\(\s*([^)]*\$\{[^)]*)\)/g;
+const LOADER_EXPRESSION = /\b(?:require|import)\(\s*([^()\n]+)\)/g;
+const STATIC_LOADER_LITERAL = /^\s*(?:"([^"]+)"|'([^']+)'|`([^`$]+)`)\s*$/;
+const CONCATENATED_PREFIX = /^\s*(?:"([^"]*)"|'([^']*)'|`([^`$]*)`)\s*\+/;
+const DIRECTORY_ASSET_DECLARATION = /\bassets\s*:\s*\[([\s\S]*?)\]/g;
+const DIRECTORY_STRING = /"([^"]+)"|'([^']+)'|`([^`$]+)`/g;
 
 export interface AssetReferenceCollection {
   staticPaths: Set<string>;
+  staticDirectories: Set<string>;
   dynamicDirectories: Map<string, string[]>;
+  opaqueLoaderSources: string[];
   allowlistPatterns: readonly string[];
 }
 
@@ -71,11 +79,38 @@ const resolveReference = (
 };
 
 const getDynamicPrefix = (expression: string) => {
-  const prefix = expression.slice(0, expression.indexOf("${"));
+  const templateIndex = expression.indexOf("${");
+  const templatePrefix = templateIndex >= 0 ? expression.slice(0, templateIndex) : undefined;
+  const concatenatedPrefix = expression.match(CONCATENATED_PREFIX)?.slice(1).find(Boolean);
+  const prefix = templatePrefix ?? concatenatedPrefix;
   if (!prefix) return undefined;
 
   const lastSlash = prefix.lastIndexOf("/");
   return lastSlash >= 0 ? prefix.slice(0, lastSlash + 1) : undefined;
+};
+
+const addStaticReferences = (
+  collection: AssetReferenceCollection,
+  value: string,
+  sourceFile: string,
+  projectRoot: string,
+  tenantId: string
+) => {
+  for (const resolvedPath of resolveReference(value, sourceFile, projectRoot, tenantId)) {
+    collection.staticPaths.add(path.resolve(resolvedPath));
+  }
+};
+
+const addStaticDirectories = (
+  collection: AssetReferenceCollection,
+  value: string,
+  sourceFile: string,
+  projectRoot: string,
+  tenantId: string
+) => {
+  for (const resolvedPath of resolveReference(value, sourceFile, projectRoot, tenantId)) {
+    collection.staticDirectories.add(path.resolve(resolvedPath));
+  }
 };
 
 const addDynamicDirectories = (
@@ -109,30 +144,53 @@ export const collectAssetReferences = async ({
   });
   const collection: AssetReferenceCollection = {
     staticPaths: new Set<string>(),
+    staticDirectories: new Set<string>(),
     dynamicDirectories: new Map<string, string[]>(),
+    opaqueLoaderSources: [],
     allowlistPatterns: DYNAMIC_ASSET_ALLOWLIST,
   };
 
   for (const sourceFile of files) {
     const contents = await readFile(sourceFile, "utf8");
+    const sourceName = path.basename(sourceFile);
 
     for (const match of contents.matchAll(STATIC_ASSET_STRING)) {
-      for (const resolvedPath of resolveReference(
-        match[1],
-        sourceFile,
-        resolvedProjectRoot,
-        tenantId
-      )) {
-        collection.staticPaths.add(path.resolve(resolvedPath));
-      }
+      addStaticReferences(collection, match[1], sourceFile, resolvedProjectRoot, tenantId);
+    }
+
+    for (const match of contents.matchAll(STATIC_TEMPLATE_ASSET_STRING)) {
+      addStaticReferences(collection, match[1], sourceFile, resolvedProjectRoot, tenantId);
     }
 
     for (const match of contents.matchAll(TEMPLATE_STRING)) {
       addDynamicDirectories(collection, match[1], sourceFile, resolvedProjectRoot, tenantId);
     }
 
-    for (const match of contents.matchAll(DYNAMIC_REQUIRE)) {
-      addDynamicDirectories(collection, match[1], sourceFile, resolvedProjectRoot, tenantId);
+    for (const match of contents.matchAll(LOADER_EXPRESSION)) {
+      const expression = match[1];
+      const staticLiteral = expression.match(STATIC_LOADER_LITERAL);
+      if (staticLiteral) {
+        const value = staticLiteral.slice(1).find(Boolean);
+        if (value)
+          addStaticReferences(collection, value, sourceFile, resolvedProjectRoot, tenantId);
+        continue;
+      }
+
+      if (getDynamicPrefix(expression)) {
+        addDynamicDirectories(collection, expression, sourceFile, resolvedProjectRoot, tenantId);
+      } else {
+        collection.opaqueLoaderSources.push(toPosix(path.relative(projectRoot, sourceFile)));
+      }
+    }
+
+    if (sourceName === "react-native.config.js") {
+      for (const declaration of contents.matchAll(DIRECTORY_ASSET_DECLARATION)) {
+        for (const match of declaration[1].matchAll(DIRECTORY_STRING)) {
+          const value = match.slice(1).find(Boolean);
+          if (value)
+            addStaticDirectories(collection, value, sourceFile, resolvedProjectRoot, tenantId);
+        }
+      }
     }
   }
 

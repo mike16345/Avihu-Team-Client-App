@@ -3,6 +3,7 @@ import path from "node:path";
 import { glob } from "fast-glob";
 import { getTenant } from "../../config/tenants/registry";
 import { collectAssetReferences } from "./references";
+import { ASSET_OUTPUT_FILES, type AssetOutputName } from "./types";
 
 const ASSET_FILE_PATTERN = "**/*.{png,jpg,jpeg,svg,webp,gif,ttf,otf}";
 const EXCLUDED_DIRECTORIES = [
@@ -76,11 +77,17 @@ const readManifestPaths = async (manifestPath: string, tenantDirectory: string) 
     return { valid: false, paths: new Set<string>() };
   }
 
-  const outputPaths = Object.values(manifest.outputs ?? {}).map((output) => output.relativePath);
+  const outputNames = Object.keys(ASSET_OUTPUT_FILES) as AssetOutputName[];
+  const manifestOutputs = manifest.outputs ?? {};
+  const outputPaths = outputNames.map((name) => manifestOutputs[name]?.relativePath);
   if (
     typeof manifest.source?.relativePath !== "string" ||
-    outputPaths.length === 0 ||
-    outputPaths.some((outputPath) => typeof outputPath !== "string")
+    Object.keys(manifestOutputs).length !== outputNames.length ||
+    outputPaths.some(
+      (outputPath, index) =>
+        typeof outputPath !== "string" ||
+        outputPath !== `generated/${ASSET_OUTPUT_FILES[outputNames[index]]}`
+    )
   ) {
     return { valid: false, paths: new Set<string>() };
   }
@@ -144,6 +151,9 @@ export const auditAssets = async ({
   const approvedRoots = await Promise.all(
     [appAssetsRoot, tenantDirectory].map((root) => realpath(root))
   );
+  if (!approvedRoots.every((root) => isWithin(root, realProjectRoot))) {
+    throw new Error("Approved asset root escapes the real project root");
+  }
   const generatedDirectory = path.join(approvedRoots[1], "generated");
   const manifestPath = path.join(generatedDirectory, "manifest.json");
   const references = await collectAssetReferences({ projectRoot: resolvedProjectRoot, tenantId });
@@ -166,6 +176,17 @@ export const auditAssets = async ({
       dynamicDirectories.set(path.resolve(directory), sources);
     }
   }
+  const staticDirectories = new Set(
+    await Promise.all(
+      [...references.staticDirectories].map(async (directory) => {
+        try {
+          return await realpath(directory);
+        } catch {
+          return path.resolve(directory);
+        }
+      })
+    )
+  );
   const manifest = await readManifestPaths(manifestPath, approvedRoots[1]);
   const files = await getAssetFiles(approvedRoots);
   const entries: AssetAuditEntry[] = [];
@@ -187,12 +208,18 @@ export const auditAssets = async ({
       classification = "used";
       reason =
         "Referenced statically by source, configuration, plugin, native template, or font loader";
+    } else if ([...staticDirectories].some((directory) => isWithin(candidate, directory))) {
+      classification = "used";
+      reason = "Included by a static asset-directory declaration";
     } else if (matchesAllowlist(relativePath, references.allowlistPatterns)) {
       classification = "used";
       reason = "Covered by an explicit dynamic asset allowlist entry";
     } else if (dynamicSources) {
       classification = "ambiguous";
       reason = `Dynamic asset expression in ${dynamicSources.join(", ")}`;
+    } else if (references.opaqueLoaderSources.length > 0) {
+      classification = "ambiguous";
+      reason = `Opaque asset loader in ${references.opaqueLoaderSources.join(", ")}`;
     } else if (isWithin(candidate, path.join(approvedRoots[1], "source"))) {
       classification = "used";
       reason = "Tenant source artwork is immutable input";
