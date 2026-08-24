@@ -6,6 +6,21 @@ const CLOSING_DELIMITER_BY_OPENING: Record<string, string> = {
   "{": "}",
 };
 const CLOSING_DELIMITERS = new Set(Object.values(CLOSING_DELIMITER_BY_OPENING));
+const REGEX_PREFIX_CHARACTERS = new Set([
+  "=",
+  "+",
+  "-",
+  "*",
+  "%",
+  "&",
+  "|",
+  "^",
+  "~",
+  "?",
+  ":",
+  ",",
+  ";",
+]);
 const REGEX_PREFIX_KEYWORDS = new Set([
   "await",
   "case",
@@ -22,6 +37,7 @@ const REGEX_PREFIX_KEYWORDS = new Set([
   "void",
   "yield",
 ]);
+type SlashMode = "regex" | "division" | "ambiguous";
 
 export interface LoaderCall {
   expression?: string;
@@ -220,7 +236,7 @@ function scanExecutableCode(
 ): number | undefined {
   const closingStack = expectedClosings ? [...expectedClosings] : undefined;
   let index = startIndex;
-  let canStartRegex = true;
+  let slashMode: SlashMode = "regex";
 
   while (index < contents.length) {
     const character = contents[index];
@@ -228,14 +244,14 @@ function scanExecutableCode(
       const stringEnd = readQuotedString(contents, index);
       if (stringEnd === undefined) return undefined;
       index = stringEnd;
-      canStartRegex = false;
+      slashMode = "division";
       continue;
     }
     if (character === "`") {
       const templateEnd = readTemplateLiteral(contents, index, state);
       if (templateEnd === undefined) return undefined;
       index = templateEnd;
-      canStartRegex = false;
+      slashMode = "division";
       continue;
     }
     if (contents.startsWith("/*", index)) {
@@ -252,24 +268,25 @@ function scanExecutableCode(
     if (
       character === "<" &&
       state.scanJsxSyntax &&
-      canStartRegex &&
+      slashMode === "regex" &&
       isJsxElementStart(contents, index)
     ) {
       const jsxEnd = readJsxElement(contents, index, state);
       if (jsxEnd === undefined) return undefined;
       index = jsxEnd;
-      canStartRegex = false;
+      slashMode = "division";
       continue;
     }
     if (character === "/" && state.scanRegexLiterals) {
-      if (canStartRegex) {
+      if (slashMode === "ambiguous") return undefined;
+      if (slashMode === "regex") {
         const regexEnd = readRegularExpression(contents, index);
         if (regexEnd === undefined) return undefined;
         index = regexEnd;
-        canStartRegex = false;
+        slashMode = "division";
       } else {
         index += contents[index + 1] === "=" ? 2 : 1;
-        canStartRegex = true;
+        slashMode = "regex";
       }
       continue;
     }
@@ -284,14 +301,14 @@ function scanExecutableCode(
         previousCharacter === "." ||
         isIdentifierCharacter(previousCharacter)
       ) {
-        canStartRegex = REGEX_PREFIX_KEYWORDS.has(identifier);
+        slashMode = REGEX_PREFIX_KEYWORDS.has(identifier) ? "regex" : "division";
         continue;
       }
 
       const openingParenthesis = skipTrivia(contents, index);
       if (openingParenthesis === undefined) return undefined;
       if (contents[openingParenthesis] !== "(") {
-        canStartRegex = false;
+        slashMode = "division";
         continue;
       }
 
@@ -301,7 +318,7 @@ function scanExecutableCode(
         expression: contents.slice(openingParenthesis + 1, callEnd - 1),
       });
       index = callEnd;
-      canStartRegex = false;
+      slashMode = "division";
       continue;
     }
 
@@ -309,7 +326,7 @@ function scanExecutableCode(
     if (nestedClosing) {
       closingStack?.push(nestedClosing);
       index += 1;
-      canStartRegex = true;
+      slashMode = "regex";
       continue;
     }
     if (CLOSING_DELIMITERS.has(character)) {
@@ -321,7 +338,7 @@ function scanExecutableCode(
       } else {
         index += 1;
       }
-      canStartRegex = false;
+      slashMode = "division";
       continue;
     }
     if (/\s/.test(character)) {
@@ -333,7 +350,34 @@ function scanExecutableCode(
       continue;
     }
 
-    canStartRegex = character !== ".";
+    if (contents.startsWith("=>", index)) {
+      index += 2;
+      slashMode = "regex";
+      continue;
+    }
+    if (contents.startsWith("...", index)) {
+      index += 3;
+      slashMode = "regex";
+      continue;
+    }
+    // Prefix logical-not and postfix non-null assertion both preserve the preceding slash mode.
+    if (character === "!") {
+      index += 1;
+      continue;
+    }
+    if (REGEX_PREFIX_CHARACTERS.has(character)) {
+      slashMode = "regex";
+      index += 1;
+      continue;
+    }
+    if (character === ".") {
+      slashMode = "division";
+      index += 1;
+      continue;
+    }
+
+    // An unclassified token may be operand-like, so a following slash must fail closed.
+    slashMode = "ambiguous";
     index += 1;
   }
 

@@ -331,6 +331,48 @@ describe("auditAssets", () => {
     expect(report.deleted).toEqual(cleanupCandidates);
   });
 
+  it("blocks deletion when a postfix non-null assertion precedes division around a loader", async () => {
+    await writeFixtureFile(
+      projectRoot,
+      "src/postfix-non-null-division.ts",
+      "const value = `outer ${foo! / bar + require(getAssetPath()) / baz}`;"
+    );
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual([]);
+    await expect(
+      readFile(path.join(projectRoot, "assets/proven-unused.png"), "utf8")
+    ).resolves.toBe("asset");
+  });
+
+  it("keeps a prefix logical-not regular expression inert", async () => {
+    await writeFixtureFile(
+      projectRoot,
+      "src/prefix-logical-not-regexp.ts",
+      "const value = `outer ${! /require(getAssetPath())/.test(foo)}`;"
+    );
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual(cleanupCandidates);
+  });
+
+  it("blocks deletion when TypeScript type arguments make slash classification ambiguous", async () => {
+    await writeFixtureFile(
+      projectRoot,
+      "src/ambiguous-type-argument-division.ts",
+      "const value = `outer ${foo<string> / bar + require(getAssetPath()) / baz}`;"
+    );
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual([]);
+    await expect(
+      readFile(path.join(projectRoot, "assets/proven-unused.png"), "utf8")
+    ).resolves.toBe("asset");
+  });
+
   it("does not treat JSX closing tags as malformed regular expressions", async () => {
     await writeFixtureFile(
       projectRoot,
