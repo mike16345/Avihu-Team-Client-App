@@ -97,9 +97,7 @@ describe("createExpoConfig", () => {
       });
 
       const expectedIdentity =
-        environment === "development"
-          ? "com.avihuteam.avihuteam.dev"
-          : "com.avihuteam.avihuteam";
+        environment === "development" ? "com.avihuteam.avihuteam.dev" : "com.avihuteam.avihuteam";
 
       expect(config.name).toBe("Elevate Coach");
       expect(config.extra?.tenant).toMatchObject({ displayName: "Elevate Coach" });
