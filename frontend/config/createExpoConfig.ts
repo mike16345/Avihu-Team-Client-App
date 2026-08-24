@@ -97,6 +97,7 @@ export const createExpoConfig = ({
     android: {
       adaptiveIcon: {
         foregroundImage: tenant.assets.adaptiveIconForeground,
+        backgroundImage: tenant.assets.adaptiveIconBackgroundImage,
         backgroundColor: tenant.assets.adaptiveIconBackgroundColor,
       },
       permissions: tenant.permissions.android,

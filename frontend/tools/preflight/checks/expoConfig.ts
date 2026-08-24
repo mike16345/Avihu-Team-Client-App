@@ -84,7 +84,13 @@ const runExpoConfigCheck = (context: Readonly<ConfigurationPreflightContext>): C
   );
   compare(
     drift,
-    "Adaptive icon background",
+    "Adaptive icon background image",
+    tenantConfig.assets.adaptiveIconBackgroundImage,
+    expoConfig.android?.adaptiveIcon?.backgroundImage
+  );
+  compare(
+    drift,
+    "Adaptive icon background color",
     tenantConfig.assets.adaptiveIconBackgroundColor,
     expoConfig.android?.adaptiveIcon?.backgroundColor
   );

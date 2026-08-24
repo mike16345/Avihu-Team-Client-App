@@ -151,7 +151,7 @@ describe("createExpoConfig", () => {
     ]);
   });
 
-  it("keeps the working asset paths explicitly marked as legacy", () => {
+  it("uses tenant-generated platform asset paths", () => {
     const production = createExpoConfig({
       baseConfig: {},
       tenant: getTenant("avihu"),
@@ -159,13 +159,21 @@ describe("createExpoConfig", () => {
       processEnv: {},
     });
 
-    expect(getTenant("avihu").assets.legacy).toBe(true);
-    expect(production.icon).toBe("./assets/app-logo.png");
-    expect(production.splash?.image).toBe("./assets/splash-screen.png");
-    expect(production.android?.adaptiveIcon?.foregroundImage).toBe("./assets/app-logo.png");
+    expect(getTenant("avihu").assets.legacy).toBe(false);
+    expect(production.icon).toBe("./config/tenants/assets/avihu/generated/apple-icon.png");
+    expect(production.splash?.image).toBe("./config/tenants/assets/avihu/generated/splash.png");
+    expect(production.android?.adaptiveIcon?.foregroundImage).toBe(
+      "./config/tenants/assets/avihu/generated/android-adaptive-foreground.png"
+    );
+    expect(production.android?.adaptiveIcon?.backgroundImage).toBe(
+      "./config/tenants/assets/avihu/generated/android-adaptive-background.png"
+    );
     expect(production.plugins).toContainEqual([
       "expo-notifications",
-      expect.objectContaining({ icon: "./assets/app-logo.png", color: "#ffffff" }),
+      expect.objectContaining({
+        icon: "./config/tenants/assets/avihu/generated/notification-icon.png",
+        color: "#ffffff",
+      }),
     ]);
   });
 });

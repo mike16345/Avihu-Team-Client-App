@@ -23,13 +23,16 @@ export const avihuTenant = {
   orientation: "portrait",
   platforms: ["ios", "android"],
   assets: {
-    legacy: true,
-    icon: "./assets/app-logo.png",
-    adaptiveIconForeground: "./assets/app-logo.png",
+    legacy: false,
+    icon: "./config/tenants/assets/avihu/generated/apple-icon.png",
+    adaptiveIconForeground:
+      "./config/tenants/assets/avihu/generated/android-adaptive-foreground.png",
+    adaptiveIconBackgroundImage:
+      "./config/tenants/assets/avihu/generated/android-adaptive-background.png",
     adaptiveIconBackgroundColor: "#FFFFFF",
-    notificationIcon: "./assets/app-logo.png",
+    notificationIcon: "./config/tenants/assets/avihu/generated/notification-icon.png",
     notificationColor: "#ffffff",
-    splash: "./assets/splash-screen.png",
+    splash: "./config/tenants/assets/avihu/generated/splash.png",
     splashBackgroundColor: "#FFFFFF",
   },
   brand: {
