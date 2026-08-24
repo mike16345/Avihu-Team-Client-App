@@ -17,6 +17,14 @@ command resolves to `npx --yes eas-cli@16.27.0 build --platform android --profil
 `APP_TENANT=avihu` and `APP_ENV=production` in the child environment. No secret value is included
 in command arguments or control-center output.
 
+The legacy build aliases take the same control path and still require an explicit tenant; append
+the tenant flag rather than relying on shell expansion:
+
+```sh
+npm run build:android:preview -- --tenant avihu --dry-run
+npm run build:ios:prod -- --tenant avihu --dry-run
+```
+
 Before a real build, run the same selected preflight locally:
 
 ```sh
@@ -41,15 +49,17 @@ EAS-project environment value so the profiles work for future tenant projects.
 An authorized EAS project administrator can set the selector variable with the EAS dashboard or
 the equivalent noninteractive command, choosing the target project and each named environment.
 These commands change remote EAS state and are shown for operators only; do not run them during
-local verification:
+local verification. The pinned CLI documents `--force` as overwriting an existing variable, so it
+makes repeated setup idempotent for the same tenant value:
 
 ```sh
-APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@16.27.0 env:set --name APP_TENANT --value avihu --environment development --visibility plaintext --scope project --non-interactive
-APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@16.27.0 env:set --name APP_TENANT --value avihu --environment preview --visibility plaintext --scope project --non-interactive
-APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@16.27.0 env:set --name APP_TENANT --value avihu --environment production --visibility plaintext --scope project --non-interactive
+APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@16.27.0 env:create --name APP_TENANT --value avihu --environment development --visibility plaintext --scope project --force --non-interactive
+APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@16.27.0 env:create --name APP_TENANT --value avihu --environment preview --visibility plaintext --scope project --force --non-interactive
+APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@16.27.0 env:create --name APP_TENANT --value avihu --environment production --visibility plaintext --scope project --force --non-interactive
 ```
 
-Verify the selected project without exposing values:
+Verify the selected project without requesting sensitive values. Plaintext `APP_TENANT` values can
+appear in the output, so review the output before sharing it:
 
 ```sh
 APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@16.27.0 env:list --environment development --scope project

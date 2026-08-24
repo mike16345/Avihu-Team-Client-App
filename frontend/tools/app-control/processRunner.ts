@@ -1,11 +1,18 @@
 import { spawn } from "node:child_process";
-import type { CommandSpec } from "./types";
+import type { CommandSpec, CommandStep } from "./types";
 
-export const runCommand = (spec: CommandSpec): Promise<number> =>
+export interface CommandRunnerDependencies {
+  spawnProcess?: typeof spawn;
+}
+
+const runStep = (
+  step: CommandStep,
+  { spawnProcess = spawn }: CommandRunnerDependencies
+): Promise<number> =>
   new Promise((resolve) => {
-    const child = spawn(spec.command, spec.args, {
+    const child = spawnProcess(step.command, step.args, {
       stdio: "inherit",
-      env: { ...process.env, ...spec.env },
+      env: { ...process.env, ...step.env },
     });
     const forwardSignal = (signal: NodeJS.Signals) => {
       child.kill(signal);
@@ -20,7 +27,7 @@ export const runCommand = (spec: CommandSpec): Promise<number> =>
 
     child.once("error", (error) => {
       removeSignalHandlers();
-      console.error(`${spec.label} could not start: ${error.message}`);
+      console.error(`${step.label} could not start: ${error.message}`);
       resolve(1);
     });
 
@@ -28,10 +35,26 @@ export const runCommand = (spec: CommandSpec): Promise<number> =>
       removeSignalHandlers();
 
       if (signal) {
-        process.kill(process.pid, signal);
+        console.error(`${step.label} stopped by ${signal}`);
+        resolve(1);
         return;
       }
 
       resolve(code ?? 1);
     });
   });
+
+export const createCommandRunner =
+  (dependencies: CommandRunnerDependencies = {}) =>
+  async (spec: CommandSpec): Promise<number> => {
+    if (spec.prerequisite) {
+      const prerequisiteExitCode = await runStep(spec.prerequisite, dependencies);
+      if (prerequisiteExitCode !== 0) {
+        return prerequisiteExitCode;
+      }
+    }
+
+    return runStep(spec, dependencies);
+  };
+
+export const runCommand = (spec: CommandSpec): Promise<number> => createCommandRunner()(spec);

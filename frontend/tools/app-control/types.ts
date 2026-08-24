@@ -9,13 +9,17 @@ export type AppAction = (typeof APP_ACTIONS)[number];
 export type AppPlatform = (typeof APP_PLATFORMS)[number];
 export type PreflightMode = (typeof PREFLIGHT_MODES)[number];
 export type AssetOperation = (typeof ASSET_OPERATIONS)[number];
-export type ReleaseProfile = Exclude<TenantEnvironment, "development">;
+export type ReleaseProfile = TenantEnvironment;
 
-export interface CommandSpec {
+export interface CommandStep {
   command: string;
   args: string[];
   env: Record<string, string>;
   label: string;
+}
+
+export interface CommandSpec extends CommandStep {
+  prerequisite?: CommandStep;
 }
 
 export interface ParsedAppArguments {

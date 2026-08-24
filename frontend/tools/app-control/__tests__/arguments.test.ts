@@ -28,6 +28,26 @@ describe("parseAppArguments", () => {
     });
   });
 
+  it("parses a confirmed Android development build", () => {
+    expect(
+      parseAppArguments([
+        "build",
+        "android",
+        "--tenant",
+        "avihu",
+        "--profile",
+        "development",
+        "--yes",
+      ])
+    ).toMatchObject({
+      action: "build",
+      platform: "android",
+      tenantId: "avihu",
+      environment: "development",
+      confirmed: true,
+    });
+  });
+
   it("rejects unknown tenants before a command can run", () => {
     expect(() =>
       parseAppArguments([

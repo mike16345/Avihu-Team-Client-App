@@ -1,14 +1,14 @@
 import { getTenant } from "../../config/tenants/registry";
-import type { AppSelection, CommandSpec } from "./types";
+import type { AppSelection, CommandSpec, CommandStep } from "./types";
 
 export const EAS_CLI_ARGS = ["--yes", "eas-cli@16.27.0"] as const;
 
-const createCommandSpec = (
+const createCommandStep = (
   selection: AppSelection,
   command: string,
   args: string[],
   label: string
-): CommandSpec => ({
+): CommandStep => ({
   command,
   args,
   env: {
@@ -17,6 +17,13 @@ const createCommandSpec = (
   },
   label,
 });
+
+const createCommandSpec = (
+  selection: AppSelection,
+  command: string,
+  args: string[],
+  label: string
+): CommandSpec => createCommandStep(selection, command, args, label);
 
 export const resolveAction = (selection: AppSelection): CommandSpec => {
   const tenant = getTenant(selection.tenantId);
@@ -46,8 +53,8 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         ["run", `assets:${selection.operation}`],
         `${selection.operation === "generate" ? "Generate" : "Audit"} assets for ${labelPrefix}`
       );
-    case "build":
-      return createCommandSpec(
+    case "build": {
+      const build = createCommandSpec(
         selection,
         "npx",
         [
@@ -60,6 +67,16 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         ],
         `Build ${labelPrefix} for ${selection.platform}`
       );
+      return {
+        ...build,
+        prerequisite: createCommandStep(
+          selection,
+          "npm",
+          ["run", "preflight:eas"],
+          `EAS preflight for ${labelPrefix}`
+        ),
+      };
+    }
     case "update":
       return createCommandSpec(
         selection,
