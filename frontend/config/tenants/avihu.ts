@@ -13,7 +13,7 @@ const REQUIRED_PUBLIC_ENVIRONMENT_VARIABLES = [
 
 export const avihuTenant = {
   id: "avihu",
-  displayName: "Avihu Team",
+  displayName: "Elevate Coach",
   slug: "avihu-team",
   owner: "avihuteam",
   version: "2.4.0",

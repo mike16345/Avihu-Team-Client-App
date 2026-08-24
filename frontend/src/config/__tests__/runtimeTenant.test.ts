@@ -1,13 +1,17 @@
 import { describe, expect, it } from "vitest";
 
-import { getRuntimeTenant, isTenantEnvironmentBadgeVisible } from "../runtimeTenant";
+import {
+  getRuntimeTenant,
+  getRuntimeTenantDisplayName,
+  isTenantEnvironmentBadgeVisible,
+} from "../runtimeTenant";
 
 const createConstants = (showEnvironmentBadge: boolean) => ({
   expoConfig: {
     extra: {
       tenant: {
         id: "avihu",
-        displayName: "Avihu Team",
+        displayName: "Elevate Coach",
         environment: "development",
         brand: {
           primaryColor: "#000000",
@@ -28,6 +32,7 @@ describe("getRuntimeTenant", () => {
     const runtimeTenant = getRuntimeTenant(createConstants(true));
 
     expect(runtimeTenant).toEqual(createConstants(true).expoConfig.extra.tenant);
+    expect(getRuntimeTenantDisplayName(createConstants(true))).toBe("Elevate Coach");
     expect(isTenantEnvironmentBadgeVisible(runtimeTenant)).toBe(true);
   });
 
