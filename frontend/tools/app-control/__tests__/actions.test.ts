@@ -1,7 +1,28 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { resolveAction } from "../actions";
 
 describe("resolveAction", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("runs local Android builds with the configured Java 17 toolchain", () => {
+    vi.stubEnv("APP_ANDROID_JAVA_HOME", "/toolchains/java-17");
+    vi.stubEnv("PATH", "/usr/local/bin:/usr/bin");
+
+    expect(
+      resolveAction({
+        action: "run",
+        platform: "android",
+        tenantId: "avihu",
+        environment: "development",
+      }).env
+    ).toMatchObject({
+      JAVA_HOME: "/toolchains/java-17",
+      PATH: "/toolchains/java-17/bin:/usr/local/bin:/usr/bin",
+    });
+  });
+
   it("builds and launches an Android production release with Expo's device selector", () => {
     expect(
       resolveAction({

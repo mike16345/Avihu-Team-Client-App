@@ -1,19 +1,62 @@
+import { existsSync } from "node:fs";
+import { delimiter, join } from "node:path";
 import { getTenant } from "../../config/tenants/registry";
 import type { AppSelection, CommandSpec, CommandStep } from "./types";
 
 export const EAS_CLI_ARGS = ["--yes", "eas-cli@16.27.0"] as const;
 
+const findAndroidJavaHome = (): string => {
+  const override = process.env.APP_ANDROID_JAVA_HOME?.trim();
+  if (override) {
+    return override;
+  }
+
+  const candidates = [
+    process.env.JAVA_HOME_17_ARM64,
+    process.env.JAVA_HOME_17_X64,
+    process.platform === "darwin" ? "/opt/homebrew/opt/openjdk@17" : undefined,
+    process.platform === "darwin" ? "/usr/local/opt/openjdk@17" : undefined,
+    process.platform === "linux" ? "/usr/lib/jvm/java-17-openjdk" : undefined,
+    process.platform === "linux" ? "/usr/lib/jvm/java-17-openjdk-amd64" : undefined,
+  ];
+  const javaExecutable = process.platform === "win32" ? "java.exe" : "java";
+  const javaHome = candidates.find(
+    (candidate): candidate is string =>
+      typeof candidate === "string" && existsSync(join(candidate, "bin", javaExecutable))
+  );
+
+  if (!javaHome) {
+    throw new Error(
+      "Java 17 is required for local Android builds. Install Java 17 or set APP_ANDROID_JAVA_HOME."
+    );
+  }
+
+  return javaHome;
+};
+
+const getAndroidJavaEnvironment = (): Record<string, string> => {
+  const javaHome = findAndroidJavaHome();
+  const existingPath = process.env.PATH ?? "";
+
+  return {
+    JAVA_HOME: javaHome,
+    PATH: [join(javaHome, "bin"), existingPath].filter(Boolean).join(delimiter),
+  };
+};
+
 const createCommandStep = (
   selection: AppSelection,
   command: string,
   args: string[],
-  label: string
+  label: string,
+  extraEnv: Record<string, string> = {}
 ): CommandStep => ({
   command,
   args,
   env: {
     APP_TENANT: selection.tenantId,
     APP_ENV: selection.environment,
+    ...extraEnv,
   },
   label,
 });
@@ -22,8 +65,9 @@ const createCommandSpec = (
   selection: AppSelection,
   command: string,
   args: string[],
-  label: string
-): CommandSpec => createCommandStep(selection, command, args, label);
+  label: string,
+  extraEnv: Record<string, string> = {}
+): CommandSpec => createCommandStep(selection, command, args, label, extraEnv);
 
 export const resolveAction = (selection: AppSelection): CommandSpec => {
   const tenant = getTenant(selection.tenantId);
@@ -50,7 +94,8 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
           ...deviceArguments,
           ...(isRelease ? ["--no-bundler"] : []),
         ],
-        `Build and run ${labelPrefix} on ${selection.platform}`
+        `Build and run ${labelPrefix} on ${selection.platform}`,
+        selection.platform === "android" ? getAndroidJavaEnvironment() : {}
       );
     }
     case "install": {
