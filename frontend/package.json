@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "expo/AppEntry.js",
   "scripts": {
+    "app": "tsx tools/app-control/cli.ts",
     "start": "expo start -c",
     "start-no-clear": "expo start",
     "android": "expo run:android",
