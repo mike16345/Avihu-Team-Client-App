@@ -10,6 +10,7 @@ import Animated, {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import useBackHandler from "@/hooks/useBackHandler";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { getBottomDrawerMaxHeight } from "./bottomDrawerLayout";
 
 type FixedRangeBottomDrawerProps = {
   /** Collapsed height in px – parent decides (e.g. X px above navbar) */
@@ -38,12 +39,16 @@ const FixedRangeBottomDrawer: React.FC<FixedRangeBottomDrawerProps> = ({
   const [isOpenJS, setIsOpenJS] = useState(false); // 👈 NEW
 
   // Maximum height the drawer can reach (fixed distance from top).
-  const maxHeight = useMemo(() => {
-    const bottomOffset = 30;
-    const h = screenHeight - (bottomBarHeight + bottomOffset) - topOffset;
-
-    return Math.max(h, minHeight);
-  }, [screenHeight, topOffset, minHeight]);
+  const maxHeight = useMemo(
+    () =>
+      getBottomDrawerMaxHeight({
+        screenHeight,
+        bottomBarHeight,
+        topOffset,
+        minHeight,
+      }),
+    [screenHeight, bottomBarHeight, topOffset, minHeight]
+  );
 
   // Current height of the drawer.
   const height = useSharedValue(minHeight);
