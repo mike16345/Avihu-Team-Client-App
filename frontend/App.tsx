@@ -21,6 +21,7 @@ import { HtmlRenderProvider } from "@/navigators/providers/HTMLRendererProvider"
 import { useWorkoutSessionExpiryWatcher } from "@/hooks/useWorkoutSessionExpiryWatcher";
 import { linking } from "@/navigators/linking";
 import { navigationRef } from "@/navigators/navigationRef";
+import { TenantEnvironmentBadge } from "@/components/dev/TenantEnvironmentBadge";
 
 export default function App() {
   const ready = useOneTimeRTLFix();
@@ -54,6 +55,7 @@ export default function App() {
                     <Update />
                   </NavigationContainer>
                 </PersistQueryClientProvider>
+                <TenantEnvironmentBadge />
               </View>
             </HtmlRenderProvider>
           </SafeAreaProvider>

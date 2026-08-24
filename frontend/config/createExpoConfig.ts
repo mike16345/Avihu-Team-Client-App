@@ -121,6 +121,7 @@ export const createExpoConfig = ({
         environment,
         brand: tenant.brand,
         featureFlags: tenant.featureFlags,
+        showEnvironmentBadge: environment !== "production",
       },
       ...getPublicRuntimeExtra(processEnv),
     },

@@ -1,5 +1,39 @@
 # Tenant release control
 
+## Daily development
+
+`npm run app` is the authoritative entry point. The interactive selector never silently chooses a
+tenant or production action. For automation, make the tenant and environment explicit:
+
+```sh
+npm run app
+npm run app -- start --tenant avihu --environment development --yes
+npm run app -- run android --tenant avihu --environment development --yes
+npm run app -- preflight --tenant avihu --environment development --yes
+```
+
+Development and internal preview binaries display a small tenant/environment badge. Production
+binaries carry `showEnvironmentBadge: false` in their resolved Expo configuration and never infer
+visibility from `NODE_ENV`.
+
+## Fast versus release preflight
+
+Fast preflight validates tenant selection, required environment names, TypeScript, unit tests, Expo
+compatibility, assets, resolved config, native drift, and platform policy. Release preflight is the
+strict superset: it clean-generates native projects, runs Android lint/bundle and iOS validation,
+checks AAB/R8/source-map artifacts, and runs configured smoke infrastructure.
+
+```sh
+APP_TENANT=avihu APP_ENV=development npm run preflight
+APP_TENANT=avihu APP_ENV=production npm run preflight:release
+```
+
+`PASS` is verified. `WARN` is a documented, non-blocking condition with remediation (for example,
+the current portrait/large-screen decision or unavailable optional tooling). `FAIL` blocks the
+selected action. Never convert a missing credential, device flow, artifact, test, or configuration
+requirement into a warning merely to obtain a green report. Full sanitized logs and optional JSON
+reports are stored under ignored `.preflight/`.
+
 ## Local selector
 
 Use the control center for every build. It pins the EAS CLI and passes only the selected,
@@ -25,7 +59,8 @@ npm run build:android:preview -- --tenant avihu --dry-run
 npm run build:ios:prod -- --tenant avihu --dry-run
 ```
 
-Before a real build, run the same selected preflight locally:
+The selector and legacy aliases automatically run tenant-scoped `preflight:eas` before EAS starts;
+the remote post-install hook repeats it. You can also run the fuller local checks explicitly:
 
 ```sh
 npm run app -- preflight --tenant avihu --environment preview --yes --dry-run
@@ -95,6 +130,40 @@ Confirm `extra.eas.projectId` is `bbbbb60d-eb47-48fb-a278-517aba8dcea2`, `update
 `https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2`, and each bundle/package identity matches
 the tenant configuration.
 
+## Tenant onboarding checklist
+
+1. Copy an existing typed file under `config/tenants/`, change every identity/permission/brand
+   field, and register it in `config/tenants/registry.ts`. Do not put secret values in TypeScript.
+2. Give development a distinct bundle/package identity. Preview and production may share a store
+   identity only when both explicitly set `allowSharedStoreIdentity: true`.
+3. Create `config/tenants/assets/<tenant>/source/app-icon.png`, generate assets, and visually inspect
+   every Apple/Android/notification preview.
+4. Create the tenant's EAS project and its symbolic `development`, `preview`, and `production`
+   environments. Set `APP_TENANT` and the tenant's required runtime variables in that project.
+5. Resolve all three Expo configurations, run fast preflight, then release preflight on supported
+   platforms. Complete the manual device matrix before store submission.
+
+## Asset replacement and cleanup
+
+The source artwork is immutable generator input; never hand-edit generated outputs. To replace it,
+put the approved square PNG at `config/tenants/assets/<tenant>/source/app-icon.png`, then run:
+
+```sh
+npm run assets:generate -- --tenant avihu
+npm run assets:check -- --tenant avihu
+npm run assets:audit -- --tenant avihu
+```
+
+Inspect `generated/previews/` at full size and launcher size. Audit is report-only by default.
+Cleanup removes only `proven-unused` or stale generated files and requires explicit confirmation:
+
+```sh
+npm run assets:audit -- --tenant avihu --clean
+npm run assets:audit -- --tenant avihu --clean --yes
+```
+
+Dynamic or otherwise uncertain references remain `ambiguous` and are never cleanup candidates.
+
 ## Android release shrinking
 
 Avihu enables standard R8 code shrinking and obfuscation together with Android resource shrinking.
@@ -151,6 +220,34 @@ available. Verify the exact release build on a representative Android device:
 
 Record blocked credential or personal-health-data steps as unavailable; never mark them passed
 without exercising them.
+
+## Edge-to-edge and device matrix
+
+Android uses edge-to-edge with live safe-area insets; do not restore `StatusBar.currentHeight`, a
+fixed status-bar color, or `windowOptOutEdgeToEdgeEnforcement`. Before release, test gesture and
+three-button navigation on Android 15 and 16 across headers, floating bottom tabs, shared modals,
+scrolling diet/workout/article/agreement screens, workout wheel, barcode camera, display cutouts,
+and keyboard forms. Check for both overlap and double padding. Portrait phone-only behavior remains
+an intentional warning; this migration does not enable tablets or landscape.
+
+Current automated checks validate source/native ownership, but authenticated, credentialed,
+camera, Health Connect, personal-data, and unavailable device scenarios remain manual until they
+are actually exercised.
+
+## Recovering generated native state
+
+`android/`, `ios/`, `.expo/`, `.preflight/`, and build artifacts are disposable/ignored outputs.
+When native output is stale, preserve any diagnostic log you need, verify the selected tenant, then
+regenerate rather than editing generated files:
+
+```sh
+APP_TENANT=avihu APP_ENV=production npx expo prebuild --clean --no-install --platform android
+APP_TENANT=avihu APP_ENV=production npm run preflight:release
+```
+
+If generation was interrupted, remove only the resolved generated native folder—not the repository
+or tenant source assets—and rerun clean prebuild. Asset generator publication is transactional and
+recovers an interrupted backup on its next run.
 
 ## Troubleshooting
 
