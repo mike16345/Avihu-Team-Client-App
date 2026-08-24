@@ -31,6 +31,31 @@ describe("tenant registry", () => {
     ).toThrow();
   });
 
+  it("rejects malformed semantic app versions", () => {
+    for (const version of ["01.2.3", "1.2.3-a..b"]) {
+      expect(
+        tenantConfigSchema.safeParse({
+          ...avihuTenant,
+          version,
+        }).success
+      ).toBe(false);
+    }
+  });
+
+  it("rejects leading and nested asset traversal segments", () => {
+    for (const icon of ["./../secret.png", "./icons/../secret.png"]) {
+      expect(
+        tenantConfigSchema.safeParse({
+          ...avihuTenant,
+          assets: {
+            ...avihuTenant.assets,
+            icon,
+          },
+        }).success
+      ).toBe(false);
+    }
+  });
+
   it("requires explicit permission when environments share a store identity", () => {
     expect(() =>
       tenantConfigSchema.parse({

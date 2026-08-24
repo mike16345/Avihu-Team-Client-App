@@ -4,13 +4,20 @@ import { TENANT_ENVIRONMENTS, type TenantEnvironment } from "./types";
 const tenantIdSchema = z.string().regex(/^[a-z][a-z0-9-]*$/);
 const semanticVersionSchema = z
   .string()
-  .regex(/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/);
+  .regex(
+    /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/
+  );
 const appleBundleIdentifierSchema = z.string().regex(/^[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$/);
 const androidPackageSchema = z
   .string()
   .regex(/^[A-Za-z][A-Za-z0-9_]*(?:\.[A-Za-z][A-Za-z0-9_]*)+$/);
 const schemeSchema = z.string().regex(/^[a-z][a-z0-9+.-]*$/);
-const assetPathSchema = z.string().regex(/^\.\/(?!.*(?:^|\/)\.\.(?:\/|$))[^\0]+$/);
+const assetPathSchema = z
+  .string()
+  .regex(/^\.\/[^\0\\]+$/)
+  .refine((assetPath) => !assetPath.split("/").includes(".."), {
+    message: "Asset paths cannot contain traversal segments",
+  });
 const permissionDescriptionSchema = z.string().trim().min(1);
 const environmentVariableNameSchema = z.string().regex(/^[A-Z][A-Z0-9_]*$/);
 const hexColorSchema = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
