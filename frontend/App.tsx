@@ -22,6 +22,7 @@ import { useWorkoutSessionExpiryWatcher } from "@/hooks/useWorkoutSessionExpiryW
 import { linking } from "@/navigators/linking";
 import { navigationRef } from "@/navigators/navigationRef";
 import { TenantEnvironmentBadge } from "@/components/dev/TenantEnvironmentBadge";
+import { DeveloperToolsProvider } from "@/devtools/DeveloperToolsProvider";
 
 export default function App() {
   const ready = useOneTimeRTLFix();
@@ -48,14 +49,16 @@ export default function App() {
                   client={queryClient}
                   persistOptions={{ persister: persister }}
                 >
-                  <NavigationContainer ref={navigationRef} linking={linking}>
-                    <RootNavigator />
-                    <StatusBar key={colorScheme} style={"dark"} />
-                    <ToastContainer />
-                    <Update />
-                  </NavigationContainer>
+                  <DeveloperToolsProvider>
+                    <NavigationContainer ref={navigationRef} linking={linking}>
+                      <RootNavigator />
+                      <StatusBar key={colorScheme} style={"dark"} />
+                      <ToastContainer />
+                      <Update />
+                    </NavigationContainer>
+                    <TenantEnvironmentBadge />
+                  </DeveloperToolsProvider>
                 </PersistQueryClientProvider>
-                <TenantEnvironmentBadge />
               </View>
             </HtmlRenderProvider>
           </SafeAreaProvider>

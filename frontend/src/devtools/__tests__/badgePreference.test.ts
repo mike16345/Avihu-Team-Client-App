@@ -40,8 +40,6 @@ describe("badge preference repository", () => {
   });
 
   it("constructs a tenant-scoped stable preference key", () => {
-    expect(getBadgePreferenceKey("future-coach")).toBe(
-      "@developer-tools/future-coach/show-badge"
-    );
+    expect(getBadgePreferenceKey("future-coach")).toBe("@developer-tools/future-coach/show-badge");
   });
 });

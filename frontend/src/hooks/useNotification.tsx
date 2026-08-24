@@ -128,8 +128,8 @@ export const useNotification = () => {
         }),
       });
       return identifier;
-    } catch (error) {
-      console.log(error);
+    } catch {
+      console.error("[notifications] scheduling failed");
     }
   };
 
