@@ -9,7 +9,7 @@ const TEXT_FILE_PATTERNS = [
   "config/**/*.{js,jsx,ts,tsx,json}",
   "tools/**/*.{js,jsx,ts,tsx,json}",
   "plugins/**/*.{js,jsx,ts,tsx,json}",
-  "native-modules/**/*.{js,jsx,ts,tsx,json}",
+  "native-modules/**/*.{js,jsx,ts,tsx,json,java,kt,kts,xml,gradle,properties,m,mm,swift,h,plist,pbxproj}",
   "android/**/*.{java,kt,kts,xml,gradle,properties,json}",
   "ios/**/*.{m,mm,swift,h,plist,pbxproj,json}",
 ];
@@ -23,12 +23,17 @@ const EXCLUDED_DIRECTORIES = [
 ];
 const STATIC_ASSET_STRING = /["']([^"'\n]+\.(?:png|jpe?g|svg|webp|gif|ttf|otf))["']/gi;
 const STATIC_TEMPLATE_ASSET_STRING = /`([^`$\n]+\.(?:png|jpe?g|svg|webp|gif|ttf|otf))`/gi;
+const XML_ASSET_STRING = /<string>\s*([^<\s]+\.(?:png|jpe?g|svg|webp|gif|ttf|otf))\s*<\/string>/gi;
 const TEMPLATE_STRING = /`([^`]*\$\{[^}]+\}[^`]*)`/g;
-const LOADER_EXPRESSION = /\b(?:require|import)\(\s*([^()\n]+)\)/g;
+const LOADER_CALL_START = /\b(?:require|import)\s*\(/g;
 const STATIC_LOADER_LITERAL = /^\s*(?:"([^"]+)"|'([^']+)'|`([^`$]+)`)\s*$/;
 const CONCATENATED_PREFIX = /^\s*(?:"([^"]*)"|'([^']*)'|`([^`$]*)`)\s*\+/;
 const DIRECTORY_ASSET_DECLARATION = /\bassets\s*:\s*\[([\s\S]*?)\]/g;
 const DIRECTORY_STRING = /"([^"]+)"|'([^']+)'|`([^`$]+)`/g;
+
+interface LoaderCall {
+  expression?: string;
+}
 
 export interface AssetReferenceCollection {
   staticPaths: Set<string>;
@@ -87,6 +92,56 @@ const getDynamicPrefix = (expression: string) => {
 
   const lastSlash = prefix.lastIndexOf("/");
   return lastSlash >= 0 ? prefix.slice(0, lastSlash + 1) : undefined;
+};
+
+const findLoaderCalls = (contents: string): LoaderCall[] => {
+  const calls: LoaderCall[] = [];
+
+  while (LOADER_CALL_START.exec(contents)) {
+    const openingParenthesis = LOADER_CALL_START.lastIndex - 1;
+    let depth = 1;
+    let quote: '"' | "'" | "`" | undefined;
+    let escaped = false;
+    let closingParenthesis = -1;
+
+    for (let index = openingParenthesis + 1; index < contents.length; index += 1) {
+      const character = contents[index];
+      if (quote) {
+        if (escaped) {
+          escaped = false;
+        } else if (character === "\\") {
+          escaped = true;
+        } else if (character === quote) {
+          quote = undefined;
+        }
+        continue;
+      }
+
+      if (character === '"' || character === "'" || character === "`") {
+        quote = character;
+        continue;
+      }
+      if (character === "(") {
+        depth += 1;
+      } else if (character === ")") {
+        depth -= 1;
+        if (depth === 0) {
+          closingParenthesis = index;
+          break;
+        }
+      }
+    }
+
+    if (closingParenthesis === -1) {
+      calls.push({});
+      LOADER_CALL_START.lastIndex = openingParenthesis + 1;
+    } else {
+      calls.push({ expression: contents.slice(openingParenthesis + 1, closingParenthesis) });
+      LOADER_CALL_START.lastIndex = closingParenthesis + 1;
+    }
+  }
+
+  return calls;
 };
 
 const addStaticReferences = (
@@ -162,12 +217,19 @@ export const collectAssetReferences = async ({
       addStaticReferences(collection, match[1], sourceFile, resolvedProjectRoot, tenantId);
     }
 
+    for (const match of contents.matchAll(XML_ASSET_STRING)) {
+      addStaticReferences(collection, match[1], sourceFile, resolvedProjectRoot, tenantId);
+    }
+
     for (const match of contents.matchAll(TEMPLATE_STRING)) {
       addDynamicDirectories(collection, match[1], sourceFile, resolvedProjectRoot, tenantId);
     }
 
-    for (const match of contents.matchAll(LOADER_EXPRESSION)) {
-      const expression = match[1];
+    for (const { expression } of findLoaderCalls(contents)) {
+      if (!expression) {
+        collection.opaqueLoaderSources.push(toPosix(path.relative(projectRoot, sourceFile)));
+        continue;
+      }
       const staticLiteral = expression.match(STATIC_LOADER_LITERAL);
       if (staticLiteral) {
         const value = staticLiteral.slice(1).find(Boolean);

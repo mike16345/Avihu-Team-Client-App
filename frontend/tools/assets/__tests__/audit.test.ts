@@ -51,6 +51,25 @@ const cleanupCandidates = [
   "config/tenants/assets/avihu/generated/stale.png",
 ];
 
+const nestedOpaqueLoaderCases = [
+  {
+    name: "a nested require call",
+    source: "const image = require(getAssetPath());\n",
+  },
+  {
+    name: "a nested path join require call",
+    source: 'const image = require(path.join("../assets", name));\n',
+  },
+  {
+    name: "a nested dynamic import call",
+    source: "const image = import(resolveAsset(name));\n",
+  },
+  {
+    name: "an unbalanced loader call",
+    source: "const image = require(getAssetPath();\n",
+  },
+];
+
 describe("auditAssets", () => {
   let projectRoot: string;
 
@@ -216,6 +235,19 @@ describe("auditAssets", () => {
     );
   });
 
+  it.each(nestedOpaqueLoaderCases)("blocks deletion for $name", async ({ source }, caseIndex) => {
+    const assetPath = `assets/nested-opaque-${caseIndex}.png`;
+    await Promise.all([
+      writeFixtureFile(projectRoot, assetPath),
+      writeFixtureFile(projectRoot, `src/nested-opaque-${caseIndex}.ts`, source),
+    ]);
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual([]);
+    await expect(readFile(path.join(projectRoot, assetPath), "utf8")).resolves.toBe("asset");
+  });
+
   it("retains native-module references and registered asset directories during cleanup", async () => {
     await Promise.all([
       writeFixtureFile(projectRoot, "assets/native-module.png"),
@@ -250,6 +282,42 @@ describe("auditAssets", () => {
 
     await expect(auditAssets({ projectRoot, tenantId: TENANT_ID })).rejects.toThrow(
       "outside approved asset roots"
+    );
+  });
+
+  it("retains Kotlin, Swift, and plist native-module asset references during cleanup", async () => {
+    await Promise.all([
+      writeFixtureFile(projectRoot, "assets/native-kotlin.png"),
+      writeFixtureFile(projectRoot, "assets/native-swift.png"),
+      writeFixtureFile(projectRoot, "assets/native-plist.png"),
+      writeFixtureFile(
+        projectRoot,
+        "native-modules/android/Assets.kt",
+        'val image = "../../assets/native-kotlin.png"\n'
+      ),
+      writeFixtureFile(
+        projectRoot,
+        "native-modules/ios/Assets.swift",
+        'let image = "../../assets/native-swift.png"\n'
+      ),
+      writeFixtureFile(
+        projectRoot,
+        "native-modules/ios/Info.plist",
+        "<string>../../assets/native-plist.png</string>\n"
+      ),
+    ]);
+
+    const report = await auditAssets({ projectRoot, tenantId: TENANT_ID, clean: true, yes: true });
+
+    expect(report.deleted).toEqual(cleanupCandidates);
+    await expect(
+      readFile(path.join(projectRoot, "assets/native-kotlin.png"), "utf8")
+    ).resolves.toBe("asset");
+    await expect(readFile(path.join(projectRoot, "assets/native-swift.png"), "utf8")).resolves.toBe(
+      "asset"
+    );
+    await expect(readFile(path.join(projectRoot, "assets/native-plist.png"), "utf8")).resolves.toBe(
+      "asset"
     );
   });
 
