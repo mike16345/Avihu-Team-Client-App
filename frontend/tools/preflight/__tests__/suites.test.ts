@@ -180,9 +180,12 @@ describe("preflight suite composition", () => {
     const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-suite-"));
     temporaryRoots.push(root);
     const bundleRoot = path.join(root, "android", "app", "build", "outputs", "bundle", "release");
+    const mappingRoot = path.join(root, "android", "app", "build", "outputs", "mapping", "release");
     await mkdir(bundleRoot, { recursive: true });
+    await mkdir(mappingRoot, { recursive: true });
     await writeFile(path.join(root, "android", "gradlew"), "fixture wrapper");
     await writeFile(path.join(bundleRoot, "app-release.aab"), "fixture bundle");
+    await writeFile(path.join(mappingRoot, "mapping.txt"), "fixture mapping");
     const calls: ProcessSpec[] = [];
     const context = createContext({
       projectRoot: root,
@@ -411,8 +414,19 @@ describe("injected process checks", () => {
         calls.push(spec);
         if (spec.args[0] === "bundleRelease") {
           const output = path.join(root, "android", "app", "build", "outputs", "bundle", "release");
+          const mapping = path.join(
+            root,
+            "android",
+            "app",
+            "build",
+            "outputs",
+            "mapping",
+            "release"
+          );
           await mkdir(output, { recursive: true });
+          await mkdir(mapping, { recursive: true });
           await writeFile(path.join(output, "app-release.aab"), "bundle");
+          await writeFile(path.join(mapping, "mapping.txt"), "mapping");
         }
         return { exitCode: 0, stdout: "", stderr: "" };
       },
@@ -423,7 +437,7 @@ describe("injected process checks", () => {
       summary: "valid",
     }));
 
-    await android.bundle.run(context);
+    const result = await android.bundle.run(context);
 
     expect(calls).toEqual([
       {
@@ -439,6 +453,39 @@ describe("injected process checks", () => {
         env: { APP_TENANT: "avihu", APP_ENV: "development" },
       },
     ]);
+    expect(result).toMatchObject({
+      status: "pass",
+      details: [expect.stringContaining("(6 B)"), expect.stringContaining("(7 B)")],
+    });
+  });
+
+  it("fails a completed Android bundle when R8 mapping output is missing", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "avihu-preflight-gradle-mapping-"));
+    temporaryRoots.push(root);
+    await mkdir(path.join(root, "android"), { recursive: true });
+    await writeFile(path.join(root, "android", "gradlew"), "wrapper");
+    const context = createContext({
+      projectRoot: root,
+      runner: async (spec) => {
+        if (spec.args[0] === "bundleRelease") {
+          const output = path.join(root, "android", "app", "build", "outputs", "bundle", "release");
+          await mkdir(output, { recursive: true });
+          await writeFile(path.join(output, "app-release.aab"), "bundle");
+        }
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+    });
+    const result = await createAndroidReleaseChecks(async () => ({
+      status: "pass",
+      check: "native.android-post-prebuild",
+      summary: "valid",
+    })).bundle.run(context);
+
+    expect(result).toMatchObject({
+      status: "fail",
+      check: "android.bundle-release",
+      summary: "Gradle completed without a nonempty R8 mapping file",
+    });
   });
 
   it("filters platform policy and release checks to the tenant's supported platforms", () => {

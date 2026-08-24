@@ -95,6 +95,62 @@ Confirm `extra.eas.projectId` is `bbbbb60d-eb47-48fb-a278-517aba8dcea2`, `update
 `https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2`, and each bundle/package identity matches
 the tenant configuration.
 
+## Android release shrinking
+
+Avihu enables standard R8 code shrinking, optimization, and obfuscation together with Android
+resource shrinking. Removing unreachable bytecode and unused packaged resources reduces download
+and installed size; loading less code and fewer resources can also improve startup and memory use,
+but those runtime effects must be measured on release builds. The Expo options affect only the
+Gradle `release` build type, so development/debug builds remain unminified. R8 full mode is not
+enabled.
+
+Generate and inspect the native project before a release build:
+
+```sh
+APP_TENANT=avihu APP_ENV=production npx expo prebuild --clean --no-install --platform android
+rg 'enableProguardInReleaseBuilds|enableShrinkResourcesInReleaseBuilds' android/gradle.properties
+rg 'minifyEnabled|shrinkResources' android/app/build.gradle
+```
+
+Both properties must be `true`, and `minifyEnabled`/`shrinkResources` must be wired only inside the
+`release` build type. Use Java 17 for the Expo SDK 53 Android toolchain on machines whose default
+Java is newer, then run the selected release preflight. Its artifact report records sizes and
+requires both files to be nonempty:
+
+```sh
+APP_TENANT=avihu APP_ENV=production npm run preflight:release
+```
+
+- AAB: `android/app/build/outputs/bundle/release/app-release.aab`
+- R8 mapping: `android/app/build/outputs/mapping/release/mapping.txt`
+- Full preflight logs and JSON output, when requested: `.preflight/`
+
+Archive the mapping file with the exact AAB that produced it. Android crash stacks from an
+obfuscated release require that matching mapping to restore original class and method names.
+
+If R8 exposes a native-library failure, reproduce it in a release build and identify the affected
+library/reflection boundary before changing rules. Add only the narrow keep rule supported by that
+evidence, and record the library and rationale. Do not enable R8 full mode, add broad keep rules,
+use `-dontobfuscate`, or edit generated `android/` files. For temporary rollback after release-owner
+approval, set the two tenant build-properties flags to `false`, clean-prebuild Android, and rebuild;
+restore shrinking after the affected integration is corrected.
+
+Device smoke remains a manual release gate when no authorized emulator/device and test accounts are
+available. Verify the exact release build on a representative Android device:
+
+- Cold startup and Expo Updates startup/restart
+- Login and session restoration
+- Barcode scanner and camera permission
+- Health Connect authorization and data read
+- Notification registration and receipt
+- Background-task registration and execution
+- Diet-plan history
+- PDF viewing
+- Signature capture and submission
+
+Record blocked credential or personal-health-data steps as unavailable; never mark them passed
+without exercising them.
+
 ## Troubleshooting
 
 - `APP_TENANT is required`: set it in the tenant's selected EAS environment, or use a selector
@@ -107,3 +163,10 @@ the tenant configuration.
   then regenerate any disposable native output.
 - EAS environment verification is ambiguous: select the intended tenant EAS project first, then
   rerun the matching `eas env:list --environment <name>` command above.
+- Android Gradle fails while parsing a Java version: select an installed Java 17 runtime for the
+  command and rerun; do not treat a toolchain failure as an R8 keep-rule failure.
+- Android lint blocks the bundle: inspect
+  `android/app/build/intermediates/lint_intermediate_text_report/release/lintReportRelease/lint-results-release.txt`,
+  fix the source/config-plugin cause, clean-prebuild, and rerun the full release preflight.
+- `bundletool` is unavailable: install it and rerun preflight for structural AAB validation. A
+  missing analyzer does not replace the required nonempty AAB and mapping checks.

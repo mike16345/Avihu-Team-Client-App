@@ -57,6 +57,19 @@ export const findReleaseAab = async (projectRoot: string) => {
   );
 };
 
+const getReleaseMappingPath = (projectRoot: string) =>
+  path.join(projectRoot, "android", "app", "build", "outputs", "mapping", "release", "mapping.txt");
+
+const formatBytes = (bytes: number) => {
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+  if (bytes < 1024 * 1024) {
+    return `${(bytes / 1024).toFixed(1)} KiB`;
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`;
+};
+
 export const createCleanPrebuildCheck = (
   platforms: readonly ("ios" | "android")[] = ["ios", "android"]
 ): CheckDefinition<ProcessPreflightContext> => {
@@ -154,15 +167,44 @@ export const createAndroidReleaseChecks = (
 
         const aabPath = await findReleaseAab(context.projectRoot);
         const aabStats = aabPath ? await lstat(aabPath) : undefined;
-        return aabPath && aabStats?.isFile() && !aabStats.isSymbolicLink() && aabStats.size > 0
-          ? { ...result, details: [`AAB: ${aabPath}`] }
-          : {
-              status: "fail",
-              check: "android.bundle-release",
-              summary: "Gradle completed without a release AAB",
-              remediation:
-                "Inspect android/app/build/outputs/bundle, then rerun the release bundle task.",
-            };
+        if (!aabPath || !aabStats?.isFile() || aabStats.isSymbolicLink() || aabStats.size === 0) {
+          return {
+            status: "fail",
+            check: "android.bundle-release",
+            summary: "Gradle completed without a release AAB",
+            remediation:
+              "Inspect android/app/build/outputs/bundle, then rerun the release bundle task.",
+          };
+        }
+
+        const mappingPath = getReleaseMappingPath(context.projectRoot);
+        let mappingStats: Awaited<ReturnType<typeof lstat>> | undefined;
+        try {
+          mappingStats = await lstat(mappingPath);
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+            throw error;
+          }
+          mappingStats = undefined;
+        }
+        if (!mappingStats?.isFile() || mappingStats.isSymbolicLink() || mappingStats.size === 0) {
+          return {
+            status: "fail",
+            check: "android.bundle-release",
+            summary: "Gradle completed without a nonempty R8 mapping file",
+            details: [`Expected: ${mappingPath}`],
+            remediation:
+              "Confirm release minification is enabled, then rerun the release bundle task.",
+          };
+        }
+
+        return {
+          ...result,
+          details: [
+            `AAB: ${aabPath} (${formatBytes(aabStats.size)})`,
+            `R8 mapping: ${mappingPath} (${formatBytes(mappingStats.size)})`,
+          ],
+        };
       }),
   };
   const bundleNode = memoizedDefinition(bundle);
