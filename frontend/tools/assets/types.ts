@@ -1,5 +1,6 @@
 export const GENERATOR_VERSION = 1 as const;
 export const ADAPTIVE_SAFE_ZONE_RATIO = 0.66;
+export const ADAPTIVE_MINIMUM_SAFE_ZONE_UTILIZATION = 0.9;
 export const NOTIFICATION_ALPHA_THRESHOLD = 128;
 export const NOTIFICATION_LUMINANCE_THRESHOLD = 176;
 
@@ -36,6 +37,7 @@ export interface AssetManifest {
   tenantId: string;
   rules: {
     adaptiveSafeZoneRatio: number;
+    adaptiveMinimumSafeZoneUtilization: number;
     notificationMask: string;
   };
   source: ManifestImage;

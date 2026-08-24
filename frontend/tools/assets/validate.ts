@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import sharp from "sharp";
 import { getTenantAssetPaths, toManifestPath } from "./paths";
 import {
+  ADAPTIVE_MINIMUM_SAFE_ZONE_UTILIZATION,
   ADAPTIVE_SAFE_ZONE_RATIO,
   ASSET_OUTPUT_FILES,
   GENERATOR_VERSION,
@@ -100,6 +101,9 @@ const validateAdaptiveForeground = async (filePath: string): Promise<CheckResult
   const visibleWidth = right >= left ? right - left + 1 : 0;
   const visibleHeight = bottom >= top ? bottom - top + 1 : 0;
   const maximumVisibleSize = Math.ceil(info.width * ADAPTIVE_SAFE_ZONE_RATIO);
+  const minimumVisibleSize = Math.floor(
+    maximumVisibleSize * ADAPTIVE_MINIMUM_SAFE_ZONE_UTILIZATION
+  );
   const safeZoneInset = Math.floor((info.width - maximumVisibleSize) / 2);
   const fitsCenteredSafeZone =
     left >= safeZoneInset &&
@@ -111,6 +115,7 @@ const validateAdaptiveForeground = async (filePath: string): Promise<CheckResult
     visibleHeight > 0 &&
     visibleWidth <= maximumVisibleSize &&
     visibleHeight <= maximumVisibleSize &&
+    Math.max(visibleWidth, visibleHeight) >= minimumVisibleSize &&
     transparentPixels > 0 &&
     fitsCenteredSafeZone;
 
@@ -119,7 +124,7 @@ const validateAdaptiveForeground = async (filePath: string): Promise<CheckResult
     ok,
     message: ok
       ? `Visible artwork fits inside the centered ${ADAPTIVE_SAFE_ZONE_RATIO} safe-zone ratio`
-      : `Visible artwork must be nonempty, fit the centered safe zone, and be transparent outside it`,
+      : `Visible artwork must use at least ${minimumVisibleSize}px, fit the centered safe zone, and be transparent outside it`,
   };
 };
 
