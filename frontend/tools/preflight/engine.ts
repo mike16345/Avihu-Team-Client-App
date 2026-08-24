@@ -14,7 +14,10 @@ const DEFAULT_CONTEXT: PreflightContext = {
   environment: "unknown",
 };
 
-const getCheckId = (definition: CheckInput, index: number) => {
+const getCheckId = <TContext extends PreflightContext>(
+  definition: CheckInput<TContext>,
+  index: number
+) => {
   if (typeof definition === "function") {
     return definition.check || definition.id || definition.name || `check-${index + 1}`;
   }
@@ -22,7 +25,9 @@ const getCheckId = (definition: CheckInput, index: number) => {
   return definition.check;
 };
 
-const getRunner = (definition: CheckInput): CheckRunner => {
+const getRunner = <TContext extends PreflightContext>(
+  definition: CheckInput<TContext>
+): CheckRunner<TContext> => {
   if (typeof definition === "function") {
     return definition;
   }
@@ -51,10 +56,10 @@ const countResults = (results: readonly CheckResult[]): PreflightCounts =>
     { pass: 0, warn: 0, fail: 0 }
   );
 
-const runCheck = async (
-  definition: CheckInput,
+const runCheck = async <TContext extends PreflightContext>(
+  definition: CheckInput<TContext>,
   index: number,
-  context: Readonly<PreflightContext>
+  context: Readonly<TContext>
 ): Promise<CheckResult> => {
   const check = getCheckId(definition, index);
 
@@ -76,9 +81,9 @@ const runCheck = async (
   }
 };
 
-export const runChecks = async (
-  definitions: readonly CheckInput[],
-  context: PreflightContext = DEFAULT_CONTEXT
+export const runChecks = async <TContext extends PreflightContext = PreflightContext>(
+  definitions: readonly CheckInput<TContext>[],
+  context: TContext = DEFAULT_CONTEXT as TContext
 ): Promise<PreflightReport> => {
   const immutableContext = Object.freeze({ ...DEFAULT_CONTEXT, ...context });
   const results = await Promise.all(
