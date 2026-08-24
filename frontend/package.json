@@ -109,13 +109,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@clack/prompts": "^1.7.0",
+    "@clack/prompts": "1.7.0",
     "@expo/config": "~11.0.13",
     "@types/react": "~19.0.10",
     "dotenv-cli": "^7.4.4",
-    "fast-glob": "^3.3.3",
-    "sharp": "^0.35.3",
-    "tsx": "^4.23.12",
+    "fast-glob": "3.3.3",
+    "sharp": "0.35.3",
+    "tsx": "4.23.12",
     "typescript": "~5.8.3",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
