@@ -32,13 +32,43 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
   switch (selection.action) {
     case "start":
       return createCommandSpec(selection, "npx", ["expo", "start", "-c"], `Start ${labelPrefix}`);
-    case "run":
+    case "run": {
+      const isRelease = selection.environment !== "development";
+      const buildArguments =
+        selection.platform === "android"
+          ? ["--variant", isRelease ? "release" : "debug"]
+          : ["--configuration", isRelease ? "Release" : "Debug"];
+      const deviceArguments = selection.device ? ["--device", selection.device] : ["--device"];
+
       return createCommandSpec(
         selection,
         "npx",
-        ["expo", `run:${selection.platform}`],
-        `Run ${labelPrefix} on ${selection.platform}`
+        [
+          "expo",
+          `run:${selection.platform}`,
+          ...buildArguments,
+          ...deviceArguments,
+          ...(isRelease ? ["--no-bundler"] : []),
+        ],
+        `Build and run ${labelPrefix} on ${selection.platform}`
       );
+    }
+    case "install": {
+      const deviceArguments = selection.device ? ["--device", selection.device] : ["--device"];
+      return createCommandSpec(
+        selection,
+        "npx",
+        [
+          "expo",
+          `run:${selection.platform}`,
+          "--binary",
+          selection.binaryPath,
+          ...deviceArguments,
+          "--no-bundler",
+        ],
+        `Install ${labelPrefix} on ${selection.platform}`
+      );
+    }
     case "preflight":
       return createCommandSpec(
         selection,

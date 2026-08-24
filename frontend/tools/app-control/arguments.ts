@@ -42,7 +42,7 @@ const parsePlatform = (
     throw new Error(`Unsupported platform "${value}"`);
   }
 
-  if (action !== "build" && action !== "run") {
+  if (action !== "build" && action !== "run" && action !== "install") {
     throw new Error(`Action "${action}" does not support platform "${value}"`);
   }
 
@@ -110,6 +110,13 @@ const assertConfirmedArguments = (arguments_: ParsedAppArguments): void => {
     requireConfirmedValue(arguments_.platform, "platform");
   }
 
+  if (arguments_.action === "install") {
+    requireConfirmedValue(arguments_.platform, "platform");
+    if (!arguments_.binaryPath) {
+      throw new Error("--binary is required for install in non-interactive mode");
+    }
+  }
+
   if (arguments_.action === "assets") {
     requireConfirmedValue(arguments_.assetOperation, "asset operation");
   }
@@ -141,6 +148,8 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
       tenant: { type: "string" },
       environment: { type: "string" },
       profile: { type: "string" },
+      binary: { type: "string" },
+      device: { type: "string" },
       yes: { type: "boolean", default: false },
       "dry-run": { type: "boolean", default: false },
     },
@@ -156,6 +165,7 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
   if (
     action !== "build" &&
     action !== "run" &&
+    action !== "install" &&
     operationOrPlatform &&
     isOneOf(APP_PLATFORMS, operationOrPlatform)
   ) {
@@ -163,7 +173,9 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
   }
 
   const platform =
-    action === "build" || action === "run" ? parsePlatform(action, operationOrPlatform) : undefined;
+    action === "build" || action === "run" || action === "install"
+      ? parsePlatform(action, operationOrPlatform)
+      : undefined;
   const profile = parseReleaseProfile(values.profile);
   const environment = resolveEnvironment(action, values.environment, profile);
   const preflightMode =
@@ -173,6 +185,7 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
   if (
     action !== "build" &&
     action !== "run" &&
+    action !== "install" &&
     operationOrPlatform &&
     action !== "preflight" &&
     action !== "assets"
@@ -182,6 +195,14 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
 
   if (action !== "build" && profile) {
     throw new Error("--profile is only supported for build actions");
+  }
+
+  if (action !== "install" && values.binary) {
+    throw new Error("--binary is only supported for install actions");
+  }
+
+  if (action !== "run" && action !== "install" && values.device) {
+    throw new Error("--device is only supported for run and install actions");
   }
 
   if (action === "update" && environment === "development") {
@@ -200,6 +221,8 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
     profile,
     preflightMode,
     assetOperation,
+    binaryPath: values.binary,
+    device: values.device,
     confirmed: values.yes,
     dryRun: values["dry-run"],
   } satisfies ParsedAppArguments;

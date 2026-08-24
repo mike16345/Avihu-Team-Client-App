@@ -1,4 +1,6 @@
-import { box, cancel, confirm, isCancel, select } from "@clack/prompts";
+import { existsSync, statSync } from "node:fs";
+import { resolve } from "node:path";
+import { box, cancel, confirm, isCancel, path as pathPrompt, select } from "@clack/prompts";
 import { getTenant, listTenants } from "../../config/tenants/registry";
 import { TENANT_ENVIRONMENTS, type TenantEnvironment } from "../../config/tenants/types";
 import type {
@@ -11,14 +13,8 @@ import type {
   ReleaseProfile,
 } from "./types";
 
-const ACTION_OPTIONS: Array<{ value: AppAction; label: string }> = [
-  { value: "start", label: "Start development server" },
-  { value: "run", label: "Run on a device or simulator" },
-  { value: "preflight", label: "Run preflight" },
-  { value: "assets", label: "Manage tenant assets" },
-  { value: "build", label: "Build with EAS" },
-  { value: "update", label: "Publish an update" },
-];
+const APP_AREAS = ["develop", "verify", "release", "assets"] as const;
+type AppArea = (typeof APP_AREAS)[number];
 
 const isPromptCancelled = <Value>(value: Value): value is Value & symbol => isCancel(value);
 
@@ -30,15 +26,25 @@ const formatAction = (selection: AppSelection): string => {
       return `${selection.operation} assets`;
     case "build":
       return `${selection.profile} build`;
-    default:
-      return selection.action;
+    case "install":
+      return "install existing build";
+    case "run":
+      return `build, install & launch (${selection.environment === "development" ? "Debug" : "Release"})`;
+    case "start":
+      return "start development server";
+    case "update":
+      return "publish update";
   }
 };
 
 const formatEquivalentCommand = (selection: AppSelection): string => {
   const parts = ["npm run app --", selection.action];
 
-  if (selection.action === "run" || selection.action === "build") {
+  if (
+    selection.action === "run" ||
+    selection.action === "install" ||
+    selection.action === "build"
+  ) {
     parts.push(selection.platform);
   }
 
@@ -58,6 +64,14 @@ const formatEquivalentCommand = (selection: AppSelection): string => {
     parts.push("--environment", selection.environment);
   }
 
+  if (selection.action === "install") {
+    parts.push("--binary", JSON.stringify(selection.binaryPath));
+  }
+
+  if ((selection.action === "run" || selection.action === "install") && selection.device) {
+    parts.push("--device", JSON.stringify(selection.device));
+  }
+
   parts.push("--yes");
   return parts.join(" ");
 };
@@ -66,7 +80,7 @@ export const printSelectionSummary = (selection: AppSelection): void => {
   const tenant = getTenant(selection.tenantId);
   const identity = tenant.environments[selection.environment];
   const identityLines =
-    selection.action === "run" || selection.action === "build"
+    selection.action === "run" || selection.action === "install" || selection.action === "build"
       ? selection.platform === "android"
         ? [`Android package: ${identity.androidPackage}`]
         : [`iOS bundle ID: ${identity.iosBundleIdentifier}`]
@@ -82,7 +96,7 @@ export const printSelectionSummary = (selection: AppSelection): void => {
       `Environment: ${selection.environment}`,
       `Platform: ${"platform" in selection ? selection.platform : "not platform-specific"}`,
       ...identityLines,
-      `Non-interactive: ${formatEquivalentCommand(selection)}`,
+      `Repeat command: ${formatEquivalentCommand(selection)}`,
     ].join("\n"),
     "App control summary"
   );
@@ -102,11 +116,51 @@ const chooseTenant = async (initialValue?: string): Promise<string | null> => {
   return isPromptCancelled(tenantId) ? null : tenantId;
 };
 
+const chooseArea = async (): Promise<AppArea | null> => {
+  const area = await select({
+    message: "What do you want to do?",
+    options: [
+      { value: "develop" as const, label: "Develop & run" },
+      { value: "verify" as const, label: "Verify app" },
+      { value: "release" as const, label: "Release app" },
+      { value: "assets" as const, label: "Manage assets" },
+    ],
+  });
+
+  return isPromptCancelled(area) ? null : area;
+};
+
 const chooseAction = async (initialValue?: AppAction): Promise<AppAction | null> => {
+  if (initialValue) {
+    return initialValue;
+  }
+
+  const area = await chooseArea();
+  if (!area) {
+    return null;
+  }
+
+  if (area === "verify") {
+    return "preflight";
+  }
+
+  if (area === "assets") {
+    return "assets";
+  }
+
   const action = await select({
-    message: "Select action",
-    options: ACTION_OPTIONS,
-    initialValue,
+    message: area === "develop" ? "Select development action" : "Select release action",
+    options:
+      area === "develop"
+        ? [
+            { value: "start" as const, label: "Start development server" },
+            { value: "run" as const, label: "Build, install & launch" },
+            { value: "install" as const, label: "Install an existing build" },
+          ]
+        : [
+            { value: "build" as const, label: "Build with EAS" },
+            { value: "update" as const, label: "Publish an update" },
+          ],
   });
 
   return isPromptCancelled(action) ? null : action;
@@ -139,6 +193,29 @@ const choosePlatform = async (initialValue?: AppPlatform): Promise<AppPlatform |
   });
 
   return isPromptCancelled(platform) ? null : platform;
+};
+
+const chooseBinaryPath = async (initialValue?: string): Promise<string | null> => {
+  const binaryPath = await pathPrompt({
+    message: "Select the existing app build",
+    root: process.cwd(),
+    initialValue,
+    validate: (value) => {
+      if (!value) {
+        return "Select a build file";
+      }
+      const absolutePath = resolve(value);
+      if (!existsSync(absolutePath)) {
+        return "Build file does not exist";
+      }
+      if (!statSync(absolutePath).isFile()) {
+        return "Select a build file, not a directory";
+      }
+      return undefined;
+    },
+  });
+
+  return isPromptCancelled(binaryPath) ? null : resolve(binaryPath);
 };
 
 const choosePreflightMode = async (initialValue?: PreflightMode): Promise<PreflightMode | null> => {
@@ -214,7 +291,25 @@ export const promptForSelection = async (
       return null;
     }
 
-    return { action, tenantId, environment, platform };
+    return { action, tenantId, environment, platform, device: parsed.device };
+  }
+
+  if (action === "install") {
+    const platform = parsed.platform ?? (await choosePlatform());
+    const binaryPath = parsed.binaryPath ?? (await chooseBinaryPath());
+    if (!platform || !binaryPath) {
+      cancel("Operation cancelled.");
+      return null;
+    }
+
+    return {
+      action,
+      tenantId,
+      environment,
+      platform,
+      binaryPath,
+      device: parsed.device,
+    };
   }
 
   if (action === "preflight") {

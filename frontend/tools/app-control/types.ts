@@ -1,6 +1,14 @@
 import type { TenantEnvironment } from "../../config/tenants/types";
 
-export const APP_ACTIONS = ["start", "run", "preflight", "assets", "build", "update"] as const;
+export const APP_ACTIONS = [
+  "start",
+  "run",
+  "install",
+  "preflight",
+  "assets",
+  "build",
+  "update",
+] as const;
 export const APP_PLATFORMS = ["android", "ios"] as const;
 export const PREFLIGHT_MODES = ["fast", "release"] as const;
 export const ASSET_OPERATIONS = ["generate", "audit"] as const;
@@ -30,6 +38,8 @@ export interface ParsedAppArguments {
   profile?: ReleaseProfile;
   preflightMode?: PreflightMode;
   assetOperation?: AssetOperation;
+  binaryPath?: string;
+  device?: string;
   confirmed: boolean;
   dryRun: boolean;
 }
@@ -41,7 +51,13 @@ interface BaseSelection {
 
 export type AppSelection =
   | (BaseSelection & { action: "start" })
-  | (BaseSelection & { action: "run"; platform: AppPlatform })
+  | (BaseSelection & { action: "run"; platform: AppPlatform; device?: string })
+  | (BaseSelection & {
+      action: "install";
+      platform: AppPlatform;
+      binaryPath: string;
+      device?: string;
+    })
   | (BaseSelection & { action: "preflight"; mode: PreflightMode })
   | (BaseSelection & { action: "assets"; operation: AssetOperation })
   | (BaseSelection & {

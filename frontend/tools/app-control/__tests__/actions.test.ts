@@ -2,6 +2,67 @@ import { describe, expect, it } from "vitest";
 import { resolveAction } from "../actions";
 
 describe("resolveAction", () => {
+  it("builds and launches an Android production release with Expo's device selector", () => {
+    expect(
+      resolveAction({
+        action: "run",
+        platform: "android",
+        tenantId: "avihu",
+        environment: "production",
+      })
+    ).toMatchObject({
+      command: "npx",
+      args: ["expo", "run:android", "--variant", "release", "--device", "--no-bundler"],
+      env: {
+        APP_TENANT: "avihu",
+        APP_ENV: "production",
+      },
+    });
+  });
+
+  it("builds and launches an iOS development build on the requested device", () => {
+    expect(
+      resolveAction({
+        action: "run",
+        platform: "ios",
+        tenantId: "avihu",
+        environment: "development",
+        device: "iPhone 16 Pro",
+      })
+    ).toMatchObject({
+      command: "npx",
+      args: ["expo", "run:ios", "--configuration", "Debug", "--device", "iPhone 16 Pro"],
+    });
+  });
+
+  it("installs an existing binary on a selected device without rebuilding it", () => {
+    expect(
+      resolveAction({
+        action: "install",
+        platform: "android",
+        tenantId: "avihu",
+        environment: "production",
+        binaryPath: "/tmp/elevate-coach.apk",
+        device: "Pixel_9_API_36",
+      })
+    ).toMatchObject({
+      command: "npx",
+      args: [
+        "expo",
+        "run:android",
+        "--binary",
+        "/tmp/elevate-coach.apk",
+        "--device",
+        "Pixel_9_API_36",
+        "--no-bundler",
+      ],
+      env: {
+        APP_TENANT: "avihu",
+        APP_ENV: "production",
+      },
+    });
+  });
+
   it("maps an Avihu production build to the pinned EAS command and child environment", () => {
     expect(
       resolveAction({
