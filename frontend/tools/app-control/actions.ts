@@ -57,7 +57,6 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
           selection.platform,
           "--profile",
           selection.profile,
-          "--non-interactive",
         ],
         `Build ${labelPrefix} for ${selection.platform}`
       );
