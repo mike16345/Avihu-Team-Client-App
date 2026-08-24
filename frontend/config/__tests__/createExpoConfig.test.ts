@@ -86,6 +86,28 @@ describe("tenant registry", () => {
 });
 
 describe("createExpoConfig", () => {
+  it.each(["development", "preview", "production"] as const)(
+    "brands the Avihu %s app as Elevate Coach without changing native identity",
+    (environment) => {
+      const config = createExpoConfig({
+        baseConfig: {},
+        tenant: getTenant("avihu"),
+        environment,
+        processEnv: {},
+      });
+
+      const expectedIdentity =
+        environment === "development"
+          ? "com.avihuteam.avihuteam.dev"
+          : "com.avihuteam.avihuteam";
+
+      expect(config.name).toBe("Elevate Coach");
+      expect(config.extra?.tenant).toMatchObject({ displayName: "Elevate Coach" });
+      expect(config.android?.package).toBe(expectedIdentity);
+      expect(config.ios?.bundleIdentifier).toBe(expectedIdentity);
+    }
+  );
+
   it("uses the isolated development application identity", () => {
     const development = createExpoConfig({
       baseConfig: {},

@@ -23,7 +23,7 @@ const runtimeTenantSchema = z
 
 export type PublicTenantRuntimeConfig = z.infer<typeof runtimeTenantSchema>;
 
-interface RuntimeConstantsLike {
+export interface RuntimeConstantsLike {
   expoConfig?: {
     extra?: Record<string, unknown>;
   } | null;
@@ -39,3 +39,6 @@ export const getRuntimeTenant = (constants: RuntimeConstantsLike): PublicTenantR
 
 export const isTenantEnvironmentBadgeVisible = (tenant: PublicTenantRuntimeConfig) =>
   tenant.showEnvironmentBadge;
+
+export const getRuntimeTenantDisplayName = (constants: RuntimeConstantsLike): string =>
+  getRuntimeTenant(constants).displayName;

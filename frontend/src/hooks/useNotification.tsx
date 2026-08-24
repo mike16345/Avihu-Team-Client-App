@@ -1,12 +1,10 @@
 // hooks/useNotification.ts
-import {
-  NOTIFICATION_TITLE,
-  NotificationBodies,
-  NotificationIdentifiers,
-} from "@/constants/notifications";
+import { NotificationBodies, NotificationIdentifiers } from "@/constants/notifications";
+import { getRuntimeTenantDisplayName } from "@/config/runtimeTenant";
 import { useNotificationStore } from "@/store/notificationStore";
 import { getNextEightAM, getNextEightAMOnSunday, toTrigger } from "@/utils/notification";
 import { generateUniqueId } from "@/utils/utils";
+import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
@@ -24,6 +22,8 @@ async function ensureAndroidChannel() {
 }
 
 export const useNotification = () => {
+  const notificationTitle = getRuntimeTenantDisplayName(Constants);
+
   // Set the global notification handler (keeps your previous behavior)
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -67,7 +67,7 @@ export const useNotification = () => {
     await Notifications.scheduleNotificationAsync({
       identifier: NotificationIdentifiers.NEW_DAILY_WEIGH_IN_REMINDER_ID,
       content: {
-        title: NOTIFICATION_TITLE,
+        title: notificationTitle,
         body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
         data,
       },
@@ -95,7 +95,7 @@ export const useNotification = () => {
     await Notifications.scheduleNotificationAsync({
       identifier: NotificationIdentifiers.WEEKLY_MEASUERMENT_REMINDER_ID,
       content: {
-        title: NOTIFICATION_TITLE,
+        title: notificationTitle,
         body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER,
         data,
       },
@@ -116,7 +116,7 @@ export const useNotification = () => {
         await ensureAndroidChannel();
       }
       const identifier = await Notifications.scheduleNotificationAsync({
-        content: { title: NOTIFICATION_TITLE, body, data: data || {} },
+        content: { title: notificationTitle, body, data: data || {} },
         trigger: toTrigger(triggerAt ?? 1, {
           channelId: Platform.OS === "android" ? DEFAULT_CHANNEL_ID : undefined,
         }),
