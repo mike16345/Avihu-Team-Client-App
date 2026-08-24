@@ -59,23 +59,21 @@ export const findReleaseAab = async (projectRoot: string) => {
 
 export const createCleanPrebuildCheck = (
   platforms: readonly ("ios" | "android")[] = ["ios", "android"]
-): CheckDefinition<ProcessPreflightContext> =>
-  createProcessCheck({
+): CheckDefinition<ProcessPreflightContext> => {
+  const includesIos = platforms.includes("ios");
+  const includesAndroid = platforms.includes("android");
+  const selectedPlatform = includesIos && includesAndroid ? "all" : includesIos ? "ios" : "android";
+
+  return createProcessCheck({
     check: "native.prebuild",
     command: "npx",
-    args: [
-      "expo",
-      "prebuild",
-      "--clean",
-      "--no-install",
-      "--platform",
-      platforms.length === 2 ? "all" : platforms[0],
-    ],
+    args: ["expo", "prebuild", "--clean", "--no-install", "--platform", selectedPlatform],
     env: { CI: "1" },
     successSummary: "Clean native projects were generated",
     failureSummary: "Clean Expo prebuild failed",
     remediation: "Run npx expo prebuild --clean --no-install and resolve the generation error.",
   });
+};
 
 export interface AndroidReleaseChecks {
   lint: CheckDefinition<ProcessPreflightContext>;

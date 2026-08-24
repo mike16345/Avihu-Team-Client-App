@@ -70,6 +70,19 @@ describe("tenant registry", () => {
       })
     ).toThrowError(/allowSharedStoreIdentity/);
   });
+
+  it.each([
+    ["duplicate iOS", ["ios", "ios"]],
+    ["duplicate Android", ["android", "android"]],
+    ["oversized duplicates", ["ios", "android", "ios"]],
+  ])("rejects %s supported-platform declarations", (_label, platforms) => {
+    expect(
+      tenantConfigSchema.safeParse({
+        ...avihuTenant,
+        platforms,
+      }).success
+    ).toBe(false);
+  });
 });
 
 describe("createExpoConfig", () => {
