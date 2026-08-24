@@ -1,0 +1,206 @@
+import { access, readdir } from "node:fs/promises";
+import path from "node:path";
+
+import { createProcessCheck, type ProcessPreflightContext } from "../processCheck";
+import type { CheckDefinition, CheckResult } from "../types";
+
+export type CheckPrerequisite = (
+  context: Readonly<ProcessPreflightContext>
+) => Promise<CheckResult>;
+
+const failForPrerequisite = (check: string, prerequisite: CheckResult): CheckResult => ({
+  status: "fail",
+  check,
+  summary: `Skipped because ${prerequisite.check} failed`,
+  details: [prerequisite.summary],
+  remediation: prerequisite.remediation ?? "Resolve the prerequisite failure and rerun preflight.",
+});
+
+const runAfter = async (
+  check: string,
+  context: Readonly<ProcessPreflightContext>,
+  prerequisite: CheckPrerequisite,
+  run: () => Promise<CheckResult>
+) => {
+  const result = await prerequisite(context);
+  return result.status === "fail" ? failForPrerequisite(check, result) : run();
+};
+
+const findFiles = async (root: string, extension: string): Promise<string[]> => {
+  try {
+    const entries = await readdir(root, { withFileTypes: true });
+    const nested = await Promise.all(
+      entries.map(async (entry) => {
+        const target = path.join(root, entry.name);
+        if (entry.isDirectory()) {
+          return findFiles(target, extension);
+        }
+        return entry.isFile() && entry.name.endsWith(extension) ? [target] : [];
+      })
+    );
+    return nested.flat().sort();
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
+};
+
+export const findReleaseAab = async (projectRoot: string) => {
+  const candidates = await findFiles(
+    path.join(projectRoot, "android", "app", "build", "outputs", "bundle"),
+    ".aab"
+  );
+  return (
+    candidates.find((candidate) => candidate.includes(`${path.sep}release${path.sep}`)) ?? null
+  );
+};
+
+export const createCleanPrebuildCheck = (): CheckDefinition<ProcessPreflightContext> =>
+  createProcessCheck({
+    check: "native.prebuild",
+    command: "npx",
+    args: ["expo", "prebuild", "--clean", "--no-install"],
+    env: { CI: "1" },
+    successSummary: "Clean native projects were generated",
+    failureSummary: "Clean Expo prebuild failed",
+    remediation: "Run npx expo prebuild --clean --no-install and resolve the generation error.",
+  });
+
+export interface AndroidReleaseChecks {
+  lint: CheckDefinition<ProcessPreflightContext>;
+  bundle: CheckDefinition<ProcessPreflightContext>;
+  aabValidation: CheckDefinition<ProcessPreflightContext>;
+  ensureBundle: CheckPrerequisite;
+}
+
+const memoize = (definition: CheckDefinition<ProcessPreflightContext>): CheckPrerequisite => {
+  let pending: Promise<CheckResult> | undefined;
+  return (context) => {
+    pending ??= Promise.resolve(definition.run(context));
+    return pending;
+  };
+};
+
+export const createAndroidReleaseChecks = (
+  ensurePrebuild: CheckPrerequisite
+): AndroidReleaseChecks => {
+  const gradleCommand = (context: Readonly<ProcessPreflightContext>) =>
+    path.join(
+      context.projectRoot,
+      "android",
+      context.platform === "win32" ? "gradlew.bat" : "gradlew"
+    );
+
+  const lint: CheckDefinition<ProcessPreflightContext> = {
+    check: "android.lint-release",
+    run: (context) =>
+      runAfter("android.lint-release", context, ensurePrebuild, async () => {
+        const command = gradleCommand(context);
+        try {
+          await access(command);
+        } catch {
+          return {
+            status: "fail",
+            check: "android.lint-release",
+            summary: "Generated Android Gradle wrapper is missing",
+            remediation: "Resolve the clean prebuild output, then rerun release preflight.",
+          };
+        }
+
+        return createProcessCheck({
+          check: "android.lint-release",
+          command,
+          args: ["lintRelease", "--no-daemon"],
+          successSummary: "Android release lint passed",
+          failureSummary: "Android release lint failed",
+          remediation: "Open the Android lint report, fix blocking findings, and rerun preflight.",
+        }).run(context);
+      }),
+  };
+  const ensureLint = memoize(lint);
+
+  const bundle: CheckDefinition<ProcessPreflightContext> = {
+    check: "android.bundle-release",
+    run: (context) =>
+      runAfter("android.bundle-release", context, ensureLint, async () => {
+        const result = await createProcessCheck({
+          check: "android.bundle-release",
+          command: gradleCommand(context),
+          args: ["bundleRelease", "--no-daemon"],
+          successSummary: "Android release bundle compiled",
+          failureSummary: "Android release bundle compilation failed",
+          remediation: "Fix the Gradle release build, then rerun release preflight.",
+        }).run(context);
+
+        if (result.status === "fail") {
+          return result;
+        }
+
+        const aabPath = await findReleaseAab(context.projectRoot);
+        return aabPath
+          ? { ...result, details: [`AAB: ${aabPath}`] }
+          : {
+              status: "fail",
+              check: "android.bundle-release",
+              summary: "Gradle completed without a release AAB",
+              remediation:
+                "Inspect android/app/build/outputs/bundle, then rerun the release bundle task.",
+            };
+      }),
+  };
+  const ensureBundle = memoize(bundle);
+
+  const aabValidation: CheckDefinition<ProcessPreflightContext> = {
+    check: "android.aab-validation",
+    run: (context) =>
+      runAfter("android.aab-validation", context, ensureBundle, async () => {
+        const aabPath = await findReleaseAab(context.projectRoot);
+        if (!aabPath) {
+          return {
+            status: "fail",
+            check: "android.aab-validation",
+            summary: "Release AAB is missing",
+            remediation: "Run the Android release bundle task and inspect its full preflight log.",
+          };
+        }
+
+        const locator = createProcessCheck({
+          check: "android.aab-tool",
+          command: context.platform === "win32" ? "where.exe" : "which",
+          args: ["bundletool"],
+          successSummary: "Android bundletool is installed",
+          failureSummary: "Android bundletool is unavailable",
+          remediation:
+            context.platform === "darwin"
+              ? "Run brew install bundletool."
+              : "Download bundletool from https://github.com/google/bundletool/releases and add a bundletool launcher to PATH.",
+        });
+        const tool = await locator.run(context);
+        if (tool.status === "fail") {
+          return {
+            status: "warn",
+            check: "android.aab-validation",
+            summary: "AAB exists but optional SDK validation was skipped",
+            details: tool.details,
+            remediation:
+              context.platform === "darwin"
+                ? "Run brew install bundletool, then rerun release preflight."
+                : "Download bundletool from https://github.com/google/bundletool/releases, add a bundletool launcher to PATH, then rerun release preflight.",
+          };
+        }
+
+        return createProcessCheck({
+          check: "android.aab-validation",
+          command: "bundletool",
+          args: ["validate", `--bundle=${aabPath}`],
+          successSummary: "Android App Bundle passed bundletool validation",
+          failureSummary: "Android App Bundle validation failed",
+          remediation: "Rebuild the release AAB and inspect the analyzer diagnostics.",
+        }).run(context);
+      }),
+  };
+
+  return { lint, bundle, aabValidation, ensureBundle };
+};

@@ -36,7 +36,7 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
       return createCommandSpec(
         selection,
         "npm",
-        ["run", `preflight:${selection.mode}`],
+        ["run", selection.mode === "release" ? "preflight:release" : "preflight"],
         `${selection.mode === "release" ? "Release" : "Fast"} preflight for ${labelPrefix}`
       );
     case "assets":
