@@ -24,6 +24,10 @@ describe("tenant:add validation", () => {
     expect(tenant.assets.icon).toContain("assets/.local/test-tenant");
     expect(Object.values(tenant.featureDefaults).every(Boolean)).toBe(true);
     expect(tenant.theme.colors.primary).toBe("#5B21B6");
+    expect(tenant.theme.colors.diet.primaryText).not.toBe(
+      avihuTenant.theme.colors.diet.primaryText
+    );
+    expect(tenant.theme.colors.graph.line).toBe("#F59E0B");
   });
 
   it("rejects low-contrast and Avihu-equivalent core palettes", () => {

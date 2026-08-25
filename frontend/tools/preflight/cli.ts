@@ -13,6 +13,7 @@ import { renderJson } from "./renderJson";
 import { runSpawnProcess } from "./processCheck";
 import { createEasSuite, createFastSuite, createReleaseSuite } from "./suites";
 import type { PreflightMode } from "./types";
+import type { TenantConfig } from "../../config/tenants/types";
 import { publishPreflightFile } from "./safePublication";
 
 interface CliArguments {
@@ -105,6 +106,12 @@ export interface PreflightCliDependencies {
   writeOutput: (value: string) => void;
 }
 
+export const assertPreflightAllowed = (tenant: TenantConfig, mode: PreflightMode) => {
+  if (tenant.kind === "local" && mode !== "fast") {
+    throw new Error(`Local tenant "${tenant.id}" cannot run ${mode} preflight`);
+  }
+};
+
 export const runPreflightCli = async (dependencies: PreflightCliDependencies) => {
   const { projectRoot } = dependencies;
   const args = parsePreflightArguments(dependencies.argv, dependencies.processEnv);
@@ -116,6 +123,7 @@ export const runPreflightCli = async (dependencies: PreflightCliDependencies) =>
     processEnv: dependencies.processEnv,
     timestamp,
   });
+  assertPreflightAllowed(configuration.tenantConfig, args.mode);
   const smokeCommand = parseSmokeCommand(dependencies.processEnv.PREFLIGHT_SMOKE_COMMAND_JSON);
   const context = {
     ...configuration,

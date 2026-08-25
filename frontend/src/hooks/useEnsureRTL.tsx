@@ -2,22 +2,24 @@ import { useEffect, useState } from "react";
 import { I18nManager } from "react-native";
 import * as Updates from "expo-updates";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import type { TenantLocalization } from "../../config/tenants/types";
 
-const RTL_FIX_KEY = "rtl_restarted_once";
+const RTL_FIX_KEY = "tenant_layout_direction";
 
-export const useOneTimeRTLFix = () => {
+export const useOneTimeRTLFix = (tenantId: string, localization: TenantLocalization) => {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const applyRTLFix = async () => {
       try {
-        const alreadyApplied = await AsyncStorage.getItem(RTL_FIX_KEY);
+        const appliedLayout = await AsyncStorage.getItem(RTL_FIX_KEY);
+        const requestedLayout = `${tenantId}:${localization.supportsRtl}:${localization.forcesRtl}`;
 
-        if (!alreadyApplied && !I18nManager.isRTL) {
-          I18nManager.allowRTL(true);
-          I18nManager.forceRTL(true);
+        if (appliedLayout !== requestedLayout) {
+          I18nManager.allowRTL(localization.supportsRtl);
+          I18nManager.forceRTL(localization.forcesRtl);
 
-          await AsyncStorage.setItem(RTL_FIX_KEY, "true");
+          await AsyncStorage.setItem(RTL_FIX_KEY, requestedLayout);
 
           await Updates.reloadAsync(); // Trigger one-time reload
           return;
@@ -32,7 +34,7 @@ export const useOneTimeRTLFix = () => {
     };
 
     applyRTLFix();
-  }, []);
+  }, [localization.forcesRtl, localization.supportsRtl, tenantId]);
 
   return ready;
 };

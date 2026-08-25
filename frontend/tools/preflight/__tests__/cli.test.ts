@@ -2,6 +2,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { runPreflightCli } from "../cli";
+import { assertPreflightAllowed } from "../cli";
+import { avihuTenant } from "../../../config/tenants/avihu";
 
 const projectRoot = path.resolve(import.meta.dirname, "../../..");
 const processEnv = {
@@ -13,6 +15,13 @@ const processEnv = {
 };
 
 describe("injectable preflight CLI", () => {
+  it("rejects direct release and EAS preflight for local tenants", () => {
+    const localTenant = { ...avihuTenant, kind: "local" as const, id: "test-tenant" };
+    expect(() => assertPreflightAllowed(localTenant, "release")).toThrow(/cannot run release/u);
+    expect(() => assertPreflightAllowed(localTenant, "eas")).toThrow(/cannot run eas/u);
+    expect(() => assertPreflightAllowed(localTenant, "fast")).not.toThrow();
+  });
+
   it("renders human and JSON from equivalent results and exit behavior", async () => {
     let human = "";
     let json = "";
