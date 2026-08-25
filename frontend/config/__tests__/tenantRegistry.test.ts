@@ -29,11 +29,7 @@ describe("tenant policy foundations", () => {
       kind: "local" as const,
       id,
       slug: id,
-      projectId:
-        id === "alpha"
-          ? "11111111-1111-4111-8111-111111111111"
-          : "22222222-2222-4222-8222-222222222222",
-      updateUrl: `https://u.expo.dev/${id}`,
+      eas: { status: "pending" as const },
       environments: Object.fromEntries(
         Object.entries(avihuTenant.environments).map(([environment, identity]) => [
           environment,
@@ -71,6 +67,12 @@ describe("tenant policy foundations", () => {
   it("separates localization, JavaScript defaults, and native binary capabilities", () => {
     expect(tenantConfigSchema.parse(avihuTenant)).toMatchObject({
       kind: "repository",
+      eas: {
+        status: "linked",
+        owner: "avihuteam",
+        projectId: "bbbbb60d-eb47-48fb-a278-517aba8dcea2",
+        updateUrl: "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2",
+      },
       localization: {
         supportsRtl: true,
         forcesRtl: true,
@@ -97,6 +99,17 @@ describe("tenant policy foundations", () => {
         liveActivities: true,
       },
     });
+  });
+
+  it("accepts pending EAS setup without fake remote identity", () => {
+    expect(
+      tenantConfigSchema.parse({
+        ...avihuTenant,
+        id: "pending-tenant",
+        slug: "pending-tenant",
+        eas: { status: "pending" },
+      }).eas
+    ).toEqual({ status: "pending" });
   });
 
   it("resolves future entitlement overrides over tenant defaults and rejects unknown keys", () => {

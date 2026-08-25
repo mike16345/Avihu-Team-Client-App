@@ -4,7 +4,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
-import { parseTenantEnvironment } from "../../config/tenants/schema";
+import { assertTenantEasActionAllowed, parseTenantEnvironment } from "../../config/tenants/schema";
 import { createPreflightContext } from "./contexts";
 import { runChecks } from "./engine";
 import { applyPolicy } from "./policy";
@@ -107,6 +107,7 @@ export interface PreflightCliDependencies {
 }
 
 export const assertPreflightAllowed = (tenant: TenantConfig, mode: PreflightMode) => {
+  if (mode !== "fast") assertTenantEasActionAllowed(tenant, `${mode} preflight`);
   if (tenant.kind === "local" && mode !== "fast") {
     throw new Error(`Local tenant "${tenant.id}" cannot run ${mode} preflight`);
   }

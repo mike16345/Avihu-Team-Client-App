@@ -90,6 +90,24 @@ describe("tenant registry", () => {
 });
 
 describe("createExpoConfig", () => {
+  it("omits remote EAS fields for pending tenants", () => {
+    const pendingTenant = tenantConfigSchema.parse({
+      ...avihuTenant,
+      id: "pending-tenant",
+      slug: "pending-tenant",
+      eas: { status: "pending" },
+    });
+    const config = createExpoConfig({
+      baseConfig: {},
+      tenant: pendingTenant,
+      environment: "development",
+      processEnv: {},
+    });
+    expect(config.owner).toBeUndefined();
+    expect(config.extra?.eas).toBeUndefined();
+    expect(config.updates).toBeUndefined();
+  });
+
   it.each(["development", "preview", "production"] as const)(
     "brands the Avihu %s app as Elevate Coach without changing native identity",
     (environment) => {

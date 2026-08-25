@@ -1,4 +1,5 @@
 import type { ExpoConfig } from "@expo/config";
+import { isLinkedTenantEas } from "./tenants/schema";
 import type { TenantConfig, TenantEnvironment } from "./tenants/types";
 
 type ProcessEnvironment = Readonly<Record<string, string | undefined>>;
@@ -78,6 +79,7 @@ export const createExpoConfig = ({
   processEnv,
 }: CreateExpoConfigInput): ExpoConfig => {
   const identity = tenant.environments[environment];
+  const linkedEas = isLinkedTenantEas(tenant.eas) ? tenant.eas : null;
 
   return {
     ...baseConfig,
@@ -119,9 +121,7 @@ export const createExpoConfig = ({
       backgroundColor: "#00000000",
     },
     extra: {
-      eas: {
-        projectId: tenant.projectId,
-      },
+      ...(linkedEas ? { eas: { projectId: linkedEas.projectId } } : {}),
       supportsRtl: tenant.localization.supportsRtl,
       forcesRTL: tenant.localization.forcesRtl,
       tenant: {
@@ -137,12 +137,9 @@ export const createExpoConfig = ({
       },
       ...getPublicRuntimeExtra(processEnv),
     },
-    owner: tenant.owner,
+    ...(linkedEas ? { owner: linkedEas.owner } : {}),
     runtimeVersion: tenant.version,
-    updates: {
-      enabled: true,
-      url: tenant.updateUrl,
-    },
+    ...(linkedEas ? { updates: { enabled: true, url: linkedEas.updateUrl } } : {}),
     sdkVersion: "53.0.0",
     platforms: tenant.platforms,
   };

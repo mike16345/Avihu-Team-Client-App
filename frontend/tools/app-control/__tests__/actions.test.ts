@@ -35,6 +35,17 @@ describe("resolveAction", () => {
     ).not.toThrow();
   });
 
+  it("blocks EAS actions for repository tenants whose setup is pending", () => {
+    const pendingTenant = { ...avihuTenant, id: "new-tenant", eas: { status: "pending" as const } };
+    expect(() =>
+      assertTenantActionAllowed(pendingTenant, {
+        action: "update",
+        tenantId: pendingTenant.id,
+        environment: "production",
+      })
+    ).toThrow(/tenant:eas -- --tenant new-tenant/u);
+  });
+
   it("runs local Android builds with the configured Java 17 toolchain", () => {
     vi.stubEnv("APP_ANDROID_JAVA_HOME", "/toolchains/java-17");
     vi.stubEnv("PATH", "/usr/local/bin:/usr/bin");

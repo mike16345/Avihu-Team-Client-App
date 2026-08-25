@@ -1,4 +1,4 @@
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import { avihuTenant } from "../../config/tenants/avihu";
 import { tenantConfigSchema } from "../../config/tenants/schema";
 import type { TenantConfig } from "../../config/tenants/types";
@@ -200,12 +200,15 @@ export const createTenantConfig = (
     id: answers.id,
     displayName: answers.displayName.trim(),
     slug: answers.id,
-    owner: answers.mode === "local" ? "local-test" : answers.owner!,
-    projectId: answers.mode === "local" ? randomUUID() : answers.projectId!,
-    updateUrl:
+    eas:
       answers.mode === "local"
-        ? `https://u.expo.dev/${randomUUID()}`
-        : `https://u.expo.dev/${answers.projectId}`,
+        ? { status: "pending" as const }
+        : {
+            status: "linked" as const,
+            owner: answers.owner!,
+            projectId: answers.projectId!,
+            updateUrl: `https://u.expo.dev/${answers.projectId}`,
+          },
     version: "1.0.0",
     assets: {
       ...avihuTenant.assets,

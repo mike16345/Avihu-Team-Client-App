@@ -32,7 +32,7 @@ export const assertUniqueTenants = (tenants: TenantConfig[]) => {
   for (const tenant of tenants) {
     claim("id", tenant.id, tenant.id);
     claim("slug", tenant.slug, tenant.id);
-    claim("project ID", tenant.projectId, tenant.id);
+    if (tenant.eas.status === "linked") claim("project ID", tenant.eas.projectId, tenant.id);
     for (const environment of Object.values(tenant.environments)) {
       claim("scheme", environment.scheme, tenant.id);
       claim("iOS bundle identifier", environment.iosBundleIdentifier, tenant.id);
