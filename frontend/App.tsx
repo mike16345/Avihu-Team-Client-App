@@ -23,8 +23,11 @@ import { linking } from "@/navigators/linking";
 import { navigationRef } from "@/navigators/navigationRef";
 import { TenantEnvironmentBadge } from "@/components/dev/TenantEnvironmentBadge";
 import { DeveloperToolsProvider } from "@/devtools/DeveloperToolsProvider";
+import { getRuntimeTenant } from "@/config/runtimeTenant";
+import Constants from "expo-constants";
 
 export default function App() {
+  const runtimeTenant = getRuntimeTenant(Constants);
   const ready = useOneTimeRTLFix();
   const colorScheme = Appearance.getColorScheme();
   const [loaded] = useCustomFonts();
@@ -40,7 +43,7 @@ export default function App() {
 
   return (
     <KeyboardProvider preserveEdgeToEdge statusBarTranslucent>
-      <ThemeProvider>
+      <ThemeProvider theme={runtimeTenant.theme}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
             <HtmlRenderProvider>
