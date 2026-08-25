@@ -1,4 +1,10 @@
 import { z } from "zod";
+import { tenantFeatureDefaultsSchema } from "../../config/tenants/features";
+import {
+  tenantLocalizationSchema,
+  tenantNativeCapabilitiesSchema,
+} from "../../config/tenants/schema";
+import { tenantThemeSchema } from "../../config/tenants/theme";
 
 const runtimeTenantSchema = z
   .object({
@@ -11,12 +17,10 @@ const runtimeTenantSchema = z
         backgroundColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
       })
       .strict(),
-    featureFlags: z
-      .object({
-        supportsRtl: z.boolean(),
-        forcesRtl: z.boolean(),
-      })
-      .strict(),
+    theme: tenantThemeSchema,
+    localization: tenantLocalizationSchema,
+    featureDefaults: tenantFeatureDefaultsSchema,
+    nativeCapabilities: tenantNativeCapabilitiesSchema,
     showEnvironmentBadge: z.boolean(),
   })
   .strict();
@@ -42,3 +46,5 @@ export const isTenantEnvironmentBadgeVisible = (tenant: PublicTenantRuntimeConfi
 
 export const getRuntimeTenantDisplayName = (constants: RuntimeConstantsLike): string =>
   getRuntimeTenant(constants).displayName;
+
+export { getResolvedTenantFeatures } from "./tenantFeatures";
