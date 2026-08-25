@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useWindowDimensions, View } from "react-native";
 import React from "react";
 import useStyles from "@/styles/useGlobalStyles";
@@ -39,7 +40,7 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
         spacing.gapLg,
         spacing.pdVerticalSm,
         spacing.pdBottomBar,
-        { width: containerWidth, zIndex: 100, backgroundColor: "#F2F2F2" },
+        { width: containerWidth, zIndex: 100, backgroundColor: semanticColors.surfaceMuted },
       ]}
     >
       {showExitButton ? (

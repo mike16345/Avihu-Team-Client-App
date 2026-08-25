@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, StyleSheet, Dimensions, Modal } from "react-native";
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    backgroundColor: semanticColors.app.translucentWhite,
   },
   drawerContainer: {
     position: "absolute",
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    shadowColor: "#000",
+    shadowColor: semanticColors.scrim,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,

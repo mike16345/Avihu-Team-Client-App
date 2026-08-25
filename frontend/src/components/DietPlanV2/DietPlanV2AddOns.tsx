@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import type { DietV2PlanItem } from "@/interfaces/IDietPlanV2";
@@ -54,12 +55,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     marginHorizontal: -8,
     borderColor: "transparent",
-    borderBottomColor: "rgba(15, 94, 59, 0.10)",
+    borderBottomColor: semanticColors.app.dietSectionDivider,
   },
   consumed: {
-    backgroundColor: "#F0FDF4",
+    backgroundColor: semanticColors.diet.mintStrong,
     borderWidth: 1,
-    borderColor: "#D1FAE5",
+    borderColor: semanticColors.app.dietSectionBorder,
   },
   pressed: {
     opacity: 0.72,
@@ -72,16 +73,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   heading: {
-    color: "#0B2A22",
+    color: semanticColors.diet.primaryText,
   },
   description: {
-    color: "#4B5563",
+    color: semanticColors.diet.secondaryText,
     lineHeight: 22,
   },
   descriptionConsumed: {
-    color: "#4B7A62",
+    color: semanticColors.diet.tertiaryText,
     textDecorationLine: "line-through",
-    textDecorationColor: "#86EFAC",
+    textDecorationColor: semanticColors.diet.borderStrong,
   },
 });
 

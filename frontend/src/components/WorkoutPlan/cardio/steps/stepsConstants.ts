@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 export interface DayData {
   label: string;
   steps: number | null;
@@ -28,26 +29,26 @@ export const MOCK_WEEK: DayData[] = [
   { label: DAY_LABELS[6], steps: 8500, calories: 258 },
 ];
 
-export const GREEN_DARK = "#2EB94D";
-export const GREEN_MID = "#4ED167";
-export const GREEN_LIGHT = "#C7F0CB";
-export const RED_DARK = "#DC6E4A";
-export const RED_MID = "#E88E72";
-export const RED_LIGHT = "#F4C4B5";
-export const RING_TRACK = "#E4E7EC";
-export const RING_GRAD_START = "#072723";
-export const RING_GRAD_END = "#9FE6A3";
-export const SURFACE_WHITE = "#FFFFFF";
-export const PRIMARY_DARK = "#072723";
-export const LIGHT_TEXT_ON_DARK = "#F8F8F8";
-export const MUTED_TEXT = "rgba(7,39,35,0.55)";
-export const MUTED_TEXT_SOFT = "rgba(7,39,35,0.6)";
-export const MUTED_TEXT_FAINT = "rgba(7,39,35,0.45)";
-export const HAIRLINE = "rgba(7,39,35,0.08)";
-export const BASELINE_LINE = "rgba(7,39,35,0.12)";
-export const TARGET_LINE = "rgba(7,39,35,0.3)";
-export const DAY_LABEL_TEXT = "rgba(7,39,35,0.75)";
-export const SELECTED_PILL_BG = "rgba(7,39,35,0.08)";
+export const GREEN_DARK = semanticColors.steps.aboveGoalDark;
+export const GREEN_MID = semanticColors.steps.aboveGoal;
+export const GREEN_LIGHT = semanticColors.steps.aboveGoalLight;
+export const RED_DARK = semanticColors.steps.belowGoalDark;
+export const RED_MID = semanticColors.steps.belowGoal;
+export const RED_LIGHT = semanticColors.steps.belowGoalLight;
+export const RING_TRACK = semanticColors.steps.ringTrack;
+export const RING_GRAD_START = semanticColors.steps.ringGradientStart;
+export const RING_GRAD_END = semanticColors.steps.ringGradientEnd;
+export const SURFACE_WHITE = semanticColors.app.surfaceRaised;
+export const PRIMARY_DARK = semanticColors.steps.ringGradientStart;
+export const LIGHT_TEXT_ON_DARK = semanticColors.errorContainer;
+export const MUTED_TEXT = semanticColors.steps.mutedText;
+export const MUTED_TEXT_SOFT = semanticColors.steps.mutedTextSoft;
+export const MUTED_TEXT_FAINT = semanticColors.steps.mutedTextFaint;
+export const HAIRLINE = semanticColors.steps.selectedPill;
+export const BASELINE_LINE = semanticColors.steps.baseline;
+export const TARGET_LINE = semanticColors.steps.target;
+export const DAY_LABEL_TEXT = semanticColors.steps.dayLabel;
+export const SELECTED_PILL_BG = semanticColors.steps.selectedPill;
 
 export const SMALL_SCREEN_BREAKPOINT = 360;
 

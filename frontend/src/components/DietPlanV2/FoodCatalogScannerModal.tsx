@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Linking, Modal, Pressable, StyleSheet, View } from "react-native";
 import { CameraView, useCameraPermissions, type BarcodeScanningResult } from "expo-camera";
@@ -277,7 +278,7 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
               ) : null}
               {status === "looking-up" ? (
                 <View style={styles.lookupOverlay}>
-                  <ActivityIndicator size="large" color="#FFFFFF" />
+                  <ActivityIndicator size="large" color={semanticColors.app.surfaceRaised} />
                   <Text fontVariant="semibold" fontSize={14} style={styles.overlayText}>
                     בודק את המוצר...
                   </Text>
@@ -370,7 +371,7 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#07110E" },
+  container: { flex: 1, backgroundColor: semanticColors.scanner.background },
   topBar: {
     zIndex: 2,
     flexDirection: "row",
@@ -378,21 +379,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingBottom: 12,
-    backgroundColor: "rgba(7, 17, 14, 0.72)",
+    backgroundColor: semanticColors.scanner.headerOverlay,
   },
-  title: { color: "#FFFFFF", textAlign: "center" },
+  title: { color: semanticColors.app.surfaceRaised, textAlign: "center" },
   roundButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.16)",
+    backgroundColor: semanticColors.scanner.controlSurface,
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.24)",
+    borderColor: semanticColors.scanner.controlBorder,
   },
   roundButtonActive: { backgroundColor: DIET_V2_GREEN },
-  roundButtonLabel: { color: "#FFFFFF", lineHeight: 24 },
+  roundButtonLabel: { color: semanticColors.app.surfaceRaised, lineHeight: 24 },
   scannerContent: {
     flex: 1,
     alignItems: "center",
@@ -404,10 +405,15 @@ const styles = StyleSheet.create({
     maxWidth: 330,
     aspectRatio: 1.55,
     borderRadius: 24,
-    backgroundColor: "rgba(0, 0, 0, 0.08)",
+    backgroundColor: semanticColors.app.shadowSoft,
     overflow: "hidden",
   },
-  corner: { position: "absolute", width: 42, height: 42, borderColor: "#5BE29B" },
+  corner: {
+    position: "absolute",
+    width: 42,
+    height: 42,
+    borderColor: semanticColors.scanner.scanLine,
+  },
   scanLine: {
     position: "absolute",
     left: 18,
@@ -415,8 +421,8 @@ const styles = StyleSheet.create({
     top: "50%",
     height: 2,
     borderRadius: 1,
-    backgroundColor: "#5BE29B",
-    shadowColor: "#5BE29B",
+    backgroundColor: semanticColors.scanner.scanLine,
+    shadowColor: semanticColors.scanner.scanLine,
     shadowOpacity: 0.8,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 0 },
@@ -425,8 +431,8 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     borderWidth: 4,
     borderRadius: 24,
-    borderColor: "#5BE29B",
-    backgroundColor: "#5BE29B",
+    borderColor: semanticColors.scanner.scanLine,
+    backgroundColor: semanticColors.scanner.scanLine,
   },
   holdFeedback: {
     position: "absolute",
@@ -437,20 +443,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 14,
-    backgroundColor: "rgba(7, 17, 14, 0.78)",
+    backgroundColor: semanticColors.app.scannerHoldOverlay,
   },
-  holdLabel: { color: "#FFFFFF", textAlign: "center" },
+  holdLabel: { color: semanticColors.app.surfaceRaised, textAlign: "center" },
   holdTrack: {
     height: 5,
     overflow: "hidden",
     borderRadius: 3,
-    backgroundColor: "rgba(255, 255, 255, 0.22)",
+    backgroundColor: semanticColors.overlay.translucentSurface,
   },
   holdFill: {
     width: "100%",
     height: "100%",
     borderRadius: 3,
-    backgroundColor: "#5BE29B",
+    backgroundColor: semanticColors.scanner.scanLine,
   },
   topRight: { top: 0, right: 0, borderTopWidth: 4, borderRightWidth: 4, borderTopRightRadius: 22 },
   topLeft: { top: 0, left: 0, borderTopWidth: 4, borderLeftWidth: 4, borderTopLeftRadius: 22 },
@@ -473,14 +479,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 12,
-    backgroundColor: "rgba(7, 17, 14, 0.62)",
+    backgroundColor: semanticColors.scanner.dimOverlay,
   },
   foundOverlay: {
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
-    backgroundColor: "rgba(7, 46, 34, 0.78)",
+    backgroundColor: semanticColors.scanner.successOverlay,
   },
   foundIcon: {
     width: 58,
@@ -488,23 +494,23 @@ const styles = StyleSheet.create({
     borderRadius: 29,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#5BE29B",
+    backgroundColor: semanticColors.scanner.scanLine,
   },
-  foundCheck: { color: "#073A2A", lineHeight: 34 },
-  overlayText: { color: "#FFFFFF" },
+  foundCheck: { color: semanticColors.app.scannerSuccessText, lineHeight: 34 },
+  overlayText: { color: semanticColors.app.surfaceRaised },
   bottomPanel: {
     minHeight: 126,
     paddingTop: 18,
     paddingHorizontal: 20,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
   },
   panelTextWrap: { alignItems: "center", gap: 4 },
   panelTitle: { color: DIET_V2_DARK, textAlign: "center" },
-  panelDescription: { color: "#6B7280", textAlign: "center" },
+  panelDescription: { color: semanticColors.scanner.panelText, textAlign: "center" },
   successText: { color: DIET_V2_GREEN, textAlign: "center" },
   permissionContent: { width: "100%", alignItems: "center", gap: 10 },
   iconCircle: {
@@ -513,10 +519,10 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#E8F7EF",
+    backgroundColor: semanticColors.app.scannerErrorSurface,
   },
   errorContent: { width: "100%", alignItems: "center", gap: 12 },
-  errorText: { color: "#B42318", textAlign: "center" },
+  errorText: { color: semanticColors.diet.dangerText, textAlign: "center" },
 });
 
 export default FoodCatalogScannerModal;

@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import useStyles from "@/styles/useGlobalStyles";
 import { FC } from "react";
 import { TouchableOpacity, StyleSheet } from "react-native";
@@ -36,7 +37,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 9999,
-    backgroundColor: "white",
+    backgroundColor: semanticColors.app.surfaceRaised,
     position: "absolute",
     start: 3,
   },

@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { StyleSheet, View, useWindowDimensions, Pressable, LayoutChangeEvent } from "react-native";
 import Animated, {
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     zIndex: 999,
     // backgroundColor intentionally neutral – you style it outside if you want
-    backgroundColor: "white",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   handleArea: {
     paddingVertical: 8,
@@ -167,13 +168,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 0.5,
-    borderColor: "#E2E2E2",
+    borderColor: semanticColors.app.borderControl,
   },
   handleBar: {
     width: 42,
     height: 5,
     borderRadius: 3,
-    backgroundColor: "#C8C8C8",
+    backgroundColor: semanticColors.app.borderHandle,
   },
   content: {
     flex: 1,

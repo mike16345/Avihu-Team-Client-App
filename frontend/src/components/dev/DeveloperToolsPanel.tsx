@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import Icon from "@/components/Icon/Icon";
 import { DeveloperToolActionRow, DeveloperToolDetailRow } from "@/components/dev/DeveloperToolRows";
 import BottomDrawer from "@/components/ui/BottomDrawer";
@@ -28,26 +29,26 @@ const apiStatus: Record<
   test: {
     label: "TEST API",
     detail: "Development data",
-    foreground: "#067647",
-    background: "#ECFDF3",
+    foreground: semanticColors.app.developerSuccessText,
+    background: semanticColors.app.developerSuccessSurface,
   },
   preview: {
     label: "PREVIEW API",
     detail: "Staging data",
-    foreground: "#B54708",
-    background: "#FFFAEB",
+    foreground: semanticColors.app.developerWarningText,
+    background: semanticColors.app.developerWarningSurface,
   },
   production: {
     label: "PRODUCTION API",
     detail: "Live customer data",
-    foreground: "#B42318",
-    background: "#FEF3F2",
+    foreground: semanticColors.diet.dangerText,
+    background: semanticColors.app.developerErrorSurface,
   },
   unknown: {
     label: "API UNKNOWN",
     detail: "Check build configuration",
-    foreground: "#344054",
-    background: "#F2F4F7",
+    foreground: semanticColors.app.textDefault,
+    background: semanticColors.app.surfaceSoft,
   },
 };
 
@@ -150,7 +151,7 @@ const DeveloperToolsPanel = () => {
             onPress={closePanel}
             style={styles.closeButton}
           >
-            <Icon color="#475467" height={18} name="close" width={18} />
+            <Icon color={semanticColors.app.textSlate} height={18} name="close" width={18} />
           </TouchableOpacity>
         </View>
 
@@ -269,18 +270,18 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     alignItems: "center",
-    backgroundColor: "#F2F4F7",
+    backgroundColor: semanticColors.app.surfaceSoft,
     borderRadius: 18,
     height: 36,
     justifyContent: "center",
     width: 36,
   },
   primaryText: {
-    color: "#101828",
+    color: semanticColors.app.textStrong,
     writingDirection: "ltr",
   },
   secondaryText: {
-    color: "#667085",
+    color: semanticColors.app.textMuted,
     writingDirection: "ltr",
   },
   statusCard: {
@@ -301,8 +302,8 @@ const styles = StyleSheet.create({
     width: 8,
   },
   detailsCard: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#EAECF0",
+    backgroundColor: semanticColors.app.surfaceRaised,
+    borderColor: semanticColors.app.borderSoft,
     borderCurve: "continuous",
     borderRadius: 16,
     borderWidth: 1,
@@ -313,14 +314,14 @@ const styles = StyleSheet.create({
     gap: 7,
   },
   sectionLabel: {
-    color: "#667085",
+    color: semanticColors.app.textMuted,
     letterSpacing: 0.7,
     paddingHorizontal: 2,
     writingDirection: "ltr",
   },
   actionCard: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#EAECF0",
+    backgroundColor: semanticColors.app.surfaceRaised,
+    borderColor: semanticColors.app.borderSoft,
     borderCurve: "continuous",
     borderRadius: 16,
     borderWidth: 1,
@@ -328,7 +329,7 @@ const styles = StyleSheet.create({
   },
   preferenceRow: {
     alignItems: "center",
-    backgroundColor: "#F9FAFB",
+    backgroundColor: semanticColors.app.surfacePanel,
     borderCurve: "continuous",
     borderRadius: 16,
     flexDirection: "row",

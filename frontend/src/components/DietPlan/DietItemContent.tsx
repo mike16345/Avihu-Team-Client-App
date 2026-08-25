@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { Pressable, StyleSheet, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import GreenDotGenerator from "../ui/GreenDotGenerator";
@@ -139,8 +140,8 @@ const styles = StyleSheet.create({
     marginHorizontal: -4,
   },
   eatenWrap: {
-    backgroundColor: "#EDFFEB",
-    borderColor: "rgba(23, 178, 106, 0.28)",
+    backgroundColor: semanticColors.successContainer,
+    borderColor: semanticColors.app.dietProgressTrack,
   },
   chip: {
     width: 96,
@@ -151,24 +152,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   eatenChip: {
-    borderColor: "#A7ECC0",
-    backgroundColor: "#D3F5DB",
+    borderColor: semanticColors.app.dietSuccessBorder,
+    backgroundColor: semanticColors.app.dietSuccessSurface,
   },
   eatenChipText: {
-    color: "#1F5C3B",
+    color: semanticColors.app.dietSuccessText,
   },
   markChip: {
-    borderColor: "rgba(0, 0, 0, 0.12)",
-    backgroundColor: "#FFFFFF",
+    borderColor: semanticColors.app.shadowStrong,
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   markChipText: {
-    color: "#4B5563",
+    color: semanticColors.diet.secondaryText,
   },
   blockedChip: {
     opacity: 0.4,
   },
   blockedChipText: {
-    color: "#0F5E3B",
+    color: semanticColors.app.brandStrong,
   },
 });
 

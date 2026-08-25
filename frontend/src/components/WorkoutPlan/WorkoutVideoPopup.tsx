@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { FC, useEffect, useRef, useState } from "react";
 import {
   View,
@@ -76,7 +77,7 @@ const WorkoutVideoPopup: FC<WorkoutVideoPopupProps> = ({ videoId, width, height 
         <>
           {isLoading && (
             <View style={styles.loader}>
-              <ActivityIndicator size="large" color="red" />
+              <ActivityIndicator size="large" color={semanticColors.app.dangerPure} />
             </View>
           )}
 

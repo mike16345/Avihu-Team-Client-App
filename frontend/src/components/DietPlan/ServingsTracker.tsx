@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, Pressable, TextInput, Modal } from "react-native";
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Stop, Rect } from "react-native-svg";
@@ -43,10 +44,10 @@ const sumMealField = (
   field: "totalProtein" | "totalCarbs" | "totalFats" | "totalVeggies"
 ): number => meals.reduce((acc, m) => acc + (m[field]?.quantity ?? 0), 0);
 
-const GRAD_DARK = "#047857";
-const GRAD_LIGHT = "#86EFAC";
-const RED_DARK = "#DC2626";
-const RED_LIGHT = "#FCA5A5";
+const GRAD_DARK = semanticColors.app.brandPressed;
+const GRAD_LIGHT = semanticColors.diet.borderStrong;
+const RED_DARK = semanticColors.diet.dangerBorder;
+const RED_LIGHT = semanticColors.app.dietNegativeSoft;
 const BAR_H = 5;
 
 const useAnimatedValue = (value: number, duration = 450): number => {
@@ -122,7 +123,7 @@ const WheelButton: React.FC<{
       {formatVal(value)}
     </Text>
     <View style={styles.wheelChevron}>
-      <ChevronDownIcon size={11} color={over ? RED_DARK : "#0B5E37"} />
+      <ChevronDownIcon size={11} color={over ? RED_DARK : semanticColors.app.brandAction} />
     </View>
   </Pressable>
 );
@@ -190,7 +191,7 @@ const WheelModal: React.FC<WheelModalProps> = ({
               height={108}
               itemHeight={36}
               activeItemColor={DIET_V2_DARK}
-              inactiveItemColor="#B7BEBB"
+              inactiveItemColor={semanticColors.app.dietMutedBorder}
               dangerThreshold={max}
               dangerColor={RED_DARK}
             />
@@ -391,15 +392,15 @@ const styles = StyleSheet.create({
     marginTop: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#D0D5DD",
-    backgroundColor: "#FFFFFF",
+    borderColor: semanticColors.outline,
+    backgroundColor: semanticColors.app.surfaceRaised,
     paddingHorizontal: 18,
     paddingVertical: 12,
     gap: 8,
   },
   wrapClosed: {
-    backgroundColor: "#EDFFEB",
-    borderColor: "#D0D5DD",
+    backgroundColor: semanticColors.successContainer,
+    borderColor: semanticColors.outline,
   },
   bar: {
     flexDirection: "row",
@@ -407,7 +408,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: {
-    color: "#000000",
+    color: semanticColors.scrim,
   },
   chevronOpen: {
     transform: [{ rotate: "180deg" }],
@@ -450,8 +451,8 @@ const styles = StyleSheet.create({
     width: 78,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#0B5E37",
-    backgroundColor: "#FFFFFF",
+    borderColor: semanticColors.app.brandAction,
+    backgroundColor: semanticColors.app.surfaceRaised,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -482,8 +483,8 @@ const styles = StyleSheet.create({
     height: ITEM_H,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#0B5E37",
-    backgroundColor: "#FFFFFF",
+    borderColor: semanticColors.app.brandAction,
+    backgroundColor: semanticColors.app.surfaceRaised,
     textAlign: "center",
     color: DIET_V2_DARK,
     fontSize: 16,
@@ -492,7 +493,7 @@ const styles = StyleSheet.create({
   track: {
     height: BAR_H,
     borderRadius: 999,
-    backgroundColor: "rgba(4, 120, 87, 0.12)",
+    backgroundColor: semanticColors.app.dietSelection,
     overflow: "hidden",
     alignSelf: "stretch",
   },
@@ -503,10 +504,10 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(11, 42, 34, 0.45)",
+    backgroundColor: semanticColors.app.dietMutedText,
   },
   sheet: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
     borderRadius: 18,
     paddingTop: 12,
     paddingBottom: 10,
@@ -540,8 +541,8 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#0B5E37",
-    backgroundColor: "#FFFFFF",
+    borderColor: semanticColors.app.brandAction,
+    backgroundColor: semanticColors.app.surfaceRaised,
     textAlign: "center",
     color: DIET_V2_DARK,
     fontSize: 24,
@@ -555,7 +556,7 @@ const styles = StyleSheet.create({
     top: 36,
     height: 36,
     borderRadius: 8,
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
+    backgroundColor: semanticColors.app.shadowHairline,
   },
   confirmBtn: {
     marginTop: 10,
@@ -565,14 +566,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000000",
+    shadowColor: semanticColors.scrim,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.12,
     shadowRadius: 14,
     elevation: 3,
   },
   confirmTxt: {
-    color: "#FFFFFF",
+    color: semanticColors.app.surfaceRaised,
   },
 });
 
