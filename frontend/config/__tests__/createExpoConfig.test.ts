@@ -216,6 +216,19 @@ describe("createExpoConfig", () => {
     ).toEqual(["./plugins/withOptionalCameraFeature"]);
   });
 
+  it("wires the Xcode 26 fmt compatibility plugin exactly once", () => {
+    const development = createExpoConfig({
+      baseConfig: {},
+      tenant: getTenant("avihu"),
+      environment: "development",
+      processEnv: {},
+    });
+
+    expect(
+      development.plugins?.filter((plugin) => plugin === "./plugins/withFmtXcode26Fix")
+    ).toEqual(["./plugins/withFmtXcode26Fix"]);
+  });
+
   it("enables Android edge-to-edge in every resolved environment", () => {
     for (const environment of ["development", "preview", "production"] as const) {
       const config = createExpoConfig({

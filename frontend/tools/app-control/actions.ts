@@ -69,6 +69,29 @@ const createCommandSpec = (
   extraEnv: Record<string, string> = {}
 ): CommandSpec => createCommandStep(selection, command, args, label, extraEnv);
 
+const getDeviceArguments = (platform: "android" | "ios", device?: string): string[] => {
+  if (!device || (platform === "android" && device.includes("._adb-tls-connect._tcp"))) {
+    return ["--device"];
+  }
+
+  return ["--device", device];
+};
+
+const withAndroidDevicePreparation = (
+  selection: AppSelection,
+  command: CommandSpec
+): CommandSpec => ({
+  ...command,
+  env: { ...command.env, ADB_MDNS_AUTO_CONNECT: "0" },
+  prerequisite: createCommandStep(
+    selection,
+    "npx",
+    ["tsx", "tools/app-control/prepareAndroidDevice.ts"],
+    "Prepare Android devices",
+    { ADB_MDNS_AUTO_CONNECT: "0" }
+  ),
+});
+
 export const resolveAction = (selection: AppSelection): CommandSpec => {
   const tenant = getTenant(selection.tenantId);
   const labelPrefix = `${tenant.displayName} (${selection.environment})`;
@@ -82,9 +105,9 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         selection.platform === "android"
           ? ["--variant", isRelease ? "release" : "debug"]
           : ["--configuration", isRelease ? "Release" : "Debug"];
-      const deviceArguments = selection.device ? ["--device", selection.device] : ["--device"];
+      const deviceArguments = getDeviceArguments(selection.platform, selection.device);
 
-      return createCommandSpec(
+      const command = createCommandSpec(
         selection,
         "npx",
         [
@@ -97,10 +120,13 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         `Build and run ${labelPrefix} on ${selection.platform}`,
         selection.platform === "android" ? getAndroidJavaEnvironment() : {}
       );
+      return selection.platform === "android"
+        ? withAndroidDevicePreparation(selection, command)
+        : command;
     }
     case "install": {
-      const deviceArguments = selection.device ? ["--device", selection.device] : ["--device"];
-      return createCommandSpec(
+      const deviceArguments = getDeviceArguments(selection.platform, selection.device);
+      const command = createCommandSpec(
         selection,
         "npx",
         [
@@ -113,6 +139,9 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         ],
         `Install ${labelPrefix} on ${selection.platform}`
       );
+      return selection.platform === "android"
+        ? withAndroidDevicePreparation(selection, command)
+        : command;
     }
     case "preflight":
       return createCommandSpec(
