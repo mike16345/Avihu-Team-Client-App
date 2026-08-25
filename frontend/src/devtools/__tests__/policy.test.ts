@@ -16,7 +16,9 @@ const validInput = (
   appVersion: "2.4.0",
   iosBundleIdentifier: "com.avihuteam.avihuteam.dev",
   androidPackage: "com.avihuteam.avihuteam.dev",
-  apiUrl: "https://api.example.com",
+  apiMode: "development",
+  hasApiUrl: true,
+  hasPreviewApi: false,
   ...overrides,
 });
 
@@ -32,19 +34,13 @@ describe("isDeveloperToolsAvailable", () => {
 });
 
 describe("createDeveloperDiagnostics", () => {
-  it("returns platform identity and strips every sensitive API URL component", () => {
-    expect(
-      createDeveloperDiagnostics(
-        validInput({
-          apiUrl: "https://token:secret@api.example.com/private/path?key=secret#fragment",
-        })
-      )
-    ).toEqual({
+  it("returns platform identity and a safe API environment without exposing a URL", () => {
+    expect(createDeveloperDiagnostics(validInput())).toEqual({
       tenant: "Elevate Coach (avihu)",
       environment: "development",
       applicationId: "com.avihuteam.avihuteam.dev",
       appVersion: "2.4.0",
-      apiHost: "api.example.com",
+      apiEnvironment: "test",
     });
   });
 
@@ -60,8 +56,14 @@ describe("createDeveloperDiagnostics", () => {
     ).toBe("com.avihuteam.avihuteam.dev");
   });
 
-  it.each([undefined, null, "", "not a URL"])("fails closed for API value %s", (apiUrl) => {
-    expect(createDeveloperDiagnostics(validInput({ apiUrl })).apiHost).toBe("Unavailable");
+  it.each([
+    [{ apiMode: "development", hasPreviewApi: false }, "test"],
+    [{ apiMode: "production", hasPreviewApi: false }, "production"],
+    [{ apiMode: "development", hasPreviewApi: true }, "preview"],
+    [{ apiMode: undefined, hasApiUrl: true, hasPreviewApi: false }, "production"],
+    [{ apiMode: "development", hasApiUrl: false, hasPreviewApi: false }, "unknown"],
+  ] as const)("maps API runtime %o to %s", (runtime, expected) => {
+    expect(createDeveloperDiagnostics(validInput(runtime)).apiEnvironment).toBe(expected);
   });
 
   it("fails closed when application identity and version are unavailable", () => {
