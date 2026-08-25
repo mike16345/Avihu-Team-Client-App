@@ -9,7 +9,8 @@ import { getTenantAssetPaths } from "../assets/paths";
 import { validateTenantAssets } from "../assets/validate";
 import { normalizeOrCreateLogo } from "./logo";
 import { addRepositoryTenantToRegistry } from "./registryEditor";
-import { renderTenantModule } from "./renderTenantModule";
+import { renderTenantFiles } from "./renderTenantFiles";
+import { themeRecipeV1Schema } from "../../config/tenants/themeRecipe";
 import type { TenantAddAnswers, TenantAddResult } from "./types";
 import { createTenantConfig } from "./validation";
 
@@ -29,7 +30,7 @@ export const scaffoldTenant = async (
     frontendRoot,
     "config/tenants",
     tenant.kind === "local" ? ".local" : "",
-    `${tenant.id}.ts`
+    tenant.id
   );
   const registryPath = path.join(frontendRoot, "config/tenants/registry.ts");
   const registryBefore = await readFile(registryPath, "utf8");
@@ -40,8 +41,23 @@ export const scaffoldTenant = async (
 
   try {
     await mkdir(path.dirname(modulePath), { recursive: true });
-    await writeFile(modulePath, renderTenantModule(tenant), { encoding: "utf8", flag: "wx" });
+    await mkdir(modulePath, { recursive: false });
     created.push(modulePath);
+    const recipe = themeRecipeV1Schema.parse({
+      schemaVersion: 1,
+      foundation: {
+        primary: tenant.theme.colors.primary,
+        onPrimary: tenant.theme.colors.onPrimary,
+        accent: tenant.theme.colors.accent,
+        onAccent: tenant.theme.colors.onAccent,
+        background: tenant.theme.colors.background,
+        onBackground: tenant.theme.colors.onBackground,
+      },
+      overrides: tenant.theme.colors,
+    });
+    for (const [fileName, source] of Object.entries(renderTenantFiles(tenant, recipe))) {
+      await writeFile(path.join(modulePath, fileName), source, { encoding: "utf8", flag: "wx" });
+    }
 
     if (tenant.kind === "repository") {
       await writeFile(
@@ -66,7 +82,7 @@ export const scaffoldTenant = async (
     created.push(paths.tenantDirectory);
     await writeFile(paths.sourceIcon, logo.contents, { flag: "wx" });
     if (tenant.kind === "local") {
-      for (const ignoredPath of [modulePath, paths.sourceIcon]) {
+      for (const ignoredPath of [path.join(modulePath, "index.ts"), paths.sourceIcon]) {
         await execFileAsync("git", ["check-ignore", "-q", ignoredPath], {
           cwd: frontendRoot,
         });
