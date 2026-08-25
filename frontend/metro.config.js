@@ -1,6 +1,6 @@
 const fs = require("node:fs");
-const path = require("node:path");
 const { getDefaultConfig } = require("expo/metro-config");
+const { resolveTenantAssetsDirectory } = require("./tools/metro/tenantAssets.cjs");
 
 const tenantId = process.env.APP_TENANT;
 
@@ -12,16 +12,7 @@ if (!/^[a-z][a-z0-9-]*$/.test(tenantId)) {
   throw new Error(`Invalid APP_TENANT "${tenantId}". Expected a lowercase tenant ID.`);
 }
 
-const localTenantModule = path.resolve(__dirname, "config", "tenants", ".local", `${tenantId}.ts`);
-const tenantAssetsDirectory = path.resolve(
-  __dirname,
-  "config",
-  "tenants",
-  "assets",
-  ...(fs.existsSync(localTenantModule) ? [".local"] : []),
-  tenantId,
-  "generated"
-);
+const tenantAssetsDirectory = resolveTenantAssetsDirectory(__dirname, tenantId, fs.existsSync);
 
 if (!fs.existsSync(tenantAssetsDirectory)) {
   throw new Error(
