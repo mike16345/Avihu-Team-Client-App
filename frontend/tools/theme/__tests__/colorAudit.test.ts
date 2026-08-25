@@ -8,7 +8,9 @@ import { auditApplicationColors } from "../colorAudit";
 const temporaryRoots: string[] = [];
 
 afterEach(async () => {
-  await Promise.all(temporaryRoots.splice(0).map((root) => rm(root, { force: true, recursive: true })));
+  await Promise.all(
+    temporaryRoots.splice(0).map((root) => rm(root, { force: true, recursive: true }))
+  );
 });
 
 describe("application color audit", () => {
