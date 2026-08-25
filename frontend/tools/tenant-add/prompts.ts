@@ -1,6 +1,7 @@
 import { box, cancel, confirm, isCancel, multiselect, select, text } from "@clack/prompts";
 import { avihuTenant } from "../../config/tenants/avihu";
-import type { TenantNativeCapabilities } from "../../config/tenants/types";
+import { TENANT_FEATURE_KEYS } from "../../config/tenants/features";
+import type { TenantFeatureDefaults, TenantNativeCapabilities } from "../../config/tenants/types";
 import type { TenantAddAnswers, TenantAddMode } from "./types";
 
 const DEFAULT_PALETTE = {
@@ -53,6 +54,27 @@ export const collectTenantAnswers = async (): Promise<TenantAddAnswers | null> =
     palette[key] = value;
   }
 
+  const supportsRtl = await confirm({
+    message: "Support right-to-left layouts?",
+    initialValue: true,
+  });
+  if (cancelled(supportsRtl)) return null;
+  const forcesRtl = supportsRtl
+    ? await confirm({ message: "Force right-to-left layout?", initialValue: true })
+    : false;
+  if (cancelled(forcesRtl)) return null;
+
+  const selectedFeatures = await multiselect({
+    message: "Default JavaScript features",
+    options: TENANT_FEATURE_KEYS.map((value) => ({ value, label: value })),
+    initialValues: [...TENANT_FEATURE_KEYS],
+    required: false,
+  });
+  if (cancelled(selectedFeatures)) return null;
+  const featureDefaults = Object.fromEntries(
+    TENANT_FEATURE_KEYS.map((key) => [key, selectedFeatures.includes(key)])
+  ) as TenantFeatureDefaults;
+
   const capabilityKeys = Object.keys(
     avihuTenant.nativeCapabilities
   ) as (keyof TenantNativeCapabilities)[];
@@ -76,6 +98,9 @@ export const collectTenantAnswers = async (): Promise<TenantAddAnswers | null> =
     ...(projectId ? { projectId } : {}),
     ...(identifierBase ? { identifierBase } : {}),
     ...palette,
+    supportsRtl,
+    forcesRtl,
+    featureDefaults,
     nativeCapabilities,
   };
   box(
@@ -83,7 +108,7 @@ export const collectTenantAnswers = async (): Promise<TenantAddAnswers | null> =
       `Mode: ${answers.mode}`,
       `Tenant: ${answers.displayName} (${answers.id})`,
       `Logo: ${answers.logoPath ?? "generated fallback"}`,
-      "JavaScript feature defaults: all enabled",
+      `JavaScript features: ${selectedFeatures.join(", ") || "none"}`,
       `Native capabilities: ${selectedCapabilities.join(", ") || "none"}`,
     ].join("\n"),
     "Tenant summary"

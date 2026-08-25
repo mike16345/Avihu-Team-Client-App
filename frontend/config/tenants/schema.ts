@@ -163,6 +163,13 @@ export const tenantConfigSchema = z
   })
   .strict()
   .superRefine((tenant, context) => {
+    if (tenant.localization.forcesRtl && !tenant.localization.supportsRtl) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["localization", "forcesRtl"],
+        message: "A tenant cannot force RTL without supporting RTL",
+      });
+    }
     if (tenant.kind === "repository") {
       for (const environment of TENANT_ENVIRONMENTS) {
         if (tenant.requiredEnvironmentVariables[environment].length === 0) {

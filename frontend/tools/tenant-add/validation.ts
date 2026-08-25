@@ -133,7 +133,18 @@ export const createTenantConfig = (
     },
     brand: { primaryColor: primary, backgroundColor: background },
     theme,
-    featureDefaults: { ...avihuTenant.featureDefaults },
+    permissions: {
+      camera: "Allow $(PRODUCT_NAME) to use the camera for scanning and photos.",
+      photos: "Allow $(PRODUCT_NAME) to select photos from your library.",
+      healthShare: "Allow $(PRODUCT_NAME) to read step and activity data.",
+      healthUpdate: "$(PRODUCT_NAME) does not modify your health data.",
+      android: [...avihuTenant.permissions.android],
+    },
+    localization: {
+      supportsRtl: answers.supportsRtl ?? true,
+      forcesRtl: answers.forcesRtl ?? true,
+    },
+    featureDefaults: answers.featureDefaults ?? { ...avihuTenant.featureDefaults },
     nativeCapabilities: { ...answers.nativeCapabilities },
     requiredEnvironmentVariables:
       answers.mode === "local"
