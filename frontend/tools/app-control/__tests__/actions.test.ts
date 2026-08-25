@@ -1,9 +1,38 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { resolveAction } from "../actions";
+import { avihuTenant } from "../../../config/tenants/avihu";
+import { assertTenantActionAllowed, resolveAction } from "../actions";
 
 describe("resolveAction", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
+  });
+
+  it("blocks release operations for ignored local tenants", () => {
+    const localTenant = { ...avihuTenant, id: "test-tenant", kind: "local" as const };
+    expect(() =>
+      assertTenantActionAllowed(localTenant, {
+        action: "build",
+        platform: "ios",
+        tenantId: localTenant.id,
+        environment: "production",
+        profile: "production",
+      })
+    ).toThrow('Local tenant "test-tenant" cannot run build actions');
+    expect(() =>
+      assertTenantActionAllowed(localTenant, {
+        action: "preflight",
+        mode: "release",
+        tenantId: localTenant.id,
+        environment: "production",
+      })
+    ).toThrow(/release preflight/u);
+    expect(() =>
+      assertTenantActionAllowed(localTenant, {
+        action: "start",
+        tenantId: localTenant.id,
+        environment: "development",
+      })
+    ).not.toThrow();
   });
 
   it("runs local Android builds with the configured Java 17 toolchain", () => {
