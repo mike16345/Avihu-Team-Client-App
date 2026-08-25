@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createExpoConfig } from "../createExpoConfig";
+import { createExpoConfig, createTenantPlugins } from "../createExpoConfig";
 import { avihuTenant } from "../tenants/avihu";
 import { getTenant, listTenants } from "../tenants/registry";
 import { parseTenantEnvironment, tenantConfigSchema } from "../tenants/schema";
@@ -231,6 +231,27 @@ describe("createExpoConfig", () => {
     expect(
       development.plugins?.filter((plugin) => plugin === "./plugins/withFmtXcode26Fix")
     ).toEqual(["./plugins/withFmtXcode26Fix"]);
+  });
+
+  it("composes binary plugins only from native capabilities", () => {
+    const plugins = createTenantPlugins({
+      ...avihuTenant,
+      nativeCapabilities: {
+        camera: false,
+        photoLibrary: false,
+        notifications: false,
+        backgroundTasks: false,
+        appleHealth: false,
+        healthConnect: false,
+        liveActivities: false,
+      },
+    });
+
+    expect(plugins).toEqual([
+      "expo-localization",
+      ["expo-build-properties", { android: avihuTenant.androidBuildProperties }],
+      "./plugins/withFmtXcode26Fix",
+    ]);
   });
 
   it("enables Android edge-to-edge in every resolved environment", () => {
