@@ -7,6 +7,7 @@ export type TenantSourceFile = (typeof TENANT_SOURCE_FILES)[number];
 
 const renderTenantIndex = (tenant: TenantConfig) => {
   const {
+    eas: _eas,
     theme: _theme,
     featureDefaults: _features,
     nativeCapabilities: _native,
@@ -14,12 +15,17 @@ const renderTenantIndex = (tenant: TenantConfig) => {
   } = tenant;
   const typePath = tenant.kind === "local" ? "../../types" : "../types";
   return [
-    `import type { TenantConfig } from ${JSON.stringify(typePath)};`,
+    `import type { TenantConfig, TenantEasConfig } from ${JSON.stringify(typePath)};`,
     'import { featureDefaults, nativeCapabilities } from "./features";',
     'import { tenantTheme } from "./theme";',
     "",
+    "// tenant:eas:start",
+    'const tenantEas = { status: "pending" } satisfies TenantEasConfig;',
+    "// tenant:eas:end",
+    "",
     `export const ${toExportName(tenant.id)} = {`,
     `  ...${JSON.stringify(identity, null, 2).replace(/\n/gu, "\n  ")},`,
+    "  eas: tenantEas,",
     "  theme: tenantTheme,",
     "  featureDefaults,",
     "  nativeCapabilities,",
