@@ -31,3 +31,18 @@ export const addRepositoryTenantToRegistry = (source: string, tenantId: string):
   );
   return updated;
 };
+
+export const removeRepositoryTenantFromRegistry = (source: string, tenantId: string): string => {
+  const exportName = toExportName(tenantId);
+  const importLine = `import { ${exportName} } from "./${tenantId}";\n`;
+  if (!source.includes(importLine)) return source;
+  const withoutImport = source.replace(importLine, "");
+  const entryPattern = /(const committedTenants = \[)([^\]]*)(\];)/u;
+  return withoutImport.replace(entryPattern, (_, start: string, entries: string, end: string) => {
+    const kept = entries
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter((entry) => entry && entry !== exportName);
+    return `${start}${kept.join(", ")}${end}`;
+  });
+};

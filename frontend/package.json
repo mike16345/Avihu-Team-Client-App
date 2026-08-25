@@ -31,8 +31,8 @@
     "build:ios:dev": "npm run app -- build ios --profile development --yes",
     "build:ios:preview": "npm run app -- build ios --profile preview --yes",
     "build:ios:prod": "npm run app -- build ios --profile production --yes",
-    "update:prod": "eas update --branch production --environment production --message",
-    "update:preview": "eas update --branch preview --environment preview --message"
+    "update:prod": "npm run app -- update --tenant avihu --environment production --yes",
+    "update:preview": "npm run app -- update --tenant avihu --environment preview --yes"
   },
   "expo": {
     "install": {

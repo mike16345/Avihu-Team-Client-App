@@ -18,7 +18,12 @@ import type {
   EasProjectRunner,
   TenantEasSelection,
 } from "../tenant-add/eas/types";
-import { removeTenantRecovery } from "../tenant-add/recovery";
+import {
+  readTenantRecovery,
+  removeTenantRecovery,
+  type TenantRecovery,
+  writeTenantRecovery,
+} from "../tenant-add/recovery";
 
 export interface TenantEasCliDependencies {
   argv: string[];
@@ -32,6 +37,8 @@ export interface TenantEasCliDependencies {
   writeTenantIndex: (tenantId: string, source: string) => Promise<void>;
   replaceTenantEasBlock: typeof replaceTenantEasBlock;
   runFastPreflight: (tenantId: string) => Promise<void>;
+  readRecovery: (tenantId: string) => Promise<TenantRecovery | null>;
+  writeRecovery: (identity: EasProjectIdentity, tenantId: string) => Promise<void>;
   removeRecovery: (tenantId: string) => Promise<void>;
   writeOutput: (value: string) => void;
 }
@@ -47,22 +54,45 @@ export const runTenantEasCli = async (dependencies: TenantEasCliDependencies): P
   const tenant = dependencies.getTenant(tenantId);
   if (tenant.kind !== "repository") throw new Error("Local tenants cannot be linked to EAS");
   if (tenant.eas.status !== "pending") throw new Error(`Tenant "${tenant.id}" is already linked`);
-  const selection = await dependencies.collectSelection(tenant);
-  if (!selection || selection.kind === "skip") return 0;
-  const identity = await dependencies.resolveProject(tenant, selection);
+  const recovery = await dependencies.readRecovery(tenant.id);
+  if (recovery && recovery.slug !== tenant.slug) {
+    throw new Error(`Recovery slug "${recovery.slug}" does not match tenant slug "${tenant.slug}"`);
+  }
+  let identity: EasProjectIdentity;
+  if (recovery) {
+    identity = await dependencies.resolveProject(tenant, {
+      kind: "link",
+      projectId: recovery.projectId,
+    });
+    for (const field of ["owner", "slug", "projectId", "updateUrl"] as const) {
+      if (identity[field] !== recovery[field]) {
+        throw new Error(`Recovered EAS ${field} no longer matches the verified remote project`);
+      }
+    }
+  } else {
+    const selection = await dependencies.collectSelection(tenant);
+    if (!selection || selection.kind === "skip") return 0;
+    identity = await dependencies.resolveProject(tenant, selection);
+  }
   const eas: TenantEasConfig = {
     status: "linked",
     owner: identity.owner,
     projectId: identity.projectId,
     updateUrl: identity.updateUrl,
   };
-  const original = await dependencies.readTenantIndex(tenant.id);
-  const updated = dependencies.replaceTenantEasBlock(original, eas);
-  await dependencies.writeTenantIndex(tenant.id, updated);
+  let original: string | undefined;
+  let wroteLinkedSource = false;
   try {
+    original = await dependencies.readTenantIndex(tenant.id);
+    const updated = dependencies.replaceTenantEasBlock(original, eas);
+    await dependencies.writeTenantIndex(tenant.id, updated);
+    wroteLinkedSource = true;
     await dependencies.runFastPreflight(tenant.id);
   } catch (error) {
-    await dependencies.writeTenantIndex(tenant.id, original);
+    if (wroteLinkedSource && original !== undefined) {
+      await dependencies.writeTenantIndex(tenant.id, original);
+    }
+    await dependencies.writeRecovery(identity, tenant.id);
     throw error;
   }
   await dependencies.removeRecovery(tenant.id);
@@ -128,7 +158,13 @@ const runDefaultCli = async () => {
       if (isCancel(action) || action === "skip") return null;
       if (action === "link") {
         const projectId = await text({ message: "Expo project UUID" });
-        return isCancel(projectId) ? null : { kind: "link", projectId: String(projectId).trim() };
+        if (isCancel(projectId)) return null;
+        const normalizedProjectId = String(projectId).trim();
+        const approved = await confirm({
+          message: `Link ${tenant.slug} to Expo project ${normalizedProjectId}?`,
+          initialValue: false,
+        });
+        return approved === true ? { kind: "link", projectId: normalizedProjectId } : null;
       }
       const authenticated = await getAuthenticatedExpoUser(runProcess, frontendRoot);
       const owner = await text({ message: "Expo owner", initialValue: authenticated });
@@ -159,6 +195,28 @@ const runDefaultCli = async () => {
     },
     replaceTenantEasBlock,
     runFastPreflight: (tenantId) => runFastPreflight(frontendRoot, tenantId),
+    readRecovery: async (tenantId) => {
+      const recovery = await readTenantRecovery(path.join(frontendRoot, ".tenant-add"), tenantId);
+      if (!recovery) return null;
+      const approved = await confirm({
+        message: `Resume recovered EAS project ${recovery.owner}/${recovery.slug} (${recovery.projectId})?`,
+        initialValue: true,
+      });
+      if (approved !== true) {
+        throw new Error("Recovery retained; no new Expo project was created");
+      }
+      return recovery;
+    },
+    writeRecovery: (identity, tenantId) =>
+      writeTenantRecovery(path.join(frontendRoot, ".tenant-add"), {
+        schemaVersion: 1,
+        tenantId,
+        owner: identity.owner,
+        slug: identity.slug,
+        projectId: identity.projectId,
+        updateUrl: identity.updateUrl,
+        createdAt: new Date().toISOString(),
+      }),
     removeRecovery: (tenantId) =>
       removeTenantRecovery(path.join(frontendRoot, ".tenant-add"), tenantId),
     writeOutput: (value) => process.stdout.write(value),

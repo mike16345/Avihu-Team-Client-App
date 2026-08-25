@@ -3,14 +3,14 @@ import { spawn } from "node:child_process";
 import { readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { box, cancel, confirm, intro, outro } from "@clack/prompts";
+import { box, cancel, intro, outro } from "@clack/prompts";
 import type { TenantEasConfig } from "../../config/tenants/types";
 import { replaceTenantEasBlock } from "./easEditor";
 import { createEasProject, getAuthenticatedExpoUser, verifyLinkedEasProject } from "./eas/project";
 import type { EasProjectIdentity, EasProjectRunner, TenantEasSelection } from "./eas/types";
 import { collectTenantAnswers, collectTenantEasSelection } from "./prompts";
 import { writeTenantRecovery } from "./recovery";
-import { scaffoldTenant } from "./scaffold";
+import { discardStagedTenant, publishStagedTenant, scaffoldTenant } from "./scaffold";
 
 const runFastPreflight = (frontendRoot: string, tenantId: string) =>
   new Promise<void>((resolve, reject) => {
@@ -51,11 +51,6 @@ const resolveEasSelection = async (
 ): Promise<EasProjectIdentity | null> => {
   if (selection.kind === "skip") return null;
   if (selection.kind === "create") {
-    const approved = await confirm({
-      message: `Create Expo project ${selection.owner}/${input.slug} now?`,
-      initialValue: false,
-    });
-    if (approved !== true) return null;
     return createEasProject(runEasProcess, {
       displayName: input.displayName,
       slug: input.slug,
@@ -72,9 +67,7 @@ const resolveEasSelection = async (
 };
 
 const publishLinkedEas = async (
-  frontendRoot: string,
   modulePath: string,
-  tenantId: string,
   identity: EasProjectIdentity
 ) => {
   const indexPath = path.join(modulePath, "index.ts");
@@ -92,21 +85,6 @@ const publishLinkedEas = async (
     await rename(temporary, indexPath);
   };
   await writeAtomic(updated);
-  try {
-    await runFastPreflight(frontendRoot, tenantId);
-  } catch (error) {
-    await writeAtomic(original);
-    await writeTenantRecovery(path.join(frontendRoot, ".tenant-add"), {
-      schemaVersion: 1,
-      tenantId,
-      owner: identity.owner,
-      slug: identity.slug,
-      projectId: identity.projectId,
-      updateUrl: identity.updateUrl,
-      createdAt: new Date().toISOString(),
-    });
-    throw error;
-  }
 };
 
 export const runTenantAddCli = async (
@@ -117,24 +95,43 @@ export const runTenantAddCli = async (
   if (!answers) return 0;
 
   try {
-    const result = await scaffoldTenant(answers, frontendRoot, (tenantId) =>
-      runFastPreflight(frontendRoot, tenantId)
-    );
+    const result = await scaffoldTenant(answers, frontendRoot);
     const selection = await collectTenantEasSelection(
       result.tenant.kind,
       result.tenant.slug,
       undefined,
       () => getAuthenticatedExpoUser(runEasProcess, frontendRoot)
     );
-    if (!selection) return 0;
-    const identity = await resolveEasSelection(selection, {
-      frontendRoot,
-      displayName: result.tenant.displayName,
-      slug: result.tenant.slug,
-      sourceIcon: path.join(result.assetDirectory, "source/app-icon.png"),
-    });
-    if (identity) {
-      await publishLinkedEas(frontendRoot, result.modulePath, result.tenant.id, identity);
+    if (!selection) {
+      await discardStagedTenant(result);
+      return 0;
+    }
+    let identity: EasProjectIdentity | null = null;
+    try {
+      identity = await resolveEasSelection(selection, {
+        frontendRoot,
+        displayName: result.tenant.displayName,
+        slug: result.tenant.slug,
+        sourceIcon: path.join(result.stagedAssetDirectory, "source/app-icon.png"),
+      });
+      if (identity) await publishLinkedEas(result.stagedModulePath, identity);
+      await publishStagedTenant(result, frontendRoot, (tenantId) =>
+        runFastPreflight(frontendRoot, tenantId)
+      );
+    } catch (error) {
+      await discardStagedTenant(result);
+      if (identity) {
+        await writeTenantRecovery(path.join(frontendRoot, ".tenant-add"), {
+          schemaVersion: 1,
+          tenantId: result.tenant.id,
+          owner: identity.owner,
+          slug: identity.slug,
+          projectId: identity.projectId,
+          updateUrl: identity.updateUrl,
+          createdAt: new Date().toISOString(),
+        });
+      }
+      throw error;
     }
     box(
       [
