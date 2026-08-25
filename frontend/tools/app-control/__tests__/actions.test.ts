@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import packageJson from "../../../package.json";
 import { avihuTenant } from "../../../config/tenants/avihu";
 import { assertTenantActionAllowed, resolveAction } from "../actions";
 
@@ -44,6 +45,13 @@ describe("resolveAction", () => {
         environment: "production",
       })
     ).toThrow(/tenant:eas -- --tenant new-tenant/u);
+  });
+
+  it("routes every legacy update alias through guarded app control", () => {
+    expect(packageJson.scripts["update:prod"]).toMatch(/^npm run app -- update /u);
+    expect(packageJson.scripts["update:preview"]).toMatch(/^npm run app -- update /u);
+    expect(packageJson.scripts["update:prod"]).not.toContain("eas update");
+    expect(packageJson.scripts["update:preview"]).not.toContain("eas update");
   });
 
   it("runs local Android builds with the configured Java 17 toolchain", () => {

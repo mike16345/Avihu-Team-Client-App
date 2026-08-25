@@ -29,6 +29,8 @@ const createDependencies = () => {
       }),
       replaceTenantEasBlock: vi.fn().mockReturnValue("linked source"),
       runFastPreflight: vi.fn().mockResolvedValue(undefined),
+      readRecovery: vi.fn().mockResolvedValue(null),
+      writeRecovery: vi.fn().mockResolvedValue(undefined),
       removeRecovery: vi.fn().mockResolvedValue(undefined),
       writeOutput: vi.fn(),
     } satisfies TenantEasCliDependencies,
@@ -55,5 +57,30 @@ describe("tenant:eas", () => {
     dependencies.runFastPreflight.mockRejectedValueOnce(new Error("preflight failed"));
     await expect(runTenantEasCli(dependencies)).rejects.toThrow(/preflight/u);
     expect(getSource()).toBe("pending source");
+    expect(dependencies.writeRecovery).toHaveBeenCalledWith(identity, "new-tenant");
+  });
+
+  it("persists remote identity when a local edit fails before writing", async () => {
+    const { dependencies } = createDependencies();
+    dependencies.readTenantIndex.mockRejectedValueOnce(new Error("disk failed"));
+    await expect(runTenantEasCli(dependencies)).rejects.toThrow(/disk/u);
+    expect(dependencies.writeRecovery).toHaveBeenCalledWith(identity, "new-tenant");
+  });
+
+  it("resumes the exact recovered project without creating another remote project", async () => {
+    const { dependencies } = createDependencies();
+    dependencies.readRecovery.mockResolvedValueOnce({
+      schemaVersion: 1,
+      tenantId: "new-tenant",
+      ...identity,
+      createdAt: "2026-08-25T00:00:00.000Z",
+    });
+    expect(await runTenantEasCli(dependencies)).toBe(0);
+    expect(dependencies.collectSelection).not.toHaveBeenCalled();
+    expect(dependencies.resolveProject).toHaveBeenCalledWith(pendingTenant, {
+      kind: "link",
+      projectId: identity.projectId,
+    });
+    expect(dependencies.removeRecovery).toHaveBeenCalledWith("new-tenant");
   });
 });

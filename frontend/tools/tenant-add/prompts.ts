@@ -49,13 +49,23 @@ export const collectTenantEasSelection = async (
   if (action === "skip") return { kind: "skip" };
   if (action === "link") {
     const projectId = await askText(promptApi, "Expo project UUID");
-    return projectId ? { kind: "link", projectId } : null;
+    if (!projectId) return null;
+    promptApi.box(`Existing Expo project UUID: ${projectId}\nTenant slug: ${tenantSlug}`, "Confirm EAS link");
+    const approved = await promptApi.confirm({
+      message: `Link ${tenantSlug} to this Expo project?`,
+      initialValue: false,
+    });
+    return approved === true ? { kind: "link", projectId } : null;
   }
   const authenticatedUser = await getAuthenticatedUser();
   const owner = await askText(promptApi, "Expo owner", authenticatedUser);
   if (!owner) return null;
   promptApi.box(`Expo project to create: ${owner}/${tenantSlug}`, "External EAS action");
-  return { kind: "create", owner };
+  const approved = await promptApi.confirm({
+    message: `Create Expo project ${owner}/${tenantSlug} now?`,
+    initialValue: false,
+  });
+  return approved === true ? { kind: "create", owner } : null;
 };
 
 const askText = async (

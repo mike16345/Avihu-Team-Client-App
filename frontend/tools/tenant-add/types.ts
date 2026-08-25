@@ -26,6 +26,9 @@ export interface TenantAddResult {
   tenant: TenantConfig;
   modulePath: string;
   assetDirectory: string;
+  stagingRoot: string;
+  stagedModulePath: string;
+  stagedAssetDirectory: string;
   logoSource: "provided" | "fallback";
   launchCommand: string;
 }
