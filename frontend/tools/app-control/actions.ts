@@ -3,8 +3,9 @@ import { delimiter, join } from "node:path";
 import { getTenant } from "../../config/tenants/registry";
 import { assertTenantEasActionAllowed } from "../../config/tenants/schema";
 import type { AppSelection, CommandSpec, CommandStep } from "./types";
+import { EAS_CLI_ARGS } from "../eas/constants";
 
-export const EAS_CLI_ARGS = ["--yes", "eas-cli@16.27.0"] as const;
+export { EAS_CLI_ARGS } from "../eas/constants";
 
 export const assertTenantActionAllowed = (
   tenant: ReturnType<typeof getTenant>,
