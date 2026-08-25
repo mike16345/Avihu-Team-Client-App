@@ -10,6 +10,14 @@ import type { TenantConfig } from "./types";
 const committedTenants = [avihuTenant];
 // tenant:add entries:end
 
+const transientTenants = new Map<string, TenantConfig>();
+
+export const registerTransientTenant = (tenant: TenantConfig): (() => void) => {
+  if (transientTenants.has(tenant.id)) throw new Error(`Tenant ${tenant.id} is already staged`);
+  transientTenants.set(tenant.id, tenant);
+  return () => transientTenants.delete(tenant.id);
+};
+
 export const assertUniqueTenants = (tenants: TenantConfig[]) => {
   const claims = new Map<string, string>();
   const claim = (kind: string, value: string, tenantId: string) => {
@@ -33,15 +41,18 @@ export const assertUniqueTenants = (tenants: TenantConfig[]) => {
   }
 };
 
-const tenantRegistry = tenantConfigSchema
-  .array()
-  .parse([...committedTenants, ...loadLocalTenants()]);
-assertUniqueTenants(tenantRegistry);
+const getTenantRegistry = () => {
+  const tenantRegistry = tenantConfigSchema
+    .array()
+    .parse([...committedTenants, ...loadLocalTenants(), ...transientTenants.values()]);
+  assertUniqueTenants(tenantRegistry);
+  return tenantRegistry;
+};
 
-export const listTenants = (): TenantConfig[] => [...tenantRegistry];
+export const listTenants = (): TenantConfig[] => [...getTenantRegistry()];
 
 export const getTenant = (tenantId: string): TenantConfig => {
-  const tenant = tenantRegistry.find(({ id }) => id === tenantId);
+  const tenant = getTenantRegistry().find(({ id }) => id === tenantId);
 
   if (!tenant) {
     throw new Error(`Unknown tenant "${tenantId}"`);

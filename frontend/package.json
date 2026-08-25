@@ -8,6 +8,7 @@
     "assets:check": "tsx tools/assets/cli.ts check",
     "assets:audit": "tsx tools/assets/cli.ts audit",
     "theme:audit": "tsx tools/theme/colorAudit.ts --paths src",
+    "tenant:add": "tsx tools/tenant-add/cli.ts",
     "preflight": "tsx tools/preflight/cli.ts fast",
     "preflight:release": "tsx tools/preflight/cli.ts release",
     "preflight:eas": "tsx tools/preflight/cli.ts eas --json .preflight/eas-report.json",

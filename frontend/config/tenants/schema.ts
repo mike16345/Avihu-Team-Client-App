@@ -92,9 +92,9 @@ const tenantEnvironmentsSchema = z
 
 const requiredEnvironmentVariablesSchema = z
   .object({
-    development: z.array(environmentVariableNameSchema).min(1),
-    preview: z.array(environmentVariableNameSchema).min(1),
-    production: z.array(environmentVariableNameSchema).min(1),
+    development: z.array(environmentVariableNameSchema),
+    preview: z.array(environmentVariableNameSchema),
+    production: z.array(environmentVariableNameSchema),
   })
   .strict();
 
@@ -163,6 +163,17 @@ export const tenantConfigSchema = z
   })
   .strict()
   .superRefine((tenant, context) => {
+    if (tenant.kind === "repository") {
+      for (const environment of TENANT_ENVIRONMENTS) {
+        if (tenant.requiredEnvironmentVariables[environment].length === 0) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["requiredEnvironmentVariables", environment],
+            message: "Repository tenants must declare required environment variables",
+          });
+        }
+      }
+    }
     const requireCapability = (
       enabled: boolean,
       capability: boolean,
