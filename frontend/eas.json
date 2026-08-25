@@ -6,7 +6,7 @@
       "distribution": "internal",
       "channel": "development",
       "environment": "development",
-      "env": { "APP_ENV": "development" }
+      "env": { "APP_TENANT": "avihu", "APP_ENV": "development" }
     },
     "development-simulator": {
       "extends": "development",
@@ -20,14 +20,14 @@
       "channel": "preview",
       "autoIncrement": true,
       "environment": "preview",
-      "env": { "APP_ENV": "preview" },
+      "env": { "APP_TENANT": "avihu", "APP_ENV": "preview" },
       "ios": { "image": "macos-sequoia-15.6-xcode-26.0" }
     },
     "production": {
       "android": { "credentialsSource": "remote" },
       "ios": { "image": "macos-sequoia-15.6-xcode-26.0" },
       "environment": "production",
-      "env": { "APP_ENV": "production" },
+      "env": { "APP_TENANT": "avihu", "APP_ENV": "production" },
       "channel": "production",
       "autoIncrement": true
     }
