@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { avihuTenant } from "./avihu/index.ts";
 import {
   tenantColorSchema,
   tenantThemeColorsSchema,
@@ -7,14 +6,19 @@ import {
   type TenantTheme,
 } from "./theme.ts";
 
+const themeFoundationColorSchema = tenantColorSchema.refine(
+  (value) => /^#[0-9A-Fa-f]{6}$/u.test(value),
+  "Foundation colors must use six-digit hex values"
+);
+
 export const themeFoundationSchema = z
   .object({
-    primary: tenantColorSchema,
-    onPrimary: tenantColorSchema,
-    accent: tenantColorSchema,
-    onAccent: tenantColorSchema,
-    background: tenantColorSchema,
-    onBackground: tenantColorSchema,
+    primary: themeFoundationColorSchema,
+    onPrimary: themeFoundationColorSchema,
+    accent: themeFoundationColorSchema,
+    onAccent: themeFoundationColorSchema,
+    background: themeFoundationColorSchema,
+    onBackground: themeFoundationColorSchema,
   })
   .strict();
 
@@ -90,9 +94,79 @@ export type ThemeColorOverrides = z.infer<typeof themeColorOverridesSchema>;
 
 const withAlpha = (color: string, alpha: string) => `${color}${alpha}`;
 
+const getFoundationColor = (
+  path: string[],
+  foundation: ThemeRecipeV1["foundation"]
+): string => {
+  const key = path.at(-1) ?? "";
+  const semanticPath = path.join(".").toLowerCase();
+
+  const exactFoundationColors: Record<string, string> = {
+    primary: foundation.primary,
+    onPrimary: foundation.onPrimary,
+    accent: foundation.accent,
+    onAccent: foundation.onAccent,
+    background: foundation.background,
+    onBackground: foundation.onBackground,
+  };
+  if (path.length === 1 && exactFoundationColors[key] !== undefined) {
+    return exactFoundationColors[key];
+  }
+  if (key === "level0" || semanticPath.includes("transparentbackground")) return "transparent";
+
+  if (/onaccent|tooltiptext/u.test(semanticPath)) return foundation.onAccent;
+  if (/onprimary/u.test(semanticPath)) return foundation.onPrimary;
+  if (
+    /^on/u.test(key.toLowerCase()) ||
+    /paneltext|primarytext|consumedtext|dayheader|agendatext/u.test(semanticPath)
+  ) {
+    return foundation.onBackground;
+  }
+
+  if (
+    /accent|success|warning|error|danger|info|positive|negative|mint|abovegoal|selected|dot|line|viewfinder|scanline|notification|indicator|gradientend/u.test(
+      semanticPath
+    )
+  ) {
+    return foundation.accent;
+  }
+
+  if (
+    /overlay|shadow|scrim|backdrop|dim|modal|translucent|muted|subtle|soft|faint|border|divider|outline|hairline|baseline|target|track|today|placeholder|pressed/u.test(
+      semanticPath
+    )
+  ) {
+    return withAlpha(foundation.primary, "33");
+  }
+
+  if (/surface|background|card|panel|container|raised|disabled/u.test(semanticPath)) {
+    return foundation.background;
+  }
+
+  if (/text|label|agreement/u.test(semanticPath)) return foundation.onBackground;
+  if (/accent|warm|cool/u.test(semanticPath)) return foundation.accent;
+  return foundation.primary;
+};
+
+const expandColorSchema = (
+  schema: z.ZodTypeAny,
+  foundation: ThemeRecipeV1["foundation"],
+  path: string[] = []
+): unknown => {
+  if (schema instanceof z.ZodObject) {
+    return Object.fromEntries(
+      Object.entries(schema.shape).map(([key, childSchema]) => [
+        key,
+        expandColorSchema(childSchema as z.ZodTypeAny, foundation, [...path, key]),
+      ])
+    );
+  }
+  return getFoundationColor(path, foundation);
+};
+
 const createFoundationColors = (foundation: ThemeRecipeV1["foundation"]): TenantTheme["colors"] => {
   const { primary, onPrimary, accent, onAccent, background, onBackground } = foundation;
-  const colors = structuredClone(avihuTenant.theme.colors);
+  const colors = tenantThemeColorsSchema.parse(expandColorSchema(tenantThemeColorsSchema, foundation));
   Object.assign(colors, {
     primary,
     onPrimary,

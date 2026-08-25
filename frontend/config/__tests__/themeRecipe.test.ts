@@ -32,6 +32,12 @@ describe("tenant theme recipes", () => {
     ).toThrow();
   });
 
+  it("does not leak Avihu-only colors into new tenant presets", () => {
+    const theme = createTenantTheme(getThemePreset("violet-amber"));
+    expect(JSON.stringify(theme)).not.toContain("#17B26A");
+    expect(theme.colors.scanner.controlSurface).not.toBe("rgba(255, 255, 255, 0.16)");
+  });
+
   it("rejects unsupported versions and inaccessible foundation contrast", () => {
     const recipe = getThemePreset("violet-amber");
     expect(() => themeRecipeV1Schema.parse({ ...recipe, schemaVersion: 2 })).toThrow();
