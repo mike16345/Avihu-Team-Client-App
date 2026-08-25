@@ -17,6 +17,10 @@
 - App-wide providers are composed at the application root in `frontend/App.tsx`; new global providers should be added there instead of being recreated inside feature screens.
 - Tenant records under `frontend/config/tenants` are the source of truth for public app identity, branding, permissions, supported platforms, release properties, and required environment-variable names. Runtime code consumes only the validated public snapshot in `extra.tenant`; secret values never belong in tenant TypeScript files or Expo `extra`.
 - Tenant theme colors, JavaScript feature defaults, and native capabilities are distinct contracts. Future entitlement sources may override validated JavaScript defaults, but they must never enable native functionality absent from the selected binary.
+- Author tenant themes through versioned presets or JSON recipes; expand them into the complete strict semantic runtime theme before publication.
+- Keep each tenant's identity/platform record in `index.ts`, semantic recipe in `theme.ts`, and JavaScript defaults plus native capabilities in `features.ts`.
+- EAS project initialization must run in an invocation-owned isolated workspace with explicit confirmation immediately before remote creation.
+- Tenants with pending EAS state may develop locally but cannot enter build, update, release, or EAS preflight actions.
 - Use `npm run tenant:add` for both repository tenants and ignored local test tenants. Local tenant modules and assets stay under the exact ignored `.local` roots and are prohibited from release preflight, build, update, and non-development native-run actions.
 - Local and automated app commands must select both `APP_TENANT` and `APP_ENV` explicitly. `frontend/tools/app-control` and the shared preflight suites own command resolution; feature code and package scripts must not invent parallel tenant-selection logic.
 - Keep screens as orchestration layers. Screens should compose navigation params, hooks, stores, and domain components; large headers, toolbars, cards, empty states, modal bodies, action bars, and repeated view sections should move into feature components when they obscure the screen flow.

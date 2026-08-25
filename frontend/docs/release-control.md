@@ -47,8 +47,10 @@ npm run tenant:add
 ```
 
 It supports repository tenants and Git-ignored local tests, accepts an optional source logo, creates
-a deterministic fallback when none is supplied, generates/validates assets, resolves Expo config,
-and runs fast preflight. The local `test-tenant` launch command is:
+a deterministic fallback when none is supplied, offers semantic presets or a strict JSON recipe,
+generates/validates assets, resolves Expo config, and runs fast preflight. Repository onboarding
+then offers EAS **Create**, **Link**, or **Skip**; local onboarding always skips. The local
+`test-tenant` launch command is:
 
 ```sh
 npm run app -- start --tenant test-tenant --environment development --yes
@@ -58,8 +60,8 @@ Local tenants intentionally have isolated placeholder bundle/package identities 
 server environment variables. They may start Metro, install an existing compatible binary, perform
 development native runs, manage assets, and run fast preflight. Build, update, release preflight,
 and preview/production native-run actions are blocked before any process is launched. Creating a
-real tenant in repository mode does not create EAS credentials or backend entitlements; complete
-those operational steps separately before release.
+real tenant in repository mode does not create EAS credentials, environment variables, builds,
+updates, submissions, store releases, or backend entitlements.
 
 ## Fast versus release preflight
 
@@ -115,6 +117,20 @@ APP_TENANT=avihu APP_ENV=production npm run preflight
 ```
 
 ## EAS project setup
+
+Run `eas login` before choosing Create. The Expo owner is the signed-in account or organization that
+owns the project. Create runs `eas project:init` only in an isolated temporary Expo workspace and
+asks for a dedicated confirmation immediately before changing remote state. Link verifies the
+project UUID, owner, and tenant slug. Skip leaves the generated tenant pending:
+
+```sh
+npm run tenant:eas -- --tenant <tenant-id>
+```
+
+Pending repository tenants are allowed to start locally and run fast checks, but build, update,
+release, and EAS preflight stop before child execution. If Create succeeds remotely and a later
+local write or preflight fails, inspect the non-secret ignored record in
+`.tenant-add/recovery/<tenant-id>.json` and resume with `tenant:eas`; no remote deletion is attempted.
 
 Each tenant has its own EAS project. In that project, create symbolic EAS environments named
 exactly `development`, `preview`, and `production`. Set `APP_TENANT` to the tenant ID in all three
