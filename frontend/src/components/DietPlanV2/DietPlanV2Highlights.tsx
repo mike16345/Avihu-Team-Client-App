@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   header: {
     width: "100%",

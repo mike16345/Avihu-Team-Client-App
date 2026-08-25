@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -191,7 +192,7 @@ const FoodCatalogSearchModal = ({
                 }}
                 style={styles.scanButton}
               >
-                <BarcodeIcon size={16} color="#FFFFFF" />
+                <BarcodeIcon size={16} color={semanticColors.app.surfaceRaised} />
                 <Text fontVariant="semibold" fontSize={13} style={styles.scanButtonLabel}>
                   סריקת ברקוד
                 </Text>
@@ -218,7 +219,7 @@ const FoodCatalogSearchModal = ({
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F9F8" },
+  container: { flex: 1, backgroundColor: semanticColors.surfaceSubtle },
   headerBar: {
     minHeight: 58,
     flexDirection: "row",
@@ -232,7 +233,7 @@ const styles = StyleSheet.create({
     borderRadius: 19,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   searchIcon: { width: 20, alignItems: "center" },
   searchInput: {
@@ -275,10 +276,10 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   messageText: { color: DIET_V2_MUTED, textAlign: "center" },
-  errorText: { color: "#B42318", textAlign: "center" },
+  errorText: { color: semanticColors.diet.dangerText, textAlign: "center" },
   retryButton: {
     paddingHorizontal: 18,
     paddingVertical: 8,
@@ -294,7 +295,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   emptyIcon: {
     width: 54,
@@ -317,7 +318,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: DIET_V2_GREEN,
   },
-  scanButtonLabel: { color: "#FFFFFF" },
+  scanButtonLabel: { color: semanticColors.app.surfaceRaised },
 });
 
 export default FoodCatalogSearchModal;

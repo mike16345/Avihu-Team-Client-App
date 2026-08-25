@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { View, Image, TouchableOpacity, BackHandler, StyleSheet } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import Icon from "../Icon/Icon";
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
     borderRadius: 17,
   },
   shadow: {
-    shadowColor: "#000",
+    shadowColor: semanticColors.scrim,
     shadowOffset: {
       width: -4,
       height: 8,

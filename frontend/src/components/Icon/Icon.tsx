@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import icons, { IconName } from "../../constants/iconMap";
 import React from "react";
 
@@ -14,7 +15,7 @@ const Icon: React.FC<IconProps> = ({
   name,
   width = 24,
   height = 24,
-  color = "black",
+  color = semanticColors.scrim,
   variant = "outline",
   rotation,
 }) => {

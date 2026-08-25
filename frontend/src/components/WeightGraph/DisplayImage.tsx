@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import useStyles from "@/styles/useGlobalStyles";
 import React from "react";
 import { Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -60,8 +61,8 @@ const styles = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 7,
-    backgroundColor: "rgba(255, 255, 255, 0.92)",
-    shadowColor: "#000",
+    backgroundColor: semanticColors.overlay.imageSurface,
+    shadowColor: semanticColors.scrim,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.16,
     shadowRadius: 2,

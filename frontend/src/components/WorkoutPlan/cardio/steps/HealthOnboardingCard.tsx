@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import React from "react";
 import { Image, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import appLogo from "tenant-assets/runtime-logo.png";
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 14,
     marginBottom: 14,
-    shadowColor: "#999999",
+    shadowColor: semanticColors.shadowMuted,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 10,

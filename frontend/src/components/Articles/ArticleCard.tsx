@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { IArticle } from "@/interfaces/IArticle";
 import { Pressable, StyleSheet, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
@@ -14,8 +15,8 @@ import { ConditionalRender } from "../ui/ConditionalRender";
 import { usePinnedArticlesStore } from "@/store/pinnedArticlesStore";
 import { selectionHaptic } from "@/utils/haptics";
 
-const PIN_ACTIVE = "#0F5E3B";
-const PIN_INACTIVE = "#9CA3AF";
+const PIN_ACTIVE = semanticColors.app.brandStrong;
+const PIN_INACTIVE = semanticColors.elevation.level5;
 
 const PinIcon: React.FC<{ size?: number; color: string; filled: boolean }> = ({
   size = 20,
@@ -58,11 +59,7 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
       <Card style={[common.roundedMd, spacing.pdMd, spacing.gapLg]}>
         <Card.Header>
           <View style={pinStyles.headerRow}>
-            <Text
-              fontVariant="semibold"
-              fontSize={16}
-              style={[text.textLeft, pinStyles.title]}
-            >
+            <Text fontVariant="semibold" fontSize={16} style={[text.textLeft, pinStyles.title]}>
               {article.title}
             </Text>
             <Pressable
@@ -74,7 +71,6 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article }) => {
               <PinIcon color={pinned ? PIN_ACTIVE : PIN_INACTIVE} filled={pinned} />
             </Pressable>
           </View>
-
 
           <ConditionalRender condition={!!article.subtitle}>
             <Text style={{ textAlign: "left" }} fontSize={14}>

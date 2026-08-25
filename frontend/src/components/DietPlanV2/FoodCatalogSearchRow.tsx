@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
@@ -100,9 +101,9 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
-  rowPressed: { backgroundColor: "#F0F8F4", transform: [{ scale: 0.99 }] },
+  rowPressed: { backgroundColor: semanticColors.pressed, transform: [{ scale: 0.99 }] },
   addButton: {
     width: 32,
     height: 32,

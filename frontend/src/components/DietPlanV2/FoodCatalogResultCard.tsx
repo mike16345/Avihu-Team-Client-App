@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, TextInput, View } from "react-native";
 import { Text } from "@/components/ui/Text";
@@ -51,7 +52,7 @@ const MacroInput = ({ label, value, error, onChange }: MacroInputProps) => (
       onChangeText={onChange}
       keyboardType="decimal-pad"
       placeholder="0"
-      placeholderTextColor="#A0A7B0"
+      placeholderTextColor={semanticColors.placeholder}
       selectTextOnFocus
       style={[styles.macroInput, error ? styles.inputError : null]}
     />
@@ -162,7 +163,7 @@ const FoodCatalogResultCard = ({
           value={draft.name}
           onChangeText={(value) => update("name", value)}
           placeholder="שם המוצר"
-          placeholderTextColor="#A0A7B0"
+          placeholderTextColor={semanticColors.placeholder}
           style={[styles.nameInput, errors.name ? styles.inputError : null]}
         />
         {product?.brand ? (
@@ -300,9 +301,9 @@ const styles = StyleSheet.create({
     gap: 14,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#BDE7D0",
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#0F5E3B",
+    borderColor: semanticColors.app.dietInputBorder,
+    backgroundColor: semanticColors.app.surfaceRaised,
+    shadowColor: semanticColors.app.brandStrong,
     shadowOpacity: 0.07,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FAFBFA",
+    backgroundColor: semanticColors.app.dietResultSurface,
     color: DIET_V2_DARK,
     fontFamily: "Assistant-SemiBold",
     fontSize: 15,
@@ -360,7 +361,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 12,
     borderRadius: 12,
-    backgroundColor: "#F5F8F6",
+    backgroundColor: semanticColors.diet.cardSubtle,
   },
   servingText: { color: DIET_V2_DARK },
   servingAmountField: { width: 112, gap: 5, alignItems: "flex-start" },
@@ -373,7 +374,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   servingInput: {
     flex: 1,
@@ -391,7 +392,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 11,
     borderRadius: 11,
-    backgroundColor: "#F5F8F6",
+    backgroundColor: semanticColors.diet.cardSubtle,
   },
   macroTogglePressed: { opacity: 0.7 },
   macroToggleText: { color: DIET_V2_MUTED },
@@ -414,19 +415,29 @@ const styles = StyleSheet.create({
   },
   preview: { padding: 10, borderRadius: 11, backgroundColor: DIET_V2_MINT },
   previewText: { color: DIET_V2_GREEN, textAlign: "center", writingDirection: "rtl" },
-  inputError: { borderColor: "#DC2626", borderWidth: 1.5, backgroundColor: "#FFF7F7" },
+  inputError: {
+    borderColor: semanticColors.diet.dangerBorder,
+    borderWidth: 1.5,
+    backgroundColor: semanticColors.app.dietInputErrorSurface,
+  },
   errorSummary: {
     width: "100%",
     paddingHorizontal: 11,
     paddingVertical: 9,
     gap: 3,
     borderRadius: 10,
-    backgroundColor: "#FFF1F2",
+    backgroundColor: semanticColors.diet.dangerBackground,
   },
-  error: { width: "100%", color: "#B42318" },
+  error: { width: "100%", color: semanticColors.diet.dangerText },
   errorDetailRow: { width: "100%", flexDirection: "row", alignItems: "flex-start", gap: 6 },
-  errorDot: { width: 5, height: 5, marginTop: 7, borderRadius: 3, backgroundColor: "#DC2626" },
-  errorDetail: { flex: 1, color: "#B42318" },
+  errorDot: {
+    width: 5,
+    height: 5,
+    marginTop: 7,
+    borderRadius: 3,
+    backgroundColor: semanticColors.diet.dangerBorder,
+  },
+  errorDetail: { flex: 1, color: semanticColors.diet.dangerText },
 });
 
 export default FoodCatalogResultCard;

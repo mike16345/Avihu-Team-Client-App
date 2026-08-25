@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useMemo, useState } from "react";
 import { Linking, Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown, FadeOut, LinearTransition } from "react-native-reanimated";
@@ -202,7 +203,7 @@ const DietPlanV2SmartMenu = ({
 
         {isReady && entries.length === 0 ? (
           <View style={styles.emptyState}>
-            <BarcodeIcon size={27} color="#9AA5A0" />
+            <BarcodeIcon size={27} color={semanticColors.app.dietSearchIcon} />
             <Text fontSize={13} style={styles.emptyText}>
               מוצרים שתסרוק ותאשר יופיעו כאן ויתווספו להתקדמות היומית.
             </Text>
@@ -315,7 +316,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   cardHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
   headerCopy: { flex: 1, gap: 3, alignItems: "flex-start" },
@@ -338,10 +339,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#F8FAF9",
+    backgroundColor: semanticColors.app.dietSearchSurface,
   },
   searchIcon: { width: 22, alignItems: "center" },
-  searchWrapPressed: { backgroundColor: "#F0F8F4", borderColor: "#BFDCCB" },
+  searchWrapPressed: {
+    backgroundColor: semanticColors.pressed,
+    borderColor: semanticColors.app.dietSearchBorder,
+  },
   searchPlaceholder: { width: "100%", color: DIET_V2_MUTED },
   quickActions: { flexDirection: "row", gap: 8 },
   quickAction: {
@@ -355,7 +359,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   quickActionLabel: { color: DIET_V2_DARK, textAlign: "center" },
   searchHint: { width: "100%", color: DIET_V2_MUTED },
@@ -365,7 +369,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   todayHeader: { flexDirection: "row", alignItems: "center", gap: 10 },
   todayTitleWrap: { flex: 1, gap: 2, alignItems: "flex-start" },
@@ -387,7 +391,7 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingTop: 11,
     borderTopWidth: 1,
-    borderTopColor: "#EEF1EF",
+    borderTopColor: semanticColors.app.dietSearchDivider,
   },
   entryCopy: { flex: 1, alignItems: "flex-start" },
   entryName: { color: DIET_V2_DARK },
@@ -400,7 +404,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F5F6F5",
+    backgroundColor: semanticColors.app.dietSearchDisabled,
   },
   removeLabel: { color: DIET_V2_MUTED, lineHeight: 18 },
   attribution: {
@@ -412,14 +416,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 14,
   },
-  attributionPressed: { backgroundColor: "#EEF4F1" },
+  attributionPressed: { backgroundColor: semanticColors.app.dietAttributionPressed },
   attributionDot: {
     width: 5,
     height: 5,
     borderRadius: 3,
-    backgroundColor: "#A8B3AE",
+    backgroundColor: semanticColors.app.dietSearchIconMuted,
   },
-  attributionText: { color: "#7F8B85" },
+  attributionText: { color: semanticColors.app.dietSearchAttribution },
 });
 
 export default DietPlanV2SmartMenu;

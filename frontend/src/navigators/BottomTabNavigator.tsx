@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { BottomStackParamList } from "@/types/navigatorTypes";
 import { Keyboard, StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
@@ -157,7 +158,7 @@ const BottomTabNavigator = () => {
           },
         ]}
       >
-        <Icon name={indicators[activeIndex].icon} color="white" />
+        <Icon name={indicators[activeIndex].icon} color={semanticColors.app.surfaceRaised} />
         <Text
           allowFontScaling={false}
           fontSize={11}
@@ -193,7 +194,7 @@ const styles = StyleSheet.create({
     height: FLOATING_TAB_BAR_HEIGHT,
     alignItems: "center",
     borderRadius: 100,
-    shadowColor: "#072723",
+    shadowColor: semanticColors.steps.ringGradientStart,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     zIndex: -1,
-    shadowColor: "#000",
+    shadowColor: semanticColors.scrim,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
-    backgroundColor: "#fff",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
 });
 

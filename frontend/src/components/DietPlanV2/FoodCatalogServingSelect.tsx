@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import type { FoodCatalogProduct } from "@/interfaces/IFoodCatalog";
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#F8FAF8",
+    backgroundColor: semanticColors.app.dietServingSurface,
   },
   triggerText: { flex: 1, color: DIET_V2_DARK },
   chevron: { color: DIET_V2_GREEN },
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     padding: 16,
-    backgroundColor: "rgba(9, 29, 22, 0.3)",
+    backgroundColor: semanticColors.overlay.modalStrong,
   },
   sheet: {
     width: "100%",
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
     paddingBottom: 22,
     gap: 13,
     borderRadius: 22,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   handle: {
     width: 38,
@@ -151,7 +152,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
   },
-  selectedOption: { borderColor: "#86C9A5", backgroundColor: DIET_V2_MINT },
+  selectedOption: {
+    borderColor: semanticColors.app.dietServingBorder,
+    backgroundColor: DIET_V2_MINT,
+  },
   radio: {
     width: 20,
     height: 20,

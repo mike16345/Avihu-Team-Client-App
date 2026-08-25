@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
@@ -275,7 +276,7 @@ const SmartFoodHistoryModal = ({
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F9F8" },
+  container: { flex: 1, backgroundColor: semanticColors.surfaceSubtle },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -290,7 +291,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   closeLabel: { color: DIET_V2_DARK, lineHeight: 23 },
   headerTitle: { flex: 1, color: DIET_V2_DARK, textAlign: "center" },
@@ -311,7 +312,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   weekButtonDisabled: { opacity: 0.35 },
   weekButtonLabel: { color: DIET_V2_DARK, textAlign: "center" },
@@ -329,7 +330,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   emptyTitle: { width: "100%", color: DIET_V2_DARK, textAlign: "center" },
   emptyText: { width: "100%", color: DIET_V2_MUTED, textAlign: "center" },
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   dayHeader: { flexDirection: "row", alignItems: "center", gap: 7 },
   dayTitle: { flex: 1, color: DIET_V2_DARK },
@@ -360,7 +361,7 @@ const styles = StyleSheet.create({
     borderRadius: 11,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FBFDFC",
+    backgroundColor: semanticColors.app.dietHistorySurface,
   },
   entryDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: DIET_V2_GREEN },
   entryCopy: { flex: 1, alignItems: "flex-start" },

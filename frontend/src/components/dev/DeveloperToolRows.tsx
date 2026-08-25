@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { Text } from "@/components/ui/Text";
 import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -61,7 +62,10 @@ export const DeveloperToolActionRow = ({
       </Text>
     </View>
     {loading ? (
-      <ActivityIndicator color={emphasized ? "#FFFFFF" : "#101828"} size="small" />
+      <ActivityIndicator
+        color={emphasized ? semanticColors.app.surfaceRaised : semanticColors.app.textStrong}
+        size="small"
+      />
     ) : (
       <Text
         accessibilityElementsHidden
@@ -76,11 +80,11 @@ export const DeveloperToolActionRow = ({
 
 const styles = StyleSheet.create({
   primaryText: {
-    color: "#101828",
+    color: semanticColors.app.textStrong,
     writingDirection: "ltr",
   },
   secondaryText: {
-    color: "#667085",
+    color: semanticColors.app.textMuted,
     writingDirection: "ltr",
   },
   detailRow: {
@@ -90,7 +94,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   detailValue: {
-    color: "#344054",
+    color: semanticColors.app.textDefault,
     flex: 1,
     textAlign: "right",
     writingDirection: "ltr",
@@ -105,7 +109,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   actionDivider: {
-    borderBottomColor: "#EAECF0",
+    borderBottomColor: semanticColors.app.borderSoft,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   actionCopy: {
@@ -113,18 +117,18 @@ const styles = StyleSheet.create({
     gap: 1,
   },
   emphasizedAction: {
-    backgroundColor: "#101828",
+    backgroundColor: semanticColors.app.textStrong,
   },
   emphasizedTitle: {
-    color: "#FFFFFF",
+    color: semanticColors.app.surfaceRaised,
     writingDirection: "ltr",
   },
   emphasizedDetail: {
-    color: "#D0D5DD",
+    color: semanticColors.outline,
     writingDirection: "ltr",
   },
   chevron: {
-    color: "#98A2B3",
+    color: semanticColors.app.textSubtle,
     writingDirection: "ltr",
   },
   disabled: {
