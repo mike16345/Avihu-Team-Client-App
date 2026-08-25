@@ -12,11 +12,13 @@ if (!/^[a-z][a-z0-9-]*$/.test(tenantId)) {
   throw new Error(`Invalid APP_TENANT "${tenantId}". Expected a lowercase tenant ID.`);
 }
 
+const localTenantModule = path.resolve(__dirname, "config", "tenants", ".local", `${tenantId}.ts`);
 const tenantAssetsDirectory = path.resolve(
   __dirname,
   "config",
   "tenants",
   "assets",
+  ...(fs.existsSync(localTenantModule) ? [".local"] : []),
   tenantId,
   "generated"
 );

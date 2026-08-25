@@ -40,6 +40,8 @@ const normalizeIdentifierSegment = (value: string) =>
     .replace(/[^a-z0-9_]/gu, "")
     .replace(/^[^a-z]+/u, "t");
 
+const withAlpha = (color: string, alpha: string) => `${color}${alpha}`;
+
 export const createTenantConfig = (
   answers: TenantAddAnswers,
   randomSuffix = randomBytes(3).toString("hex")
@@ -105,6 +107,91 @@ export const createTenantConfig = (
     onSurface: onBackground,
     selected: `${accent}22`,
     pressed: `${primary}12`,
+  });
+  Object.assign(theme.colors.app, {
+    textStrong: onBackground,
+    textDefault: withAlpha(onBackground, "E6"),
+    textMuted: withAlpha(onBackground, "B3"),
+    textSubtle: withAlpha(onBackground, "80"),
+    textSlate: withAlpha(onBackground, "CC"),
+    textForm: onBackground,
+    textPlaceholder: withAlpha(onBackground, "73"),
+    textAgreement: withAlpha(onBackground, "C2"),
+    surfaceRaised: background,
+    surfacePanel: withAlpha(primary, "08"),
+    surfaceSoft: withAlpha(primary, "0D"),
+    surfaceCool: withAlpha(accent, "0D"),
+    surfaceWarm: withAlpha(accent, "14"),
+    borderSoft: withAlpha(primary, "24"),
+    borderControl: withAlpha(primary, "33"),
+    borderHandle: withAlpha(primary, "4D"),
+    formBorder: withAlpha(primary, "52"),
+    brandStrong: primary,
+    brandAction: primary,
+    brandSuccess: accent,
+    brandPressed: withAlpha(primary, "D9"),
+    articleLiked: withAlpha(accent, "1F"),
+    notificationAccent: accent,
+    graphIndicator: accent,
+    shadowHairline: withAlpha(primary, "0D"),
+    shadowSoft: withAlpha(primary, "14"),
+    shadowMedium: withAlpha(primary, "1A"),
+    shadowStrong: withAlpha(primary, "1F"),
+    drawerOverlay: withAlpha(primary, "80"),
+  });
+  Object.assign(theme.colors.diet, {
+    primaryText: onBackground,
+    secondaryText: withAlpha(onBackground, "B3"),
+    tertiaryText: primary,
+    card: background,
+    cardSubtle: withAlpha(primary, "0D"),
+    border: withAlpha(primary, "1A"),
+    borderStrong: withAlpha(accent, "99"),
+    mint: withAlpha(accent, "24"),
+    mintStrong: withAlpha(accent, "14"),
+    consumedBackground: withAlpha(accent, "29"),
+    consumedBorder: withAlpha(accent, "66"),
+    consumedText: onBackground,
+  });
+  Object.assign(theme.colors.steps, {
+    aboveGoalDark: primary,
+    aboveGoal: accent,
+    aboveGoalLight: withAlpha(accent, "4D"),
+    belowGoalDark: withAlpha(primary, "D9"),
+    belowGoal: withAlpha(primary, "B3"),
+    belowGoalLight: withAlpha(primary, "4D"),
+    ringTrack: withAlpha(primary, "24"),
+    ringGradientStart: primary,
+    ringGradientEnd: accent,
+    selectedPill: withAlpha(primary, "14"),
+  });
+  Object.assign(theme.colors.graph, {
+    line: accent,
+    lineSecondary: primary,
+    gradientStart: accent,
+    gradientEnd: primary,
+    gradientStartTransparent: withAlpha(accent, "33"),
+    gradientEndTransparent: withAlpha(primary, "0D"),
+    dot: accent,
+    dotBorder: background,
+    tooltip: accent,
+    tooltipText: onAccent,
+    tooltipShadow: withAlpha(primary, "59"),
+  });
+  Object.assign(theme.colors.calendar, {
+    dayHeader: onBackground,
+    today: withAlpha(primary, "1F"),
+    agendaText: onBackground,
+    selected: primary,
+    dot: accent,
+    dotSelected: primary,
+  });
+  Object.assign(theme.colors.scanner, {
+    background: onBackground,
+    viewfinder: accent,
+    scanLine: accent,
+    panel: background,
+    panelText: onBackground,
   });
 
   const tenant = {
