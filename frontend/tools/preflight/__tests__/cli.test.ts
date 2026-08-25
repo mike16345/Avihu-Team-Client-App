@@ -22,6 +22,14 @@ describe("injectable preflight CLI", () => {
     expect(() => assertPreflightAllowed(localTenant, "fast")).not.toThrow();
   });
 
+  it("rejects release preflight for pending repository tenants", () => {
+    const pendingTenant = { ...avihuTenant, id: "new-tenant", eas: { status: "pending" as const } };
+    expect(() => assertPreflightAllowed(pendingTenant, "release")).toThrow(
+      /tenant:eas -- --tenant new-tenant/u
+    );
+    expect(() => assertPreflightAllowed(pendingTenant, "fast")).not.toThrow();
+  });
+
   it("renders human and JSON from equivalent results and exit behavior", async () => {
     let human = "";
     let json = "";

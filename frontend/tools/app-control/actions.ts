@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { delimiter, join } from "node:path";
 import { getTenant } from "../../config/tenants/registry";
+import { assertTenantEasActionAllowed } from "../../config/tenants/schema";
 import type { AppSelection, CommandSpec, CommandStep } from "./types";
 
 export const EAS_CLI_ARGS = ["--yes", "eas-cli@16.27.0"] as const;
@@ -9,6 +10,10 @@ export const assertTenantActionAllowed = (
   tenant: ReturnType<typeof getTenant>,
   selection: AppSelection
 ): void => {
+  if (selection.action === "build" || selection.action === "update") {
+    assertTenantEasActionAllowed(tenant, `${selection.action} actions`);
+  }
+
   if (tenant.kind !== "local") return;
 
   const forbidden =

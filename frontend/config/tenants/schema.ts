@@ -3,7 +3,7 @@ import { TENANT_ENVIRONMENTS, type TenantEnvironment } from "./types";
 import { tenantFeatureDefaultsSchema } from "./features";
 import { tenantThemeSchema } from "./theme";
 
-const tenantIdSchema = z.string().regex(/^[a-z][a-z0-9-]*$/);
+export const tenantIdSchema = z.string().regex(/^[a-z][a-z0-9-]*$/);
 const semanticVersionSchema = z
   .string()
   .regex(
@@ -23,6 +23,18 @@ const assetPathSchema = z
 const permissionDescriptionSchema = z.string().trim().min(1);
 const environmentVariableNameSchema = z.string().regex(/^[A-Z][A-Z0-9_]*$/);
 const hexColorSchema = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
+
+export const tenantEasConfigSchema = z.discriminatedUnion("status", [
+  z
+    .object({
+      status: z.literal("linked"),
+      owner: tenantIdSchema,
+      projectId: z.string().uuid(),
+      updateUrl: z.string().url(),
+    })
+    .strict(),
+  z.object({ status: z.literal("pending") }).strict(),
+]);
 
 export const tenantLocalizationSchema = z
   .object({
@@ -104,10 +116,8 @@ export const tenantConfigSchema = z
     id: tenantIdSchema,
     displayName: z.string().trim().min(1),
     slug: tenantIdSchema,
-    owner: tenantIdSchema,
     version: semanticVersionSchema,
-    projectId: z.string().uuid(),
-    updateUrl: z.string().url(),
+    eas: tenantEasConfigSchema,
     runtimeVersion: z.object({ policy: z.literal("appVersion") }).strict(),
     orientation: z.enum(["default", "portrait", "landscape"]),
     platforms: z
@@ -227,6 +237,26 @@ export const tenantConfigSchema = z
       "healthConnect"
     );
   });
+
+export const isLinkedTenantEas = (
+  eas: import("./types").TenantEasConfig
+): eas is Extract<import("./types").TenantEasConfig, { status: "linked" }> =>
+  eas.status === "linked";
+
+export const assertTenantEasActionAllowed = (
+  tenant: import("./types").TenantConfig,
+  actionName: string
+) => {
+  if (tenant.kind === "local") {
+    throw new Error(`Local tenant "${tenant.id}" cannot run ${actionName}`);
+  }
+  if (tenant.eas.status === "pending") {
+    throw new Error(
+      `Tenant "${tenant.id}" has pending EAS setup and cannot run ${actionName}. ` +
+        `Run: npm run tenant:eas -- --tenant ${tenant.id}`
+    );
+  }
+};
 
 export const parseTenantEnvironment = (value: string | undefined): TenantEnvironment => {
   if (!value) {

@@ -1,6 +1,7 @@
 import type { z } from "zod";
 import type {
   tenantConfigSchema,
+  tenantEasConfigSchema,
   tenantLocalizationSchema,
   tenantNativeCapabilitiesSchema,
 } from "./schema";
@@ -11,6 +12,7 @@ export const TENANT_ENVIRONMENTS = ["development", "preview", "production"] as c
 
 export type TenantEnvironment = (typeof TENANT_ENVIRONMENTS)[number];
 export type TenantConfig = z.infer<typeof tenantConfigSchema>;
+export type TenantEasConfig = z.infer<typeof tenantEasConfigSchema>;
 export type TenantLocalization = z.infer<typeof tenantLocalizationSchema>;
 export type TenantFeatureDefaults = z.infer<typeof tenantFeatureDefaultsSchema>;
 export type TenantNativeCapabilities = z.infer<typeof tenantNativeCapabilitiesSchema>;

@@ -70,8 +70,15 @@ const runExpoConfigCheck = (context: Readonly<ConfigurationPreflightContext>): C
     expoConfig.ios?.bundleIdentifier
   );
   compare(drift, "URL scheme", identity.scheme, expoConfig.scheme);
-  compare(drift, "Expo owner", tenantConfig.owner, expoConfig.owner);
-  compare(drift, "EAS project ID", tenantConfig.projectId, eas?.projectId);
+  if (tenantConfig.eas.status === "linked") {
+    compare(drift, "Expo owner", tenantConfig.eas.owner, expoConfig.owner);
+    compare(drift, "EAS project ID", tenantConfig.eas.projectId, eas?.projectId);
+    compare(drift, "EAS update URL", tenantConfig.eas.updateUrl, expoConfig.updates?.url);
+  } else {
+    compare(drift, "Expo owner", undefined, expoConfig.owner);
+    compare(drift, "EAS project ID", undefined, eas?.projectId);
+    compare(drift, "EAS updates", undefined, expoConfig.updates);
+  }
   compare(drift, "Runtime version", tenantConfig.version, expoConfig.runtimeVersion);
   compare(drift, "Orientation", tenantConfig.orientation, expoConfig.orientation);
   compare(drift, "App icon", tenantConfig.assets.icon, expoConfig.icon);
