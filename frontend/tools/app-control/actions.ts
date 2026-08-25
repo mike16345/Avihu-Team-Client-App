@@ -5,6 +5,25 @@ import type { AppSelection, CommandSpec, CommandStep } from "./types";
 
 export const EAS_CLI_ARGS = ["--yes", "eas-cli@16.27.0"] as const;
 
+export const assertTenantActionAllowed = (
+  tenant: ReturnType<typeof getTenant>,
+  selection: AppSelection
+): void => {
+  if (tenant.kind !== "local") return;
+
+  const forbidden =
+    selection.action === "build" ||
+    selection.action === "update" ||
+    (selection.action === "preflight" && selection.mode === "release") ||
+    (selection.action === "run" && selection.environment !== "development");
+
+  if (forbidden) {
+    const action =
+      selection.action === "preflight" ? "release preflight" : `${selection.action} actions`;
+    throw new Error(`Local tenant "${tenant.id}" cannot run ${action}`);
+  }
+};
+
 const findAndroidJavaHome = (): string => {
   const override = process.env.APP_ANDROID_JAVA_HOME?.trim();
   if (override) {
@@ -94,6 +113,7 @@ const withAndroidDevicePreparation = (
 
 export const resolveAction = (selection: AppSelection): CommandSpec => {
   const tenant = getTenant(selection.tenantId);
+  assertTenantActionAllowed(tenant, selection);
   const labelPrefix = `${tenant.displayName} (${selection.environment})`;
 
   switch (selection.action) {

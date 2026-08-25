@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 
 import { avihuTenant } from "../tenants/avihu";
 import * as tenantFeatures from "../tenants/features";
+import { loadLocalTenants } from "../tenants/localRegistry";
+import { assertUniqueTenants } from "../tenants/registry";
 import { tenantConfigSchema } from "../tenants/schema";
 
 type FeatureFoundationModule = typeof tenantFeatures & {
@@ -17,6 +22,52 @@ type FeatureFoundationModule = typeof tenantFeatures & {
 const featureFoundation = tenantFeatures as FeatureFoundationModule;
 
 describe("tenant policy foundations", () => {
+  it("loads local TypeScript tenants in deterministic ID order", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "local-tenants-"));
+    const localTenant = (id: string) => ({
+      ...avihuTenant,
+      kind: "local" as const,
+      id,
+      slug: id,
+      projectId:
+        id === "alpha"
+          ? "11111111-1111-4111-8111-111111111111"
+          : "22222222-2222-4222-8222-222222222222",
+      updateUrl: `https://u.expo.dev/${id}`,
+      environments: Object.fromEntries(
+        Object.entries(avihuTenant.environments).map(([environment, identity]) => [
+          environment,
+          {
+            ...identity,
+            iosBundleIdentifier: `local.${id}.${environment}`,
+            androidPackage: `local.${id}.${environment}`,
+            scheme: `${id}-${environment}`,
+          },
+        ])
+      ),
+    });
+
+    try {
+      await writeFile(
+        path.join(root, "beta.ts"),
+        `export const beta = ${JSON.stringify(localTenant("beta"))};`
+      );
+      await writeFile(
+        path.join(root, "alpha.ts"),
+        `export const alpha = ${JSON.stringify(localTenant("alpha"))};`
+      );
+      expect(loadLocalTenants(root).map(({ id }) => id)).toEqual(["alpha", "beta"]);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects tenant identity collisions", () => {
+    expect(() =>
+      assertUniqueTenants([avihuTenant, { ...avihuTenant, id: "duplicate", kind: "local" }])
+    ).toThrow(/conflicts.*slug/u);
+  });
+
   it("separates localization, JavaScript defaults, and native binary capabilities", () => {
     expect(tenantConfigSchema.parse(avihuTenant)).toMatchObject({
       kind: "repository",
