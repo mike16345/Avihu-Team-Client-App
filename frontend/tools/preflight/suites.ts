@@ -60,7 +60,7 @@ export const createFastSuite = (context: PreflightSuiteContext): PreflightSuite 
   ...createProjectHealthChecks(),
   createAssetsCheck(context.tenant),
   expoConfigCheck,
-  nativeDriftCheck,
+  ...(context.tenantConfig.kind === "local" ? [] : [nativeDriftCheck]),
   ...createPlatformPolicyChecks(context.tenantConfig.platforms ?? ["ios", "android"]),
 ];
 

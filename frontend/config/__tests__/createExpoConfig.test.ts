@@ -6,7 +6,11 @@ import { parseTenantEnvironment, tenantConfigSchema } from "../tenants/schema";
 
 describe("tenant registry", () => {
   it("lists the registered tenants in stable order", () => {
-    expect(listTenants().map(({ id }) => id)).toEqual(["avihu"]);
+    expect(
+      listTenants()
+        .filter(({ kind }) => kind === "repository")
+        .map(({ id }) => id)
+    ).toEqual(["avihu"]);
   });
 
   it("rejects an unknown tenant", () => {
