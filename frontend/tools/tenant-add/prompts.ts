@@ -1,121 +1,170 @@
 import { box, cancel, confirm, isCancel, multiselect, select, text } from "@clack/prompts";
 import { avihuTenant } from "../../config/tenants/avihu";
 import { TENANT_FEATURE_KEYS } from "../../config/tenants/features";
+import { getContrastRatio } from "../../config/tenants/themeRecipe";
+import type { ThemePresetId } from "../../config/tenants/themePresets";
 import type { TenantFeatureDefaults, TenantNativeCapabilities } from "../../config/tenants/types";
-import type { TenantAddAnswers, TenantAddMode } from "./types";
+import { loadThemeSelection } from "./themeInput";
+import type { TenantAddAnswers, TenantAddMode, TenantThemeSelection } from "./types";
 
-const DEFAULT_PALETTE = {
-  primaryColor: "#5B21B6",
-  onPrimaryColor: "#FFFFFF",
-  accentColor: "#F59E0B",
-  onAccentColor: "#1F1300",
-  backgroundColor: "#FFF7ED",
-  onBackgroundColor: "#2E1065",
+export interface TenantPromptApi {
+  select: typeof select;
+  text: typeof text;
+  multiselect: typeof multiselect;
+  confirm: typeof confirm;
+  box: typeof box;
+  cancel: typeof cancel;
+  isCancel: typeof isCancel;
+}
+
+const defaultTenantPromptApi: TenantPromptApi = {
+  select,
+  text,
+  multiselect,
+  confirm,
+  box,
+  cancel,
+  isCancel,
 };
 
-const cancelled = (value: unknown): value is symbol => isCancel(value);
-const askText = async (message: string, initialValue?: string, required = true) => {
-  const value = await text({
+const askText = async (
+  promptApi: TenantPromptApi,
+  message: string,
+  initialValue?: string,
+  required = true
+) => {
+  const value = await promptApi.text({
     message,
     initialValue,
     validate: (input) => (required && !(input ?? "").trim() ? "This value is required" : undefined),
   });
-  return cancelled(value) ? null : (value ?? "").trim();
+  return promptApi.isCancel(value) ? null : String(value ?? "").trim();
 };
 
-export const collectTenantAnswers = async (): Promise<TenantAddAnswers | null> => {
-  const mode = await select({
+const selectTheme = async (promptApi: TenantPromptApi): Promise<TenantThemeSelection | null> => {
+  const selected = await promptApi.select({
+    message: "Choose a semantic theme",
+    options: [
+      { value: "avihu", label: "Avihu" },
+      { value: "ivory-orange-blue", label: "Ivory / Orange / Blue" },
+      { value: "violet-amber", label: "Violet / Amber" },
+      { value: "recipe-file", label: "Import JSON recipe" },
+    ],
+  });
+  if (promptApi.isCancel(selected)) return null;
+  if (selected !== "recipe-file") {
+    return { kind: "preset", presetId: selected as ThemePresetId };
+  }
+  const recipePath = await askText(promptApi, "Path to versioned JSON theme recipe");
+  return recipePath ? { kind: "recipe-file", path: recipePath } : null;
+};
+
+export const collectTenantAnswers = async (
+  promptApi: TenantPromptApi = defaultTenantPromptApi
+): Promise<TenantAddAnswers | null> => {
+  const mode = await promptApi.select({
     message: "Where should this tenant live?",
     options: [
       { value: "local" as const, label: "Local test (Git-ignored)" },
       { value: "repository" as const, label: "Repository tenant" },
     ],
   });
-  if (cancelled(mode)) return null;
-  const id = await askText("Tenant ID (lowercase letters, numbers, hyphens)", "test-tenant");
-  const displayName = await askText("App display name", "Test Tenant");
-  const logoPath = await askText("Logo path (leave blank for geometric fallback)", "", false);
-  if (id === null || displayName === null || logoPath === null) return null;
+  if (promptApi.isCancel(mode)) return null;
+  const id = await askText(
+    promptApi,
+    "Tenant ID (lowercase letters, numbers, hyphens)",
+    "test-tenant"
+  );
+  if (id === null) return null;
+  const displayName = await askText(promptApi, "App display name", "Test Tenant");
+  if (displayName === null) return null;
+  const logoPath = await askText(
+    promptApi,
+    "Logo path (leave blank for geometric fallback)",
+    "",
+    false
+  );
+  if (logoPath === null) return null;
 
-  let owner: string | undefined;
-  let projectId: string | undefined;
   let identifierBase: string | undefined;
   if (mode === "repository") {
-    owner = (await askText("Expo owner")) ?? undefined;
-    projectId = (await askText("Expo project UUID")) ?? undefined;
-    identifierBase = (await askText("Bundle/package base (for example com.company)")) ?? undefined;
-    if (!owner || !projectId || !identifierBase) return null;
+    identifierBase =
+      (await askText(promptApi, "Bundle/package base (for example com.company)")) ?? undefined;
+    if (!identifierBase) return null;
   }
 
-  const palette = { ...DEFAULT_PALETTE };
-  for (const key of Object.keys(palette) as (keyof typeof palette)[]) {
-    const value = await askText(key.replace(/Color$/u, " color"), palette[key]);
-    if (value === null) return null;
-    palette[key] = value;
-  }
-
-  const supportsRtl = await confirm({
+  const themeSelection = await selectTheme(promptApi);
+  if (!themeSelection) return null;
+  const loadedTheme = await loadThemeSelection(themeSelection);
+  const supportsRtl = await promptApi.confirm({
     message: "Support right-to-left layouts?",
     initialValue: true,
   });
-  if (cancelled(supportsRtl)) return null;
+  if (promptApi.isCancel(supportsRtl)) return null;
   const forcesRtl = supportsRtl
-    ? await confirm({ message: "Force right-to-left layout?", initialValue: true })
+    ? await promptApi.confirm({ message: "Force right-to-left layout?", initialValue: true })
     : false;
-  if (cancelled(forcesRtl)) return null;
+  if (promptApi.isCancel(forcesRtl)) return null;
 
-  const selectedFeatures = await multiselect({
+  const selectedFeatures = await promptApi.multiselect({
     message: "Default JavaScript features",
     options: TENANT_FEATURE_KEYS.map((value) => ({ value, label: value })),
     initialValues: [...TENANT_FEATURE_KEYS],
     required: false,
   });
-  if (cancelled(selectedFeatures)) return null;
+  if (promptApi.isCancel(selectedFeatures)) return null;
+  const featureValues = selectedFeatures as (keyof TenantFeatureDefaults)[];
   const featureDefaults = Object.fromEntries(
-    TENANT_FEATURE_KEYS.map((key) => [key, selectedFeatures.includes(key)])
+    TENANT_FEATURE_KEYS.map((key) => [key, featureValues.includes(key)])
   ) as TenantFeatureDefaults;
 
   const capabilityKeys = Object.keys(
     avihuTenant.nativeCapabilities
   ) as (keyof TenantNativeCapabilities)[];
-  const selectedCapabilities = await multiselect({
+  const selectedCapabilities = await promptApi.multiselect({
     message: "Native capabilities present in the compatible binary",
     options: capabilityKeys.map((value) => ({ value, label: value })),
     initialValues: capabilityKeys,
     required: false,
   });
-  if (cancelled(selectedCapabilities)) return null;
+  if (promptApi.isCancel(selectedCapabilities)) return null;
+  const capabilityValues = selectedCapabilities as (keyof TenantNativeCapabilities)[];
   const nativeCapabilities = Object.fromEntries(
-    capabilityKeys.map((key) => [key, selectedCapabilities.includes(key)])
+    capabilityKeys.map((key) => [key, capabilityValues.includes(key)])
   ) as TenantNativeCapabilities;
 
+  const { foundation, overrides } = loadedTheme.recipe;
+  const contrast = (foreground: string, background: string) =>
+    (getContrastRatio(foreground, background) ?? 0).toFixed(2);
   const answers: TenantAddAnswers = {
     mode: mode as TenantAddMode,
     id,
     displayName,
     ...(logoPath ? { logoPath } : {}),
-    ...(owner ? { owner } : {}),
-    ...(projectId ? { projectId } : {}),
     ...(identifierBase ? { identifierBase } : {}),
-    ...palette,
-    supportsRtl,
-    forcesRtl,
+    themeSelection,
+    supportsRtl: Boolean(supportsRtl),
+    forcesRtl: Boolean(forcesRtl),
     featureDefaults,
     nativeCapabilities,
   };
-  box(
+  promptApi.box(
     [
       `Mode: ${answers.mode}`,
       `Tenant: ${answers.displayName} (${answers.id})`,
       `Logo: ${answers.logoPath ?? "generated fallback"}`,
-      `JavaScript features: ${selectedFeatures.join(", ") || "none"}`,
-      `Native capabilities: ${selectedCapabilities.join(", ") || "none"}`,
+      `Theme: ${loadedTheme.sourceLabel}`,
+      `Foundation: ${Object.values(foundation).join(", ")}`,
+      `Contrast: primary ${contrast(foundation.onPrimary, foundation.primary)}, accent ${contrast(foundation.onAccent, foundation.accent)}, background ${contrast(foundation.onBackground, foundation.background)}`,
+      `Overrides: ${overrides ? (JSON.stringify(overrides).match(/#[0-9A-Fa-f]{6,8}|rgba?\(/gu)?.length ?? 0) : 0}`,
+      `JavaScript features: ${featureValues.join(", ") || "none"}`,
+      `Native capabilities: ${capabilityValues.join(", ") || "none"}`,
     ].join("\n"),
     "Tenant summary"
   );
-  const approved = await confirm({ message: "Create this tenant?", initialValue: false });
-  if (cancelled(approved) || !approved) {
-    cancel("Tenant creation cancelled; no files changed.");
+  const approved = await promptApi.confirm({ message: "Create this tenant?", initialValue: false });
+  if (promptApi.isCancel(approved) || !approved) {
+    promptApi.cancel("Tenant creation cancelled; no files changed.");
     return null;
   }
   return answers;

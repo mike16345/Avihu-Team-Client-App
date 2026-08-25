@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { avihuTenant } from "../../../config/tenants/avihu";
 import { renderTenantModule } from "../renderTenantModule";
 import { createTenantConfig } from "../validation";
+import { getThemePreset } from "../../../config/tenants/themePresets";
 
 describe("tenant module rendering", () => {
   it("renders a typed local module with feature, theme, and native contracts", () => {
@@ -10,14 +11,10 @@ describe("tenant module rendering", () => {
         mode: "local",
         id: "test-tenant",
         displayName: "Test Tenant",
-        primaryColor: "#5B21B6",
-        onPrimaryColor: "#FFFFFF",
-        accentColor: "#F59E0B",
-        onAccentColor: "#1F1300",
-        backgroundColor: "#FFF7ED",
-        onBackgroundColor: "#2E1065",
+        themeSelection: { kind: "preset", presetId: "violet-amber" },
         nativeCapabilities: avihuTenant.nativeCapabilities,
       },
+      getThemePreset("violet-amber"),
       "a1b2c3"
     );
     const source = renderTenantModule(tenant);

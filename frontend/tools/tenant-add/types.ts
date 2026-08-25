@@ -3,23 +3,19 @@ import type {
   TenantFeatureDefaults,
   TenantNativeCapabilities,
 } from "../../config/tenants/types";
+import type { ThemePresetId } from "../../config/tenants/themePresets";
 
 export type TenantAddMode = "local" | "repository";
+export type TenantThemeSelection =
+  { kind: "preset"; presetId: ThemePresetId } | { kind: "recipe-file"; path: string };
 
 export interface TenantAddAnswers {
   mode: TenantAddMode;
   id: string;
   displayName: string;
   logoPath?: string;
-  owner?: string;
-  projectId?: string;
   identifierBase?: string;
-  primaryColor: string;
-  onPrimaryColor: string;
-  accentColor: string;
-  onAccentColor: string;
-  backgroundColor: string;
-  onBackgroundColor: string;
+  themeSelection: TenantThemeSelection;
   supportsRtl?: boolean;
   forcesRtl?: boolean;
   featureDefaults?: TenantFeatureDefaults;
