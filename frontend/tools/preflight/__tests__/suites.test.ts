@@ -642,7 +642,8 @@ describe("injected process checks", () => {
   });
 
   it("executes successful composed release nodes exactly once and in dependency order", async () => {
-    const projectRoot = path.resolve(import.meta.dirname, "../../..");
+    const projectRoot = await mkdtemp(path.join(tmpdir(), "avihu-preflight-release-dag-"));
+    temporaryRoots.push(projectRoot);
     const runDirectory = path.join(projectRoot, ".preflight", "2026-08-24T01-00-00-000Z");
     const configuration = await createPreflightContext({
       projectRoot,
