@@ -38,6 +38,29 @@ Development and internal preview binaries display a small tenant/environment bad
 binaries carry `showEnvironmentBadge: false` in their resolved Expo configuration and never infer
 visibility from `NODE_ENV`.
 
+## Add and test a tenant
+
+Use the interactive onboarding command instead of copying tenant files by hand:
+
+```sh
+npm run tenant:add
+```
+
+It supports repository tenants and Git-ignored local tests, accepts an optional source logo, creates
+a deterministic fallback when none is supplied, generates/validates assets, resolves Expo config,
+and runs fast preflight. The local `test-tenant` launch command is:
+
+```sh
+npm run app -- start --tenant test-tenant --environment development --yes
+```
+
+Local tenants intentionally have isolated placeholder bundle/package identities and no required
+server environment variables. They may start Metro, install an existing compatible binary, perform
+development native runs, manage assets, and run fast preflight. Build, update, release preflight,
+and preview/production native-run actions are blocked before any process is launched. Creating a
+real tenant in repository mode does not create EAS credentials or backend entitlements; complete
+those operational steps separately before release.
+
 ## Fast versus release preflight
 
 Fast preflight validates tenant selection, required environment names, TypeScript, unit tests, Expo
@@ -154,15 +177,17 @@ the tenant configuration.
 
 ## Tenant onboarding checklist
 
-1. Copy an existing typed file under `config/tenants/`, change every identity/permission/brand
-   field, and register it in `config/tenants/registry.ts`. Do not put secret values in TypeScript.
-2. Give development a distinct bundle/package identity. Preview and production may share a store
+1. Run `npm run tenant:add` in repository mode and review the generated typed configuration and
+   registry edit. Do not put secret values in TypeScript.
+2. Replace fallback artwork when it is not approved production branding. Inspect generated Apple,
+   Android, notification, splash, and runtime-logo previews.
+3. Confirm the semantic theme, all JavaScript feature defaults, and the separate native-capability
+   declaration. Avihu defaults remain all enabled; server entitlements are future work.
+4. Give development a distinct bundle/package identity. Preview and production may share a store
    identity only when both explicitly set `allowSharedStoreIdentity: true`.
-3. Create `config/tenants/assets/<tenant>/source/app-icon.png`, generate assets, and visually inspect
-   every Apple/Android/notification preview.
-4. Create the tenant's EAS project and its symbolic `development`, `preview`, and `production`
+5. Create the tenant's EAS project and its symbolic `development`, `preview`, and `production`
    environments. Set `APP_TENANT` and the tenant's required runtime variables in that project.
-5. Resolve all three Expo configurations, run fast preflight, then release preflight on supported
+6. Resolve all three Expo configurations, run fast preflight, then release preflight on supported
    platforms. Complete the manual device matrix before store submission.
 
 ## Asset replacement and cleanup
