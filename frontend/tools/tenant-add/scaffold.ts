@@ -10,9 +10,9 @@ import { validateTenantAssets } from "../assets/validate";
 import { normalizeOrCreateLogo } from "./logo";
 import { addRepositoryTenantToRegistry } from "./registryEditor";
 import { renderTenantFiles } from "./renderTenantFiles";
-import { themeRecipeV1Schema } from "../../config/tenants/themeRecipe";
 import type { TenantAddAnswers, TenantAddResult } from "./types";
 import { createTenantConfig } from "./validation";
+import { loadThemeSelection } from "./themeInput";
 
 const exists = async (target: string) =>
   access(target)
@@ -25,7 +25,8 @@ export const scaffoldTenant = async (
   frontendRoot = process.cwd(),
   verify?: (tenantId: string) => Promise<void>
 ): Promise<TenantAddResult> => {
-  const tenant = createTenantConfig(answers);
+  const loadedTheme = await loadThemeSelection(answers.themeSelection);
+  const tenant = createTenantConfig(answers, loadedTheme.recipe);
   const modulePath = path.join(
     frontendRoot,
     "config/tenants",
@@ -43,19 +44,9 @@ export const scaffoldTenant = async (
     await mkdir(path.dirname(modulePath), { recursive: true });
     await mkdir(modulePath, { recursive: false });
     created.push(modulePath);
-    const recipe = themeRecipeV1Schema.parse({
-      schemaVersion: 1,
-      foundation: {
-        primary: tenant.theme.colors.primary,
-        onPrimary: tenant.theme.colors.onPrimary,
-        accent: tenant.theme.colors.accent,
-        onAccent: tenant.theme.colors.onAccent,
-        background: tenant.theme.colors.background,
-        onBackground: tenant.theme.colors.onBackground,
-      },
-      overrides: tenant.theme.colors,
-    });
-    for (const [fileName, source] of Object.entries(renderTenantFiles(tenant, recipe))) {
+    for (const [fileName, source] of Object.entries(
+      renderTenantFiles(tenant, loadedTheme.recipe)
+    )) {
       await writeFile(path.join(modulePath, fileName), source, { encoding: "utf8", flag: "wx" });
     }
 
