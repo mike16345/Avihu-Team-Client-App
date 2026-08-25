@@ -46,6 +46,7 @@ export const createExpoConfig = ({
           android: tenant.androidBuildProperties,
         },
       ],
+      "./plugins/withFmtXcode26Fix",
       "expo-background-task",
       [
         "expo-camera",

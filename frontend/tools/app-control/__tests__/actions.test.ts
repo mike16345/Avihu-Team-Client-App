@@ -37,6 +37,16 @@ describe("resolveAction", () => {
       env: {
         APP_TENANT: "avihu",
         APP_ENV: "production",
+        ADB_MDNS_AUTO_CONNECT: "0",
+      },
+      prerequisite: {
+        command: "npx",
+        args: ["tsx", "tools/app-control/prepareAndroidDevice.ts"],
+        env: {
+          APP_TENANT: "avihu",
+          APP_ENV: "production",
+          ADB_MDNS_AUTO_CONNECT: "0",
+        },
       },
     });
   });
@@ -54,6 +64,20 @@ describe("resolveAction", () => {
       command: "npx",
       args: ["expo", "run:ios", "--configuration", "Debug", "--device", "iPhone 16 Pro"],
     });
+  });
+
+  it("reopens the Android chooser when a broken mDNS serial was supplied explicitly", () => {
+    vi.stubEnv("APP_ANDROID_JAVA_HOME", "/toolchains/java-17");
+
+    expect(
+      resolveAction({
+        action: "run",
+        platform: "android",
+        tenantId: "avihu",
+        environment: "development",
+        device: "adb-RFGYB1ELTPW-ihT621 (2)._adb-tls-connect._tcp",
+      }).args
+    ).toEqual(["expo", "run:android", "--variant", "debug", "--device"]);
   });
 
   it("installs an existing binary on a selected device without rebuilding it", () => {
@@ -80,6 +104,11 @@ describe("resolveAction", () => {
       env: {
         APP_TENANT: "avihu",
         APP_ENV: "production",
+        ADB_MDNS_AUTO_CONNECT: "0",
+      },
+      prerequisite: {
+        command: "npx",
+        args: ["tsx", "tools/app-control/prepareAndroidDevice.ts"],
       },
     });
   });
