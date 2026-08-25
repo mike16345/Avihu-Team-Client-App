@@ -12,15 +12,19 @@ export interface DeveloperDiagnosticsInput {
   appVersion?: string | null;
   iosBundleIdentifier?: string | null;
   androidPackage?: string | null;
-  apiUrl?: string | null;
+  apiMode?: string | null;
+  hasApiUrl?: boolean;
+  hasPreviewApi?: boolean;
 }
+
+export type DeveloperApiEnvironment = "test" | "preview" | "production" | "unknown";
 
 export interface DeveloperDiagnostics {
   tenant: string;
   environment: TenantEnvironment;
   applicationId: string;
   appVersion: string;
-  apiHost: string;
+  apiEnvironment: DeveloperApiEnvironment;
 }
 
 export const isDeveloperToolsAvailable = (
@@ -28,14 +32,18 @@ export const isDeveloperToolsAvailable = (
   environment: TenantEnvironment
 ): boolean => isDevelopmentBuild && environment === "development";
 
-const getApiHost = (apiUrl: string | null | undefined): string => {
-  if (!apiUrl) return UNAVAILABLE;
-
-  try {
-    return new URL(apiUrl).host || UNAVAILABLE;
-  } catch {
-    return UNAVAILABLE;
-  }
+const getApiEnvironment = ({
+  apiMode,
+  hasApiUrl,
+  hasPreviewApi,
+}: Pick<
+  DeveloperDiagnosticsInput,
+  "apiMode" | "hasApiUrl" | "hasPreviewApi"
+>): DeveloperApiEnvironment => {
+  if (hasPreviewApi) return "preview";
+  if (!hasApiUrl) return "unknown";
+  if (apiMode === "development") return "test";
+  return "production";
 };
 
 export const createDeveloperDiagnostics = (
@@ -46,5 +54,5 @@ export const createDeveloperDiagnostics = (
   applicationId:
     (input.platform === "ios" ? input.iosBundleIdentifier : input.androidPackage) || UNAVAILABLE,
   appVersion: input.appVersion || UNAVAILABLE,
-  apiHost: getApiHost(input.apiUrl),
+  apiEnvironment: getApiEnvironment(input),
 });
