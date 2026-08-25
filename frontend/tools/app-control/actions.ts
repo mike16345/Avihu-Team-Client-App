@@ -207,8 +207,8 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         ),
       };
     }
-    case "update":
-      return createCommandSpec(
+    case "update": {
+      const update = createCommandSpec(
         selection,
         "npx",
         [
@@ -223,5 +223,15 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         ],
         `Publish update for ${labelPrefix}`
       );
+      return {
+        ...update,
+        prerequisite: createCommandStep(
+          selection,
+          "npm",
+          ["run", "preflight"],
+          `Fast preflight for ${labelPrefix}`
+        ),
+      };
+    }
   }
 };

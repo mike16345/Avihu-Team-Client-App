@@ -196,6 +196,25 @@ describe("resolveAction", () => {
     });
   });
 
+  it("runs tenant preflight before publishing an Avihu update", () => {
+    expect(
+      resolveAction({
+        action: "update",
+        tenantId: "avihu",
+        environment: "production",
+      })
+    ).toMatchObject({
+      command: "npx",
+      args: expect.arrayContaining(["eas-cli@16.27.0", "update"]),
+      env: { APP_TENANT: "avihu", APP_ENV: "production" },
+      prerequisite: {
+        command: "npm",
+        args: ["run", "preflight"],
+        env: { APP_TENANT: "avihu", APP_ENV: "production" },
+      },
+    });
+  });
+
   it("maps fast preflight directly to the shared package script", () => {
     expect(
       resolveAction({
