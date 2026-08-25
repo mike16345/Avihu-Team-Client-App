@@ -5,7 +5,7 @@ import path from "node:path";
 export interface EasWorkspaceInput {
   displayName: string;
   slug: string;
-  owner: string;
+  owner?: string;
   sourceIcon?: string;
 }
 
@@ -28,7 +28,7 @@ export const withIsolatedEasWorkspace = async <Result>(
           expo: {
             name: input.displayName,
             slug: input.slug,
-            owner: input.owner,
+            ...(input.owner ? { owner: input.owner } : {}),
             ...(icon ? { icon } : {}),
           },
         },

@@ -23,7 +23,11 @@ export interface EasProjectRequest {
   sourceIcon?: string;
 }
 
-export interface EasLinkedProjectRequest extends EasProjectRequest {
+export interface EasLinkedProjectRequest {
+  displayName: string;
+  slug: string;
+  owner?: string;
+  sourceIcon?: string;
   projectId: string;
 }
 

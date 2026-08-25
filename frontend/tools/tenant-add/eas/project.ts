@@ -45,7 +45,7 @@ const parseIdentity = (
 
 const runProjectInit = async (
   runner: EasProjectRunner,
-  request: EasProjectRequest,
+  request: EasProjectRequest | EasLinkedProjectRequest,
   initArgs: string[]
 ) =>
   withIsolatedEasWorkspace(request, async (cwd) => {
