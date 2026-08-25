@@ -268,4 +268,24 @@ describe("createExpoConfig", () => {
       }),
     ]);
   });
+
+  it("publishes separated tenant theme, localization, feature defaults, and native capabilities", () => {
+    const development = createExpoConfig({
+      baseConfig: {},
+      tenant: getTenant("avihu"),
+      environment: "development",
+      processEnv: {},
+    });
+
+    expect(development.extra).toMatchObject({
+      supportsRtl: true,
+      forcesRTL: true,
+      tenant: {
+        theme: avihuTenant.theme,
+        localization: avihuTenant.localization,
+        featureDefaults: avihuTenant.featureDefaults,
+        nativeCapabilities: avihuTenant.nativeCapabilities,
+      },
+    });
+  });
 });
