@@ -12,10 +12,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     throw new Error("APP_TENANT is required. Run `npm run app` to select a tenant.");
   }
 
-  return createExpoConfig({
+  const resolvedConfig = createExpoConfig({
     baseConfig: config,
     tenant: getTenant(tenantId),
     environment: parseTenantEnvironment(process.env.APP_ENV),
     processEnv: process.env,
   });
+
+  return {
+    ...resolvedConfig,
+    owner: process.env.EXPO_OWNER?.trim() || resolvedConfig.owner || "avihuteam",
+  };
 };
