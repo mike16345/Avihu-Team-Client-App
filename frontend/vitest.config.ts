@@ -11,9 +11,14 @@ export default defineConfig({
     },
   },
   test: {
-    dir: "src",
+    dir: ".",
     environment: "node",
-    include: ["**/__tests__/**/*.test.ts", "**/__tests__/**/*.test.tsx"],
+    include: [
+      "src/**/__tests__/**/*.test.ts",
+      "src/**/__tests__/**/*.test.tsx",
+      "config/**/__tests__/**/*.test.ts",
+      "tools/**/__tests__/**/*.test.ts",
+    ],
     exclude: ["**/node_modules/**", "**/dist/**", "**/.expo/**"],
     restoreMocks: true,
   },

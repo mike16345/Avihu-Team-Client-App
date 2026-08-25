@@ -4,7 +4,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@assets/*": ["./assets/*"]
+      "@assets/*": ["./assets/*"],
+      "@config/*": ["./config/*"],
+      "tenant-assets/*": ["./config/tenants/assets/avihu/generated/*"]
     },
     /* Bundler mode */
     "moduleResolution": "bundler",

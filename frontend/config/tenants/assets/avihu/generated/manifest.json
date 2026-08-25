@@ -1,0 +1,107 @@
+{
+  "generatorVersion": 1,
+  "tenantId": "avihu",
+  "rules": {
+    "adaptiveSafeZoneRatio": 0.66,
+    "adaptiveMinimumSafeZoneUtilization": 0.9,
+    "notificationMask": "Source alpha >= 128 and grayscale luminance < 176 becomes opaque white; all other pixels become transparent."
+  },
+  "source": {
+    "relativePath": "source/app-icon.png",
+    "sha256": "b4afcc16961d54dafe3070239802d347937670e1f75988b71e0f941a8dbfa7b7",
+    "width": 2000,
+    "height": 2000,
+    "hasAlpha": true,
+    "colorSpace": "srgb"
+  },
+  "outputs": {
+    "appleIcon": {
+      "relativePath": "generated/apple-icon.png",
+      "sha256": "f5791fca8ae6c66b7155733c11ced7d900c6cb21798f254b79f5378bba646a0d",
+      "width": 1024,
+      "height": 1024,
+      "hasAlpha": false,
+      "colorSpace": "srgb"
+    },
+    "androidLegacyIcon": {
+      "relativePath": "generated/android-legacy-icon.png",
+      "sha256": "f5c85b85aa9dcb714adddceb77c80a236a9fc22919ed5cfbe9f68acc6e5d9c40",
+      "width": 512,
+      "height": 512,
+      "hasAlpha": false,
+      "colorSpace": "srgb"
+    },
+    "androidAdaptiveForeground": {
+      "relativePath": "generated/android-adaptive-foreground.png",
+      "sha256": "7cd89d26b409c9a597dfadd9d0585159ce9821caeaf2f66bc94204abdbdd0ff7",
+      "width": 1024,
+      "height": 1024,
+      "hasAlpha": true,
+      "colorSpace": "srgb"
+    },
+    "androidAdaptiveBackground": {
+      "relativePath": "generated/android-adaptive-background.png",
+      "sha256": "b0a2a14fdb96bdbcc93e433fde76665ad377a597f380a4adafc28881e931b1c5",
+      "width": 1024,
+      "height": 1024,
+      "hasAlpha": false,
+      "colorSpace": "srgb"
+    },
+    "notificationIcon": {
+      "relativePath": "generated/notification-icon.png",
+      "sha256": "b0ab689ebeceb0fafb7e15df5ca598b96ea4d0dfd23958e70f4fe9bec070d386",
+      "width": 96,
+      "height": 96,
+      "hasAlpha": true,
+      "colorSpace": "srgb"
+    },
+    "splash": {
+      "relativePath": "generated/splash.png",
+      "sha256": "dba7deadc86b18ed866071a71780166140bc05fa2ee081e033719b6cce83b6db",
+      "width": 1284,
+      "height": 2778,
+      "hasAlpha": false,
+      "colorSpace": "srgb"
+    },
+    "runtimeLogo": {
+      "relativePath": "generated/runtime-logo.png",
+      "sha256": "64901d2e769045438023669e941ccd938f54a9483fa6a46828139d41fcb7ca70",
+      "width": 1024,
+      "height": 1024,
+      "hasAlpha": true,
+      "colorSpace": "srgb"
+    },
+    "applePreview": {
+      "relativePath": "generated/previews/apple.png",
+      "sha256": "3e6705f8ad21b1dbd5c1597445ebbd0aba380f7e1d21c3654499780a498c367a",
+      "width": 512,
+      "height": 512,
+      "hasAlpha": true,
+      "colorSpace": "srgb"
+    },
+    "androidCirclePreview": {
+      "relativePath": "generated/previews/android-circle.png",
+      "sha256": "366d6b91c37df1b25e2f07eb6a9f9771c314a6695102677ccb60d012eeff8396",
+      "width": 512,
+      "height": 512,
+      "hasAlpha": true,
+      "colorSpace": "srgb"
+    },
+    "androidSquirclePreview": {
+      "relativePath": "generated/previews/android-squircle.png",
+      "sha256": "f1c787a7cecf6bac30099ab68b66376d92f9103672787a06b8773dfae1c53bd3",
+      "width": 512,
+      "height": 512,
+      "hasAlpha": true,
+      "colorSpace": "srgb"
+    },
+    "notificationPreview": {
+      "relativePath": "generated/previews/notification.png",
+      "sha256": "cb725b95850f84973e42e3b8642962a592bb7b0088071697b7fef165fc8af57d",
+      "width": 512,
+      "height": 512,
+      "hasAlpha": false,
+      "colorSpace": "srgb"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import React from "react";
 import { Image, Platform, StyleSheet, TouchableOpacity, View } from "react-native";
-import appLogo from "@assets/app-logo.png";
+import appLogo from "tenant-assets/runtime-logo.png";
 import { Text } from "@/components/ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
 import { HealthStatus, MUTED_TEXT_SOFT, SURFACE_WHITE } from "./stepsConstants";

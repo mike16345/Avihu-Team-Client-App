@@ -111,16 +111,16 @@ describe("V2 meal completion", () => {
   });
 
   it("scopes persisted completion by plan and the 3am logical day", () => {
-    expect(getDietPlanV2DayKey(new Date("2026-08-12T02:59:00Z"))).toBe("2026-08-11");
-    expect(getDietPlanV2DayKey(new Date("2026-08-12T03:00:00Z"))).toBe("2026-08-12");
+    expect(getDietPlanV2DayKey(new Date(2026, 7, 12, 2, 59))).toBe("2026-08-11");
+    expect(getDietPlanV2DayKey(new Date(2026, 7, 12, 3, 0))).toBe("2026-08-12");
     expect(getDietPlanV2ConsumptionStorageKey(plan, "2026-08-12")).toBe(
       "diet-plan-v2-consumption:plan:plan-1:2026-08-12"
     );
   });
 
   it("schedules persisted daily state to roll over at the next 3am boundary", () => {
-    expect(getMillisecondsUntilDietPlanV2DayChange(new Date("2026-08-12T02:59:59Z"))).toBe(1_000);
-    expect(getMillisecondsUntilDietPlanV2DayChange(new Date("2026-08-12T03:00:01Z"))).toBe(
+    expect(getMillisecondsUntilDietPlanV2DayChange(new Date(2026, 7, 12, 2, 59, 59))).toBe(1_000);
+    expect(getMillisecondsUntilDietPlanV2DayChange(new Date(2026, 7, 12, 3, 0, 1))).toBe(
       86_399_000
     );
   });

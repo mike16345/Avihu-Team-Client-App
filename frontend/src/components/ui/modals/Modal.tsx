@@ -20,6 +20,8 @@ import { Card } from "../Card";
 import { IconName } from "@/constants/iconMap";
 import ToastContainer from "../toast/ToastContainer";
 import { useToastStore } from "@/store/toastStore";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { getModalSafeAreaPadding, MODAL_HORIZONTAL_PADDING } from "./modalSafeArea";
 
 export interface CustomModalProps extends ModalProps {
   style?: StyleProp<ViewStyle>;
@@ -42,7 +44,9 @@ export const CustomModal: CompoundModal = ({
   ...props
 }) => {
   const { colors, layout, spacing } = useStyles();
+  const insets = useSafeAreaInsets();
   const modalToasts = useToastStore((state) => state.modalToasts);
+  const safeAreaPadding = getModalSafeAreaPadding(insets);
 
   const animationValue = useRef(new Animated.Value(0)).current;
 
@@ -72,17 +76,14 @@ export const CustomModal: CompoundModal = ({
         style={[
           colors.background,
           spacing.gapDefault,
-          spacing.pdStatusBar,
-          spacing.pdLg,
-          spacing.gapDefault,
           layout.flex1,
+          { paddingHorizontal: MODAL_HORIZONTAL_PADDING },
+          props.style,
           {
             transform: [{ scale: animationValue }],
             opacity: animationValue,
-            paddingBottom: spacing.pdBottomBar.paddingBottom * 3,
-            paddingTop: 48,
+            ...safeAreaPadding,
           },
-          props.style,
         ]}
       >
         <ModalContextProvider onDismiss={handleDismiss}>

@@ -1,11 +1,14 @@
-import Constants from "expo-constants";
-
 export const API_KEY_HEADER = "X-Api-Key";
 
-const isDevMode = process.env.EXPO_PUBLIC_MODE === "development";
+export const getApiKey = () => {
+  const apiKey = process.env.EXPO_PUBLIC_API_AUTH_TOKEN;
 
-export const getApiKey = () =>
-  isDevMode ? process.env.EXPO_PUBLIC_API_AUTH_TOKEN : Constants.expoConfig?.extra?.API_TOKEN;
+  if (!apiKey) {
+    throw new Error("EXPO_PUBLIC_API_AUTH_TOKEN is required");
+  }
+
+  return apiKey;
+};
 
 export const applyApiKeyToHeaders = (headers: Headers) => {
   const apiKey = getApiKey();
