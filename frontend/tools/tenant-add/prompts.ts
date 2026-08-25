@@ -6,6 +6,7 @@ import type { ThemePresetId } from "../../config/tenants/themePresets";
 import type { TenantFeatureDefaults, TenantNativeCapabilities } from "../../config/tenants/types";
 import { loadThemeSelection } from "./themeInput";
 import type { TenantAddAnswers, TenantAddMode, TenantThemeSelection } from "./types";
+import type { TenantEasSelection } from "./eas/types";
 
 export interface TenantPromptApi {
   select: typeof select;
@@ -25,6 +26,36 @@ const defaultTenantPromptApi: TenantPromptApi = {
   box,
   cancel,
   isCancel,
+};
+
+export const collectTenantEasSelection = async (
+  mode: TenantAddMode,
+  tenantSlug: string,
+  promptApi: TenantPromptApi = defaultTenantPromptApi,
+  getAuthenticatedUser: () => Promise<string> = async () => {
+    throw new Error("Expo authentication lookup is unavailable");
+  }
+): Promise<TenantEasSelection | null> => {
+  if (mode === "local") return { kind: "skip" };
+  const action = await promptApi.select({
+    message: "EAS project setup",
+    options: [
+      { value: "create", label: "Create a new Expo project" },
+      { value: "link", label: "Link an existing Expo project" },
+      { value: "skip", label: "Skip for now" },
+    ],
+  });
+  if (promptApi.isCancel(action)) return null;
+  if (action === "skip") return { kind: "skip" };
+  if (action === "link") {
+    const projectId = await askText(promptApi, "Expo project UUID");
+    return projectId ? { kind: "link", projectId } : null;
+  }
+  const authenticatedUser = await getAuthenticatedUser();
+  const owner = await askText(promptApi, "Expo owner", authenticatedUser);
+  if (!owner) return null;
+  promptApi.box(`Expo project to create: ${owner}/${tenantSlug}`, "External EAS action");
+  return { kind: "create", owner };
 };
 
 const askText = async (

@@ -1,7 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
-import { collectTenantAnswers, type TenantPromptApi } from "../prompts";
+import { collectTenantAnswers, collectTenantEasSelection, type TenantPromptApi } from "../prompts";
 
 describe("tenant:add prompts", () => {
+  it("automatically skips EAS for a local tenant", async () => {
+    const promptApi = { select: vi.fn() } as unknown as TenantPromptApi;
+    await expect(
+      collectTenantEasSelection("local", "new-tenant", promptApi, async () => "unused")
+    ).resolves.toEqual({ kind: "skip" });
+    expect(promptApi.select).not.toHaveBeenCalled();
+  });
+
   it("selects a theme preset without asking for individual colors", async () => {
     const text = vi
       .fn()
