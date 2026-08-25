@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { avihuTenant } from "./avihu";
+import { avihuTenant } from "./avihu/index.ts";
 import {
   tenantColorSchema,
   tenantThemeColorsSchema,
   tenantThemeSchema,
   type TenantTheme,
-} from "./theme";
+} from "./theme.ts";
 
 export const themeFoundationSchema = z
   .object({

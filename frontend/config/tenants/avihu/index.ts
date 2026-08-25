@@ -1,6 +1,6 @@
 import type { TenantConfig } from "../types";
-import { featureDefaults, nativeCapabilities } from "./features";
-import { tenantTheme } from "./theme";
+import { featureDefaults, nativeCapabilities } from "./features.ts";
+import { tenantTheme } from "./theme.ts";
 
 const CAMERA_PERMISSION =
   "אפשר ל-$(PRODUCT_NAME) להשתמש במצלמה כדי לסרוק ברקודים ולצלם תמונות באפליקציה.";

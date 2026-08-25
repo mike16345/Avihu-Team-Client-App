@@ -16,8 +16,8 @@ const renderTenantIndex = (tenant: TenantConfig) => {
   const typePath = tenant.kind === "local" ? "../../types" : "../types";
   return [
     `import type { TenantConfig, TenantEasConfig } from ${JSON.stringify(typePath)};`,
-    'import { featureDefaults, nativeCapabilities } from "./features";',
-    'import { tenantTheme } from "./theme";',
+    'import { featureDefaults, nativeCapabilities } from "./features.ts";',
+    'import { tenantTheme } from "./theme.ts";',
     "",
     "// tenant:eas:start",
     'const tenantEas = { status: "pending" } satisfies TenantEasConfig;',
@@ -35,7 +35,7 @@ const renderTenantIndex = (tenant: TenantConfig) => {
 };
 
 const renderTenantTheme = (recipe: ThemeRecipeV1, kind: TenantConfig["kind"]) => {
-  const recipePath = kind === "local" ? "../../themeRecipe" : "../themeRecipe";
+  const recipePath = kind === "local" ? "../../themeRecipe.ts" : "../themeRecipe.ts";
   return [
     `import { createTenantTheme, type ThemeRecipeV1 } from ${JSON.stringify(recipePath)};`,
     "",
