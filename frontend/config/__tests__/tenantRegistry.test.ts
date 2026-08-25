@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -44,14 +44,16 @@ describe("tenant policy foundations", () => {
     });
 
     try {
-      await writeFile(
-        path.join(root, "beta.ts"),
-        `export const beta = ${JSON.stringify(localTenant("beta"))};`
-      );
-      await writeFile(
-        path.join(root, "alpha.ts"),
-        `export const alpha = ${JSON.stringify(localTenant("alpha"))};`
-      );
+      for (const id of ["beta", "alpha"]) {
+        const directory = path.join(root, id);
+        await mkdir(directory);
+        await writeFile(
+          path.join(directory, "index.ts"),
+          `export const tenant = ${JSON.stringify(localTenant(id))};`
+        );
+        await writeFile(path.join(directory, "theme.ts"), "export const theme = {};\n");
+        await writeFile(path.join(directory, "features.ts"), "export const features = {};\n");
+      }
       expect(loadLocalTenants(root).map(({ id }) => id)).toEqual(["alpha", "beta"]);
     } finally {
       await rm(root, { recursive: true, force: true });
