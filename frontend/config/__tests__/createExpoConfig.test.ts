@@ -101,11 +101,22 @@ describe("createExpoConfig", () => {
       baseConfig: {},
       tenant: pendingTenant,
       environment: "development",
-      processEnv: {},
+      processEnv: { EXPO_OWNER: "personal-account" },
     });
     expect(config.owner).toBeUndefined();
     expect(config.extra?.eas).toBeUndefined();
     expect(config.updates).toBeUndefined();
+  });
+
+  it("allows an explicit owner override only for a linked tenant", () => {
+    const config = createExpoConfig({
+      baseConfig: {},
+      tenant: avihuTenant,
+      environment: "production",
+      processEnv: { EXPO_OWNER: "organization-override" },
+    });
+
+    expect(config.owner).toBe("organization-override");
   });
 
   it.each(["development", "preview", "production"] as const)(

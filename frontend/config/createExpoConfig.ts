@@ -80,6 +80,7 @@ export const createExpoConfig = ({
 }: CreateExpoConfigInput): ExpoConfig => {
   const identity = tenant.environments[environment];
   const linkedEas = isLinkedTenantEas(tenant.eas) ? tenant.eas : null;
+  const ownerOverride = processEnv.EXPO_OWNER?.trim();
 
   return {
     ...baseConfig,
@@ -137,7 +138,7 @@ export const createExpoConfig = ({
       },
       ...getPublicRuntimeExtra(processEnv),
     },
-    ...(linkedEas ? { owner: linkedEas.owner } : {}),
+    ...(linkedEas ? { owner: ownerOverride || linkedEas.owner } : {}),
     runtimeVersion: tenant.version,
     ...(linkedEas ? { updates: { enabled: true, url: linkedEas.updateUrl } } : {}),
     sdkVersion: "53.0.0",
