@@ -1,4 +1,8 @@
-import type { TenantConfig, TenantNativeCapabilities } from "../../config/tenants/types";
+import type {
+  TenantConfig,
+  TenantFeatureDefaults,
+  TenantNativeCapabilities,
+} from "../../config/tenants/types";
 
 export type TenantAddMode = "local" | "repository";
 
@@ -16,6 +20,9 @@ export interface TenantAddAnswers {
   onAccentColor: string;
   backgroundColor: string;
   onBackgroundColor: string;
+  supportsRtl?: boolean;
+  forcesRtl?: boolean;
+  featureDefaults?: TenantFeatureDefaults;
   nativeCapabilities: TenantNativeCapabilities;
 }
 
