@@ -6,24 +6,33 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { box, cancel, intro, outro } from "@clack/prompts";
 import type { TenantEasConfig } from "../../config/tenants/types";
 import { replaceTenantEasBlock } from "./easEditor";
-import { createEasProject, getAuthenticatedExpoUser, verifyLinkedEasProject } from "./eas/project";
+import {
+  createEasProject,
+  getAuthenticatedExpoAccounts,
+  getAuthenticatedExpoUser,
+  verifyLinkedEasProject,
+} from "./eas/project";
 import type { EasProjectIdentity, EasProjectRunner, TenantEasSelection } from "./eas/types";
-import { collectTenantAnswers, collectTenantEasSelection } from "./prompts";
-import { writeTenantRecovery } from "./recovery";
+import { listTenantDrafts, removeTenantDraft, writeTenantDraft } from "./draft";
+import {
+  collectTenantAnswers,
+  collectTenantDraftSelection,
+  collectTenantEasSelection,
+} from "./prompts";
+import {
+  createRecoveredEasSelection,
+  readTenantRecovery,
+  removeTenantRecovery,
+  writeTenantRecovery,
+} from "./recovery";
 import { discardStagedTenant, publishStagedTenant, scaffoldTenant } from "./scaffold";
+import { verifyNewTenant, type TenantVerificationRunner } from "./verification";
 
-const runFastPreflight = (frontendRoot: string, tenantId: string) =>
-  new Promise<void>((resolve, reject) => {
-    const child = spawn(
-      "npm",
-      ["run", "preflight", "--", "--tenant", tenantId, "--environment", "development"],
-      { cwd: frontendRoot, env: process.env, stdio: "inherit" }
-    );
+const runTenantVerificationProcess: TenantVerificationRunner = ({ command, args, cwd, env }) =>
+  new Promise((resolve, reject) => {
+    const child = spawn(command, args, { cwd, env, stdio: "inherit" });
     child.once("error", reject);
-    child.once("exit", (code, signal) => {
-      if (code === 0) resolve();
-      else reject(new Error(`Fast preflight failed${signal ? ` (${signal})` : ` (exit ${code})`}`));
-    });
+    child.once("exit", (code) => resolve(code ?? 1));
   });
 
 const runEasProcess: EasProjectRunner = ({ command, args, cwd, env }) =>
@@ -61,15 +70,13 @@ const resolveEasSelection = async (
   return verifyLinkedEasProject(runEasProcess, {
     displayName: input.displayName,
     slug: input.slug,
+    ...(selection.owner ? { owner: selection.owner } : {}),
     projectId: selection.projectId,
     sourceIcon: input.sourceIcon,
   });
 };
 
-const publishLinkedEas = async (
-  modulePath: string,
-  identity: EasProjectIdentity
-) => {
+const publishLinkedEas = async (modulePath: string, identity: EasProjectIdentity) => {
   const indexPath = path.join(modulePath, "index.ts");
   const original = await readFile(indexPath, "utf8");
   const eas: TenantEasConfig = {
@@ -91,17 +98,54 @@ export const runTenantAddCli = async (
   frontendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 ) => {
   intro("Add a white-label tenant");
-  const answers = await collectTenantAnswers();
+  const tenantAddRoot = path.join(frontendRoot, ".tenant-add");
+  const draftSelection = await collectTenantDraftSelection(await listTenantDrafts(tenantAddRoot));
+  if (!draftSelection) return 0;
+  if (draftSelection.kind === "delete") {
+    await removeTenantDraft(tenantAddRoot, draftSelection.tenantId);
+    outro(`Deleted saved tenant draft ${draftSelection.tenantId}.`);
+    return 0;
+  }
+  if (draftSelection.kind === "start-over") {
+    await removeTenantDraft(tenantAddRoot, draftSelection.tenantId);
+  }
+  const initialAnswers =
+    draftSelection.kind === "resume" ? draftSelection.draft.answers : undefined;
+  let activeDraftId = draftSelection.kind === "resume" ? draftSelection.draft.tenantId : undefined;
+  const answers = await collectTenantAnswers(undefined, {
+    initialAnswers,
+    getExpoAccounts: () => getAuthenticatedExpoAccounts(runEasProcess, frontendRoot),
+    onProgress: async (partialAnswers) => {
+      if (!partialAnswers.id) return;
+      activeDraftId = partialAnswers.id;
+      await writeTenantDraft(tenantAddRoot, {
+        schemaVersion: 1,
+        tenantId: partialAnswers.id,
+        updatedAt: new Date().toISOString(),
+        answers: partialAnswers,
+      });
+    },
+  });
   if (!answers) return 0;
 
   try {
     const result = await scaffoldTenant(answers, frontendRoot);
-    const selection = await collectTenantEasSelection(
-      result.tenant.kind,
-      result.tenant.slug,
-      undefined,
-      () => getAuthenticatedExpoUser(runEasProcess, frontendRoot)
-    );
+    const recovery = await readTenantRecovery(tenantAddRoot, result.tenant.id);
+    const selection = recovery
+      ? createRecoveredEasSelection(recovery, result.tenant.id, result.tenant.slug)
+      : await collectTenantEasSelection(
+          result.tenant.kind,
+          result.tenant.slug,
+          undefined,
+          () => getAuthenticatedExpoUser(runEasProcess, frontendRoot),
+          answers.expoOwner
+        );
+    if (recovery) {
+      box(
+        `Reusing recovered EAS project ${recovery.owner}/${recovery.slug} (${recovery.projectId})`,
+        "EAS recovery"
+      );
+    }
     if (!selection) {
       await discardStagedTenant(result);
       return 0;
@@ -116,7 +160,7 @@ export const runTenantAddCli = async (
       });
       if (identity) await publishLinkedEas(result.stagedModulePath, identity);
       await publishStagedTenant(result, frontendRoot, (tenantId) =>
-        runFastPreflight(frontendRoot, tenantId)
+        verifyNewTenant(frontendRoot, tenantId, runTenantVerificationProcess)
       );
     } catch (error) {
       await discardStagedTenant(result);
@@ -133,6 +177,8 @@ export const runTenantAddCli = async (
       }
       throw error;
     }
+    if (recovery) await removeTenantRecovery(tenantAddRoot, result.tenant.id);
+    if (activeDraftId) await removeTenantDraft(tenantAddRoot, activeDraftId);
     box(
       [
         `Mode: ${result.tenant.kind}`,

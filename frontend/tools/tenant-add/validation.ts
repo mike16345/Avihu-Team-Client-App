@@ -20,6 +20,9 @@ const normalizeIdentifierSegment = (value: string) =>
     .replace(/[^a-z0-9_]/gu, "")
     .replace(/^[^a-z]+/u, "t");
 
+export const createIdentifierBaseSuggestion = (expoOwner: string) =>
+  `com.${normalizeIdentifierSegment(expoOwner)}`;
+
 type TenantIdentityFields = Omit<
   TenantConfig,
   "eas" | "assets" | "brand" | "theme" | "featureDefaults" | "nativeCapabilities"

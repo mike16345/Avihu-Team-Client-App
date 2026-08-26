@@ -14,6 +14,7 @@ export interface TenantAddAnswers {
   id: string;
   displayName: string;
   logoPath?: string;
+  expoOwner?: string;
   identifierBase?: string;
   themeSelection: TenantThemeSelection;
   supportsRtl?: boolean;

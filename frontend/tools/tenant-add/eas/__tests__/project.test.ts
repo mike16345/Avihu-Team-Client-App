@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { createEasProject, getAuthenticatedExpoUser, verifyLinkedEasProject } from "../project";
+import {
+  createEasProject,
+  getAuthenticatedExpoAccounts,
+  getAuthenticatedExpoUser,
+  verifyLinkedEasProject,
+} from "../project";
 
 const project = {
   owner: "acme",
@@ -51,5 +56,27 @@ describe("EAS project adapter", () => {
         { displayName: "New Tenant", ...project }
       )
     ).rejects.toThrow(/slug/u);
+  });
+
+  it("parses the signed-in user and every available Expo account", async () => {
+    const stdout = [
+      "mikeg-studios",
+      "michael@example.com",
+      "",
+      "Accounts:",
+      "• mikeg-studios (Role: Owner)",
+      "• mikeg-studios-team (Role: Owner)",
+      "• avihuteam (Role: Admin)",
+    ].join("\n");
+
+    await expect(
+      getAuthenticatedExpoAccounts(
+        vi.fn().mockResolvedValue({ exitCode: 0, stdout, stderr: "" }),
+        "/repo"
+      )
+    ).resolves.toEqual({
+      username: "mikeg-studios",
+      accounts: ["mikeg-studios", "mikeg-studios-team", "avihuteam"],
+    });
   });
 });

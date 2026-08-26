@@ -123,6 +123,7 @@
     "@babel/core": "^7.20.0",
     "@clack/prompts": "1.7.0",
     "@expo/config": "~11.0.13",
+    "@expo/env": "^1.0.7",
     "@types/react": "~19.0.10",
     "dotenv-cli": "^7.4.4",
     "fast-glob": "3.3.3",
