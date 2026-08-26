@@ -1,9 +1,10 @@
 import { Pressable, StyleSheet, View } from "react-native";
-import Animated, { ZoomIn, ZoomOut } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import type { DietV2FreeCalories as DietV2FreeCaloriesValue } from "@/interfaces/IDietPlanV2";
 import { selectionHaptic } from "@/utils/haptics";
 import { formatDietPlanV2Number } from "./dietPlanV2Utils";
+import DietPlanV2ConsumedBadge from "./DietPlanV2ConsumedBadge";
+import { getDietPlanV2MealRowVisualState } from "./dietPlanV2MealRowVisualState";
 
 interface DietPlanV2FreeCaloriesProps {
   freeCalories?: DietV2FreeCaloriesValue;
@@ -18,6 +19,7 @@ const DietPlanV2FreeCalories = ({
   disabled,
   onToggle,
 }: DietPlanV2FreeCaloriesProps) => {
+  const visualState = getDietPlanV2MealRowVisualState(consumed);
   if (!freeCalories) return null;
 
   return (
@@ -27,26 +29,23 @@ const DietPlanV2FreeCalories = ({
         selectionHaptic();
         onToggle();
       }}
-      style={[styles.container, consumed && styles.consumed]}
+      style={[
+        styles.container,
+        { borderWidth: visualState.layout.borderWidth },
+        consumed && styles.consumed,
+      ]}
     >
       <View style={styles.headerRow}>
         <Text fontVariant="bold" fontSize={15} style={styles.title}>
           {`קלוריות חופשיות · ${formatDietPlanV2Number(freeCalories.calories)} קק"ל`}
         </Text>
-        {consumed && (
-          <Animated.View
-            entering={ZoomIn.duration(180).springify().damping(16)}
-            exiting={ZoomOut.duration(120)}
-            style={styles.checkBadge}
-          >
-            <Text fontVariant="bold" fontSize={11} style={styles.checkLabel}>
-              ✓ נאכל
-            </Text>
-          </Animated.View>
-        )}
+        <DietPlanV2ConsumedBadge consumed={consumed} />
       </View>
       <Text fontSize={15} style={[styles.description, consumed && styles.descriptionConsumed]}>
-        {freeCalories.description}
+        {freeCalories.items
+          .map((item) => item.name.trim())
+          .filter(Boolean)
+          .join(" / ")}
       </Text>
     </Pressable>
   );
@@ -60,7 +59,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 8,
     marginHorizontal: -8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: "transparent",
     borderBottomColor: "rgba(15, 94, 59, 0.10)",
   },
   consumed: {
@@ -76,28 +75,15 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "#0B2A22",
-    textAlign: "right",
   },
   description: {
     color: "#4B5563",
-    textAlign: "right",
     lineHeight: 22,
   },
   descriptionConsumed: {
     color: "#4B7A62",
     textDecorationLine: "line-through",
     textDecorationColor: "#86EFAC",
-  },
-  checkBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 999,
-    backgroundColor: "#DCFCE7",
-    borderWidth: 1,
-    borderColor: "#BBF7D0",
-  },
-  checkLabel: {
-    color: "#166534",
   },
 });
 

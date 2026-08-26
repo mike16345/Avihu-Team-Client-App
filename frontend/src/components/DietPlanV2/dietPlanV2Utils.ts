@@ -55,9 +55,17 @@ const isDietV2Category = (value: unknown): value is DietV2Category => {
   return (
     hasValidItems &&
     (value.items.length === 0
-      ? value.macros === undefined || hasValidMacros(value.macros)
-      : hasValidMacros(value.macros))
+      ? value.macros === undefined || hasValidCategoryMacros(value.category, value.macros)
+      : hasValidCategoryMacros(value.category, value.macros))
   );
+};
+
+const hasValidCategoryMacros = (category: unknown, value: unknown): boolean => {
+  if (!isRecord(value) || !isFiniteNumber(value.calories)) return false;
+  if (category === "protein") return isFiniteNumber(value.protein);
+  if (category === "carbs" || category === "vegetables") return isFiniteNumber(value.carbs);
+  if (category === "fat") return isFiniteNumber(value.fat);
+  return false;
 };
 
 const hasValidMacros = (value: unknown): boolean =>
@@ -69,7 +77,14 @@ const hasValidMacros = (value: unknown): boolean =>
 
 const hasValidFreeCalories = (value: unknown): boolean =>
   value === undefined ||
-  (isRecord(value) && isFiniteNumber(value.calories) && typeof value.description === "string");
+  (isRecord(value) &&
+    isFiniteNumber(value.calories) &&
+    Array.isArray(value.items) &&
+    value.items.length > 0 &&
+    value.items.every(
+      (item) =>
+        isRecord(item) && typeof item.name === "string" && isOptionalString(item.catalogItemId)
+    ));
 
 const isDietV2Meal = (value: unknown): value is DietV2Meal =>
   isRecord(value) &&
@@ -86,7 +101,8 @@ const isDietV2Meal = (value: unknown): value is DietV2Meal =>
   hasValidFreeCalories(value.freeCalories) &&
   (value.supplements === undefined || isStringArray(value.supplements));
 
-const getFiniteValue = (value: number): number => (Number.isFinite(value) ? value : 0);
+const getFiniteValue = (value: number | undefined): number =>
+  Number.isFinite(value) ? (value as number) : 0;
 
 const hasNonblankString = (value: unknown): boolean =>
   typeof value === "string" && value.trim().length > 0;
@@ -125,7 +141,7 @@ export const getDietPlanContentState = (plan: AnyDietPlan): "empty" | "ready" =>
   }
 
   if (plan.version === 2) {
-    return hasNonblankString(plan.highlights) ? "ready" : "empty";
+    return !isHtmlEmpty(plan.highlights) ? "ready" : "empty";
   }
 
   const hasInstructions = plan.customInstructions?.some((value) => !isHtmlEmpty(value)) ?? false;
@@ -149,8 +165,38 @@ export const computeDietPlanV2Totals = (plan: IDietPlanV2): DietPlanV2Totals =>
     { calories: 0, protein: 0, carbs: 0, fat: 0, freeCalories: 0 }
   );
 
+export const isDecimalNumber = (value: string | number): boolean => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) && !Number.isInteger(value);
+  }
+  if (typeof value === "string") {
+    const parsedValue = parseFloat(value);
+    return !isNaN(parsedValue) && !Number.isInteger(parsedValue);
+  }
+  return false;
+};
+
+export const toFixedDecimal = (value: string | number, decimals: number) => {
+  if (typeof value === "string" && isDecimalNumber(value)) {
+    const parsedValue = parseFloat(value);
+    if (isNaN(parsedValue)) {
+      return value;
+    }
+    return parsedValue.toFixed(decimals);
+  } else if (typeof value === "number" && value !== 0 && isDecimalNumber(value)) {
+    return value.toFixed(decimals);
+  }
+
+  return value;
+};
+
 export const formatDietPlanV2Number = (value: number): string =>
-  Object.is(value, -0) ? "0" : value.toString();
+  Object.is(value, -0) ? "0" : value.toFixed(2).replace(/\.?0+$/, "");
+
+export const formatDietPlanV2MealMacroSummary = (
+  macros: Pick<DietPlanV2Totals, "calories" | "protein" | "carbs" | "fat">
+): string =>
+  `${formatDietPlanV2Number(macros.calories)} קק"ל · ${formatDietPlanV2Number(macros.protein)} חלב׳ · ${formatDietPlanV2Number(macros.carbs)} פחמ׳ · ${formatDietPlanV2Number(macros.fat)} ש׳`;
 
 export const getDietPlanV2CalorieTarget = (totals: DietPlanV2Totals): number =>
   totals.calories + totals.freeCalories;
@@ -163,6 +209,19 @@ export const formatDietV2CategoryItems = (category: DietV2Category): string =>
     .map(({ name }) => name.trim())
     .filter(hasNonblankString)
     .join(" / ");
+
+export const formatDietV2CategoryMacros = (category: DietV2Category): string => {
+  if (!category.macros) return "";
+
+  const calories = `${formatDietPlanV2Number(category.macros.calories)} קק״ל`;
+  if (category.category === "protein") {
+    return `${formatDietPlanV2Number(getFiniteValue(category.macros.protein))} ג׳ חלבון · ${calories}`;
+  }
+  if (category.category === "fat") {
+    return `${formatDietPlanV2Number(getFiniteValue(category.macros.fat))} ג׳ שומן · ${calories}`;
+  }
+  return `${formatDietPlanV2Number(getFiniteValue(category.macros.carbs))} ג׳ פחמימה · ${calories}`;
+};
 
 export const formatDietV2Items = (items: DietV2Category["items"]): string =>
   items

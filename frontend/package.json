@@ -59,6 +59,7 @@
     "axios": "^1.7.2",
     "expo": "~53.0.24",
     "expo-background-task": "~0.2.8",
+    "expo-camera": "~16.1.11",
     "expo-constants": "~17.1.7",
     "expo-dev-client": "~5.2.4",
     "expo-file-system": "~18.1.11",

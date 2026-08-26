@@ -3,7 +3,9 @@ import type { IDietPlan } from "@/interfaces/DietPlan";
 import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
 import {
   computeDietPlanV2Totals,
+  formatDietV2CategoryMacros,
   formatDietV2CategoryItems,
+  formatDietPlanV2MealMacroSummary,
   formatDietPlanV2Number,
   getDietPlanContentState,
   getDietPlanV2CalorieTarget,
@@ -29,13 +31,16 @@ const plan: IDietPlanV2 = {
         {
           category: "protein",
           items: [{ name: "100 גרם חזה עוף" }, { name: "2 ביצים" }],
-          macros: { calories: 448, protein: 25, carbs: 45, fat: 12 },
+          macros: { calories: 448, protein: 25 },
         },
         { category: "vegetables", items: [] },
       ],
       addOns: [{ name: "קפה" }],
       macros: { calories: 448, protein: 25, carbs: 45, fat: 12 },
-      freeCalories: { calories: 150, description: "פרי / חטיף / כף ממרח" },
+      freeCalories: {
+        calories: 150,
+        items: [{ name: "פרי" }, { name: "חטיף" }, { name: "כף ממרח" }],
+      },
     },
     {
       _id: "meal-2",
@@ -44,7 +49,7 @@ const plan: IDietPlanV2 = {
         {
           category: "carbs",
           items: [{ name: "200 גרם אורז" }],
-          macros: { calories: 590, protein: 40, carbs: 60, fat: 10 },
+          macros: { calories: 590, carbs: 60 },
         },
       ],
       addOns: [],
@@ -109,12 +114,18 @@ describe("diet plan version resolution", () => {
 });
 
 describe("V2 display derivation", () => {
+  it("formats the meal macro summary compactly for a single mobile line", () => {
+    expect(
+      formatDietPlanV2MealMacroSummary({ calories: 448.5, protein: 25, carbs: 45, fat: 12 })
+    ).toBe('448.5 קק"ל · 25 חלב׳ · 45 פחמ׳ · 12 ש׳');
+  });
+
   it("sums meal macros and free calories without merging them", () => {
     expect(computeDietPlanV2Totals(plan)).toEqual({
       calories: 1038,
-      protein: 65,
-      carbs: 105,
-      fat: 22,
+      protein: 25,
+      carbs: 60,
+      fat: 0,
       freeCalories: 150,
     });
   });
@@ -147,6 +158,11 @@ describe("V2 display derivation", () => {
     );
   });
 
+  it("shows only the category's relevant macro plus calories", () => {
+    expect(formatDietV2CategoryMacros(plan.meals[0].categories[0])).toBe("25 ג׳ חלבון · 448 קק״ל");
+    expect(formatDietV2CategoryMacros(plan.meals[1].categories[0])).toBe("60 ג׳ פחמימה · 590 קק״ל");
+  });
+
   it("trims only the outside of long literal item strings", () => {
     expect(
       formatDietV2CategoryItems({
@@ -171,7 +187,7 @@ describe("V2 display derivation", () => {
           categories: [],
           addOns: [],
           macros: { calories: 0, protein: 0, carbs: 0, fat: 0 },
-          freeCalories: { calories: 75, description: "בחירה חופשית" },
+          freeCalories: { calories: 75, items: [{ name: "בחירה חופשית" }] },
         },
       ],
     };

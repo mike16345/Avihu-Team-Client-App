@@ -18,6 +18,15 @@ export const getDietPlanV2DayKey = (now = new Date()): string => {
   return `${year}-${month}-${day}`;
 };
 
+export const getMillisecondsUntilDietPlanV2DayChange = (now = new Date()): number => {
+  const nextBoundary = new Date(now);
+  nextBoundary.setHours(DAY_START_HOUR, 0, 0, 0);
+  if (nextBoundary.getTime() <= now.getTime()) {
+    nextBoundary.setDate(nextBoundary.getDate() + 1);
+  }
+  return nextBoundary.getTime() - now.getTime();
+};
+
 export const getDietPlanV2ContextKey = (plan: IDietPlanV2): string => {
   if (plan._id) return `plan:${plan._id}`;
   if (plan.userId) return `user:${plan.userId}`;
@@ -117,9 +126,9 @@ export const computeDietPlanV2ConsumedTotals = (
 
           return {
             calories: mealTotals.calories + category.macros.calories,
-            protein: mealTotals.protein + category.macros.protein,
-            carbs: mealTotals.carbs + category.macros.carbs,
-            fat: mealTotals.fat + category.macros.fat,
+            protein: mealTotals.protein + (category.macros.protein ?? 0),
+            carbs: mealTotals.carbs + (category.macros.carbs ?? 0),
+            fat: mealTotals.fat + (category.macros.fat ?? 0),
           };
         },
         { calories: 0, protein: 0, carbs: 0, fat: 0 }

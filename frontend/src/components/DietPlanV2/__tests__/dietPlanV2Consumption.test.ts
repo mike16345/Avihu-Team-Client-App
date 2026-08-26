@@ -6,12 +6,15 @@ import {
   getDietPlanV2ContextKey,
   getDietPlanV2DayKey,
   getDietPlanV2MealKey,
+  getMillisecondsUntilDietPlanV2DayChange,
   getDietPlanV2TrackableRows,
   reconcileDietPlanV2Completion,
   toggleDietPlanV2Meal,
   toggleDietPlanV2Row,
   type DietPlanV2CompletionMap,
 } from "../dietPlanV2Consumption";
+import { getDietPlanV2MealRowVisualState } from "../dietPlanV2MealRowVisualState";
+import { buildDietPlanV2HistoryEntries, sumDietPlanV2HistoryMacros } from "../dietPlanV2History";
 
 const plan: IDietPlanV2 = {
   _id: "plan-1",
@@ -26,18 +29,18 @@ const plan: IDietPlanV2 = {
         {
           category: "protein",
           items: [{ name: "100 גרם חזה עוף" }],
-          macros: { calories: 200, protein: 25, carbs: 0, fat: 4 },
+          macros: { calories: 200, protein: 25 },
         },
         {
           category: "carbs",
           items: [{ name: "200 גרם אורז" }],
-          macros: { calories: 248.5, protein: 0, carbs: 45, fat: 8 },
+          macros: { calories: 248.5, carbs: 45 },
         },
         { category: "vegetables", items: [] },
       ],
       addOns: [{ name: "קפה" }],
       macros: { calories: 448.5, protein: 25, carbs: 45, fat: 12 },
-      freeCalories: { calories: 150, description: "פרי / חטיף" },
+      freeCalories: { calories: 150, items: [{ name: "פרי" }, { name: "חטיף" }] },
     },
     {
       name: "ארוחה 2",
@@ -45,7 +48,7 @@ const plan: IDietPlanV2 = {
         {
           category: "protein",
           items: [{ name: "טונה" }],
-          macros: { calories: 300, protein: 30, carbs: 0, fat: 5 },
+          macros: { calories: 300, protein: 30 },
         },
       ],
       addOns: [],
@@ -55,11 +58,70 @@ const plan: IDietPlanV2 = {
 };
 
 describe("V2 meal completion", () => {
+  it("keeps row geometry identical when its recorded style is applied", () => {
+    const pending = getDietPlanV2MealRowVisualState(false);
+    const recorded = getDietPlanV2MealRowVisualState(true);
+
+    expect(pending.layout).toEqual({ borderWidth: 1, badgeWidth: 62, badgeHeight: 23 });
+    expect(recorded.layout).toEqual(pending.layout);
+    expect(pending.badgeOpacity).toBe(0);
+    expect(recorded.badgeOpacity).toBe(1);
+  });
+
+  it("includes recorded meal rows alongside scanned foods in history", () => {
+    const mealKey = getDietPlanV2MealKey(plan.meals[0], 0);
+    const completion: DietPlanV2CompletionMap = {
+      [mealKey]: {
+        selectedRows: ["category:protein:0", "add-ons", "free-calories"],
+        completed: false,
+      },
+    };
+    const entries = buildDietPlanV2HistoryEntries(plan, completion, [
+      {
+        id: "scan-1",
+        catalogItemId: "catalog-1",
+        barcode: "7290000000000",
+        name: "יוגורט",
+        servingDescription: "100 גרם",
+        servingAmount: 100,
+        servingUnit: "g",
+        servingReferenceQuantity: 100,
+        macros: { calories: 90, protein: 10, carbs: 5, fat: 3 },
+        recordedAt: "2026-08-14T12:00:00.000Z",
+      },
+    ]);
+
+    expect(entries.map(({ name }) => name)).toEqual([
+      "100 גרם חזה עוף",
+      "קפה",
+      "פרי / חטיף",
+      "יוגורט",
+    ]);
+    expect(entries[0]).toMatchObject({
+      detail: "ארוחה 1 · חלבון",
+      macros: { calories: 200, protein: 25, carbs: 0, fat: 0 },
+    });
+    expect(sumDietPlanV2HistoryMacros(entries)).toEqual({
+      calories: 440,
+      protein: 35,
+      carbs: 5,
+      fat: 3,
+      freeCalories: 0,
+    });
+  });
+
   it("scopes persisted completion by plan and the 3am logical day", () => {
     expect(getDietPlanV2DayKey(new Date("2026-08-12T02:59:00Z"))).toBe("2026-08-11");
     expect(getDietPlanV2DayKey(new Date("2026-08-12T03:00:00Z"))).toBe("2026-08-12");
     expect(getDietPlanV2ConsumptionStorageKey(plan, "2026-08-12")).toBe(
       "diet-plan-v2-consumption:plan:plan-1:2026-08-12"
+    );
+  });
+
+  it("schedules persisted daily state to roll over at the next 3am boundary", () => {
+    expect(getMillisecondsUntilDietPlanV2DayChange(new Date("2026-08-12T02:59:59Z"))).toBe(1_000);
+    expect(getMillisecondsUntilDietPlanV2DayChange(new Date("2026-08-12T03:00:01Z"))).toBe(
+      86_399_000
     );
   });
 
@@ -106,7 +168,7 @@ describe("V2 meal completion", () => {
       calories: 200,
       protein: 25,
       carbs: 0,
-      fat: 4,
+      fat: 0,
       freeCalories: 0,
     });
   });
@@ -125,7 +187,7 @@ describe("V2 meal completion", () => {
       calories: 598.5,
       protein: 25,
       carbs: 45,
-      fat: 12,
+      fat: 0,
       freeCalories: 150,
     });
   });

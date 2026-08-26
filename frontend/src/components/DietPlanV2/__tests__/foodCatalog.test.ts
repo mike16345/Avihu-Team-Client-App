@@ -1,0 +1,469 @@
+import { describe, expect, it } from "vitest";
+import {
+  createFoodCatalogDraft,
+  createSmartFoodEntry,
+  createSmartFoodEntryDraft,
+  replaceSmartFoodEntry,
+  sumSmartFoodMacros,
+  validateSmartFoodDraft,
+} from "../foodCatalog";
+import {
+  getRemainingScanFeedbackMs,
+  isBarcodeHoldReady,
+  updateBarcodeHoldCandidate,
+} from "../foodCatalogScanner";
+import {
+  getDietPlanV2SmartFoodsHistoryDayKeys,
+  getDietPlanV2SmartFoodsStorageKey,
+  reconcileSmartFoodEntries,
+} from "../smartFoodStorage";
+import {
+  normalizeFoodCatalogSearchQuery,
+  shouldRequestFoodCatalogSearch,
+} from "../foodCatalogSearch";
+import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
+import type { FoodCatalogProduct } from "@/interfaces/IFoodCatalog";
+
+const product: FoodCatalogProduct = {
+  id: "catalog-1",
+  identifiers: { barcode: "7290000000000", barcodeAliases: [], providerId: "7290000000000" },
+  names: { he: "יוגורט", en: "Yogurt", original: "Yogurt", originalLanguage: "en" },
+  brand: "Example",
+  imageUrl: null,
+  package: { description: "200 g", quantity: 200, unit: "g" },
+  serving: { description: "100 g", quantity: 100, unit: "g", source: "open_food_facts" },
+  servings: [
+    {
+      id: "off-serving",
+      description: "100 g",
+      quantity: 100,
+      unit: "g",
+      nutrition: {
+        calories: 150,
+        protein: 20,
+        carbohydrates: 5,
+        fat: 4,
+        saturatedFat: 2,
+        sugars: 3,
+        fiber: 0,
+        sodium: 0.1,
+        salt: 0.25,
+      },
+      source: "open_food_facts",
+    },
+    {
+      id: "admin-cup",
+      description: "כוס אחת",
+      quantity: 1,
+      unit: "cup",
+      nutrition: {
+        calories: 225,
+        protein: 30,
+        carbohydrates: 7.5,
+        fat: 6,
+        saturatedFat: 3,
+        sugars: 4.5,
+        fiber: 0,
+        sodium: 0.15,
+        salt: 0.38,
+      },
+      source: "admin",
+    },
+  ],
+  nutrition: {
+    basisUnit: "g",
+    per100: {
+      calories: 150,
+      protein: 20,
+      carbohydrates: 5,
+      fat: 4,
+      saturatedFat: 2,
+      sugars: 3,
+      fiber: 0,
+      sodium: 0.1,
+      salt: 0.25,
+    },
+    perServing: {
+      calories: 150,
+      protein: 20,
+      carbohydrates: 5,
+      fat: 4,
+      saturatedFat: 2,
+      sugars: 3,
+      fiber: 0,
+      sodium: 0.1,
+      salt: 0.25,
+    },
+  },
+  dataQuality: { status: "complete", missingFields: [], errors: [], warnings: [] },
+  displayName: "יוגורט",
+  displayLanguage: "he",
+  hasAdminOverrides: false,
+  provenance: {
+    provider: "open_food_facts",
+    license: "ODbL-1.0",
+    sourceUrl: "https://world.openfoodfacts.org/product/7290000000000",
+  },
+  analytics: {
+    lookupCount: 1,
+    consumptionCount: 0,
+    lastLookedUpAt: null,
+    lastConsumedAt: null,
+  },
+};
+
+describe("Food Catalog recording", () => {
+  it("normalizes search input and waits for two meaningful characters", () => {
+    expect(normalizeFoodCatalogSearchQuery("  Chicken   Breast ")).toBe("Chicken Breast");
+    expect(shouldRequestFoodCatalogSearch("")).toBe(true);
+    expect(shouldRequestFoodCatalogSearch("ח")).toBe(false);
+    expect(shouldRequestFoodCatalogSearch("חז")).toBe(true);
+  });
+  it("prefills exactly one serving from the normalized catalog response", () => {
+    expect(createFoodCatalogDraft(product)).toEqual({
+      catalogItemId: "catalog-1",
+      barcode: "7290000000000",
+      name: "יוגורט",
+      servingDescription: "100 g",
+      servingId: "off-serving",
+      servingQuantity: 100,
+      servingUnit: "g",
+      servingAmount: "100",
+      calories: "150",
+      protein: "20",
+      carbs: "5",
+      fat: "4",
+    });
+  });
+
+  it("switches between every normalized serving without requiring a gram conversion", () => {
+    expect(createFoodCatalogDraft(product, "admin-cup")).toMatchObject({
+      servingId: "admin-cup",
+      servingDescription: "כוס אחת",
+      servingQuantity: 1,
+      servingUnit: "cup",
+      servingAmount: "1",
+      calories: "225",
+      protein: "30",
+      carbs: "7.5",
+      fat: "6",
+    });
+  });
+
+  it("uses the selected serving quantity as the editable amount", () => {
+    expect(createFoodCatalogDraft(product)).toMatchObject({
+      servingId: "off-serving",
+      servingQuantity: 100,
+      servingUnit: "g",
+      servingAmount: "100",
+    });
+
+    expect(createFoodCatalogDraft(product, "admin-cup")).toMatchObject({
+      servingId: "admin-cup",
+      servingQuantity: 1,
+      servingUnit: "cup",
+      servingAmount: "1",
+    });
+  });
+
+  it("scales macros by actual unit amount instead of number of servings", () => {
+    const draft = createFoodCatalogDraft(product) as ReturnType<typeof createFoodCatalogDraft> & {
+      servingAmount: string;
+    };
+    draft.servingAmount = "150";
+
+    expect(createSmartFoodEntry(draft, "entry-amount", "2026-08-13T12:00:00.000Z")).toMatchObject({
+      servingAmount: 150,
+      servingUnit: "g",
+      servingReferenceQuantity: 100,
+      macros: { calories: 225, protein: 30, carbs: 7.5, fat: 6 },
+    });
+  });
+
+  it("keeps missing nutrition editable instead of inventing values", () => {
+    const draft = createFoodCatalogDraft({
+      ...product,
+      servings: product.servings?.map((serving, index) =>
+        index === 0
+          ? {
+              ...serving,
+              nutrition: { ...serving.nutrition, calories: null, protein: null },
+            }
+          : serving
+      ),
+      nutrition: {
+        ...product.nutrition,
+        perServing: {
+          ...product.nutrition.perServing,
+          calories: null,
+          protein: null,
+        },
+      },
+    });
+
+    expect(draft.calories).toBe("");
+    expect(draft.protein).toBe("");
+  });
+
+  it("limits catalog nutrition and recorded macro totals to two decimal places", () => {
+    const draft = createFoodCatalogDraft({
+      ...product,
+      servings: product.servings?.map((serving, index) =>
+        index === 0
+          ? {
+              ...serving,
+              nutrition: {
+                ...serving.nutrition,
+                calories: 124.999999,
+                protein: 24.664838,
+                carbohydrates: 5.5,
+                fat: 4,
+              },
+            }
+          : serving
+      ),
+      nutrition: {
+        ...product.nutrition,
+        perServing: {
+          ...product.nutrition.perServing,
+          calories: 124.999999,
+          protein: 24.664838,
+          carbohydrates: 5.5,
+          fat: 4,
+        },
+      },
+    });
+
+    expect(draft).toMatchObject({
+      calories: "125",
+      protein: "24.66",
+      carbs: "5.5",
+      fat: "4",
+    });
+
+    expect(
+      createSmartFoodEntry(
+        { ...draft, servingAmount: "133.3" },
+        "entry-rounded",
+        "2026-08-13T12:00:00.000Z"
+      )?.macros
+    ).toEqual({ calories: 166.63, protein: 32.87, carbs: 7.33, fat: 5.33 });
+  });
+
+  it("records editable reference macros scaled to the entered amount", () => {
+    const entry = createSmartFoodEntry(
+      {
+        ...createFoodCatalogDraft(product),
+        servingAmount: "250",
+        calories: "160",
+      },
+      "entry-1",
+      "2026-08-13T12:00:00.000Z"
+    );
+
+    expect(entry).toMatchObject({
+      id: "entry-1",
+      catalogItemId: "catalog-1",
+      servingAmount: 250,
+      servingUnit: "g",
+      servingReferenceQuantity: 100,
+      macros: { calories: 400, protein: 50, carbs: 12.5, fat: 10 },
+      recordedAt: "2026-08-13T12:00:00.000Z",
+    });
+  });
+
+  it("reconstructs editable per-serving values without changing entry identity", () => {
+    const entry = createSmartFoodEntry(
+      {
+        ...createFoodCatalogDraft(product),
+        servingAmount: "200",
+        calories: "150.25",
+        protein: "20.5",
+      },
+      "entry-1",
+      "2026-08-13T12:00:00.000Z"
+    )!;
+
+    expect(createSmartFoodEntryDraft(entry)).toEqual({
+      catalogItemId: "catalog-1",
+      barcode: "7290000000000",
+      name: "יוגורט",
+      servingDescription: "100 g",
+      servingId: "",
+      servingQuantity: 100,
+      servingUnit: "g",
+      servingAmount: "200",
+      calories: "150.25",
+      protein: "20.5",
+      carbs: "5",
+      fat: "4",
+    });
+
+    const replacement = { ...entry, name: "יוגורט מעודכן" };
+    expect(replaceSmartFoodEntry([entry], replacement)).toEqual([replacement]);
+    expect(replaceSmartFoodEntry([entry], { ...replacement, id: "missing" })).toEqual([entry]);
+  });
+
+  it("keeps scan feedback visible for a minimum perceptible duration", () => {
+    expect(getRemainingScanFeedbackMs(1_000, 1_100)).toBe(550);
+    expect(getRemainingScanFeedbackMs(1_000, 1_800)).toBe(0);
+  });
+
+  it("requires continuous sightings of the same barcode before accepting a scan", () => {
+    const first = updateBarcodeHoldCandidate(null, "7290000000000", 1_000);
+    const continued = updateBarcodeHoldCandidate(first, "7290000000000", 1_600);
+
+    expect(continued).toEqual({
+      barcode: "7290000000000",
+      startedAt: 1_000,
+      lastSeenAt: 1_600,
+    });
+    expect(isBarcodeHoldReady(continued, 1_749)).toBe(false);
+    expect(isBarcodeHoldReady(continued, 1_750)).toBe(true);
+  });
+
+  it("does not accept a barcode seen in only one passing frame", () => {
+    const passingFrame = updateBarcodeHoldCandidate(null, "7290000000000", 1_000);
+
+    expect(isBarcodeHoldReady(passingFrame, 1_750)).toBe(false);
+  });
+
+  it("restarts the hold when the camera passes over another barcode", () => {
+    const first = updateBarcodeHoldCandidate(null, "barcode-a", 1_000);
+    const replacement = updateBarcodeHoldCandidate(first, "barcode-b", 1_400);
+
+    expect(replacement).toEqual({
+      barcode: "barcode-b",
+      startedAt: 1_400,
+      lastSeenAt: 1_400,
+    });
+    expect(isBarcodeHoldReady(replacement, 2_500)).toBe(false);
+  });
+
+  it("restarts the hold after the barcode leaves the frame", () => {
+    const first = updateBarcodeHoldCandidate(null, "7290000000000", 1_000);
+    const staleReturn = updateBarcodeHoldCandidate(first, "7290000000000", 1_751);
+
+    expect(staleReturn.startedAt).toBe(1_751);
+    expect(isBarcodeHoldReady(first, 2_500)).toBe(false);
+  });
+
+  it("allows blank optional macros as zero but rejects a missing name or invalid amount", () => {
+    const draft = createFoodCatalogDraft(product);
+
+    expect(
+      createSmartFoodEntry(
+        { ...draft, calories: "", protein: "", carbs: "", fat: "" },
+        "entry-1",
+        "2026-08-13T12:00:00.000Z"
+      )?.macros
+    ).toEqual({ calories: 0, protein: 0, carbs: 0, fat: 0 });
+    expect(
+      createSmartFoodEntry({ ...draft, name: "   " }, "entry-2", "2026-08-13T12:00:00.000Z")
+    ).toBeNull();
+    expect(
+      createSmartFoodEntry({ ...draft, servingAmount: "0" }, "entry-3", "2026-08-13T12:00:00.000Z")
+    ).toBeNull();
+  });
+
+  it("identifies each invalid draft field with a specific user-facing reason", () => {
+    expect(
+      validateSmartFoodDraft({
+        ...createFoodCatalogDraft(product),
+        name: "   ",
+        servingAmount: "0",
+        calories: "-1",
+        protein: "not-a-number",
+        carbs: "",
+      })
+    ).toEqual({
+      name: "יש להזין שם מוצר.",
+      servingAmount: "הכמות חייבת להיות גדולה מאפס.",
+      calories: "הקלוריות חייבות להיות מספר חיובי או אפס.",
+      protein: "החלבון חייב להיות מספר חיובי או אפס.",
+    });
+  });
+
+  it("adds recorded foods to the V2 progress totals", () => {
+    const first = createSmartFoodEntry(
+      createFoodCatalogDraft(product),
+      "entry-1",
+      "2026-08-13T12:00:00.000Z"
+    );
+    const second = createSmartFoodEntry(
+      { ...createFoodCatalogDraft(product), servingAmount: "200" },
+      "entry-2",
+      "2026-08-13T13:00:00.000Z"
+    );
+
+    expect(sumSmartFoodMacros([first!, second!])).toEqual({
+      calories: 450,
+      protein: 60,
+      carbs: 15,
+      fat: 12,
+      freeCalories: 0,
+    });
+  });
+
+  it("persists smart foods by plan and logical diet day while dropping corrupt entries", () => {
+    const plan = { _id: "plan-1", version: 2, meals: [], highlights: "" } as IDietPlanV2;
+    const valid = createSmartFoodEntry(
+      createFoodCatalogDraft(product),
+      "entry-1",
+      "2026-08-13T12:00:00.000Z"
+    )!;
+
+    expect(getDietPlanV2SmartFoodsStorageKey(plan, "2026-08-13")).toBe(
+      "diet-plan-v2-smart-foods:plan:plan-1:2026-08-13"
+    );
+    expect(reconcileSmartFoodEntries([valid, { id: "broken" }, null])).toEqual([valid]);
+    expect(reconcileSmartFoodEntries("not-an-array")).toEqual([]);
+  });
+
+  it("upgrades stored serving-count entries to unit amounts", () => {
+    expect(
+      reconcileSmartFoodEntries([
+        {
+          id: "legacy-entry",
+          catalogItemId: "catalog-1",
+          barcode: "7290000000000",
+          name: "יוגורט",
+          servingDescription: "100 g",
+          servingCount: 1.5,
+          macros: { calories: 225, protein: 30, carbs: 7.5, fat: 6 },
+          recordedAt: "2026-08-13T12:00:00.000Z",
+        },
+      ])
+    ).toMatchObject([
+      {
+        servingAmount: 150,
+        servingUnit: "g",
+        servingReferenceQuantity: 100,
+      },
+    ]);
+  });
+
+  it("builds one seven-day history page at a time from the logical diet day", () => {
+    expect(getDietPlanV2SmartFoodsHistoryDayKeys(new Date("2026-08-14T12:00:00Z"), 0)).toEqual([
+      "2026-08-14",
+      "2026-08-13",
+      "2026-08-12",
+      "2026-08-11",
+      "2026-08-10",
+      "2026-08-09",
+      "2026-08-08",
+    ]);
+    expect(getDietPlanV2SmartFoodsHistoryDayKeys(new Date("2026-08-14T12:00:00Z"), 1)).toEqual([
+      "2026-08-07",
+      "2026-08-06",
+      "2026-08-05",
+      "2026-08-04",
+      "2026-08-03",
+      "2026-08-02",
+      "2026-08-01",
+    ]);
+    expect(getDietPlanV2SmartFoodsHistoryDayKeys(new Date("2026-08-14T02:59:00Z"), 0)[0]).toBe(
+      "2026-08-13"
+    );
+  });
+});

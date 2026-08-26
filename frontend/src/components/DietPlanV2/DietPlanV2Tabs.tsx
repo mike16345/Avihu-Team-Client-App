@@ -3,12 +3,14 @@ import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
+import type { SmartFoodEntry } from "./foodCatalog";
 import useStyles from "@/styles/useGlobalStyles";
 import { selectionHaptic } from "@/utils/haptics";
 import type { DietPlanV2CompletionMap } from "./dietPlanV2Consumption";
 import { DIET_V2_CARD_BORDER, DIET_V2_DARK } from "./dietV2Icons";
 import DietPlanV2Highlights from "./DietPlanV2Highlights";
 import DietPlanV2MealsList from "./DietPlanV2MealsList";
+import DietPlanV2SmartMenu from "./DietPlanV2SmartMenu";
 
 interface DietPlanV2TabsProps {
   plan: IDietPlanV2;
@@ -16,6 +18,11 @@ interface DietPlanV2TabsProps {
   disabled?: boolean;
   onToggleRow: (mealIndex: number, rowKey: string) => void;
   onToggleMeal: (mealIndex: number) => void;
+  smartFoodEntries: SmartFoodEntry[];
+  smartFoodsReady: boolean;
+  onRecordSmartFood: (entry: SmartFoodEntry) => void;
+  onUpdateSmartFood: (entry: SmartFoodEntry) => void;
+  onRemoveSmartFood: (entryId: string) => void;
 }
 
 interface TabItem {
@@ -30,9 +37,16 @@ const DietPlanV2Tabs = ({
   disabled,
   onToggleRow,
   onToggleMeal,
+  smartFoodEntries,
+  smartFoodsReady,
+  onRecordSmartFood,
+  onUpdateSmartFood,
+  onRemoveSmartFood,
 }: DietPlanV2TabsProps) => {
   const { spacing } = useStyles();
+
   const [selectedTab, setSelectedTab] = useState("הארוחות שלי");
+
   const tabs: TabItem[] = [
     {
       label: "הארוחות שלי",
@@ -47,8 +61,21 @@ const DietPlanV2Tabs = ({
         />
       ),
     },
-    // Smart Menu stays disabled until barcode/manual logging has a real Server contract.
-    // { label: "תפריט חכם", value: "תפריט חכם", content: <DietPlanV2SmartMenu /> },
+    {
+      label: "תפריט חכם",
+      value: "תפריט חכם",
+      content: (
+        <DietPlanV2SmartMenu
+          plan={plan}
+          completion={completion}
+          entries={smartFoodEntries}
+          isReady={smartFoodsReady}
+          onRecord={onRecordSmartFood}
+          onUpdate={onUpdateSmartFood}
+          onRemove={onRemoveSmartFood}
+        />
+      ),
+    },
     {
       label: "דגשים",
       value: "דגשים",

@@ -9,7 +9,11 @@ import DietPlanV2CategoryRow from "./DietPlanV2CategoryRow";
 import DietPlanV2AddOns from "./DietPlanV2AddOns";
 import DietPlanV2FreeCalories from "./DietPlanV2FreeCalories";
 import type { DietPlanV2MealCompletion } from "./dietPlanV2Consumption";
-import { deriveDietPlanV2MealMacros, formatDietPlanV2Number } from "./dietPlanV2Utils";
+import {
+  deriveDietPlanV2MealMacros,
+  formatDietPlanV2MealMacroSummary,
+  formatDietPlanV2Number,
+} from "./dietPlanV2Utils";
 import {
   ChevronDownIcon,
   DIET_V2_GREEN,
@@ -39,6 +43,7 @@ const DietPlanV2MealCard = ({
   onToggleMeal,
 }: DietPlanV2MealCardProps) => {
   const [isCollapsed, setIsCollapsed] = useState(index !== 0);
+
   const selectedRows = new Set(completion?.selectedRows ?? []);
   const allConsumed = completion?.completed ?? false;
   const displayName = meal.name.trim() || `ארוחה ${index + 1}`;
@@ -64,8 +69,14 @@ const DietPlanV2MealCard = ({
           <Text fontSize={16} fontVariant="bold" style={styles.mealTitle}>
             {displayName}
           </Text>
-          <Text fontSize={12} style={styles.summary}>
-            {`${formatDietPlanV2Number(macros.calories)} קק"ל   ·   ${formatDietPlanV2Number(macros.protein)} ג' חלבון   ·   ${formatDietPlanV2Number(macros.carbs)} ג' פחמימה   ·   ${formatDietPlanV2Number(macros.fat)} ג' שומן`}
+          <Text
+            fontSize={12}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.78}
+            style={styles.summary}
+          >
+            {formatDietPlanV2MealMacroSummary(macros)}
           </Text>
           {meal.freeCalories && (
             <View style={styles.freeChip}>
@@ -89,6 +100,7 @@ const DietPlanV2MealCard = ({
           {meal.categories.map((category, categoryIndex) => {
             if (!category.items.some(({ name }) => name.trim().length > 0)) return null;
             const rowKey = `category:${category.category}:${categoryIndex}`;
+
             return (
               <DietPlanV2CategoryRow
                 key={rowKey}
@@ -170,12 +182,10 @@ const styles = StyleSheet.create({
   },
   mealTitle: {
     color: "#0B2A22",
-    textAlign: "right",
   },
   summary: {
     color: "#4B5563",
     marginTop: 2,
-    textAlign: "right",
   },
   freeChip: {
     marginTop: 6,
