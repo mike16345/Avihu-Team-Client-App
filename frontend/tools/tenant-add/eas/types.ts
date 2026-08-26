@@ -32,4 +32,6 @@ export interface EasLinkedProjectRequest {
 }
 
 export type TenantEasSelection =
-  { kind: "create"; owner: string } | { kind: "link"; projectId: string } | { kind: "skip" };
+  | { kind: "create"; owner: string }
+  | { kind: "link"; projectId: string; owner?: string }
+  | { kind: "skip" };

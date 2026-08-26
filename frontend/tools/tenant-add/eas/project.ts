@@ -70,7 +70,15 @@ const runProjectInit = async (
     return parseIdentity(result.stdout, { owner: request.owner, slug: request.slug });
   });
 
-export const getAuthenticatedExpoUser = async (runner: EasProjectRunner, cwd: string) => {
+export interface AuthenticatedExpoAccounts {
+  username: string;
+  accounts: string[];
+}
+
+export const getAuthenticatedExpoAccounts = async (
+  runner: EasProjectRunner,
+  cwd: string
+): Promise<AuthenticatedExpoAccounts> => {
   const result = await runner({
     command: "npx",
     args: [...EAS_CLI_ARGS, "whoami"],
@@ -80,8 +88,19 @@ export const getAuthenticatedExpoUser = async (runner: EasProjectRunner, cwd: st
   if (result.exitCode !== 0 || !result.stdout.trim()) {
     throw new Error("Expo authentication is required. Run: eas login");
   }
-  return result.stdout.trim();
+  const lines = result.stdout
+    .split(/\r?\n/gu)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const username = lines[0];
+  const accounts = lines
+    .map((line) => line.match(/^[•*]\s+([a-z0-9][a-z0-9_-]*)\s+\(Role:/iu)?.[1])
+    .filter((account): account is string => Boolean(account));
+  return { username, accounts: [...new Set([username, ...accounts])] };
 };
+
+export const getAuthenticatedExpoUser = async (runner: EasProjectRunner, cwd: string) =>
+  (await getAuthenticatedExpoAccounts(runner, cwd)).username;
 
 export const createEasProject = (runner: EasProjectRunner, request: EasProjectRequest) =>
   runProjectInit(runner, request, ["--account", request.owner]);

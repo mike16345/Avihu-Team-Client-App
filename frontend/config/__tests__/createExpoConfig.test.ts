@@ -5,12 +5,13 @@ import { getTenant, listTenants } from "../tenants/registry";
 import { parseTenantEnvironment, tenantConfigSchema } from "../tenants/schema";
 
 describe("tenant registry", () => {
-  it("lists the registered tenants in stable order", () => {
-    expect(
-      listTenants()
-        .filter(({ kind }) => kind === "repository")
-        .map(({ id }) => id)
-    ).toEqual(["avihu"]);
+  it("keeps Avihu as the baseline repository tenant when more tenants are registered", () => {
+    const tenantIds = listTenants()
+      .filter(({ kind }) => kind === "repository")
+      .map(({ id }) => id);
+
+    expect(tenantIds).toContain("avihu");
+    expect(tenantIds[0]).toBe("avihu");
   });
 
   it("rejects an unknown tenant", () => {

@@ -2,7 +2,12 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { readTenantRecovery, removeTenantRecovery, writeTenantRecovery } from "../recovery";
+import {
+  createRecoveredEasSelection,
+  readTenantRecovery,
+  removeTenantRecovery,
+  writeTenantRecovery,
+} from "../recovery";
 
 const recovery = {
   schemaVersion: 1 as const,
@@ -15,6 +20,17 @@ const recovery = {
 };
 
 describe("tenant EAS recovery", () => {
+  it("turns a matching remote recovery record into a verified link retry", () => {
+    expect(createRecoveredEasSelection(recovery, "new-tenant", "new-tenant")).toEqual({
+      kind: "link",
+      owner: "acme",
+      projectId: recovery.projectId,
+    });
+    expect(() => createRecoveredEasSelection(recovery, "other-tenant", "new-tenant")).toThrow(
+      /does not match/u
+    );
+  });
+
   it("round-trips a strict non-secret record and removes it", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "tenant-recovery-"));
     try {

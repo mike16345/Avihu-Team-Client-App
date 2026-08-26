@@ -2,6 +2,7 @@ import { access, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises
 import path from "node:path";
 import { z } from "zod";
 import { tenantIdSchema } from "../../config/tenants/schema";
+import type { TenantEasSelection } from "./eas/types";
 
 export const tenantRecoverySchema = z
   .object({
@@ -16,6 +17,19 @@ export const tenantRecoverySchema = z
   .strict();
 
 export type TenantRecovery = z.infer<typeof tenantRecoverySchema>;
+
+export const createRecoveredEasSelection = (
+  recovery: TenantRecovery,
+  tenantId: string,
+  slug: string
+): TenantEasSelection => {
+  if (recovery.tenantId !== tenantId || recovery.slug !== slug) {
+    throw new Error(
+      `Recovered EAS project ${recovery.owner}/${recovery.slug} does not match tenant ${tenantId}/${slug}`
+    );
+  }
+  return { kind: "link", owner: recovery.owner, projectId: recovery.projectId };
+};
 
 const recoveryPath = (root: string, tenantId: string) => {
   const parsed = tenantIdSchema.safeParse(tenantId);

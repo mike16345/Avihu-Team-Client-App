@@ -49,7 +49,13 @@ npm run tenant:add
 It supports repository tenants and Git-ignored local tests, accepts an optional source logo, creates
 a deterministic fallback when none is supplied, offers semantic presets or a strict JSON recipe,
 generates/validates assets, resolves Expo config, and runs fast preflight. Repository onboarding
-then offers EAS **Create**, **Link**, or **Skip**; local onboarding always skips. The local
+selects an available Expo account before suggesting an editable `com.<owner>` bundle/package base,
+then offers EAS **Create**, **Link**, or **Skip**; local onboarding always skips. Completed prompt
+sections are saved under the ignored `.tenant-add/drafts/` directory. After a cancellation or
+failure, rerunning the command offers **Resume draft**, **Start over**, or **Delete draft**. A
+successful onboarding removes its draft. Before fast preflight, onboarding clean-generates native
+projects for the selected tenant so ignored output from another tenant cannot create false drift.
+Preflight resolves the same `.env*` files as Expo while preserving explicit shell values. The local
 `test-tenant` launch command is:
 
 ```sh
@@ -130,7 +136,9 @@ npm run tenant:eas -- --tenant <tenant-id>
 Pending repository tenants are allowed to start locally and run fast checks, but build, update,
 release, and EAS preflight stop before child execution. If Create succeeds remotely and a later
 local write or preflight fails, inspect the non-secret ignored record in
-`.tenant-add/recovery/<tenant-id>.json` and resume with `tenant:eas`; no remote deletion is attempted.
+`.tenant-add/recovery/<tenant-id>.json`. A resumed `tenant:add` verifies and reuses that project;
+`tenant:eas` provides the same recovery path after a tenant already exists. No remote deletion or
+second project creation is attempted.
 
 Each tenant has its own EAS project. In that project, create symbolic EAS environments named
 exactly `development`, `preview`, and `production`. Set `APP_TENANT` to the tenant ID in all three

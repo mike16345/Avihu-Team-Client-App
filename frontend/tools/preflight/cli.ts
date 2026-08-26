@@ -1,5 +1,3 @@
-import "dotenv/config";
-
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
@@ -15,6 +13,7 @@ import { createEasSuite, createFastSuite, createReleaseSuite } from "./suites";
 import type { PreflightMode } from "./types";
 import type { TenantConfig } from "../../config/tenants/types";
 import { publishPreflightFile } from "./safePublication";
+import { resolveExpoProjectEnvironment } from "./projectEnv";
 
 interface CliArguments {
   mode: PreflightMode;
@@ -158,7 +157,7 @@ if (isMain)
   void runPreflightCli({
     argv: process.argv.slice(2),
     projectRoot: process.cwd(),
-    processEnv: process.env,
+    processEnv: resolveExpoProjectEnvironment(process.cwd(), process.env),
     platform: process.platform,
     runner: runSpawnProcess,
     now: () => new Date(),
