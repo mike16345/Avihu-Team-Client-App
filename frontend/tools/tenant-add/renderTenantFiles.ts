@@ -59,8 +59,9 @@ const renderTenantFeatures = (tenant: TenantConfig) => {
 export const renderTenantFiles = (
   tenant: TenantConfig,
   recipe: ThemeRecipeV1
-): Record<TenantSourceFile, string> => ({
+): Record<TenantSourceFile, string> & Partial<Record<"package.json", string>> => ({
   "index.ts": renderTenantIndex(tenant),
   "theme.ts": renderTenantTheme(recipe, tenant.kind),
   "features.ts": renderTenantFeatures(tenant),
+  ...(tenant.kind === "local" ? { "package.json": '{"type":"module"}\n' } : {}),
 });

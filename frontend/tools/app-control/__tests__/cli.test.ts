@@ -17,9 +17,17 @@ describe("formatDryRun", () => {
       },
     };
 
-    expect(formatDryRun(spec)).toBe(
-      "Dry run 1/2: APP_TENANT=avihu APP_ENV=preview npm run preflight:eas\n" +
-        "Dry run 2/2: APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@22.4.0 build --platform android --profile preview"
+    expect(formatDryRun(spec, false)).toBe(
+      "┌  App control dry run\n" +
+        "│\n" +
+        "◆  avihu · preview\n" +
+        "│\n" +
+        "◆  EAS preflight for Elevate Coach (preview)  ready\n" +
+        "│  APP_TENANT=avihu APP_ENV=preview npm run preflight:eas\n" +
+        "◆  Build Elevate Coach (preview) for android  ready\n" +
+        "│  APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@22.4.0 build --platform android --profile preview\n" +
+        "│\n" +
+        "└  2 steps · no changes made"
     );
   });
 });

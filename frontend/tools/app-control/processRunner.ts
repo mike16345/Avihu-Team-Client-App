@@ -1,15 +1,23 @@
 import { spawn } from "node:child_process";
+import { renderError, renderStatusLine } from "../cli-ui/render";
 import type { CommandSpec, CommandStep } from "./types";
 
 export interface CommandRunnerDependencies {
   spawnProcess?: typeof spawn;
+  writeOutput?: (value: string) => void;
+  writeError?: (value: string) => void;
 }
 
 const runStep = (
   step: CommandStep,
-  { spawnProcess = spawn }: CommandRunnerDependencies
+  {
+    spawnProcess = spawn,
+    writeOutput = console.log,
+    writeError = console.error,
+  }: CommandRunnerDependencies
 ): Promise<number> =>
   new Promise((resolve) => {
+    writeOutput(renderStatusLine("info", step.label));
     const child = spawnProcess(step.command, step.args, {
       stdio: "inherit",
       env: { ...process.env, ...step.env },
@@ -27,7 +35,7 @@ const runStep = (
 
     child.once("error", (error) => {
       removeSignalHandlers();
-      console.error(`${step.label} could not start: ${error.message}`);
+      writeError(renderError(`${step.label} could not start\n${error.message}`));
       resolve(1);
     });
 
@@ -35,7 +43,7 @@ const runStep = (
       removeSignalHandlers();
 
       if (signal) {
-        console.error(`${step.label} stopped by ${signal}`);
+        writeError(renderError(`${step.label} stopped by ${signal}`));
         resolve(1);
         return;
       }

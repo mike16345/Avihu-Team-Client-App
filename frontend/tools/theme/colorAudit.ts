@@ -2,6 +2,13 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import fg from "fast-glob";
+import {
+  renderDetailLines,
+  renderError,
+  renderHeader,
+  renderStatusLine,
+  supportsDecoratedOutput,
+} from "../cli-ui/render";
 
 export interface ApplicationColorFinding {
   relativePath: string;
@@ -89,6 +96,27 @@ export const auditApplicationColors = async (
   });
 };
 
+export const renderColorAudit = (
+  findings: readonly ApplicationColorFinding[],
+  decorated = supportsDecoratedOutput()
+) => {
+  const lines = [renderHeader("Semantic theme audit", undefined, decorated)];
+  if (findings.length === 0) {
+    lines.push(renderStatusLine("pass", "Application colors use tenant theme tokens", decorated));
+    lines.push("│", "└  No hardcoded application colors · ready");
+    return lines.join("\n");
+  }
+
+  for (const finding of findings) {
+    lines.push(
+      renderStatusLine("fail", `${finding.relativePath}:${finding.line}`, decorated),
+      renderDetailLines([finding.literal])
+    );
+  }
+  lines.push("│", `└  ${findings.length} hardcoded color${findings.length === 1 ? "" : "s"} found`);
+  return lines.join("\n");
+};
+
 const parsePaths = (argv: string[]) => {
   const paths: string[] = [];
   for (let index = 0; index < argv.length; index += 1) {
@@ -106,16 +134,13 @@ const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv
 if (isMain) {
   void auditApplicationColors(parsePaths(process.argv.slice(2)))
     .then((findings) => {
-      for (const finding of findings) {
-        console.error(`${finding.relativePath}:${finding.line} ${finding.literal}`);
-      }
+      console.log(renderColorAudit(findings));
       if (findings.length > 0) {
-        throw new Error(`${findings.length} hardcoded application color(s) found`);
+        process.exitCode = 1;
       }
-      console.log("PASS application colors use tenant semantic theme tokens");
     })
     .catch((error: unknown) => {
-      console.error(error instanceof Error ? error.message : String(error));
+      console.error(renderError(error instanceof Error ? error.message : String(error)));
       process.exitCode = 1;
     });
 }
