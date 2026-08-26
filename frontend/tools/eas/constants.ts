@@ -1,1 +1,1 @@
-export const EAS_CLI_ARGS = ["--yes", "eas-cli@16.27.0"] as const;
+export const EAS_CLI_ARGS = ["--yes", "eas-cli@22.4.0"] as const;

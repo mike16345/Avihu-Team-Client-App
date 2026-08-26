@@ -22,7 +22,7 @@ describe("EAS project adapter", () => {
         command: "npx",
         args: [
           "--yes",
-          "eas-cli@16.27.0",
+          "eas-cli@22.4.0",
           "project:init",
           "--account",
           "acme",

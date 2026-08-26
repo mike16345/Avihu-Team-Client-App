@@ -94,7 +94,7 @@ npm run app -- build ios --tenant avihu --profile production --yes --dry-run
 ```
 
 Remove `--dry-run` only when the operator has approved the EAS build. The production Android
-command resolves to `npx --yes eas-cli@16.27.0 build --platform android --profile production` with
+command resolves to `npx --yes eas-cli@22.4.0 build --platform android --profile production` with
 `APP_TENANT=avihu` and `APP_ENV=production` in the child environment. No secret value is included
 in command arguments or control-center output.
 
@@ -145,22 +145,22 @@ EAS-project environment value so the profiles work for future tenant projects.
 An authorized EAS project administrator can set the selector variable with the EAS dashboard or
 the equivalent noninteractive command, choosing the target project and each named environment.
 These commands change remote EAS state and are shown for operators only; do not run them during
-local verification. The pinned CLI documents `--force` as overwriting an existing variable, so it
-makes repeated setup idempotent for the same tenant value:
+local verification. The pinned CLI's `env:set` command creates or updates the variable, making
+repeated setup idempotent for the same tenant value:
 
 ```sh
-APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@16.27.0 env:create --name APP_TENANT --value avihu --environment development --visibility plaintext --scope project --force --non-interactive
-APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@16.27.0 env:create --name APP_TENANT --value avihu --environment preview --visibility plaintext --scope project --force --non-interactive
-APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@16.27.0 env:create --name APP_TENANT --value avihu --environment production --visibility plaintext --scope project --force --non-interactive
+APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@22.4.0 env:set --name APP_TENANT --value avihu --environment development --visibility plaintext --scope project --non-interactive
+APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@22.4.0 env:set --name APP_TENANT --value avihu --environment preview --visibility plaintext --scope project --non-interactive
+APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@22.4.0 env:set --name APP_TENANT --value avihu --environment production --visibility plaintext --scope project --non-interactive
 ```
 
 Verify the selected project without requesting sensitive values. Plaintext `APP_TENANT` values can
 appear in the output, so review the output before sharing it:
 
 ```sh
-APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@16.27.0 env:list --environment development --scope project
-APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@16.27.0 env:list --environment preview --scope project
-APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@16.27.0 env:list --environment production --scope project
+APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@22.4.0 env:list --environment development --scope project
+APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@22.4.0 env:list --environment preview --scope project
+APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@22.4.0 env:list --environment production --scope project
 ```
 
 The Avihu tenant intentionally shares the iOS bundle identifier and Android package between
