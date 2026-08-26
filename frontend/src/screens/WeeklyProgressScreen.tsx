@@ -32,7 +32,11 @@ import { useProgressManualStore } from "@/store/progressManualStore";
 import { useWeeklyFeedbackStore } from "@/store/weeklyFeedbackStore";
 import { useNutritionDayNotesStore } from "@/store/nutritionDayNotesStore";
 import { buildGoalsByDay, formatSteps, getLocalDateKey } from "@/utils/stepsUtils";
-import { IStepsCardioType } from "@/interfaces/Workout";
+import { ISimpleCardioType, IStepsCardioType } from "@/interfaces/Workout";
+import { useCardioMinutesStore } from "@/store/cardioMinutesStore";
+import { useUserStore } from "@/store/userStore";
+import { getPreviousWeekKey, useWeeklySignatureStore } from "@/store/weeklySignatureStore";
+import { useWeeklyFeedbackApi } from "@/hooks/api/useWeeklyFeedbackApi";
 import { selectionHaptic } from "@/utils/haptics";
 import WheelPicker from "@/components/ui/WheelPicker";
 
@@ -94,6 +98,16 @@ const isWithinThisWeek = (iso?: string): boolean => {
   const start = startOfWeek(new Date()).getTime();
   const end = start + 7 * 24 * 60 * 60 * 1000;
   return t >= start && t < end;
+};
+
+const formatWeekRangeFromKey = (weekKey: string): string => {
+  const [y, m, d] = weekKey.split("-").map(Number);
+  const start = new Date(y, m - 1, d);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  const dd = (x: Date) => String(x.getDate()).padStart(2, "0");
+  const mm = (x: Date) => String(x.getMonth() + 1).padStart(2, "0");
+  return `${dd(start)}/${mm(start)} — ${dd(end)}/${mm(end)}`;
 };
 
 const formatIsraeliDate = (iso: string): string => {
@@ -187,8 +201,15 @@ const WorkoutsCard: React.FC<{
 
 const DAY_LABELS = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
 
-const buildWeekDayKeys = (): { label: string; key: string; isToday: boolean; isFuture: boolean }[] => {
-  const start = startOfWeek(new Date());
+const buildWeekDayKeys = (
+  baseWeekKey?: string
+): { label: string; key: string; isToday: boolean; isFuture: boolean }[] => {
+  const start = baseWeekKey
+    ? (() => {
+        const [y, m, d] = baseWeekKey.split("-").map(Number);
+        return new Date(y, m - 1, d);
+      })()
+    : startOfWeek(new Date());
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return DAY_LABELS.map((label, i) => {
@@ -200,8 +221,8 @@ const buildWeekDayKeys = (): { label: string; key: string; isToday: boolean; isF
     return {
       label,
       key: `${y}-${m}-${dd}`,
-      isToday: d.getTime() === today.getTime(),
-      isFuture: d.getTime() > today.getTime(),
+      isToday: !baseWeekKey && d.getTime() === today.getTime(),
+      isFuture: !baseWeekKey && d.getTime() > today.getTime(),
     };
   });
 };
@@ -268,10 +289,21 @@ const NutritionCard: React.FC<{
   notes: Record<string, string>;
   onToggleDay: (dayKey: string) => void;
   onOpenNote: (dayKey: string, dayLabel: string) => void;
-}> = ({ mealsDone, mealsPlanned, marks, notes, onToggleDay, onOpenNote }) => {
+  allowAllDays?: boolean;
+  baseWeekKey?: string;
+}> = ({
+  mealsDone,
+  mealsPlanned,
+  marks,
+  notes,
+  onToggleDay,
+  onOpenNote,
+  allowAllDays,
+  baseWeekKey,
+}) => {
   const [logOpen, setLogOpen] = useState(false);
   const smartDoneToday = mealsPlanned > 0 && mealsDone >= mealsPlanned;
-  const weekDays = useMemo(buildWeekDayKeys, []);
+  const weekDays = useMemo(() => buildWeekDayKeys(baseWeekKey), [baseWeekKey]);
 
   const isDayDone = (day: { key: string; isToday: boolean }) => {
     if (marks[day.key]) return true;
@@ -327,7 +359,7 @@ const NutritionCard: React.FC<{
             return (
               <View
                 key={day.key}
-                style={[styles.dayRow, day.isFuture && styles.dayRowDisabled]}
+                style={[styles.dayRow, !allowAllDays && day.isFuture && styles.dayRowDisabled]}
               >
                 <View style={styles.dayLabelGroup}>
                   {day.isToday && (
@@ -357,7 +389,7 @@ const NutritionCard: React.FC<{
                     </Text>
                   </Pressable>
                   <Pressable
-                    onPress={() => !day.isFuture && onToggleDay(day.key)}
+                    onPress={() => (allowAllDays || !day.isFuture) && onToggleDay(day.key)}
                     hitSlop={8}
                     style={[
                       styles.dayBadge,
@@ -569,10 +601,20 @@ const StatCard: React.FC<{
   primary: string;
   caption: string;
   onPress?: () => void;
-}> = ({ title, icon, percent, primary, caption, onPress }) => {
+  editable?: boolean;
+  editLabel?: string;
+}> = ({ title, icon, percent, primary, caption, onPress, editable, editLabel }) => {
   const Container = onPress ? Pressable : View;
   return (
     <Container onPress={onPress} style={[styles.card, styles.statCard]}>
+      {editable && (
+        <View style={styles.editBadge}>
+          <Text fontSize={10} style={styles.editBadgeText}>
+            {editLabel || "עדכן"}
+          </Text>
+          <Icon name="pencil" color="#0F7A52" width={10} height={10} />
+        </View>
+      )}
       <View style={styles.statHead}>
         <Text fontVariant="semibold" fontSize={13} style={styles.cardTitle}>
           {title}
@@ -604,24 +646,27 @@ const StatCard: React.FC<{
 const FeedbackCard: React.FC<{
   text: string;
   onChange: (t: string) => void;
-  onSave: () => void;
-}> = ({ text, onChange, onSave }) => {
-  const [justSaved, setJustSaved] = useState(false);
-
-  const handleSave = () => {
-    if (text.trim().length === 0) return;
-    onSave();
-    setJustSaved(true);
-    const t = setTimeout(() => setJustSaved(false), 1600);
-    return () => clearTimeout(t);
-  };
+  readOnly?: boolean;
+}> = ({ text, onChange, readOnly }) => {
+  const hasText = text.trim().length > 0;
 
   return (
     <View style={styles.card}>
-      <CardHeader
-        title="פידבק שבועי"
-        icon={<Icon name="chat" color={PRIMARY} width={16} height={16} />}
-      />
+      <View style={styles.feedbackHeaderRow}>
+        <Text fontVariant="semibold" fontSize={15} style={styles.cardTitle}>
+          פידבק שבועי
+        </Text>
+        <View style={styles.feedbackHeaderEnd}>
+          {hasText && (
+            <View style={styles.autosaveWrap}>
+              <Text fontSize={11} style={styles.autosaveText}>
+                נשמר אוטומטית ✓
+              </Text>
+            </View>
+          )}
+          <Icon name="chat" color={PRIMARY} width={16} height={16} />
+        </View>
+      </View>
       <View style={styles.feedbackInputWrap}>
         <TextInput
           value={text}
@@ -630,8 +675,9 @@ const FeedbackCard: React.FC<{
           numberOfLines={5}
           style={styles.feedbackInput}
           textAlignVertical="top"
+          editable={!readOnly}
         />
-        {text.trim().length === 0 && (
+        {!hasText && (
           <View pointerEvents="none" style={styles.feedbackPlaceholderWrap}>
             <RNText allowFontScaling={false} style={styles.feedbackPlaceholderText}>
               איך עבר לך השבוע? היו קשיים או משהו שאני צריך לדעת?
@@ -639,19 +685,6 @@ const FeedbackCard: React.FC<{
           </View>
         )}
       </View>
-      <Pressable
-        onPress={handleSave}
-        disabled={text.trim().length === 0}
-        style={[
-          styles.sendBtn,
-          text.trim().length === 0 && styles.sendBtnDisabled,
-          justSaved && styles.sendBtnSaved,
-        ]}
-      >
-        <Text fontVariant="bold" fontSize={14} style={styles.sendBtnText}>
-          {justSaved ? "נשמר ✓" : "שמור פידבק למאמן"}
-        </Text>
-      </Pressable>
     </View>
   );
 };
@@ -722,6 +755,74 @@ const SLEEP_WHEEL_OPTIONS = Array.from(
   }
 );
 
+const CARDIO_MIN = 0;
+const CARDIO_MAX = 600;
+const CARDIO_STEP = 5;
+const clampCardio = (v: number) => Math.min(CARDIO_MAX, Math.max(CARDIO_MIN, v));
+
+const CARDIO_WHEEL_OPTIONS = Array.from(
+  { length: Math.round((CARDIO_MAX - CARDIO_MIN) / CARDIO_STEP) + 1 },
+  (_, i) => {
+    const v = CARDIO_MIN + i * CARDIO_STEP;
+    return { value: v, label: String(v) };
+  }
+);
+
+const CardioMinutesModal: React.FC<{
+  visible: boolean;
+  initial: number | null;
+  goal: number;
+  onClose: () => void;
+  onSave: (minutes: number) => void;
+}> = ({ visible, initial, goal, onClose, onSave }) => {
+  const initialValue = initial != null ? clampCardio(initial) : clampCardio(goal || 30);
+  const [pending, setPending] = useState<number>(initialValue);
+
+  useEffect(() => {
+    if (visible) {
+      setPending(initial != null ? clampCardio(initial) : clampCardio(goal || 30));
+    }
+  }, [visible, initial, goal]);
+
+  const handleSave = () => {
+    onSave(pending);
+    onClose();
+  };
+
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <View style={styles.modalRoot}>
+        <Pressable style={styles.backdrop} onPress={onClose} />
+        <View style={styles.sheet}>
+          <Text fontVariant="bold" fontSize={16} style={styles.sheetTitle}>
+            דקות אירובי השבוע
+          </Text>
+          <Text fontSize={12} style={styles.sheetHint}>
+            {goal > 0 ? `יעד שבועי: ${goal} דקות` : "בחר דקות שבוצעו השבוע"}
+          </Text>
+          <View style={styles.sleepWheelStage}>
+            <View pointerEvents="none" style={styles.sleepWheelBand} />
+            <WheelPicker
+              data={CARDIO_WHEEL_OPTIONS}
+              selectedValue={pending}
+              onValueChange={(v: number) => setPending(clampCardio(v))}
+              height={144}
+              itemHeight={48}
+              activeItemColor={PRIMARY}
+              inactiveItemColor="#B7BEBB"
+            />
+          </View>
+          <Pressable onPress={handleSave} style={styles.confirmBtn}>
+            <Text fontVariant="bold" fontSize={15} style={styles.confirmText}>
+              אישור
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
 const SleepInputModal: React.FC<{
   visible: boolean;
   initial: number | null;
@@ -773,7 +874,29 @@ const SleepInputModal: React.FC<{
   );
 };
 
-const WeeklyProgressScreen = () => {
+interface HistoricWeekData {
+  workoutsDone: Record<string, boolean>;
+  nutritionMarks: Record<string, boolean>;
+  dayNotes: Record<string, string>;
+  sleepHours: number | null;
+  cardioMinutes: number | null;
+  feedbackText: string;
+}
+
+interface WeeklyProgressScreenProps {
+  popupMode?: boolean;
+  onFinalize?: () => void;
+  historicData?: HistoricWeekData | null;
+  historicWeekKey?: string;
+}
+
+const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
+  popupMode,
+  onFinalize,
+  historicData,
+  historicWeekKey,
+}) => {
+  const readOnlyFromProps = !!historicData;
   const { colors, layout, spacing } = useStyles();
 
   const { data: workoutPlan } = useWorkoutPlanQuery();
@@ -797,6 +920,7 @@ const WeeklyProgressScreen = () => {
 
 
 
+
   const manualWorkoutIds = useProgressManualStore((s) => s.workoutMarks);
   const toggleWorkoutMark = useProgressManualStore((s) => s.toggleWorkoutMark);
   const manualNutritionMarks = useProgressManualStore((s) => s.nutritionMarks);
@@ -805,12 +929,91 @@ const WeeklyProgressScreen = () => {
   const resetIfNewPeriod = useProgressManualStore((s) => s.resetIfNewPeriod);
 
   const [sleepModalOpen, setSleepModalOpen] = useState(false);
+  const [cardioModalOpen, setCardioModalOpen] = useState(false);
+  const currentUserIdForHistory = useUserStore((s) => s.currentUser?._id);
+  const previousWeekKeyForHistory = getPreviousWeekKey();
+
+  const previousWeekFinalizedAt = useWeeklySignatureStore(
+    (s) => s.finalizedWeeks[previousWeekKeyForHistory]
+  );
+  const hasPreviousWeekData = !!previousWeekFinalizedAt;
+  const [activeHistoricWeek, setActiveHistoricWeek] = useState<string | null>(null);
+  const [activeHistoricData, setActiveHistoricData] = useState<HistoricWeekData | null>(null);
+  const [historicLoading, setHistoricLoading] = useState(false);
+  const { getWeeklyFeedbackByWeek: fetchHistoricWeek } = useWeeklyFeedbackApi();
+
+  useEffect(() => {
+    if (!activeHistoricWeek || !currentUserIdForHistory) {
+      setActiveHistoricData(null);
+      return;
+    }
+    let cancelled = false;
+    setHistoricLoading(true);
+    const [y, m, d] = activeHistoricWeek.split("-").map(Number);
+    const weekStartIso = new Date(y, m - 1, d).toISOString();
+    fetchHistoricWeek(currentUserIdForHistory, weekStartIso)
+      .then((res) => {
+        if (cancelled) return;
+        if (!res) {
+          setActiveHistoricData({
+            workoutsDone: {},
+            nutritionMarks: {},
+            dayNotes: {},
+            sleepHours: null,
+            cardioMinutes: null,
+            feedbackText: "",
+          });
+          return;
+        }
+        const workoutMarksMap: Record<string, boolean> = {};
+        (res.workouts || []).forEach((w, i) => {
+          if (w.doneManual || w.doneSmart) {
+            workoutMarksMap[`${activeHistoricWeek}::${w.planId || `plan-${i}`}`] = true;
+          }
+        });
+        const nutritionMarksMap: Record<string, boolean> = {};
+        (res.nutrition?.daysCompleted || []).forEach((day) => {
+          nutritionMarksMap[day] = true;
+        });
+        setActiveHistoricData({
+          workoutsDone: workoutMarksMap,
+          nutritionMarks: nutritionMarksMap,
+          dayNotes: { ...(res.nutrition?.dayNotes || {}) },
+          sleepHours: res.sleepHours ?? null,
+          cardioMinutes: res.cardioMinutes ?? null,
+          feedbackText: res.feedbackText || "",
+        });
+      })
+      .finally(() => {
+        if (!cancelled) setHistoricLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeHistoricWeek, currentUserIdForHistory]);
 
   useEffect(() => {
     resetSleepIfNewWeek();
     resetIfNewPeriod();
     resetFeedbackIfNewWeek();
-  }, [resetSleepIfNewWeek, resetIfNewPeriod, resetFeedbackIfNewWeek]);
+    resetCardioMinutesIfNewWeek();
+  }, [
+    resetSleepIfNewWeek,
+    resetIfNewPeriod,
+    resetFeedbackIfNewWeek,
+    resetCardioMinutesIfNewWeek,
+  ]);
+
+  const mergedHistoricData = activeHistoricData ?? historicData ?? null;
+  const mergedHistoricWeekKey = activeHistoricWeek ?? historicWeekKey ?? null;
+  const inHistoric = !!mergedHistoricData;
+  const readOnly = readOnlyFromProps || inHistoric;
+  const effectiveWorkoutMarks = mergedHistoricData?.workoutsDone ?? manualWorkoutIds;
+  const effectiveWorkoutKey = mergedHistoricWeekKey ?? weekKey;
+  const effectiveNutritionMarks = mergedHistoricData?.nutritionMarks ?? manualNutritionMarks;
+  const effectiveDayNotes = mergedHistoricData?.dayNotes ?? dayNotes;
+  const effectiveSleepHours = mergedHistoricData ? mergedHistoricData.sleepHours : sleepHours;
+  const effectiveFeedbackText = mergedHistoricData ? mergedHistoricData.feedbackText : feedbackText;
 
   const workouts = useMemo<WorkoutEntry[]>(() => {
     const plans = workoutPlan?.workoutPlans ?? [];
@@ -833,10 +1036,10 @@ const WeeklyProgressScreen = () => {
         !!p._id &&
         required.length > 0 &&
         required.every((mg) => setsByMuscleGroup[mg.muscleGroup]?.has(p._id!));
-      const doneManual = !!manualWorkoutIds[`${weekKey}::${planId}`];
+      const doneManual = !!effectiveWorkoutMarks[`${effectiveWorkoutKey}::${planId}`];
       return { planId, index: i + 1, doneSmart, doneManual };
     });
-  }, [workoutPlan, recordedSets, manualWorkoutIds, weekKey]);
+  }, [workoutPlan, recordedSets, effectiveWorkoutMarks, effectiveWorkoutKey]);
 
   const weekPoints = useMemo<WeightPoint[]>(() => {
     const entries = (weighIns ?? [])
@@ -865,10 +1068,22 @@ const WeeklyProgressScreen = () => {
     return weekPoints[weekPoints.length - 1].weight - weekPoints[0].weight;
   }, [weekPoints]);
 
+  const cardioType = workoutPlan?.cardio?.type;
+
   const stepsPlan = useMemo<IStepsCardioType | undefined>(() => {
-    if (workoutPlan?.cardio?.type !== "steps") return undefined;
-    return workoutPlan.cardio.plan as IStepsCardioType;
-  }, [workoutPlan?.cardio]);
+    if (cardioType !== "steps") return undefined;
+    return workoutPlan?.cardio?.plan as IStepsCardioType;
+  }, [cardioType, workoutPlan?.cardio]);
+
+  const simplePlan = useMemo<ISimpleCardioType | undefined>(() => {
+    if (cardioType !== "simple") return undefined;
+    return workoutPlan?.cardio?.plan as ISimpleCardioType;
+  }, [cardioType, workoutPlan?.cardio]);
+
+  const rawCardioMinutes = useCardioMinutesStore((s) => s.minutes);
+  const cardioMinutesDone = mergedHistoricData ? mergedHistoricData.cardioMinutes : rawCardioMinutes;
+  const setCardioMinutes = useCardioMinutesStore((s) => s.setMinutes);
+  const resetCardioMinutesIfNewWeek = useCardioMinutesStore((s) => s.resetIfNewWeek);
 
   const stepsWeeklyGoal = useMemo(
     () => buildGoalsByDay(stepsPlan).reduce((sum, g) => sum + (g || 0), 0),
@@ -884,34 +1099,43 @@ const WeeklyProgressScreen = () => {
 
   const stepsPercent = stepsWeeklyGoal > 0 ? (stepsWeekTotal / stepsWeeklyGoal) * 100 : 0;
 
+  const cardioMinutesGoal = simplePlan?.minsPerWeek ?? 0;
+  const cardioMinutesPercent =
+    cardioMinutesGoal > 0 && cardioMinutesDone != null
+      ? Math.min(100, (cardioMinutesDone / cardioMinutesGoal) * 100)
+      : 0;
+
   const mealsPlanned = dietPlan?.meals?.length ?? 0;
   const mealsDone = session?.meals?.length ?? 0;
 
   const sleepPercent =
-    sleepHours != null ? Math.min(100, (sleepHours / SLEEP_TARGET_HOURS) * 100) : 0;
-  const sleepPrimary = sleepHours != null ? formatHours(sleepHours) : "—";
+    effectiveSleepHours != null ? Math.min(100, (effectiveSleepHours / SLEEP_TARGET_HOURS) * 100) : 0;
+  const sleepPrimary = effectiveSleepHours != null ? formatHours(effectiveSleepHours) : "—";
   const sleepCaption =
-    sleepHours != null ? "יעד: 7-8 שע׳" : "לחץ להזנה";
+    effectiveSleepHours != null ? "יעד: 7-8 שע׳" : "לחץ להזין ממוצע שבועי";
 
   const handleWorkoutToggle = (planId: string) => {
+    if (readOnly) return;
     selectionHaptic();
     toggleWorkoutMark(planId);
   };
 
   const handleNutritionDayToggle = (dayKey: string) => {
+    if (readOnly) return;
     selectionHaptic();
     toggleNutritionMarkForDay(dayKey);
   };
 
   const handleOpenSleep = () => {
+    if (readOnly) return;
     selectionHaptic();
     setSleepModalOpen(true);
   };
 
-  const handleSaveFeedback = () => {
-    if (feedbackText.trim().length === 0) return;
+  const handleOpenCardio = () => {
+    if (readOnly) return;
     selectionHaptic();
-    setFeedbackText(feedbackText.trim());
+    setCardioModalOpen(true);
   };
 
   return (
@@ -919,34 +1143,59 @@ const WeeklyProgressScreen = () => {
       <ScrollView
         style={[colors.background, layout.flex1]}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          spacing.pdLg,
-          spacing.pdStatusBar,
-          spacing.pdBottomBar,
-          styles.body,
-        ]}
+        contentContainerStyle={
+          popupMode
+            ? styles.bodyPopup
+            : [spacing.pdLg, spacing.pdStatusBar, spacing.pdBottomBar, styles.body]
+        }
       >
-        <View style={styles.titleRow}>
-          <Pressable
-            onPress={() => selectionHaptic()}
-            hitSlop={10}
-            style={styles.arrowBtn}
-            accessibilityLabel="שבוע קודם"
-          >
-            <Icon name="chevronRightSoft" color={PRIMARY} width={22} height={22} />
-          </Pressable>
-          <Text fontSize={22} fontVariant="light" style={styles.titleCenter}>
-            פידבק שבועי
-          </Text>
-          <Pressable
-            onPress={() => selectionHaptic()}
-            hitSlop={10}
-            style={styles.arrowBtn}
-            accessibilityLabel="שבוע הבא"
-          >
-            <Icon name="chevronLeftSoft" color={PRIMARY} width={22} height={22} />
-          </Pressable>
-        </View>
+        {!popupMode && (
+          <View style={styles.titleRow}>
+            <Pressable
+              onPress={() => {
+                if (!hasPreviousWeekData || inHistoric) return;
+                selectionHaptic();
+                setActiveHistoricWeek(previousWeekKeyForHistory);
+              }}
+              disabled={!hasPreviousWeekData || inHistoric}
+              hitSlop={10}
+              style={styles.arrowBtn}
+              accessibilityLabel="שבוע קודם"
+            >
+              <Icon
+                name="chevronRightSoft"
+                color={hasPreviousWeekData && !inHistoric ? PRIMARY : "rgba(7,39,35,0.18)"}
+                width={22}
+                height={22}
+              />
+            </Pressable>
+            <View style={styles.titleCenterWrap}>
+              <Text fontSize={22} fontVariant="light" style={styles.titleCenter}>
+                {inHistoric ? "השבוע הקודם 🔒" : "פידבק שבועי"}
+              </Text>
+              {inHistoric && mergedHistoricWeekKey && (
+                <Text fontSize={12} style={styles.titleSubtitle}>
+                  {formatWeekRangeFromKey(mergedHistoricWeekKey)}
+                </Text>
+              )}
+            </View>
+            {inHistoric ? (
+              <Pressable
+                onPress={() => {
+                  selectionHaptic();
+                  setActiveHistoricWeek(null);
+                }}
+                hitSlop={10}
+                style={styles.arrowBtn}
+                accessibilityLabel="שבוע הבא"
+              >
+                <Icon name="chevronLeftSoft" color={PRIMARY} width={22} height={22} />
+              </Pressable>
+            ) : (
+              <View style={styles.arrowBtn} />
+            )}
+          </View>
+        )}
         <AnimatedShell delay={0}>
           <WorkoutsCard workouts={workouts} onToggle={handleWorkoutToggle} />
         </AnimatedShell>
@@ -954,10 +1203,14 @@ const WeeklyProgressScreen = () => {
           <NutritionCard
             mealsDone={mealsDone}
             mealsPlanned={mealsPlanned}
-            marks={manualNutritionMarks}
-            notes={dayNotes}
+            marks={effectiveNutritionMarks}
+            notes={effectiveDayNotes}
             onToggleDay={handleNutritionDayToggle}
-            onOpenNote={(dayKey, dayLabel) => setNoteModal({ dayKey, dayLabel })}
+            onOpenNote={
+              readOnly ? () => {} : (dayKey, dayLabel) => setNoteModal({ dayKey, dayLabel })
+            }
+            allowAllDays={popupMode && !readOnly}
+            baseWeekKey={mergedHistoricWeekKey ?? undefined}
           />
         </AnimatedShell>
         <AnimatedShell delay={180}>
@@ -976,28 +1229,49 @@ const WeeklyProgressScreen = () => {
               percent={sleepPercent}
               primary={sleepPrimary}
               caption={sleepCaption}
-              onPress={handleOpenSleep}
+              onPress={readOnly ? undefined : handleOpenSleep}
+              editable={!readOnly}
+              editLabel={effectiveSleepHours != null ? `${formatSleep(effectiveSleepHours)} שעות` : "הזן ממוצע"}
             />
           </AnimatedShell>
           <AnimatedShell delay={330} style={styles.statCardWrap}>
-            <StatCard
-              title="צעדים"
-              icon={<Text fontSize={13}>👟</Text>}
-              percent={stepsPercent}
-              primary={formatSteps(stepsWeekTotal)}
-              caption={
-                stepsWeeklyGoal > 0
-                  ? `יעד שבועי: ${formatSteps(stepsWeeklyGoal)}`
-                  : "לא הוגדר יעד"
-              }
-            />
+            {cardioType === "simple" ? (
+              <StatCard
+                title="אירובי"
+                icon={<Text fontSize={13}>🏃</Text>}
+                percent={cardioMinutesPercent}
+                primary={`${cardioMinutesDone ?? 0} דק׳`}
+                caption={
+                  cardioMinutesGoal > 0
+                    ? `יעד: ${cardioMinutesGoal} דק׳`
+                    : "לחץ להזין דקות"
+                }
+                onPress={readOnly ? undefined : handleOpenCardio}
+                editable={!readOnly}
+                editLabel={
+                  cardioMinutesDone != null ? `${cardioMinutesDone} דק׳` : "הזן דקות"
+                }
+              />
+            ) : (
+              <StatCard
+                title="צעדים"
+                icon={<Text fontSize={13}>👟</Text>}
+                percent={stepsPercent}
+                primary={formatSteps(stepsWeekTotal)}
+                caption={
+                  stepsWeeklyGoal > 0
+                    ? `יעד שבועי: ${formatSteps(stepsWeeklyGoal)}`
+                    : "לא הוגדר יעד"
+                }
+              />
+            )}
           </AnimatedShell>
         </View>
         <AnimatedShell delay={400}>
           <FeedbackCard
-            text={feedbackText}
-            onChange={setFeedbackText}
-            onSave={handleSaveFeedback}
+            text={effectiveFeedbackText}
+            onChange={readOnly ? () => {} : setFeedbackText}
+            readOnly={readOnly}
           />
         </AnimatedShell>
       </ScrollView>
@@ -1006,6 +1280,13 @@ const WeeklyProgressScreen = () => {
         initial={sleepHours}
         onClose={() => setSleepModalOpen(false)}
         onSave={setSleepHours}
+      />
+      <CardioMinutesModal
+        visible={cardioModalOpen}
+        initial={cardioMinutesDone}
+        goal={cardioMinutesGoal}
+        onClose={() => setCardioModalOpen(false)}
+        onSave={setCardioMinutes}
       />
       <NoteInputModal
         visible={!!noteModal}
@@ -1024,6 +1305,10 @@ const styles = StyleSheet.create({
   body: {
     gap: 14,
   },
+  bodyPopup: {
+    padding: 12,
+    gap: 8,
+  },
   titleRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -1031,10 +1316,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     marginBottom: 4,
   },
+  titleCenterWrap: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   titleCenter: {
     color: PRIMARY,
     textAlign: "center",
-    flex: 1,
+  },
+  titleSubtitle: {
+    color: MUTED,
+    textAlign: "center",
+    marginTop: 2,
   },
   arrowBtn: {
     width: 32,
@@ -1177,20 +1471,152 @@ const styles = StyleSheet.create({
     writingDirection: "rtl",
     lineHeight: 20,
   },
-  sendBtn: {
-    backgroundColor: PRIMARY,
-    borderRadius: 12,
-    paddingVertical: 12,
+  signModalRoot: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  signBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(6, 20, 16, 0.55)",
+  },
+  signCard: {
+    width: "100%",
+    maxWidth: 380,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    padding: 22,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.22,
+    shadowRadius: 24,
+    elevation: 16,
+  },
+  signLockCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: ACCENT_SOFT,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  signTitle: {
+    color: PRIMARY,
+    textAlign: "center",
+  },
+  signSubtitle: {
+    color: MUTED,
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  signSummaryBox: {
+    width: "100%",
+    backgroundColor: "#F5F7F6",
+    borderRadius: 14,
+    padding: 12,
+    gap: 8,
+    marginBottom: 12,
+  },
+  signSummaryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
   },
-  sendBtnDisabled: {
-    opacity: 0.4,
+  signSummaryLabel: {
+    color: PRIMARY,
   },
-  sendBtnSaved: {
+  signSummaryValue: {
+    color: PRIMARY,
+  },
+  signFeedbackPreview: {
+    width: "100%",
+    backgroundColor: "#FAFBFA",
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: CARD_BORDER,
+  },
+  signFeedbackLabel: {
+    color: MUTED,
+    marginBottom: 4,
+  },
+  signFeedbackText: {
+    color: PRIMARY,
+    lineHeight: 18,
+    textAlign: "right",
+  },
+  signNoFeedback: {
+    color: MUTED,
+    marginBottom: 14,
+    fontStyle: "italic",
+  },
+  signPrimaryBtn: {
+    width: "100%",
     backgroundColor: ACCENT,
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: "center",
   },
-  sendBtnText: {
+  signPrimaryText: {
     color: "#FFFFFF",
+  },
+  signSecondaryBtn: {
+    marginTop: 10,
+    paddingVertical: 6,
+  },
+  signSecondaryText: {
+    color: MUTED,
+    textDecorationLine: "underline",
+  },
+  editBadge: {
+    position: "absolute",
+    top: 8,
+    left: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    backgroundColor: ACCENT_SOFT,
+    borderWidth: 1,
+    borderColor: "rgba(23, 178, 106, 0.35)",
+    zIndex: 5,
+  },
+  editBadgeText: {
+    color: "#0F7A52",
+  },
+  popupSendBtn: {
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+    overflow: "hidden",
+  },
+  popupSendBtnText: { color: "#FFFFFF" },
+  feedbackHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  feedbackHeaderEnd: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  autosaveWrap: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    backgroundColor: ACCENT_SOFT,
+  },
+  autosaveText: {
+    color: "#0F7A52",
   },
   chartWrap: {
     height: 72,
@@ -1370,9 +1796,12 @@ const styles = StyleSheet.create({
   statMeta: {
     flex: 1,
     gap: 2,
+    alignItems: "flex-start",
   },
   statPrimary: {
     color: PRIMARY,
+    textAlign: "right",
+    writingDirection: "rtl",
   },
   modalRoot: {
     flex: 1,

@@ -2,13 +2,13 @@ import BottomTabNavigator from "./BottomTabNavigator";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ProfileScreen from "@/screens/ProfileScreen";
 import { RootStackParamList } from "@/types/navigatorTypes";
-import ChatHeader from "@/components/chat/ChatHeader";
 import ChatScreen from "@/screens/ChatScreen";
 import FormPresetScreen from "@/screens/FormPresetScreen";
 import AgreementFlow from "./AgreementStack";
 import useInitialFormNotifications from "@/hooks/useInitFormNotifications";
 import useStartupPrefetch from "@/hooks/useStartupPrefetch";
 import { StepsTrackingProvider } from "@/context/StepsTrackingContext";
+import WeeklyFeedbackPopupHost from "@/components/weeklyProgress/WeeklyFeedbackPopupHost";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -42,9 +42,10 @@ export default function AppNavigator({
           name="Chat"
           component={ChatScreen}
           options={{
-            presentation: "containedModal",
-            header: () => <ChatHeader />,
-            headerShown: true,
+            presentation: "transparentModal",
+            animation: "fade",
+            headerShown: false,
+            contentStyle: { backgroundColor: "rgba(6, 20, 16, 0.45)" },
           }}
         />
         <Stack.Screen
@@ -64,6 +65,7 @@ export default function AppNavigator({
           }
         />
       </Stack.Navigator>
+      <WeeklyFeedbackPopupHost />
     </StepsTrackingProvider>
   );
 }

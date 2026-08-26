@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, ScrollView, Pressable, Linking } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Svg, {
   Circle,
   Defs,
@@ -14,6 +16,8 @@ import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { IMeal } from "@/interfaces/DietPlan";
 import { DIET_CALORIES_PER_SERVING } from "@/constants/dietCalories";
 import { DIET_V2_MUTED, DropIcon, SproutIcon, ChevronLeftIcon } from "../DietPlanV2/dietV2Icons";
+import { RootStackParamList } from "@/types/navigatorTypes";
+import Icon from "@/components/Icon/Icon";
 
 const DARK = "#0B2A22";
 
@@ -216,6 +220,7 @@ const DailyCalorieIntakeStyle1 = () => {
   const consumed = useDietServingsStore();
   const { data: plan } = useDietPlanQuery();
   const [rowW, setRowW] = useState(0);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const meals: IMeal[] = plan?.meals ?? [];
   const targets = {
@@ -294,6 +299,16 @@ const DailyCalorieIntakeStyle1 = () => {
             </View>
             <Text fontSize={13} style={styles.tipText}>
               אשמח לעדכון בווטסאפ
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => navigation.navigate("Chat")}
+            style={({ pressed }) => [styles.smartChatBtn, pressed && styles.smartChatBtnPressed]}
+            accessibilityLabel="פתח צ׳אט חכם"
+          >
+            <Icon name="chat" color={DARK} width={11} height={11} />
+            <Text fontVariant="semibold" style={styles.smartChatBtnText}>
+              שאל את הצ׳אט החכם
             </Text>
           </Pressable>
         </View>
@@ -385,6 +400,26 @@ const styles = StyleSheet.create({
     color: "#374151",
     lineHeight: 18,
     textAlign: "right",
+  },
+  smartChatBtn: {
+    marginTop: 4,
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 7,
+    borderWidth: 1,
+    borderColor: "rgba(11, 42, 34, 0.12)",
+    backgroundColor: "#F5F7F6",
+  },
+  smartChatBtnPressed: {
+    backgroundColor: "#EBEFEC",
+  },
+  smartChatBtnText: {
+    color: DARK,
+    fontSize: 11,
   },
   tipWhatsapp: {
     flexShrink: 1,
