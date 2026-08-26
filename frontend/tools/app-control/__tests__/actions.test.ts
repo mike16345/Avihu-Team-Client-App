@@ -174,7 +174,7 @@ describe("resolveAction", () => {
       command: "npx",
       args: [
         "--yes",
-        "eas-cli@16.27.0",
+        "eas-cli@22.4.0",
         "build",
         "--platform",
         "android",
@@ -205,7 +205,7 @@ describe("resolveAction", () => {
       })
     ).toMatchObject({
       command: "npx",
-      args: expect.arrayContaining(["eas-cli@16.27.0", "update"]),
+      args: expect.arrayContaining(["eas-cli@22.4.0", "update"]),
       env: { APP_TENANT: "avihu", APP_ENV: "production" },
       prerequisite: {
         command: "npm",

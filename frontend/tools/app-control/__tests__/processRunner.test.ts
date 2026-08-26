@@ -5,7 +5,7 @@ import type { CommandSpec } from "../types";
 
 const buildSpec: CommandSpec = {
   command: "npx",
-  args: ["--yes", "eas-cli@16.27.0", "build", "--platform", "android", "--profile", "production"],
+  args: ["--yes", "eas-cli@22.4.0", "build", "--platform", "android", "--profile", "production"],
   env: { APP_TENANT: "avihu", APP_ENV: "production" },
   label: "Build Elevate Coach (production) for android",
   prerequisite: {
@@ -44,7 +44,7 @@ describe("command runner build prerequisite", () => {
         command: "npx",
         args: [
           "--yes",
-          "eas-cli@16.27.0",
+          "eas-cli@22.4.0",
           "build",
           "--platform",
           "android",
