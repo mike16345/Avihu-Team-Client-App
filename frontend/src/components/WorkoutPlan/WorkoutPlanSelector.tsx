@@ -1,4 +1,5 @@
-import { View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
+import Icon from "@/components/Icon/Icon";
 import React, { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import useStyles from "@/styles/useGlobalStyles";
@@ -10,6 +11,7 @@ import DropDownContent from "../ui/dropwdown/DropDownContent";
 import DropDownTrigger from "../ui/dropwdown/DropDownTrigger";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
 import { ConditionalRender } from "../ui/ConditionalRender";
+import WorkoutProgressionPopup from "../WorkoutProgression/WorkoutProgressionPopup";
 
 interface WorkoutPlanSelectorProps {
   selectedPlan: string;
@@ -21,6 +23,7 @@ const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan,
   const { data } = useWorkoutPlanQuery();
 
   const [showTips, setShowTips] = useState(false);
+  const [showProgression, setShowProgression] = useState(false);
 
   const tips = isCardio
     ? data?.cardio.plan.tips
@@ -38,11 +41,23 @@ const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan,
                 יום {DateUtils.getDay()} | {selectedPlan}
               </Text>
 
-              <ConditionalRender condition={tips.length > 0}>
-                <SecondaryButton rightIcon="info" onPress={() => setShowTips(true)}>
-                  דגשים לאימון
-                </SecondaryButton>
-              </ConditionalRender>
+              <View style={[layout.flexRow, spacing.gapSm]}>
+                <ConditionalRender condition={!isCardio}>
+                  <Pressable
+                    onPress={() => setShowProgression(true)}
+                    hitSlop={8}
+                    accessibilityLabel="התקדמות אימונים"
+                    style={styles.iconBtn}
+                  >
+                    <Icon name="trendingUp" width={20} height={20} />
+                  </Pressable>
+                </ConditionalRender>
+                <ConditionalRender condition={tips.length > 0}>
+                  <SecondaryButton rightIcon="info" onPress={() => setShowTips(true)}>
+                    דגשים לאימון
+                  </SecondaryButton>
+                </ConditionalRender>
+              </View>
             </View>
           </Card.Header>
           <Card.Content style={{ zIndex: 2000, elevation: 2000 }}>
@@ -59,8 +74,25 @@ const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan,
         visible={showTips}
         onDismiss={() => setShowTips(false)}
       />
+      <WorkoutProgressionPopup
+        visible={showProgression}
+        onClose={() => setShowProgression(false)}
+      />
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  iconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "rgba(7, 39, 35, 0.15)",
+  },
+});
 
 export default WorkoutPlanSelector;

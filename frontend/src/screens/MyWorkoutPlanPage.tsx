@@ -1,4 +1,5 @@
 import { RefreshControl, ScrollView, View } from "react-native";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import useStyles from "@/styles/useGlobalStyles";
 import { useEffect, useMemo, useState } from "react";
 import { IWorkoutPlan } from "@/interfaces/Workout";
@@ -92,7 +93,8 @@ const MyWorkoutPlanScreen = () => {
 
   return (
     <View style={[layout.flex1, colors.background, spacing.pdStatusBar]}>
-      <View
+      <Animated.View
+        entering={FadeInDown.duration(320).springify().damping(20)}
         style={[
           { zIndex: 2, elevation: 5 },
           showCardio ? undefined : frameShadow,
@@ -107,7 +109,7 @@ const MyWorkoutPlanScreen = () => {
             />
           </ScrollView>
         </DropDownContextProvider>
-      </View>
+      </Animated.View>
 
       <CustomScrollView
         style={{ zIndex: 1, elevation: 1 }}
@@ -116,12 +118,19 @@ const MyWorkoutPlanScreen = () => {
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={handleRefetch} />}
       >
         <ConditionalRender condition={showCardio}>
-          <CardioWrapper cardioPlan={data?.cardio} />
+          <Animated.View entering={FadeIn.duration(400).delay(120)}>
+            <CardioWrapper cardioPlan={data?.cardio} />
+          </Animated.View>
         </ConditionalRender>
 
         <ConditionalRender condition={!showCardio}>
           {selectedPlan?.muscleGroups.map((muscleGroup, i) => (
-            <MuscleGroupContainer key={i} muscleGroup={muscleGroup} plan={selectedPlan.planName} />
+            <Animated.View
+              key={i}
+              entering={FadeInDown.duration(360).delay(120 + i * 70).springify().damping(20)}
+            >
+              <MuscleGroupContainer muscleGroup={muscleGroup} plan={selectedPlan.planName} />
+            </Animated.View>
           ))}
         </ConditionalRender>
       </CustomScrollView>
