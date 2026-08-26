@@ -98,12 +98,12 @@ describe("preflight renderers", () => {
 
     const output = renderHuman(report);
 
-    expect(output).toContain("PASS (1)");
-    expect(output).toContain("WARN (1)");
-    expect(output).toContain("FAIL (1)");
+    expect(output).toContain("◇  One  passed");
+    expect(output).toContain("▲  Two  warning");
+    expect(output).toContain("■  Three  failed");
     expect(output).not.toContain("not shown");
-    expect(output).toContain("Do this");
-    expect(output).toContain("Fix this");
+    expect(output).toContain("│  → Do this");
+    expect(output).toContain("│  → Fix this");
   });
 
   it("serializes a stable machine-readable report without ANSI escape codes", async () => {

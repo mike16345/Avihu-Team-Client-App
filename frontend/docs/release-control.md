@@ -38,6 +38,19 @@ Development and internal preview binaries display a small tenant/environment bad
 binaries carry `showEnvironmentBadge: false` in their resolved Expo configuration and never infer
 visibility from `NODE_ENV`.
 
+## Command output
+
+Repository-owned commands share one compact terminal presentation. Passing checks stay on one
+line; warnings and failures expand their supporting details and show remediation with `→`. Final
+lines summarize the outcome instead of repeating empty status sections. Interactive terminals add
+subtle status color, while redirected output, CI, and `NO_COLOR=1` remain readable without color.
+Machine-readable preflight JSON is unchanged.
+
+Tenant onboarding captures the noisy output from its owned clean prebuild and fast preflight. A
+successful run shows only live stage progress and the final result. If either child command fails,
+the error includes the last relevant output lines; full preflight logs remain sanitized under
+`.preflight/`.
+
 ## Add and test a tenant
 
 Use the interactive onboarding command instead of copying tenant files by hand:
@@ -55,6 +68,8 @@ sections are saved under the ignored `.tenant-add/drafts/` directory. After a ca
 failure, rerunning the command offers **Resume draft**, **Start over**, or **Delete draft**. A
 successful onboarding removes its draft. Before fast preflight, onboarding clean-generates native
 projects for the selected tenant so ignored output from another tenant cannot create false drift.
+That owned step bypasses Expo's dirty-worktree confirmation because the generated native folders
+are disposable; other commands retain their normal Git safeguards.
 Preflight resolves the same `.env*` files as Expo while preserving explicit shell values. The local
 `test-tenant` launch command is:
 
@@ -81,11 +96,11 @@ APP_TENANT=avihu APP_ENV=development npm run preflight
 APP_TENANT=avihu APP_ENV=production npm run preflight:release
 ```
 
-`PASS` is verified. `WARN` is a documented, non-blocking condition with remediation (for example,
-the current portrait/large-screen decision or unavailable optional tooling). `FAIL` blocks the
-selected action. Never convert a missing credential, device flow, artifact, test, or configuration
-requirement into a warning merely to obtain a green report. Full sanitized logs and optional JSON
-reports are stored under ignored `.preflight/`.
+`passed` is verified. `warning` is a documented, non-blocking condition with remediation (for
+example, the current portrait/large-screen decision or unavailable optional tooling). `failed`
+blocks the selected action. Never convert a missing credential, device flow, artifact, test, or
+configuration requirement into a warning merely to obtain a green report. Full sanitized logs and
+optional JSON reports are stored under ignored `.preflight/`.
 
 ## Local selector
 

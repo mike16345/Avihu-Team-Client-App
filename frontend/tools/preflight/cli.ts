@@ -3,6 +3,7 @@ import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
 import { assertTenantEasActionAllowed, parseTenantEnvironment } from "../../config/tenants/schema";
+import { renderError } from "../cli-ui/render";
 import { createPreflightContext } from "./contexts";
 import { runChecks } from "./engine";
 import { applyPolicy } from "./policy";
@@ -168,8 +169,6 @@ if (isMain)
     })
     .catch((error: unknown) => {
       const message = error instanceof Error ? error.message : String(error);
-      console.error(
-        `${message}\nRemediation: select a valid tenant/environment and rerun preflight.`
-      );
+      console.error(renderError(message, "Select a valid tenant/environment and rerun preflight."));
       process.exitCode = 1;
     });

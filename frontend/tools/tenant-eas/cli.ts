@@ -7,6 +7,7 @@ import { parseArgs } from "node:util";
 import { cancel, confirm, intro, isCancel, outro, select, text } from "@clack/prompts";
 import { getTenant } from "../../config/tenants/registry";
 import type { TenantConfig, TenantEasConfig } from "../../config/tenants/types";
+import { renderDetailLines, renderHeader, renderStatusLine } from "../cli-ui/render";
 import { replaceTenantEasBlock } from "../tenant-add/easEditor";
 import {
   createEasProject,
@@ -97,8 +98,17 @@ export const runTenantEasCli = async (dependencies: TenantEasCliDependencies): P
   }
   await dependencies.removeRecovery(tenant.id);
   dependencies.writeOutput(
-    `EAS linked: ${identity.owner}/${identity.projectId}\n` +
-      `npm run app -- build ios --tenant ${tenant.id} --environment production --profile production --yes --dry-run\n`
+    [
+      renderHeader("Tenant EAS setup", tenant.id),
+      renderStatusLine("pass", `${identity.owner}/${identity.slug}`),
+      renderDetailLines([
+        `Project: ${identity.projectId}`,
+        `Next: npm run app -- build ios --tenant ${tenant.id} --environment production --profile production --yes --dry-run`,
+      ]),
+      "│",
+      "└  EAS project linked · ready",
+      "",
+    ].join("\n")
   );
   return 0;
 };

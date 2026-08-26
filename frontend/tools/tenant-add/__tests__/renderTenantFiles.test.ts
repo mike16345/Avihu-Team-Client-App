@@ -14,4 +14,15 @@ describe("tenant folder rendering", () => {
     expect(files["theme.ts"]).toContain("createTenantTheme");
     expect(files["features.ts"]).toContain("satisfies TenantFeatureDefaults");
   });
+
+  it("marks ignored local tenant modules as ESM without changing repository tenant files", () => {
+    const repositoryFiles = renderTenantFiles(avihuTenant, getThemePreset("avihu"));
+    const localFiles = renderTenantFiles(
+      { ...avihuTenant, id: "test-tenant", slug: "test-tenant", kind: "local" },
+      getThemePreset("avihu")
+    );
+
+    expect(repositoryFiles["package.json"]).toBeUndefined();
+    expect(localFiles["package.json"]).toBe('{"type":"module"}\n');
+  });
 });

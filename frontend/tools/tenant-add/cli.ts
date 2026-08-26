@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import { readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { box, cancel, intro, outro } from "@clack/prompts";
+import { box, cancel, intro, outro, spinner } from "@clack/prompts";
 import type { TenantEasConfig } from "../../config/tenants/types";
 import { replaceTenantEasBlock } from "./easEditor";
 import {
@@ -30,9 +30,16 @@ import { verifyNewTenant, type TenantVerificationRunner } from "./verification";
 
 const runTenantVerificationProcess: TenantVerificationRunner = ({ command, args, cwd, env }) =>
   new Promise((resolve, reject) => {
-    const child = spawn(command, args, { cwd, env, stdio: "inherit" });
+    const child = spawn(command, args, { cwd, env, stdio: ["ignore", "pipe", "pipe"] });
+    let output = "";
+    child.stdout.on("data", (value: Buffer) => {
+      output += String(value);
+    });
+    child.stderr.on("data", (value: Buffer) => {
+      output += String(value);
+    });
     child.once("error", reject);
-    child.once("exit", (code) => resolve(code ?? 1));
+    child.once("exit", (code) => resolve({ exitCode: code ?? 1, output }));
   });
 
 const runEasProcess: EasProjectRunner = ({ command, args, cwd, env }) =>
@@ -159,9 +166,19 @@ export const runTenantAddCli = async (
         sourceIcon: path.join(result.stagedAssetDirectory, "source/app-icon.png"),
       });
       if (identity) await publishLinkedEas(result.stagedModulePath, identity);
-      await publishStagedTenant(result, frontendRoot, (tenantId) =>
-        verifyNewTenant(frontendRoot, tenantId, runTenantVerificationProcess)
-      );
+      const verificationProgress = spinner();
+      await publishStagedTenant(result, frontendRoot, async (tenantId) => {
+        verificationProgress.start("Preparing tenant validation");
+        try {
+          await verifyNewTenant(frontendRoot, tenantId, runTenantVerificationProcess, (stage) =>
+            verificationProgress.message(stage)
+          );
+          verificationProgress.stop("Tenant validation passed");
+        } catch (error) {
+          verificationProgress.error("Tenant validation failed");
+          throw error;
+        }
+      });
     } catch (error) {
       await discardStagedTenant(result);
       if (identity) {

@@ -50,6 +50,15 @@ describe("tenant:eas", () => {
     });
     expect(dependencies.runFastPreflight).toHaveBeenCalledWith("new-tenant");
     expect(getSource()).toBe("linked source");
+    expect(dependencies.writeOutput).toHaveBeenCalledWith(
+      expect.stringContaining("┌  Tenant EAS setup")
+    );
+    expect(dependencies.writeOutput).toHaveBeenCalledWith(
+      expect.stringContaining("◇  acme/new-tenant  passed")
+    );
+    expect(dependencies.writeOutput).toHaveBeenCalledWith(
+      expect.stringContaining("└  EAS project linked · ready")
+    );
   });
 
   it("restores original bytes when post-edit validation fails", async () => {

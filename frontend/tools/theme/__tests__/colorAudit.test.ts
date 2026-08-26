@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { auditApplicationColors } from "../colorAudit";
+import { auditApplicationColors, renderColorAudit } from "../colorAudit";
 
 const temporaryRoots: string[] = [];
 
@@ -34,5 +34,17 @@ describe("application color audit", () => {
       { relativePath: "src/Card.tsx", line: 3, literal: "rgba(0, 0, 0, 0.1)" },
       { relativePath: "src/Card.tsx", line: 4, literal: "red" },
     ]);
+  });
+
+  it("renders a clean success or expanded findings report", () => {
+    expect(renderColorAudit([], false)).toContain("└  No hardcoded application colors · ready");
+
+    const output = renderColorAudit(
+      [{ relativePath: "src/Card.tsx", line: 3, literal: "#FFFFFF" }],
+      false
+    );
+    expect(output).toContain("■  src/Card.tsx:3  failed");
+    expect(output).toContain("│  #FFFFFF");
+    expect(output).toContain("└  1 hardcoded color found");
   });
 });
