@@ -43,6 +43,15 @@ Every visible application color belongs to the strict semantic tenant theme. Avi
 existing palettes, including newer Diet, scanner, health, graph, agreement, and developer-tool
 colors, so adopting the theme contract does not intentionally change its appearance.
 
+## Future theme validation improvements
+
+New tenant themes should default ordinary text roles to readable neutral colors instead of deriving
+them directly from brand colors. A future onboarding improvement should validate the known semantic
+foreground/background pairs and warn when contrast is too low, when foreground and background roles
+overlap, or when too many distinct UI roles collapse onto visually indistinguishable colors. The
+validator should still allow explicit intentional overrides for branded accents and status colors.
+Avihu's existing semantic mapping should remain unchanged until an intentional visual redesign.
+
 Built-in recipes are **Avihu**, **Ivory / Orange / Blue**, and **Violet / Amber**. Choose JSON import
 to supply the same strict version-1 format:
 
