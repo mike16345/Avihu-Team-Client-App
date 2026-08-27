@@ -251,6 +251,9 @@ describe("resolveAction", () => {
   });
 
   it("maps release preflight directly to the shared package script", () => {
+    vi.stubEnv("APP_ANDROID_JAVA_HOME", "/toolchains/java-17");
+    vi.stubEnv("PATH", "/usr/local/bin:/usr/bin");
+
     expect(
       resolveAction({
         action: "preflight",
@@ -264,6 +267,8 @@ describe("resolveAction", () => {
       env: {
         APP_TENANT: "avihu",
         APP_ENV: "production",
+        JAVA_HOME: "/toolchains/java-17",
+        PATH: "/toolchains/java-17/bin:/usr/local/bin:/usr/bin",
       },
     });
   });
