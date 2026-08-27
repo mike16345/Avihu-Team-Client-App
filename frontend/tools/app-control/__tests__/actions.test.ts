@@ -47,6 +47,23 @@ describe("resolveAction", () => {
     ).toThrow(/tenant:eas -- --tenant new-tenant/u);
   });
 
+  it("starts Metro with the selected tenant development-client scheme", () => {
+    expect(
+      resolveAction({
+        action: "start",
+        tenantId: "avihu",
+        environment: "development",
+      })
+    ).toMatchObject({
+      command: "npx",
+      args: ["expo", "start", "-c", "--dev-client", "--scheme", "exp+avihu-team"],
+      env: {
+        APP_TENANT: "avihu",
+        APP_ENV: "development",
+      },
+    });
+  });
+
   it("routes every legacy update alias through guarded app control", () => {
     expect(packageJson.scripts["update:prod"]).toMatch(/^npm run app -- update /u);
     expect(packageJson.scripts["update:preview"]).toMatch(/^npm run app -- update /u);
