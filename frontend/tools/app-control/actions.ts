@@ -124,7 +124,12 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
 
   switch (selection.action) {
     case "start":
-      return createCommandSpec(selection, "npx", ["expo", "start", "-c"], `Start ${labelPrefix}`);
+      return createCommandSpec(
+        selection,
+        "npx",
+        ["expo", "start", "-c", "--dev-client", "--scheme", `exp+${tenant.slug}`],
+        `Start ${labelPrefix}`
+      );
     case "run": {
       const isRelease = selection.environment !== "development";
       const buildArguments =
