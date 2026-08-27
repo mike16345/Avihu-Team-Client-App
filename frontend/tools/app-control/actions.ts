@@ -179,7 +179,10 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         selection,
         "npm",
         ["run", selection.mode === "release" ? "preflight:release" : "preflight"],
-        `${selection.mode === "release" ? "Release" : "Fast"} preflight for ${labelPrefix}`
+        `${selection.mode === "release" ? "Release" : "Fast"} preflight for ${labelPrefix}`,
+        selection.mode === "release" && tenant.platforms.includes("android")
+          ? getAndroidJavaEnvironment()
+          : {}
       );
     case "assets":
       return createCommandSpec(
