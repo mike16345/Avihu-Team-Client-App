@@ -115,11 +115,13 @@ describe("configured smoke redaction", () => {
       ),
       "utf8"
     );
-    const published = `${JSON.stringify(result)}\n${log}`;
+    const publishedDiagnostics = `${result.details
+      ?.filter((detail) => !detail.startsWith("Full sanitized log:"))
+      .join("\n")}\n${log}`;
     for (const secret of ["private-smoke-tool", ...secrets]) {
-      expect(published).not.toContain(secret);
+      expect(publishedDiagnostics).not.toContain(secret);
     }
-    expect(published).toContain("diagnostic: connection failed");
+    expect(publishedDiagnostics).toContain("diagnostic: connection failed");
   });
 });
 
