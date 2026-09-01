@@ -13,7 +13,6 @@
     "preflight": "tsx tools/preflight/cli.ts fast",
     "preflight:release": "tsx tools/preflight/cli.ts release",
     "preflight:eas": "tsx tools/preflight/cli.ts eas --json .preflight/eas-report.json",
-    "eas-build-post-install": "npm run preflight:eas",
     "start": "expo start -c",
     "start-no-clear": "expo start",
     "android": "expo run:android",

@@ -140,4 +140,4 @@ export const createReleaseSuite = (context: PreflightSuiteContext): PreflightSui
 };
 
 export const createEasSuite = (context: PreflightSuiteContext): PreflightSuite =>
-  createFastSuite(context);
+  createFastSuite(context).filter((definition) => definition !== nativeDriftCheck);

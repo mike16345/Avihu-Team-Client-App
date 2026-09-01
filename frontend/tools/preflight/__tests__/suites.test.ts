@@ -98,11 +98,16 @@ describe("preflight suite composition", () => {
     ]);
   });
 
-  it("keeps EAS non-interactive validation process-safe by composing the fast suite", () => {
+  it("excludes ignored local native folders from EAS upload validation", () => {
     const context = createContext();
+    const easIds = getCheckIds(createEasSuite(context));
+    const uploadedFastIds = getCheckIds(createFastSuite(context)).filter(
+      (check) => check !== "native.drift"
+    );
 
-    expect(getCheckIds(createEasSuite(context))).toEqual(getCheckIds(createFastSuite(context)));
-    expect(getCheckIds(createEasSuite(context))).not.toContain("native.prebuild");
+    expect(easIds).toEqual(uploadedFastIds);
+    expect(easIds).not.toContain("native.drift");
+    expect(easIds).not.toContain("native.prebuild");
   });
 
   it("skips macOS-only iOS release validation explicitly on other platforms", async () => {
