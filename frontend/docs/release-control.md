@@ -127,8 +127,8 @@ npm run build:android:preview -- --tenant avihu --dry-run
 npm run build:ios:prod -- --tenant avihu --dry-run
 ```
 
-The selector and legacy aliases automatically run tenant-scoped `preflight:eas` before EAS starts;
-the remote post-install hook repeats it. You can also run the fuller local checks explicitly:
+The selector and legacy aliases automatically run tenant-scoped `preflight:eas` before EAS starts.
+You can also run the fuller local checks explicitly:
 
 ```sh
 npm run app -- preflight --tenant avihu --environment preview --yes --dry-run
@@ -191,14 +191,6 @@ preview and production (`com.avihuteam.avihuteam`). This is declared by
 `allowSharedStoreIdentity: true` for both environments. Development is isolated as
 `com.avihuteam.avihuteam.dev`. Do not duplicate this sharing for another tenant unless its tenant
 configuration explicitly declares it.
-
-## Remote build guard
-
-EAS invokes `eas-build-post-install`, which is exactly `npm run preflight:eas`. That action uses
-the fast, noninteractive EAS suite: tenant/environment validation, dependencies, Expo config,
-assets, typecheck, and unit tests. It does not launch EAS, publish an update, or compile native
-projects recursively. The JSON report is written only to `.preflight/eas-report.json` in the build
-workspace.
 
 ## Local config checks
 

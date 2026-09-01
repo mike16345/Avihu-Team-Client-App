@@ -65,5 +65,6 @@ export type AppSelection =
       platform: AppPlatform;
       environment: ReleaseProfile;
       profile: ReleaseProfile;
+      usePackageScript?: boolean;
     })
   | (BaseSelection & { action: "update"; environment: ReleaseProfile });

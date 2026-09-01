@@ -4,6 +4,7 @@ import { getTenant } from "../../config/tenants/registry";
 import { assertTenantEasActionAllowed } from "../../config/tenants/schema";
 import type { AppSelection, CommandSpec, CommandStep } from "./types";
 import { EAS_CLI_ARGS } from "../eas/constants";
+import { getBuildPackageScript } from "./buildScripts";
 
 export { EAS_CLI_ARGS } from "../eas/constants";
 
@@ -192,6 +193,21 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         `${selection.operation === "generate" ? "Generate" : "Audit"} assets for ${labelPrefix}`
       );
     case "build": {
+      if (selection.usePackageScript) {
+        return createCommandSpec(
+          selection,
+          "npm",
+          [
+            "run",
+            getBuildPackageScript(selection.platform, selection.profile),
+            "--",
+            "--tenant",
+            selection.tenantId,
+          ],
+          `Build ${labelPrefix} for ${selection.platform}`
+        );
+      }
+
       const build = createCommandSpec(
         selection,
         "npx",

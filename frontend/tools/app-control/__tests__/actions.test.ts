@@ -213,6 +213,49 @@ describe("resolveAction", () => {
     });
   });
 
+  it("runs build preflight locally without registering an EAS post-install hook", () => {
+    expect(packageJson.scripts).not.toHaveProperty("eas-build-post-install");
+    expect(
+      resolveAction({
+        action: "build",
+        platform: "ios",
+        tenantId: "avihu",
+        environment: "development",
+        profile: "development",
+      }).prerequisite
+    ).toMatchObject({
+      command: "npm",
+      args: ["run", "preflight:eas"],
+    });
+  });
+
+  it.each([
+    ["development", "ios", "build:ios:dev"],
+    ["preview", "android", "build:android:preview"],
+    ["production", "ios", "build:ios:prod"],
+  ] as const)(
+    "routes an interactive %s %s build through npm run %s",
+    (profile, platform, script) => {
+      expect(
+        resolveAction({
+          action: "build",
+          tenantId: "avihu",
+          environment: profile,
+          profile,
+          platform,
+          usePackageScript: true,
+        })
+      ).toMatchObject({
+        command: "npm",
+        args: ["run", script, "--", "--tenant", "avihu"],
+        env: {
+          APP_TENANT: "avihu",
+          APP_ENV: profile,
+        },
+      });
+    }
+  );
+
   it("runs tenant preflight before publishing an Avihu update", () => {
     expect(
       resolveAction({
