@@ -214,9 +214,7 @@ export function formatServingText<K extends keyof IServingItem>(
   preferredUnitIndex?: 0 | 1
 ): string {
   const availableUnits = Object.entries(oneServing).filter(([key, value]) => {
-    return (
-      value !== undefined && value !== null && key !== "_id" && !ignoreKeys.includes(key as K)
-    );
+    return value !== undefined && value !== null && key !== "_id" && !ignoreKeys.includes(key as K);
   });
 
   const orderedUnits =
