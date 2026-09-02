@@ -117,6 +117,7 @@ const DietItemContent: React.FC<DietItemContentProps> = ({
             servingAmount={dietItem.quantity}
             extraItems={dietItem.extraItems}
             struck={isEaten}
+            preferredUnitIndex={plan?.unitDisplayMode === 2 ? 1 : 0}
           />
         </View>
 
@@ -124,6 +125,7 @@ const DietItemContent: React.FC<DietItemContentProps> = ({
           name={name}
           foodGroup={apiFoodGroup}
           servingSize={dietItem.quantity}
+          preferredUnitIndex={plan?.unitDisplayMode === 2 ? 1 : 0}
         />
       </View>
     </Pressable>

@@ -13,6 +13,7 @@ interface FoodItemSelectionProps {
   customItems?: ICustomItem[];
   extraItems?: string[];
   struck?: boolean;
+  preferredUnitIndex?: 0 | 1;
 }
 
 const START_SLICE_INDEX = 0;
@@ -24,6 +25,7 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
   customItems = [],
   extraItems = [],
   struck = false,
+  preferredUnitIndex,
 }) => {
   const { center, wrap } = useLayoutStyles();
   const { data: items, isLoading } = useFoodGroupQuery(foodGroup);
@@ -33,7 +35,16 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
 
   const formatted = useMemo(() => {
     const customFormatted = customItems.map((customItem) =>
-      formatServingText(customItem.name, customItem.oneServing, servingAmount, 1, [], " ", true)
+      formatServingText(
+        customItem.name,
+        customItem.oneServing,
+        servingAmount,
+        1,
+        [],
+        " ",
+        true,
+        preferredUnitIndex
+      )
     );
 
     if (hasCustomItems && hasExtraItems) {
@@ -52,9 +63,28 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
 
     return items
       .slice(START_SLICE_INDEX, END_SLICE_INDEX)
-      .map((item) => formatServingText(item.name, item.oneServing, servingAmount, 1, [], " ", true))
+      .map((item) =>
+        formatServingText(
+          item.name,
+          item.oneServing,
+          servingAmount,
+          1,
+          [],
+          " ",
+          true,
+          preferredUnitIndex
+        )
+      )
       .join(" | ");
-  }, [customItems, extraItems, hasCustomItems, hasExtraItems, items, servingAmount]);
+  }, [
+    customItems,
+    extraItems,
+    hasCustomItems,
+    hasExtraItems,
+    items,
+    servingAmount,
+    preferredUnitIndex,
+  ]);
 
   if (shouldShowGeneralItems && (items == undefined || isLoading))
     return (

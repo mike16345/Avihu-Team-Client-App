@@ -57,7 +57,7 @@ export const buildDietPlanV2HistoryEntries = (
             {
               id: `${mealKey}:add-ons`,
               name: addOnName,
-              detail: `${mealName} · תוספות`,
+              detail: `${mealName} · תוספים`,
               macros: ZERO_MACROS,
               source: "meal",
             },
