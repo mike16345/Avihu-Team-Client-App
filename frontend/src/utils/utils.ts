@@ -210,19 +210,24 @@ export function formatServingText<K extends keyof IServingItem>(
   servingsToShow: 1 | 2 = 2,
   ignoreKeys: K[] = [],
   separator = " ",
-  reverse: boolean = false
+  reverse: boolean = false,
+  preferredUnitIndex?: 0 | 1
 ): string {
-  const units = Object.entries(oneServing)
-    .filter(([key, value]) => {
-      return (
-        value !== undefined && value !== null && key !== "_id" && !ignoreKeys.includes(key as K)
-      );
-    })
-    .slice(0, servingsToShow) // limit to requested number of servings
-    .map(([unitKey, value]) => {
-      const label = unitLabels[unitKey as DietItemUnit];
-      return `${value * servingAmount} ${label}`;
-    });
+  const availableUnits = Object.entries(oneServing).filter(([key, value]) => {
+    return (
+      value !== undefined && value !== null && key !== "_id" && !ignoreKeys.includes(key as K)
+    );
+  });
+
+  const orderedUnits =
+    preferredUnitIndex !== undefined && availableUnits[preferredUnitIndex]
+      ? [availableUnits[preferredUnitIndex]]
+      : availableUnits.slice(0, servingsToShow);
+
+  const units = orderedUnits.map(([unitKey, value]) => {
+    const label = unitLabels[unitKey as DietItemUnit];
+    return `${value * servingAmount} ${label}`;
+  });
 
   const serving = reverse ? [...units, name] : [name, ...units];
 

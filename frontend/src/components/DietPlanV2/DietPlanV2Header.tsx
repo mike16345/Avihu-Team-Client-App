@@ -1,6 +1,6 @@
 import { useEffect, type ComponentProps, type ComponentType } from "react";
 import { StyleSheet, View } from "react-native";
-import Svg, { Circle } from "react-native-svg";
+import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import Animated, {
   Easing,
   FadeInUp,
@@ -82,6 +82,7 @@ const AnimatedBarValue = ({ consumed, target }: { consumed: number; target: numb
 
 const CalorieRing = ({ consumed, target }: { consumed: number; target: number }) => {
   const progress = useSharedValue(clampProgress(consumed, target));
+  const isOver = target > 0 && consumed > target;
 
   useEffect(() => {
     progress.value = withTiming(clampProgress(consumed, target), {
@@ -97,6 +98,16 @@ const CalorieRing = ({ consumed, target }: { consumed: number; target: number })
   return (
     <View style={styles.ringWrap}>
       <Svg width={RING_SIZE} height={RING_SIZE} style={StyleSheet.absoluteFill}>
+        <Defs>
+          <LinearGradient id="calorieRingGradient" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#4ADE80" />
+            <Stop offset="1" stopColor="#0F5E3B" />
+          </LinearGradient>
+          <LinearGradient id="calorieRingGradientOver" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#FCA5A5" />
+            <Stop offset="1" stopColor="#B91C1C" />
+          </LinearGradient>
+        </Defs>
         <Circle
           cx={RING_SIZE / 2}
           cy={RING_SIZE / 2}
@@ -109,7 +120,7 @@ const CalorieRing = ({ consumed, target }: { consumed: number; target: number })
           cx={RING_SIZE / 2}
           cy={RING_SIZE / 2}
           r={RING_RADIUS}
-          stroke={DIET_V2_GREEN}
+          stroke={isOver ? "url(#calorieRingGradientOver)" : "url(#calorieRingGradient)"}
           strokeWidth={RING_STROKE}
           fill="transparent"
           strokeDasharray={`${RING_CIRCUMFERENCE} ${RING_CIRCUMFERENCE}`}
@@ -130,6 +141,7 @@ const CalorieRing = ({ consumed, target }: { consumed: number; target: number })
 
 const MacroBar = ({ label, consumed, target, Icon }: MacroBarProps) => {
   const progress = useSharedValue(clampProgress(consumed, target));
+  const isOver = target > 0 && consumed > target;
 
   useEffect(() => {
     progress.value = withTiming(clampProgress(consumed, target), {
@@ -146,7 +158,7 @@ const MacroBar = ({ label, consumed, target, Icon }: MacroBarProps) => {
     <View style={styles.bar}>
       <View style={styles.barHeader}>
         <View style={styles.barLabelWrap}>
-          <Icon size={14} color={DIET_V2_GREEN} />
+          <Icon size={14} color={isOver ? "#B91C1C" : DIET_V2_GREEN} />
           <Text fontSize={13} fontVariant="semibold" style={styles.barLabel}>
             {label}
           </Text>
@@ -154,7 +166,7 @@ const MacroBar = ({ label, consumed, target, Icon }: MacroBarProps) => {
         <AnimatedBarValue consumed={consumed} target={target} />
       </View>
       <View style={styles.track}>
-        <Animated.View style={[styles.fill, fillStyle]} />
+        <Animated.View style={[styles.fill, isOver && styles.fillOver, fillStyle]} />
       </View>
     </View>
   );
@@ -266,6 +278,9 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 999,
     backgroundColor: DIET_V2_GREEN,
+  },
+  fillOver: {
+    backgroundColor: "#B91C1C",
   },
 });
 
