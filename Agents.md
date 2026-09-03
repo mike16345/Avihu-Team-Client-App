@@ -39,7 +39,10 @@
 - Non-null assertions are used only after a guard has already made the value effectively required in that execution path.
 - Error handling is local and lightweight: functions typically catch errors to log them with `console.error` or `console.log`, and rethrow only when a caller still needs to decide the outcome.
 - User-facing text should use the shared `Text` component where possible so font mapping and RTL writing direction stay consistent.
-- Shared visual tokens should come from `useGlobalStyles()` and related style hooks; component-specific one-off values may still use inline style objects or a local `StyleSheet.create(...)`.
+- Use `useGlobalStyles()` and the related style hooks as the default source for layout,
+  spacing, typography, colors, and other shared visual rules. Create a local
+  `StyleSheet.create(...)` only for styles that are genuinely specific to that component and cannot
+  be composed cleanly from the shared hooks; do not recreate an available shared style locally.
 - Keep JSX declarative and easy to scan. Avoid nested ternaries in JSX; use explicit boolean renders for conditional sections and move label, icon, message, status, and style decisions into named helpers such as `getSaveLabel`, `getStatusTone`, or `getCardStyle`.
 - Use strict equality and explicit branches in new or edited code. Avoid boolean/object expressions such as `condition && object` when a named branch is clearer.
 - Prefer guard clauses over deeply nested `if` blocks, especially around loading, error, missing route params, missing user/session state, and permission gates.
@@ -79,13 +82,19 @@
 ## 7. UI/UX Conventions (if applicable)
 
 - Layout direction comes from the validated tenant localization contract. Avihu remains forced RTL; the root tree and shared `Text` primitive follow `I18nManager.isRTL` for tenants that support or require a different direction.
-- In RTL layouts, keep children in their intended right-to-left source order and rely on the root direction. Do not use `row-reverse` or force `textAlign: "right"`; omit alignment, or use `textAlign: "start"` only when explicit alignment is necessary.
+- In RTL layouts, author row children in their intended right-to-left source order: the first
+  child is the rightmost item. Keep equivalent rows consistent across screens and rely on the root
+  direction. Do not use `row-reverse` or force `textAlign: "right"`; omit alignment, or use
+  `textAlign: "start"` only when explicit alignment is necessary.
 - Reusable UI primitives live in `frontend/src/components/ui`, while feature-specific UI is organized under `frontend/src/components/<Feature>`.
 - Shared styling is utility-like: `useGlobalStyles()` aggregates layout, spacing, text, and color style sheets so components compose style arrays from common tokens.
 - Theme tokens are centralized in `frontend/src/themes/useAppTheme.tsx`; repeated color or typography values should be added to the theme/style layer before being duplicated across multiple screens.
 - Application colors must resolve through the strict semantic tenant theme; run `npm run theme:audit` after editing visual color values. Preserve Avihu appearance by updating its semantic mapping when an intentional palette is added.
 - Motion and interaction feedback are part of the existing UI vocabulary through `react-native-reanimated` animations and haptic helper utilities.
-- Prefer style arrays composed from shared style hooks, theme tokens, and local `StyleSheet.create(...)` objects. Avoid large anonymous inline style objects in JSX except for genuinely dynamic one-off values such as animated styles, measured dimensions, or values derived from props.
+- Prefer style arrays led by shared style hooks and theme tokens. Add a local
+  `StyleSheet.create(...)` only for the remaining component-specific details, and keep anonymous
+  inline style objects for genuinely dynamic one-off values such as animated styles, measured
+  dimensions, or values derived from props.
 - When button, card, chip, empty-state, list-row, modal, or toolbar styles repeat inside a feature, extract a small feature-local component or style helper. If the pattern repeats across domains, formalize it as a shared UI primitive.
 - Keep platform differences explicit. Use React Native and Expo APIs for native behavior rather than web-only assumptions such as DOM APIs, CSS selectors, `className`, browser history, or window/document globals.
 - Respect safe-area, keyboard, and scroll behavior in mobile screens. Use the existing safe-area, keyboard-aware, modal, and scroll patterns before introducing a new layout approach.

@@ -218,11 +218,7 @@ const DietPlanV2SmartMenu = ({
             layout={LinearTransition.duration(180)}
             style={styles.entryRow}
           >
-            <Pressable onPress={() => requestRemove(entry)} hitSlop={8} style={styles.removeButton}>
-              <Text fontVariant="bold" fontSize={16} style={styles.removeLabel}>
-                ×
-              </Text>
-            </Pressable>
+            <View style={styles.entryDot} />
             <Pressable
               onPress={() => {
                 selectionHaptic();
@@ -231,17 +227,23 @@ const DietPlanV2SmartMenu = ({
               }}
               style={styles.entryCopy}
             >
-              <Text fontVariant="semibold" fontSize={14} style={styles.entryName}>
-                {entry.name}
-              </Text>
-              <Text fontSize={11} style={styles.entryMeta}>
-                {`${formatSmartFoodServingAmount(entry)} · ${formatDietPlanV2Number(entry.macros.calories)} קק"ל`}
-              </Text>
-              <Text fontVariant="medium" fontSize={11} style={styles.editLabel}>
-                הקש לעריכה
+              <View style={{ alignItems: "flex-start", flex: 1 }}>
+                <Text fontVariant="semibold" fontSize={14} style={styles.entryName}>
+                  {entry.name}
+                </Text>
+                <Text fontSize={11} style={styles.entryMeta}>
+                  {`${formatSmartFoodServingAmount(entry)} · ${formatDietPlanV2Number(entry.macros.calories)} קק"ל`}
+                </Text>
+                <Text fontVariant="medium" fontSize={11} style={styles.editLabel}>
+                  הקש לעריכה
+                </Text>
+              </View>
+            </Pressable>
+            <Pressable onPress={() => requestRemove(entry)} hitSlop={8} style={styles.removeButton}>
+              <Text fontVariant="bold" fontSize={16} style={styles.removeLabel}>
+                ×
               </Text>
             </Pressable>
-            <View style={styles.entryDot} />
           </Animated.View>
         ))}
       </View>
@@ -317,6 +319,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
     backgroundColor: semanticColors.app.surfaceRaised,
+    alignItems: "flex-start",
   },
   cardHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
   headerCopy: { flex: 1, gap: 3, alignItems: "flex-start" },
@@ -331,6 +334,7 @@ const styles = StyleSheet.create({
     backgroundColor: DIET_V2_MINT,
   },
   searchWrap: {
+    width: "100%",
     minHeight: 44,
     flexDirection: "row",
     alignItems: "center",
@@ -362,7 +366,7 @@ const styles = StyleSheet.create({
     backgroundColor: semanticColors.app.surfaceRaised,
   },
   quickActionLabel: { color: DIET_V2_DARK, textAlign: "center" },
-  searchHint: { width: "100%", color: DIET_V2_MUTED },
+  searchHint: { color: DIET_V2_MUTED },
   todayCard: {
     padding: 16,
     gap: 12,
@@ -393,7 +397,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: semanticColors.app.dietSearchDivider,
   },
-  entryCopy: { flex: 1, alignItems: "flex-start" },
+  entryCopy: { flex: 1 },
   entryName: { color: DIET_V2_DARK },
   entryMeta: { color: DIET_V2_MUTED },
   editLabel: { color: DIET_V2_GREEN, paddingTop: 2 },

@@ -3,6 +3,7 @@ import { I18nManager } from "react-native";
 import * as Updates from "expo-updates";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { TenantLocalization } from "../../config/tenants/types";
+import { isTenantLayoutDirectionSatisfied } from "./rtlPolicy";
 
 const RTL_FIX_KEY = "tenant_layout_direction";
 
@@ -15,7 +16,12 @@ export const useOneTimeRTLFix = (tenantId: string, localization: TenantLocalizat
         const appliedLayout = await AsyncStorage.getItem(RTL_FIX_KEY);
         const requestedLayout = `${tenantId}:${localization.supportsRtl}:${localization.forcesRtl}`;
 
-        if (appliedLayout !== requestedLayout) {
+        const nativeDirectionMatchesTenant = isTenantLayoutDirectionSatisfied(
+          localization,
+          I18nManager.isRTL
+        );
+
+        if (appliedLayout !== requestedLayout || !nativeDirectionMatchesTenant) {
           I18nManager.allowRTL(localization.supportsRtl);
           I18nManager.forceRTL(localization.forcesRtl);
 

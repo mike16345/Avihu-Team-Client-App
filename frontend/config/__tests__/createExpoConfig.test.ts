@@ -91,6 +91,20 @@ describe("tenant registry", () => {
 });
 
 describe("createExpoConfig", () => {
+  it("passes the tenant RTL contract directly to the native localization plugin", () => {
+    const config = createExpoConfig({
+      baseConfig: {},
+      tenant: getTenant("avihu"),
+      environment: "development",
+      processEnv: {},
+    });
+
+    expect(config.plugins).toContainEqual([
+      "expo-localization",
+      { supportsRTL: true, forcesRTL: true },
+    ]);
+  });
+
   it("omits remote EAS fields for pending tenants", () => {
     const pendingTenant = tenantConfigSchema.parse({
       ...avihuTenant,
@@ -278,7 +292,13 @@ describe("createExpoConfig", () => {
     });
 
     expect(plugins).toEqual([
-      "expo-localization",
+      [
+        "expo-localization",
+        {
+          supportsRTL: avihuTenant.localization.supportsRtl,
+          forcesRTL: avihuTenant.localization.forcesRtl,
+        },
+      ],
       ["expo-build-properties", { android: avihuTenant.androidBuildProperties }],
       "./plugins/withFmtXcode26Fix",
     ]);
@@ -333,8 +353,6 @@ describe("createExpoConfig", () => {
     });
 
     expect(development.extra).toMatchObject({
-      supportsRtl: true,
-      forcesRTL: true,
       tenant: {
         theme: avihuTenant.theme,
         localization: avihuTenant.localization,

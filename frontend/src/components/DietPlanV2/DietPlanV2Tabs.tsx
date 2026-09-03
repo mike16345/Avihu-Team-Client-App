@@ -50,6 +50,11 @@ const DietPlanV2Tabs = ({
 
   const tabs: TabItem[] = [
     {
+      label: "דגשים",
+      value: "דגשים",
+      content: <DietPlanV2Highlights highlights={plan.highlights} />,
+    },
+    {
       label: "הארוחות שלי",
       value: "הארוחות שלי",
       content: (
@@ -76,11 +81,6 @@ const DietPlanV2Tabs = ({
           onRemove={onRemoveSmartFood}
         />
       ),
-    },
-    {
-      label: "דגשים",
-      value: "דגשים",
-      content: <DietPlanV2Highlights highlights={plan.highlights} />,
     },
   ];
   const activeTab = tabs.find(({ value }) => value === selectedTab) ?? tabs[0];
