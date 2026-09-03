@@ -57,10 +57,8 @@ const FoodCatalogSearchRow = ({ product, index, onSelect }: FoodCatalogSearchRow
         }}
         style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
       >
-        <View style={styles.addButton}>
-          <Text fontVariant="bold" fontSize={20} style={styles.addButtonLabel}>
-            +
-          </Text>
+        <View style={styles.productIcon}>
+          <BarcodeIcon size={21} color={DIET_V2_GREEN} />
         </View>
         <View style={styles.copy}>
           <Text fontVariant="bold" fontSize={14} style={styles.name} numberOfLines={2}>
@@ -82,8 +80,10 @@ const FoodCatalogSearchRow = ({ product, index, onSelect }: FoodCatalogSearchRow
             </Text>
           ) : null}
         </View>
-        <View style={styles.productIcon}>
-          <BarcodeIcon size={21} color={DIET_V2_GREEN} />
+        <View style={styles.addButton}>
+          <Text fontVariant="bold" fontSize={20} style={styles.addButtonLabel}>
+            +
+          </Text>
         </View>
       </Pressable>
     </Animated.View>

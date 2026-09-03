@@ -33,22 +33,23 @@ const DietPlanV2AddOns = ({ addOns, consumed, disabled, onToggle }: DietPlanV2Ad
         pressed && !disabled && styles.pressed,
       ]}
     >
-      <View style={styles.headerRow}>
-        <Text fontVariant="bold" fontSize={15} style={styles.heading}>
-          תוספות
+      <View style={[{ alignItems: "flex-start" }]}>
+        <View style={styles.headerRow}>
+          <Text fontVariant="bold" fontSize={15} style={styles.heading}>
+            תוספות
+          </Text>
+          <DietPlanV2ConsumedBadge consumed={consumed} />
+        </View>
+        <Text fontSize={15} style={[styles.description, consumed && styles.descriptionConsumed]}>
+          {description}
         </Text>
-        <DietPlanV2ConsumedBadge consumed={consumed} />
       </View>
-      <Text fontSize={15} style={[styles.description, consumed && styles.descriptionConsumed]}>
-        {description}
-      </Text>
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignSelf: "stretch",
     gap: 4,
     borderRadius: 10,
     paddingVertical: 10,

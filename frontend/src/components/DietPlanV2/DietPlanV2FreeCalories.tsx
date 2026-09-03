@@ -36,18 +36,20 @@ const DietPlanV2FreeCalories = ({
         consumed && styles.consumed,
       ]}
     >
-      <View style={styles.headerRow}>
-        <Text fontVariant="bold" fontSize={15} style={styles.title}>
-          {`קלוריות חופשיות · ${formatDietPlanV2Number(freeCalories.calories)} קק"ל`}
+      <View style={{ alignItems: "flex-start" }}>
+        <View style={styles.headerRow}>
+          <Text fontVariant="bold" fontSize={15} style={styles.title}>
+            {`קלוריות חופשיות · ${formatDietPlanV2Number(freeCalories.calories)} קק"ל`}
+          </Text>
+          <DietPlanV2ConsumedBadge consumed={consumed} />
+        </View>
+        <Text fontSize={15} style={[styles.description, consumed && styles.descriptionConsumed]}>
+          {freeCalories.items
+            .map((item) => item.name.trim())
+            .filter(Boolean)
+            .join(" / ")}
         </Text>
-        <DietPlanV2ConsumedBadge consumed={consumed} />
       </View>
-      <Text fontSize={15} style={[styles.description, consumed && styles.descriptionConsumed]}>
-        {freeCalories.items
-          .map((item) => item.name.trim())
-          .filter(Boolean)
-          .join(" / ")}
-      </Text>
     </Pressable>
   );
 };

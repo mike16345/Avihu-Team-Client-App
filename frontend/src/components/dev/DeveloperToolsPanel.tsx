@@ -11,7 +11,15 @@ import { useDeveloperToolActions } from "@/devtools/useDeveloperToolActions";
 import { useToast } from "@/hooks/useToast";
 import Constants from "expo-constants";
 import { useMemo, type Dispatch, type SetStateAction } from "react";
-import { Alert, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  I18nManager,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { DeveloperActionName, DeveloperActionResult } from "@/devtools/actions";
@@ -173,6 +181,10 @@ const DeveloperToolsPanel = () => {
         <View style={styles.detailsCard}>
           <DeveloperToolDetailRow label="Build" value={buildLabel} />
           <DeveloperToolDetailRow label="Application ID" value={diagnostics.applicationId} />
+          <DeveloperToolDetailRow
+            label="Native layout direction"
+            value={I18nManager.isRTL ? "RTL" : "LTR"}
+          />
           <DeveloperToolDetailRow label="Notifications" value={permissionLabels[permission]} />
         </View>
 

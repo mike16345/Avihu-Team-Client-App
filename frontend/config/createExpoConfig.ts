@@ -21,7 +21,13 @@ const getPublicRuntimeExtra = (processEnv: ProcessEnvironment) => ({
 
 export const createTenantPlugins = (tenant: TenantConfig): NonNullable<ExpoConfig["plugins"]> => {
   const plugins: NonNullable<ExpoConfig["plugins"]> = [
-    "expo-localization",
+    [
+      "expo-localization",
+      {
+        supportsRTL: tenant.localization.supportsRtl,
+        forcesRTL: tenant.localization.forcesRtl,
+      },
+    ],
     ["expo-build-properties", { android: tenant.androidBuildProperties }],
     "./plugins/withFmtXcode26Fix",
   ];
@@ -123,8 +129,6 @@ export const createExpoConfig = ({
     },
     extra: {
       ...(linkedEas ? { eas: { projectId: linkedEas.projectId } } : {}),
-      supportsRtl: tenant.localization.supportsRtl,
-      forcesRTL: tenant.localization.forcesRtl,
       tenant: {
         id: tenant.id,
         displayName: tenant.displayName,
