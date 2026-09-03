@@ -2,14 +2,7 @@ import { FC } from "react";
 import { I18nManager, Text as RNText, TextProps as RNTextProps } from "react-native";
 
 type FontVariant =
-  | "extraLight"
-  | "light"
-  | "regular"
-  | "medium"
-  | "semibold"
-  | "bold"
-  | "extrabold"
-  | "brutalist";
+  "extraLight" | "light" | "regular" | "medium" | "semibold" | "bold" | "extrabold" | "brutalist";
 
 const FONT_MAP: Record<FontVariant, string> = {
   extraLight: "Assistant-ExtraLight",
