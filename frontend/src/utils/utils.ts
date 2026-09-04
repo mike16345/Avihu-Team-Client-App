@@ -6,6 +6,7 @@ import {
 } from "@/constants/Constants";
 import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
 import Constants from "expo-constants";
+import { encodeCloudFrontPath } from "./imageUrls";
 export { isHtmlEmpty } from "./htmlUtils";
 
 export const testEmail = (email: string) => {
@@ -101,7 +102,7 @@ export const buildPhotoUrl = (url: string) => {
     ? process.env.EXPO_PUBLIC_CLOUDFRONT_URL
     : Constants?.expoConfig?.extra?.CLOUDFRONT_URL;
 
-  return `${cloudfrontUrl}/images/${url}`;
+  return `${cloudfrontUrl}/images/${encodeCloudFrontPath(url)}`;
 };
 
 const stripTime = (dateParam: Date) => {
