@@ -1,5 +1,5 @@
 import { semanticColors } from "@/themes/semanticColors";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/Text";
 import useFoodCatalogSearchQuery from "@/hooks/queries/useFoodCatalogSearchQuery";
 import type { FoodCatalogProduct } from "@/interfaces/IFoodCatalog";
+import useStyles from "@/styles/useGlobalStyles";
 import {
   BarcodeIcon,
   DIET_V2_CARD_BORDER,
@@ -27,6 +28,7 @@ import {
 } from "./dietV2Icons";
 import FoodCatalogSearchRow from "./FoodCatalogSearchRow";
 import {
+  getFoodCatalogSearchPresentation,
   normalizeFoodCatalogSearchQuery,
   shouldRequestFoodCatalogSearch,
 } from "./foodCatalogSearch";
@@ -47,18 +49,25 @@ const FoodCatalogSearchModal = ({
   onScan,
 }: FoodCatalogSearchModalProps) => {
   const insets = useSafeAreaInsets();
+  const { layout } = useStyles();
+  const searchInputRef = useRef<TextInput>(null);
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
   useEffect(() => {
+    if (!visible) return;
+    const normalizedQuery = normalizeFoodCatalogSearchQuery(query);
+    if (normalizedQuery === debouncedQuery) return;
+
     const timer = setTimeout(() => {
-      setDebouncedQuery(normalizeFoodCatalogSearchQuery(query));
+      setDebouncedQuery(normalizedQuery);
     }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [query]);
+  }, [debouncedQuery, query, visible]);
 
   useEffect(() => {
     if (visible) return;
+    searchInputRef.current?.clear();
     setQuery("");
     setDebouncedQuery("");
   }, [visible]);
@@ -66,15 +75,20 @@ const FoodCatalogSearchModal = ({
   const normalizedQuery = normalizeFoodCatalogSearchQuery(query);
   const queryIsValid = shouldRequestFoodCatalogSearch(normalizedQuery);
   const queryIsSettling = normalizedQuery !== debouncedQuery;
-  const search = useFoodCatalogSearchQuery(debouncedQuery, queryIsValid && !queryIsSettling);
+  const search = useFoodCatalogSearchQuery(
+    debouncedQuery,
+    visible && queryIsValid && !queryIsSettling
+  );
 
   const products = search.data?.products ?? [];
-  const hasQuery = normalizedQuery.length > 0;
-  const showTooShort = hasQuery && !queryIsValid;
-  const showLoading = !showTooShort && (queryIsSettling || search.isLoading);
-  const showError = !showLoading && search.isError;
-  const showEmpty = !showLoading && !showError && queryIsValid && products.length === 0;
-  const showProducts = !showLoading && !showError && products.length > 0;
+  const presentation = getFoodCatalogSearchPresentation({
+    inputQuery: query,
+    requestedQuery: debouncedQuery,
+    productCount: products.length,
+    isLoading: search.isLoading,
+    isFetching: search.isFetching,
+    isError: search.isError,
+  });
 
   const close = () => {
     Keyboard.dismiss();
@@ -87,14 +101,20 @@ const FoodCatalogSearchModal = ({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={close}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      onRequestClose={close}
+      onShow={() => searchInputRef.current?.focus()}
+    >
       <View
         style={[
+          layout.flex1,
           styles.container,
           { paddingTop: Math.max(insets.top, 12), paddingBottom: Math.max(insets.bottom, 12) },
         ]}
       >
-        <View style={styles.headerBar}>
+        <View style={[layout.flexRow, layout.itemsCenter, styles.headerBar]}>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="סגור חיפוש"
@@ -116,19 +136,20 @@ const FoodCatalogSearchModal = ({
           </View>
         </View>
 
-        <View style={styles.searchWrap}>
+        <View style={[layout.flexRow, layout.itemsCenter, styles.searchWrap]}>
           <View style={styles.searchIcon}>
             <SearchIcon size={17} color={DIET_V2_MUTED} />
           </View>
           <TextInput
-            value={query}
+            ref={searchInputRef}
+            defaultValue=""
             onChangeText={setQuery}
             placeholder="חפש מוצר או מותג..."
             placeholderTextColor={DIET_V2_MUTED}
             returnKeyType="search"
             autoCorrect={false}
-            autoFocus={visible}
-            style={styles.searchInput}
+            spellCheck={false}
+            style={[layout.flex1, styles.searchInput]}
           />
         </View>
 
@@ -137,14 +158,17 @@ const FoodCatalogSearchModal = ({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.sectionHeader}>
-            {!hasQuery ? <FlameIcon size={17} color={DIET_V2_GREEN} /> : null}
+          <View style={[layout.flexRow, layout.itemsCenter, styles.sectionHeader]}>
+            {!presentation.hasQuery ? <FlameIcon size={17} color={DIET_V2_GREEN} /> : null}
+            {presentation.showRefreshing ? (
+              <ActivityIndicator size="small" color={DIET_V2_GREEN} />
+            ) : null}
             <Text fontVariant="bold" fontSize={15} style={styles.sectionTitle}>
-              {hasQuery ? "תוצאות חיפוש" : "מוצרים פופולריים"}
+              {presentation.hasQuery ? "תוצאות חיפוש" : "מוצרים פופולריים"}
             </Text>
           </View>
 
-          {showTooShort ? (
+          {presentation.showTooShort ? (
             <Animated.View entering={FadeIn.duration(150)} style={styles.messageCard}>
               <Text fontSize={13} style={styles.messageText}>
                 הקלד לפחות שני תווים כדי לחפש.
@@ -152,7 +176,7 @@ const FoodCatalogSearchModal = ({
             </Animated.View>
           ) : null}
 
-          {showLoading ? (
+          {presentation.showLoading ? (
             <View style={styles.loadingWrap}>
               <ActivityIndicator size="small" color={DIET_V2_GREEN} />
               <Text fontSize={12} style={styles.messageText}>
@@ -161,7 +185,7 @@ const FoodCatalogSearchModal = ({
             </View>
           ) : null}
 
-          {showError ? (
+          {presentation.showError ? (
             <Animated.View entering={FadeIn.duration(150)} style={styles.messageCard}>
               <Text fontVariant="semibold" fontSize={13} style={styles.errorText}>
                 לא הצלחנו לחפש כרגע. בדוק את החיבור ונסה שוב.
@@ -174,7 +198,7 @@ const FoodCatalogSearchModal = ({
             </Animated.View>
           ) : null}
 
-          {showEmpty ? (
+          {presentation.showEmpty ? (
             <Animated.View entering={FadeIn.duration(170)} style={styles.emptyCard}>
               <View style={styles.emptyIcon}>
                 <BarcodeIcon size={27} color={DIET_V2_GREEN} />
@@ -192,15 +216,17 @@ const FoodCatalogSearchModal = ({
                 }}
                 style={styles.scanButton}
               >
-                <BarcodeIcon size={16} color={semanticColors.app.surfaceRaised} />
-                <Text fontVariant="semibold" fontSize={13} style={styles.scanButtonLabel}>
-                  סריקת ברקוד
-                </Text>
+                <View style={[layout.flexRow, layout.itemsCenter, styles.scanButtonContent]}>
+                  <BarcodeIcon size={16} color={semanticColors.app.surfaceRaised} />
+                  <Text fontVariant="semibold" fontSize={13} style={styles.scanButtonLabel}>
+                    סריקת ברקוד
+                  </Text>
+                </View>
               </Pressable>
             </Animated.View>
           ) : null}
 
-          {showProducts ? (
+          {presentation.showProducts ? (
             <View style={styles.resultsWrap}>
               {products.map((product, index) => (
                 <FoodCatalogSearchRow
@@ -219,11 +245,9 @@ const FoodCatalogSearchModal = ({
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: semanticColors.surfaceSubtle },
+  container: { backgroundColor: semanticColors.surfaceSubtle },
   headerBar: {
     minHeight: 58,
-    flexDirection: "row",
-    alignItems: "center",
     paddingHorizontal: 16,
     gap: 10,
   },
@@ -242,9 +266,7 @@ const styles = StyleSheet.create({
   headerTitle: { color: DIET_V2_DARK },
   headerSubtitle: { color: DIET_V2_MUTED },
   searchWrap: {
-    minHeight: 48,
-    flexDirection: "row",
-    alignItems: "center",
+    height: 48,
     marginHorizontal: 16,
     marginTop: 6,
     paddingHorizontal: 12,
@@ -256,7 +278,9 @@ const styles = StyleSheet.create({
   },
   searchIcon: { width: 20, alignItems: "center" },
   searchInput: {
-    paddingVertical: 10,
+    minWidth: 0,
+    height: "100%",
+    paddingVertical: 0,
     color: DIET_V2_DARK,
     fontFamily: "Assistant-Regular",
     fontSize: 14,
@@ -309,15 +333,13 @@ const styles = StyleSheet.create({
   emptyDescription: { color: DIET_V2_MUTED, textAlign: "center", lineHeight: 19 },
   scanButton: {
     minHeight: 40,
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
-    gap: 7,
     marginTop: 4,
     paddingHorizontal: 20,
     borderRadius: 999,
     backgroundColor: DIET_V2_GREEN,
   },
+  scanButtonContent: { gap: 7 },
   scanButtonLabel: { color: semanticColors.app.surfaceRaised },
 });
 

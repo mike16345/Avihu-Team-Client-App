@@ -91,6 +91,11 @@
 - Theme tokens are centralized in `frontend/src/themes/useAppTheme.tsx`; repeated color or typography values should be added to the theme/style layer before being duplicated across multiple screens.
 - Application colors must resolve through the strict semantic tenant theme; run `npm run theme:audit` after editing visual color values. Preserve Avihu appearance by updating its semantic mapping when an intentional palette is added.
 - Motion and interaction feedback are part of the existing UI vocabulary through `react-native-reanimated` animations and haptic helper utilities.
+- Treat `Pressable` as the interaction boundary, not the layout container, when an action contains
+  multiple children or platform-sensitive text/flex layout. Put those children in an inner `View`
+  and apply row, alignment, spacing, and padding styles to that `View`; keep pressed-state,
+  accessibility, hit slop, borders, and background behavior on the `Pressable` so iOS and Android
+  render the content consistently.
 - Prefer style arrays led by shared style hooks and theme tokens. Add a local
   `StyleSheet.create(...)` only for the remaining component-specific details, and keep anonymous
   inline style objects for genuinely dynamic one-off values such as animated styles, measured
