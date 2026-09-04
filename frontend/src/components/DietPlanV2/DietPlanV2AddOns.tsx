@@ -34,7 +34,7 @@ const DietPlanV2AddOns = ({ addOns, consumed, disabled, onToggle }: DietPlanV2Ad
     >
       <View style={styles.headerRow}>
         <Text fontVariant="bold" fontSize={15} style={styles.heading}>
-          תוספות
+          תוספים
         </Text>
         <DietPlanV2ConsumedBadge consumed={consumed} />
       </View>

@@ -15,12 +15,14 @@ interface AdditionalDietItemsModalProps {
   foodGroup: FoodGroup;
   name: string;
   servingSize: number;
+  preferredUnitIndex?: 0 | 1;
 }
 
 const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({
   name,
   foodGroup,
   servingSize,
+  preferredUnitIndex,
 }) => {
   const { colors, layout, common, spacing } = useStyles();
   const { data = [], isLoading } = useFoodGroupQuery(foodGroup);
@@ -74,7 +76,16 @@ const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({
             {data.map((item, i) => {
               return (
                 <Text key={item?._id || i} style={[layout.alignSelfStart]} fontVariant="semibold">
-                  {formatServingText(item.name, item.oneServing, servingSize, 2, [], " | ")}
+                  {formatServingText(
+                    item.name,
+                    item.oneServing,
+                    servingSize,
+                    2,
+                    [],
+                    " | ",
+                    false,
+                    preferredUnitIndex
+                  )}
                 </Text>
               );
             })}

@@ -42,7 +42,7 @@ const DietPlanV2MealCard = ({
   onToggleRow,
   onToggleMeal,
 }: DietPlanV2MealCardProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(index !== 0);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const selectedRows = new Set(completion?.selectedRows ?? []);
   const allConsumed = completion?.completed ?? false;
