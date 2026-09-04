@@ -8,7 +8,6 @@ import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
 import Constants from "expo-constants";
 export { isHtmlEmpty } from "./htmlUtils";
 import { encodeCloudFrontPath } from "./imageUrls";
-export { isHtmlEmpty } from "./htmlUtils";
 
 export const testEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
