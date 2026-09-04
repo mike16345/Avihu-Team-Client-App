@@ -1,9 +1,74 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { resolveAction } from "../actions";
+import packageJson from "../../../package.json";
+import { avihuTenant } from "../../../config/tenants/avihu";
+import { assertTenantActionAllowed, resolveAction } from "../actions";
 
 describe("resolveAction", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
+  });
+
+  it("blocks release operations for ignored local tenants", () => {
+    const localTenant = { ...avihuTenant, id: "test-tenant", kind: "local" as const };
+    expect(() =>
+      assertTenantActionAllowed(localTenant, {
+        action: "build",
+        platform: "ios",
+        tenantId: localTenant.id,
+        environment: "production",
+        profile: "production",
+      })
+    ).toThrow('Local tenant "test-tenant" cannot run build actions');
+    expect(() =>
+      assertTenantActionAllowed(localTenant, {
+        action: "preflight",
+        mode: "release",
+        tenantId: localTenant.id,
+        environment: "production",
+      })
+    ).toThrow(/release preflight/u);
+    expect(() =>
+      assertTenantActionAllowed(localTenant, {
+        action: "start",
+        tenantId: localTenant.id,
+        environment: "development",
+      })
+    ).not.toThrow();
+  });
+
+  it("blocks EAS actions for repository tenants whose setup is pending", () => {
+    const pendingTenant = { ...avihuTenant, id: "new-tenant", eas: { status: "pending" as const } };
+    expect(() =>
+      assertTenantActionAllowed(pendingTenant, {
+        action: "update",
+        tenantId: pendingTenant.id,
+        environment: "production",
+      })
+    ).toThrow(/tenant:eas -- --tenant new-tenant/u);
+  });
+
+  it("starts Metro with the selected tenant development-client scheme", () => {
+    expect(
+      resolveAction({
+        action: "start",
+        tenantId: "avihu",
+        environment: "development",
+      })
+    ).toMatchObject({
+      command: "npx",
+      args: ["expo", "start", "-c", "--dev-client", "--scheme", "exp+avihu-team"],
+      env: {
+        APP_TENANT: "avihu",
+        APP_ENV: "development",
+      },
+    });
+  });
+
+  it("routes every legacy update alias through guarded app control", () => {
+    expect(packageJson.scripts["update:prod"]).toMatch(/^npm run app -- update /u);
+    expect(packageJson.scripts["update:preview"]).toMatch(/^npm run app -- update /u);
+    expect(packageJson.scripts["update:prod"]).not.toContain("eas update");
+    expect(packageJson.scripts["update:preview"]).not.toContain("eas update");
   });
 
   it("runs local Android builds with the configured Java 17 toolchain", () => {
@@ -126,7 +191,7 @@ describe("resolveAction", () => {
       command: "npx",
       args: [
         "--yes",
-        "eas-cli@16.27.0",
+        "eas-cli@22.4.0",
         "build",
         "--platform",
         "android",
@@ -144,6 +209,68 @@ describe("resolveAction", () => {
           APP_TENANT: "avihu",
           APP_ENV: "production",
         },
+      },
+    });
+  });
+
+  it("runs build preflight locally without registering an EAS post-install hook", () => {
+    expect(packageJson.scripts).not.toHaveProperty("eas-build-post-install");
+    expect(
+      resolveAction({
+        action: "build",
+        platform: "ios",
+        tenantId: "avihu",
+        environment: "development",
+        profile: "development",
+      }).prerequisite
+    ).toMatchObject({
+      command: "npm",
+      args: ["run", "preflight:eas"],
+    });
+  });
+
+  it.each([
+    ["development", "ios", "build:ios:dev"],
+    ["preview", "android", "build:android:preview"],
+    ["production", "ios", "build:ios:prod"],
+  ] as const)(
+    "routes an interactive %s %s build through npm run %s",
+    (profile, platform, script) => {
+      expect(
+        resolveAction({
+          action: "build",
+          tenantId: "avihu",
+          environment: profile,
+          profile,
+          platform,
+          usePackageScript: true,
+        })
+      ).toMatchObject({
+        command: "npm",
+        args: ["run", script, "--", "--tenant", "avihu"],
+        env: {
+          APP_TENANT: "avihu",
+          APP_ENV: profile,
+        },
+      });
+    }
+  );
+
+  it("runs tenant preflight before publishing an Avihu update", () => {
+    expect(
+      resolveAction({
+        action: "update",
+        tenantId: "avihu",
+        environment: "production",
+      })
+    ).toMatchObject({
+      command: "npx",
+      args: expect.arrayContaining(["eas-cli@22.4.0", "update"]),
+      env: { APP_TENANT: "avihu", APP_ENV: "production" },
+      prerequisite: {
+        command: "npm",
+        args: ["run", "preflight"],
+        env: { APP_TENANT: "avihu", APP_ENV: "production" },
       },
     });
   });
@@ -167,6 +294,9 @@ describe("resolveAction", () => {
   });
 
   it("maps release preflight directly to the shared package script", () => {
+    vi.stubEnv("APP_ANDROID_JAVA_HOME", "/toolchains/java-17");
+    vi.stubEnv("PATH", "/usr/local/bin:/usr/bin");
+
     expect(
       resolveAction({
         action: "preflight",
@@ -180,6 +310,8 @@ describe("resolveAction", () => {
       env: {
         APP_TENANT: "avihu",
         APP_ENV: "production",
+        JAVA_HOME: "/toolchains/java-17",
+        PATH: "/toolchains/java-17/bin:/usr/local/bin:/usr/bin",
       },
     });
   });

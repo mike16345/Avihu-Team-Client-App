@@ -1,4 +1,6 @@
-import type { TenantConfig } from "./types";
+import type { TenantConfig } from "../types";
+import { featureDefaults, nativeCapabilities } from "./features.ts";
+import { tenantTheme } from "./theme.ts";
 
 const CAMERA_PERMISSION =
   "אפשר ל-$(PRODUCT_NAME) להשתמש במצלמה כדי לסרוק ברקודים ולצלם תמונות באפליקציה.";
@@ -12,13 +14,17 @@ const REQUIRED_PUBLIC_ENVIRONMENT_VARIABLES = [
 ];
 
 export const avihuTenant = {
+  kind: "repository",
   id: "avihu",
   displayName: "Elevate Coach",
   slug: "avihu-team",
-  owner: "avihuteam",
   version: "2.4.0",
-  projectId: "bbbbb60d-eb47-48fb-a278-517aba8dcea2",
-  updateUrl: "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2",
+  eas: {
+    status: "linked",
+    owner: "avihuteam",
+    projectId: "bbbbb60d-eb47-48fb-a278-517aba8dcea2",
+    updateUrl: "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2",
+  },
   runtimeVersion: { policy: "appVersion" },
   orientation: "portrait",
   platforms: ["ios", "android"],
@@ -39,6 +45,7 @@ export const avihuTenant = {
     primaryColor: "#000000",
     backgroundColor: "#FFFFFF",
   },
+  theme: tenantTheme,
   permissions: {
     camera: CAMERA_PERMISSION,
     photos: "The app accesses your photos to let you share them with your friends.",
@@ -57,10 +64,12 @@ export const avihuTenant = {
     enableProguardInReleaseBuilds: true,
     enableShrinkResourcesInReleaseBuilds: true,
   },
-  featureFlags: {
+  localization: {
     supportsRtl: true,
     forcesRtl: true,
   },
+  featureDefaults,
+  nativeCapabilities,
   requiredEnvironmentVariables: {
     development: REQUIRED_PUBLIC_ENVIRONMENT_VARIABLES,
     preview: [...REQUIRED_PUBLIC_ENVIRONMENT_VARIABLES, "EXPO_PUBLIC_API_URL_PREVIEW"],

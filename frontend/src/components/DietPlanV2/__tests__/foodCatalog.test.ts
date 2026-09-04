@@ -18,6 +18,7 @@ import {
   reconcileSmartFoodEntries,
 } from "../smartFoodStorage";
 import {
+  getFoodCatalogSearchPresentation,
   normalizeFoodCatalogSearchQuery,
   shouldRequestFoodCatalogSearch,
 } from "../foodCatalogSearch";
@@ -118,6 +119,60 @@ describe("Food Catalog recording", () => {
     expect(shouldRequestFoodCatalogSearch("")).toBe(true);
     expect(shouldRequestFoodCatalogSearch("ח")).toBe(false);
     expect(shouldRequestFoodCatalogSearch("חז")).toBe(true);
+  });
+
+  it("does not restart search presentation for whitespace-only edits", () => {
+    expect(
+      getFoodCatalogSearchPresentation({
+        inputQuery: "חזה עוף ",
+        requestedQuery: "חזה עוף",
+        productCount: 2,
+        isLoading: false,
+        isFetching: false,
+        isError: false,
+      })
+    ).toMatchObject({
+      isSettling: false,
+      showLoading: false,
+      showProducts: true,
+      showRefreshing: false,
+    });
+  });
+
+  it("keeps existing products visible while the next search settles", () => {
+    expect(
+      getFoodCatalogSearchPresentation({
+        inputQuery: "יוגורט טבעי",
+        requestedQuery: "יוגורט",
+        productCount: 3,
+        isLoading: false,
+        isFetching: false,
+        isError: false,
+      })
+    ).toMatchObject({
+      isSettling: true,
+      showLoading: false,
+      showProducts: true,
+      showRefreshing: true,
+    });
+  });
+
+  it("blocks results for a one-character search", () => {
+    expect(
+      getFoodCatalogSearchPresentation({
+        inputQuery: "ח",
+        requestedQuery: "",
+        productCount: 3,
+        isLoading: false,
+        isFetching: false,
+        isError: false,
+      })
+    ).toMatchObject({
+      showTooShort: true,
+      showLoading: false,
+      showProducts: false,
+      showRefreshing: false,
+    });
   });
   it("prefills exactly one serving from the normalized catalog response", () => {
     expect(createFoodCatalogDraft(product)).toEqual({

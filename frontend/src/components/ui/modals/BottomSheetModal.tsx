@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { BOTTOM_BAR_HEIGHT, IS_IOS, TOP_BAR_HEIGHT } from "@/constants/Constants";
 import useBackHandler from "@/hooks/useBackHandler";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
@@ -206,15 +207,15 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "black",
+    backgroundColor: semanticColors.scrim,
   },
   sheet: {
     position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "white",
-    shadowColor: "#000",
+    backgroundColor: semanticColors.app.surfaceRaised,
+    shadowColor: semanticColors.scrim,
     shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 8,
@@ -223,7 +224,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 0.5,
-    borderColor: "#E2E2E2",
+    borderColor: semanticColors.app.borderControl,
   },
   defaultHandle: {
     paddingVertical: 6,
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 5,
     borderRadius: 3,
-    backgroundColor: "#C8C8C8",
+    backgroundColor: semanticColors.app.borderHandle,
   },
   content: {
     flex: 1,

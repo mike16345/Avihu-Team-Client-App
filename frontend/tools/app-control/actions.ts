@@ -1,9 +1,35 @@
 import { existsSync } from "node:fs";
 import { delimiter, join } from "node:path";
 import { getTenant } from "../../config/tenants/registry";
+import { assertTenantEasActionAllowed } from "../../config/tenants/schema";
 import type { AppSelection, CommandSpec, CommandStep } from "./types";
+import { EAS_CLI_ARGS } from "../eas/constants";
+import { getBuildPackageScript } from "./buildScripts";
 
-export const EAS_CLI_ARGS = ["--yes", "eas-cli@16.27.0"] as const;
+export { EAS_CLI_ARGS } from "../eas/constants";
+
+export const assertTenantActionAllowed = (
+  tenant: ReturnType<typeof getTenant>,
+  selection: AppSelection
+): void => {
+  if (selection.action === "build" || selection.action === "update") {
+    assertTenantEasActionAllowed(tenant, `${selection.action} actions`);
+  }
+
+  if (tenant.kind !== "local") return;
+
+  const forbidden =
+    selection.action === "build" ||
+    selection.action === "update" ||
+    (selection.action === "preflight" && selection.mode === "release") ||
+    (selection.action === "run" && selection.environment !== "development");
+
+  if (forbidden) {
+    const action =
+      selection.action === "preflight" ? "release preflight" : `${selection.action} actions`;
+    throw new Error(`Local tenant "${tenant.id}" cannot run ${action}`);
+  }
+};
 
 const findAndroidJavaHome = (): string => {
   const override = process.env.APP_ANDROID_JAVA_HOME?.trim();
@@ -94,11 +120,17 @@ const withAndroidDevicePreparation = (
 
 export const resolveAction = (selection: AppSelection): CommandSpec => {
   const tenant = getTenant(selection.tenantId);
+  assertTenantActionAllowed(tenant, selection);
   const labelPrefix = `${tenant.displayName} (${selection.environment})`;
 
   switch (selection.action) {
     case "start":
-      return createCommandSpec(selection, "npx", ["expo", "start", "-c"], `Start ${labelPrefix}`);
+      return createCommandSpec(
+        selection,
+        "npx",
+        ["expo", "start", "-c", "--dev-client", "--scheme", `exp+${tenant.slug}`],
+        `Start ${labelPrefix}`
+      );
     case "run": {
       const isRelease = selection.environment !== "development";
       const buildArguments =
@@ -148,7 +180,10 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         selection,
         "npm",
         ["run", selection.mode === "release" ? "preflight:release" : "preflight"],
-        `${selection.mode === "release" ? "Release" : "Fast"} preflight for ${labelPrefix}`
+        `${selection.mode === "release" ? "Release" : "Fast"} preflight for ${labelPrefix}`,
+        selection.mode === "release" && tenant.platforms.includes("android")
+          ? getAndroidJavaEnvironment()
+          : {}
       );
     case "assets":
       return createCommandSpec(
@@ -158,6 +193,21 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         `${selection.operation === "generate" ? "Generate" : "Audit"} assets for ${labelPrefix}`
       );
     case "build": {
+      if (selection.usePackageScript) {
+        return createCommandSpec(
+          selection,
+          "npm",
+          [
+            "run",
+            getBuildPackageScript(selection.platform, selection.profile),
+            "--",
+            "--tenant",
+            selection.tenantId,
+          ],
+          `Build ${labelPrefix} for ${selection.platform}`
+        );
+      }
+
       const build = createCommandSpec(
         selection,
         "npx",
@@ -181,8 +231,8 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         ),
       };
     }
-    case "update":
-      return createCommandSpec(
+    case "update": {
+      const update = createCommandSpec(
         selection,
         "npx",
         [
@@ -197,5 +247,15 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         ],
         `Publish update for ${labelPrefix}`
       );
+      return {
+        ...update,
+        prerequisite: createCommandStep(
+          selection,
+          "npm",
+          ["run", "preflight"],
+          `Fast preflight for ${labelPrefix}`
+        ),
+      };
+    }
   }
 };

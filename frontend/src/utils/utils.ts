@@ -7,6 +7,8 @@ import {
 import { DietItemUnit, IMeal, IServingItem } from "@/interfaces/DietPlan";
 import Constants from "expo-constants";
 export { isHtmlEmpty } from "./htmlUtils";
+import { encodeCloudFrontPath } from "./imageUrls";
+export { isHtmlEmpty } from "./htmlUtils";
 
 export const testEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -101,7 +103,7 @@ export const buildPhotoUrl = (url: string) => {
     ? process.env.EXPO_PUBLIC_CLOUDFRONT_URL
     : Constants?.expoConfig?.extra?.CLOUDFRONT_URL;
 
-  return `${cloudfrontUrl}/images/${url}`;
+  return `${cloudfrontUrl}/images/${encodeCloudFrontPath(url)}`;
 };
 
 const stripTime = (dateParam: Date) => {

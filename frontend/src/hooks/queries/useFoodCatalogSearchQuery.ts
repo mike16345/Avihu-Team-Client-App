@@ -19,6 +19,7 @@ const useFoodCatalogSearchQuery = (query: string, enabled = true) => {
     staleTime: TEN_MINUTES,
     gcTime: ONE_HOUR,
     retry: 1,
+    placeholderData: (previousData) => previousData,
   });
 };
 

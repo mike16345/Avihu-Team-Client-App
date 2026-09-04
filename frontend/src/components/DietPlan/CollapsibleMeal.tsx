@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { FC, useEffect, useMemo, useRef, useState, Fragment } from "react";
 import Collapsible from "../ui/Collapsible";
 import { IDietItem, IMeal } from "@/interfaces/DietPlan";
@@ -239,15 +240,15 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
 
 const styles = StyleSheet.create({
   mealCard: {
-    backgroundColor: "#F7F8F9",
+    backgroundColor: semanticColors.app.surfaceWarm,
   },
   categoryDivider: {
     height: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    backgroundColor: semanticColors.app.shadowMedium,
     marginVertical: 8,
   },
   blockedHint: {
-    color: "#0F5E3B",
+    color: semanticColors.app.brandStrong,
     textAlign: "center",
     marginBottom: 16,
     paddingHorizontal: 6,

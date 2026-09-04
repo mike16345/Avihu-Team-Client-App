@@ -1,6 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { ASSET_OUTPUT_FILES, type AssetOutputName } from "./types";
+import { getTenant } from "../../config/tenants/registry";
 
 const DEFAULT_ASSETS_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -29,8 +30,15 @@ export const getTenantAssetPaths = (
     throw new Error(`Invalid tenant ID "${tenantId}"`);
   }
 
-  const assetsRoot = getTenantAssetsRoot();
-  const tenantDirectory = path.join(assetsRoot, tenantId);
+  const overriddenRoot = process.env.TENANT_ASSETS_ROOT;
+  const declaredIcon = getTenant(tenantId).assets.icon;
+  const declaredTenantDirectory = path.dirname(
+    path.dirname(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..", declaredIcon))
+  );
+  const tenantDirectory = overriddenRoot
+    ? path.join(path.resolve(overriddenRoot), tenantId)
+    : declaredTenantDirectory;
+  const assetsRoot = path.dirname(tenantDirectory);
   const resolvedGeneratedDirectory = generatedDirectory ?? path.join(tenantDirectory, "generated");
   const outputs = Object.fromEntries(
     Object.entries(ASSET_OUTPUT_FILES).map(([name, relativePath]) => [

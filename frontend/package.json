@@ -7,10 +7,12 @@
     "assets:generate": "tsx tools/assets/cli.ts generate",
     "assets:check": "tsx tools/assets/cli.ts check",
     "assets:audit": "tsx tools/assets/cli.ts audit",
+    "theme:audit": "tsx tools/theme/colorAudit.ts --paths src",
+    "tenant:add": "tsx tools/tenant-add/cli.ts",
+    "tenant:eas": "tsx tools/tenant-eas/cli.ts",
     "preflight": "tsx tools/preflight/cli.ts fast",
     "preflight:release": "tsx tools/preflight/cli.ts release",
     "preflight:eas": "tsx tools/preflight/cli.ts eas --json .preflight/eas-report.json",
-    "eas-build-post-install": "npm run preflight:eas",
     "start": "expo start -c",
     "start-no-clear": "expo start",
     "android": "expo run:android",
@@ -28,8 +30,8 @@
     "build:ios:dev": "npm run app -- build ios --profile development --yes",
     "build:ios:preview": "npm run app -- build ios --profile preview --yes",
     "build:ios:prod": "npm run app -- build ios --profile production --yes",
-    "update:prod": "eas update --branch production --environment production --message",
-    "update:preview": "eas update --branch preview --environment preview --message"
+    "update:prod": "npm run app -- update --tenant avihu --environment production --yes",
+    "update:preview": "npm run app -- update --tenant avihu --environment preview --yes"
   },
   "expo": {
     "install": {
@@ -120,6 +122,7 @@
     "@babel/core": "^7.20.0",
     "@clack/prompts": "1.7.0",
     "@expo/config": "~11.0.13",
+    "@expo/env": "^1.0.7",
     "@types/react": "~19.0.10",
     "dotenv-cli": "^7.4.4",
     "fast-glob": "3.3.3",

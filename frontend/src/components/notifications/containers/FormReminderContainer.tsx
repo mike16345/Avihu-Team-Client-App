@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Text } from "@/components/ui/Text";
@@ -45,7 +46,11 @@ const FormReminderContainer: React.FC<FormReminderContainerProps> = ({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleDismiss}>
-              <Text fontSize={14} fontVariant="semibold" style={{ color: "grey" }}>
+              <Text
+                fontSize={14}
+                fontVariant="semibold"
+                style={{ color: semanticColors.app.neutralGray }}
+              >
                 התעלם
               </Text>
             </TouchableOpacity>

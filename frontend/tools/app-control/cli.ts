@@ -1,4 +1,5 @@
 import { resolveAction } from "./actions";
+import { renderError } from "../cli-ui/render";
 import { parseAppArguments } from "./arguments";
 import { formatDryRun } from "./dryRun";
 import { runCommand } from "./processRunner";
@@ -106,7 +107,7 @@ const main = async (): Promise<number> => {
     return runCommand(spec);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to run app control";
-    console.error(`${message}\nRemediation: run npm run app with --tenant <tenant-id> and --yes.`);
+    console.error(renderError(message, "Run npm run app with --tenant <tenant-id> and --yes."));
     return 1;
   }
 };

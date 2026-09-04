@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { ScrollView, View, StyleSheet } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
@@ -38,10 +39,10 @@ const HighlightsTab = () => {
 const styles = StyleSheet.create({
   card: {
     alignSelf: "stretch",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: "rgba(15, 94, 59, 0.08)",
+    borderColor: semanticColors.diet.border,
     minHeight: 180,
     paddingVertical: 28,
     paddingHorizontal: 16,

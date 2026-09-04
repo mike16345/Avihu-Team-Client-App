@@ -16,7 +16,14 @@
 - Navigation is layered: `RootNavigator` handles bootstrap and session gating, then hands off to `AuthNavigator` or `AppNavigator`, while deeper flows are split into stack and tab navigators.
 - App-wide providers are composed at the application root in `frontend/App.tsx`; new global providers should be added there instead of being recreated inside feature screens.
 - Tenant records under `frontend/config/tenants` are the source of truth for public app identity, branding, permissions, supported platforms, release properties, and required environment-variable names. Runtime code consumes only the validated public snapshot in `extra.tenant`; secret values never belong in tenant TypeScript files or Expo `extra`.
+- Tenant theme colors, JavaScript feature defaults, and native capabilities are distinct contracts. Future entitlement sources may override validated JavaScript defaults, but they must never enable native functionality absent from the selected binary.
+- Author tenant themes through versioned presets or JSON recipes; expand them into the complete strict semantic runtime theme before publication.
+- Keep each tenant's identity/platform record in `index.ts`, semantic recipe in `theme.ts`, and JavaScript defaults plus native capabilities in `features.ts`.
+- EAS project initialization must run in an invocation-owned isolated workspace with explicit confirmation immediately before remote creation.
+- Tenants with pending EAS state may develop locally but cannot enter build, update, release, or EAS preflight actions.
+- Use `npm run tenant:add` for both repository tenants and ignored local test tenants. Local tenant modules and assets stay under the exact ignored `.local` roots and are prohibited from release preflight, build, update, and non-development native-run actions.
 - Local and automated app commands must select both `APP_TENANT` and `APP_ENV` explicitly. `frontend/tools/app-control` and the shared preflight suites own command resolution; feature code and package scripts must not invent parallel tenant-selection logic.
+- Repository-owned CLI output must use the shared `frontend/tools/cli-ui` presentation primitives. Keep successes compact, expand warning/failure details and remediation, preserve machine-readable formats, and keep `NO_COLOR`, CI, and redirected output readable.
 - Keep screens as orchestration layers. Screens should compose navigation params, hooks, stores, and domain components; large headers, toolbars, cards, empty states, modal bodies, action bars, and repeated view sections should move into feature components when they obscure the screen flow.
 - Prefer feature-local components, hooks, and helpers first when an extraction only serves one screen or flow. Promote to `frontend/src/components/ui`, shared hooks, or shared utilities only after reuse is real and the API is stable.
 - Preserve navigation boundaries. Navigator files should define route structure and screen wiring, not become the home for feature logic or data transformations.
@@ -32,7 +39,10 @@
 - Non-null assertions are used only after a guard has already made the value effectively required in that execution path.
 - Error handling is local and lightweight: functions typically catch errors to log them with `console.error` or `console.log`, and rethrow only when a caller still needs to decide the outcome.
 - User-facing text should use the shared `Text` component where possible so font mapping and RTL writing direction stay consistent.
-- Shared visual tokens should come from `useGlobalStyles()` and related style hooks; component-specific one-off values may still use inline style objects or a local `StyleSheet.create(...)`.
+- Use `useGlobalStyles()` and the related style hooks as the default source for layout,
+  spacing, typography, colors, and other shared visual rules. Create a local
+  `StyleSheet.create(...)` only for styles that are genuinely specific to that component and cannot
+  be composed cleanly from the shared hooks; do not recreate an available shared style locally.
 - Keep JSX declarative and easy to scan. Avoid nested ternaries in JSX; use explicit boolean renders for conditional sections and move label, icon, message, status, and style decisions into named helpers such as `getSaveLabel`, `getStatusTone`, or `getCardStyle`.
 - Use strict equality and explicit branches in new or edited code. Avoid boolean/object expressions such as `condition && object` when a named branch is clearer.
 - Prefer guard clauses over deeply nested `if` blocks, especially around loading, error, missing route params, missing user/session state, and permission gates.
@@ -71,13 +81,25 @@
 
 ## 7. UI/UX Conventions (if applicable)
 
-- The app is RTL-first: the root tree sets RTL direction, and the shared `Text` primitive applies `writingDirection: "rtl"`.
-- In RTL layouts, keep children in their intended right-to-left source order and rely on the root direction. Do not use `row-reverse` or force `textAlign: "right"`; omit alignment, or use `textAlign: "start"` only when explicit alignment is necessary.
+- Layout direction comes from the validated tenant localization contract. Avihu remains forced RTL; the root tree and shared `Text` primitive follow `I18nManager.isRTL` for tenants that support or require a different direction.
+- In RTL layouts, author row children in their intended right-to-left source order: the first
+  child is the rightmost item. Keep equivalent rows consistent across screens and rely on the root
+  direction. Do not use `row-reverse` or force `textAlign: "right"`; omit alignment, or use
+  `textAlign: "start"` only when explicit alignment is necessary.
 - Reusable UI primitives live in `frontend/src/components/ui`, while feature-specific UI is organized under `frontend/src/components/<Feature>`.
 - Shared styling is utility-like: `useGlobalStyles()` aggregates layout, spacing, text, and color style sheets so components compose style arrays from common tokens.
 - Theme tokens are centralized in `frontend/src/themes/useAppTheme.tsx`; repeated color or typography values should be added to the theme/style layer before being duplicated across multiple screens.
+- Application colors must resolve through the strict semantic tenant theme; run `npm run theme:audit` after editing visual color values. Preserve Avihu appearance by updating its semantic mapping when an intentional palette is added.
 - Motion and interaction feedback are part of the existing UI vocabulary through `react-native-reanimated` animations and haptic helper utilities.
-- Prefer style arrays composed from shared style hooks, theme tokens, and local `StyleSheet.create(...)` objects. Avoid large anonymous inline style objects in JSX except for genuinely dynamic one-off values such as animated styles, measured dimensions, or values derived from props.
+- Treat `Pressable` as the interaction boundary, not the layout container, when an action contains
+  multiple children or platform-sensitive text/flex layout. Put those children in an inner `View`
+  and apply row, alignment, spacing, and padding styles to that `View`; keep pressed-state,
+  accessibility, hit slop, borders, and background behavior on the `Pressable` so iOS and Android
+  render the content consistently.
+- Prefer style arrays led by shared style hooks and theme tokens. Add a local
+  `StyleSheet.create(...)` only for the remaining component-specific details, and keep anonymous
+  inline style objects for genuinely dynamic one-off values such as animated styles, measured
+  dimensions, or values derived from props.
 - When button, card, chip, empty-state, list-row, modal, or toolbar styles repeat inside a feature, extract a small feature-local component or style helper. If the pattern repeats across domains, formalize it as a shared UI primitive.
 - Keep platform differences explicit. Use React Native and Expo APIs for native behavior rather than web-only assumptions such as DOM APIs, CSS selectors, `className`, browser history, or window/document globals.
 - Respect safe-area, keyboard, and scroll behavior in mobile screens. Use the existing safe-area, keyboard-aware, modal, and scroll patterns before introducing a new layout approach.

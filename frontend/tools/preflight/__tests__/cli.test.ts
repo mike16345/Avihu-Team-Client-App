@@ -2,6 +2,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { runPreflightCli } from "../cli";
+import { assertPreflightAllowed } from "../cli";
+import { avihuTenant } from "../../../config/tenants/avihu";
 
 const projectRoot = path.resolve(import.meta.dirname, "../../..");
 const processEnv = {
@@ -13,6 +15,21 @@ const processEnv = {
 };
 
 describe("injectable preflight CLI", () => {
+  it("rejects direct release and EAS preflight for local tenants", () => {
+    const localTenant = { ...avihuTenant, kind: "local" as const, id: "test-tenant" };
+    expect(() => assertPreflightAllowed(localTenant, "release")).toThrow(/cannot run release/u);
+    expect(() => assertPreflightAllowed(localTenant, "eas")).toThrow(/cannot run eas/u);
+    expect(() => assertPreflightAllowed(localTenant, "fast")).not.toThrow();
+  });
+
+  it("rejects release preflight for pending repository tenants", () => {
+    const pendingTenant = { ...avihuTenant, id: "new-tenant", eas: { status: "pending" as const } };
+    expect(() => assertPreflightAllowed(pendingTenant, "release")).toThrow(
+      /tenant:eas -- --tenant new-tenant/u
+    );
+    expect(() => assertPreflightAllowed(pendingTenant, "fast")).not.toThrow();
+  });
+
   it("renders human and JSON from equivalent results and exit behavior", async () => {
     let human = "";
     let json = "";
@@ -51,8 +68,8 @@ describe("injectable preflight CLI", () => {
     };
     expect(humanExit).toBe(jsonExit);
     expect(report.exitCode).toBe(jsonExit);
-    expect(human).toContain(`PASS (${report.counts.pass})`);
-    expect(human).toContain(`WARN (${report.counts.warn})`);
-    expect(human).toContain(`FAIL (${report.counts.fail})`);
+    expect(human).toContain(
+      `└  ${report.counts.pass} passed · ${report.counts.warn} warning · ${report.counts.fail} failed`
+    );
   });
 });

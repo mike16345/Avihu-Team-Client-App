@@ -1,4 +1,10 @@
 import type { CommandSpec, CommandStep } from "./types";
+import {
+  renderDetailLines,
+  renderHeader,
+  renderStatusLine,
+  supportsDecoratedOutput,
+} from "../cli-ui/render";
 
 const formatCommand = (step: CommandStep): string => [step.command, ...step.args].join(" ");
 
@@ -8,12 +14,15 @@ const formatEnvironment = (step: CommandStep): string =>
 const getSteps = (spec: CommandSpec): CommandStep[] =>
   spec.prerequisite ? [spec.prerequisite, spec] : [spec];
 
-export const formatDryRun = (spec: CommandSpec): string => {
+export const formatDryRun = (spec: CommandSpec, decorated = supportsDecoratedOutput()): string => {
   const steps = getSteps(spec);
-  return steps
-    .map(
-      (step, index) =>
-        `Dry run ${index + 1}/${steps.length}: ${formatEnvironment(step)} ${formatCommand(step)}`
-    )
-    .join("\n");
+  return [
+    renderHeader("App control dry run", `${spec.env.APP_TENANT} · ${spec.env.APP_ENV}`, decorated),
+    ...steps.flatMap((step) => [
+      renderStatusLine("info", step.label, decorated),
+      renderDetailLines([`${formatEnvironment(step)} ${formatCommand(step)}`]),
+    ]),
+    "│",
+    `└  ${steps.length} ${steps.length === 1 ? "step" : "steps"} · no changes made`,
+  ].join("\n");
 };

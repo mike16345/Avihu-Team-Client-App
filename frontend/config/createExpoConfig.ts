@@ -1,4 +1,5 @@
 import type { ExpoConfig } from "@expo/config";
+import { isLinkedTenantEas } from "./tenants/schema";
 import type { TenantConfig, TenantEnvironment } from "./tenants/types";
 
 type ProcessEnvironment = Readonly<Record<string, string | undefined>>;
@@ -18,6 +19,65 @@ const getPublicRuntimeExtra = (processEnv: ProcessEnvironment) => ({
   DEV_MODE: processEnv.EXPO_PUBLIC_MODE,
 });
 
+export const createTenantPlugins = (tenant: TenantConfig): NonNullable<ExpoConfig["plugins"]> => {
+  const plugins: NonNullable<ExpoConfig["plugins"]> = [
+    [
+      "expo-localization",
+      {
+        supportsRTL: tenant.localization.supportsRtl,
+        forcesRTL: tenant.localization.forcesRtl,
+      },
+    ],
+    ["expo-build-properties", { android: tenant.androidBuildProperties }],
+    "./plugins/withFmtXcode26Fix",
+  ];
+  if (tenant.nativeCapabilities.backgroundTasks) plugins.push("expo-background-task");
+  if (tenant.nativeCapabilities.camera) {
+    plugins.push([
+      "expo-camera",
+      { cameraPermission: tenant.permissions.camera, recordAudioAndroid: false },
+    ]);
+    plugins.push("./plugins/withOptionalCameraFeature");
+  }
+  if (tenant.nativeCapabilities.photoLibrary) {
+    plugins.push([
+      "expo-image-picker",
+      {
+        cameraPermission: tenant.permissions.camera,
+        photosPermission: tenant.permissions.photos,
+      },
+    ]);
+  }
+  if (tenant.nativeCapabilities.notifications) {
+    plugins.push([
+      "expo-notifications",
+      {
+        icon: tenant.assets.notificationIcon,
+        color: tenant.assets.notificationColor,
+        defaultChannel: "default",
+        enableBackgroundRemoteNotifications: false,
+      },
+    ]);
+  }
+  if (tenant.nativeCapabilities.appleHealth) {
+    plugins.push([
+      "react-native-health",
+      {
+        isClinicalDataEnabled: false,
+        healthSharePermission: tenant.permissions.healthShare,
+        healthUpdatePermission: tenant.permissions.healthUpdate,
+      },
+    ]);
+  }
+  if (tenant.nativeCapabilities.healthConnect) {
+    plugins.push("expo-health-connect", "./plugins/withHealthConnectPermissionDelegate");
+  }
+  if (tenant.nativeCapabilities.liveActivities) {
+    plugins.push("./native-modules/live-steps-activity/plugin/withLiveStepsActivity");
+  }
+  return plugins;
+};
+
 export const createExpoConfig = ({
   baseConfig,
   tenant,
@@ -25,6 +85,8 @@ export const createExpoConfig = ({
   processEnv,
 }: CreateExpoConfigInput): ExpoConfig => {
   const identity = tenant.environments[environment];
+  const linkedEas = isLinkedTenantEas(tenant.eas) ? tenant.eas : null;
+  const ownerOverride = processEnv.EXPO_OWNER?.trim();
 
   return {
     ...baseConfig,
@@ -38,52 +100,7 @@ export const createExpoConfig = ({
       image: tenant.assets.splash,
       backgroundColor: tenant.assets.splashBackgroundColor,
     },
-    plugins: [
-      "expo-localization",
-      [
-        "expo-build-properties",
-        {
-          android: tenant.androidBuildProperties,
-        },
-      ],
-      "./plugins/withFmtXcode26Fix",
-      "expo-background-task",
-      [
-        "expo-camera",
-        {
-          cameraPermission: tenant.permissions.camera,
-          recordAudioAndroid: false,
-        },
-      ],
-      "./plugins/withOptionalCameraFeature",
-      [
-        "expo-image-picker",
-        {
-          cameraPermission: tenant.permissions.camera,
-          photosPermission: tenant.permissions.photos,
-        },
-      ],
-      [
-        "expo-notifications",
-        {
-          icon: tenant.assets.notificationIcon,
-          color: tenant.assets.notificationColor,
-          defaultChannel: "default",
-          enableBackgroundRemoteNotifications: false,
-        },
-      ],
-      [
-        "react-native-health",
-        {
-          isClinicalDataEnabled: false,
-          healthSharePermission: tenant.permissions.healthShare,
-          healthUpdatePermission: tenant.permissions.healthUpdate,
-        },
-      ],
-      "expo-health-connect",
-      "./plugins/withHealthConnectPermissionDelegate",
-      "./native-modules/live-steps-activity/plugin/withLiveStepsActivity",
-    ],
+    plugins: createTenantPlugins(tenant),
     scheme: identity.scheme,
     ios: {
       bundleIdentifier: identity.iosBundleIdentifier,
@@ -103,7 +120,7 @@ export const createExpoConfig = ({
         backgroundColor: tenant.assets.adaptiveIconBackgroundColor,
       },
       edgeToEdgeEnabled: true,
-      permissions: tenant.permissions.android,
+      permissions: tenant.nativeCapabilities.healthConnect ? tenant.permissions.android : [],
       softwareKeyboardLayoutMode: "resize",
       package: identity.androidPackage,
     },
@@ -111,27 +128,23 @@ export const createExpoConfig = ({
       backgroundColor: "#00000000",
     },
     extra: {
-      eas: {
-        projectId: tenant.projectId,
-      },
-      supportsRtl: tenant.featureFlags.supportsRtl,
-      forcesRTL: tenant.featureFlags.forcesRtl,
+      ...(linkedEas ? { eas: { projectId: linkedEas.projectId } } : {}),
       tenant: {
         id: tenant.id,
         displayName: tenant.displayName,
         environment,
         brand: tenant.brand,
-        featureFlags: tenant.featureFlags,
+        theme: tenant.theme,
+        localization: tenant.localization,
+        featureDefaults: tenant.featureDefaults,
+        nativeCapabilities: tenant.nativeCapabilities,
         showEnvironmentBadge: environment !== "production",
       },
       ...getPublicRuntimeExtra(processEnv),
     },
-    owner: tenant.owner,
+    ...(linkedEas ? { owner: ownerOverride || linkedEas.owner } : {}),
     runtimeVersion: tenant.version,
-    updates: {
-      enabled: true,
-      url: tenant.updateUrl,
-    },
+    ...(linkedEas ? { updates: { enabled: true, url: linkedEas.updateUrl } } : {}),
     sdkVersion: "53.0.0",
     platforms: tenant.platforms,
   };

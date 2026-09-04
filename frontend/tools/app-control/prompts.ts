@@ -12,12 +12,15 @@ import type {
   PreflightMode,
   ReleaseProfile,
 } from "./types";
+import { getBuildPackageScript } from "./buildScripts";
 
 const APP_AREAS = ["develop", "verify", "release", "assets"] as const;
 type AppArea = (typeof APP_AREAS)[number];
 const BACK = "__back__" as const;
 type Back = typeof BACK;
 const BACK_OPTION = { value: BACK, label: "← Back" } as const;
+const DEVELOPMENT_EAS_BUILD = "__development_eas_build__" as const;
+type ActionChoice = AppAction | typeof DEVELOPMENT_EAS_BUILD;
 
 const isPromptCancelled = <Value>(value: Value): value is Value & symbol => isCancel(value);
 const isBack = (value: unknown): value is Back => value === BACK;
@@ -42,6 +45,10 @@ const formatAction = (selection: AppSelection): string => {
 };
 
 const formatEquivalentCommand = (selection: AppSelection): string => {
+  if (selection.action === "build" && selection.usePackageScript) {
+    return `npm run ${getBuildPackageScript(selection.platform, selection.profile)} -- --tenant ${selection.tenantId}`;
+  }
+
   const parts = ["npm run app --", selection.action];
 
   if (
@@ -120,13 +127,13 @@ const chooseTenant = async (initialValue?: string): Promise<string | null> => {
   return isPromptCancelled(tenantId) ? null : tenantId;
 };
 
-const chooseArea = async (): Promise<AppArea | Back | null> => {
+const chooseArea = async (localOnly: boolean): Promise<AppArea | Back | null> => {
   const area = await select({
     message: "What do you want to do?",
     options: [
       { value: "develop" as const, label: "Develop & run" },
       { value: "verify" as const, label: "Verify app" },
-      { value: "release" as const, label: "Release app" },
+      ...(localOnly ? [] : [{ value: "release" as const, label: "Release app" }]),
       { value: "assets" as const, label: "Manage assets" },
       BACK_OPTION,
     ],
@@ -135,13 +142,16 @@ const chooseArea = async (): Promise<AppArea | Back | null> => {
   return isPromptCancelled(area) ? null : area;
 };
 
-const chooseAction = async (initialValue?: AppAction): Promise<AppAction | Back | null> => {
+const chooseAction = async (
+  localOnly: boolean,
+  initialValue?: AppAction
+): Promise<ActionChoice | Back | null> => {
   if (initialValue) {
     return initialValue;
   }
 
   while (true) {
-    const area = await chooseArea();
+    const area = await chooseArea(localOnly);
     if (!area || isBack(area)) {
       return area;
     }
@@ -161,6 +171,14 @@ const chooseAction = async (initialValue?: AppAction): Promise<AppAction | Back 
           ? [
               { value: "start" as const, label: "Start development server" },
               { value: "run" as const, label: "Build, install & launch" },
+              ...(localOnly
+                ? []
+                : [
+                    {
+                      value: DEVELOPMENT_EAS_BUILD,
+                      label: "Build development client with EAS",
+                    },
+                  ]),
               { value: "install" as const, label: "Install an existing build" },
               BACK_OPTION,
             ]
@@ -182,11 +200,14 @@ const chooseAction = async (initialValue?: AppAction): Promise<AppAction | Back 
 
 const chooseEnvironment = async (
   initialValue: TenantEnvironment | undefined,
-  releaseOnly: boolean
+  releaseOnly: boolean,
+  developmentOnly = false
 ): Promise<TenantEnvironment | Back | null> => {
-  const environments = releaseOnly
-    ? TENANT_ENVIRONMENTS.filter((environment) => environment !== "development")
-    : TENANT_ENVIRONMENTS;
+  const environments = developmentOnly
+    ? TENANT_ENVIRONMENTS.filter((environment) => environment === "development")
+    : releaseOnly
+      ? TENANT_ENVIRONMENTS.filter((environment) => environment !== "development")
+      : TENANT_ENVIRONMENTS;
   const environment = await select({
     message: releaseOnly ? "Select release environment" : "Select environment",
     options: [...environments.map((value) => ({ value, label: value })), BACK_OPTION],
@@ -280,7 +301,8 @@ export const promptForSelection = async (
       return null;
     }
 
-    const actionResult = actionOverride ?? (await chooseAction());
+    const localOnly = getTenant(tenantId).kind === "local";
+    const actionResult = actionOverride ?? (await chooseAction(localOnly));
     if (!actionResult) {
       cancel("Operation cancelled.");
       return null;
@@ -291,12 +313,16 @@ export const promptForSelection = async (
       continue;
     }
 
-    const action = actionResult;
+    const isDevelopmentEasBuild = actionResult === DEVELOPMENT_EAS_BUILD;
+    const action = isDevelopmentEasBuild ? "build" : actionResult;
     while (true) {
-      const environmentResult = await chooseEnvironment(
-        parsed.environment,
-        action === "build" || action === "update"
-      );
+      const environmentResult = isDevelopmentEasBuild
+        ? "development"
+        : await chooseEnvironment(
+            parsed.environment,
+            action === "build" || action === "update",
+            localOnly && action === "run"
+          );
       if (!environmentResult) {
         cancel("Operation cancelled.");
         return null;
@@ -353,7 +379,7 @@ export const promptForSelection = async (
         return null;
       }
       if (isBack(platform)) {
-        if (parsed.environment) {
+        if (isDevelopmentEasBuild || parsed.environment) {
           actionOverride = undefined;
           break;
         }
@@ -371,6 +397,7 @@ export const promptForSelection = async (
           platform,
           environment: environment as ReleaseProfile,
           profile: environment as ReleaseProfile,
+          usePackageScript: true,
         };
       }
 

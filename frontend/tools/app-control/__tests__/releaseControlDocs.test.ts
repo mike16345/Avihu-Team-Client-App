@@ -5,10 +5,10 @@ import { describe, expect, it } from "vitest";
 const releaseControl = readFileSync(path.join(process.cwd(), "docs", "release-control.md"), "utf8");
 
 describe("release-control operator commands", () => {
-  it("documents the pinned CLI's supported idempotent environment creation command", () => {
-    expect(releaseControl).toContain("eas-cli@16.27.0 env:create");
-    expect(releaseControl).toContain("--force");
-    expect(releaseControl).not.toContain("eas-cli@16.27.0 env:set");
+  it("documents the pinned CLI's supported idempotent environment setter", () => {
+    expect(releaseControl).toContain("eas-cli@22.4.0 env:set");
+    expect(releaseControl).not.toContain("eas-cli@22.4.0 env:create");
+    expect(releaseControl).not.toContain("--force");
   });
 
   it("warns that environment listing can display plaintext values", () => {

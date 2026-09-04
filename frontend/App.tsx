@@ -4,7 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider } from "@/themes/useAppTheme";
-import { Appearance, View } from "react-native";
+import { Appearance, I18nManager, View } from "react-native";
 import RootNavigator from "@/navigators/RootNavigator";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import Update from "@/hooks/useUpdates";
@@ -23,9 +23,12 @@ import { linking } from "@/navigators/linking";
 import { navigationRef } from "@/navigators/navigationRef";
 import { TenantEnvironmentBadge } from "@/components/dev/TenantEnvironmentBadge";
 import { DeveloperToolsProvider } from "@/devtools/DeveloperToolsProvider";
+import { getRuntimeTenant } from "@/config/runtimeTenant";
+import Constants from "expo-constants";
 
 export default function App() {
-  const ready = useOneTimeRTLFix();
+  const runtimeTenant = getRuntimeTenant(Constants);
+  const ready = useOneTimeRTLFix(runtimeTenant.id, runtimeTenant.localization);
   const colorScheme = Appearance.getColorScheme();
   const [loaded] = useCustomFonts();
   const { registerBackgroundTask, runTaskOnAppOpen } = useBackgroundTasks();
@@ -40,11 +43,11 @@ export default function App() {
 
   return (
     <KeyboardProvider preserveEdgeToEdge statusBarTranslucent>
-      <ThemeProvider>
+      <ThemeProvider theme={runtimeTenant.theme}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <SafeAreaProvider initialMetrics={initialWindowMetrics}>
             <HtmlRenderProvider>
-              <View style={[{ direction: "rtl" }, { flex: 1 }]}>
+              <View style={[{ direction: I18nManager.isRTL ? "rtl" : "ltr" }, { flex: 1 }]}>
                 <PersistQueryClientProvider
                   client={queryClient}
                   persistOptions={{ persister: persister }}

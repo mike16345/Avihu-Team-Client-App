@@ -38,6 +38,52 @@ Development and internal preview binaries display a small tenant/environment bad
 binaries carry `showEnvironmentBadge: false` in their resolved Expo configuration and never infer
 visibility from `NODE_ENV`.
 
+## Command output
+
+Repository-owned commands share one compact terminal presentation. Passing checks stay on one
+line; warnings and failures expand their supporting details and show remediation with `→`. Final
+lines summarize the outcome instead of repeating empty status sections. Interactive terminals add
+subtle status color, while redirected output, CI, and `NO_COLOR=1` remain readable without color.
+Machine-readable preflight JSON is unchanged.
+
+Tenant onboarding captures the noisy output from its owned clean prebuild and fast preflight. A
+successful run shows only live stage progress and the final result. If either child command fails,
+the error includes the last relevant output lines; full preflight logs remain sanitized under
+`.preflight/`.
+
+## Add and test a tenant
+
+Use the interactive onboarding command instead of copying tenant files by hand:
+
+```sh
+npm run tenant:add
+```
+
+It supports repository tenants and Git-ignored local tests, accepts an optional source logo, creates
+a deterministic fallback when none is supplied, offers semantic presets or a strict JSON recipe,
+generates/validates assets, resolves Expo config, and runs fast preflight. Repository onboarding
+selects an available Expo account before suggesting an editable `com.<owner>` bundle/package base,
+then offers EAS **Create**, **Link**, or **Skip**; local onboarding always skips. Completed prompt
+sections are saved under the ignored `.tenant-add/drafts/` directory. After a cancellation or
+failure, rerunning the command offers **Resume draft**, **Start over**, or **Delete draft**. A
+successful onboarding removes its draft. Before fast preflight, onboarding clean-generates native
+projects for the selected tenant so ignored output from another tenant cannot create false drift.
+That owned step bypasses Expo's dirty-worktree confirmation because the generated native folders
+are disposable; other commands retain their normal Git safeguards.
+Preflight resolves the same `.env*` files as Expo while preserving explicit shell values. The local
+`test-tenant` launch command is:
+
+```sh
+npm run app -- start --tenant test-tenant --environment development --yes
+```
+
+Local tenants intentionally have isolated placeholder bundle/package identities and no required
+server environment variables. They may start Metro, install an existing compatible binary, perform
+development native runs, manage assets, and run fast preflight. Build, update, release preflight,
+and preview/production native-run actions are blocked before any process is launched. Creating a
+real tenant in repository mode does not create EAS credentials, environment variables, builds,
+updates, submissions, store releases, or backend entitlements.
+
 ## Fast versus release preflight
 
 Fast preflight validates tenant selection, required environment names, TypeScript, unit tests, Expo
@@ -50,11 +96,11 @@ APP_TENANT=avihu APP_ENV=development npm run preflight
 APP_TENANT=avihu APP_ENV=production npm run preflight:release
 ```
 
-`PASS` is verified. `WARN` is a documented, non-blocking condition with remediation (for example,
-the current portrait/large-screen decision or unavailable optional tooling). `FAIL` blocks the
-selected action. Never convert a missing credential, device flow, artifact, test, or configuration
-requirement into a warning merely to obtain a green report. Full sanitized logs and optional JSON
-reports are stored under ignored `.preflight/`.
+`passed` is verified. `warning` is a documented, non-blocking condition with remediation (for
+example, the current portrait/large-screen decision or unavailable optional tooling). `failed`
+blocks the selected action. Never convert a missing credential, device flow, artifact, test, or
+configuration requirement into a warning merely to obtain a green report. Full sanitized logs and
+optional JSON reports are stored under ignored `.preflight/`.
 
 ## Local selector
 
@@ -69,7 +115,7 @@ npm run app -- build ios --tenant avihu --profile production --yes --dry-run
 ```
 
 Remove `--dry-run` only when the operator has approved the EAS build. The production Android
-command resolves to `npx --yes eas-cli@16.27.0 build --platform android --profile production` with
+command resolves to `npx --yes eas-cli@22.4.0 build --platform android --profile production` with
 `APP_TENANT=avihu` and `APP_ENV=production` in the child environment. No secret value is included
 in command arguments or control-center output.
 
@@ -81,8 +127,8 @@ npm run build:android:preview -- --tenant avihu --dry-run
 npm run build:ios:prod -- --tenant avihu --dry-run
 ```
 
-The selector and legacy aliases automatically run tenant-scoped `preflight:eas` before EAS starts;
-the remote post-install hook repeats it. You can also run the fuller local checks explicitly:
+The selector and legacy aliases automatically run tenant-scoped `preflight:eas` before EAS starts.
+You can also run the fuller local checks explicitly:
 
 ```sh
 npm run app -- preflight --tenant avihu --environment preview --yes --dry-run
@@ -92,6 +138,22 @@ APP_TENANT=avihu APP_ENV=production npm run preflight
 ```
 
 ## EAS project setup
+
+Run `eas login` before choosing Create. The Expo owner is the signed-in account or organization that
+owns the project. Create runs `eas project:init` only in an isolated temporary Expo workspace and
+asks for a dedicated confirmation immediately before changing remote state. Link verifies the
+project UUID, owner, and tenant slug. Skip leaves the generated tenant pending:
+
+```sh
+npm run tenant:eas -- --tenant <tenant-id>
+```
+
+Pending repository tenants are allowed to start locally and run fast checks, but build, update,
+release, and EAS preflight stop before child execution. If Create succeeds remotely and a later
+local write or preflight fails, inspect the non-secret ignored record in
+`.tenant-add/recovery/<tenant-id>.json`. A resumed `tenant:add` verifies and reuses that project;
+`tenant:eas` provides the same recovery path after a tenant already exists. No remote deletion or
+second project creation is attempted.
 
 Each tenant has its own EAS project. In that project, create symbolic EAS environments named
 exactly `development`, `preview`, and `production`. Set `APP_TENANT` to the tenant ID in all three
@@ -106,22 +168,22 @@ EAS-project environment value so the profiles work for future tenant projects.
 An authorized EAS project administrator can set the selector variable with the EAS dashboard or
 the equivalent noninteractive command, choosing the target project and each named environment.
 These commands change remote EAS state and are shown for operators only; do not run them during
-local verification. The pinned CLI documents `--force` as overwriting an existing variable, so it
-makes repeated setup idempotent for the same tenant value:
+local verification. The pinned CLI's `env:set` command creates or updates the variable, making
+repeated setup idempotent for the same tenant value:
 
 ```sh
-APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@16.27.0 env:create --name APP_TENANT --value avihu --environment development --visibility plaintext --scope project --force --non-interactive
-APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@16.27.0 env:create --name APP_TENANT --value avihu --environment preview --visibility plaintext --scope project --force --non-interactive
-APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@16.27.0 env:create --name APP_TENANT --value avihu --environment production --visibility plaintext --scope project --force --non-interactive
+APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@22.4.0 env:set --name APP_TENANT --value avihu --environment development --visibility plaintext --scope project --non-interactive
+APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@22.4.0 env:set --name APP_TENANT --value avihu --environment preview --visibility plaintext --scope project --non-interactive
+APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@22.4.0 env:set --name APP_TENANT --value avihu --environment production --visibility plaintext --scope project --non-interactive
 ```
 
 Verify the selected project without requesting sensitive values. Plaintext `APP_TENANT` values can
 appear in the output, so review the output before sharing it:
 
 ```sh
-APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@16.27.0 env:list --environment development --scope project
-APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@16.27.0 env:list --environment preview --scope project
-APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@16.27.0 env:list --environment production --scope project
+APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@22.4.0 env:list --environment development --scope project
+APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@22.4.0 env:list --environment preview --scope project
+APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@22.4.0 env:list --environment production --scope project
 ```
 
 The Avihu tenant intentionally shares the iOS bundle identifier and Android package between
@@ -129,14 +191,6 @@ preview and production (`com.avihuteam.avihuteam`). This is declared by
 `allowSharedStoreIdentity: true` for both environments. Development is isolated as
 `com.avihuteam.avihuteam.dev`. Do not duplicate this sharing for another tenant unless its tenant
 configuration explicitly declares it.
-
-## Remote build guard
-
-EAS invokes `eas-build-post-install`, which is exactly `npm run preflight:eas`. That action uses
-the fast, noninteractive EAS suite: tenant/environment validation, dependencies, Expo config,
-assets, typecheck, and unit tests. It does not launch EAS, publish an update, or compile native
-projects recursively. The JSON report is written only to `.preflight/eas-report.json` in the build
-workspace.
 
 ## Local config checks
 
@@ -154,15 +208,17 @@ the tenant configuration.
 
 ## Tenant onboarding checklist
 
-1. Copy an existing typed file under `config/tenants/`, change every identity/permission/brand
-   field, and register it in `config/tenants/registry.ts`. Do not put secret values in TypeScript.
-2. Give development a distinct bundle/package identity. Preview and production may share a store
+1. Run `npm run tenant:add` in repository mode and review the generated typed configuration and
+   registry edit. Do not put secret values in TypeScript.
+2. Replace fallback artwork when it is not approved production branding. Inspect generated Apple,
+   Android, notification, splash, and runtime-logo previews.
+3. Confirm the semantic theme, all JavaScript feature defaults, and the separate native-capability
+   declaration. Avihu defaults remain all enabled; server entitlements are future work.
+4. Give development a distinct bundle/package identity. Preview and production may share a store
    identity only when both explicitly set `allowSharedStoreIdentity: true`.
-3. Create `config/tenants/assets/<tenant>/source/app-icon.png`, generate assets, and visually inspect
-   every Apple/Android/notification preview.
-4. Create the tenant's EAS project and its symbolic `development`, `preview`, and `production`
+5. Create the tenant's EAS project and its symbolic `development`, `preview`, and `production`
    environments. Set `APP_TENANT` and the tenant's required runtime variables in that project.
-5. Resolve all three Expo configurations, run fast preflight, then release preflight on supported
+6. Resolve all three Expo configurations, run fast preflight, then release preflight on supported
    platforms. Complete the manual device matrix before store submission.
 
 ## Asset replacement and cleanup

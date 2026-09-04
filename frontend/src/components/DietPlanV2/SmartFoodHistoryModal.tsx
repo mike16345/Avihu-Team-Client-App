@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
@@ -30,6 +31,7 @@ import {
   DIET_V2_MUTED,
 } from "./dietV2Icons";
 import { formatDietPlanV2Number } from "./dietPlanV2Utils";
+import useStyles from "@/styles/useGlobalStyles";
 
 interface SmartFoodHistoryModalProps {
   visible: boolean;
@@ -74,6 +76,7 @@ const SmartFoodHistoryModal = ({
   onClose,
 }: SmartFoodHistoryModalProps) => {
   const insets = useSafeAreaInsets();
+  const { layout } = useStyles();
   const [weekOffset, setWeekOffset] = useState(0);
   const [openedAt, setOpenedAt] = useState(() => new Date());
   const [days, setDays] = useState<SmartFoodHistoryDay[]>([]);
@@ -153,42 +156,43 @@ const SmartFoodHistoryModal = ({
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <View
         style={[
+          layout.flex1,
           styles.container,
           { paddingTop: Math.max(insets.top, 12), paddingBottom: Math.max(insets.bottom, 12) },
         ]}
       >
-        <View style={styles.header}>
+        <View style={[layout.flexRow, layout.itemsCenter, styles.header]}>
           <Pressable
             onPress={() => {
               selectionHaptic();
               onClose();
             }}
             hitSlop={10}
-            style={styles.closeButton}
+            style={[layout.itemsCenter, layout.justifyCenter, styles.closeButton]}
           >
             <Text fontVariant="bold" fontSize={21} style={styles.closeLabel}>
               ×
             </Text>
           </Pressable>
-          <Text fontVariant="bold" fontSize={17} style={styles.headerTitle}>
+          <Text fontVariant="bold" fontSize={17} style={[layout.flex1, styles.headerTitle]}>
             היסטוריית תיעוד
           </Text>
           <View style={styles.headerSpacer} />
         </View>
 
-        <View style={styles.weekNavigation}>
+        <View style={[layout.flexRow, layout.itemsCenter, styles.weekNavigation]}>
           <Pressable
             onPress={() => {
               selectionHaptic();
               setWeekOffset((current) => current + 1);
             }}
-            style={styles.weekButton}
+            style={[layout.itemsCenter, layout.justifyCenter, styles.weekButton]}
           >
             <Text fontVariant="semibold" fontSize={13} style={styles.weekButtonLabel}>
               שבוע קודם
             </Text>
           </Pressable>
-          <View style={styles.weekLabelWrap}>
+          <View style={[layout.flex1, layout.itemsCenter, styles.weekLabelWrap]}>
             <Text fontVariant="bold" fontSize={14} style={styles.weekLabel}>
               {weekOffset === 0 ? "7 הימים האחרונים" : formatWeekRange(dayKeys)}
             </Text>
@@ -204,7 +208,12 @@ const SmartFoodHistoryModal = ({
               selectionHaptic();
               setWeekOffset((current) => Math.max(0, current - 1));
             }}
-            style={[styles.weekButton, weekOffset === 0 ? styles.weekButtonDisabled : null]}
+            style={[
+              layout.itemsCenter,
+              layout.justifyCenter,
+              styles.weekButton,
+              weekOffset === 0 ? styles.weekButtonDisabled : null,
+            ]}
           >
             <Text fontVariant="semibold" fontSize={13} style={styles.weekButtonLabel}>
               שבוע הבא
@@ -214,21 +223,25 @@ const SmartFoodHistoryModal = ({
 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           {loading ? (
-            <View style={styles.loadingState}>
+            <View style={[layout.itemsCenter, styles.loadingState]}>
               <ActivityIndicator color={DIET_V2_GREEN} />
-              <Text fontSize={13} style={styles.emptyText}>
+              <Text fontSize={13} style={[layout.widthFull, styles.emptyText]}>
                 טוען היסטוריה...
               </Text>
             </View>
           ) : null}
 
           {!loading && populatedDays.length === 0 ? (
-            <View style={styles.emptyState}>
+            <View style={[layout.itemsCenter, layout.justifyCenter, styles.emptyState]}>
               <ClockIcon size={30} color={DIET_V2_MUTED} />
-              <Text fontVariant="semibold" fontSize={15} style={styles.emptyTitle}>
+              <Text
+                fontVariant="semibold"
+                fontSize={15}
+                style={[layout.widthFull, styles.emptyTitle]}
+              >
                 אין רישומים בשבוע הזה
               </Text>
-              <Text fontSize={12} style={styles.emptyText}>
+              <Text fontSize={12} style={[layout.widthFull, styles.emptyText]}>
                 אפשר לעבור לשבוע קודם או לחזור ולסרוק מוצר חדש.
               </Text>
             </View>
@@ -238,30 +251,42 @@ const SmartFoodHistoryModal = ({
             ? populatedDays.map((day) => {
                 const dayIndex = dayKeys.indexOf(day.dayKey);
                 const totals = sumDietPlanV2HistoryMacros(day.entries);
+
                 return (
                   <View key={day.dayKey} style={styles.dayCard}>
-                    <View style={styles.dayHeader}>
+                    <View style={[layout.flexRow, layout.itemsCenter, styles.dayHeader]}>
                       <ClockIcon size={16} color={DIET_V2_GREEN} />
-                      <Text fontVariant="bold" fontSize={15} style={styles.dayTitle}>
+                      <Text
+                        fontVariant="bold"
+                        fontSize={15}
+                        style={[layout.flex1, styles.dayTitle]}
+                      >
                         {formatDayLabel(day.dayKey, dayIndex, weekOffset)}
                       </Text>
                     </View>
-                    <View style={styles.totalBadge}>
+                    <View style={[layout.alignSelfStart, styles.totalBadge]}>
                       <Text fontVariant="semibold" fontSize={11} style={styles.totalLabel}>
                         {`${formatDietPlanV2Number(totals.calories)} קק"ל · ${formatDietPlanV2Number(totals.protein)} חלבון · ${formatDietPlanV2Number(totals.carbs)} פחמימה · ${formatDietPlanV2Number(totals.fat)} שומן`}
                       </Text>
                     </View>
                     {day.entries.map((entry) => (
-                      <View key={entry.id} style={styles.entryRow}>
-                        <View style={styles.entryCopy}>
-                          <Text fontVariant="semibold" fontSize={14} style={styles.entryName}>
+                      <View
+                        key={entry.id}
+                        style={[layout.flexRow, layout.itemsCenter, styles.entryRow]}
+                      >
+                        <View style={styles.entryDot} />
+                        <View style={[layout.flex1, layout.itemsStart]}>
+                          <Text
+                            fontVariant="semibold"
+                            fontSize={14}
+                            style={[layout.widthFull, styles.entryName]}
+                          >
                             {entry.name}
                           </Text>
-                          <Text fontSize={11} style={styles.entryMeta}>
+                          <Text fontSize={11} style={[layout.widthFull, styles.entryMeta]}>
                             {`${entry.detail}${entry.macros.calories > 0 ? ` · ${formatDietPlanV2Number(entry.macros.calories)} קק"ל` : ""}`}
                           </Text>
                         </View>
-                        <View style={styles.entryDot} />
                       </View>
                     ))}
                   </View>
@@ -275,10 +300,8 @@ const SmartFoodHistoryModal = ({
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F7F9F8" },
+  container: { backgroundColor: semanticColors.surfaceSubtle },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
@@ -286,18 +309,14 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    alignItems: "center",
-    justifyContent: "center",
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   closeLabel: { color: DIET_V2_DARK, lineHeight: 23 },
-  headerTitle: { flex: 1, color: DIET_V2_DARK, textAlign: "center" },
+  headerTitle: { color: DIET_V2_DARK, textAlign: "center" },
   headerSpacer: { width: 38 },
   weekNavigation: {
-    flexDirection: "row",
-    alignItems: "center",
     gap: 8,
     paddingHorizontal: 16,
     paddingVertical: 10,
@@ -306,45 +325,40 @@ const styles = StyleSheet.create({
     minWidth: 82,
     minHeight: 38,
     paddingHorizontal: 10,
-    alignItems: "center",
-    justifyContent: "center",
     borderRadius: 12,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   weekButtonDisabled: { opacity: 0.35 },
   weekButtonLabel: { color: DIET_V2_DARK, textAlign: "center" },
-  weekLabelWrap: { flex: 1, alignItems: "center", gap: 1 },
+  weekLabelWrap: { gap: 1 },
   weekLabel: { color: DIET_V2_DARK, textAlign: "center", fontVariant: ["tabular-nums"] },
   weekRange: { color: DIET_V2_MUTED, textAlign: "center", fontVariant: ["tabular-nums"] },
   content: { padding: 16, gap: 14 },
-  loadingState: { alignItems: "center", gap: 10, paddingVertical: 50 },
+  loadingState: { gap: 10, paddingVertical: 50 },
   emptyState: {
     minHeight: 220,
-    alignItems: "center",
-    justifyContent: "center",
     gap: 8,
     padding: 24,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
-  emptyTitle: { width: "100%", color: DIET_V2_DARK, textAlign: "center" },
-  emptyText: { width: "100%", color: DIET_V2_MUTED, textAlign: "center" },
+  emptyTitle: { color: DIET_V2_DARK, textAlign: "center" },
+  emptyText: { color: DIET_V2_MUTED, textAlign: "center" },
   dayCard: {
     padding: 14,
     gap: 10,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
-  dayHeader: { flexDirection: "row", alignItems: "center", gap: 7 },
-  dayTitle: { flex: 1, color: DIET_V2_DARK },
+  dayHeader: { gap: 7 },
+  dayTitle: { color: DIET_V2_DARK },
   totalBadge: {
-    alignSelf: "flex-start",
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 999,
@@ -352,20 +366,17 @@ const styles = StyleSheet.create({
   },
   totalLabel: { color: DIET_V2_GREEN },
   entryRow: {
-    flexDirection: "row",
-    alignItems: "center",
     gap: 9,
     paddingHorizontal: 10,
     paddingVertical: 9,
     borderRadius: 11,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FBFDFC",
+    backgroundColor: semanticColors.app.dietHistorySurface,
   },
   entryDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: DIET_V2_GREEN },
-  entryCopy: { flex: 1, alignItems: "flex-start" },
-  entryName: { width: "100%", color: DIET_V2_DARK },
-  entryMeta: { width: "100%", color: DIET_V2_MUTED },
+  entryName: { color: DIET_V2_DARK },
+  entryMeta: { color: DIET_V2_MUTED },
 });
 
 export default SmartFoodHistoryModal;

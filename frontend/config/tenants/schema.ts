@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { TENANT_ENVIRONMENTS, type TenantEnvironment } from "./types";
+import { tenantFeatureDefaultsSchema } from "./features";
+import { tenantThemeSchema } from "./theme";
 
-const tenantIdSchema = z.string().regex(/^[a-z][a-z0-9-]*$/);
+export const tenantIdSchema = z.string().regex(/^[a-z][a-z0-9-]*$/);
 const semanticVersionSchema = z
   .string()
   .regex(
@@ -22,10 +24,34 @@ const permissionDescriptionSchema = z.string().trim().min(1);
 const environmentVariableNameSchema = z.string().regex(/^[A-Z][A-Z0-9_]*$/);
 const hexColorSchema = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
 
-export const tenantFeatureFlagsSchema = z
+export const tenantEasConfigSchema = z.discriminatedUnion("status", [
+  z
+    .object({
+      status: z.literal("linked"),
+      owner: tenantIdSchema,
+      projectId: z.string().uuid(),
+      updateUrl: z.string().url(),
+    })
+    .strict(),
+  z.object({ status: z.literal("pending") }).strict(),
+]);
+
+export const tenantLocalizationSchema = z
   .object({
     supportsRtl: z.boolean(),
     forcesRtl: z.boolean(),
+  })
+  .strict();
+
+export const tenantNativeCapabilitiesSchema = z
+  .object({
+    camera: z.boolean(),
+    photoLibrary: z.boolean(),
+    notifications: z.boolean(),
+    backgroundTasks: z.boolean(),
+    appleHealth: z.boolean(),
+    healthConnect: z.boolean(),
+    liveActivities: z.boolean(),
   })
   .strict();
 
@@ -78,21 +104,20 @@ const tenantEnvironmentsSchema = z
 
 const requiredEnvironmentVariablesSchema = z
   .object({
-    development: z.array(environmentVariableNameSchema).min(1),
-    preview: z.array(environmentVariableNameSchema).min(1),
-    production: z.array(environmentVariableNameSchema).min(1),
+    development: z.array(environmentVariableNameSchema),
+    preview: z.array(environmentVariableNameSchema),
+    production: z.array(environmentVariableNameSchema),
   })
   .strict();
 
 export const tenantConfigSchema = z
   .object({
+    kind: z.enum(["repository", "local"]),
     id: tenantIdSchema,
     displayName: z.string().trim().min(1),
     slug: tenantIdSchema,
-    owner: tenantIdSchema,
     version: semanticVersionSchema,
-    projectId: z.string().uuid(),
-    updateUrl: z.string().url(),
+    eas: tenantEasConfigSchema,
     runtimeVersion: z.object({ policy: z.literal("appVersion") }).strict(),
     orientation: z.enum(["default", "portrait", "landscape"]),
     platforms: z
@@ -121,6 +146,7 @@ export const tenantConfigSchema = z
         backgroundColor: hexColorSchema,
       })
       .strict(),
+    theme: tenantThemeSchema,
     permissions: z
       .object({
         camera: permissionDescriptionSchema,
@@ -139,11 +165,98 @@ export const tenantConfigSchema = z
         enableShrinkResourcesInReleaseBuilds: z.boolean(),
       })
       .strict(),
-    featureFlags: tenantFeatureFlagsSchema,
+    localization: tenantLocalizationSchema,
+    featureDefaults: tenantFeatureDefaultsSchema,
+    nativeCapabilities: tenantNativeCapabilitiesSchema,
     requiredEnvironmentVariables: requiredEnvironmentVariablesSchema,
     environments: tenantEnvironmentsSchema,
   })
-  .strict();
+  .strict()
+  .superRefine((tenant, context) => {
+    if (tenant.localization.forcesRtl && !tenant.localization.supportsRtl) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["localization", "forcesRtl"],
+        message: "A tenant cannot force RTL without supporting RTL",
+      });
+    }
+    if (tenant.kind === "repository") {
+      for (const environment of TENANT_ENVIRONMENTS) {
+        if (tenant.requiredEnvironmentVariables[environment].length === 0) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["requiredEnvironmentVariables", environment],
+            message: "Repository tenants must declare required environment variables",
+          });
+        }
+      }
+    }
+    const requireCapability = (
+      enabled: boolean,
+      capability: boolean,
+      feature: keyof typeof tenant.featureDefaults,
+      capabilityName: keyof typeof tenant.nativeCapabilities
+    ) => {
+      if (enabled && !capability) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["featureDefaults", feature],
+          message: `${feature} requires the ${capabilityName} native capability`,
+        });
+      }
+    };
+
+    requireCapability(
+      tenant.featureDefaults.mediaCapture,
+      tenant.nativeCapabilities.camera,
+      "mediaCapture",
+      "camera"
+    );
+    requireCapability(
+      tenant.featureDefaults.mediaCapture,
+      tenant.nativeCapabilities.photoLibrary,
+      "mediaCapture",
+      "photoLibrary"
+    );
+    requireCapability(
+      tenant.featureDefaults.notifications,
+      tenant.nativeCapabilities.notifications,
+      "notifications",
+      "notifications"
+    );
+    requireCapability(
+      tenant.featureDefaults.stepTracking && tenant.platforms.includes("ios"),
+      tenant.nativeCapabilities.appleHealth,
+      "stepTracking",
+      "appleHealth"
+    );
+    requireCapability(
+      tenant.featureDefaults.stepTracking && tenant.platforms.includes("android"),
+      tenant.nativeCapabilities.healthConnect,
+      "stepTracking",
+      "healthConnect"
+    );
+  });
+
+export const isLinkedTenantEas = (
+  eas: import("./types").TenantEasConfig
+): eas is Extract<import("./types").TenantEasConfig, { status: "linked" }> =>
+  eas.status === "linked";
+
+export const assertTenantEasActionAllowed = (
+  tenant: import("./types").TenantConfig,
+  actionName: string
+) => {
+  if (tenant.kind === "local") {
+    throw new Error(`Local tenant "${tenant.id}" cannot run ${actionName}`);
+  }
+  if (tenant.eas.status === "pending") {
+    throw new Error(
+      `Tenant "${tenant.id}" has pending EAS setup and cannot run ${actionName}. ` +
+        `Run: npm run tenant:eas -- --tenant ${tenant.id}`
+    );
+  }
+};
 
 export const parseTenantEnvironment = (value: string | undefined): TenantEnvironment => {
   if (!value) {

@@ -1,10 +1,9 @@
-import "dotenv/config";
-
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
-import { parseTenantEnvironment } from "../../config/tenants/schema";
+import { assertTenantEasActionAllowed, parseTenantEnvironment } from "../../config/tenants/schema";
+import { renderError } from "../cli-ui/render";
 import { createPreflightContext } from "./contexts";
 import { runChecks } from "./engine";
 import { applyPolicy } from "./policy";
@@ -13,7 +12,9 @@ import { renderJson } from "./renderJson";
 import { runSpawnProcess } from "./processCheck";
 import { createEasSuite, createFastSuite, createReleaseSuite } from "./suites";
 import type { PreflightMode } from "./types";
+import type { TenantConfig } from "../../config/tenants/types";
 import { publishPreflightFile } from "./safePublication";
+import { resolveExpoProjectEnvironment } from "./projectEnv";
 
 interface CliArguments {
   mode: PreflightMode;
@@ -105,6 +106,13 @@ export interface PreflightCliDependencies {
   writeOutput: (value: string) => void;
 }
 
+export const assertPreflightAllowed = (tenant: TenantConfig, mode: PreflightMode) => {
+  if (mode !== "fast") assertTenantEasActionAllowed(tenant, `${mode} preflight`);
+  if (tenant.kind === "local" && mode !== "fast") {
+    throw new Error(`Local tenant "${tenant.id}" cannot run ${mode} preflight`);
+  }
+};
+
 export const runPreflightCli = async (dependencies: PreflightCliDependencies) => {
   const { projectRoot } = dependencies;
   const args = parsePreflightArguments(dependencies.argv, dependencies.processEnv);
@@ -116,6 +124,7 @@ export const runPreflightCli = async (dependencies: PreflightCliDependencies) =>
     processEnv: dependencies.processEnv,
     timestamp,
   });
+  assertPreflightAllowed(configuration.tenantConfig, args.mode);
   const smokeCommand = parseSmokeCommand(dependencies.processEnv.PREFLIGHT_SMOKE_COMMAND_JSON);
   const context = {
     ...configuration,
@@ -149,7 +158,7 @@ if (isMain)
   void runPreflightCli({
     argv: process.argv.slice(2),
     projectRoot: process.cwd(),
-    processEnv: process.env,
+    processEnv: resolveExpoProjectEnvironment(process.cwd(), process.env),
     platform: process.platform,
     runner: runSpawnProcess,
     now: () => new Date(),
@@ -160,8 +169,6 @@ if (isMain)
     })
     .catch((error: unknown) => {
       const message = error instanceof Error ? error.message : String(error);
-      console.error(
-        `${message}\nRemediation: select a valid tenant/environment and rerun preflight.`
-      );
+      console.error(renderError(message, "Select a valid tenant/environment and rerun preflight."));
       process.exitCode = 1;
     });

@@ -1,10 +1,22 @@
 import { describe, expect, it } from "vitest";
 
+import { avihuTenant } from "../../../config/tenants/avihu";
+
 import {
   getRuntimeTenant,
   getRuntimeTenantDisplayName,
   isTenantEnvironmentBadgeVisible,
 } from "../runtimeTenant";
+import * as runtimeTenantModule from "../runtimeTenant";
+
+type RuntimeTenantFeatureModule = typeof runtimeTenantModule & {
+  getResolvedTenantFeatures?: (
+    tenant: ReturnType<typeof getRuntimeTenant>,
+    overrides?: Partial<typeof avihuTenant.featureDefaults>
+  ) => typeof avihuTenant.featureDefaults;
+};
+
+const runtimeFeatures = runtimeTenantModule as RuntimeTenantFeatureModule;
 
 const createConstants = (showEnvironmentBadge: boolean) => ({
   expoConfig: {
@@ -17,10 +29,10 @@ const createConstants = (showEnvironmentBadge: boolean) => ({
           primaryColor: "#000000",
           backgroundColor: "#FFFFFF",
         },
-        featureFlags: {
-          supportsRtl: true,
-          forcesRtl: true,
-        },
+        theme: avihuTenant.theme,
+        localization: avihuTenant.localization,
+        featureDefaults: avihuTenant.featureDefaults,
+        nativeCapabilities: avihuTenant.nativeCapabilities,
         showEnvironmentBadge,
       },
     },
@@ -56,5 +68,17 @@ describe("getRuntimeTenant", () => {
         process.env.NODE_ENV = previousNodeEnvironment;
       }
     }
+  });
+
+  it("resolves optional future entitlement overrides without a remote source", () => {
+    const tenant = getRuntimeTenant(createConstants(true));
+
+    expect(runtimeFeatures.getResolvedTenantFeatures?.(tenant, { chat: false })).toEqual({
+      ...avihuTenant.featureDefaults,
+      chat: false,
+    });
+    expect(runtimeFeatures.getResolvedTenantFeatures?.(tenant)).toEqual(
+      avihuTenant.featureDefaults
+    );
   });
 });

@@ -1,12 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { createExpoConfig } from "../createExpoConfig";
+import { createExpoConfig, createTenantPlugins } from "../createExpoConfig";
 import { avihuTenant } from "../tenants/avihu";
 import { getTenant, listTenants } from "../tenants/registry";
 import { parseTenantEnvironment, tenantConfigSchema } from "../tenants/schema";
 
 describe("tenant registry", () => {
-  it("lists the registered tenants in stable order", () => {
-    expect(listTenants().map(({ id }) => id)).toEqual(["avihu"]);
+  it("keeps Avihu as the baseline repository tenant when more tenants are registered", () => {
+    const tenantIds = listTenants()
+      .filter(({ kind }) => kind === "repository")
+      .map(({ id }) => id);
+
+    expect(tenantIds).toContain("avihu");
+    expect(tenantIds[0]).toBe("avihu");
   });
 
   it("rejects an unknown tenant", () => {
@@ -86,6 +91,49 @@ describe("tenant registry", () => {
 });
 
 describe("createExpoConfig", () => {
+  it("passes the tenant RTL contract directly to the native localization plugin", () => {
+    const config = createExpoConfig({
+      baseConfig: {},
+      tenant: getTenant("avihu"),
+      environment: "development",
+      processEnv: {},
+    });
+
+    expect(config.plugins).toContainEqual([
+      "expo-localization",
+      { supportsRTL: true, forcesRTL: true },
+    ]);
+  });
+
+  it("omits remote EAS fields for pending tenants", () => {
+    const pendingTenant = tenantConfigSchema.parse({
+      ...avihuTenant,
+      id: "pending-tenant",
+      slug: "pending-tenant",
+      eas: { status: "pending" },
+    });
+    const config = createExpoConfig({
+      baseConfig: {},
+      tenant: pendingTenant,
+      environment: "development",
+      processEnv: { EXPO_OWNER: "personal-account" },
+    });
+    expect(config.owner).toBeUndefined();
+    expect(config.extra?.eas).toBeUndefined();
+    expect(config.updates).toBeUndefined();
+  });
+
+  it("allows an explicit owner override only for a linked tenant", () => {
+    const config = createExpoConfig({
+      baseConfig: {},
+      tenant: avihuTenant,
+      environment: "production",
+      processEnv: { EXPO_OWNER: "organization-override" },
+    });
+
+    expect(config.owner).toBe("organization-override");
+  });
+
   it.each(["development", "preview", "production"] as const)(
     "brands the Avihu %s app as Elevate Coach without changing native identity",
     (environment) => {
@@ -229,6 +277,33 @@ describe("createExpoConfig", () => {
     ).toEqual(["./plugins/withFmtXcode26Fix"]);
   });
 
+  it("composes binary plugins only from native capabilities", () => {
+    const plugins = createTenantPlugins({
+      ...avihuTenant,
+      nativeCapabilities: {
+        camera: false,
+        photoLibrary: false,
+        notifications: false,
+        backgroundTasks: false,
+        appleHealth: false,
+        healthConnect: false,
+        liveActivities: false,
+      },
+    });
+
+    expect(plugins).toEqual([
+      [
+        "expo-localization",
+        {
+          supportsRTL: avihuTenant.localization.supportsRtl,
+          forcesRTL: avihuTenant.localization.forcesRtl,
+        },
+      ],
+      ["expo-build-properties", { android: avihuTenant.androidBuildProperties }],
+      "./plugins/withFmtXcode26Fix",
+    ]);
+  });
+
   it("enables Android edge-to-edge in every resolved environment", () => {
     for (const environment of ["development", "preview", "production"] as const) {
       const config = createExpoConfig({
@@ -267,5 +342,23 @@ describe("createExpoConfig", () => {
         color: "#ffffff",
       }),
     ]);
+  });
+
+  it("publishes separated tenant theme, localization, feature defaults, and native capabilities", () => {
+    const development = createExpoConfig({
+      baseConfig: {},
+      tenant: getTenant("avihu"),
+      environment: "development",
+      processEnv: {},
+    });
+
+    expect(development.extra).toMatchObject({
+      tenant: {
+        theme: avihuTenant.theme,
+        localization: avihuTenant.localization,
+        featureDefaults: avihuTenant.featureDefaults,
+        nativeCapabilities: avihuTenant.nativeCapabilities,
+      },
+    });
   });
 });

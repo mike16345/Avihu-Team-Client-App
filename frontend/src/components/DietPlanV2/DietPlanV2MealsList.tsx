@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import type { DietV2Meal } from "@/interfaces/IDietPlanV2";
@@ -54,7 +55,7 @@ const DietPlanV2MealsList = ({
 const styles = {
   list: { gap: 10 },
   empty: { paddingVertical: 40, alignItems: "center" },
-  emptyText: { textAlign: "center", color: "#4B5563" },
+  emptyText: { textAlign: "center", color: semanticColors.diet.secondaryText },
 } as const;
 
 export default DietPlanV2MealsList;

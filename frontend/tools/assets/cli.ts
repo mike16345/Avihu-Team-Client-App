@@ -3,6 +3,8 @@ import { getTenantAssetPaths } from "./paths";
 import { validateTenantAssets } from "./validate";
 import { auditAssets } from "./audit";
 import { confirm } from "@clack/prompts";
+import { renderDetailLines, renderError, renderHeader } from "../cli-ui/render";
+import { renderAssetAudit, renderAssetChecks, renderAssetGenerated } from "./presentation";
 
 type AssetCommand = "generate" | "check" | "audit";
 
@@ -30,9 +32,11 @@ const run = async () => {
   if (command === "generate") {
     const manifest = await generateTenantAssets(tenantId);
     console.log(
-      `Generated ${Object.keys(manifest.outputs).length} tenant assets: ${
+      renderAssetGenerated(
+        tenantId,
+        Object.keys(manifest.outputs).length,
         getTenantAssetPaths(tenantId).manifest
-      }`
+      )
     );
     return;
   }
@@ -47,8 +51,12 @@ const run = async () => {
       clean,
       yes,
       confirmCleanup: async (entries) => {
-        console.log("Cleanup candidates:");
-        for (const entry of entries) console.log(`- ${entry.relativePath}`);
+        console.log(
+          [
+            renderHeader("Cleanup candidates", tenantId),
+            renderDetailLines(entries.map((entry) => entry.relativePath)),
+          ].join("\n")
+        );
         return (
           (await confirm({
             message: `Remove ${entries.length} proven-unused or stale-generated asset(s)?`,
@@ -58,22 +66,12 @@ const run = async () => {
       },
     });
 
-    for (const entry of report.entries) {
-      console.log(`${entry.classification.toUpperCase()} ${entry.relativePath}: ${entry.reason}`);
-    }
-    console.log(
-      `Summary: ${Object.entries(report.summary)
-        .map(([kind, count]) => `${kind}=${count}`)
-        .join(", ")}`
-    );
-    if (report.deleted.length > 0) console.log(`Deleted: ${report.deleted.join(", ")}`);
+    console.log(renderAssetAudit(report));
     return;
   }
 
   const results = await validateTenantAssets(tenantId);
-  for (const result of results) {
-    console.log(`${result.ok ? "PASS" : "FAIL"} ${result.name}: ${result.message}`);
-  }
+  console.log(renderAssetChecks(tenantId, results));
 
   const failures = results.filter(({ ok }) => !ok);
   if (failures.length > 0) {
@@ -82,6 +80,6 @@ const run = async () => {
 };
 
 run().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : String(error));
+  console.error(renderError(error instanceof Error ? error.message : String(error)));
   process.exitCode = 1;
 });

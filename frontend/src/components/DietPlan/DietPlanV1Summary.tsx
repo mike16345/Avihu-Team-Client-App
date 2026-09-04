@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, ScrollView, Pressable, Linking } from "react-native";
 import Svg, {
@@ -15,7 +16,7 @@ import { IMeal } from "@/interfaces/DietPlan";
 import { DIET_CALORIES_PER_SERVING } from "@/constants/dietCalories";
 import { DIET_V2_MUTED, DropIcon, SproutIcon, ChevronLeftIcon } from "../DietPlanV2/dietV2Icons";
 
-const DARK = "#0B2A22";
+const DARK = semanticColors.diet.primaryText;
 
 const sumMealField = (
   meals: IMeal[],
@@ -28,7 +29,7 @@ const WhatsAppIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24">
     <Path
       d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.9-4.44 9.9-9.9S17.5 2 12.04 2zm5.8 14.16c-.24.68-1.2 1.25-1.97 1.42-.53.11-1.22.2-3.55-.76-2.98-1.23-4.9-4.27-5.05-4.47-.15-.2-1.2-1.6-1.2-3.05s.76-2.16 1.03-2.46c.27-.3.58-.37.78-.37.2 0 .39 0 .56.01.18.01.42-.07.66.5.24.58.82 2 .89 2.15.07.15.12.32.02.52-.1.2-.15.32-.3.5-.15.18-.31.4-.44.53-.15.15-.3.31-.13.6.17.3.76 1.25 1.63 2.03 1.12 1 2.06 1.31 2.35 1.46.29.15.46.12.63-.07.17-.2.73-.85.92-1.14.2-.29.39-.24.66-.15.27.1 1.7.8 2 .95.29.15.48.22.55.34.07.12.07.7-.17 1.38z"
-      fill="#25D366"
+      fill={semanticColors.app.dietWhatsapp}
     />
   </Svg>
 );
@@ -95,8 +96,8 @@ const useAnimatedFloat = (value: number, duration = 650): number => {
   return display;
 };
 
-const GRAD_LIGHT = "#86EFAC";
-const GRAD_DARK = "#0B5E37";
+const GRAD_LIGHT = semanticColors.diet.borderStrong;
+const GRAD_DARK = semanticColors.app.brandAction;
 
 const DONUT_SIZE = 130;
 const DONUT_STROKE = 11;
@@ -119,7 +120,14 @@ const CalorieDonut: React.FC<{ consumed: number; target: number }> = ({ consumed
             <Stop offset="1" stopColor={GRAD_DARK} />
           </SvgLinearGradient>
         </Defs>
-        <Circle cx={c} cy={c} r={DONUT_R} stroke="#D6DAD8" strokeWidth={DONUT_STROKE} fill="none" />
+        <Circle
+          cx={c}
+          cy={c}
+          r={DONUT_R}
+          stroke={semanticColors.app.dietNeutralBorder}
+          strokeWidth={DONUT_STROKE}
+          fill="none"
+        />
         {clamped > 0 && (
           <Circle
             cx={c}
@@ -265,7 +273,7 @@ const DietPlanV1Summary = () => {
         <View style={styles.tipsPanel}>
           <View style={styles.tipRow}>
             <View style={styles.tipIconWrap}>
-              <DropIcon size={14} color="#3B82F6" />
+              <DropIcon size={14} color={semanticColors.app.dietInfo} />
             </View>
             <Text fontSize={13} style={styles.tipText}>
               לשתות 3 ליטר מים
@@ -273,7 +281,7 @@ const DietPlanV1Summary = () => {
           </View>
           <View style={styles.tipRow}>
             <View style={styles.tipIconWrap}>
-              <SproutIcon size={14} color="#22C55E" />
+              <SproutIcon size={14} color={semanticColors.app.dietPositive} />
             </View>
             <Text fontSize={13} style={styles.tipText}>
               לאכול 5-3 ירקות ביום
@@ -327,10 +335,10 @@ const DietPlanV1Summary = () => {
 const styles = StyleSheet.create({
   card: {
     alignSelf: "stretch",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: "rgba(15, 94, 59, 0.08)",
+    borderColor: semanticColors.diet.border,
     paddingVertical: 18,
     paddingHorizontal: 16,
     gap: 14,
@@ -378,14 +386,14 @@ const styles = StyleSheet.create({
   },
   tipText: {
     flexShrink: 1,
-    color: "#374151",
+    color: semanticColors.elevation.level2,
     lineHeight: 18,
     textAlign: "right",
   },
   topDivider: {
     width: StyleSheet.hairlineWidth,
     alignSelf: "stretch",
-    backgroundColor: "rgba(0, 0, 0, 0.08)",
+    backgroundColor: semanticColors.app.shadowSoft,
     marginVertical: 8,
   },
   macroWrap: {
@@ -395,7 +403,7 @@ const styles = StyleSheet.create({
   macroScroll: {
     alignSelf: "stretch",
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "rgba(0, 0, 0, 0.06)",
+    borderTopColor: semanticColors.app.dietCardShadow,
   },
   scrollHintLeft: {
     position: "absolute",
@@ -413,7 +421,7 @@ const styles = StyleSheet.create({
   vDivider: {
     width: StyleSheet.hairlineWidth,
     alignSelf: "stretch",
-    backgroundColor: "rgba(0, 0, 0, 0.08)",
+    backgroundColor: semanticColors.app.shadowSoft,
   },
   macroCol: {
     alignItems: "center",
@@ -434,7 +442,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 6,
     height: MACRO_BAR_H,
     borderRadius: 999,
-    backgroundColor: "rgba(11, 94, 55, 0.10)",
+    backgroundColor: semanticColors.app.dietDividerDark,
     overflow: "hidden",
     marginTop: 2,
   },

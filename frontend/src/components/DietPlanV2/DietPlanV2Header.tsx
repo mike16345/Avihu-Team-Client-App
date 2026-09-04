@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useEffect, type ComponentProps, type ComponentType } from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
@@ -101,7 +102,7 @@ const CalorieRing = ({ consumed, target }: { consumed: number; target: number })
           cx={RING_SIZE / 2}
           cy={RING_SIZE / 2}
           r={RING_RADIUS}
-          stroke="#E5E7EB"
+          stroke={semanticColors.divider}
           strokeWidth={RING_STROKE}
           fill="transparent"
         />
@@ -210,13 +211,13 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   ringValue: {
-    color: "#0B2A22",
+    color: semanticColors.diet.primaryText,
     lineHeight: 30,
     writingDirection: "ltr",
     fontVariant: ["tabular-nums"],
   },
   ringTarget: {
-    color: "#6B7280",
+    color: semanticColors.scanner.panelText,
     lineHeight: 13,
     marginTop: 1,
     writingDirection: "ltr",
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   barLabel: {
-    color: "#0B2A22",
+    color: semanticColors.diet.primaryText,
   },
   barValue: {
     color: DIET_V2_MUTED,
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({
   track: {
     height: 8,
     borderRadius: 999,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: semanticColors.divider,
     flexDirection: "row",
     overflow: "hidden",
   },

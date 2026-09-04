@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { StyleSheet } from "react-native";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
@@ -45,11 +46,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 999,
     borderWidth: 1,
-    borderColor: "#BBF7D0",
-    backgroundColor: "#DCFCE7",
+    borderColor: semanticColors.diet.consumedBorder,
+    backgroundColor: semanticColors.diet.consumedBackground,
   },
   label: {
-    color: "#166534",
+    color: semanticColors.diet.consumedText,
   },
 });
 

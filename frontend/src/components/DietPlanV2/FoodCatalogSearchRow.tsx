@@ -1,8 +1,10 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown, LinearTransition } from "react-native-reanimated";
 import { Text } from "@/components/ui/Text";
 import type { FoodCatalogProduct } from "@/interfaces/IFoodCatalog";
+import useStyles from "@/styles/useGlobalStyles";
 import { selectionHaptic } from "@/utils/haptics";
 import {
   BarcodeIcon,
@@ -39,6 +41,7 @@ const buildProductMeta = (product: FoodCatalogProduct): string => {
 };
 
 const FoodCatalogSearchRow = ({ product, index, onSelect }: FoodCatalogSearchRowProps) => {
+  const { layout } = useStyles();
   const meta = useMemo(() => buildProductMeta(product), [product]);
   const serving = product.serving?.description ?? product.package.description;
 
@@ -56,33 +59,35 @@ const FoodCatalogSearchRow = ({ product, index, onSelect }: FoodCatalogSearchRow
         }}
         style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
       >
-        <View style={styles.addButton}>
-          <Text fontVariant="bold" fontSize={20} style={styles.addButtonLabel}>
-            +
-          </Text>
-        </View>
-        <View style={styles.copy}>
-          <Text fontVariant="bold" fontSize={14} style={styles.name} numberOfLines={2}>
-            {product.displayName ?? "מוצר ללא שם"}
-          </Text>
-          {product.brand ? (
-            <Text fontSize={11} style={styles.brand} numberOfLines={1}>
-              {product.brand}
+        <View style={[layout.widthFull, layout.flexRow, layout.itemsCenter, styles.rowContent]}>
+          <View style={styles.productIcon}>
+            <BarcodeIcon size={21} color={DIET_V2_GREEN} />
+          </View>
+          <View style={[layout.flex1, layout.itemsStart, styles.copy]}>
+            <Text fontVariant="bold" fontSize={14} style={styles.name} numberOfLines={2}>
+              {product.displayName ?? "מוצר ללא שם"}
             </Text>
-          ) : null}
-          {meta ? (
-            <Text fontSize={11} style={styles.meta} numberOfLines={2}>
-              {meta}
+            {product.brand ? (
+              <Text fontSize={11} style={styles.brand} numberOfLines={1}>
+                {product.brand}
+              </Text>
+            ) : null}
+            {meta ? (
+              <Text fontSize={11} style={styles.meta} numberOfLines={2}>
+                {meta}
+              </Text>
+            ) : null}
+            {serving ? (
+              <Text fontSize={10} style={styles.serving} numberOfLines={1}>
+                {serving}
+              </Text>
+            ) : null}
+          </View>
+          <View style={styles.addButton}>
+            <Text fontVariant="bold" fontSize={20} style={styles.addButtonLabel}>
+              +
             </Text>
-          ) : null}
-          {serving ? (
-            <Text fontSize={10} style={styles.serving} numberOfLines={1}>
-              {serving}
-            </Text>
-          ) : null}
-        </View>
-        <View style={styles.productIcon}>
-          <BarcodeIcon size={21} color={DIET_V2_GREEN} />
+          </View>
         </View>
       </Pressable>
     </Animated.View>
@@ -91,18 +96,18 @@ const FoodCatalogSearchRow = ({ product, index, onSelect }: FoodCatalogSearchRow
 
 const styles = StyleSheet.create({
   row: {
-    minHeight: 88,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    gap: 11,
     borderRadius: 15,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
-  rowPressed: { backgroundColor: "#F0F8F4", transform: [{ scale: 0.99 }] },
+  rowContent: {
+    minHeight: 88,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 11,
+  },
+  rowPressed: { backgroundColor: semanticColors.pressed, transform: [{ scale: 0.99 }] },
   addButton: {
     width: 32,
     height: 32,
@@ -112,7 +117,7 @@ const styles = StyleSheet.create({
     backgroundColor: DIET_V2_MINT,
   },
   addButtonLabel: { color: DIET_V2_GREEN, lineHeight: 23 },
-  copy: { flex: 1, alignItems: "flex-start" },
+  copy: {},
   name: { color: DIET_V2_DARK },
   brand: { color: DIET_V2_GREEN, paddingTop: 1 },
   meta: { color: DIET_V2_MUTED, paddingTop: 2 },
