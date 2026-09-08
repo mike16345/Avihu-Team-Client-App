@@ -44,22 +44,26 @@ interface MacroInputProps {
   onChange: (value: string) => void;
 }
 
-const MacroInput = ({ label, value, error, onChange }: MacroInputProps) => (
-  <View style={styles.macroField}>
-    <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
-      {label}
-    </Text>
-    <TextInput
-      value={value}
-      onChangeText={onChange}
-      keyboardType="decimal-pad"
-      placeholder="0"
-      placeholderTextColor={semanticColors.placeholder}
-      selectTextOnFocus
-      style={[styles.macroInput, error ? styles.inputError : null]}
-    />
-  </View>
-);
+const MacroInput = ({ label, value, error, onChange }: MacroInputProps) => {
+  const { layout, text } = useStyles();
+
+  return (
+    <View style={[layout.itemsStart, styles.macroField]}>
+      <Text fontVariant="medium" fontSize={11} style={[text.textStart, styles.fieldLabel]}>
+        {label}
+      </Text>
+      <TextInput
+        value={value}
+        onChangeText={onChange}
+        keyboardType="decimal-pad"
+        placeholder="0"
+        placeholderTextColor={semanticColors.placeholder}
+        selectTextOnFocus
+        style={[styles.macroInput, error ? styles.inputError : null]}
+      />
+    </View>
+  );
+};
 
 const resolveInitialDraft = (
   product: FoodCatalogProduct | undefined,
@@ -81,7 +85,7 @@ const FoodCatalogResultCard = ({
   onDismiss,
   onSubmit,
 }: FoodCatalogResultCardProps) => {
-  const { layout } = useStyles();
+  const { layout, text } = useStyles();
   const [draft, setDraft] = useState<SmartFoodDraft>(() =>
     resolveInitialDraft(product, initialDraft)
   );
@@ -137,10 +141,10 @@ const FoodCatalogResultCard = ({
           </Text>
         </View>
         <View style={[layout.flex1, layout.itemsStart, styles.headerText]}>
-          <Text fontVariant="bold" fontSize={17} style={styles.title}>
+          <Text fontVariant="bold" fontSize={17} style={[text.textStart, styles.title]}>
             {title}
           </Text>
-          <Text fontSize={12} style={styles.subtitle}>
+          <Text fontSize={12} style={[text.textStart, styles.subtitle]}>
             {subtitle}
           </Text>
         </View>
@@ -158,8 +162,8 @@ const FoodCatalogResultCard = ({
         </Pressable>
       </View>
 
-      <View style={styles.nameSection}>
-        <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
+      <View style={[layout.itemsStart, styles.nameSection]}>
+        <Text fontVariant="medium" fontSize={11} style={[text.textStart, styles.fieldLabel]}>
           שם המוצר
         </Text>
         <TextInput
@@ -167,10 +171,10 @@ const FoodCatalogResultCard = ({
           onChangeText={(value) => update("name", value)}
           placeholder="שם המוצר"
           placeholderTextColor={semanticColors.placeholder}
-          style={[styles.nameInput, errors.name ? styles.inputError : null]}
+          style={[text.textStart, styles.nameInput, errors.name ? styles.inputError : null]}
         />
         {product?.brand ? (
-          <Text fontSize={11} style={styles.brand}>
+          <Text fontSize={11} style={[text.textStart, styles.brand]}>
             {product.brand}
           </Text>
         ) : null}
@@ -178,7 +182,7 @@ const FoodCatalogResultCard = ({
 
       <View style={[layout.flexRow, styles.servingRow]}>
         <View style={[layout.flex1, layout.itemsStart, styles.servingTypeField]}>
-          <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
+          <Text fontVariant="medium" fontSize={11} style={[text.textStart, styles.fieldLabel]}>
             סוג מנה
           </Text>
           {product?.servings?.length ? (
@@ -196,23 +200,35 @@ const FoodCatalogResultCard = ({
             />
           ) : (
             <View style={styles.staticServing}>
-              <Text fontVariant="semibold" fontSize={14} style={styles.servingText}>
+              <Text
+                fontVariant="semibold"
+                fontSize={14}
+                style={[layout.widthFull, text.textStart, styles.servingText]}
+              >
                 {draft.servingDescription}
               </Text>
             </View>
           )}
         </View>
         <View style={[layout.itemsStart, styles.servingAmountField]}>
-          <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
+          <Text fontVariant="medium" fontSize={11} style={[text.textStart, styles.fieldLabel]}>
             כמות
           </Text>
-          <View style={[styles.amountInputWrap, errors.servingAmount ? styles.inputError : null]}>
+          <View
+            style={[
+              layout.flexRow,
+              layout.itemsCenter,
+              layout.ltr,
+              styles.amountInputWrap,
+              errors.servingAmount ? styles.inputError : null,
+            ]}
+          >
             <TextInput
               value={draft.servingAmount}
               onChangeText={(value) => update("servingAmount", value)}
               keyboardType="decimal-pad"
               selectTextOnFocus
-              style={styles.servingInput}
+              style={[layout.flex1, text.textRight, styles.servingInput]}
             />
             <Text fontVariant="semibold" fontSize={12} style={styles.amountUnit}>
               {draft.servingUnit}
@@ -244,8 +260,8 @@ const FoodCatalogResultCard = ({
       </Pressable>
 
       {macroEditorOpen ? (
-        <View style={styles.macrosSection}>
-          <Text fontVariant="semibold" fontSize={13} style={styles.sectionTitle}>
+        <View style={[layout.itemsStart, styles.macrosSection]}>
+          <Text fontVariant="semibold" fontSize={13} style={[text.textStart, styles.sectionTitle]}>
             {`ערכים עבור ${draft.servingQuantity} ${draft.servingUnit}`}
           </Text>
           <View style={styles.macrosRow}>
@@ -286,8 +302,13 @@ const FoodCatalogResultCard = ({
       ) : null}
 
       {Object.keys(errors).length > 0 ? (
-        <View style={styles.errorSummary}>
-          <Text selectable fontVariant="semibold" fontSize={12} style={styles.error}>
+        <View style={[layout.itemsStart, styles.errorSummary]}>
+          <Text
+            selectable
+            fontVariant="semibold"
+            fontSize={12}
+            style={[text.textStart, styles.error]}
+          >
             יש לתקן את השדות המסומנים:
           </Text>
           {Object.values(errors).map((message) => (
@@ -296,7 +317,11 @@ const FoodCatalogResultCard = ({
               style={[layout.widthFull, layout.flexRow, layout.itemsStart, styles.errorDetailRow]}
             >
               <View style={styles.errorDot} />
-              <Text selectable fontSize={12} style={styles.errorDetail}>
+              <Text
+                selectable
+                fontSize={12}
+                style={[layout.flex1, text.textStart, styles.errorDetail]}
+              >
                 {message}
               </Text>
             </View>
@@ -348,8 +373,8 @@ const styles = StyleSheet.create({
     borderColor: DIET_V2_CARD_BORDER,
   },
   closeLabel: { color: DIET_V2_MUTED, lineHeight: 20 },
-  nameSection: { gap: 5, alignItems: "stretch" },
-  fieldLabel: { width: "100%", color: DIET_V2_MUTED },
+  nameSection: { gap: 5 },
+  fieldLabel: { color: DIET_V2_MUTED },
   nameInput: {
     width: "100%",
     minHeight: 44,
@@ -382,8 +407,7 @@ const styles = StyleSheet.create({
   amountInputWrap: {
     width: "100%",
     height: 44,
-    flexDirection: "row",
-    alignItems: "center",
+    gap: 4,
     paddingHorizontal: 8,
     borderRadius: 12,
     borderWidth: 1,
@@ -391,7 +415,6 @@ const styles = StyleSheet.create({
     backgroundColor: semanticColors.app.surfaceRaised,
   },
   servingInput: {
-    flex: 1,
     height: "100%",
     color: DIET_V2_DARK,
     fontFamily: "Assistant-Bold",
@@ -409,9 +432,9 @@ const styles = StyleSheet.create({
   macroToggleText: { color: DIET_V2_MUTED },
   macroToggleIconOpen: { transform: [{ rotate: "180deg" }] },
   macrosSection: { gap: 7 },
-  sectionTitle: { color: DIET_V2_DARK, alignSelf: "flex-start" },
+  sectionTitle: { color: DIET_V2_DARK },
   macrosRow: { flexDirection: "row", gap: 7 },
-  macroField: { flex: 1, gap: 4, alignItems: "center" },
+  macroField: { flex: 1, gap: 4 },
   macroInput: {
     width: "100%",
     height: 42,
@@ -439,7 +462,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: semanticColors.diet.dangerBackground,
   },
-  error: { width: "100%", color: semanticColors.diet.dangerText },
+  error: { color: semanticColors.diet.dangerText },
   errorDetailRow: { gap: 6 },
   errorDot: {
     width: 5,
@@ -448,7 +471,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: semanticColors.diet.dangerBorder,
   },
-  errorDetail: { flex: 1, color: semanticColors.diet.dangerText },
+  errorDetail: { color: semanticColors.diet.dangerText },
 });
 
 export default FoodCatalogResultCard;

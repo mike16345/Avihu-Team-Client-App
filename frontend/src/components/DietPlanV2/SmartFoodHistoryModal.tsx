@@ -76,7 +76,7 @@ const SmartFoodHistoryModal = ({
   onClose,
 }: SmartFoodHistoryModalProps) => {
   const insets = useSafeAreaInsets();
-  const { layout } = useStyles();
+  const { layout, text } = useStyles();
   const [weekOffset, setWeekOffset] = useState(0);
   const [openedAt, setOpenedAt] = useState(() => new Date());
   const [days, setDays] = useState<SmartFoodHistoryDay[]>([]);
@@ -259,13 +259,17 @@ const SmartFoodHistoryModal = ({
                       <Text
                         fontVariant="bold"
                         fontSize={15}
-                        style={[layout.flex1, styles.dayTitle]}
+                        style={[layout.flex1, text.textStart, styles.dayTitle]}
                       >
                         {formatDayLabel(day.dayKey, dayIndex, weekOffset)}
                       </Text>
                     </View>
                     <View style={[layout.alignSelfStart, styles.totalBadge]}>
-                      <Text fontVariant="semibold" fontSize={11} style={styles.totalLabel}>
+                      <Text
+                        fontVariant="semibold"
+                        fontSize={11}
+                        style={[text.textStart, styles.totalLabel]}
+                      >
                         {`${formatDietPlanV2Number(totals.calories)} קק"ל · ${formatDietPlanV2Number(totals.protein)} חלבון · ${formatDietPlanV2Number(totals.carbs)} פחמימה · ${formatDietPlanV2Number(totals.fat)} שומן`}
                       </Text>
                     </View>
@@ -279,11 +283,14 @@ const SmartFoodHistoryModal = ({
                           <Text
                             fontVariant="semibold"
                             fontSize={14}
-                            style={[layout.widthFull, styles.entryName]}
+                            style={[layout.widthFull, text.textStart, styles.entryName]}
                           >
                             {entry.name}
                           </Text>
-                          <Text fontSize={11} style={[layout.widthFull, styles.entryMeta]}>
+                          <Text
+                            fontSize={11}
+                            style={[layout.widthFull, text.textStart, styles.entryMeta]}
+                          >
                             {`${entry.detail}${entry.macros.calories > 0 ? ` · ${formatDietPlanV2Number(entry.macros.calories)} קק"ל` : ""}`}
                           </Text>
                         </View>

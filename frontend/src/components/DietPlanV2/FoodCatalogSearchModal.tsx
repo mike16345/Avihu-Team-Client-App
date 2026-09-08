@@ -49,7 +49,7 @@ const FoodCatalogSearchModal = ({
   onScan,
 }: FoodCatalogSearchModalProps) => {
   const insets = useSafeAreaInsets();
-  const { layout } = useStyles();
+  const { layout, text } = useStyles();
   const searchInputRef = useRef<TextInput>(null);
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -136,10 +136,9 @@ const FoodCatalogSearchModal = ({
           </View>
         </View>
 
-        <View style={[layout.flexRow, layout.itemsCenter, styles.searchWrap]}>
-          <View style={styles.searchIcon}>
-            <SearchIcon size={17} color={DIET_V2_MUTED} />
-          </View>
+        <View
+          style={[layout.flexRow, layout.justifyBetween, layout.itemsCenter, styles.searchWrap]}
+        >
           <TextInput
             ref={searchInputRef}
             defaultValue=""
@@ -149,8 +148,11 @@ const FoodCatalogSearchModal = ({
             returnKeyType="search"
             autoCorrect={false}
             spellCheck={false}
-            style={[layout.flex1, styles.searchInput]}
+            style={[layout.flex1, text.textStart, styles.searchInput]}
           />
+          <View style={styles.searchIcon}>
+            <SearchIcon size={17} color={DIET_V2_MUTED} />
+          </View>
         </View>
 
         <ScrollView
