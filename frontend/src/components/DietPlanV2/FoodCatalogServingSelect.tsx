@@ -32,7 +32,7 @@ const FoodCatalogServingSelect = ({
   onClose,
   onSelect,
 }: FoodCatalogServingSelectProps) => {
-  const { layout } = useStyles();
+  const { layout, text } = useStyles();
   const selected = servings.find((serving) => serving.id === selectedId) ?? servings[0];
 
   if (!selected) return null;
@@ -57,7 +57,7 @@ const FoodCatalogServingSelect = ({
             styles.triggerContent,
           ]}
         >
-          <Text fontVariant="semibold" fontSize={14} style={styles.triggerText}>
+          <Text fontVariant="semibold" fontSize={14} style={[text.textStart, styles.triggerText]}>
             {selected.description}
           </Text>
           <View style={visible ? styles.chevronOpen : undefined}>
@@ -71,7 +71,11 @@ const FoodCatalogServingSelect = ({
           <Pressable style={styles.sheet} onPress={(event) => event.stopPropagation()}>
             <View style={[layout.widthFull, styles.sheetContent]}>
               <View style={styles.handle} />
-              <Text fontVariant="bold" fontSize={17} style={styles.title}>
+              <Text
+                fontVariant="bold"
+                fontSize={17}
+                style={[layout.widthFull, text.textStart, styles.title]}
+              >
                 בחירת סוג מנה
               </Text>
               <View style={styles.options}>
@@ -105,7 +109,11 @@ const FoodCatalogServingSelect = ({
                           {isSelected ? <View style={styles.radioDot} /> : null}
                         </View>
                         <View style={[layout.flex1, layout.itemsStart, styles.optionCopy]}>
-                          <Text fontVariant="semibold" fontSize={15} style={styles.optionName}>
+                          <Text
+                            fontVariant="semibold"
+                            fontSize={15}
+                            style={[layout.widthFull, text.textStart, styles.optionName]}
+                          >
                             {serving.description}
                           </Text>
                           <Text fontSize={11} style={styles.optionMeta}>
