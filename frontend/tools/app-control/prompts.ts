@@ -33,6 +33,8 @@ const formatAction = (selection: AppSelection): string => {
       return `${selection.operation} assets`;
     case "build":
       return `${selection.profile} build`;
+    case "submit":
+      return `${selection.profile} app-store submission`;
     case "install":
       return "install existing build";
     case "run":
@@ -54,7 +56,8 @@ const formatEquivalentCommand = (selection: AppSelection): string => {
   if (
     selection.action === "run" ||
     selection.action === "install" ||
-    selection.action === "build"
+    selection.action === "build" ||
+    selection.action === "submit"
   ) {
     parts.push(selection.platform);
   }
@@ -69,7 +72,7 @@ const formatEquivalentCommand = (selection: AppSelection): string => {
 
   parts.push("--tenant", selection.tenantId);
 
-  if (selection.action === "build") {
+  if (selection.action === "build" || selection.action === "submit") {
     parts.push("--profile", selection.profile);
   } else {
     parts.push("--environment", selection.environment);
@@ -91,7 +94,10 @@ export const printSelectionSummary = (selection: AppSelection): void => {
   const tenant = getTenant(selection.tenantId);
   const identity = tenant.environments[selection.environment];
   const identityLines =
-    selection.action === "run" || selection.action === "install" || selection.action === "build"
+    selection.action === "run" ||
+    selection.action === "install" ||
+    selection.action === "build" ||
+    selection.action === "submit"
       ? selection.platform === "android"
         ? [`Android package: ${identity.androidPackage}`]
         : [`iOS bundle ID: ${identity.iosBundleIdentifier}`]
@@ -184,6 +190,7 @@ const chooseAction = async (
             ]
           : [
               { value: "build" as const, label: "Build with EAS" },
+              { value: "submit" as const, label: "Submit to app stores" },
               { value: "update" as const, label: "Publish an update" },
               BACK_OPTION,
             ],
@@ -318,11 +325,13 @@ export const promptForSelection = async (
     while (true) {
       const environmentResult = isDevelopmentEasBuild
         ? "development"
-        : await chooseEnvironment(
-            parsed.environment,
-            action === "build" || action === "update",
-            localOnly && action === "run"
-          );
+        : action === "submit"
+          ? "production"
+          : await chooseEnvironment(
+              parsed.environment,
+              action === "build" || action === "update",
+              localOnly && action === "run"
+            );
       if (!environmentResult) {
         cancel("Operation cancelled.");
         return null;
@@ -398,6 +407,16 @@ export const promptForSelection = async (
           environment: environment as ReleaseProfile,
           profile: environment as ReleaseProfile,
           usePackageScript: true,
+        };
+      }
+
+      if (action === "submit") {
+        return {
+          action,
+          tenantId,
+          platform,
+          environment: environment as ReleaseProfile,
+          profile: environment as ReleaseProfile,
         };
       }
 

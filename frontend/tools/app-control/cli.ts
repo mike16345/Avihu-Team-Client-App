@@ -69,6 +69,17 @@ const selectionFromConfirmedArguments = (arguments_: ParsedAppArguments): AppSel
         profile: arguments_.profile,
         platform: arguments_.platform,
       };
+    case "submit":
+      if (!arguments_.platform || !arguments_.profile) {
+        throw new Error("platform and profile are required for submit actions");
+      }
+      return {
+        action: "submit",
+        tenantId: arguments_.tenantId,
+        environment: arguments_.profile,
+        profile: arguments_.profile,
+        platform: arguments_.platform,
+      };
     case "update":
       if (arguments_.environment === "development") {
         throw new Error("Updates require the preview or production environment");

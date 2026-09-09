@@ -42,7 +42,7 @@ const parsePlatform = (
     throw new Error(`Unsupported platform "${value}"`);
   }
 
-  if (action !== "build" && action !== "run" && action !== "install") {
+  if (action !== "build" && action !== "submit" && action !== "run" && action !== "install") {
     throw new Error(`Action "${action}" does not support platform "${value}"`);
   }
 
@@ -97,10 +97,10 @@ const assertConfirmedArguments = (arguments_: ParsedAppArguments): void => {
   requireConfirmedValue(arguments_.action, "action");
   requireConfirmedValue(arguments_.tenantId, "--tenant");
 
-  if (arguments_.action === "build") {
+  if (arguments_.action === "build" || arguments_.action === "submit") {
     requireConfirmedValue(arguments_.platform, "platform");
     if (!arguments_.profile) {
-      throw new Error("--profile is required for build in non-interactive mode");
+      throw new Error(`--profile is required for ${arguments_.action} in non-interactive mode`);
     }
   } else {
     requireConfirmedValue(arguments_.environment, "--environment");
@@ -129,12 +129,12 @@ const resolveEnvironment = (
 ): TenantEnvironment | undefined => {
   const environment = environmentValue ? parseTenantEnvironment(environmentValue) : undefined;
 
-  if (action !== "build") {
+  if (action !== "build" && action !== "submit") {
     return environment;
   }
 
   if (environment && profile && environment !== profile) {
-    throw new Error("--environment must match --profile for build actions");
+    throw new Error(`--environment must match --profile for ${action} actions`);
   }
 
   return profile ?? environment;
@@ -164,6 +164,7 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
   const action = parseAction(actionValue);
   if (
     action !== "build" &&
+    action !== "submit" &&
     action !== "run" &&
     action !== "install" &&
     operationOrPlatform &&
@@ -173,17 +174,24 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
   }
 
   const platform =
-    action === "build" || action === "run" || action === "install"
+    action === "build" || action === "submit" || action === "run" || action === "install"
       ? parsePlatform(action, operationOrPlatform)
       : undefined;
   const profile = parseReleaseProfile(values.profile);
   const environment = resolveEnvironment(action, values.environment, profile);
+  if (action === "submit" && profile && profile !== "production") {
+    throw new Error('Submit actions require the "production" profile');
+  }
+  if (action === "submit" && environment && environment !== "production") {
+    throw new Error('Submit actions require the "production" environment');
+  }
   const preflightMode =
     action === "preflight" ? parsePreflightMode(operationOrPlatform) : undefined;
   const assetOperation = action === "assets" ? parseAssetOperation(operationOrPlatform) : undefined;
 
   if (
     action !== "build" &&
+    action !== "submit" &&
     action !== "run" &&
     action !== "install" &&
     operationOrPlatform &&
@@ -193,8 +201,8 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
     throw new Error(`Action "${action}" does not accept "${operationOrPlatform}"`);
   }
 
-  if (action !== "build" && profile) {
-    throw new Error("--profile is only supported for build actions");
+  if (action !== "build" && action !== "submit" && profile) {
+    throw new Error("--profile is only supported for build and submit actions");
   }
 
   if (action !== "install" && values.binary) {

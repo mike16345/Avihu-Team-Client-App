@@ -7,6 +7,7 @@ export const APP_ACTIONS = [
   "preflight",
   "assets",
   "build",
+  "submit",
   "update",
 ] as const;
 export const APP_PLATFORMS = ["android", "ios"] as const;
@@ -66,5 +67,11 @@ export type AppSelection =
       environment: ReleaseProfile;
       profile: ReleaseProfile;
       usePackageScript?: boolean;
+    })
+  | (BaseSelection & {
+      action: "submit";
+      platform: AppPlatform;
+      environment: ReleaseProfile;
+      profile: ReleaseProfile;
     })
   | (BaseSelection & { action: "update"; environment: ReleaseProfile });

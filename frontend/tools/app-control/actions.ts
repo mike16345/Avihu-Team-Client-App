@@ -12,7 +12,11 @@ export const assertTenantActionAllowed = (
   tenant: ReturnType<typeof getTenant>,
   selection: AppSelection
 ): void => {
-  if (selection.action === "build" || selection.action === "update") {
+  if (
+    selection.action === "build" ||
+    selection.action === "submit" ||
+    selection.action === "update"
+  ) {
     assertTenantEasActionAllowed(tenant, `${selection.action} actions`);
   }
 
@@ -20,6 +24,7 @@ export const assertTenantActionAllowed = (
 
   const forbidden =
     selection.action === "build" ||
+    selection.action === "submit" ||
     selection.action === "update" ||
     (selection.action === "preflight" && selection.mode === "release") ||
     (selection.action === "run" && selection.environment !== "development");
@@ -223,6 +228,30 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
       );
       return {
         ...build,
+        prerequisite: createCommandStep(
+          selection,
+          "npm",
+          ["run", "preflight:eas"],
+          `EAS preflight for ${labelPrefix}`
+        ),
+      };
+    }
+    case "submit": {
+      const submit = createCommandSpec(
+        selection,
+        "npx",
+        [
+          ...EAS_CLI_ARGS,
+          "submit",
+          "--platform",
+          selection.platform,
+          "--profile",
+          selection.profile,
+        ],
+        `Submit ${labelPrefix} for ${selection.platform}`
+      );
+      return {
+        ...submit,
         prerequisite: createCommandStep(
           selection,
           "npm",

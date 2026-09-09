@@ -21,6 +21,15 @@ describe("resolveAction", () => {
     ).toThrow('Local tenant "test-tenant" cannot run build actions');
     expect(() =>
       assertTenantActionAllowed(localTenant, {
+        action: "submit",
+        platform: "ios",
+        tenantId: localTenant.id,
+        environment: "production",
+        profile: "production",
+      })
+    ).toThrow('Local tenant "test-tenant" cannot run submit actions');
+    expect(() =>
+      assertTenantActionAllowed(localTenant, {
         action: "preflight",
         mode: "release",
         tenantId: localTenant.id,
@@ -43,6 +52,15 @@ describe("resolveAction", () => {
         action: "update",
         tenantId: pendingTenant.id,
         environment: "production",
+      })
+    ).toThrow(/tenant:eas -- --tenant new-tenant/u);
+    expect(() =>
+      assertTenantActionAllowed(pendingTenant, {
+        action: "submit",
+        platform: "android",
+        tenantId: pendingTenant.id,
+        environment: "production",
+        profile: "production",
       })
     ).toThrow(/tenant:eas -- --tenant new-tenant/u);
   });
@@ -198,6 +216,33 @@ describe("resolveAction", () => {
         "--profile",
         "production",
       ],
+      env: {
+        APP_TENANT: "avihu",
+        APP_ENV: "production",
+      },
+      prerequisite: {
+        command: "npm",
+        args: ["run", "preflight:eas"],
+        env: {
+          APP_TENANT: "avihu",
+          APP_ENV: "production",
+        },
+      },
+    });
+  });
+
+  it("submits a user-selected EAS build with the selected tenant configuration", () => {
+    expect(
+      resolveAction({
+        action: "submit",
+        platform: "ios",
+        tenantId: "avihu",
+        environment: "production",
+        profile: "production",
+      })
+    ).toMatchObject({
+      command: "npx",
+      args: ["--yes", "eas-cli@22.4.0", "submit", "--platform", "ios", "--profile", "production"],
       env: {
         APP_TENANT: "avihu",
         APP_ENV: "production",

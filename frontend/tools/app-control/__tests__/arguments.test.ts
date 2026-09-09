@@ -100,6 +100,40 @@ describe("parseAppArguments", () => {
     });
   });
 
+  it("parses a confirmed iOS production submission", () => {
+    expect(
+      parseAppArguments(["submit", "ios", "--tenant", "avihu", "--profile", "production", "--yes"])
+    ).toMatchObject({
+      action: "submit",
+      platform: "ios",
+      tenantId: "avihu",
+      environment: "production",
+      profile: "production",
+      confirmed: true,
+    });
+  });
+
+  it("requires a profile for confirmed submissions", () => {
+    expect(() =>
+      parseAppArguments(["submit", "android", "--tenant", "avihu", "--yes"])
+    ).toThrowError("--profile is required for submit in non-interactive mode");
+  });
+
+  it.each(["development", "preview"])(
+    "rejects the unsupported %s submission profile",
+    (profile) => {
+      expect(() =>
+        parseAppArguments(["submit", "ios", "--tenant", "avihu", "--profile", profile, "--yes"])
+      ).toThrowError('Submit actions require the "production" profile');
+    }
+  );
+
+  it("rejects an explicit non-production submission environment", () => {
+    expect(() =>
+      parseAppArguments(["submit", "ios", "--tenant", "avihu", "--environment", "preview"])
+    ).toThrowError('Submit actions require the "production" environment');
+  });
+
   it("parses a confirmed Android development build", () => {
     expect(
       parseAppArguments([
