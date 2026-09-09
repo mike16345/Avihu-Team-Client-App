@@ -81,6 +81,39 @@ describe("interactive app-control navigation", () => {
     });
   });
 
+  it("creates a submission selection from the release menu", async () => {
+    promptMocks.select
+      .mockResolvedValueOnce("avihu")
+      .mockResolvedValueOnce("release")
+      .mockImplementationOnce(optionValue("Submit to app stores"))
+      .mockResolvedValueOnce("ios");
+
+    await expect(promptForSelection({ confirmed: false, dryRun: false })).resolves.toMatchObject({
+      action: "submit",
+      tenantId: "avihu",
+      environment: "production",
+      profile: "production",
+      platform: "ios",
+    });
+  });
+
+  it("prints a repeatable tenant-aware submission command", () => {
+    printSelectionSummary({
+      action: "submit",
+      tenantId: "avihu",
+      environment: "production",
+      profile: "production",
+      platform: "ios",
+    });
+
+    expect(promptMocks.box).toHaveBeenCalledWith(
+      expect.stringContaining(
+        "Repeat command: npm run app -- submit ios --tenant avihu --profile production --yes"
+      ),
+      "App control summary"
+    );
+  });
+
   it.each([
     ["development", "ios", "build:ios:dev"],
     ["production", "android", "build:android:prod"],
