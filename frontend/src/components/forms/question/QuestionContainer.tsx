@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useWindowDimensions, View } from "react-native";
 import { FormQuestion } from "@/interfaces/FormPreset";
 import useStyles from "@/styles/useGlobalStyles";
@@ -61,11 +62,15 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   subtitle: {
-    color: "#4A5568",
+    color: semanticColors.app.textForm,
     marginTop: 4,
   },
   paddingStart: { paddingStart: 24 },
-  borderBottom: { borderBottomWidth: 1, paddingBottom: 20, borderColor: "#cccccc" },
+  borderBottom: {
+    borderBottomWidth: 1,
+    paddingBottom: 20,
+    borderColor: semanticColors.app.formBorder,
+  },
 });
 
 export default QuestionContainer;

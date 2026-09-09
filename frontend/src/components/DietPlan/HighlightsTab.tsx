@@ -1,14 +1,15 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { ScrollView, View, StyleSheet } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { Text } from "../ui/Text";
 import HtmlBlock from "../ui/HTMLBlock";
-import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 import { isHtmlEmpty } from "@/utils/utils";
 import { DIET_V2_MUTED } from "../DietPlanV2/dietV2Icons";
 
 const HighlightsTab = () => {
   const { spacing } = useStyles();
-  const { data } = useDietPlanQuery();
+  const { data } = useDietPlanV1Query();
   const tips = (data?.customInstructions || []).filter((t: string) => !isHtmlEmpty(t));
 
   return (
@@ -38,10 +39,10 @@ const HighlightsTab = () => {
 const styles = StyleSheet.create({
   card: {
     alignSelf: "stretch",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: "rgba(15, 94, 59, 0.08)",
+    borderColor: semanticColors.diet.border,
     minHeight: 180,
     paddingVertical: 28,
     paddingHorizontal: 16,

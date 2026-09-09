@@ -1,4 +1,4 @@
-import { View, Pressable, StyleSheet, StatusBar } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import Icon from "@/components/Icon/Icon";
@@ -14,14 +14,15 @@ import {
   DEFAULT_SET,
   IS_IOS,
   RECORD_SET_SHEET_MAX_PEEK_HEIGHT,
-  TOP_BAR_HEIGHT,
 } from "@/constants/Constants";
 import { useLayoutStore } from "@/store/layoutStore";
 import FixedRangeBottomDrawer from "@/components/ui/BottomDrawerModal";
 import type { SetInput } from "./SetInputContainer";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const HORIZONTAL_PADDING = 24;
 const VERTICAL_PADDING = 16;
+const ANDROID_SHEET_TOP_OFFSET_PADDING = 30;
 
 interface WheelSetInputProps {
   sheetHeight: number;
@@ -39,14 +40,15 @@ const WheelSetInput: FC<WheelSetInputProps> = ({
   exercise,
 }) => {
   const { layout, colors, spacing, common } = useStyles();
+  const insets = useSafeAreaInsets();
   const lastRecordedSetForSetNumber = useGetLastRecordedSetForSetNumber(
     exercise.exerciseId.name,
     setNumber
   );
   const setIsSheetExpanded = useLayoutStore((state) => state.setIsSheetExpanded);
-  const topoffset = IS_IOS
-    ? TOP_BAR_HEIGHT
-    : (StatusBar.currentHeight || TOP_BAR_HEIGHT) + DEFAULT_PAGE_TOP_PADDING + 30;
+  const topOffset = IS_IOS
+    ? insets.top
+    : insets.top + DEFAULT_PAGE_TOP_PADDING + ANDROID_SHEET_TOP_OFFSET_PADDING;
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [containerHeight, setContainerHeight] = useState(0);
@@ -113,7 +115,7 @@ const WheelSetInput: FC<WheelSetInputProps> = ({
           ? RECORD_SET_SHEET_MAX_PEEK_HEIGHT
           : sheetHeight
       }
-      topOffset={topoffset}
+      topOffset={topOffset}
       renderHandle={({ toggle, isOpen }) => (
         <Pressable onPress={toggle}>
           <Icon rotation={isOpen ? 180 : 0} name={"arrowRoundUp"} />

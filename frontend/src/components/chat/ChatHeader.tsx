@@ -1,7 +1,8 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { View, Image, TouchableOpacity, BackHandler, StyleSheet } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import Icon from "../Icon/Icon";
-import appIcon from "@assets/app-logo.png";
+import appIcon from "tenant-assets/runtime-logo.png";
 import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect } from "react";
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
     borderRadius: 17,
   },
   shadow: {
-    shadowColor: "#000",
+    shadowColor: semanticColors.scrim,
     shadowOffset: {
       width: -4,
       height: 8,

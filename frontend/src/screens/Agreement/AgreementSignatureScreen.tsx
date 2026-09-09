@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
@@ -116,15 +117,15 @@ const AgreementSignatureScreen = () => {
   const webStyle = `
   .m-signature-pad {
     box-shadow: none; 
-    border: 1px solid #DDE8F8;
+    border: 1px solid ${semanticColors.app.agreementBorder};
     height: ${200}px;
     width: ${width - 80}px;
     border-radius:16px;
     margin: 0 auto;
-    background-color:#F7FBFF;
+    background-color:${semanticColors.app.agreementSurface};
   }
   .m-signature-pad--body {
-    border: 1px solid #E9F0FA;
+    border: 1px solid ${semanticColors.app.agreementSurfaceStrong};
     border-radius:16px;
   }
   .m-signature-pad--footer {
@@ -176,7 +177,7 @@ const AgreementSignatureScreen = () => {
           onOK={handleOK}
           webStyle={webStyle}
           onEnd={handleEnd}
-          penColor={"#000"}
+          penColor={semanticColors.scrim}
           imageType="image/png"
           trimWhitespace
         />
@@ -218,7 +219,7 @@ const AgreementSignatureScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: semanticColors.app.surfaceRaised,
     gap: 12,
   },
   title: {
@@ -253,7 +254,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   signHintIconWrap: {
-    backgroundColor: "white",
+    backgroundColor: semanticColors.app.surfaceRaised,
     width: 24,
     height: 24,
     borderRadius: 999,

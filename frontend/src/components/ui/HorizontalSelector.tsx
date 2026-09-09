@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { ScrollView, StyleProp, View, ViewStyle } from "react-native";
 import { Text } from "./Text";
 import PrimaryButton from "./buttons/PrimaryButton";
@@ -42,7 +43,11 @@ const HorizontalSelector: React.FC<HorizontalSelectorProps> = ({
               onPress={() => handleSelect(item)}
               style={[
                 spacing.pdVerticalSm,
-                { borderWidth: 1, borderColor: "#072723", borderRadius: 8 },
+                {
+                  borderWidth: 1,
+                  borderColor: semanticColors.steps.ringGradientStart,
+                  borderRadius: 8,
+                },
               ]}
             >
               <View style={[{ minWidth: 68 }]}>

@@ -3,6 +3,7 @@ node_modules/
 
 # Expo
 .expo/
+.preflight/
 dist/
 web-build/
 
