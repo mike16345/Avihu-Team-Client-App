@@ -1,10 +1,11 @@
-import { Line,  vec } from "@shopify/react-native-skia";
+import { semanticColors } from "@/themes/semanticColors";
+import { Line, vec } from "@shopify/react-native-skia";
 import { useDerivedValue } from "react-native-reanimated";
 import { ChartBounds } from "victory-native";
 
 type Orientation = "horizontal" | "vertical";
 
-interface SkiaLineProps  {
+interface SkiaLineProps {
   chartBounds: ChartBounds;
   orientation?: Orientation;
 }
@@ -21,7 +22,7 @@ const SkiaLine = ({ chartBounds, orientation = "horizontal", ...props }: SkiaLin
       strokeWidth={0.54}
       p1={startLine}
       p2={endLine}
-      color={"#454459"}
+      color={semanticColors.graph.lineSecondary}
     />
   );
 };

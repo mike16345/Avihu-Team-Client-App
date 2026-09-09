@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -49,6 +50,11 @@ const DietPlanV2Tabs = ({
 
   const tabs: TabItem[] = [
     {
+      label: "דגשים",
+      value: "דגשים",
+      content: <DietPlanV2Highlights highlights={plan.highlights} />,
+    },
+    {
       label: "הארוחות שלי",
       value: "הארוחות שלי",
       content: (
@@ -75,11 +81,6 @@ const DietPlanV2Tabs = ({
           onRemove={onRemoveSmartFood}
         />
       ),
-    },
-    {
-      label: "דגשים",
-      value: "דגשים",
-      content: <DietPlanV2Highlights highlights={plan.highlights} />,
     },
   ];
   const activeTab = tabs.find(({ value }) => value === selectedTab) ?? tabs[0];
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     flexDirection: "row",
-    backgroundColor: "#EFF1F5",
+    backgroundColor: semanticColors.secondary,
     borderRadius: 14,
     paddingHorizontal: 4,
     paddingVertical: 2,
@@ -139,17 +140,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   tabActive: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
     borderWidth: 1,
-    borderColor: "#D6DBE0",
-    shadowColor: "#0B2A22",
+    borderColor: semanticColors.app.dietTabBorder,
+    shadowColor: semanticColors.diet.primaryText,
     shadowOpacity: 0.06,
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 1 },
     elevation: 1,
   },
   labelIdle: {
-    color: "#6B7280",
+    color: semanticColors.scanner.panelText,
   },
   labelActive: {
     color: DIET_V2_DARK,

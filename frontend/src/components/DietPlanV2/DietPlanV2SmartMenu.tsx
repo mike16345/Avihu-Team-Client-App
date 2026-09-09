@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useMemo, useState } from "react";
 import { Linking, Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown, FadeOut, LinearTransition } from "react-native-reanimated";
@@ -202,7 +203,7 @@ const DietPlanV2SmartMenu = ({
 
         {isReady && entries.length === 0 ? (
           <View style={styles.emptyState}>
-            <BarcodeIcon size={27} color="#9AA5A0" />
+            <BarcodeIcon size={27} color={semanticColors.app.dietSearchIcon} />
             <Text fontSize={13} style={styles.emptyText}>
               מוצרים שתסרוק ותאשר יופיעו כאן ויתווספו להתקדמות היומית.
             </Text>
@@ -217,11 +218,7 @@ const DietPlanV2SmartMenu = ({
             layout={LinearTransition.duration(180)}
             style={styles.entryRow}
           >
-            <Pressable onPress={() => requestRemove(entry)} hitSlop={8} style={styles.removeButton}>
-              <Text fontVariant="bold" fontSize={16} style={styles.removeLabel}>
-                ×
-              </Text>
-            </Pressable>
+            <View style={styles.entryDot} />
             <Pressable
               onPress={() => {
                 selectionHaptic();
@@ -230,17 +227,23 @@ const DietPlanV2SmartMenu = ({
               }}
               style={styles.entryCopy}
             >
-              <Text fontVariant="semibold" fontSize={14} style={styles.entryName}>
-                {entry.name}
-              </Text>
-              <Text fontSize={11} style={styles.entryMeta}>
-                {`${formatSmartFoodServingAmount(entry)} · ${formatDietPlanV2Number(entry.macros.calories)} קק"ל`}
-              </Text>
-              <Text fontVariant="medium" fontSize={11} style={styles.editLabel}>
-                הקש לעריכה
+              <View style={{ alignItems: "flex-start", flex: 1 }}>
+                <Text fontVariant="semibold" fontSize={14} style={styles.entryName}>
+                  {entry.name}
+                </Text>
+                <Text fontSize={11} style={styles.entryMeta}>
+                  {`${formatSmartFoodServingAmount(entry)} · ${formatDietPlanV2Number(entry.macros.calories)} קק"ל`}
+                </Text>
+                <Text fontVariant="medium" fontSize={11} style={styles.editLabel}>
+                  הקש לעריכה
+                </Text>
+              </View>
+            </Pressable>
+            <Pressable onPress={() => requestRemove(entry)} hitSlop={8} style={styles.removeButton}>
+              <Text fontVariant="bold" fontSize={16} style={styles.removeLabel}>
+                ×
               </Text>
             </Pressable>
-            <View style={styles.entryDot} />
           </Animated.View>
         ))}
       </View>
@@ -315,7 +318,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
+    alignItems: "flex-start",
   },
   cardHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
   headerCopy: { flex: 1, gap: 3, alignItems: "flex-start" },
@@ -330,6 +334,7 @@ const styles = StyleSheet.create({
     backgroundColor: DIET_V2_MINT,
   },
   searchWrap: {
+    width: "100%",
     minHeight: 44,
     flexDirection: "row",
     alignItems: "center",
@@ -338,10 +343,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#F8FAF9",
+    backgroundColor: semanticColors.app.dietSearchSurface,
   },
   searchIcon: { width: 22, alignItems: "center" },
-  searchWrapPressed: { backgroundColor: "#F0F8F4", borderColor: "#BFDCCB" },
+  searchWrapPressed: {
+    backgroundColor: semanticColors.pressed,
+    borderColor: semanticColors.app.dietSearchBorder,
+  },
   searchPlaceholder: { width: "100%", color: DIET_V2_MUTED },
   quickActions: { flexDirection: "row", gap: 8 },
   quickAction: {
@@ -355,17 +363,17 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   quickActionLabel: { color: DIET_V2_DARK, textAlign: "center" },
-  searchHint: { width: "100%", color: DIET_V2_MUTED },
+  searchHint: { color: DIET_V2_MUTED },
   todayCard: {
     padding: 16,
     gap: 12,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   todayHeader: { flexDirection: "row", alignItems: "center", gap: 10 },
   todayTitleWrap: { flex: 1, gap: 2, alignItems: "flex-start" },
@@ -387,9 +395,9 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingTop: 11,
     borderTopWidth: 1,
-    borderTopColor: "#EEF1EF",
+    borderTopColor: semanticColors.app.dietSearchDivider,
   },
-  entryCopy: { flex: 1, alignItems: "flex-start" },
+  entryCopy: { flex: 1 },
   entryName: { color: DIET_V2_DARK },
   entryMeta: { color: DIET_V2_MUTED },
   editLabel: { color: DIET_V2_GREEN, paddingTop: 2 },
@@ -400,7 +408,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F5F6F5",
+    backgroundColor: semanticColors.app.dietSearchDisabled,
   },
   removeLabel: { color: DIET_V2_MUTED, lineHeight: 18 },
   attribution: {
@@ -412,14 +420,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 14,
   },
-  attributionPressed: { backgroundColor: "#EEF4F1" },
+  attributionPressed: { backgroundColor: semanticColors.app.dietAttributionPressed },
   attributionDot: {
     width: 5,
     height: 5,
     borderRadius: 3,
-    backgroundColor: "#A8B3AE",
+    backgroundColor: semanticColors.app.dietSearchIconMuted,
   },
-  attributionText: { color: "#7F8B85" },
+  attributionText: { color: semanticColors.app.dietSearchAttribution },
 });
 
 export default DietPlanV2SmartMenu;

@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useWindowDimensions, StyleProp, ViewStyle, StyleSheet } from "react-native";
 import React, { useMemo } from "react";
 import { Canvas, LinearGradient, Rect, vec } from "@shopify/react-native-skia";
@@ -25,20 +26,20 @@ const ScrollViewShadow: React.FC<ScrollViewShadowProps> = ({
   const notAtEndStyles = {
     positions: [0, 0.4, 0.75, 1],
     colors: [
-      "rgba(0,0,0,0.0005)",
-      "rgba(248, 248, 248,0)",
+      semanticColors.app.shadowTrace,
+      semanticColors.app.transparentBackground,
       firstColor, // Match exact bottom container color
       firstColor, // Match exact bottom container color
     ],
     invertedPositions: [0, 0.4],
-    invertedColors: [firstColor, "rgba(248, 248, 248,0)"],
+    invertedColors: [firstColor, semanticColors.app.transparentBackground],
   };
 
   const endStyles = {
     positions: [0.5, 1],
-    colors: ["rgba(248, 248, 248,0)", firstColor],
+    colors: [semanticColors.app.transparentBackground, firstColor],
     invertedPositions: [0, 0.025],
-    invertedColors: [firstColor, "rgba(248, 248, 248,0)"],
+    invertedColors: [firstColor, semanticColors.app.transparentBackground],
   };
 
   const gradientStyles = useMemo(() => (isAtEnd ? endStyles : notAtEndStyles), [isAtEnd]);

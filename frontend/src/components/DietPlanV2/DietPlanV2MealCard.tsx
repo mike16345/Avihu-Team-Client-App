@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown, FadeOutUp, LinearTransition } from "react-native-reanimated";
@@ -146,11 +147,11 @@ const DietPlanV2MealCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(15, 94, 59, 0.08)",
-    shadowColor: "#000",
+    borderColor: semanticColors.diet.border,
+    shadowColor: semanticColors.scrim,
     shadowOpacity: 0.05,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 1 },
@@ -158,8 +159,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   cardConsumed: {
-    backgroundColor: "#F0FDF4",
-    borderColor: "#BBF7D0",
+    backgroundColor: semanticColors.diet.mintStrong,
+    borderColor: semanticColors.diet.consumedBorder,
   },
   header: {
     flexDirection: "row",
@@ -181,10 +182,10 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   mealTitle: {
-    color: "#0B2A22",
+    color: semanticColors.diet.primaryText,
   },
   summary: {
-    color: "#4B5563",
+    color: semanticColors.diet.secondaryText,
     marginTop: 2,
   },
   freeChip: {
@@ -194,11 +195,11 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderStyle: "dashed",
-    borderColor: "#86EFAC",
-    backgroundColor: "#F0FDF4",
+    borderColor: semanticColors.diet.borderStrong,
+    backgroundColor: semanticColors.diet.mintStrong,
   },
   freeChipLabel: {
-    color: "#166534",
+    color: semanticColors.diet.consumedText,
   },
   chevron: {
     width: 22,

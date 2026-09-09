@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { Pressable, StyleSheet, View } from "react-native";
 import Icon from "@/components/Icon/Icon";
 import { Text } from "@/components/ui/Text";
@@ -18,7 +19,7 @@ const SmartFoodDeleteModal = ({ entry, onDismiss, onConfirm }: SmartFoodDeleteMo
     <View style={styles.container}>
       <View style={styles.card}>
         <View style={styles.iconCircle}>
-          <Icon name="trash" width={24} height={24} color="#DC2626" />
+          <Icon name="trash" width={24} height={24} color={semanticColors.diet.dangerBorder} />
         </View>
         <View style={styles.copy}>
           <Text fontVariant="bold" fontSize={20} style={styles.title}>
@@ -60,7 +61,7 @@ const SmartFoodDeleteModal = ({ entry, onDismiss, onConfirm }: SmartFoodDeleteMo
 );
 
 const styles = StyleSheet.create({
-  backdrop: { paddingHorizontal: 20, backgroundColor: "rgba(5, 20, 16, 0.48)" },
+  backdrop: { paddingHorizontal: 20, backgroundColor: semanticColors.overlay.modal },
   container: { flex: 1, alignItems: "center", justifyContent: "center" },
   card: {
     width: "100%",
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   iconCircle: {
     width: 54,
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
     borderRadius: 27,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFF1F2",
+    backgroundColor: semanticColors.diet.dangerBackground,
   },
   copy: { width: "100%", gap: 7 },
   title: { width: "100%", color: DIET_V2_DARK, textAlign: "center" },
@@ -96,9 +97,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 14,
-    backgroundColor: "#DC2626",
+    backgroundColor: semanticColors.diet.dangerBorder,
   },
-  deleteLabel: { color: "#FFFFFF" },
+  deleteLabel: { color: semanticColors.app.surfaceRaised },
 });
 
 export default SmartFoodDeleteModal;

@@ -1,4 +1,4 @@
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 export const useLayoutStyles = () => {
   const layoutStyles = StyleSheet.create({
@@ -49,9 +49,6 @@ export const useLayoutStyles = () => {
     },
     flexRowReverse: {
       flexDirection: "row-reverse",
-    },
-    flexDirectionByPlatform: {
-      flexDirection: Platform.OS == `android` ? "row-reverse" : "row",
     },
     flexColumnReverse: {
       flexDirection: "column-reverse",

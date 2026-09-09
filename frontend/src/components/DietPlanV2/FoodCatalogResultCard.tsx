@@ -1,8 +1,10 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, TextInput, View } from "react-native";
 import { Text } from "@/components/ui/Text";
 import PrimaryButton from "@/components/ui/buttons/PrimaryButton";
 import type { FoodCatalogProduct } from "@/interfaces/IFoodCatalog";
+import useStyles from "@/styles/useGlobalStyles";
 import { selectionHaptic, successNotificationHaptic } from "@/utils/haptics";
 import {
   createFoodCatalogDraft,
@@ -13,6 +15,7 @@ import {
   type SmartFoodEntry,
 } from "./foodCatalog";
 import {
+  ChevronDownIcon,
   DIET_V2_CARD_BORDER,
   DIET_V2_DARK,
   DIET_V2_GREEN,
@@ -41,22 +44,26 @@ interface MacroInputProps {
   onChange: (value: string) => void;
 }
 
-const MacroInput = ({ label, value, error, onChange }: MacroInputProps) => (
-  <View style={styles.macroField}>
-    <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
-      {label}
-    </Text>
-    <TextInput
-      value={value}
-      onChangeText={onChange}
-      keyboardType="decimal-pad"
-      placeholder="0"
-      placeholderTextColor="#A0A7B0"
-      selectTextOnFocus
-      style={[styles.macroInput, error ? styles.inputError : null]}
-    />
-  </View>
-);
+const MacroInput = ({ label, value, error, onChange }: MacroInputProps) => {
+  const { layout, text } = useStyles();
+
+  return (
+    <View style={[layout.itemsStart, styles.macroField]}>
+      <Text fontVariant="medium" fontSize={11} style={[text.textStart, styles.fieldLabel]}>
+        {label}
+      </Text>
+      <TextInput
+        value={value}
+        onChangeText={onChange}
+        keyboardType="decimal-pad"
+        placeholder="0"
+        placeholderTextColor={semanticColors.placeholder}
+        selectTextOnFocus
+        style={[styles.macroInput, error ? styles.inputError : null]}
+      />
+    </View>
+  );
+};
 
 const resolveInitialDraft = (
   product: FoodCatalogProduct | undefined,
@@ -78,6 +85,7 @@ const FoodCatalogResultCard = ({
   onDismiss,
   onSubmit,
 }: FoodCatalogResultCardProps) => {
+  const { layout, text } = useStyles();
   const [draft, setDraft] = useState<SmartFoodDraft>(() =>
     resolveInitialDraft(product, initialDraft)
   );
@@ -126,7 +134,20 @@ const FoodCatalogResultCard = ({
 
   return (
     <View style={styles.card}>
-      <View style={styles.headerRow}>
+      <View style={[layout.flexRow, layout.itemsCenter, styles.headerRow]}>
+        <View style={styles.successDot}>
+          <Text fontVariant="bold" fontSize={16} style={styles.successCheck}>
+            ✓
+          </Text>
+        </View>
+        <View style={[layout.flex1, layout.itemsStart, styles.headerText]}>
+          <Text fontVariant="bold" fontSize={17} style={[text.textStart, styles.title]}>
+            {title}
+          </Text>
+          <Text fontSize={12} style={[text.textStart, styles.subtitle]}>
+            {subtitle}
+          </Text>
+        </View>
         <Pressable
           onPress={() => {
             selectionHaptic();
@@ -139,42 +160,29 @@ const FoodCatalogResultCard = ({
             ×
           </Text>
         </Pressable>
-        <View style={styles.headerText}>
-          <Text fontVariant="bold" fontSize={17} style={styles.title}>
-            {title}
-          </Text>
-          <Text fontSize={12} style={styles.subtitle}>
-            {subtitle}
-          </Text>
-        </View>
-        <View style={styles.successDot}>
-          <Text fontVariant="bold" fontSize={16} style={styles.successCheck}>
-            ✓
-          </Text>
-        </View>
       </View>
 
-      <View style={styles.nameSection}>
-        <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
+      <View style={[layout.itemsStart, styles.nameSection]}>
+        <Text fontVariant="medium" fontSize={11} style={[text.textStart, styles.fieldLabel]}>
           שם המוצר
         </Text>
         <TextInput
           value={draft.name}
           onChangeText={(value) => update("name", value)}
           placeholder="שם המוצר"
-          placeholderTextColor="#A0A7B0"
-          style={[styles.nameInput, errors.name ? styles.inputError : null]}
+          placeholderTextColor={semanticColors.placeholder}
+          style={[text.textStart, styles.nameInput, errors.name ? styles.inputError : null]}
         />
         {product?.brand ? (
-          <Text fontSize={11} style={styles.brand}>
+          <Text fontSize={11} style={[text.textStart, styles.brand]}>
             {product.brand}
           </Text>
         ) : null}
       </View>
 
-      <View style={styles.servingRow}>
-        <View style={styles.servingTypeField}>
-          <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
+      <View style={[layout.flexRow, styles.servingRow]}>
+        <View style={[layout.flex1, layout.itemsStart, styles.servingTypeField]}>
+          <Text fontVariant="medium" fontSize={11} style={[text.textStart, styles.fieldLabel]}>
             סוג מנה
           </Text>
           {product?.servings?.length ? (
@@ -192,23 +200,35 @@ const FoodCatalogResultCard = ({
             />
           ) : (
             <View style={styles.staticServing}>
-              <Text fontVariant="semibold" fontSize={14} style={styles.servingText}>
+              <Text
+                fontVariant="semibold"
+                fontSize={14}
+                style={[layout.widthFull, text.textStart, styles.servingText]}
+              >
                 {draft.servingDescription}
               </Text>
             </View>
           )}
         </View>
-        <View style={styles.servingAmountField}>
-          <Text fontVariant="medium" fontSize={11} style={styles.fieldLabel}>
+        <View style={[layout.itemsStart, styles.servingAmountField]}>
+          <Text fontVariant="medium" fontSize={11} style={[text.textStart, styles.fieldLabel]}>
             כמות
           </Text>
-          <View style={[styles.amountInputWrap, errors.servingAmount ? styles.inputError : null]}>
+          <View
+            style={[
+              layout.flexRow,
+              layout.itemsCenter,
+              layout.ltr,
+              styles.amountInputWrap,
+              errors.servingAmount ? styles.inputError : null,
+            ]}
+          >
             <TextInput
               value={draft.servingAmount}
               onChangeText={(value) => update("servingAmount", value)}
               keyboardType="decimal-pad"
               selectTextOnFocus
-              style={styles.servingInput}
+              style={[layout.flex1, text.textRight, styles.servingInput]}
             />
             <Text fontVariant="semibold" fontSize={12} style={styles.amountUnit}>
               {draft.servingUnit}
@@ -221,17 +241,27 @@ const FoodCatalogResultCard = ({
         onPress={() => setMacroEditorOpen((current) => !current)}
         style={({ pressed }) => [styles.macroToggle, pressed && styles.macroTogglePressed]}
       >
-        <Text fontVariant="semibold" fontSize={12} style={styles.macroToggleText}>
-          {macroEditorOpen ? "הסתר ערכים בסיסיים" : "עריכת ערכים בסיסיים"}
-        </Text>
-        <Text fontVariant="bold" fontSize={14} style={styles.macroToggleIcon}>
-          {macroEditorOpen ? "⌃" : "⌄"}
-        </Text>
+        <View
+          style={[
+            layout.widthFull,
+            layout.flexRow,
+            layout.itemsCenter,
+            layout.justifyBetween,
+            styles.macroToggleContent,
+          ]}
+        >
+          <Text fontVariant="semibold" fontSize={12} style={styles.macroToggleText}>
+            {macroEditorOpen ? "הסתר ערכים בסיסיים" : "עריכת ערכים בסיסיים"}
+          </Text>
+          <View style={macroEditorOpen ? styles.macroToggleIconOpen : undefined}>
+            <ChevronDownIcon size={17} color={DIET_V2_GREEN} />
+          </View>
+        </View>
       </Pressable>
 
       {macroEditorOpen ? (
-        <View style={styles.macrosSection}>
-          <Text fontVariant="semibold" fontSize={13} style={styles.sectionTitle}>
+        <View style={[layout.itemsStart, styles.macrosSection]}>
+          <Text fontVariant="semibold" fontSize={13} style={[text.textStart, styles.sectionTitle]}>
             {`ערכים עבור ${draft.servingQuantity} ${draft.servingUnit}`}
           </Text>
           <View style={styles.macrosRow}>
@@ -272,14 +302,26 @@ const FoodCatalogResultCard = ({
       ) : null}
 
       {Object.keys(errors).length > 0 ? (
-        <View style={styles.errorSummary}>
-          <Text selectable fontVariant="semibold" fontSize={12} style={styles.error}>
+        <View style={[layout.itemsStart, styles.errorSummary]}>
+          <Text
+            selectable
+            fontVariant="semibold"
+            fontSize={12}
+            style={[text.textStart, styles.error]}
+          >
             יש לתקן את השדות המסומנים:
           </Text>
           {Object.values(errors).map((message) => (
-            <View key={message} style={styles.errorDetailRow}>
+            <View
+              key={message}
+              style={[layout.widthFull, layout.flexRow, layout.itemsStart, styles.errorDetailRow]}
+            >
               <View style={styles.errorDot} />
-              <Text selectable fontSize={12} style={styles.errorDetail}>
+              <Text
+                selectable
+                fontSize={12}
+                style={[layout.flex1, text.textStart, styles.errorDetail]}
+              >
                 {message}
               </Text>
             </View>
@@ -300,16 +342,16 @@ const styles = StyleSheet.create({
     gap: 14,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#BDE7D0",
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#0F5E3B",
+    borderColor: semanticColors.app.dietInputBorder,
+    backgroundColor: semanticColors.app.surfaceRaised,
+    shadowColor: semanticColors.app.brandStrong,
     shadowOpacity: 0.07,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 2,
   },
-  headerRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  headerText: { flex: 1, alignItems: "flex-start" },
+  headerRow: { gap: 10 },
+  headerText: {},
   title: { color: DIET_V2_DARK },
   subtitle: { color: DIET_V2_MUTED },
   successDot: {
@@ -331,8 +373,8 @@ const styles = StyleSheet.create({
     borderColor: DIET_V2_CARD_BORDER,
   },
   closeLabel: { color: DIET_V2_MUTED, lineHeight: 20 },
-  nameSection: { gap: 5, alignItems: "stretch" },
-  fieldLabel: { width: "100%", color: DIET_V2_MUTED },
+  nameSection: { gap: 5 },
+  fieldLabel: { color: DIET_V2_MUTED },
   nameInput: {
     width: "100%",
     minHeight: 44,
@@ -341,18 +383,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FAFBFA",
+    backgroundColor: semanticColors.app.dietResultSurface,
     color: DIET_V2_DARK,
     fontFamily: "Assistant-SemiBold",
     fontSize: 15,
     writingDirection: "rtl",
   },
   brand: { color: DIET_V2_MUTED },
-  servingRow: { flexDirection: "row", gap: 10, alignItems: "stretch" },
+  servingRow: { gap: 10, alignItems: "stretch" },
   servingTypeField: {
-    flex: 1,
     gap: 5,
-    alignItems: "flex-start",
   },
   staticServing: {
     width: "100%",
@@ -360,23 +400,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: 12,
     borderRadius: 12,
-    backgroundColor: "#F5F8F6",
+    backgroundColor: semanticColors.diet.cardSubtle,
   },
   servingText: { color: DIET_V2_DARK },
-  servingAmountField: { width: 112, gap: 5, alignItems: "flex-start" },
+  servingAmountField: { width: 112, gap: 5 },
   amountInputWrap: {
     width: "100%",
     height: 44,
-    flexDirection: "row",
-    alignItems: "center",
+    gap: 4,
     paddingHorizontal: 8,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: DIET_V2_CARD_BORDER,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   servingInput: {
-    flex: 1,
     height: "100%",
     color: DIET_V2_DARK,
     fontFamily: "Assistant-Bold",
@@ -386,20 +424,17 @@ const styles = StyleSheet.create({
   amountUnit: { color: DIET_V2_MUTED },
   macroToggle: {
     minHeight: 38,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 11,
     borderRadius: 11,
-    backgroundColor: "#F5F8F6",
+    backgroundColor: semanticColors.diet.cardSubtle,
   },
+  macroToggleContent: { minHeight: 38, paddingHorizontal: 11 },
   macroTogglePressed: { opacity: 0.7 },
   macroToggleText: { color: DIET_V2_MUTED },
-  macroToggleIcon: { color: DIET_V2_GREEN },
+  macroToggleIconOpen: { transform: [{ rotate: "180deg" }] },
   macrosSection: { gap: 7 },
-  sectionTitle: { color: DIET_V2_DARK, alignSelf: "flex-start" },
+  sectionTitle: { color: DIET_V2_DARK },
   macrosRow: { flexDirection: "row", gap: 7 },
-  macroField: { flex: 1, gap: 4, alignItems: "center" },
+  macroField: { flex: 1, gap: 4 },
   macroInput: {
     width: "100%",
     height: 42,
@@ -414,19 +449,29 @@ const styles = StyleSheet.create({
   },
   preview: { padding: 10, borderRadius: 11, backgroundColor: DIET_V2_MINT },
   previewText: { color: DIET_V2_GREEN, textAlign: "center", writingDirection: "rtl" },
-  inputError: { borderColor: "#DC2626", borderWidth: 1.5, backgroundColor: "#FFF7F7" },
+  inputError: {
+    borderColor: semanticColors.diet.dangerBorder,
+    borderWidth: 1.5,
+    backgroundColor: semanticColors.app.dietInputErrorSurface,
+  },
   errorSummary: {
     width: "100%",
     paddingHorizontal: 11,
     paddingVertical: 9,
     gap: 3,
     borderRadius: 10,
-    backgroundColor: "#FFF1F2",
+    backgroundColor: semanticColors.diet.dangerBackground,
   },
-  error: { width: "100%", color: "#B42318" },
-  errorDetailRow: { width: "100%", flexDirection: "row", alignItems: "flex-start", gap: 6 },
-  errorDot: { width: 5, height: 5, marginTop: 7, borderRadius: 3, backgroundColor: "#DC2626" },
-  errorDetail: { flex: 1, color: "#B42318" },
+  error: { color: semanticColors.diet.dangerText },
+  errorDetailRow: { gap: 6 },
+  errorDot: {
+    width: 5,
+    height: 5,
+    marginTop: 7,
+    borderRadius: 3,
+    backgroundColor: semanticColors.diet.dangerBorder,
+  },
+  errorDetail: { color: semanticColors.diet.dangerText },
 });
 
 export default FoodCatalogResultCard;

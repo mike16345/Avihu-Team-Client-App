@@ -1,10 +1,14 @@
 import { useThemeContext } from "@/themes/useAppTheme";
-import { StyleSheet } from "react-native";
+import { I18nManager, StyleSheet } from "react-native";
+import { getTextStartAlignment } from "./textDirection";
 
 const useTextStyles = () => {
   const { theme } = useThemeContext();
 
   const textStyles = StyleSheet.create({
+    textStart: {
+      textAlign: getTextStartAlignment(I18nManager.isRTL, I18nManager.doLeftAndRightSwapInRTL),
+    },
     textRight: {
       textAlign: "right",
     },

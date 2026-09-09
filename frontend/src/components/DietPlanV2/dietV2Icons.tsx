@@ -1,7 +1,8 @@
+import { semanticColors } from "@/themes/semanticColors";
 import React from "react";
 import Svg, { Path, Circle, Line, G } from "react-native-svg";
 
-const GREEN = "#0F5E3B";
+const GREEN = semanticColors.app.brandStrong;
 
 interface IconProps {
   size?: number;
@@ -279,7 +280,7 @@ export const ChevronLeftIcon: React.FC<IconProps> = ({ size = 18, color = GREEN 
 );
 
 export const DIET_V2_GREEN = GREEN;
-export const DIET_V2_MINT = "#E8F5EF";
-export const DIET_V2_MUTED = "#4B5563";
-export const DIET_V2_DARK = "#0B2A22";
-export const DIET_V2_CARD_BORDER = "rgba(15, 94, 59, 0.08)";
+export const DIET_V2_MINT = semanticColors.diet.mint;
+export const DIET_V2_MUTED = semanticColors.diet.secondaryText;
+export const DIET_V2_DARK = semanticColors.diet.primaryText;
+export const DIET_V2_CARD_BORDER = semanticColors.diet.border;

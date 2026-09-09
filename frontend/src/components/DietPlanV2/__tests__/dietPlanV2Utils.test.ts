@@ -106,6 +106,11 @@ describe("diet plan version resolution", () => {
     expect(isDietPlanV2({ ...plan, meals: [withoutAddOns] })).toBe(false);
     expect(isDietPlanV2({ ...plan, meals: [categoryWithoutMacros] })).toBe(false);
   });
+
+  it("selects only resolved V1 plans for legacy consumers", () => {
+    expect(selectDietPlanV1(v1Plan)).toBe(v1Plan);
+    expect(selectDietPlanV1(plan)).toBeUndefined();
+  });
 });
 
 describe("V2 display derivation", () => {
@@ -203,5 +208,16 @@ describe("V2 display derivation", () => {
     expect(getDietPlanContentState(plan)).toBe("ready");
     expect(getDietPlanContentState({ ...plan, meals: [], highlights: "" })).toBe("empty");
     expect(getDietPlanContentState({ ...plan, meals: [], highlights: "דגש" })).toBe("ready");
+  });
+
+  it("treats HTML-only V1 instructions and supplements as empty", () => {
+    expect(
+      getDietPlanContentState({
+        meals: [],
+        freeCalories: 0,
+        customInstructions: ["<p><br></p>"],
+        supplements: ["&nbsp;"],
+      })
+    ).toBe("empty");
   });
 });
