@@ -64,7 +64,10 @@ export const scaffoldTenant = async (
     for (const [fileName, source] of Object.entries(
       renderTenantFiles(tenant, loadedTheme.recipe)
     )) {
-      await writeFile(path.join(stagedModulePath, fileName), source, { encoding: "utf8", flag: "wx" });
+      await writeFile(path.join(stagedModulePath, fileName), source, {
+        encoding: "utf8",
+        flag: "wx",
+      });
     }
 
     unregisterTransientTenant = registerTransientTenant(tenant);

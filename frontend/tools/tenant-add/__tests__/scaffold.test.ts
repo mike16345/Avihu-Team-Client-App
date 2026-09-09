@@ -27,13 +27,13 @@ const createStagedResult = async (): Promise<{ root: string; result: TenantAddRe
   await writeFile(
     path.join(root, "config/tenants/registry.ts"),
     [
-      '// tenant:add imports:start',
-      '// tenant:add imports:end',
-      '',
-      '// tenant:add entries:start',
-      'const committedTenants = [avihuTenant];',
-      '// tenant:add entries:end',
-      '',
+      "// tenant:add imports:start",
+      "// tenant:add imports:end",
+      "",
+      "// tenant:add entries:start",
+      "const committedTenants = [avihuTenant];",
+      "// tenant:add entries:end",
+      "",
     ].join("\n")
   );
   return {

@@ -94,10 +94,7 @@ export type ThemeColorOverrides = z.infer<typeof themeColorOverridesSchema>;
 
 const withAlpha = (color: string, alpha: string) => `${color}${alpha}`;
 
-const getFoundationColor = (
-  path: string[],
-  foundation: ThemeRecipeV1["foundation"]
-): string => {
+const getFoundationColor = (path: string[], foundation: ThemeRecipeV1["foundation"]): string => {
   const key = path.at(-1) ?? "";
   const semanticPath = path.join(".").toLowerCase();
 
@@ -166,7 +163,9 @@ const expandColorSchema = (
 
 const createFoundationColors = (foundation: ThemeRecipeV1["foundation"]): TenantTheme["colors"] => {
   const { primary, onPrimary, accent, onAccent, background, onBackground } = foundation;
-  const colors = tenantThemeColorsSchema.parse(expandColorSchema(tenantThemeColorsSchema, foundation));
+  const colors = tenantThemeColorsSchema.parse(
+    expandColorSchema(tenantThemeColorsSchema, foundation)
+  );
   Object.assign(colors, {
     primary,
     onPrimary,
