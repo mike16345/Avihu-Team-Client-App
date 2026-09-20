@@ -1,8 +1,9 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { BottomStackParamList } from "@/types/navigatorTypes";
 import { Keyboard, StyleSheet, useWindowDimensions, View } from "react-native";
 import BottomScreenNavigatorTabs from "./tabs/BottomScreenNavigatorTabs";
 import useStyles from "@/styles/useGlobalStyles";
-import { BOTTOM_BAR_HEIGHT, DEFAULT_PAGE_TOP_PADDING } from "@/constants/Constants";
+import { DEFAULT_PAGE_TOP_PADDING } from "@/constants/Constants";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text } from "@/components/ui/Text";
 import { useEffect, useRef, useState } from "react";
@@ -12,22 +13,29 @@ import { IconLayoutContext } from "@/context/useiconLayout";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import useNotification from "@/hooks/useNotification";
 import { selectionHaptic } from "@/utils/haptics";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { FLOATING_TAB_BAR_HEIGHT, getBottomTabLayout } from "./bottomTabLayout";
 
 const Tab = createBottomTabNavigator<BottomStackParamList>();
 const HORIZONTAL_MARGIN = 5;
-const TAB_BAR_HEIGHT = 70;
+const ACTIVE_INDICATOR_WIDTH = 80;
+const REACT_NAVIGATION_BOTTOM_INSET = 0;
 const INITIAL_ROUTE_NAME: keyof BottomStackParamList = "Home";
 
 const BottomTabNavigator = () => {
   const { layout, colors, common, spacing } = useStyles();
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const { initializeNotifications } = useNotification();
 
-  const indicatorWidth = 80;
   const [activeIndex, setActiveIndex] = useState(() => {
     return BottomScreenNavigatorTabs.findIndex((tab) => tab.name == INITIAL_ROUTE_NAME);
   });
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const bottomTabLayout = getBottomTabLayout({
+    bottomInset: insets.bottom,
+    keyboardVisible,
+  });
 
   const indicatorAnim = useSharedValue(0);
 
@@ -50,12 +58,12 @@ const BottomTabNavigator = () => {
     const isWorkoutSceen = tabName == "MyWorkoutPlanPage";
     const isArticleScreen = tabName == "ArticleScreen";
 
-    const xValue = x - indicatorWidth / 2;
+    const xValue = x - ACTIVE_INDICATOR_WIDTH / 2;
     const addedSpacing = isWorkoutSceen ? -10 : isArticleScreen ? +10 : 0;
 
     const value = xValue + addedSpacing;
 
-    if (x != null && indicatorWidth > 0) {
+    if (x != null && ACTIVE_INDICATOR_WIDTH > 0) {
       indicatorAnim.value = withSpring(value, {
         damping: 15,
         stiffness: 150,
@@ -83,11 +91,12 @@ const BottomTabNavigator = () => {
         <Tab.Navigator
           backBehavior="initialRoute"
           initialRouteName={INITIAL_ROUTE_NAME}
+          safeAreaInsets={{ bottom: REACT_NAVIGATION_BOTTOM_INSET }}
           sceneContainerStyle={[
             colors.backgroundTransparent,
 
             {
-              paddingBottom: keyboardVisible ? BOTTOM_BAR_HEIGHT : BOTTOM_BAR_HEIGHT + 80,
+              paddingBottom: bottomTabLayout.scenePaddingBottom,
               paddingTop: DEFAULT_PAGE_TOP_PADDING,
             },
           ]}
@@ -98,14 +107,15 @@ const BottomTabNavigator = () => {
               spacing.mgHorizontalSm,
               colors.backgroundSurface,
               {
-                opacity: keyboardVisible ? 0 : 100,
+                opacity: bottomTabLayout.tabBarVisible ? 1 : 0,
                 position: "absolute",
                 left: HORIZONTAL_MARGIN,
                 right: HORIZONTAL_MARGIN,
-                bottom: BOTTOM_BAR_HEIGHT,
+                bottom: bottomTabLayout.tabBarBottom,
+                paddingBottom: 0,
               },
             ],
-            tabBarItemStyle: { height: TAB_BAR_HEIGHT },
+            tabBarItemStyle: { height: FLOATING_TAB_BAR_HEIGHT },
             tabBarActiveTintColor: colors.textPrimary.color,
             tabBarInactiveTintColor: colors.textPrimary.color,
             tabBarShowLabel: false,
@@ -143,11 +153,12 @@ const BottomTabNavigator = () => {
           common.roundedFull,
           indicatorStyle,
           {
-            display: keyboardVisible ? "none" : "flex",
+            bottom: bottomTabLayout.activeIndicatorBottom,
+            display: bottomTabLayout.tabBarVisible ? "flex" : "none",
           },
         ]}
       >
-        <Icon name={indicators[activeIndex].icon} color="white" />
+        <Icon name={indicators[activeIndex].icon} color={semanticColors.app.surfaceRaised} />
         <Text
           allowFontScaling={false}
           fontSize={11}
@@ -157,8 +168,16 @@ const BottomTabNavigator = () => {
           {indicators[activeIndex].name}
         </Text>
       </Animated.View>
-      {!keyboardVisible && (
-        <View style={[styles.shadowContainer, { width: width - HORIZONTAL_MARGIN * 2 - 40 }]} />
+      {bottomTabLayout.tabBarVisible && (
+        <View
+          style={[
+            styles.shadowContainer,
+            {
+              bottom: bottomTabLayout.shadowBottom,
+              width: width - HORIZONTAL_MARGIN * 2 - 40,
+            },
+          ]}
+        />
       )}
     </Animated.View>
   );
@@ -167,16 +186,15 @@ const BottomTabNavigator = () => {
 const styles = StyleSheet.create({
   activeIndicator: {
     position: "absolute",
-    bottom: BOTTOM_BAR_HEIGHT + 15,
-    width: 80,
+    width: ACTIVE_INDICATOR_WIDTH,
     height: 40,
     zIndex: 10000,
   },
   navigationBar: {
-    height: TAB_BAR_HEIGHT,
+    height: FLOATING_TAB_BAR_HEIGHT,
     alignItems: "center",
     borderRadius: 100,
-    shadowColor: "#072723",
+    shadowColor: semanticColors.steps.ringGradientStart,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
@@ -185,12 +203,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     overflow: "hidden",
     borderRadius: 100,
-    bottom: BOTTOM_BAR_HEIGHT,
-    height: 70,
+    height: FLOATING_TAB_BAR_HEIGHT,
     alignItems: "center",
     alignSelf: "center",
     zIndex: -1,
-    shadowColor: "#000",
+    shadowColor: semanticColors.scrim,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -198,7 +215,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
-    backgroundColor: "#fff",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
 });
 

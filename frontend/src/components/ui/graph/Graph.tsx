@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
 import React, { ReactNode, useMemo } from "react";
 import useStyles from "@/styles/useGlobalStyles";
@@ -50,7 +51,7 @@ const Graph: React.FC<GraphProps> = ({
   enableZoom = false,
   enablePan = false,
 }) => {
-  const labelColor = "rgba(69, 68, 89, 0.5)";
+  const labelColor = semanticColors.graph.label;
   const showDots = data.length < LARGE_AMOUNT_OF_DOTS;
 
   const font = useFont(AssistantRegular, 14);
@@ -140,7 +141,10 @@ const Graph: React.FC<GraphProps> = ({
               <LinearGradient
                 start={vec(0, chartBounds.top)}
                 end={vec(0, chartBounds.bottom)}
-                colors={["rgba(159, 255, 162, 0.2)", "rgba(121, 246, 129, 0.05)"]}
+                colors={[
+                  semanticColors.graph.gradientStartTransparent,
+                  semanticColors.graph.gradientEndTransparent,
+                ]}
               />
             </Area>
 
@@ -154,7 +158,7 @@ const Graph: React.FC<GraphProps> = ({
               <LinearGradient
                 start={vec(0, 0)}
                 end={vec(chartBounds.right, 0)}
-                colors={["#9FFFA2", "#79F681"]}
+                colors={[semanticColors.graph.gradientStart, semanticColors.graph.tooltip]}
               />
             </Line>
             {showDots && (
@@ -162,9 +166,9 @@ const Graph: React.FC<GraphProps> = ({
                 animate={{ type: animationType, duration: animationDuration }}
                 points={points.value}
                 radius={radius}
-                color={"#95FDA8"}
+                color={semanticColors.app.graphIndicator}
               >
-                <Paint color="#FFF" style="stroke" strokeWidth={2.5} />
+                <Paint color={semanticColors.app.surfaceRaised} style="stroke" strokeWidth={2.5} />
               </Scatter>
             )}
             {isActive ? (

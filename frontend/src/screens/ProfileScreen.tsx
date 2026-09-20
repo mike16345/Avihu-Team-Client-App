@@ -9,6 +9,7 @@ import { View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 import { useState } from "react";
+import { DeveloperToolsProfileEntry } from "@/components/dev/DeveloperToolsProfileEntry";
 
 const ProfileScreen = () => {
   const { layout, spacing } = useStyles();
@@ -32,6 +33,7 @@ const ProfileScreen = () => {
         </View>
         <UserDetailsWrapper />
         <View style={spacing.pdHorizontalLg}>
+          <DeveloperToolsProfileEntry />
           <PrimaryButton
             style={{ marginTop: 20 }}
             block

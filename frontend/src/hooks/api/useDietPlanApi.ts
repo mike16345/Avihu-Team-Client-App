@@ -1,5 +1,6 @@
 import { deleteItem, fetchData, sendData, updateItem } from "@/API/api";
 import { IDietPlan } from "@/interfaces/DietPlan";
+import type { AnyDietPlan } from "@/interfaces/DietPlanTypes";
 import { ApiResponse } from "@/types/ApiTypes";
 
 const DIET_PLAN_ENDPOINT = "dietPlans";
@@ -30,12 +31,12 @@ export const useDietPlanApi = () => {
     );
 
   const getDietPlanByUserId = (userID: string) =>
-    fetchData<ApiResponse<IDietPlan>>(
+    fetchData<ApiResponse<AnyDietPlan>>(
       `${DIET_PLAN_ENDPOINT}/user?userId=${userID}&populate=true`
     ).then((res) => res.data);
 
   const getDietPlan = (id: string) =>
-    fetchData<ApiResponse<IDietPlan>>(`${DIET_PLAN_ENDPOINT}/one?id=${id}&populate=true`).then(
+    fetchData<ApiResponse<AnyDietPlan>>(`${DIET_PLAN_ENDPOINT}/one?id=${id}&populate=true`).then(
       (res) => res.data
     );
 

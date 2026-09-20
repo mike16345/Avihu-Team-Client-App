@@ -1,6 +1,6 @@
 import { View, Image, StyleSheet } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import appIcon from "@assets/app-icon.png";
+import appIcon from "tenant-assets/runtime-logo.png";
 import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
 
 const SplashScreen = () => {

@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
   },
   questionDescription: {
     marginBottom: 8,
-    color: "#666",
+    color: semanticColors.app.textAgreement,
   },
   button: {
     margin: "auto",

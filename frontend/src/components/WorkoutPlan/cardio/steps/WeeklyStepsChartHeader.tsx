@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import Icon from "@/components/Icon/Icon";
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
     opacity: 0.35,
   },
   weeklyTotal: {
-    color: "rgba(7,39,35,0.4)",
+    color: semanticColors.app.stepsHeaderMuted,
     textAlign: "right",
   },
   weekRange: {

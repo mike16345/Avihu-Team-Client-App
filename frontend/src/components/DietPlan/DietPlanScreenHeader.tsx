@@ -1,13 +1,13 @@
 import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import DailyCalorieIntakeStyle1 from "./DailyCalorieIntakeStyle1";
+import DietPlanV1Summary from "./DietPlanV1Summary";
 
 const DietPlanScreenHeader = () => {
   const { spacing } = useStyles();
 
   return (
     <View style={[spacing.pdHorizontalMd]}>
-      <DailyCalorieIntakeStyle1 />
+      <DietPlanV1Summary />
     </View>
   );
 };

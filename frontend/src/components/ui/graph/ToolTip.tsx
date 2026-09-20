@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import {
   Circle,
   Group,
@@ -85,8 +86,8 @@ export function ToolTip({
 
   return (
     <Group>
-      <Circle cx={x} cy={y} r={radius} color="#79F681">
-        <Paint color="#FFF" style="stroke" strokeWidth={4} />
+      <Circle cx={x} cy={y} r={radius} color={semanticColors.graph.tooltip}>
+        <Paint color={semanticColors.app.surfaceRaised} style="stroke" strokeWidth={4} />
       </Circle>
 
       <Group transform={tooltipTransform}>
@@ -96,13 +97,13 @@ export function ToolTip({
           width={labelWidth}
           height={labelHeight}
           r={corner}
-          color="#FFF"
+          color={semanticColors.app.surfaceRaised}
         >
-          <Shadow dx={0} dy={2} blur={4} color="rgba(0,0,0,0.35)" />
-          <Paint color="rgba(255,255,255,0.06)" style="stroke" strokeWidth={1} />
+          <Shadow dx={0} dy={2} blur={4} color={semanticColors.graph.tooltipShadow} />
+          <Paint color={semanticColors.app.translucentWhiteFaint} style="stroke" strokeWidth={1} />
         </RoundedRect>
 
-        <SkText x={textX} y={textY} text={labelText} font={font} color="#000" />
+        <SkText x={textX} y={textY} text={labelText} font={font} color={semanticColors.scrim} />
       </Group>
     </Group>
   );

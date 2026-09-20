@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { StyleSheet, View, useWindowDimensions, Pressable, LayoutChangeEvent } from "react-native";
 import Animated, {
@@ -10,6 +11,7 @@ import Animated, {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import useBackHandler from "@/hooks/useBackHandler";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { getBottomDrawerMaxHeight } from "./bottomDrawerLayout";
 
 type FixedRangeBottomDrawerProps = {
   /** Collapsed height in px – parent decides (e.g. X px above navbar) */
@@ -38,12 +40,16 @@ const FixedRangeBottomDrawer: React.FC<FixedRangeBottomDrawerProps> = ({
   const [isOpenJS, setIsOpenJS] = useState(false); // 👈 NEW
 
   // Maximum height the drawer can reach (fixed distance from top).
-  const maxHeight = useMemo(() => {
-    const bottomOffset = 30;
-    const h = screenHeight - (bottomBarHeight + bottomOffset) - topOffset;
-
-    return Math.max(h, minHeight);
-  }, [screenHeight, topOffset, minHeight]);
+  const maxHeight = useMemo(
+    () =>
+      getBottomDrawerMaxHeight({
+        screenHeight,
+        bottomBarHeight,
+        topOffset,
+        minHeight,
+      }),
+    [screenHeight, bottomBarHeight, topOffset, minHeight]
+  );
 
   // Current height of the drawer.
   const height = useSharedValue(minHeight);
@@ -147,7 +153,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     zIndex: 999,
     // backgroundColor intentionally neutral – you style it outside if you want
-    backgroundColor: "white",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   handleArea: {
     paddingVertical: 8,
@@ -162,13 +168,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     borderBottomWidth: 0.5,
-    borderColor: "#E2E2E2",
+    borderColor: semanticColors.app.borderControl,
   },
   handleBar: {
     width: 42,
     height: 5,
     borderRadius: 3,
-    backgroundColor: "#C8C8C8",
+    backgroundColor: semanticColors.app.borderHandle,
   },
   content: {
     flex: 1,

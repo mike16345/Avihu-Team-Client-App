@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import useStyles from "@/styles/useGlobalStyles";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -40,7 +41,7 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) =>
 
   useEffect(() => {
     if (open) {
-      softHaptic()
+      softHaptic();
       setIsVisible(true); // Show the modal when open is true
       Animated.timing(slideAnim, {
         toValue: 0,
@@ -48,7 +49,7 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) =>
         useNativeDriver: true,
       }).start();
     } else {
-      softHaptic()
+      softHaptic();
 
       Animated.timing(slideAnim, {
         toValue: width, // Slide out to the right
@@ -68,12 +69,12 @@ const RightDrawer: React.FC<RightDrawerProps> = ({ open, onClose, children }) =>
             activePageIndex == 0
               ? workoutPage
               : activePageIndex == 1
-              ? dietScreen
-              : activePageIndex == 2
-              ? progressPage
-              : activePageIndex == 3
-              ? blogsPage
-              : recordExercisePage
+                ? dietScreen
+                : activePageIndex == 2
+                  ? progressPage
+                  : activePageIndex == 3
+                    ? blogsPage
+                    : recordExercisePage
           }
           style={styles.overlay}
           blurRadius={50}
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: semanticColors.app.drawerOverlay,
   },
   drawerContainer: {
     position: "absolute",
@@ -107,12 +108,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0, // Align to the right side of the screen
     width: width * 0.8, // Set the drawer width
-    shadowColor: "#000",
+    shadowColor: semanticColors.scrim,
     shadowOffset: { width: -2, height: 0 }, // Adjust shadow direction
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
-    backgroundColor: "#fff", // Ensure background color is set
+    backgroundColor: semanticColors.app.surfaceRaised, // Ensure background color is set
   },
   drawerContent: {
     justifyContent: "center",

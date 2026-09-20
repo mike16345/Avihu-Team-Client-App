@@ -26,6 +26,9 @@ export interface IMeal {
 }
 
 export interface IDietPlan {
+  _id?: string;
+  userId?: string;
+  version?: 1;
   meals: IMeal[];
   totalCalories?: number;
   freeCalories: number;
@@ -40,13 +43,7 @@ export interface IDietPlanPreset extends IDietPlan {
 }
 
 export type DietItemUnit =
-  | "grams"
-  | "spoons"
-  | "pieces"
-  | "scoops"
-  | "cups"
-  | "units"
-  | "teaSpoons";
+  "grams" | "spoons" | "pieces" | "scoops" | "cups" | "units" | "teaSpoons";
 
 export interface IServingItem {
   grams?: number;

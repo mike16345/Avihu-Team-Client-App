@@ -1,9 +1,10 @@
+import { semanticColors } from "@/themes/semanticColors";
 import useStyles from "@/styles/useGlobalStyles";
 import { View } from "react-native";
 import { Text } from "../ui/Text";
 import ProgressBar from "../ui/ProgressBar";
 import Badge from "../ui/Badge";
-import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 import { useDietPlanStore } from "@/store/useDietPlanStore";
 import { useRecordMeal } from "@/hooks/useRecordMeal";
 import { selectionHaptic } from "@/utils/haptics";
@@ -11,7 +12,7 @@ import { selectionHaptic } from "@/utils/haptics";
 const DailyCalorieIntake = () => {
   const { layout, spacing } = useStyles();
   const totalCaloriesEaten = useDietPlanStore((state) => state.totalCaloriesEaten);
-  const { data } = useDietPlanQuery();
+  const { data } = useDietPlanV1Query();
   const { totalCalories = 0, freeCalories = 0 } = data || {};
   const { session, recordFreeCalorieConsumption } = useRecordMeal();
 
@@ -31,7 +32,11 @@ const DailyCalorieIntake = () => {
         </View>
         <ProgressBar value={totalCaloriesEaten} maxValue={totalCalories} />
         <Badge
-          style={[session?.freeCaloriesConsumed ? { backgroundColor: "#EDFFEB" } : {}]}
+          style={[
+            session?.freeCaloriesConsumed
+              ? { backgroundColor: semanticColors.successContainer }
+              : {},
+          ]}
           alignStart
           showDot
           onPress={handlePress}

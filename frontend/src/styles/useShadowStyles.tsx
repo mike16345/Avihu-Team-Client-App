@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { Platform, StyleSheet } from "react-native";
 import useColors from "./useColors";
 
@@ -10,16 +11,16 @@ export const useShadowStyles = () => {
     buttonShadow: {
       ...Platform.select({
         ios: {
-          shadowColor: "#072723",
+          shadowColor: semanticColors.steps.ringGradientStart,
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: 0.2,
           shadowRadius: 10,
         },
         android: {
           elevation: 8,
-          backgroundColor: "#F6F8FA",
+          backgroundColor: semanticColors.app.surfaceCool,
 
-          shadowColor: "#072723",
+          shadowColor: semanticColors.steps.ringGradientStart,
         },
       }),
     },
@@ -28,16 +29,16 @@ export const useShadowStyles = () => {
     buttonShadowLight: {
       ...Platform.select({
         ios: {
-          shadowColor: "#072723",
+          shadowColor: semanticColors.steps.ringGradientStart,
           shadowOffset: { width: 0, height: 7 },
           shadowOpacity: 0.09,
           shadowRadius: 7,
         },
         android: {
           /*   elevation: 6,
-      backgroundColor: "#F6F8FA",
+      backgroundColor: semanticColors.app.surfaceCool,
 
-          shadowColor: "#072723", */
+          shadowColor: semanticColors.steps.ringGradientStart, */
         },
       }),
     },
@@ -47,7 +48,7 @@ export const useShadowStyles = () => {
     frameShadow: {
       ...Platform.select({
         ios: {
-          shadowColor: "#999999",
+          shadowColor: semanticColors.shadowMuted,
           shadowOffset: { width: 0, height: 3 },
           shadowOpacity: 0.2, // Reduced from 0% to make it visible
           shadowRadius: 64,
@@ -59,14 +60,14 @@ export const useShadowStyles = () => {
     frameShadowVisible: {
       ...Platform.select({
         ios: {
-          shadowColor: "#999999",
+          shadowColor: semanticColors.shadowMuted,
           shadowOffset: { width: 0, height: 146 },
           shadowOpacity: 0.01,
           shadowRadius: 58,
         },
         android: {
           elevation: 15,
-          shadowColor: "#999999",
+          shadowColor: semanticColors.shadowMuted,
         },
       }),
     },
@@ -79,26 +80,26 @@ export const useShadowStyles = () => {
       borderRadius: 12,
       ...Platform.select({
         ios: {
-          shadowColor: "#072723",
+          shadowColor: semanticColors.steps.ringGradientStart,
           shadowOffset: { width: 0, height: 47 },
           shadowOpacity: 0.0, // Original was 0%, making it 0.01 to be visible
           shadowRadius: 13,
         },
         android: {
           elevation: 10,
-          shadowColor: "#072723",
+          shadowColor: semanticColors.steps.ringGradientStart,
           backgroundColor: background.backgroundColor,
         },
       }),
     },
 
     buttonLayer2: {
-      backgroundColor: "#fff",
+      backgroundColor: semanticColors.app.surfaceRaised,
       borderRadius: 12,
 
       ...Platform.select({
         ios: {
-          shadowColor: "#072723",
+          shadowColor: semanticColors.steps.ringGradientStart,
           shadowOffset: { width: 0, height: 30 },
           shadowOpacity: 0.01,
           shadowRadius: 12,
@@ -108,12 +109,12 @@ export const useShadowStyles = () => {
     },
 
     buttonLayer3: {
-      backgroundColor: "#fff",
+      backgroundColor: semanticColors.app.surfaceRaised,
       borderRadius: 12,
 
       ...Platform.select({
         ios: {
-          shadowColor: "#072723",
+          shadowColor: semanticColors.steps.ringGradientStart,
           shadowOffset: { width: 0, height: 17 },
           shadowOpacity: 0.05,
           shadowRadius: 10,
@@ -123,12 +124,12 @@ export const useShadowStyles = () => {
     },
 
     buttonLayer4: {
-      backgroundColor: "#fff",
+      backgroundColor: semanticColors.app.surfaceRaised,
       borderRadius: 12,
 
       ...Platform.select({
         ios: {
-          shadowColor: "#072723",
+          shadowColor: semanticColors.steps.ringGradientStart,
           shadowOffset: { width: 0, height: 7 },
           shadowOpacity: 0.09,
           shadowRadius: 7,
@@ -142,7 +143,7 @@ export const useShadowStyles = () => {
 
       ...Platform.select({
         ios: {
-          shadowColor: "#072723",
+          shadowColor: semanticColors.steps.ringGradientStart,
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.1,
           shadowRadius: 4,
@@ -151,7 +152,7 @@ export const useShadowStyles = () => {
           elevation: 2,
           backgroundColor: background.backgroundColor,
 
-          shadowColor: "#072723",
+          shadowColor: semanticColors.steps.ringGradientStart,
         },
       }),
     },
@@ -161,7 +162,7 @@ export const useShadowStyles = () => {
       borderRadius: 25,
       ...Platform.select({
         ios: {
-          shadowColor: "#999999",
+          shadowColor: semanticColors.shadowMuted,
           backgroundColor: background.backgroundColor,
           shadowOffset: { width: 0, height: 228 },
           shadowOpacity: 0.01, // Made visible
@@ -174,7 +175,7 @@ export const useShadowStyles = () => {
       borderRadius: 25,
       ...Platform.select({
         ios: {
-          shadowColor: "#999999",
+          shadowColor: semanticColors.shadowMuted,
           backgroundColor: background.backgroundColor,
           shadowOffset: { width: 0, height: 146 },
           shadowOpacity: 0.01,
@@ -188,7 +189,7 @@ export const useShadowStyles = () => {
       borderRadius: 25,
       ...Platform.select({
         ios: {
-          shadowColor: "#999999",
+          shadowColor: semanticColors.shadowMuted,
           backgroundColor: background.backgroundColor,
           shadowOffset: { width: 0, height: 82 },
           shadowOpacity: 0.05,
@@ -202,7 +203,7 @@ export const useShadowStyles = () => {
       borderRadius: 25,
       ...Platform.select({
         ios: {
-          shadowColor: "#999999",
+          shadowColor: semanticColors.shadowMuted,
           backgroundColor: background.backgroundColor,
           shadowOffset: { width: 0, height: 37 },
           shadowOpacity: 0.09,
@@ -217,17 +218,17 @@ export const useShadowStyles = () => {
       opacity: 1,
       ...Platform.select({
         ios: {
-          shadowColor: "#999999",
+          shadowColor: semanticColors.shadowMuted,
           backgroundColor: background.backgroundColor,
           shadowOffset: { width: 0, height: 9 },
           shadowOpacity: 0.1,
           shadowRadius: 20,
         },
         android: {
-          backgroundColor: "#999999",
+          backgroundColor: semanticColors.shadowMuted,
           shadowRadius: 15,
           elevation: 4,
-          shadowColor: "#999999",
+          shadowColor: semanticColors.shadowMuted,
         },
       }),
     },

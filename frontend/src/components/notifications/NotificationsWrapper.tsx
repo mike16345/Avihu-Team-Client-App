@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { useMemo, useState } from "react";
 import Icon from "../Icon/Icon";
@@ -41,7 +42,7 @@ const NotificationsWrapper = () => {
 
 const styles = StyleSheet.create({
   notificationBadge: {
-    backgroundColor: "#95FDA8",
+    backgroundColor: semanticColors.app.graphIndicator,
     position: "absolute",
     paddingHorizontal: 5,
     top: 0,

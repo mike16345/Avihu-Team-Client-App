@@ -1,12 +1,10 @@
 // hooks/useNotification.ts
-import {
-  NOTIFICATION_TITLE,
-  NotificationBodies,
-  NotificationIdentifiers,
-} from "@/constants/notifications";
+import { NotificationBodies, NotificationIdentifiers } from "@/constants/notifications";
+import { getRuntimeTenantDisplayName } from "@/config/runtimeTenant";
 import { useNotificationStore } from "@/store/notificationStore";
 import { getNextEightAM, getNextEightAMOnSunday, toTrigger } from "@/utils/notification";
 import { generateUniqueId } from "@/utils/utils";
+import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
@@ -24,6 +22,8 @@ async function ensureAndroidChannel() {
 }
 
 export const useNotification = () => {
+  const notificationTitle = getRuntimeTenantDisplayName(Constants);
+
   // Set the global notification handler (keeps your previous behavior)
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -35,7 +35,7 @@ export const useNotification = () => {
   });
 
   /** Ask for permissions (creates Android channel first) */
-  const requestPermissions = async () => {
+  const requestPermissions = async ({ showDeniedAlert = true } = {}) => {
     if (Platform.OS === "android") {
       await ensureAndroidChannel();
     }
@@ -43,9 +43,14 @@ export const useNotification = () => {
     if (status !== "granted") {
       const { status: newStatus } = await Notifications.requestPermissionsAsync();
       if (newStatus !== "granted") {
-        alert("The app will run better with notifications on!");
+        if (showDeniedAlert) {
+          alert("The app will run better with notifications on!");
+        }
       }
+      return newStatus;
     }
+
+    return status;
   };
 
   /** Schedule the daily reminder at 08:00 (idempotent) */
@@ -67,7 +72,7 @@ export const useNotification = () => {
     await Notifications.scheduleNotificationAsync({
       identifier: NotificationIdentifiers.NEW_DAILY_WEIGH_IN_REMINDER_ID,
       content: {
-        title: NOTIFICATION_TITLE,
+        title: notificationTitle,
         body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
         data,
       },
@@ -95,7 +100,7 @@ export const useNotification = () => {
     await Notifications.scheduleNotificationAsync({
       identifier: NotificationIdentifiers.WEEKLY_MEASUERMENT_REMINDER_ID,
       content: {
-        title: NOTIFICATION_TITLE,
+        title: notificationTitle,
         body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER,
         data,
       },
@@ -109,21 +114,22 @@ export const useNotification = () => {
   const showNotification = async (
     body: string,
     triggerAt?: number | Date | null,
-    data?: Record<string, any>
+    data?: Record<string, any>,
+    title = notificationTitle
   ) => {
     try {
       if (Platform.OS === "android") {
         await ensureAndroidChannel();
       }
       const identifier = await Notifications.scheduleNotificationAsync({
-        content: { title: NOTIFICATION_TITLE, body, data: data || {} },
+        content: { title, body, data: data || {} },
         trigger: toTrigger(triggerAt ?? 1, {
           channelId: Platform.OS === "android" ? DEFAULT_CHANNEL_ID : undefined,
         }),
       });
       return identifier;
-    } catch (error) {
-      console.log(error);
+    } catch {
+      console.error("[notifications] scheduling failed");
     }
   };
 

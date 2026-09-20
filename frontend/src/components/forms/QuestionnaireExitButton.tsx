@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   exitText: {
-    color: "#C53030",
+    color: semanticColors.app.formExit,
   },
 });
 

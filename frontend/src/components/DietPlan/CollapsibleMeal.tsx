@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { FC, useEffect, useMemo, useRef, useState, Fragment } from "react";
 import Collapsible from "../ui/Collapsible";
 import { IDietItem, IMeal } from "@/interfaces/DietPlan";
@@ -11,7 +12,7 @@ import { useRecordMeal } from "@/hooks/useRecordMeal";
 import { Text } from "../ui/Text";
 import Icon from "../Icon/Icon";
 import { selectionHaptic } from "@/utils/haptics";
-import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 
 interface CollapsibleMealProps {
   meal: IMeal;
@@ -56,7 +57,7 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
   const consumedFat = useDietServingsStore((s) => s.fat);
   const consumedVeg = useDietServingsStore((s) => s.veg);
 
-  const { data: plan } = useDietPlanQuery();
+  const { data: plan } = useDietPlanV1Query();
 
   const dailyTargets = useMemo<Record<MacroKey, number>>(() => {
     const allMeals = plan?.meals ?? [];
@@ -125,9 +126,7 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
 
   const allCategoriesEaten = useMemo(() => {
     if (relevantServingItems.length === 0) return false;
-    return relevantServingItems.every(
-      ({ key }) => !!eatenCategories[`${meal._id}::${key}`]
-    );
+    return relevantServingItems.every(({ key }) => !!eatenCategories[`${meal._id}::${key}`]);
   }, [relevantServingItems, eatenCategories, meal._id]);
 
   const syncingRef = useRef(false);
@@ -241,15 +240,15 @@ const CollapsibleMeal: FC<CollapsibleMealProps> = ({ meal, index }) => {
 
 const styles = StyleSheet.create({
   mealCard: {
-    backgroundColor: "#F7F8F9",
+    backgroundColor: semanticColors.app.surfaceWarm,
   },
   categoryDivider: {
     height: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    backgroundColor: semanticColors.app.shadowMedium,
     marginVertical: 8,
   },
   blockedHint: {
-    color: "#0F5E3B",
+    color: semanticColors.app.brandStrong,
     textAlign: "center",
     marginBottom: 16,
     paddingHorizontal: 6,

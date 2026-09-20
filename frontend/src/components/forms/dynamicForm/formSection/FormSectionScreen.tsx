@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { BackHandler, Platform, View } from "react-native";
 import { useCallback, useEffect, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
@@ -139,8 +140,8 @@ const FormSectionScreen = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[spacing.pdVerticalMd, spacing.gapXl]}
         nestedScrollEnabled
-        topShadowFirstColor="#F2F2F2"
-        bottomShadowFirstColor="#F2F2F2"
+        topShadowFirstColor={semanticColors.surfaceMuted}
+        bottomShadowFirstColor={semanticColors.surfaceMuted}
       >
         <FormSectionHeader
           currentSection={sectionIndex + 1}
