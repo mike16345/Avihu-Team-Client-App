@@ -9,7 +9,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { useEffect, useState } from "react";
-import appIcon from "@assets/app-icon.png";
+import appIcon from "tenant-assets/runtime-logo.png";
 import useStyles from "@/styles/useGlobalStyles";
 import { IUser } from "@/interfaces/User";
 import { Text } from "../ui/Text";

@@ -1,5 +1,3 @@
-export const NOTIFICATION_TITLE = "Avihu Team";
-
 export const NotificationIdentifiers = {
   OLD_DAILY_WEIGH_IN_REMINDER_ID: "daily-8am-weigh-in-reminder",
   NEW_DAILY_WEIGH_IN_REMINDER_ID: "daily-8am-weigh-in-reminder-new",

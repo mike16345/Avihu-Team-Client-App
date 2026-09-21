@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { View, StyleSheet } from "react-native";
 import React from "react";
 
@@ -20,9 +21,9 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     borderRadius: 12,
-    backgroundColor: "#33B333",
+    backgroundColor: semanticColors.graph.dot,
     borderWidth: 2,
-    borderColor: "#FFF",
+    borderColor: semanticColors.app.surfaceRaised,
   },
 });
 

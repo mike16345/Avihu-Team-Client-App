@@ -1,6 +1,7 @@
 import { deleteItem } from "@/API/api";
 import { applyApiKeyToHeaders } from "@/services/apiKey";
 import Constants from "expo-constants";
+import { buildSignedImageUploadUrl, createImageObjectName } from "@/utils/imageUrls";
 
 const S3_IMAGES_ENDPOINT = "s3/photos/one";
 
@@ -45,13 +46,18 @@ export const useImageApi = () => {
     }
   };
 
-  const handleUploadImageToS3 = async (fileUri: string, userId: string, imageName: string) => {
+  const handleUploadImageToS3 = async (fileUri: string, userId: string, _imageName: string) => {
     if (!fileUri) throw new Error("No file provided");
 
     const today = new Date().toISOString().split("T")[0];
     const api = process.env.EXPO_PUBLIC_SERVER || Constants.expoConfig?.extra?.API_URL;
-    const url = `${api}/signedUrl?userId=${userId}&date=${today}&imageName=${imageName}`;
-    const urlToStore = `${userId}/${today}/${imageName}`;
+    const safeImageName = createImageObjectName();
+    const url = buildSignedImageUploadUrl(api!, {
+      userId,
+      date: today,
+      imageName: safeImageName,
+    });
+    const urlToStore = `${userId}/${today}/${safeImageName}`;
 
     try {
       // Fetch the presigned URL

@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { StyleSheet, View } from "react-native";
 import React from "react";
 import { Text } from "@/components/ui/Text";
@@ -27,7 +28,7 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
         spacing.gap20,
         spacing.pdVerticalXl,
         spacing.pdHorizontalLg,
-        { borderBottomWidth: 1, borderColor: "#cccccc" },
+        { borderBottomWidth: 1, borderColor: semanticColors.app.formBorder },
       ]}
     >
       <View style={layout.center}>
@@ -67,14 +68,14 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   subtitle: {
-    color: "#4A5568",
+    color: semanticColors.app.textForm,
     marginTop: 4,
   },
   stepPill: {
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 999,
-    shadowColor: "#000000",
+    shadowColor: semanticColors.scrim,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   stepPillText: {
-    color: "#072723",
+    color: semanticColors.steps.ringGradientStart,
   },
 });
 

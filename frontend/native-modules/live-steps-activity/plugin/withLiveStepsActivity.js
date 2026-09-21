@@ -14,6 +14,7 @@ const IOS_SRC = path.join(NATIVE_ROOT, "ios-template");
 const ANDROID_SRC = path.join(NATIVE_ROOT, "android-template");
 
 const LIVE_STEPS_PACKAGE_SUFFIX = "livesteps";
+const IOS_DISPLAY_NAME_MARKER = '"__APP_DISPLAY_NAME__"';
 
 function getAndroidAppPackage(config) {
   return config.android?.package || "com.avihuteam.avihuteam";
@@ -33,6 +34,23 @@ function copyFile(from, to) {
   }
   fs.mkdirSync(path.dirname(to), { recursive: true });
   fs.copyFileSync(from, to);
+}
+
+function renderIosBridgeSource(source, displayName) {
+  if (!source.includes(IOS_DISPLAY_NAME_MARKER)) {
+    throw new Error("Live steps iOS template is missing the display-name marker");
+  }
+
+  return source.replace(IOS_DISPLAY_NAME_MARKER, JSON.stringify(displayName));
+}
+
+function copyIosBridgeFile(from, to, displayName) {
+  if (!fs.existsSync(from)) {
+    throw new Error(`Live steps native template is missing: ${from}`);
+  }
+  fs.mkdirSync(path.dirname(to), { recursive: true });
+  const source = fs.readFileSync(from, "utf8");
+  fs.writeFileSync(to, renderIosBridgeSource(source, displayName));
 }
 
 function copyDir(from, to) {
@@ -113,7 +131,11 @@ const withIOSBridgeFiles = (config) =>
       if (!appDir) return cfg;
 
       const target = path.join(root, appDir);
-      copyFile(path.join(IOS_SRC, "RNLiveSteps.swift"), path.join(target, "RNLiveSteps.swift"));
+      copyIosBridgeFile(
+        path.join(IOS_SRC, "RNLiveSteps.swift"),
+        path.join(target, "RNLiveSteps.swift"),
+        cfg.name
+      );
       copyFile(path.join(IOS_SRC, "RNLiveSteps.m"), path.join(target, "RNLiveSteps.m"));
       copyFile(
         path.join(IOS_SRC, "StepsActivityAttributes.swift"),
@@ -268,5 +290,7 @@ const withLiveStepsActivity = (config) => {
   config = withAndroidManifestEntries(config);
   return config;
 };
+
+withLiveStepsActivity.renderIosBridgeSource = renderIosBridgeSource;
 
 module.exports = withLiveStepsActivity;

@@ -23,7 +23,7 @@ final class RNLiveSteps: NSObject {
         }
 
         do {
-            let attrs = StepsActivityAttributes(trainerName: "Avihu Team")
+            let attrs = StepsActivityAttributes(trainerName: "__APP_DISPLAY_NAME__")
             let state = StepsActivityAttributes.ContentState(
                 todaySteps: todaySteps.intValue,
                 dailyGoal: dailyGoal.intValue,

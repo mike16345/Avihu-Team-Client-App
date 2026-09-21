@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { View } from "react-native";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import Icon from "../Icon/Icon";
@@ -71,7 +72,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ articleId, likes, group }) => {
 
   return (
     <PrimaryButton
-      style={isLiked ? { backgroundColor: "#EBFFEF" } : {}}
+      style={isLiked ? { backgroundColor: semanticColors.app.articleLiked } : {}}
       block
       mode="light"
       onPress={handleLikePress}

@@ -2,7 +2,7 @@ import { Text } from "../ui/Text";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import { Card } from "../ui/Card";
-import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 import { BOTTOM_BAR_HEIGHT } from "@/constants/Constants";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { useMemo } from "react";
@@ -12,7 +12,7 @@ import { isHtmlEmpty } from "@/utils/utils";
 const Supplements = () => {
   const { layout, spacing } = useStyles();
   const { height } = useWindowDimensions();
-  const { data } = useDietPlanQuery();
+  const { data } = useDietPlanV1Query();
   const isEmpty = !data?.supplements?.length || isHtmlEmpty(data?.supplements.join(""));
 
   const supplements = useMemo(() => {

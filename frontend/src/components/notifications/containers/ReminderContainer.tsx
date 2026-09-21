@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Text } from "@/components/ui/Text";
@@ -41,10 +42,18 @@ const ReminderContainer: React.FC<ReminderContainerProps> = ({
           <Text fontSize={16} fontVariant="semibold" style={{ paddingBottom: 4 }}>
             מתזכרים אותך לעדכן {type == "measurement" ? "היקפים" : "שקילה יומית"}
           </Text>
-          <Text fontSize={14} fontVariant="regular" style={{ color: "grey" }}>
+          <Text
+            fontSize={14}
+            fontVariant="regular"
+            style={{ color: semanticColors.app.neutralGray }}
+          >
             כדי שנוכל להיות במעקב חשוב
           </Text>
-          <Text fontSize={14} fontVariant="regular" style={{ paddingBottom: 12, color: "grey" }}>
+          <Text
+            fontSize={14}
+            fontVariant="regular"
+            style={{ paddingBottom: 12, color: semanticColors.app.neutralGray }}
+          >
             למלא את הפרטים
           </Text>
 
@@ -55,7 +64,11 @@ const ReminderContainer: React.FC<ReminderContainerProps> = ({
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleDismiss}>
-              <Text fontSize={14} fontVariant="semibold" style={{ color: "grey" }}>
+              <Text
+                fontSize={14}
+                fontVariant="semibold"
+                style={{ color: semanticColors.app.neutralGray }}
+              >
                 התעלם
               </Text>
             </TouchableOpacity>

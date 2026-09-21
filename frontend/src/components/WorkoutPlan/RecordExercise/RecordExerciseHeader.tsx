@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import Icon from "@/components/Icon/Icon";
 import IconButton from "@/components/ui/buttons/IconButton";
 import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
@@ -68,7 +69,10 @@ const RecordExerciseHeader: FC<RecordExerciseHeaderProps> = ({ exercise }) => {
             <RestTimer
               trigger={
                 <IconButton
-                  style={[buttonsPadding, { backgroundColor: "#ECFDF3" }]}
+                  style={[
+                    buttonsPadding,
+                    { backgroundColor: semanticColors.app.developerSuccessSurface },
+                  ]}
                   icon={"clock"}
                   size={20}
                   label={

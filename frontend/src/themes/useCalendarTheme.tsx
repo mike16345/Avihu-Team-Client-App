@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useMemo } from "react";
 import { MarkingProps } from "react-native-calendars/src/calendar/day/marking";
 import useStyles from "@/styles/useGlobalStyles";
@@ -13,8 +14,8 @@ interface MarkedDays {
   [key: string]: ExtendedMarking;
 }
 
-const DAY_HEADER_COLOR = "#000";
-const TODAY_TEXT_COLOR = "#E0E0E0";
+const DAY_HEADER_COLOR = semanticColors.scrim;
+const TODAY_TEXT_COLOR = semanticColors.calendar.today;
 
 const useCalendarTheme = (
   today: string = "",
@@ -48,7 +49,7 @@ const useCalendarTheme = (
           fontSize: 16,
           fontFamily: "Assistant-Regular",
           fontWeight: "400",
-          color: "#2d4150",
+          color: semanticColors.calendar.agendaText,
         },
         dot: {
           width: 4,
@@ -104,12 +105,12 @@ const useCalendarTheme = (
       baseMarked[date] = {
         ...(baseMarked[date] || {}), // preserve existing styles
         marked: true,
-        dotColor: "#FFBC5D",
+        dotColor: semanticColors.calendar.dot,
         dots: [
           {
             key: "highlight",
-            color: "orange",
-            selectedDotColor: "orange",
+            color: semanticColors.calendar.dotSelected,
+            selectedDotColor: semanticColors.calendar.dotSelected,
           },
         ],
       };

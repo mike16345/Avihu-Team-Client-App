@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import React from "react";
 import { StyleSheet, TextInput, TextInputProps } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
@@ -7,7 +8,7 @@ const ChatInput: React.FC<TextInputProps> = ({ style, ...props }) => {
 
   return (
     <TextInput
-      placeholderTextColor="#A0A0A0"
+      placeholderTextColor={semanticColors.app.textPlaceholder}
       style={[
         common.borderXsm,
         colors.outline,

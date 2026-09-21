@@ -4,8 +4,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { lightHaptic } from "@/utils/haptics";
 import { Platform } from "react-native";
 import { generateUniqueId } from "@/utils/utils";
-import { NOTIFICATION_TITLE, NotificationBodies } from "@/constants/notifications";
+import { NotificationBodies } from "@/constants/notifications";
+import { getRuntimeTenantDisplayName } from "@/config/runtimeTenant";
 import { getNextEightAM, getNextEightAMOnSunday } from "@/utils/notification";
+import Constants from "expo-constants";
+
+const getNotificationTitle = () => getRuntimeTenantDisplayName(Constants);
 
 export interface INotification {
   id: string;
@@ -77,7 +81,7 @@ export const useNotificationStore = create<INotificationStore>()(
         get().addNotification({
           id: data.id,
           status: "delivered",
-          title: NOTIFICATION_TITLE,
+          title: getNotificationTitle(),
           data,
           type,
           triggerTime: new Date(),
@@ -101,7 +105,7 @@ export const useNotificationStore = create<INotificationStore>()(
         get().addNotification({
           id: data.id,
           status: "pending",
-          title: NOTIFICATION_TITLE,
+          title: getNotificationTitle(),
           body: NotificationBodies.DAILY_WEIGH_IN_REMINDER,
           type: "weighIn",
           data,
@@ -125,7 +129,7 @@ export const useNotificationStore = create<INotificationStore>()(
         get().addNotification({
           id: data.id,
           status: "pending",
-          title: NOTIFICATION_TITLE,
+          title: getNotificationTitle(),
           body: NotificationBodies.WEEKLY_MEASUERMENT_REMINDER,
           type: "measurement",
           data,

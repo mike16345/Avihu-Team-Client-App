@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
-import { View } from "react-native";
+import React from "react";
+import { Alert, Linking, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import { useToast } from "@/hooks/useToast";
 import IconButton from "../ui/buttons/IconButton";
+import { resolveCameraPermission, type CameraPermissionResolution } from "./imagePickerPermission";
 
 interface SelectUploadTypeProps {
   imageCap: number;
@@ -26,8 +27,6 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({
   const { layout } = useStyles();
   const { triggerErrorToast } = useToast();
 
-  const [_, requestPermission] = ImagePicker.useCameraPermissions();
-
   const showMaxImagesReachedError = () => {
     triggerErrorToast({
       title: "הגעת למגבלת התמונות",
@@ -37,30 +36,23 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({
 
   const getRemainingSlots = () => Math.max(imageCap - selectedImagesCount, 0);
 
-  const checkPermissions = async (
-    getPermissions: () => Promise<
-      ImagePicker.CameraPermissionResponse | ImagePicker.MediaLibraryPermissionResponse
-    >,
-    requestPermissions: () => Promise<
-      ImagePicker.CameraPermissionResponse | ImagePicker.MediaLibraryPermissionResponse
-    >
-  ) => {
-    const { status, canAskAgain } = await getPermissions();
-
-    if (status !== "granted") {
-      if (canAskAgain) {
-        const { status: newStatus } = await requestPermissions();
-
-        return newStatus;
-      }
-
-      triggerErrorToast({
-        title: "אין הרשאה לתמונות",
-        message: "כדי לבחור או לצלם תמונה, יש לאפשר גישה לתמונות או למצלמה בהגדרות המכשיר.",
-      });
+  const showCameraPermissionMessage = (resolution: CameraPermissionResolution) => {
+    if (resolution === "settings-required") {
+      Alert.alert("נדרשת הרשאה למצלמה", "כדי לצלם תמונה, יש לאפשר גישה למצלמה דרך הגדרות המכשיר.", [
+        { text: "ביטול", style: "cancel" },
+        {
+          text: "פתיחת הגדרות",
+          onPress: () => void Linking.openSettings(),
+        },
+      ]);
+      return;
     }
 
-    return status;
+    Alert.alert(
+      "נדרשת הרשאה למצלמה",
+      "לא ניתן לצלם ללא גישה למצלמה. אפשר לנסות שוב בלחיצה על כפתור המצלמה.",
+      [{ text: "הבנתי" }]
+    );
   };
 
   const pickImage = async () => {
@@ -70,13 +62,6 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({
       showMaxImagesReachedError();
       return;
     }
-
-    const status = await checkPermissions(
-      ImagePicker.getMediaLibraryPermissionsAsync,
-      ImagePicker.requestMediaLibraryPermissionsAsync
-    );
-
-    if (status !== "granted") return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -107,12 +92,15 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({
       return;
     }
 
-    const status = await checkPermissions(
-      ImagePicker.getCameraPermissionsAsync,
-      ImagePicker.requestCameraPermissionsAsync
-    );
+    const permissionResolution = await resolveCameraPermission({
+      getPermission: ImagePicker.getCameraPermissionsAsync,
+      requestPermission: ImagePicker.requestCameraPermissionsAsync,
+    });
 
-    if (status !== "granted") return;
+    if (permissionResolution !== "granted") {
+      showCameraPermissionMessage(permissionResolution);
+      return;
+    }
 
     const result = await ImagePicker.launchCameraAsync(cameraPickerOptions);
 
@@ -128,10 +116,6 @@ const SelectUploadType: React.FC<SelectUploadTypeProps> = ({
 
     returnImages([fixedImage.uri]);
   };
-
-  useEffect(() => {
-    requestPermission();
-  }, []);
 
   return (
     <View style={[layout.flexRow, layout.center, { gap: 40 }, layout.widthFull]}>

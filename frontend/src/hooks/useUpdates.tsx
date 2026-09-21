@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import { useEffect, useRef, useState } from "react";
 import { Modal, StyleSheet, View } from "react-native";
 import * as Updates from "expo-updates";
@@ -98,7 +99,7 @@ export default Update;
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: "rgba(7, 39, 35, 0.22)",
+    backgroundColor: semanticColors.app.updateOverlay,
     alignItems: "center",
     justifyContent: "center",
     padding: 24,

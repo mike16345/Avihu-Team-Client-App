@@ -3,7 +3,7 @@ import CollapsibleMeal from "./CollapsibleMeal";
 import ServingsTracker from "./ServingsTracker";
 import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
-import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { Text } from "../ui/Text";
@@ -11,7 +11,7 @@ import { IMeal } from "@/interfaces/DietPlan";
 
 const MealsList: FC = () => {
   const { spacing, layout } = useStyles();
-  const { data, isLoading } = useDietPlanQuery();
+  const { data, isLoading } = useDietPlanV1Query();
   const meals = data?.meals || [];
 
   return (

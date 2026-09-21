@@ -5,6 +5,7 @@ node_modules/
 
 # Expo
 .expo/
+.preflight/
 dist/   `   `
 web-build/
 
@@ -37,3 +38,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Local white-label tenant testing
+config/tenants/.local/
+config/tenants/assets/.local/
+.tenant-add/

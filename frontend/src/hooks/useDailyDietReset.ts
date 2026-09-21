@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { AppState } from "react-native";
 import { useDietServingsStore } from "@/store/dietServingsStore";
-import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
+import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 import { IDietPlan, IMeal } from "@/interfaces/DietPlan";
 
 const RESET_CHECK_INTERVAL_MS = 60 * 1000;
@@ -30,7 +30,7 @@ export const useDailyDietReset = () => {
   const reset = useDietServingsStore((s) => s.reset);
   const reconcileEaten = useDietServingsStore((s) => s.reconcileEaten);
   const reconcileWithTargets = useDietServingsStore((s) => s.reconcileWithTargets);
-  const { data: plan, isLoading, isError } = useDietPlanQuery();
+  const { data: plan, isLoading, isError } = useDietPlanV1Query();
 
   useEffect(() => {
     resetIfNewDay();

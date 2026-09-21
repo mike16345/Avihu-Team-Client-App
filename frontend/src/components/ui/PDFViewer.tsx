@@ -1,3 +1,4 @@
+import { semanticColors } from "@/themes/semanticColors";
 import React, { useMemo } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import Pdf from "react-native-pdf";
@@ -39,7 +40,7 @@ const PDFViewer: React.FC<Props> = ({ uri, onScrollToEnd }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: semanticColors.app.surfaceRaised,
   },
   pdf: {
     flex: 1,
