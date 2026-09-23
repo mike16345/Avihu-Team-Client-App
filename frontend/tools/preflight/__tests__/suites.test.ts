@@ -259,7 +259,7 @@ describe("preflight suite composition", () => {
       "✖ Validate packages against React Native Directory package metadata",
       ...Array.from({ length: 8 }, (_, index) => `diagnostic ${index + 1}`),
       "  Untested on New Architecture: react-native-health, react-native-infinite-wheel-picker",
-      "  Unmaintained: expo-health-connect, react-native-infinite-wheel-picker",
+      "  Unmaintained: expo-health-connect, react-native-infinite-wheel-picker, react-native-render-html",
     ].join("\n");
     const doctor = createFastSuite(
       createContext({
