@@ -9,7 +9,7 @@ import {
   type CheckPrerequisite,
 } from "./checks/androidRelease";
 import { createAssetsCheck } from "./checks/assets";
-import { environmentCheck } from "./checks/environment";
+import { easEnvironmentCheck, environmentCheck } from "./checks/environment";
 import { expoConfigCheck } from "./checks/expoConfig";
 import { createIosReleaseCheck } from "./checks/iosRelease";
 import { androidNativeDriftCheck, nativeDriftCheck } from "./checks/nativeDrift";
@@ -56,7 +56,9 @@ const memoizeDefinition = (
 
 export const createFastSuite = (context: PreflightSuiteContext): PreflightSuite => [
   tenantConfigCheck,
-  environmentCheck,
+  ...(context.tenantConfig.kind === "repository" && context.environment !== "development"
+    ? [easEnvironmentCheck]
+    : [environmentCheck]),
   ...createProjectHealthChecks(),
   createAssetsCheck(context.tenant),
   expoConfigCheck,

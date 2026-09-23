@@ -29,6 +29,31 @@ describe("interactive app-control navigation", () => {
     promptMocks.select.mockReset();
   });
 
+  it("offers the previous command after tenant choices and returns it directly", async () => {
+    const previousSelection = {
+      action: "run" as const,
+      tenantId: "avihu",
+      environment: "development" as const,
+      platform: "android" as const,
+    };
+    promptMocks.select.mockImplementationOnce(
+      (prompt: { options: Array<{ value: unknown; label?: string }> }) => {
+        const previousIndex = prompt.options.findIndex(
+          (option) => option.label === "Run previous command"
+        );
+
+        expect(previousIndex).toBe(prompt.options.length - 1);
+        expect(previousIndex).toBeGreaterThan(0);
+        return prompt.options[previousIndex].value;
+      }
+    );
+
+    await expect(
+      promptForSelection({ confirmed: false, dryRun: false }, previousSelection)
+    ).resolves.toEqual(previousSelection);
+    expect(promptMocks.select).toHaveBeenCalledTimes(1);
+  });
+
   it("returns from a development action to the intent menu", async () => {
     promptMocks.select
       .mockResolvedValueOnce("avihu")

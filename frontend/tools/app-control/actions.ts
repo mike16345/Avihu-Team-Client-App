@@ -281,7 +281,7 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         prerequisite: createCommandStep(
           selection,
           "npm",
-          ["run", "preflight"],
+          ["run", "preflight:eas"],
           `Fast preflight for ${labelPrefix}`
         ),
       };

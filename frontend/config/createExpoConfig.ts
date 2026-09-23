@@ -11,13 +11,26 @@ export interface CreateExpoConfigInput {
   processEnv: ProcessEnvironment;
 }
 
-const getPublicRuntimeExtra = (processEnv: ProcessEnvironment) => ({
-  API_URL: processEnv.EXPO_PUBLIC_SERVER,
-  API_URL_PREVIEW: processEnv.EXPO_PUBLIC_API_URL_PREVIEW,
-  TRAINER_PHONE_NUMBER: processEnv.EXPO_PUBLIC_TRAINER_PHONE_NUMBER,
-  CLOUDFRONT_URL: processEnv.EXPO_PUBLIC_CLOUDFRONT_URL,
-  DEV_MODE: processEnv.EXPO_PUBLIC_MODE,
-});
+const getPublicRuntimeExtra = (environment: TenantEnvironment, processEnv: ProcessEnvironment) => {
+  if (environment === "development" && !processEnv.API_URL?.trim()) {
+    return {
+      API_URL: processEnv.EXPO_PUBLIC_SERVER,
+      API_URL_PREVIEW: processEnv.EXPO_PUBLIC_API_URL_PREVIEW,
+      TRAINER_PHONE_NUMBER: processEnv.EXPO_PUBLIC_TRAINER_PHONE_NUMBER,
+      CLOUDFRONT_URL: processEnv.EXPO_PUBLIC_CLOUDFRONT_URL,
+      DEV_MODE: processEnv.EXPO_PUBLIC_MODE,
+    };
+  }
+
+  return {
+    API_URL: processEnv.API_URL,
+    API_URL_PREVIEW: processEnv.API_URL_PREVIEW,
+    API_TOKEN: processEnv.API_KEY,
+    TRAINER_PHONE_NUMBER: processEnv.TRAINER_PHONE_NUMBER,
+    CLOUDFRONT_URL: processEnv.CLOUDFRONT_URL,
+    DEV_MODE: processEnv.DEV_MODE,
+  };
+};
 
 export const createTenantPlugins = (tenant: TenantConfig): NonNullable<ExpoConfig["plugins"]> => {
   const plugins: NonNullable<ExpoConfig["plugins"]> = [
@@ -30,6 +43,7 @@ export const createTenantPlugins = (tenant: TenantConfig): NonNullable<ExpoConfi
     ],
     ["expo-build-properties", { android: tenant.androidBuildProperties }],
     "./plugins/withFmtXcode26Fix",
+    "./plugins/withAndroidBackCompatibility",
   ];
   if (tenant.nativeCapabilities.backgroundTasks) plugins.push("expo-background-task");
   if (tenant.nativeCapabilities.camera) {
@@ -140,7 +154,7 @@ export const createExpoConfig = ({
         nativeCapabilities: tenant.nativeCapabilities,
         showEnvironmentBadge: environment !== "production",
       },
-      ...getPublicRuntimeExtra(processEnv),
+      ...getPublicRuntimeExtra(environment, processEnv),
     },
     ...(linkedEas ? { owner: ownerOverride || linkedEas.owner } : {}),
     runtimeVersion: tenant.version,

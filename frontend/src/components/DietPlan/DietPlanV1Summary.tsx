@@ -15,6 +15,7 @@ import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
 import { IMeal } from "@/interfaces/DietPlan";
 import { DIET_CALORIES_PER_SERVING } from "@/constants/dietCalories";
 import { DIET_V2_MUTED, DropIcon, SproutIcon, ChevronLeftIcon } from "../DietPlanV2/dietV2Icons";
+import { getTrainerPhoneNumber } from "@/config/runtimeContact";
 
 const DARK = semanticColors.diet.primaryText;
 
@@ -289,9 +290,7 @@ const DietPlanV1Summary = () => {
           </View>
           <Pressable
             style={styles.tipRow}
-            onPress={() =>
-              Linking.openURL(`https://wa.me/${process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER || ""}`)
-            }
+            onPress={() => Linking.openURL(`https://wa.me/${getTrainerPhoneNumber()}`)}
           >
             <View style={styles.tipIconWrap}>
               <WhatsAppIcon size={14} />

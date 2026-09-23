@@ -167,13 +167,16 @@ describe("createExpoConfig", () => {
     expect(development.scheme).toBe("avihuteam");
   });
 
-  it("uses the production identity and exposes only public tenant metadata", () => {
+  it("uses production EAS values even when local development values exist", () => {
     const production = createExpoConfig({
       baseConfig: {},
       tenant: getTenant("avihu"),
       environment: "production",
       processEnv: {
-        API_KEY: "private-server-key",
+        API_KEY: "production-client-key",
+        API_URL: "https://production.example.com",
+        TRAINER_PHONE_NUMBER: "+15555550101",
+        CLOUDFRONT_URL: "https://production-cdn.example.com",
         EXPO_PUBLIC_API_AUTH_TOKEN: "public-client-key",
         EXPO_PUBLIC_SERVER: "https://api.example.com",
         EXPO_PUBLIC_API_URL_PREVIEW: "https://preview-api.example.com",
@@ -191,18 +194,39 @@ describe("createExpoConfig", () => {
       showEnvironmentBadge: false,
     });
     expect(production.extra).toMatchObject({
-      API_URL: "https://api.example.com",
-      API_URL_PREVIEW: "https://preview-api.example.com",
-      TRAINER_PHONE_NUMBER: "+15555550100",
-      CLOUDFRONT_URL: "https://cdn.example.com",
-      DEV_MODE: "production",
+      API_URL: "https://production.example.com",
+      TRAINER_PHONE_NUMBER: "+15555550101",
+      CLOUDFRONT_URL: "https://production-cdn.example.com",
+      API_TOKEN: "production-client-key",
     });
+    expect(production.extra?.API_URL_PREVIEW).toBeUndefined();
 
     const serializedExtra = JSON.stringify(production.extra);
-    expect(serializedExtra).not.toContain("API_TOKEN");
-    expect(serializedExtra).not.toContain("private-server-key");
+    expect(serializedExtra).not.toContain("public-client-key");
     expect(serializedExtra).not.toContain("public-client-key");
     expect(serializedExtra).not.toContain("not-allowlisted");
+  });
+
+  it("uses local Expo public values for development", () => {
+    const development = createExpoConfig({
+      baseConfig: {},
+      tenant: getTenant("avihu"),
+      environment: "development",
+      processEnv: {
+        EXPO_PUBLIC_SERVER: "https://local.example.com",
+        EXPO_PUBLIC_CLOUDFRONT_URL: "https://local-cdn.example.com",
+        EXPO_PUBLIC_TRAINER_PHONE_NUMBER: "+15555550100",
+        EXPO_PUBLIC_MODE: "development",
+      },
+    });
+
+    expect(development.extra).toMatchObject({
+      API_URL: "https://local.example.com",
+      CLOUDFRONT_URL: "https://local-cdn.example.com",
+      TRAINER_PHONE_NUMBER: "+15555550100",
+      DEV_MODE: "development",
+    });
+    expect(development.extra?.API_TOKEN).toBeUndefined();
   });
 
   it("enables the tenant badge only for non-production binary configurations", () => {
@@ -277,6 +301,21 @@ describe("createExpoConfig", () => {
     ).toEqual(["./plugins/withFmtXcode26Fix"]);
   });
 
+  it("wires the Android back compatibility plugin exactly once", () => {
+    const production = createExpoConfig({
+      baseConfig: {},
+      tenant: getTenant("avihu"),
+      environment: "production",
+      processEnv: {},
+    });
+
+    expect(
+      production.plugins?.filter(
+        (plugin) => plugin === "./plugins/withAndroidBackCompatibility"
+      )
+    ).toEqual(["./plugins/withAndroidBackCompatibility"]);
+  });
+
   it("composes binary plugins only from native capabilities", () => {
     const plugins = createTenantPlugins({
       ...avihuTenant,
@@ -301,6 +340,7 @@ describe("createExpoConfig", () => {
       ],
       ["expo-build-properties", { android: avihuTenant.androidBuildProperties }],
       "./plugins/withFmtXcode26Fix",
+      "./plugins/withAndroidBackCompatibility",
     ]);
   });
 

@@ -32,6 +32,7 @@ export interface CommandSpec extends CommandStep {
 }
 
 export interface ParsedAppArguments {
+  replayPrevious?: boolean;
   action?: AppAction;
   platform?: AppPlatform;
   tenantId?: string;

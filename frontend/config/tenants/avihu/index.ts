@@ -13,6 +13,13 @@ const REQUIRED_PUBLIC_ENVIRONMENT_VARIABLES = [
   "EXPO_PUBLIC_MODE",
 ];
 
+const REQUIRED_EAS_ENVIRONMENT_VARIABLES = [
+  "API_KEY",
+  "API_URL",
+  "CLOUDFRONT_URL",
+  "TRAINER_PHONE_NUMBER",
+];
+
 export const avihuTenant = {
   kind: "repository",
   id: "avihu",
@@ -72,8 +79,8 @@ export const avihuTenant = {
   nativeCapabilities,
   requiredEnvironmentVariables: {
     development: REQUIRED_PUBLIC_ENVIRONMENT_VARIABLES,
-    preview: [...REQUIRED_PUBLIC_ENVIRONMENT_VARIABLES, "EXPO_PUBLIC_API_URL_PREVIEW"],
-    production: REQUIRED_PUBLIC_ENVIRONMENT_VARIABLES,
+    preview: [...REQUIRED_EAS_ENVIRONMENT_VARIABLES, "API_URL_PREVIEW"],
+    production: REQUIRED_EAS_ENVIRONMENT_VARIABLES,
   },
   environments: {
     development: {
