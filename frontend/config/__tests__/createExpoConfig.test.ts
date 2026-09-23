@@ -310,9 +310,7 @@ describe("createExpoConfig", () => {
     });
 
     expect(
-      production.plugins?.filter(
-        (plugin) => plugin === "./plugins/withAndroidBackCompatibility"
-      )
+      production.plugins?.filter((plugin) => plugin === "./plugins/withAndroidBackCompatibility")
     ).toEqual(["./plugins/withAndroidBackCompatibility"]);
   });
 
