@@ -320,6 +320,19 @@ describe("resolveAction", () => {
     });
   });
 
+  it("publishes an update with the user-provided message instead of the git message", () => {
+    const spec = resolveAction({
+      action: "update",
+      tenantId: "avihu",
+      environment: "production",
+      updateMessage: "Fix diet plan units",
+    });
+
+    expect(spec.args).toContain("--message");
+    expect(spec.args).toContain("Fix diet plan units");
+    expect(spec.args).not.toContain("--auto");
+  });
+
   it("maps fast preflight directly to the shared package script", () => {
     expect(
       resolveAction({

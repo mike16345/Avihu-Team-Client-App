@@ -50,7 +50,9 @@ const appSelectionSchema = z.discriminatedUnion("action", [
       profile: environmentSchema,
     })
     .strict(),
-  baseSelectionSchema.extend({ action: z.literal("update") }).strict(),
+  baseSelectionSchema
+    .extend({ action: z.literal("update"), updateMessage: z.string().min(1).optional() })
+    .strict(),
 ]);
 
 export const getPreviousSelectionPath = (projectRoot = process.cwd()): string =>

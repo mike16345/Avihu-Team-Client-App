@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const promptMocks = vi.hoisted(() => ({
   box: vi.fn(),
   select: vi.fn(),
+  text: vi.fn(),
 }));
 
 vi.mock("@clack/prompts", () => ({
@@ -12,6 +13,7 @@ vi.mock("@clack/prompts", () => ({
   isCancel: (value: unknown) => typeof value === "symbol",
   path: vi.fn(),
   select: promptMocks.select,
+  text: promptMocks.text,
 }));
 
 import { printSelectionSummary, promptForSelection } from "../prompts";
@@ -27,6 +29,7 @@ describe("interactive app-control navigation", () => {
   beforeEach(() => {
     promptMocks.box.mockReset();
     promptMocks.select.mockReset();
+    promptMocks.text.mockReset();
   });
 
   it("offers the previous command after tenant choices and returns it directly", async () => {
@@ -120,6 +123,40 @@ describe("interactive app-control navigation", () => {
       profile: "production",
       platform: "ios",
     });
+  });
+
+  it("asks for an update message before creating an update selection", async () => {
+    promptMocks.select
+      .mockResolvedValueOnce("avihu")
+      .mockResolvedValueOnce("release")
+      .mockImplementationOnce(optionValue("Publish an update"))
+      .mockResolvedValueOnce("production");
+    promptMocks.text.mockResolvedValueOnce("Fix diet plan units");
+
+    await expect(promptForSelection({ confirmed: false, dryRun: false })).resolves.toMatchObject({
+      action: "update",
+      tenantId: "avihu",
+      environment: "production",
+      updateMessage: "Fix diet plan units",
+    });
+  });
+
+  it("shows the update message in the confirmation summary and repeat command", () => {
+    printSelectionSummary({
+      action: "update",
+      tenantId: "avihu",
+      environment: "production",
+      updateMessage: "Fix diet plan units",
+    });
+
+    expect(promptMocks.box).toHaveBeenCalledWith(
+      expect.stringContaining("Update message: Fix diet plan units"),
+      "App control summary"
+    );
+    expect(promptMocks.box).toHaveBeenCalledWith(
+      expect.stringContaining('--message "Fix diet plan units" --yes'),
+      "App control summary"
+    );
   });
 
   it("prints a repeatable tenant-aware submission command", () => {

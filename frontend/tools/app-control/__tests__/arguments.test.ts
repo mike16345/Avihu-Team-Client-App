@@ -167,6 +167,38 @@ describe("parseAppArguments", () => {
     });
   });
 
+  it("parses an update message for a confirmed update", () => {
+    expect(
+      parseAppArguments([
+        "update",
+        "--tenant",
+        "avihu",
+        "--environment",
+        "production",
+        "--message",
+        "Fix diet plan units",
+        "--yes",
+      ])
+    ).toMatchObject({
+      action: "update",
+      updateMessage: "Fix diet plan units",
+    });
+  });
+
+  it("rejects update messages for non-update actions", () => {
+    expect(() =>
+      parseAppArguments([
+        "preflight",
+        "--tenant",
+        "avihu",
+        "--environment",
+        "production",
+        "--message",
+        "Not an update",
+      ])
+    ).toThrowError("--message is only supported for update actions");
+  });
+
   it("rejects unknown tenants before a command can run", () => {
     expect(() =>
       parseAppArguments([

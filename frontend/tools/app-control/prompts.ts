@@ -1,6 +1,6 @@
 import { existsSync, statSync } from "node:fs";
 import { resolve } from "node:path";
-import { box, cancel, confirm, isCancel, path as pathPrompt, select } from "@clack/prompts";
+import { box, cancel, confirm, isCancel, path as pathPrompt, select, text } from "@clack/prompts";
 import { getTenant, listTenants } from "../../config/tenants/registry";
 import { TENANT_ENVIRONMENTS, type TenantEnvironment } from "../../config/tenants/types";
 import type {
@@ -88,6 +88,10 @@ const formatEquivalentCommand = (selection: AppSelection): string => {
     parts.push("--device", JSON.stringify(selection.device));
   }
 
+  if (selection.action === "update" && selection.updateMessage) {
+    parts.push("--message", JSON.stringify(selection.updateMessage));
+  }
+
   parts.push("--yes");
   return parts.join(" ");
 };
@@ -114,6 +118,9 @@ export const printSelectionSummary = (selection: AppSelection): void => {
       `Action: ${formatAction(selection)}`,
       `Environment: ${selection.environment}`,
       `Platform: ${"platform" in selection ? selection.platform : "not platform-specific"}`,
+      ...(selection.action === "update" && selection.updateMessage
+        ? [`Update message: ${selection.updateMessage}`]
+        : []),
       ...identityLines,
       `Repeat command: ${formatEquivalentCommand(selection)}`,
     ].join("\n"),
@@ -309,6 +316,16 @@ const chooseAssetOperation = async (
   return isPromptCancelled(operation) ? null : operation;
 };
 
+const chooseUpdateMessage = async (initialValue?: string): Promise<string | null> => {
+  const updateMessage = await text({
+    message: "Describe this update",
+    initialValue,
+    validate: (value) => (value?.trim() ? undefined : "Enter an update message"),
+  });
+
+  return isPromptCancelled(updateMessage) ? null : updateMessage.trim();
+};
+
 export const promptForSelection = async (
   parsed: ParsedAppArguments,
   previousSelection: AppSelection | null = null
@@ -368,7 +385,17 @@ export const promptForSelection = async (
       }
 
       if (action === "update") {
-        return { action, tenantId, environment: environment as ReleaseProfile };
+        const updateMessage = parsed.updateMessage ?? (await chooseUpdateMessage());
+        if (!updateMessage) {
+          cancel("Operation cancelled.");
+          return null;
+        }
+        return {
+          action,
+          tenantId,
+          environment: environment as ReleaseProfile,
+          updateMessage,
+        };
       }
 
       if (action === "preflight") {

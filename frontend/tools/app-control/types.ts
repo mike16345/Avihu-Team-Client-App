@@ -42,6 +42,7 @@ export interface ParsedAppArguments {
   assetOperation?: AssetOperation;
   binaryPath?: string;
   device?: string;
+  updateMessage?: string;
   confirmed: boolean;
   dryRun: boolean;
 }
@@ -75,4 +76,8 @@ export type AppSelection =
       environment: ReleaseProfile;
       profile: ReleaseProfile;
     })
-  | (BaseSelection & { action: "update"; environment: ReleaseProfile });
+  | (BaseSelection & {
+      action: "update";
+      environment: ReleaseProfile;
+      updateMessage?: string;
+    });

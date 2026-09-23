@@ -271,7 +271,7 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
           selection.environment,
           "--environment",
           selection.environment,
-          "--auto",
+          ...(selection.updateMessage ? ["--message", selection.updateMessage] : ["--auto"]),
           "--non-interactive",
         ],
         `Publish update for ${labelPrefix}`

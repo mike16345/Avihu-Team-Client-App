@@ -150,6 +150,7 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
       profile: { type: "string" },
       binary: { type: "string" },
       device: { type: "string" },
+      message: { type: "string" },
       yes: { type: "boolean", default: false },
       "dry-run": { type: "boolean", default: false },
     },
@@ -168,7 +169,14 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
     if (values.yes) {
       throw new Error('The "previous" action always requires confirmation; remove --yes');
     }
-    if (values.tenant || values.environment || values.profile || values.binary || values.device) {
+    if (
+      values.tenant ||
+      values.environment ||
+      values.profile ||
+      values.binary ||
+      values.device ||
+      values.message
+    ) {
       throw new Error('The "previous" action does not accept command overrides');
     }
 
@@ -231,6 +239,10 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
     throw new Error("--device is only supported for run and install actions");
   }
 
+  if (action !== "update" && values.message) {
+    throw new Error("--message is only supported for update actions");
+  }
+
   if (action === "update" && environment === "development") {
     throw new Error("Updates require the preview or production environment");
   }
@@ -250,6 +262,7 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
     assetOperation,
     binaryPath: values.binary,
     device: values.device,
+    updateMessage: values.message?.trim(),
     confirmed: values.yes,
     dryRun: values["dry-run"],
   } satisfies ParsedAppArguments;

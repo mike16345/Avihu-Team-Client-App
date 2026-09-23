@@ -89,6 +89,7 @@ const selectionFromConfirmedArguments = (arguments_: ParsedAppArguments): AppSel
         action: "update",
         tenantId: arguments_.tenantId,
         environment: arguments_.environment,
+        updateMessage: arguments_.updateMessage,
       };
   }
 };
