@@ -4,6 +4,10 @@
 releasing this app. Its short top-level menu is grouped into **Develop & run**, **Verify app**,
 **Release app**, and **Manage assets**, and it never silently chooses production.
 
+After a command succeeds, `npm run app` adds **Run previous command** after the tenant choices.
+The shortcut shows the resolved command and asks for confirmation before running it. The equivalent
+direct shortcut is `npm run app -- previous`; it also always requires confirmation.
+
 `preflight` is the canonical fast preflight action. Add the optional `release` positional only
 when selecting the full release preflight.
 

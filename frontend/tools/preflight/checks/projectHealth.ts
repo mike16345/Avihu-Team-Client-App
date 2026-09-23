@@ -174,7 +174,11 @@ const nativeMaintenanceCheck: CheckDefinition<ProcessPreflightContext> = {
       },
       {
         category: "Unmaintained",
-        packages: ["expo-health-connect", "react-native-infinite-wheel-picker"],
+        packages: [
+          "expo-health-connect",
+          "react-native-infinite-wheel-picker",
+          "react-native-render-html",
+        ],
       },
     ];
     const isOnlyAcknowledgedFinding =

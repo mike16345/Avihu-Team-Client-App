@@ -77,6 +77,7 @@
 - Shared request helpers inject common headers, including the API key header, before forwarding requests through the configured axios instance.
 - Feature API hooks commonly model backend envelopes as `ApiResponse<T>` and often return `res.data` so UI and query hooks work with domain data instead of raw transport wrappers.
 - Environment-dependent URLs and tokens are resolved through Expo constants and `EXPO_PUBLIC_*` environment variables in config or the shared API layer.
+- Avihu local development reads `EXPO_PUBLIC_*` values; preview and production builds and updates read the selected EAS environment's `API_KEY`, `API_URL`, `CLOUDFRONT_URL`, `TRAINER_PHONE_NUMBER`, and preview `API_URL_PREVIEW`. Map these into the public Expo runtime config, and validate the remote EAS values before publishing. Local `.env*` values cannot satisfy that release gate.
 - New backend calls should extend the existing API helper pattern instead of duplicating axios setup in feature code.
 
 ## 7. UI/UX Conventions (if applicable)

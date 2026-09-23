@@ -20,6 +20,8 @@ const BACK = "__back__" as const;
 type Back = typeof BACK;
 const BACK_OPTION = { value: BACK, label: "← Back" } as const;
 const DEVELOPMENT_EAS_BUILD = "__development_eas_build__" as const;
+const PREVIOUS_COMMAND = "__previous_command__" as const;
+type PreviousCommand = typeof PREVIOUS_COMMAND;
 type ActionChoice = AppAction | typeof DEVELOPMENT_EAS_BUILD;
 
 const isPromptCancelled = <Value>(value: Value): value is Value & symbol => isCancel(value);
@@ -119,14 +121,28 @@ export const printSelectionSummary = (selection: AppSelection): void => {
   );
 };
 
-const chooseTenant = async (initialValue?: string): Promise<string | null> => {
+const chooseTenant = async (
+  initialValue?: string,
+  canReplayPrevious = false
+): Promise<string | PreviousCommand | null> => {
   const tenantId = await select({
-    message: "Select tenant",
-    options: listTenants().map((tenant) => ({
-      value: tenant.id,
-      label: tenant.displayName,
-      hint: tenant.id,
-    })),
+    message: "Select tenant or action",
+    options: [
+      ...listTenants().map((tenant) => ({
+        value: tenant.id,
+        label: tenant.displayName,
+        hint: tenant.id,
+      })),
+      ...(canReplayPrevious
+        ? [
+            {
+              value: PREVIOUS_COMMAND,
+              label: "Run previous command",
+              hint: "Review and confirm the last successful command",
+            },
+          ]
+        : []),
+    ],
     initialValue,
   });
 
@@ -294,14 +310,19 @@ const chooseAssetOperation = async (
 };
 
 export const promptForSelection = async (
-  parsed: ParsedAppArguments
+  parsed: ParsedAppArguments,
+  previousSelection: AppSelection | null = null
 ): Promise<AppSelection | null> => {
   let tenantId = parsed.tenantId;
   let actionOverride = parsed.action;
 
   while (true) {
     if (!tenantId) {
-      tenantId = (await chooseTenant()) ?? undefined;
+      const tenantResult = await chooseTenant(undefined, previousSelection !== null);
+      if (tenantResult === PREVIOUS_COMMAND) {
+        return previousSelection;
+      }
+      tenantId = tenantResult ?? undefined;
     }
     if (!tenantId) {
       cancel("Operation cancelled.");

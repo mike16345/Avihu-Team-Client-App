@@ -161,6 +161,24 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
     throw new Error(`Unexpected argument "${unexpectedValue}"`);
   }
 
+  if (actionValue === "previous") {
+    if (operationOrPlatform) {
+      throw new Error(`Action "previous" does not accept "${operationOrPlatform}"`);
+    }
+    if (values.yes) {
+      throw new Error('The "previous" action always requires confirmation; remove --yes');
+    }
+    if (values.tenant || values.environment || values.profile || values.binary || values.device) {
+      throw new Error('The "previous" action does not accept command overrides');
+    }
+
+    return {
+      replayPrevious: true,
+      confirmed: false,
+      dryRun: values["dry-run"],
+    };
+  }
+
   const action = parseAction(actionValue);
   if (
     action !== "build" &&
@@ -222,6 +240,7 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
   }
 
   const arguments_ = {
+    replayPrevious: false,
     action,
     platform,
     tenantId: values.tenant,

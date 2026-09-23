@@ -31,6 +31,7 @@ const FoodGroupTabs = () => {
           variant="gray"
         >
           <ScrollView
+            nestedScrollEnabled
             showsVerticalScrollIndicator={false}
             contentContainerStyle={[spacing.gapDefault]}
           >

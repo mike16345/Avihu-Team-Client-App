@@ -13,10 +13,14 @@ npm run app -- run ios --tenant avihu --environment production --yes
 npm run app -- preflight --tenant avihu --environment development --yes
 ```
 
-The interactive menu first asks for an intent: **Develop & run**, **Verify app**, **Release app**,
-or **Manage assets**. Detailed choices appear only inside that section. Local `run` actions always
-open Expo's device/emulator selector. Development uses a Debug native build; preview and production
-use Release and do not start an unnecessary Metro server.
+After a successful command, choose **Run previous command** at the bottom of the initial selector,
+or run `npm run app -- previous`. Both paths show the current resolved command and require explicit
+confirmation. Cancelled, failed, and dry-run commands do not replace the saved command.
+
+After tenant selection, the interactive menu asks for an intent: **Develop & run**, **Verify app**,
+**Release app**, or **Manage assets**. Detailed choices appear only inside that section. Local `run`
+actions always open Expo's device/emulator selector. Development uses a Debug native build; preview
+and production use Release and do not start an unnecessary Metro server.
 
 Supply `--device` to skip Expo's target selector, or install an existing binary without rebuilding:
 
@@ -70,7 +74,8 @@ successful onboarding removes its draft. Before fast preflight, onboarding clean
 projects for the selected tenant so ignored output from another tenant cannot create false drift.
 That owned step bypasses Expo's dirty-worktree confirmation because the generated native folders
 are disposable; other commands retain their normal Git safeguards.
-Preflight resolves the same `.env*` files as Expo while preserving explicit shell values. The local
+Development preflight resolves the same `.env*` files as Expo while preserving explicit shell values.
+Preview and production preflight checks the selected EAS environment directly. The local
 `test-tenant` launch command is:
 
 ```sh
@@ -128,6 +133,8 @@ npm run build:ios:prod -- --tenant avihu --dry-run
 ```
 
 The selector and legacy aliases automatically run tenant-scoped `preflight:eas` before EAS starts.
+For preview and production this confirms the required values are present in the remote EAS
+environment; local `.env*` values cannot make that check pass. Update actions use the same gate.
 You can also run the fuller local checks explicitly:
 
 ```sh
@@ -156,35 +163,31 @@ local write or preflight fails, inspect the non-secret ignored record in
 second project creation is attempted.
 
 Each tenant has its own EAS project. In that project, create symbolic EAS environments named
-exactly `development`, `preview`, and `production`. Set `APP_TENANT` to the tenant ID in all three
-environments; for Avihu the value is `avihu`. Keep credentials and required public runtime
+exactly `development`, `preview`, and `production`. Keep credentials and required public runtime
 variables in the same project/environment according to the tenant's
-`requiredEnvironmentVariables` record.
+`requiredEnvironmentVariables` record. Avihu's current build profiles provide `APP_TENANT=avihu`
+and the matching `APP_ENV`; they do not depend on a remote `APP_TENANT` value.
 
-`frontend/eas.json` owns the shared build profiles and sets only the non-secret `APP_ENV` value:
-`development`, `preview`, or `production`. Do not add `APP_TENANT` there: it must remain an
-EAS-project environment value so the profiles work for future tenant projects.
+Avihu local development uses `EXPO_PUBLIC_*` names. Its preview and production EAS environments
+use `API_KEY`, `API_URL`, `CLOUDFRONT_URL`, and `TRAINER_PHONE_NUMBER`; preview also requires
+`API_URL_PREVIEW`. The app maps those EAS names into its update manifest. `API_KEY` is a client
+key that is included in the app and should be treated as public to app users. Keep values on EAS,
+not in tenant TypeScript or `eas.json`.
 
-An authorized EAS project administrator can set the selector variable with the EAS dashboard or
-the equivalent noninteractive command, choosing the target project and each named environment.
-These commands change remote EAS state and are shown for operators only; do not run them during
-local verification. The pinned CLI's `env:set` command creates or updates the variable, making
-repeated setup idempotent for the same tenant value:
-
-```sh
-APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@22.4.0 env:set --name APP_TENANT --value avihu --environment development --visibility plaintext --scope project --non-interactive
-APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@22.4.0 env:set --name APP_TENANT --value avihu --environment preview --visibility plaintext --scope project --non-interactive
-APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@22.4.0 env:set --name APP_TENANT --value avihu --environment production --visibility plaintext --scope project --non-interactive
-```
-
-Verify the selected project without requesting sensitive values. Plaintext `APP_TENANT` values can
-appear in the output, so review the output before sharing it:
+Verify the selected project and environment before publishing. `env:list` can display plaintext
+values, so review its output before sharing it:
 
 ```sh
 APP_TENANT=avihu APP_ENV=development npx --yes eas-cli@22.4.0 env:list --environment development --scope project
 APP_TENANT=avihu APP_ENV=preview npx --yes eas-cli@22.4.0 env:list --environment preview --scope project
 APP_TENANT=avihu APP_ENV=production npx --yes eas-cli@22.4.0 env:list --environment production --scope project
 ```
+
+For an OTA to existing store builds, keep the JavaScript compatible with the installed native
+runtime. Confirm the build's production channel and runtime version, then publish using the
+matching EAS environment. `npm run update:prod` runs remote environment preflight and passes
+`--environment production` to EAS Update. A new update reaches only builds on a channel mapped
+to that branch with the same runtime version.
 
 The Avihu tenant intentionally shares the iOS bundle identifier and Android package between
 preview and production (`com.avihuteam.avihuteam`). This is declared by

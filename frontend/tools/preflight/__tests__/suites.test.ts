@@ -110,6 +110,17 @@ describe("preflight suite composition", () => {
     expect(easIds).not.toContain("native.prebuild");
   });
 
+  it("uses the EAS environment gate for production preflight", () => {
+    const context = createContext({
+      environment: "production",
+      tenantConfig: { kind: "repository" } as PreflightSuiteContext["tenantConfig"],
+    });
+    const checks = getCheckIds(createEasSuite(context));
+
+    expect(checks).toContain("eas.environment");
+    expect(checks).not.toContain("tenant.environment");
+  });
+
   it("skips macOS-only iOS release validation explicitly on other platforms", async () => {
     const processSpecs: ProcessSpec[] = [];
     const context = createContext({
@@ -248,7 +259,7 @@ describe("preflight suite composition", () => {
       "✖ Validate packages against React Native Directory package metadata",
       ...Array.from({ length: 8 }, (_, index) => `diagnostic ${index + 1}`),
       "  Untested on New Architecture: react-native-health, react-native-infinite-wheel-picker",
-      "  Unmaintained: expo-health-connect, react-native-infinite-wheel-picker",
+      "  Unmaintained: expo-health-connect, react-native-infinite-wheel-picker, react-native-render-html",
     ].join("\n");
     const doctor = createFastSuite(
       createContext({

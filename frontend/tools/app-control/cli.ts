@@ -1,9 +1,10 @@
 import { resolveAction } from "./actions";
-import { renderError } from "../cli-ui/render";
+import { renderError, renderStatusLine } from "../cli-ui/render";
 import { parseAppArguments } from "./arguments";
 import { formatDryRun } from "./dryRun";
 import { runCommand } from "./processRunner";
 import { confirmSelection, printSelectionSummary, promptForSelection } from "./prompts";
+import { readPreviousSelection, writePreviousSelection } from "./history";
 import type { AppSelection, ParsedAppArguments } from "./types";
 
 const selectionFromConfirmedArguments = (arguments_: ParsedAppArguments): AppSelection => {
@@ -95,9 +96,16 @@ const selectionFromConfirmedArguments = (arguments_: ParsedAppArguments): AppSel
 const main = async (): Promise<number> => {
   try {
     const parsed = parseAppArguments(process.argv.slice(2));
-    const selection = parsed.confirmed
-      ? selectionFromConfirmedArguments(parsed)
-      : await promptForSelection(parsed);
+    const previousSelection = readPreviousSelection();
+    if (parsed.replayPrevious && !previousSelection) {
+      throw new Error("No valid previous app command is available yet");
+    }
+
+    const selection = parsed.replayPrevious
+      ? previousSelection
+      : parsed.confirmed
+        ? selectionFromConfirmedArguments(parsed)
+        : await promptForSelection(parsed, previousSelection);
 
     if (!selection) {
       return 0;
@@ -115,7 +123,16 @@ const main = async (): Promise<number> => {
       return 0;
     }
 
-    return runCommand(spec);
+    const exitCode = await runCommand(spec);
+    if (exitCode === 0) {
+      try {
+        writePreviousSelection(selection);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "unknown filesystem error";
+        console.error(renderStatusLine("warn", `Could not save previous command: ${message}`));
+      }
+    }
+    return exitCode;
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to run app control";
     console.error(renderError(message, "Run npm run app with --tenant <tenant-id> and --yes."));

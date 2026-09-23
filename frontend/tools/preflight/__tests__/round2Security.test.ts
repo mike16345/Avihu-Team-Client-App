@@ -43,7 +43,7 @@ const doctorOutput = (categoryLines: string[]) =>
 
 const baselineCategories = [
   "  Untested on New Architecture: react-native-health, react-native-infinite-wheel-picker",
-  "  Unmaintained: expo-health-connect, react-native-infinite-wheel-picker",
+  "  Unmaintained: expo-health-connect, react-native-infinite-wheel-picker, react-native-render-html",
 ];
 
 describe("strict Expo Doctor classification", () => {

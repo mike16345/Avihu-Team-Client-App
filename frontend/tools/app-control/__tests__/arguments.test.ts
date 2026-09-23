@@ -2,6 +2,19 @@ import { describe, expect, it } from "vitest";
 import { parseAppArguments } from "../arguments";
 
 describe("parseAppArguments", () => {
+  it("parses the previous-command shortcut", () => {
+    expect(parseAppArguments(["previous"])).toMatchObject({
+      replayPrevious: true,
+      confirmed: false,
+    });
+  });
+
+  it("does not allow previous-command confirmation to be bypassed", () => {
+    expect(() => parseAppArguments(["previous", "--yes"])).toThrowError(
+      'The "previous" action always requires confirmation; remove --yes'
+    );
+  });
+
   it("parses a direct local run for a named device", () => {
     expect(
       parseAppArguments([

@@ -7,7 +7,7 @@ import { runChecks } from "../engine";
 import { renderHuman } from "../renderHuman";
 import { renderJson } from "../renderJson";
 import { createPreflightContext } from "../contexts";
-import { environmentCheck } from "../checks/environment";
+import { environmentCheck, easEnvironmentCheck } from "../checks/environment";
 import { expoConfigCheck } from "../checks/expoConfig";
 import { nativeDriftCheck } from "../checks/nativeDrift";
 import { tenantConfigCheck } from "../checks/tenantConfig";
@@ -176,12 +176,43 @@ describe("tenant and environment checks", () => {
       check: "tenant.environment",
     });
     expect(report.results[0].details).toEqual([
-      "Missing: EXPO_PUBLIC_CLOUDFRONT_URL",
-      "Missing: EXPO_PUBLIC_MODE",
-      "Missing: EXPO_PUBLIC_TRAINER_PHONE_NUMBER",
+      "Missing: API_KEY",
+      "Missing: API_URL",
+      "Missing: CLOUDFRONT_URL",
+      "Missing: TRAINER_PHONE_NUMBER",
     ]);
     expect(serialized).not.toContain("super-secret-value");
     expect(serialized).not.toContain("https://api.example.com");
+  });
+
+  it("rejects missing production EAS values even when local Expo values exist", async () => {
+    const context = await createContext({
+      EXPO_PUBLIC_API_AUTH_TOKEN: "local-client-key",
+      EXPO_PUBLIC_SERVER: "https://local.example.com",
+    });
+    const specifications: Array<{ args: string[]; env: Record<string, string> }> = [];
+    const result = await easEnvironmentCheck.run({
+      ...context,
+      platform: "darwin",
+      runner: async (spec) => {
+        specifications.push({ args: spec.args, env: spec.env });
+        return {
+          exitCode: 1,
+          stdout: 'REMOTE_ENV_MISSING:["API_KEY","API_URL"]',
+          stderr: "",
+        };
+      },
+    });
+
+    expect(result).toMatchObject({
+      status: "fail",
+      check: "eas.environment",
+      details: ["Missing: API_KEY", "Missing: API_URL"],
+    });
+    expect(specifications[0].args).toContain("env:exec");
+    expect(specifications[0].args).toContain("production");
+    expect(specifications[0].env.API_KEY).toBe("");
+    expect(specifications[0].env.API_URL).toBe("");
   });
 
   it("accepts Avihu preview and production shared identity only when both declare it", async () => {
