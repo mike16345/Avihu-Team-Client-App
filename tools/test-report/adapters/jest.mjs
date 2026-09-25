@@ -24,9 +24,17 @@ function parseLocation(message, fallbackFile, explicitLocation) {
 
 export function normalizeJestResult(nativeResult, context, framework = "jest") {
   const tests = [];
+  const infrastructureErrors = [];
 
   for (const fileResult of nativeResult.testResults ?? []) {
-    for (const assertion of fileResult.assertionResults ?? []) {
+    const assertions = fileResult.assertionResults ?? [];
+    if (fileResult.status === "failed" && assertions.length === 0) {
+      infrastructureErrors.push(
+        `${fileResult.name ?? "Unknown test suite"}: ${fileResult.message || "Test suite failed before running assertions."}`
+      );
+    }
+
+    for (const assertion of assertions) {
       const failureMessage = assertion.failureMessages?.[0] ?? "";
       tests.push({
         status: normalizeStatus(assertion.status),
@@ -50,5 +58,6 @@ export function normalizeJestResult(nativeResult, context, framework = "jest") {
     framework,
     tests,
     durationMs: Math.max(0, endedAt - startedAt),
+    infrastructureErrors,
   });
 }
