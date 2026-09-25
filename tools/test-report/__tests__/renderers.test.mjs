@@ -72,6 +72,18 @@ test("terminal output excludes captured console noise", () => {
   assert.equal(output.includes("raw noisy console line"), false);
 });
 
+test("terminal output includes the reason for a suite-load failure", () => {
+  const infrastructureRun = structuredClone(failedRun);
+  infrastructureRun.suites[0].infrastructureErrors = [
+    "tests/load-error.test.ts: Test suite failed to run\n\nMissing required AVIHU_TRAINER_ID environment variable.",
+  ];
+
+  const output = renderTerminal(infrastructureRun);
+
+  assert.match(output, /Test suite failed to run/);
+  assert.match(output, /Missing required AVIHU_TRAINER_ID environment variable/);
+});
+
 test("raw excerpts are bounded and retain the artifact path", () => {
   const longLogRun = structuredClone(failedRun);
   longLogRun.suites[0].rawLogTail = "very noisy console line\n".repeat(2000);

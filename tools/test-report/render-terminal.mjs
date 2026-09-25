@@ -1,5 +1,13 @@
 import { failedTests, firstLine, formatDuration, testLocation, testTitle } from "./format.mjs";
 
+function conciseInfrastructureLines(error) {
+  return String(error)
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 2);
+}
+
 export function renderTerminal(result) {
   const { counts, metadata } = result;
   const outputDirectory = metadata.outputDir ?? ".test-report";
@@ -23,7 +31,8 @@ export function renderTerminal(result) {
     for (const suite of result.suites) {
       for (const error of suite.infrastructureErrors ?? []) {
         failureNumber += 1;
-        lines.push(`${failureNumber}. ${suite.name} infrastructure failure`, `   ${firstLine(error)}`);
+        lines.push(`${failureNumber}. ${suite.name} infrastructure failure`);
+        for (const detail of conciseInfrastructureLines(error)) lines.push(`   ${detail}`);
       }
     }
   }
