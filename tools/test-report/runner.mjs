@@ -180,7 +180,16 @@ async function runSuite(suite, index, configDirectory, outputDirectory, usedSlug
     name: suite.name,
     rawLogPath: relativeRawLogPath,
   });
-  return { ...normalized, rawLogTail, infrastructureErrors };
+  const allInfrastructureErrors = [
+    ...(normalized.infrastructureErrors ?? []),
+    ...infrastructureErrors,
+  ];
+  return {
+    ...normalized,
+    status: allInfrastructureErrors.length ? "failed" : normalized.status,
+    rawLogTail,
+    infrastructureErrors: allInfrastructureErrors,
+  };
 }
 
 export async function runConfiguredSuites(config, configDirectory) {

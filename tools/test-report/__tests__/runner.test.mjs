@@ -21,12 +21,15 @@ if (mode === "crash") {
 }
 
 const failed = mode === "fail";
+const suiteLoadFailed = mode === "suite-load-fail";
 const nativeResult = {
   startTime: 1000,
   testResults: [{
     name: "/tmp/controlled.test.js",
     endTime: 1010,
-    assertionResults: [{
+    status: suiteLoadFailed ? "failed" : undefined,
+    message: suiteLoadFailed ? "controlled suite load failure" : "",
+    assertionResults: suiteLoadFailed ? [] : [{
       ancestorTitles: ["controlled suite"],
       title: failed ? "fails" : "passes",
       status: failed ? "failed" : "passed",
@@ -86,6 +89,20 @@ test("missing JSON is an infrastructure failure", async () => {
   assert.equal(result.status, "failed");
   assert.match(result.suites[0].infrastructureErrors[0], /exited with code 2/);
   assert.match(result.suites[0].rawLogTail, /controlled crash/);
+});
+
+test("preserves suite-load errors produced by an adapter", async () => {
+  const { directory, runnerPath } = await createFixture();
+  const config = {
+    repository: "Controlled",
+    outputDir: ".test-report",
+    suites: [suite("Load failure", runnerPath, "suite-load-fail")],
+  };
+
+  const result = await runConfiguredSuites(config, directory);
+
+  assert.equal(result.status, "failed");
+  assert.match(result.suites[0].infrastructureErrors[0], /controlled suite load failure/);
 });
 
 test("writes reports while keeping noise in raw.log", async () => {
