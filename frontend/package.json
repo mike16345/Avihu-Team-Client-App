@@ -22,6 +22,7 @@
     "ios": "expo run:ios",
     "web": "expo start -c --web",
     "test:unit": "vitest run",
+    "test:report": "node ../tools/test-report/cli.mjs --config ../test-report.config.mjs",
     "test:unit:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "build:android:dev": "npm run app -- build android --profile development --yes",
