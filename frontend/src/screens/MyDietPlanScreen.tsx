@@ -1,4 +1,4 @@
-import { RefreshControl, ScrollView } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 import DietPlanV1View from "@/components/DietPlan/DietPlanV1View";
 import DietPlanV2View from "@/components/DietPlanV2/DietPlanV2View";
 import {
@@ -11,6 +11,7 @@ import DietPlanSkeleton from "@/components/ui/loaders/skeletons/DietPlanSkeleton
 import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import ErrorScreen from "@/screens/ErrorScreen";
 import useStyles from "@/styles/useGlobalStyles";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const MyDietPlanScreen = () => {
   const { spacing, layout } = useStyles();
@@ -19,30 +20,44 @@ const MyDietPlanScreen = () => {
 
   if (errorStatus === 404) {
     return (
-      <PlanPendingState
-        title="תפריט תזונה בבנייה"
-        description="ברגע שהמאמן יסיים לבנות לך את התפריט הוא יופיע לך כאן."
-        isFetching={isFetching}
-        onRefresh={() => void refetch()}
-      />
+      <View testID={E2E_TEST_IDS.dietRoot} style={layout.flex1}>
+        <PlanPendingState
+          title="תפריט תזונה בבנייה"
+          description="ברגע שהמאמן יסיים לבנות לך את התפריט הוא יופיע לך כאן."
+          isFetching={isFetching}
+          onRefresh={() => void refetch()}
+        />
+      </View>
     );
   }
 
   if (isError) {
-    return <ErrorScreen error={error} refetchFunc={() => void refetch()} isFetching={isFetching} />;
+    return (
+      <View testID={E2E_TEST_IDS.dietRoot} style={layout.flex1}>
+        <ErrorScreen error={error} refetchFunc={() => void refetch()} isFetching={isFetching} />
+      </View>
+    );
   }
 
-  if (isLoading) return <DietPlanSkeleton />;
+  if (isLoading) {
+    return (
+      <View testID={E2E_TEST_IDS.dietRoot} style={layout.flex1}>
+        <DietPlanSkeleton />
+      </View>
+    );
+  }
 
   const version = resolveDietPlanVersion(data);
 
   if (version === null || !data) {
     return (
-      <ErrorScreen
-        error={new Error("גרסת תפריט התזונה אינה נתמכת")}
-        refetchFunc={() => void refetch()}
-        isFetching={isFetching}
-      />
+      <View testID={E2E_TEST_IDS.dietRoot} style={layout.flex1}>
+        <ErrorScreen
+          error={new Error("גרסת תפריט התזונה אינה נתמכת")}
+          refetchFunc={() => void refetch()}
+          isFetching={isFetching}
+        />
+      </View>
     );
   }
 
@@ -51,11 +66,13 @@ const MyDietPlanScreen = () => {
   if (version === 2) {
     if (!isDietPlanV2(data)) {
       return (
-        <ErrorScreen
-          error={new Error("גרסת תפריט התזונה אינה נתמכת")}
-          refetchFunc={() => void refetch()}
-          isFetching={isFetching}
-        />
+        <View testID={E2E_TEST_IDS.dietRoot} style={layout.flex1}>
+          <ErrorScreen
+            error={new Error("גרסת תפריט התזונה אינה נתמכת")}
+            refetchFunc={() => void refetch()}
+            isFetching={isFetching}
+          />
+        </View>
       );
     }
 
@@ -64,17 +81,20 @@ const MyDietPlanScreen = () => {
 
   if (getDietPlanContentState(data) === "empty") {
     return (
-      <PlanPendingState
-        title="תפריט תזונה בבנייה"
-        description="ברגע שהמאמן יסיים לבנות לך את התפריט הוא יופיע לך כאן."
-        isFetching={isFetching}
-        onRefresh={() => void refetch()}
-      />
+      <View testID={E2E_TEST_IDS.dietRoot} style={layout.flex1}>
+        <PlanPendingState
+          title="תפריט תזונה בבנייה"
+          description="ברגע שהמאמן יסיים לבנות לך את התפריט הוא יופיע לך כאן."
+          isFetching={isFetching}
+          onRefresh={() => void refetch()}
+        />
+      </View>
     );
   }
 
   return (
     <ScrollView
+      testID={E2E_TEST_IDS.dietRoot}
       style={[layout.flex1]}
       contentContainerStyle={[spacing.gap34, spacing.pdBottomBar, spacing.pdStatusBar]}
       showsVerticalScrollIndicator={false}

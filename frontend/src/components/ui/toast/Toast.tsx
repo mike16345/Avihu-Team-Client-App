@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { Text } from "../Text";
 import { IToast } from "@/interfaces/toast";
 import useStyles from "@/styles/useGlobalStyles";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 interface ToastProps {
@@ -93,6 +94,7 @@ const Toast: React.FC<ToastProps> = ({
 
   return (
     <Animated.View
+      testID={type === "error" ? E2E_TEST_IDS.toastError : undefined}
       {...panResponder.panHandlers}
       style={[
         {

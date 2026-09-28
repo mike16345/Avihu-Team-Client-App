@@ -19,6 +19,7 @@ import LoginForm from "./LoginForm";
 import { useToast } from "@/hooks/useToast";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, { useSharedValue, Easing, withTiming } from "react-native-reanimated";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 export interface IUserCredentials {
   email: string;
@@ -83,6 +84,7 @@ export default function Login({ onLogin }: ILoginProps) {
       }}
     >
       <View
+        testID={E2E_TEST_IDS.loginRoot}
         style={[
           layout.justifyBetween,
           layout.itemsCenter,

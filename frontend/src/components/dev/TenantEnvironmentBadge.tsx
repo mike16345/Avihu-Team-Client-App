@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/Text";
 import { getRuntimeTenant, isTenantEnvironmentBadgeVisible } from "@/config/runtimeTenant";
 import { useDeveloperTools } from "@/devtools/context";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const BADGE_INSET = 8;
 const BADGE_TOP_GAP = 4;
@@ -40,6 +41,7 @@ export const TenantEnvironmentBadge = () => {
   if (available) {
     return (
       <Pressable
+        testID={E2E_TEST_IDS.environmentBadge}
         accessibilityLabel="Open Developer Tools"
         accessibilityRole="button"
         onPress={openPanel}
@@ -51,7 +53,12 @@ export const TenantEnvironmentBadge = () => {
   }
 
   return (
-    <View accessibilityElementsHidden pointerEvents="none" style={badgeStyle}>
+    <View
+      testID={E2E_TEST_IDS.environmentBadge}
+      accessibilityElementsHidden
+      pointerEvents="none"
+      style={badgeStyle}
+    >
       {badgeContent}
     </View>
   );

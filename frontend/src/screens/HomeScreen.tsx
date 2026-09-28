@@ -8,6 +8,7 @@ import TopBar from "@/navigators/TopBar";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { BottomStackParamList } from "@/types/navigatorTypes";
 import { useEffect, useState } from "react";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const windows = [
   <WorkoutProgressionWindow key={"workout-window"} />,
@@ -29,7 +30,7 @@ const HomeScreen = () => {
   }, [paramId]);
 
   return (
-    <View style={[layout.flex1]}>
+    <View testID={E2E_TEST_IDS.homeRoot} style={[layout.flex1]}>
       <TopBar />
 
       <Windows

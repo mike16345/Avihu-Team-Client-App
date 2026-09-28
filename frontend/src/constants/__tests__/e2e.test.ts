@@ -1,0 +1,34 @@
+import { describe, expect, it } from "vitest";
+
+import { E2E_TEST_IDS } from "../e2e";
+
+const REQUIRED_TEST_IDS = [
+  "loginRoot",
+  "loginEmail",
+  "loginPassword",
+  "loginSubmit",
+  "toastError",
+  "environmentBadge",
+  "homeRoot",
+  "tabHome",
+  "tabWorkout",
+  "workoutRoot",
+  "tabDiet",
+  "dietRoot",
+  "profileOpen",
+  "profileRoot",
+  "logout",
+] as const;
+
+describe("E2E_TEST_IDS", () => {
+  it("exposes every selector required by the mobile smoke suite", () => {
+    expect(Object.keys(E2E_TEST_IDS).sort()).toEqual([...REQUIRED_TEST_IDS].sort());
+  });
+
+  it("uses unique, stable kebab-case values", () => {
+    const values = Object.values(E2E_TEST_IDS);
+
+    expect(new Set(values).size).toBe(values.length);
+    values.forEach((value) => expect(value).toMatch(/^e2e-[a-z]+(?:-[a-z]+)*$/));
+  });
+});

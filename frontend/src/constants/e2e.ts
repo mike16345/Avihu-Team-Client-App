@@ -1,0 +1,17 @@
+export const E2E_TEST_IDS = {
+  loginRoot: "e2e-login-root",
+  loginEmail: "e2e-login-email",
+  loginPassword: "e2e-login-password",
+  loginSubmit: "e2e-login-submit",
+  toastError: "e2e-toast-error",
+  environmentBadge: "e2e-environment-badge",
+  homeRoot: "e2e-home-root",
+  tabHome: "e2e-tab-home",
+  tabWorkout: "e2e-tab-workout",
+  workoutRoot: "e2e-workout-root",
+  tabDiet: "e2e-tab-diet",
+  dietRoot: "e2e-diet-root",
+  profileOpen: "e2e-profile-open",
+  profileRoot: "e2e-profile-root",
+  logout: "e2e-logout",
+} as const;

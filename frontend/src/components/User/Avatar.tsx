@@ -7,6 +7,7 @@ import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
 import { useNavigation } from "@react-navigation/native";
 import { buildPhotoUrl } from "@/utils/utils";
 import { useShadowStyles } from "@/styles/useShadowStyles";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const Avatar = () => {
   const { colors, common, fonts, layout } = useStyles();
@@ -17,7 +18,10 @@ const Avatar = () => {
   const firstNameInitial = currentUser?.firstName.charAt(0).toUpperCase();
 
   return (
-    <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+    <TouchableOpacity
+      testID={E2E_TEST_IDS.profileOpen}
+      onPress={() => navigation.navigate("Profile")}
+    >
       <ConditionalRender condition={!currentUser?.profileImage}>
         <View
           style={[

@@ -6,6 +6,7 @@ import HomeScreen from "@/screens/HomeScreen";
 import ArticleStack from "../ArticleStack";
 import { useIconLayout } from "@/context/useiconLayout";
 import { View } from "react-native";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const ICON_HEIGHT = 24;
 const ICON_WIDTH = 24;
@@ -16,6 +17,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     component: WorkoutPlanStack,
     options: {
       tabBarLabel: "",
+      tabBarTestID: E2E_TEST_IDS.tabWorkout,
       tabBarAccessibilityLabel: "אימונים",
       tabBarIcon: ({ color }) => {
         const { setIconLayout } = useIconLayout();
@@ -69,6 +71,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     component: HomeScreen,
     options: {
       tabBarLabel: "",
+      tabBarTestID: E2E_TEST_IDS.tabHome,
       tabBarIcon: ({ color }) => {
         const { setIconLayout } = useIconLayout();
         return (
@@ -92,6 +95,7 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     component: MyDietPlanScreen,
     options: {
       tabBarLabel: "",
+      tabBarTestID: E2E_TEST_IDS.tabDiet,
       tabBarIcon: ({ color }) => {
         const { setIconLayout } = useIconLayout();
         return (

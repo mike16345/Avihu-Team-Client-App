@@ -10,6 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 import { useState } from "react";
 import { DeveloperToolsProfileEntry } from "@/components/dev/DeveloperToolsProfileEntry";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const ProfileScreen = () => {
   const { layout, spacing } = useStyles();
@@ -26,7 +27,10 @@ const ProfileScreen = () => {
   };
 
   return (
-    <View style={[layout.flex1, { paddingTop: 48 }, spacing.pdBottomBar]}>
+    <View
+      testID={E2E_TEST_IDS.profileRoot}
+      style={[layout.flex1, { paddingTop: 48 }, spacing.pdBottomBar]}
+    >
       <CustomScrollView topShadow={false}>
         <View style={[{ marginBottom: 30 }]}>
           <ProfileHeading />
@@ -35,6 +39,7 @@ const ProfileScreen = () => {
         <View style={spacing.pdHorizontalLg}>
           <DeveloperToolsProfileEntry />
           <PrimaryButton
+            testID={E2E_TEST_IDS.logout}
             style={{ marginTop: 20 }}
             block
             mode="light"

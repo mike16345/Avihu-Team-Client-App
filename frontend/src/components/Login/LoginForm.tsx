@@ -13,6 +13,7 @@ import PrimaryButton from "../ui/buttons/PrimaryButton";
 import Input from "../ui/inputs/Input";
 import PasswordInput from "../ui/inputs/PasswordInput";
 import { Text } from "../ui/Text";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 interface LoginFormProps {
   onLoginSuccess: (user: IUser) => void;
@@ -77,6 +78,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
   return (
     <View style={[spacing.gap20]}>
       <Input
+        testID={E2E_TEST_IDS.loginEmail}
         keyboardType="email-address"
         label="אימייל"
         placeholder="הכנס אימייל"
@@ -97,6 +99,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
       />
 
       <PasswordInput
+        testID={E2E_TEST_IDS.loginPassword}
         label="סיסמה"
         placeholder="הכנס סיסמה"
         error={formErrors.password}
@@ -121,7 +124,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
         </Text>
       </TouchableOpacity>
 
-      <PrimaryButton block mode="dark" onPress={handleSubmit} loading={loading}>
+      <PrimaryButton
+        testID={E2E_TEST_IDS.loginSubmit}
+        block
+        mode="dark"
+        onPress={handleSubmit}
+        loading={loading}
+      >
         כניסה
       </PrimaryButton>
     </View>

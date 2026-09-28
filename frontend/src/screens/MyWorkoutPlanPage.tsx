@@ -20,6 +20,7 @@ import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 import PlanPendingState from "@/components/ui/PlanPendingState";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { WorkoutPlanStackParamList } from "@/types/navigatorTypes";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const shouldOpenCardio = (openCardio?: boolean | string) =>
   openCardio === true || openCardio === "true";
@@ -75,23 +76,38 @@ const MyWorkoutPlanScreen = () => {
 
   if (error?.status === 404 || (!isLoading && !isError && !hasWorkoutPlanContent)) {
     return (
-      <PlanPendingState
-        title="תוכנית אימונים בבנייה"
-        description="ברגע שהמאמן יסיים לבנות לך את האימונים הם יופיעו לך כאן."
-        isFetching={isRefetching}
-        onRefresh={() => void refresh(handleRefetch)}
-      />
+      <View testID={E2E_TEST_IDS.workoutRoot} style={layout.flex1}>
+        <PlanPendingState
+          title="תוכנית אימונים בבנייה"
+          description="ברגע שהמאמן יסיים לבנות לך את האימונים הם יופיעו לך כאן."
+          isFetching={isRefetching}
+          onRefresh={() => void refresh(handleRefetch)}
+        />
+      </View>
     );
   }
 
   if (isError) {
-    return <ErrorScreen refetchFunc={() => refresh(handleRefetch)} isFetching={isRefetching} />;
+    return (
+      <View testID={E2E_TEST_IDS.workoutRoot} style={layout.flex1}>
+        <ErrorScreen refetchFunc={() => refresh(handleRefetch)} isFetching={isRefetching} />
+      </View>
+    );
   }
 
-  if (isLoading) return <WorkoutPlanSkeletonLoader />;
+  if (isLoading) {
+    return (
+      <View testID={E2E_TEST_IDS.workoutRoot} style={layout.flex1}>
+        <WorkoutPlanSkeletonLoader />
+      </View>
+    );
+  }
 
   return (
-    <View style={[layout.flex1, colors.background, spacing.pdStatusBar]}>
+    <View
+      testID={E2E_TEST_IDS.workoutRoot}
+      style={[layout.flex1, colors.background, spacing.pdStatusBar]}
+    >
       <View
         style={[
           { zIndex: 2, elevation: 5 },
