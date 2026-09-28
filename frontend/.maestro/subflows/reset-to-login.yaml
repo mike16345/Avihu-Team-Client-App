@@ -1,0 +1,8 @@
+appId: ${MAESTRO_APP_ID}
+---
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible:
+      id: e2e-login-root
+    timeout: 20000

@@ -1,0 +1,12 @@
+appId: ${MAESTRO_APP_ID}
+name: Fresh launch shows the preview login surface
+---
+- runFlow: subflows/reset-to-login.yaml
+- assertVisible:
+    id: e2e-login-email
+- assertVisible:
+    id: e2e-login-password
+- assertVisible:
+    id: e2e-login-submit
+- assertVisible:
+    id: e2e-environment-badge

@@ -44,3 +44,6 @@ yarn-error.*
 config/tenants/.local/
 config/tenants/assets/.local/
 .tenant-add/
+
+# Local Maestro reports, screenshots, and diagnostics
+.maestro-artifacts/

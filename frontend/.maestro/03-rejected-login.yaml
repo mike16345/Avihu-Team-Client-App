@@ -1,0 +1,19 @@
+appId: ${MAESTRO_APP_ID}
+name: Incorrect credentials show an error
+---
+- runFlow: subflows/reset-to-login.yaml
+- tapOn:
+    id: e2e-login-email
+- inputText: ${MAESTRO_REJECTED_EMAIL}
+- tapOn:
+    id: e2e-login-password
+- inputText: ${MAESTRO_REJECTED_PASSWORD}
+- hideKeyboard
+- tapOn:
+    id: e2e-login-submit
+- extendedWaitUntil:
+    visible:
+      id: e2e-toast-error
+    timeout: 20000
+- assertVisible:
+    id: e2e-login-root

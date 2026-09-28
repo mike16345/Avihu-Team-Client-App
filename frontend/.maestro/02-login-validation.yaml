@@ -1,0 +1,15 @@
+appId: ${MAESTRO_APP_ID}
+name: Invalid login form remains on the login surface
+---
+- runFlow: subflows/reset-to-login.yaml
+- tapOn:
+    id: e2e-login-email
+- inputText: not-an-email
+- tapOn:
+    id: e2e-login-submit
+- assertVisible:
+    id: e2e-login-root
+- assertVisible:
+    id: e2e-login-email
+- assertVisible:
+    id: e2e-login-submit

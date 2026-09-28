@@ -1,0 +1,15 @@
+appId: ${MAESTRO_APP_ID}
+---
+- tapOn:
+    id: e2e-login-email
+- inputText: ${EMAIL}
+- tapOn:
+    id: e2e-login-password
+- inputText: ${PASSWORD}
+- hideKeyboard
+- tapOn:
+    id: e2e-login-submit
+- extendedWaitUntil:
+    visible:
+      id: e2e-home-root
+    timeout: 30000

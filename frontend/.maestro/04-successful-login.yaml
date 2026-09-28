@@ -1,0 +1,15 @@
+appId: ${MAESTRO_APP_ID}
+name: Valid credentials reach the authenticated home screen
+---
+- runFlow: subflows/reset-to-login.yaml
+- runFlow:
+    file: subflows/login.yaml
+    env:
+      EMAIL: ${MAESTRO_E2E_EMAIL}
+      PASSWORD: ${MAESTRO_E2E_PASSWORD}
+- assertVisible:
+    id: e2e-home-root
+- assertVisible:
+    id: e2e-tab-home
+- assertVisible:
+    id: e2e-profile-open

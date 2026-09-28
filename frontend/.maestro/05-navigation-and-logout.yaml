@@ -1,0 +1,37 @@
+appId: ${MAESTRO_APP_ID}
+name: Core navigation works and logout returns to login
+---
+- runFlow: subflows/reset-to-login.yaml
+- runFlow:
+    file: subflows/login.yaml
+    env:
+      EMAIL: ${MAESTRO_E2E_EMAIL}
+      PASSWORD: ${MAESTRO_E2E_PASSWORD}
+- tapOn:
+    id: e2e-tab-workout
+- extendedWaitUntil:
+    visible:
+      id: e2e-workout-root
+    timeout: 20000
+- tapOn:
+    id: e2e-tab-diet
+- extendedWaitUntil:
+    visible:
+      id: e2e-diet-root
+    timeout: 20000
+- tapOn:
+    id: e2e-tab-home
+- assertVisible:
+    id: e2e-home-root
+- tapOn:
+    id: e2e-profile-open
+- extendedWaitUntil:
+    visible:
+      id: e2e-profile-root
+    timeout: 20000
+- tapOn:
+    id: e2e-logout
+- extendedWaitUntil:
+    visible:
+      id: e2e-login-root
+    timeout: 20000
