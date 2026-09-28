@@ -11,9 +11,18 @@ const TEXT_ARTIFACT_EXTENSIONS = new Set([
   ".yml",
 ]);
 
+const redactionVariants = (secrets: readonly string[]) =>
+  Array.from(
+    new Set(
+      secrets
+        .filter((secret) => secret.length > 0)
+        .flatMap((secret) => [secret, JSON.stringify(secret).slice(1, -1)])
+    )
+  );
+
 export const redactArtifactSecrets = (root: string, secrets: readonly string[]) => {
   if (!existsSync(root)) return;
-  const nonblankSecrets = secrets.filter((secret) => secret.length > 0);
+  const secretVariants = redactionVariants(secrets);
 
   const visit = (directory: string) => {
     for (const entry of readdirSync(directory, { withFileTypes: true })) {
@@ -25,7 +34,7 @@ export const redactArtifactSecrets = (root: string, secrets: readonly string[]) 
       if (!TEXT_ARTIFACT_EXTENSIONS.has(extname(entry.name).toLowerCase())) continue;
 
       const original = readFileSync(entryPath, "utf8");
-      const redacted = nonblankSecrets.reduce(
+      const redacted = secretVariants.reduce(
         (contents, secret) => contents.split(secret).join("[REDACTED]"),
         original
       );

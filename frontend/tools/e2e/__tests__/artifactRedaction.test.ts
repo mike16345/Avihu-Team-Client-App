@@ -31,4 +31,18 @@ describe("redactArtifactSecrets", () => {
     expect(readFileSync(logPath, "utf8")).toBe("email=[REDACTED] password=[REDACTED]");
     expect(readFileSync(reportPath, "utf8")).toBe("<p>[REDACTED]</p>");
   });
+
+  it("scrubs JSON-escaped credential values", () => {
+    const root = mkdtempSync(join(tmpdir(), "mobile-e2e-redaction-"));
+    temporaryDirectories.push(root);
+    const jsonPath = join(root, "commands.json");
+    const password = 'private"password\\value';
+    writeFileSync(jsonPath, JSON.stringify({ password }));
+
+    redactArtifactSecrets(root, [password]);
+
+    const contents = readFileSync(jsonPath, "utf8");
+    expect(contents).not.toContain(JSON.stringify(password).slice(1, -1));
+    expect(contents).toContain("[REDACTED]");
+  });
 });
