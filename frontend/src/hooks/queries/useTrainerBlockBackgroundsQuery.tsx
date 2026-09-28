@@ -15,7 +15,9 @@ const useTrainerBlockBackgroundsQuery = (trainerId?: string) => {
   >({
     queryFn: () => getTrainerBlockBackgrounds(trainerId ?? ""),
     queryKey: [TRAINER_BLOCK_BACKGROUNDS, trainerId] as const,
-    staleTime: ONE_DAY,
+    staleTime: 1000 * 60 * 5,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 };
 
