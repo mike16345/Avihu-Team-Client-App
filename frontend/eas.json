@@ -23,6 +23,21 @@
       "env": { "APP_TENANT": "avihu", "APP_ENV": "preview" },
       "ios": { "image": "macos-sequoia-15.6-xcode-26.0" }
     },
+    "e2e-test": {
+      "extends": "preview",
+      "distribution": "internal",
+      "channel": "preview",
+      "environment": "preview",
+      "withoutCredentials": true,
+      "env": { "APP_TENANT": "avihu", "APP_ENV": "preview" },
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": true,
+        "image": "macos-sequoia-15.6-xcode-26.0"
+      }
+    },
     "production": {
       "android": { "credentialsSource": "remote" },
       "ios": { "image": "macos-sequoia-15.6-xcode-26.0" },
