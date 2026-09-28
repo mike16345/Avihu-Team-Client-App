@@ -27,7 +27,14 @@ const ArticleGroupHeader: React.FC<ArticleGroupHeaderProps> = ({ articleGroup })
             spacing.pdVerticalXs,
             colors.backgroundSurface,
             common.roundedSm,
-            { paddingHorizontal: 14 },
+            {
+              paddingHorizontal: 14,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.08,
+              shadowRadius: 6,
+              elevation: 2,
+            },
           ]}
         >
           <Text fontSize={14} fontVariant="semibold">

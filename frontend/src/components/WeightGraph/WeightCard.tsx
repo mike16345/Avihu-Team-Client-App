@@ -18,8 +18,18 @@ const WeightCard: React.FC<CardProps> = ({ title, value, unit, operator = "" }) 
 
   return (
     <Card
-      variant="gray"
-      style={[spacing.pdHorizontalMd, spacing.pdVerticalDefault, { width: cardWidth }]}
+      variant="white"
+      style={[
+        spacing.pdHorizontalMd,
+        spacing.pdVerticalDefault,
+        {
+          width: cardWidth,
+          backgroundColor: "#FFFFFF",
+          borderColor: "rgba(7, 39, 35, 0.08)",
+          borderWidth: 1,
+          borderRadius: 18,
+        },
+      ]}
       shadow={false}
     >
       <Card.Header>

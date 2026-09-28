@@ -48,3 +48,11 @@ export function getNextEightAMOnSunday(from = new Date()) {
   next.setHours(8, 0, 0, 0);
   return next;
 }
+
+export function getNextEightAMOnFirstOfMonth(from = new Date()) {
+  const next = new Date(from.getFullYear(), from.getMonth(), 1, 8, 0, 0, 0);
+  if (next <= from) {
+    next.setMonth(next.getMonth() + 1);
+  }
+  return next;
+}

@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
+import { useToast } from "@/hooks/useToast";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Animated, { FadeIn, FadeInDown, FadeOut } from "react-native-reanimated";
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Rect, Stop } from "react-native-svg";
@@ -9,16 +11,18 @@ import WeeklyProgressScreen from "@/screens/WeeklyProgressScreen";
 import {
   useWeeklySignatureStore,
   getPreviousWeekKey,
+  getCurrentWeekKey,
 } from "@/store/weeklySignatureStore";
 import { selectionHaptic } from "@/utils/haptics";
 import { useWeeklyFeedbackApi } from "@/hooks/api/useWeeklyFeedbackApi";
-import { useProgressManualStore } from "@/store/progressManualStore";
+import { useProgressManualStore, getPreviousWeekDayKeys } from "@/store/progressManualStore";
 import { useNutritionDayNotesStore } from "@/store/nutritionDayNotesStore";
 import { useSleepAverageStore } from "@/store/sleepAverageStore";
 import { useCardioMinutesStore } from "@/store/cardioMinutesStore";
 import { useWeeklyFeedbackStore } from "@/store/weeklyFeedbackStore";
 import { useUserStore } from "@/store/userStore";
 import useWorkoutPlanQuery from "@/hooks/queries/useWorkoutPlanQuery";
+import { getWeekDayKeys } from "@/utils/weekKeys";
 
 const PRIMARY = "#072723";
 const ACCENT_SOFT = "#EDFFEB";
@@ -41,17 +45,47 @@ const WeeklyFeedbackPopupHost: React.FC = () => {
     (s) => s.finalizedWeeks[previousWeekKey]
   );
   const finalize = useWeeklySignatureStore((s) => s.finalize);
-  const visible = !finalizedAt;
 
   const currentUserId = useUserStore((s) => s.currentUser?._id);
   const workoutMarks = useProgressManualStore((s) => s.workoutMarks);
   const { data: workoutPlan } = useWorkoutPlanQuery();
   const nutritionMarks = useProgressManualStore((s) => s.nutritionMarks);
   const dayNotes = useNutritionDayNotesStore((s) => s.notes);
-  const sleepHours = useSleepAverageStore((s) => s.hours);
-  const cardioMinutes = useCardioMinutesStore((s) => s.minutes);
-  const feedbackText = useWeeklyFeedbackStore((s) => s.text);
-  const { upsertWeeklyFeedback } = useWeeklyFeedbackApi();
+  const sleepHours = useSleepAverageStore((s) => s.hoursByWeek[previousWeekKey] ?? null);
+  const cardioMinutes = useCardioMinutesStore((s) => s.minutesByWeek[previousWeekKey] ?? null);
+  const feedbackText = useWeeklyFeedbackStore((s) => s.textByWeek[previousWeekKey] ?? "");
+  const { upsertWeeklyFeedback, getWeeklyFeedbackByWeek } = useWeeklyFeedbackApi();
+  const { triggerErrorToast, triggerSuccessToast } = useToast();
+  const queryClient = useQueryClient();
+
+  const previousWeekIso = previousWeekKey;
+
+  const {
+    data: serverFeedback,
+    isLoading: isServerLoading,
+    isFetched: isServerFetched,
+  } = useQuery({
+    queryKey: ["weekly-feedback-previous", currentUserId, previousWeekKey],
+    queryFn: () => getWeeklyFeedbackByWeek(currentUserId!, previousWeekIso),
+    enabled: !!currentUserId,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+
+  const isServerFinalized = !!serverFeedback?.finalized;
+
+  useEffect(() => {
+    if (isServerFinalized && !finalizedAt) {
+      finalize(previousWeekKey);
+    }
+  }, [isServerFinalized, finalizedAt, previousWeekKey, finalize]);
+
+  const visible =
+    !!currentUserId &&
+    !isServerLoading &&
+    isServerFetched &&
+    !finalizedAt &&
+    !isServerFinalized;
 
   const handleFinalize = async () => {
     selectionHaptic();
@@ -59,16 +93,16 @@ const WeeklyFeedbackPopupHost: React.FC = () => {
       finalize(previousWeekKey);
       return;
     }
+    const weekStart = previousWeekKey;
     const [y, m, d] = previousWeekKey.split("-").map(Number);
-    const weekStart = new Date(y, m - 1, d);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    weekEnd.setHours(23, 59, 59, 999);
+    const weekEndDate = new Date(Date.UTC(y, m - 1, d + 6));
+    const weekEnd = weekEndDate.toISOString().slice(0, 10);
     const plans = workoutPlan?.workoutPlans ?? [];
+    const previousWeekPrefix = `${previousWeekKey}::`;
     const doneIds = new Set<string>(
       Object.keys(workoutMarks)
-        .filter((k) => workoutMarks[k])
-        .map((k) => k.split("::")[1])
+        .filter((k) => workoutMarks[k] && k.startsWith(previousWeekPrefix))
+        .map((k) => k.slice(previousWeekPrefix.length))
         .filter((id): id is string => !!id)
     );
     const workouts = plans.length
@@ -85,24 +119,13 @@ const WeeklyFeedbackPopupHost: React.FC = () => {
           doneManual: true,
           doneSmart: false,
         }));
-    const remapDayKeyToPreviousWeek = (originalKey: string): string => {
-      const parts = originalKey.split("-").map(Number);
-      if (parts.length !== 3 || parts.some(isNaN)) return originalKey;
-      const original = new Date(parts[0], parts[1] - 1, parts[2]);
-      const dayOfWeek = original.getDay();
-      const remapped = new Date(weekStart);
-      remapped.setDate(weekStart.getDate() + dayOfWeek);
-      const yy = remapped.getFullYear();
-      const mm = String(remapped.getMonth() + 1).padStart(2, "0");
-      const dd = String(remapped.getDate()).padStart(2, "0");
-      return `${yy}-${mm}-${dd}`;
-    };
-    const remappedDaysCompleted = Object.keys(nutritionMarks)
-      .filter((k) => !!nutritionMarks[k])
-      .map(remapDayKeyToPreviousWeek);
+    const previousWeekDayKeys = new Set(getPreviousWeekDayKeys(previousWeekKey));
+    const remappedDaysCompleted = Object.keys(nutritionMarks).filter(
+      (k) => !!nutritionMarks[k] && previousWeekDayKeys.has(k)
+    );
     const remappedDayNotes: Record<string, string> = {};
     Object.keys(dayNotes).forEach((k) => {
-      if (dayNotes[k]) remappedDayNotes[remapDayKeyToPreviousWeek(k)] = dayNotes[k];
+      if (dayNotes[k] && previousWeekDayKeys.has(k)) remappedDayNotes[k] = dayNotes[k];
     });
     try {
       const cardioPlanType = workoutPlan?.cardio?.type;
@@ -111,8 +134,8 @@ const WeeklyFeedbackPopupHost: React.FC = () => {
           ? (workoutPlan?.cardio?.plan as { minsPerWeek?: number })?.minsPerWeek ?? null
           : null;
       await upsertWeeklyFeedback(currentUserId, {
-        weekStart: weekStart.toISOString(),
-        weekEnd: weekEnd.toISOString(),
+        weekStart,
+        weekEnd,
         workouts,
         nutrition: {
           daysCompleted: remappedDaysCompleted,
@@ -125,12 +148,97 @@ const WeeklyFeedbackPopupHost: React.FC = () => {
         steps: null,
         feedbackText,
         finalized: true,
-      } as unknown as import("@/interfaces/WeeklyFeedback").IWeeklyFeedbackPayload);
-    } catch (err) {
-      console.log("weekly feedback upsert failed:", err);
+      });
+      finalize(previousWeekKey);
+      queryClient.invalidateQueries({
+        queryKey: ["weekly-feedback-previous", currentUserId, previousWeekKey],
+      });
+      triggerSuccessToast({ message: "הפידבק נשלח למאמן" });
+    } catch (err: any) {
+      const status = err?.response?.status ?? err?.status;
+      const message =
+        status === 403
+          ? "לא ניתן לערוך פידבק ישן. פנה למאמן"
+          : status === 401
+            ? "ההתחברות פגה. יש להתחבר מחדש"
+            : "שליחת הפידבק נכשלה. בדוק חיבור לרשת ונסה שוב";
+      triggerErrorToast({ message });
     }
-    finalize(previousWeekKey);
   };
+
+  const currentWeekKey = getCurrentWeekKey();
+  const currentSleep = useSleepAverageStore((s) => s.hoursByWeek[currentWeekKey] ?? null);
+  const currentCardio = useCardioMinutesStore((s) => s.minutesByWeek[currentWeekKey] ?? null);
+  const currentFeedback = useWeeklyFeedbackStore((s) => s.textByWeek[currentWeekKey] ?? "");
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    const currentDayKeys = new Set(getWeekDayKeys(currentWeekKey));
+    const daysCompleted = Object.keys(nutritionMarks).filter(
+      (k) => nutritionMarks[k] && currentDayKeys.has(k)
+    );
+    const currentDayNotes: Record<string, string> = {};
+    Object.keys(dayNotes).forEach((k) => {
+      if (dayNotes[k] && currentDayKeys.has(k)) currentDayNotes[k] = dayNotes[k];
+    });
+    const plans = workoutPlan?.workoutPlans ?? [];
+    const currentPrefix = `${currentWeekKey}::`;
+    const doneIds = new Set<string>(
+      Object.keys(workoutMarks)
+        .filter((k) => workoutMarks[k] && k.startsWith(currentPrefix))
+        .map((k) => k.slice(currentPrefix.length))
+        .filter((id): id is string => !!id)
+    );
+    const workouts = plans.length
+      ? plans.map((p, i) => {
+          const planId = p._id ?? `plan-${i}`;
+          return {
+            planId,
+            doneManual: doneIds.has(planId),
+            doneSmart: false,
+          };
+        })
+      : Array.from(doneIds).map((planId) => ({
+          planId,
+          doneManual: true,
+          doneSmart: false,
+        }));
+    const cardioPlanType = workoutPlan?.cardio?.type;
+    const cardioSimple =
+      cardioPlanType === "simple"
+        ? (workoutPlan?.cardio?.plan as { minsPerWeek?: number })?.minsPerWeek ?? null
+        : null;
+    const [y, m, d] = currentWeekKey.split("-").map(Number);
+    const weekEndDate = new Date(Date.UTC(y, m - 1, d + 6));
+    const weekEnd = weekEndDate.toISOString().slice(0, 10);
+    const timer = setTimeout(() => {
+      upsertWeeklyFeedback(currentUserId, {
+        weekStart: currentWeekKey,
+        weekEnd,
+        workouts,
+        nutrition: { daysCompleted, dayNotes: currentDayNotes },
+        weighIns: [],
+        sleepHours: currentSleep,
+        cardioMinutes: currentCardio,
+        cardioMinutesGoal: cardioSimple,
+        steps: null,
+        feedbackText: currentFeedback,
+        finalized: false,
+      }).catch(() => {});
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [
+    currentUserId,
+    currentWeekKey,
+    nutritionMarks,
+    dayNotes,
+    workoutMarks,
+    workoutPlan,
+    currentSleep,
+    currentCardio,
+    currentFeedback,
+    upsertWeeklyFeedback,
+  ]);
 
   return (
     <Modal
@@ -169,7 +277,7 @@ const WeeklyFeedbackPopupHost: React.FC = () => {
               </View>
             </View>
             <View style={styles.contentWrap}>
-              <WeeklyProgressScreen popupMode />
+              <WeeklyProgressScreen popupMode targetWeekKey={previousWeekKey} />
             </View>
             <View style={styles.footer}>
               <Pressable

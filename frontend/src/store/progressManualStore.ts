@@ -1,34 +1,17 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getWeekKey, getDayKey, getWeekDayKeys } from "@/utils/weekKeys";
 
-const getWeekKey = (now: Date = new Date()): string => {
-  const d = new Date(now);
-  const day = d.getDay();
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - day);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${dd}`;
-};
-
-export const getDayKey = (now: Date = new Date()): string => {
-  const y = now.getFullYear();
-  const m = String(now.getMonth() + 1).padStart(2, "0");
-  const d = String(now.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-};
+export { getDayKey } from "@/utils/weekKeys";
 
 interface ProgressManualState {
   workoutMarks: Record<string, boolean>;
   nutritionMarks: Record<string, boolean>;
   weekKey: string;
   dayKey: string;
-  isWorkoutMarked: (planId: string) => boolean;
-  toggleWorkoutMark: (planId: string) => void;
-  isNutritionMarkedToday: () => boolean;
-  toggleNutritionMarkToday: () => void;
+  isWorkoutMarkedForWeek: (planId: string, weekKey: string) => boolean;
+  toggleWorkoutMarkForWeek: (planId: string, weekKey: string) => void;
   toggleNutritionMarkForDay: (dayKey: string) => void;
   resetIfNewPeriod: () => void;
 }
@@ -40,23 +23,15 @@ export const useProgressManualStore = create<ProgressManualState>()(
       nutritionMarks: {},
       weekKey: getWeekKey(),
       dayKey: getDayKey(),
-      isWorkoutMarked: (planId) => !!get().workoutMarks[`${get().weekKey}::${planId}`],
-      toggleWorkoutMark: (planId) =>
+      isWorkoutMarkedForWeek: (planId, weekKey) =>
+        !!get().workoutMarks[`${weekKey}::${planId}`],
+      toggleWorkoutMarkForWeek: (planId, weekKey) =>
         set((state) => {
-          const key = `${state.weekKey}::${planId}`;
+          const key = `${weekKey}::${planId}`;
           const next = { ...state.workoutMarks };
           if (next[key]) delete next[key];
           else next[key] = true;
           return { workoutMarks: next };
-        }),
-      isNutritionMarkedToday: () => !!get().nutritionMarks[get().dayKey],
-      toggleNutritionMarkToday: () =>
-        set((state) => {
-          const key = state.dayKey;
-          const next = { ...state.nutritionMarks };
-          if (next[key]) delete next[key];
-          else next[key] = true;
-          return { nutritionMarks: next };
         }),
       toggleNutritionMarkForDay: (dayKey) =>
         set((state) => {
@@ -70,14 +45,8 @@ export const useProgressManualStore = create<ProgressManualState>()(
         const nowDay = getDayKey();
         const state = get();
         const patch: Partial<ProgressManualState> = {};
-        if (nowWeek !== state.weekKey) {
-          patch.workoutMarks = {};
-          patch.nutritionMarks = {};
-          patch.weekKey = nowWeek;
-        }
-        if (nowDay !== state.dayKey) {
-          patch.dayKey = nowDay;
-        }
+        if (nowWeek !== state.weekKey) patch.weekKey = nowWeek;
+        if (nowDay !== state.dayKey) patch.dayKey = nowDay;
         if (Object.keys(patch).length > 0) set(patch as ProgressManualState);
       },
     }),
@@ -93,3 +62,6 @@ export const useProgressManualStore = create<ProgressManualState>()(
     }
   )
 );
+
+export const getPreviousWeekDayKeys = (previousWeekKey: string): string[] =>
+  getWeekDayKeys(previousWeekKey);

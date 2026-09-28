@@ -52,9 +52,24 @@ const AgreementSignedScreen = () => {
     >
       <View style={[layout.flex1, layout.center, spacing.gapXxl]}>
         <Animated.View
-          style={[common.roundedFull, spacing.pdDefault, colors.backgroundSuccess, animatedStyle]}
+          style={[
+            common.roundedFull,
+            colors.backgroundSuccess,
+            animatedStyle,
+            {
+              width: 72,
+              height: 72,
+              alignItems: "center",
+              justifyContent: "center",
+              shadowColor: "#17B26A",
+              shadowOffset: { width: 0, height: 6 },
+              shadowOpacity: 0.25,
+              shadowRadius: 12,
+              elevation: 4,
+            },
+          ]}
         >
-          <Icon color={colors.background.backgroundColor} name="check" height={80} width={80} />
+          <Icon color={colors.background.backgroundColor} name="check" height={44} width={44} />
         </Animated.View>
         <View style={[layout.center, spacing.gapDefault]}>
           <Text fontVariant="bold" fontSize={25}>

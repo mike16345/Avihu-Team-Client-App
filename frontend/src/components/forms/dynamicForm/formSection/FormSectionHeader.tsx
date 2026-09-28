@@ -23,27 +23,14 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
   const { formType } = useFormContext();
 
   return (
-    <View
-      style={[
-        spacing.gap20,
-        spacing.pdVerticalXl,
-        spacing.pdHorizontalLg,
-        { borderBottomWidth: 1, borderColor: semanticColors.app.formBorder },
-      ]}
-    >
+    <View style={[spacing.gap20, spacing.pdVerticalXl, spacing.pdHorizontalLg]}>
       <View style={layout.center}>
         <AppIcon />
       </View>
 
-      <View
-        style={[
-          layout.flexRow,
-          layout.itemsCenter,
-          formType === "onboarding" ? layout.justifyEnd : layout.justifyStart,
-        ]}
-      >
-        <View style={[styles.stepPill, colors.backgroundSurface]}>
-          <Text fontVariant="bold" style={styles.stepPillText}>
+      <View style={[layout.flexRow, layout.itemsCenter, layout.justifyCenter]}>
+        <View style={styles.stepPill}>
+          <Text fontVariant="light" style={styles.stepPillText}>
             {`שלב ${currentSection} מתוך ${totalSections}`}
           </Text>
         </View>
@@ -59,6 +46,8 @@ const FormSectionHeader: React.FC<FormSectionHeaderProps> = ({
           </Text>
         ) : null}
       </View>
+
+      <View style={styles.divider} />
     </View>
   );
 };
@@ -74,16 +63,18 @@ const styles = StyleSheet.create({
   stepPill: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 999,
-    shadowColor: semanticColors.scrim,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 3,
-    alignSelf: "flex-start",
+    alignSelf: "center",
   },
   stepPillText: {
     color: semanticColors.steps.ringGradientStart,
+  },
+  divider: {
+    height: 0.5,
+    marginTop: 24,
+    marginHorizontal: 24,
+    backgroundColor: semanticColors.app.formBorder,
+    borderRadius: 999,
+    opacity: 0.5,
   },
 });
 

@@ -11,11 +11,15 @@ export type RowState = {
   savedSetId?: string;
 };
 
-export const getPlannedReps = (exercise: IExercise, setNumber: number) => {
+const SESSION_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+export const getPlannedReps = (exercise: IExercise, setNumber: number): number => {
+  if (!exercise.sets || exercise.sets.length === 0) return 0;
   const isOutOfBounds = isIndexOutOfBounds(exercise.sets, setNumber - 1);
-  return isOutOfBounds
-    ? exercise.sets[exercise.sets.length - 1].minReps
-    : exercise.sets[setNumber - 1].minReps;
+  const target = isOutOfBounds
+    ? exercise.sets[exercise.sets.length - 1]
+    : exercise.sets[setNumber - 1];
+  return target?.minReps ?? 0;
 };
 
 export const isSameDay = (a: Date, b: Date) =>
@@ -23,18 +27,27 @@ export const isSameDay = (a: Date, b: Date) =>
   a.getMonth() === b.getMonth() &&
   a.getDate() === b.getDate();
 
+const isInSessionWindow = (setDate: Date, sessionStartDate?: Date): boolean => {
+  if (sessionStartDate && !Number.isNaN(sessionStartDate.getTime())) {
+    const startMs = sessionStartDate.getTime();
+    const setMs = setDate.getTime();
+    return setMs >= startMs && setMs <= startMs + SESSION_WINDOW_MS;
+  }
+  return isSameDay(setDate, new Date());
+};
+
 export const collectTodaySets = (
   data: { recordedSets: Record<string, IRecordedSetRes[]> }[] | undefined,
-  exerciseName: string
+  exerciseName: string,
+  sessionStartDate?: Date
 ): IRecordedSetRes[] => {
   if (!data) return [];
-  const today = new Date();
   const sets: IRecordedSetRes[] = [];
   for (const group of data) {
     const forExercise = group.recordedSets?.[exerciseName];
     if (!forExercise) continue;
     for (const s of forExercise) {
-      if (s?.date && isSameDay(new Date(s.date), today)) sets.push(s);
+      if (s?.date && isInSessionWindow(new Date(s.date), sessionStartDate)) sets.push(s);
     }
   }
   return sets.sort((a, b) => a.setNumber - b.setNumber);
@@ -43,17 +56,17 @@ export const collectTodaySets = (
 export const findTodaySetId = (
   data: { recordedSets: Record<string, IRecordedSetRes[]> }[] | undefined,
   exerciseName: string,
-  setNumber: number
+  setNumber: number,
+  sessionStartDate?: Date
 ): string | undefined => {
   if (!data) return undefined;
-  const today = new Date();
   let latest: IRecordedSetRes | undefined;
   for (const group of data) {
     const forExercise = group.recordedSets?.[exerciseName];
     if (!forExercise) continue;
     for (const s of forExercise) {
       if (s.setNumber !== setNumber) continue;
-      if (!s.date || !isSameDay(new Date(s.date), today)) continue;
+      if (!s.date || !isInSessionWindow(new Date(s.date), sessionStartDate)) continue;
       if (!latest || new Date(s.date) > new Date(latest.date)) latest = s;
     }
   }

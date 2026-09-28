@@ -1,6 +1,7 @@
 import { Tabs, TabsList } from "../ui/Tabs";
 import { useState } from "react";
 import useMenuItemsQuery from "@/hooks/queries/MenuItems/useMenuItemsQuery";
+import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
@@ -14,6 +15,8 @@ const FoodGroupTabs = () => {
   const { height } = useWindowDimensions();
   const { layout, spacing } = useStyles();
   const { data, isLoading } = useMenuItemsQuery();
+  const { data: plan } = useDietPlanQuery();
+  const unitMode = (plan?.unitDisplayMode as 1 | 2 | undefined) || 1;
 
   const minMaxHeight = height / 2 - (BOTTOM_BAR_HEIGHT + 70);
   const [selectedTab, setSelectedTab] = useState<string>("");
@@ -41,7 +44,7 @@ const FoodGroupTabs = () => {
                 fontVariant="semibold"
                 key={item._id}
               >
-                {formatServingText(item.name, item.oneServing, 1, 2, [], " | ")}
+                {formatServingText(item.name, item.oneServing, 1, 1, [], " | ", false, unitMode)}
               </Text>
             ))}
           </ScrollView>

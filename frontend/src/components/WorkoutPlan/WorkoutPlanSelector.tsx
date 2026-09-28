@@ -16,9 +16,14 @@ import WorkoutProgressionPopup from "../WorkoutProgression/WorkoutProgressionPop
 interface WorkoutPlanSelectorProps {
   selectedPlan: string;
   isCardio: boolean;
+  overrideTips?: string[];
 }
 
-const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan, isCardio }) => {
+const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({
+  selectedPlan,
+  isCardio,
+  overrideTips,
+}) => {
   const { layout, spacing, common } = useStyles();
   const { data } = useWorkoutPlanQuery();
 
@@ -29,7 +34,9 @@ const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan,
     ? data?.cardio.plan.tips
       ? [data.cardio.plan.tips]
       : []
-    : data?.tips || [];
+    : overrideTips && overrideTips.length > 0
+      ? overrideTips
+      : data?.tips || [];
 
   return (
     <>
@@ -84,14 +91,19 @@ const WorkoutPlanSelector: React.FC<WorkoutPlanSelectorProps> = ({ selectedPlan,
 
 const styles = StyleSheet.create({
   iconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 999,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "rgba(7, 39, 35, 0.15)",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
 });
 

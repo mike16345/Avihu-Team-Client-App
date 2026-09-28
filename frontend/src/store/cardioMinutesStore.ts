@@ -1,40 +1,42 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const getWeekKey = (now: Date = new Date()): string => {
-  const d = new Date(now);
-  const day = d.getDay();
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - day);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${dd}`;
-};
+import { getWeekKey } from "@/utils/weekKeys";
 
 interface CardioMinutesState {
-  minutes: number | null;
-  weekKey: string;
-  setMinutes: (minutes: number) => void;
-  resetIfNewWeek: () => void;
+  minutesByWeek: Record<string, number>;
+  getMinutesForWeek: (weekKey?: string) => number | null;
+  setMinutesForWeek: (weekKey: string, minutes: number) => void;
+  clearWeek: (weekKey: string) => void;
 }
 
 export const useCardioMinutesStore = create<CardioMinutesState>()(
   persist(
     (set, get) => ({
-      minutes: null,
-      weekKey: getWeekKey(),
-      setMinutes: (minutes) => set({ minutes, weekKey: getWeekKey() }),
-      resetIfNewWeek: () => {
-        const nowKey = getWeekKey();
-        if (nowKey !== get().weekKey) set({ minutes: null, weekKey: nowKey });
+      minutesByWeek: {},
+      getMinutesForWeek: (weekKey) => {
+        const key = weekKey ?? getWeekKey();
+        const value = get().minutesByWeek[key];
+        return value == null ? null : value;
       },
+      setMinutesForWeek: (weekKey, minutes) =>
+        set((state) => ({
+          minutesByWeek: {
+            ...state.minutesByWeek,
+            [weekKey]: Math.max(0, minutes),
+          },
+        })),
+      clearWeek: (weekKey) =>
+        set((state) => {
+          const next = { ...state.minutesByWeek };
+          delete next[weekKey];
+          return { minutesByWeek: next };
+        }),
     }),
     {
       name: "cardio-minutes-store",
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({ minutes: state.minutes, weekKey: state.weekKey }),
+      partialize: (state) => ({ minutesByWeek: state.minutesByWeek }),
     }
   )
 );

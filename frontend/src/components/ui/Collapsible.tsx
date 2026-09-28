@@ -65,7 +65,6 @@ const Collapsible: React.FC<CollapsibleProps> = ({
     [contentHeight, customHeight]
   );
 
-  // Animate on collapse/expand
   useEffect(() => {
     const runAnimation = (toValue: number, callback?: () => void) => {
       height.value = withTiming(toValue, { duration: ANIMATION_DURATION }, (finished) => {

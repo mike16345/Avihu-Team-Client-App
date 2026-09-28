@@ -12,7 +12,6 @@ import { useCurrentAgreementStore } from "@/store/agreementStore";
 import AgreementSignedScreen from "@/screens/Agreement/AgreementSignedScreen";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamListNavigationProp } from "@/types/navigatorTypes";
-import QuestionnaireExitButton from "@/components/forms/QuestionnaireExitButton";
 import SplashScreen from "@/screens/SplashScreen";
 
 export type AgreementStackParamList = {
@@ -102,7 +101,6 @@ const AgreementStack = () => {
             headerShown: true,
             title: "תקנון והסכם ההצטרפות",
             headerBackVisible: false,
-            headerLeft: () => <QuestionnaireExitButton />,
             gestureEnabled: false,
           }}
         />
@@ -113,7 +111,6 @@ const AgreementStack = () => {
             headerShown: true,
             title: "שאלות ההסכם",
             headerBackVisible: false,
-            headerLeft: () => <QuestionnaireExitButton />,
           }}
         />
         <Stack.Screen

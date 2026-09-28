@@ -21,6 +21,7 @@ interface TabsRootProps<T extends string> {
 
 interface TabsListProps {
   children: React.ReactNode;
+  backgroundColor?: string;
 }
 
 interface TabsTriggerProps {
@@ -113,7 +114,7 @@ export const Tabs = <T extends string>({
   );
 };
 
-export const TabsList = ({ children }: TabsListProps) => {
+export const TabsList = ({ children, backgroundColor }: TabsListProps) => {
   const { colors, common, layout, spacing } = useStyles();
   const { tabWidth, value, translateX } = useTabsContext();
   const sliderStyle = useAnimatedStyle(() => ({
@@ -131,6 +132,7 @@ export const TabsList = ({ children }: TabsListProps) => {
         colors.outline,
         common.borderXsm,
         { height: 36, position: "relative", zIndex: 1 },
+        backgroundColor ? { backgroundColor } : undefined,
       ]}
     >
       <Animated.View

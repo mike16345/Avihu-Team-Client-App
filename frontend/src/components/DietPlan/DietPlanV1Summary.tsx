@@ -1,6 +1,7 @@
 import { semanticColors } from "@/themes/semanticColors";
 import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, ScrollView, Pressable, Linking } from "react-native";
+import { View, StyleSheet, ScrollView, Pressable, Linking, Animated, Easing } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import Svg, {
   Circle,
   Defs,
@@ -17,6 +18,76 @@ import { DIET_CALORIES_PER_SERVING } from "@/constants/dietCalories";
 import { DIET_V2_MUTED, DropIcon, SproutIcon, ChevronLeftIcon } from "../DietPlanV2/dietV2Icons";
 
 const DARK = semanticColors.diet.primaryText;
+const AI_GREEN = "#0B5E37";
+
+const AIChatButton: React.FC<{ onPress: () => void }> = ({ onPress }) => {
+  const pulse = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, {
+          toValue: 1,
+          duration: 1400,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulse, {
+          toValue: 0,
+          duration: 1400,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pulse]);
+
+  const scale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.08] });
+  const opacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] });
+  const badgeOpacity = pulse.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0.6, 1, 0.6],
+  });
+
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [aiStyles.btn, pressed && aiStyles.btnPressed]}
+      accessibilityLabel="פתח צ׳אט חכם"
+    >
+      <Animated.View style={[aiStyles.iconWrap, { transform: [{ scale }], opacity }]}>
+        <Svg width={100} height={100} viewBox="0 0 32 32">
+          <Path
+            d="M6 12 C6 8, 8.5 5.5, 12 5.5 L20 5.5 C23.5 5.5, 26 8, 26 12 L26 17 C26 21, 23.5 23.5, 20 23.5 L14 23.5 L9 27 L10 23.4 C7.6 22.7, 6 20.3, 6 17 Z"
+            fill="none"
+            stroke={AI_GREEN}
+            strokeWidth={0.8}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+        </Svg>
+        <Animated.Text style={[aiStyles.badge, { opacity: badgeOpacity }]}>AI</Animated.Text>
+      </Animated.View>
+    </Pressable>
+  );
+};
+
+const aiStyles = StyleSheet.create({
+  btn: { alignSelf: "center", padding: 6, borderRadius: 999 },
+  btnPressed: { opacity: 0.85 },
+  iconWrap: { width: 100, height: 100, alignItems: "center", justifyContent: "center", position: "relative" },
+  badge: {
+    position: "absolute",
+    color: AI_GREEN,
+    fontSize: 18,
+    fontWeight: "700",
+    letterSpacing: 1.5,
+    top: "36%",
+    marginTop: -2,
+  },
+});
 
 const sumMealField = (
   meals: IMeal[],
@@ -99,7 +170,7 @@ const useAnimatedFloat = (value: number, duration = 650): number => {
 const GRAD_LIGHT = semanticColors.diet.borderStrong;
 const GRAD_DARK = semanticColors.app.brandAction;
 
-const DONUT_SIZE = 130;
+const DONUT_SIZE = 170;
 const DONUT_STROKE = 11;
 const DONUT_R = (DONUT_SIZE - DONUT_STROKE) / 2;
 const DONUT_C = 2 * Math.PI * DONUT_R;
@@ -223,6 +294,7 @@ const DietPlanV1Summary = () => {
   const consumed = useDietServingsStore();
   const { data: plan } = useDietPlanV1Query();
   const [rowW, setRowW] = useState(0);
+  const navigation = useNavigation<any>();
 
   const meals: IMeal[] = plan?.meals ?? [];
   const targets = {
@@ -271,35 +343,7 @@ const DietPlanV1Summary = () => {
     <View style={styles.card}>
       <View style={styles.topRow}>
         <View style={styles.tipsPanel}>
-          <View style={styles.tipRow}>
-            <View style={styles.tipIconWrap}>
-              <DropIcon size={14} color={semanticColors.app.dietInfo} />
-            </View>
-            <Text fontSize={13} style={styles.tipText}>
-              לשתות 3 ליטר מים
-            </Text>
-          </View>
-          <View style={styles.tipRow}>
-            <View style={styles.tipIconWrap}>
-              <SproutIcon size={14} color={semanticColors.app.dietPositive} />
-            </View>
-            <Text fontSize={13} style={styles.tipText}>
-              לאכול 5-3 ירקות ביום
-            </Text>
-          </View>
-          <Pressable
-            style={styles.tipRow}
-            onPress={() =>
-              Linking.openURL(`https://wa.me/${process.env.EXPO_PUBLIC_TRAINER_PHONE_NUMBER || ""}`)
-            }
-          >
-            <View style={styles.tipIconWrap}>
-              <WhatsAppIcon size={14} />
-            </View>
-            <Text fontSize={13} style={styles.tipText}>
-              אשמח לעדכון בווטסאפ
-            </Text>
-          </Pressable>
+          <AIChatButton onPress={() => navigation.navigate("Chat")} />
         </View>
 
         <View style={styles.topDivider} />
@@ -391,10 +435,12 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   topDivider: {
-    width: StyleSheet.hairlineWidth,
-    alignSelf: "stretch",
-    backgroundColor: semanticColors.app.shadowSoft,
-    marginVertical: 8,
+    width: 1,
+    height: "80%",
+    alignSelf: "center",
+    marginEnd: 20,
+    backgroundColor: "rgba(11, 42, 34, 0.10)",
+    borderRadius: 999,
   },
   macroWrap: {
     alignSelf: "stretch",

@@ -47,7 +47,7 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
         <PrimaryButton
           mode="light"
           block
-          style={[layout.flex1, common.borderXsm, colors.borderError]}
+          style={[layout.flex1, common.borderXsm, colors.borderError, { paddingVertical: 8 }]}
           onPress={onExit}
           disabled={isExiting}
         >
@@ -60,14 +60,14 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
           </View>
         </PrimaryButton>
       ) : (
-        <PrimaryButton mode="light" block style={layout.flex1} onPress={goBack}>
+        <PrimaryButton mode="light" block style={[layout.flex1, { paddingVertical: 8 }]} onPress={goBack}>
           הקודם
         </PrimaryButton>
       )}
 
       {isLast ? (
         <PrimaryButton
-          style={layout.flex1}
+          style={[layout.flex1, { paddingVertical: 8 }]}
           block
           onPress={handleSubmit}
           disabled={isLoading}
@@ -76,7 +76,7 @@ const FormSectionFooter: React.FC<FormSectionFooterProps> = ({
           שלח
         </PrimaryButton>
       ) : (
-        <PrimaryButton style={layout.flex1} block onPress={goNext}>
+        <PrimaryButton style={[layout.flex1, { paddingVertical: 8 }]} block onPress={goNext}>
           הבא
         </PrimaryButton>
       )}

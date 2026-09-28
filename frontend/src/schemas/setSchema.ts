@@ -34,13 +34,12 @@ const setSchema = z
       .int({ message: "RIR חייב להיות שלם" })
       .min(0, { message: "RIR לא יכול להיות שלילי" })
       .max(20, { message: "RIR לא יכול לעלות על 20" })
+      .nullable()
       .optional(),
   })
   .strict();
 
 export type SetInput = z.infer<typeof setSchema>;
-
-export const UpdateSetSchema = setSchema.pick({ weight: true, repsDone: true });
 
 export const SetInputSchema = setSchema;
 

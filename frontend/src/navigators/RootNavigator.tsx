@@ -118,7 +118,7 @@ const RootNavigator = () => {
     };
 
     bootstrap();
-    requestPermissions().catch((err) => console.log(err));
+    requestPermissions().catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -158,13 +158,11 @@ const RootNavigator = () => {
       };
 
       if (hasCompletedOnboarding) {
-        console.log("User has completed onboarding, navigating to main app");
         setInitialRoute({ route: "BottomTabs" });
         return;
       }
 
       if (shouldResolveAgreementOnly) {
-        console.log("Resolving agreement only");
         const agreement = await resolveAgreement();
         if (cancelled) return;
 
@@ -180,7 +178,6 @@ const RootNavigator = () => {
       const onboardingForm = await resolveOnboardingForm();
       if (cancelled) return;
 
-      console.log("Resolved onboarding form:", onboardingForm);
       if (onboardingForm?._id) {
         setActiveFormId(onboardingForm._id);
         setInitialRoute({

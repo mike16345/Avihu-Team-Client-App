@@ -59,17 +59,9 @@ export const useImageApi = () => {
     });
     const urlToStore = `${userId}/${today}/${safeImageName}`;
 
-    try {
-      // Fetch the presigned URL
-      const presignedUrl = await fetchSignedUrl(url);
-
-      // Upload the file from the URI using the presigned URL
-      await uploadImageToS3(fileUri, presignedUrl);
-
-      return { presignedUrl, urlToStore };
-    } catch (error) {
-      throw error;
-    }
+    const presignedUrl = await fetchSignedUrl(url);
+    await uploadImageToS3(fileUri, presignedUrl);
+    return { presignedUrl, urlToStore };
   };
 
   return { handleUploadImageToS3, handleDeletePhoto };

@@ -2,14 +2,19 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, Pressable, TextInput } from "react-native";
 import Animated, { FadeInDown, FadeOutUp, LinearTransition } from "react-native-reanimated";
 import { Swipeable } from "react-native-gesture-handler";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Text } from "@/components/ui/Text";
 import Icon from "@/components/Icon/Icon";
 import SpinningIcon from "@/components/ui/loaders/SpinningIcon";
 import { useThemeContext } from "@/themes/useAppTheme";
-import { IExercise } from "@/interfaces/Workout";
+import { IExercise, IMuscleGroupRecordedSets } from "@/interfaces/Workout";
 import { useGetLastRecordedSetForSetNumber } from "@/hooks/queries/RecordedSets/useLastRecordedSetQuery";
 import useRecordedSetsQuery from "@/hooks/queries/RecordedSets/useRecordedSetsQuery";
+import { RECORDED_SETS_BY_USER_KEY } from "@/constants/reactQuery";
+import { useUserStore } from "@/store/userStore";
+import { useToast } from "@/hooks/useToast";
+import { useWorkoutSessionStore } from "@/store/workoutSessionStore";
 
 import { SetInput } from "./SetInputContainer";
 import {
@@ -24,6 +29,7 @@ import {
 } from "./setInputTableUtils";
 
 const HEADER_LABELS = ["סט", "ק״ג", "חזרות", "רזרבה"] as const;
+const MAX_WEIGHT = 999;
 
 interface SetInputTableProps {
   exercise: IExercise;
@@ -42,10 +48,18 @@ const SetInputTable: FC<SetInputTableProps> = ({
 }) => {
   const { theme } = useThemeContext();
   const { data: recordedSetsData, refetch: refetchRecordedSets } = useRecordedSetsQuery();
+  const queryClient = useQueryClient();
+  const userId = useUserStore((s) => s.currentUser?._id);
+  const workoutSession = useWorkoutSessionStore((s) => s.workoutSession);
+  const { triggerErrorToast } = useToast();
+
+  const sessionStartDate = workoutSession?.createdAt
+    ? new Date(workoutSession.createdAt)
+    : undefined;
 
   const todaySets = useMemo(
-    () => collectTodaySets(recordedSetsData, exercise.exerciseId.name),
-    [recordedSetsData, exercise.exerciseId.name]
+    () => collectTodaySets(recordedSetsData, exercise.exerciseId.name, sessionStartDate),
+    [recordedSetsData, exercise.exerciseId.name, sessionStartDate?.getTime()]
   );
 
   const [rows, setRows] = useState<RowState[]>(() => buildRowsFromServer(todaySets, maxSets));
@@ -54,6 +68,7 @@ const SetInputTable: FC<SetInputTableProps> = ({
 
   const hydratedRef = useRef(false);
   const deletingRowIndexRef = useRef<number | null>(null);
+  const savingIndexesRef = useRef<Set<number>>(new Set());
 
   useEffect(() => {
     if (hydratedRef.current) return;
@@ -73,7 +88,8 @@ const SetInputTable: FC<SetInputTableProps> = ({
         const savedSetId = findTodaySetId(
           recordedSetsData,
           exercise.exerciseId.name,
-          row.setNumber
+          row.setNumber,
+          sessionStartDate
         );
         if (!savedSetId) return row;
 
@@ -83,17 +99,29 @@ const SetInputTable: FC<SetInputTableProps> = ({
 
       return changed ? next : prev;
     });
-  }, [recordedSetsData, exercise.exerciseId.name]);
+  }, [recordedSetsData, exercise.exerciseId.name, sessionStartDate?.getTime()]);
+
+  const sanitizeNumeric = useCallback(
+    (field: "weight" | "reps" | "rir", raw: string): string => {
+      const stripped = raw.replace(/[^0-9.]/g, "");
+      if (field !== "weight") return stripped.replace(/\./g, "");
+      const firstDot = stripped.indexOf(".");
+      if (firstDot === -1) return stripped;
+      return stripped.slice(0, firstDot + 1) + stripped.slice(firstDot + 1).replace(/\./g, "");
+    },
+    []
+  );
 
   const updateField = useCallback(
     (index: number, field: "weight" | "reps" | "rir", value: string) => {
+      const clean = sanitizeNumeric(field, value);
       setRows((prev) => {
         const next = [...prev];
-        next[index] = { ...next[index], [field]: value.replace(/[^0-9.]/g, "") };
+        next[index] = { ...next[index], [field]: clean };
         return next;
       });
     },
-    []
+    [sanitizeNumeric]
   );
 
   const handleAddSet = useCallback(() => {
@@ -143,6 +171,8 @@ const SetInputTable: FC<SetInputTableProps> = ({
 
   const handleTapCheck = useCallback(
     async (index: number) => {
+      if (savingIndexesRef.current.has(index)) return;
+
       const row = rows[index];
       if (row.saving) return;
 
@@ -156,10 +186,41 @@ const SetInputTable: FC<SetInputTableProps> = ({
       }
 
       const fallbackReps = getPlannedReps(exercise, row.setNumber);
-      const weightNumber = Number(row.weight) || 0;
-      const repsNumber = Number(row.reps) || fallbackReps;
-      if (weightNumber <= 0 || repsNumber <= 0) return;
+      const trimmedWeight = row.weight.trim();
+      const trimmedReps = row.reps.trim();
 
+      if (trimmedWeight !== "") {
+        const parts = trimmedWeight.split(".");
+        if (parts.length > 2 || Number.isNaN(Number(trimmedWeight))) {
+          triggerErrorToast({ message: "המשקל שהוזן אינו תקין" });
+          return;
+        }
+      }
+
+      const weightNumber = trimmedWeight === "" ? 0 : Number(trimmedWeight);
+      if (weightNumber < 0) {
+        triggerErrorToast({ message: "המשקל לא יכול להיות שלילי" });
+        return;
+      }
+      if (weightNumber > MAX_WEIGHT) {
+        triggerErrorToast({ message: `המשקל לא יכול לעלות על ${MAX_WEIGHT} ק״ג` });
+        return;
+      }
+
+      const repsNumber = trimmedReps === "" ? fallbackReps : Number(trimmedReps);
+      if (!repsNumber || repsNumber <= 0) {
+        triggerErrorToast({ message: "צריך להזין מספר חזרות" });
+        return;
+      }
+
+      const rirValue = row.rir.trim();
+      const rirNumber = rirValue === "" ? undefined : Number(rirValue);
+      if (rirValue !== "" && (Number.isNaN(rirNumber!) || rirNumber! < 0 || rirNumber! > 20)) {
+        triggerErrorToast({ message: "RIR חייב להיות בין 0 ל־20" });
+        return;
+      }
+
+      savingIndexesRef.current.add(index);
       setRows((prev) => {
         const next = [...prev];
         next[index] = { ...next[index], saving: true };
@@ -167,36 +228,55 @@ const SetInputTable: FC<SetInputTableProps> = ({
       });
 
       try {
-        const rirValue = row.rir.trim();
-        const rirNumber = rirValue === "" ? undefined : Number(rirValue);
         const setPayload: SetInput = {
           setNumber: row.setNumber,
           weight: weightNumber,
           repsDone: repsNumber,
-          ...(rirNumber !== undefined && !Number.isNaN(rirNumber) ? { rir: rirNumber } : {}),
+          ...(rirNumber !== undefined && !Number.isNaN(rirNumber)
+            ? { rir: rirNumber }
+            : { rir: null }),
         };
+
+        const freshCache = queryClient.getQueryData<IMuscleGroupRecordedSets[]>([
+          RECORDED_SETS_BY_USER_KEY + userId,
+        ]);
         const existingId =
           row.savedSetId ??
-          findTodaySetId(recordedSetsData, exercise.exerciseId.name, row.setNumber);
+          findTodaySetId(freshCache, exercise.exerciseId.name, row.setNumber, sessionStartDate) ??
+          findTodaySetId(
+            recordedSetsData,
+            exercise.exerciseId.name,
+            row.setNumber,
+            sessionStartDate
+          );
+
         let nextSavedSetId = existingId;
         if (existingId) {
           await onUpdateSet(existingId, setPayload);
         } else {
           const saved = await onSaveSet(setPayload);
-          if (!saved) return;
+          if (!saved) {
+            setRows((prev) => {
+              const next = [...prev];
+              next[index] = { ...next[index], saving: false };
+              return next;
+            });
+            return;
+          }
 
           const refreshedResult = await refetchRecordedSets();
           nextSavedSetId = findTodaySetId(
             refreshedResult.data,
             exercise.exerciseId.name,
-            row.setNumber
+            row.setNumber,
+            sessionStartDate
           );
         }
         setRows((prev) => {
           const next = [...prev];
           next[index] = {
             ...next[index],
-            weight: String(weightNumber),
+            weight: trimmedWeight === "" ? "" : String(weightNumber),
             reps: String(repsNumber),
             rir: rirNumber !== undefined && !Number.isNaN(rirNumber) ? String(rirNumber) : "",
             completed: true,
@@ -205,16 +285,28 @@ const SetInputTable: FC<SetInputTableProps> = ({
           };
           return next;
         });
-      } catch (e: any) {
-        console.log("Error saving/updating set at index:", index, "Row data:", row, "Error:", e);
+      } catch {
         setRows((prev) => {
           const next = [...prev];
           next[index] = { ...next[index], saving: false };
           return next;
         });
+      } finally {
+        savingIndexesRef.current.delete(index);
       }
     },
-    [rows, onSaveSet, onUpdateSet, exercise, recordedSetsData, refetchRecordedSets]
+    [
+      rows,
+      onSaveSet,
+      onUpdateSet,
+      exercise,
+      recordedSetsData,
+      refetchRecordedSets,
+      queryClient,
+      userId,
+      sessionStartDate,
+      triggerErrorToast,
+    ]
   );
 
   return (
@@ -281,10 +373,15 @@ const SetRow: FC<{
   const { theme } = useThemeContext();
   const previous = useGetLastRecordedSetForSetNumber(exercise.exerciseId.name, row.setNumber - 1);
 
-  const weightPlaceholder = previous ? String(previous.weight) : "0";
+  const weightPlaceholder = previous
+    ? previous.weight > 0
+      ? String(previous.weight)
+      : "—"
+    : "—";
   const repsPlaceholder = previous
     ? String(previous.repsDone)
     : String(getPlannedReps(exercise, row.setNumber));
+  const weightDisplayValue = row.completed && row.weight === "0" ? "—" : row.weight;
 
   const rowBackground = row.completed ? theme.colors.successContainer : theme.colors.surface;
   const inputColor = row.completed ? theme.colors.onSuccess : theme.colors.primary;
@@ -330,12 +427,13 @@ const SetRow: FC<{
 
         <Cell>
           <TextInput
-            value={row.weight}
+            value={weightDisplayValue}
             onChangeText={(v) => onChangeField(index, "weight", v)}
             editable={!row.completed}
             keyboardType="decimal-pad"
             placeholder={weightPlaceholder}
             placeholderTextColor={theme.colors.onSurfaceVariant + "80"}
+            maxLength={6}
             style={[styles.input, { color: inputColor }]}
           />
         </Cell>

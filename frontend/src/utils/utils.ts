@@ -34,8 +34,9 @@ export const hexToRgba = (hex: string, opacity: number) => {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-export const extractVideoId = (url: string): string => {
+export const extractVideoId = (url?: string | null): string => {
   let videoId: string = "";
+  if (!url) return videoId;
 
   // Check if URL contains ?v=
   if (url.includes("?v=")) {
@@ -211,19 +212,31 @@ export function formatServingText<K extends keyof IServingItem>(
   servingsToShow: 1 | 2 = 2,
   ignoreKeys: K[] = [],
   separator = " ",
-  reverse: boolean = false
+  reverse: boolean = false,
+  unitDisplayMode?: 1 | 2
 ): string {
-  const units = Object.entries(oneServing)
-    .filter(([key, value]) => {
-      return (
-        value !== undefined && value !== null && key !== "_id" && !ignoreKeys.includes(key as K)
-      );
-    })
-    .slice(0, servingsToShow) // limit to requested number of servings
-    .map(([unitKey, value]) => {
-      const label = unitLabels[unitKey as DietItemUnit];
-      return `${value * servingAmount} ${label}`;
-    });
+  const entries = Object.entries(oneServing).filter(([key, value]) => {
+    return (
+      value !== undefined && value !== null && key !== "_id" && !ignoreKeys.includes(key as K)
+    );
+  });
+
+  const gramsEntry = entries.find(([k]) => k === "grams");
+  const nonGrams = entries.filter(([k]) => k !== "grams");
+
+  let ordered: [string, unknown][];
+  if (unitDisplayMode === 2) {
+    ordered = [...nonGrams, ...(gramsEntry ? [gramsEntry] : [])];
+  } else if (unitDisplayMode === 1) {
+    ordered = [...(gramsEntry ? [gramsEntry] : []), ...nonGrams];
+  } else {
+    ordered = entries;
+  }
+
+  const units = ordered.slice(0, servingsToShow).map(([unitKey, value]) => {
+    const label = unitLabels[unitKey as DietItemUnit];
+    return `${(value as number) * servingAmount} ${label}`;
+  });
 
   const serving = reverse ? [...units, name] : [name, ...units];
 

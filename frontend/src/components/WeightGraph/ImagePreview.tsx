@@ -14,12 +14,15 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
   loading,
   imageCap = 2,
   confirmTitle = "שליחה",
+  hint,
 }) => {
   const { spacing, text, layout } = useStyles();
   const { triggerErrorToast } = useToast();
 
   const [images, setImages] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const hadExistingImages = (existingImages?.length || 0) > 0;
+  const isBusy = !!loading || isSubmitting;
 
   const showMaxImagesReachedError = () => {
     triggerErrorToast({
@@ -54,7 +57,13 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
   };
 
   const uploadImage = async () => {
-    await handleUpload(images);
+    if (isBusy) return;
+    setIsSubmitting(true);
+    try {
+      await handleUpload(images);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -66,6 +75,7 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
   return (
     <View style={[styles.container, spacing.gap20, layout.flex1, layout.justifyBetween]}>
       <View style={[spacing.gap20]}>
+        {hint}
         <Text style={[text.textCenter]}>בחרו את אופן העלאת התמונות</Text>
 
         <SelectUploadType
@@ -81,9 +91,9 @@ const ImagePreview: React.FC<Omit<UploadDrawerProps, "trigger">> = ({
         <PrimaryButton
           children={confirmTitle}
           block
-          disabled={images.length === 0 && !hadExistingImages}
+          disabled={(images.length === 0 && !hadExistingImages) || isBusy}
           onPress={uploadImage}
-          loading={loading}
+          loading={isBusy}
         />
       </View>
     </View>

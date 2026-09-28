@@ -4,7 +4,6 @@ import HorizontalSelector from "@/components/ui/HorizontalSelector";
 import { MEASUREMENT_MUSCLE_GROUPS } from "@/constants/measurements";
 import { useState } from "react";
 import MeasurementInput from "@/components/measurements/MeasurementInput";
-import ProgressImageUpload from "@/components/measurements/ProgressImageUpload";
 import { View } from "react-native";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
 
@@ -35,8 +34,6 @@ const MeasurementsWindow = () => {
 
       <View style={[spacing.pdHorizontalLg, spacing.gapLg]}>
         <MeasurementInput activeMuscleGroup={activeMuscleGroup} />
-
-        <ProgressImageUpload />
       </View>
     </CustomScrollView>
   );

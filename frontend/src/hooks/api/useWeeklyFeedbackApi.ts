@@ -1,34 +1,27 @@
-import axios from "axios";
+import { fetchData, sendData } from "@/API/api";
 import { IWeeklyFeedback, IWeeklyFeedbackPayload } from "@/interfaces/WeeklyFeedback";
 import { ApiResponse } from "@/types/ApiTypes";
 
-const WEEKLY_FEEDBACK_BASE = "http://localhost:5555";
-const ENDPOINT = "/weeklyFeedback";
-
-const client = axios.create({ baseURL: WEEKLY_FEEDBACK_BASE, timeout: 15000 });
+const ENDPOINT = "weeklyFeedback";
 
 export const useWeeklyFeedbackApi = () => {
   const upsertWeeklyFeedback = async (
-    userId: string,
+    _userId: string,
     payload: IWeeklyFeedbackPayload
   ): Promise<IWeeklyFeedback> => {
-    const res = await client.post<ApiResponse<IWeeklyFeedback>>(
-      ENDPOINT,
-      payload,
-      { headers: { Authorization: `Bearer ${userId}` } }
-    );
-    return res.data.data;
+    const res = await sendData<ApiResponse<IWeeklyFeedback>>(ENDPOINT, payload);
+    return res.data;
   };
 
   const getWeeklyFeedbacksForUser = async (
     userId: string,
     limit?: number
   ): Promise<IWeeklyFeedback[]> => {
-    const res = await client.get<ApiResponse<IWeeklyFeedback[]>>(
-      `${ENDPOINT}/user/${userId}`,
-      { params: limit ? { limit } : undefined }
+    const res = await fetchData<ApiResponse<IWeeklyFeedback[]>>(
+      `${ENDPOINT}/user`,
+      { userId, ...(limit ? { limit } : {}) }
     );
-    return res.data.data;
+    return res.data;
   };
 
   const getWeeklyFeedbackByWeek = async (
@@ -36,10 +29,11 @@ export const useWeeklyFeedbackApi = () => {
     weekStart: string
   ): Promise<IWeeklyFeedback | null> => {
     try {
-      const res = await client.get<ApiResponse<IWeeklyFeedback>>(
-        `${ENDPOINT}/user/${userId}/week/${weekStart}`
+      const res = await fetchData<ApiResponse<IWeeklyFeedback>>(
+        `${ENDPOINT}/user/week`,
+        { userId, weekStart }
       );
-      return res.data.data;
+      return res.data;
     } catch {
       return null;
     }

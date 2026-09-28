@@ -1,10 +1,11 @@
 import { FC, useMemo } from "react";
 import { FoodGroup } from "@/types/foodTypes";
 import useFoodGroupQuery from "@/hooks/queries/MenuItems/useFoodGroupQuery";
-import { formatServingText } from "@/utils/utils";
+import { foodGroupToName, formatServingText } from "@/utils/utils";
 import { StyleSheet, TextInput, View } from "react-native";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
 import { useLayoutStyles } from "@/styles/useLayoutStyles";
+import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import { ICustomItem } from "@/interfaces/DietPlan";
 
 interface FoodItemSelectionProps {
@@ -15,9 +16,6 @@ interface FoodItemSelectionProps {
   struck?: boolean;
 }
 
-const START_SLICE_INDEX = 0;
-const END_SLICE_INDEX = 5;
-
 const FoodItemSelection: FC<FoodItemSelectionProps> = ({
   foodGroup,
   servingAmount = 1,
@@ -27,13 +25,24 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
 }) => {
   const { center, wrap } = useLayoutStyles();
   const { data: items, isLoading } = useFoodGroupQuery(foodGroup);
+  const { data: plan } = useDietPlanQuery();
+  const unitMode = (plan?.unitDisplayMode as 1 | 2 | undefined) || 1;
   const hasCustomItems = customItems.length > 0;
   const hasExtraItems = extraItems.length > 0;
   const shouldShowGeneralItems = !hasCustomItems && !hasExtraItems;
 
   const formatted = useMemo(() => {
     const customFormatted = customItems.map((customItem) =>
-      formatServingText(customItem.name, customItem.oneServing, servingAmount, 1, [], " ", true)
+      formatServingText(
+        customItem.name,
+        customItem.oneServing,
+        servingAmount,
+        1,
+        [],
+        " ",
+        true,
+        unitMode
+      )
     );
 
     if (hasCustomItems && hasExtraItems) {
@@ -48,13 +57,16 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
       return extraItems.join(" | ");
     }
 
-    if (!items) return "";
-
-    return items
-      .slice(START_SLICE_INDEX, END_SLICE_INDEX)
-      .map((item) => formatServingText(item.name, item.oneServing, servingAmount, 1, [], " ", true))
-      .join(" | ");
-  }, [customItems, extraItems, hasCustomItems, hasExtraItems, items, servingAmount]);
+    return `${servingAmount} מנות ${foodGroupToName(foodGroup)} — לבחירתך`;
+  }, [
+    customItems,
+    extraItems,
+    hasCustomItems,
+    hasExtraItems,
+    foodGroup,
+    servingAmount,
+    unitMode,
+  ]);
 
   if (shouldShowGeneralItems && (items == undefined || isLoading))
     return (

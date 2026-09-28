@@ -55,26 +55,7 @@ export default function Login({ onLogin }: ILoginProps) {
     setIsForgotPassword(false);
   };
 
-  useEffect(() => {
-    Keyboard.addListener("keyboardWillShow", () => {
-      translateY.value = withTiming(-500, {
-        duration: 200,
-        easing: Easing.linear,
-      });
-    });
-
-    Keyboard.addListener("keyboardWillHide", () => {
-      translateY.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.linear,
-      });
-    });
-
-    return () => {
-      Keyboard.removeAllListeners("keyboardWillShow");
-      Keyboard.removeAllListeners("keyboardWillHide");
-    };
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <TouchableWithoutFeedback
@@ -96,10 +77,12 @@ export default function Login({ onLogin }: ILoginProps) {
           style={[
             layout.flex1,
             layout.justifyStart,
-            { paddingTop: 48, transform: [{ translateY }] },
+            { paddingTop: 90, transform: [{ translateY }] },
           ]}
         >
-          <Image source={appIcon} style={styles.logo} />
+          <View style={styles.logoWrapper}>
+            <Image source={appIcon} style={styles.logo} />
+          </View>
         </Animated.View>
 
         <KeyboardAvoidingView
@@ -154,4 +137,13 @@ export default function Login({ onLogin }: ILoginProps) {
 
 const styles = StyleSheet.create({
   logo: { height: 64, width: 60 },
+  logoWrapper: {
+    backgroundColor: "#fff",
+    borderRadius: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 10,
+  },
 });

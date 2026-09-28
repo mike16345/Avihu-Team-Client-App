@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import measurementSchema from "../measurementSchema";
-import setSchema, { UpdateSetSchema } from "../setSchema";
+import setSchema from "../setSchema";
 
 describe("setSchema", () => {
   it("accepts a valid set input", () => {
@@ -23,10 +23,22 @@ describe("setSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts update payloads without setNumber", () => {
-    const result = UpdateSetSchema.safeParse({
-      weight: 60,
+  it("accepts bodyweight sets (weight = 0)", () => {
+    const result = setSchema.safeParse({
+      setNumber: 1,
+      weight: 0,
       repsDone: 12,
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts null rir (removal signal)", () => {
+    const result = setSchema.safeParse({
+      setNumber: 1,
+      weight: 60,
+      repsDone: 10,
+      rir: null,
     });
 
     expect(result.success).toBe(true);

@@ -1,6 +1,15 @@
 import { semanticColors } from "@/themes/semanticColors";
 import React from "react";
-import Svg, { Path, Circle, Line, G } from "react-native-svg";
+import Svg, {
+  Path,
+  Circle,
+  Line,
+  G,
+  Defs,
+  LinearGradient as SvgLinearGradient,
+  Stop,
+  RadialGradient,
+} from "react-native-svg";
 
 const GREEN = semanticColors.app.brandStrong;
 
@@ -9,17 +18,40 @@ interface IconProps {
   color?: string;
 }
 
-export const DropIcon: React.FC<IconProps> = ({ size = 22, color = GREEN }) => (
-  <Svg width={size} height={size} viewBox="0 0 24 24">
-    <Path
-      d="M12 3 C12 3, 5 11, 5 15.5 C5 19.6, 8.1 22, 12 22 C15.9 22, 19 19.6, 19 15.5 C19 11, 12 3, 12 3 Z"
-      fill="none"
-      stroke={color}
-      strokeWidth={1.8}
-      strokeLinejoin="round"
-    />
-  </Svg>
-);
+export const DropIcon: React.FC<IconProps> = ({ size = 22, color = GREEN }) => {
+  const gradId = `dropGrad-${color.replace("#", "")}`;
+  const highlightId = `dropHi-${color.replace("#", "")}`;
+  return (
+    <Svg width={size} height={size} viewBox="0 0 32 32">
+      <Defs>
+        <SvgLinearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0" stopColor={color} stopOpacity={0.9} />
+          <Stop offset="1" stopColor={color} stopOpacity={1} />
+        </SvgLinearGradient>
+        <RadialGradient id={highlightId} cx="0.35" cy="0.35" r="0.4">
+          <Stop offset="0" stopColor="#FFFFFF" stopOpacity={0.7} />
+          <Stop offset="1" stopColor="#FFFFFF" stopOpacity={0} />
+        </RadialGradient>
+      </Defs>
+      <Path
+        d="M16 3
+           C16 3, 6.5 13.5, 6.5 20.2
+           C6.5 25.6, 10.75 29.5, 16 29.5
+           C21.25 29.5, 25.5 25.6, 25.5 20.2
+           C25.5 13.5, 16 3, 16 3 Z"
+        fill={`url(#${gradId})`}
+      />
+      <Path
+        d="M16 3
+           C16 3, 6.5 13.5, 6.5 20.2
+           C6.5 25.6, 10.75 29.5, 16 29.5
+           C21.25 29.5, 25.5 25.6, 25.5 20.2
+           C25.5 13.5, 16 3, 16 3 Z"
+        fill={`url(#${highlightId})`}
+      />
+    </Svg>
+  );
+};
 
 export const SproutIcon: React.FC<IconProps> = ({ size = 22, color = GREEN }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24">

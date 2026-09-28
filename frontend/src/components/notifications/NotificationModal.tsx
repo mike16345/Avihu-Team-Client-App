@@ -19,7 +19,7 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
   const { layout, spacing, common } = useStyles();
 
   const notificationMap = useMemo(() => {
-    if (!notifications.length) return;
+    if (!notifications.length) return null;
 
     return notifications.map((notification) => (
       <Notification

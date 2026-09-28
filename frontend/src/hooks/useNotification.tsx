@@ -2,7 +2,12 @@
 import { NotificationBodies, NotificationIdentifiers } from "@/constants/notifications";
 import { getRuntimeTenantDisplayName } from "@/config/runtimeTenant";
 import { useNotificationStore } from "@/store/notificationStore";
-import { getNextEightAM, getNextEightAMOnSunday, toTrigger } from "@/utils/notification";
+import {
+  getNextEightAM,
+  getNextEightAMOnFirstOfMonth,
+  getNextEightAMOnSunday,
+  toTrigger,
+} from "@/utils/notification";
 import { generateUniqueId } from "@/utils/utils";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
@@ -138,6 +143,34 @@ export const useNotification = () => {
     useNotificationStore.getState().addWeeklyFeedbackNotification(data.id);
   };
 
+  const scheduleMonthlyFormReminder = async () => {
+    const nextFirstOfMonth8am = getNextEightAMOnFirstOfMonth();
+
+    const trigger: Notifications.DateTriggerInput = {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: nextFirstOfMonth8am,
+      channelId: DEFAULT_CHANNEL_ID,
+    };
+
+    if (Platform.OS === "android") {
+      await ensureAndroidChannel();
+    }
+
+    const data = { id: generateUniqueId() };
+
+    await Notifications.scheduleNotificationAsync({
+      identifier: NotificationIdentifiers.MONTHLY_FORM_REMINDER_ID,
+      content: {
+        title: NOTIFICATION_TITLE,
+        body: NotificationBodies.MONTHLY_FORM_REMINDER,
+        data,
+      },
+      trigger,
+    });
+
+    useNotificationStore.getState().addMonthlyFormNotification(data.id);
+  };
+
   /** Show a one-off notification now or in N seconds, or at a Date */
   const showNotification = async (
     body: string,
@@ -177,6 +210,7 @@ export const useNotification = () => {
       let alreadyScheduledWeightIn = false;
       let alreadyScheduledMeasurement = false;
       let alreadyScheduledWeeklyFeedback = false;
+      let alreadyScheduledMonthlyForm = false;
 
       for (const n of scheduled) {
         if (n.identifier === NotificationIdentifiers.NEW_DAILY_WEIGH_IN_REMINDER_ID) {
@@ -188,8 +222,16 @@ export const useNotification = () => {
         if (n.identifier === NotificationIdentifiers.WEEKLY_FEEDBACK_REMINDER_ID) {
           alreadyScheduledWeeklyFeedback = true;
         }
+        if (n.identifier === NotificationIdentifiers.MONTHLY_FORM_REMINDER_ID) {
+          alreadyScheduledMonthlyForm = true;
+        }
 
-        if (alreadyScheduledWeightIn && alreadyScheduledMeasurement && alreadyScheduledWeeklyFeedback)
+        if (
+          alreadyScheduledWeightIn &&
+          alreadyScheduledMeasurement &&
+          alreadyScheduledWeeklyFeedback &&
+          alreadyScheduledMonthlyForm
+        )
           break;
       }
 
@@ -203,6 +245,10 @@ export const useNotification = () => {
 
       if (!alreadyScheduledWeightIn) {
         await scheduleDailyWeightInReminder();
+      }
+
+      if (!alreadyScheduledMonthlyForm) {
+        await scheduleMonthlyFormReminder();
       }
     } catch (error) {
       console.log(error);

@@ -35,7 +35,11 @@ import { buildGoalsByDay, formatSteps, getLocalDateKey } from "@/utils/stepsUtil
 import { ISimpleCardioType, IStepsCardioType } from "@/interfaces/Workout";
 import { useCardioMinutesStore } from "@/store/cardioMinutesStore";
 import { useUserStore } from "@/store/userStore";
-import { getPreviousWeekKey, useWeeklySignatureStore } from "@/store/weeklySignatureStore";
+import {
+  getCurrentWeekKey,
+  getWeekKeyForDate,
+  useWeeklySignatureStore,
+} from "@/store/weeklySignatureStore";
 import { useWeeklyFeedbackApi } from "@/hooks/api/useWeeklyFeedbackApi";
 import { selectionHaptic } from "@/utils/haptics";
 import WheelPicker from "@/components/ui/WheelPicker";
@@ -888,6 +892,7 @@ interface WeeklyProgressScreenProps {
   onFinalize?: () => void;
   historicData?: HistoricWeekData | null;
   historicWeekKey?: string;
+  targetWeekKey?: string;
 }
 
 const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
@@ -895,6 +900,7 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
   onFinalize,
   historicData,
   historicWeekKey,
+  targetWeekKey,
 }) => {
   const readOnlyFromProps = !!historicData;
   const { colors, layout, spacing } = useStyles();
@@ -906,13 +912,11 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
   const { session } = useRecordMeal();
   const { steps } = useStepsTracking();
 
-  const sleepHours = useSleepAverageStore((s) => s.hours);
-  const setSleepHours = useSleepAverageStore((s) => s.setHours);
-  const resetSleepIfNewWeek = useSleepAverageStore((s) => s.resetIfNewWeek);
+  const hoursByWeek = useSleepAverageStore((s) => s.hoursByWeek);
+  const setHoursForWeek = useSleepAverageStore((s) => s.setHoursForWeek);
 
-  const feedbackText = useWeeklyFeedbackStore((s) => s.text);
-  const setFeedbackText = useWeeklyFeedbackStore((s) => s.setText);
-  const resetFeedbackIfNewWeek = useWeeklyFeedbackStore((s) => s.resetIfNewWeek);
+  const textByWeek = useWeeklyFeedbackStore((s) => s.textByWeek);
+  const setTextForWeek = useWeeklyFeedbackStore((s) => s.setTextForWeek);
 
   const dayNotes = useNutritionDayNotesStore((s) => s.notes);
   const setDayNote = useNutritionDayNotesStore((s) => s.setNote);
@@ -922,22 +926,50 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
 
 
   const manualWorkoutIds = useProgressManualStore((s) => s.workoutMarks);
-  const toggleWorkoutMark = useProgressManualStore((s) => s.toggleWorkoutMark);
+  const toggleWorkoutMarkForWeek = useProgressManualStore((s) => s.toggleWorkoutMarkForWeek);
   const manualNutritionMarks = useProgressManualStore((s) => s.nutritionMarks);
   const weekKey = useProgressManualStore((s) => s.weekKey);
   const toggleNutritionMarkForDay = useProgressManualStore((s) => s.toggleNutritionMarkForDay);
   const resetIfNewPeriod = useProgressManualStore((s) => s.resetIfNewPeriod);
+  const activeWeekKey = targetWeekKey || weekKey;
+
+  const sleepHours = hoursByWeek[activeWeekKey] ?? null;
+  const setSleepHours = (value: number) => setHoursForWeek(activeWeekKey, value);
+  const feedbackText = textByWeek[activeWeekKey] ?? "";
+  const setFeedbackText = (value: string) => setTextForWeek(activeWeekKey, value);
 
   const [sleepModalOpen, setSleepModalOpen] = useState(false);
   const [cardioModalOpen, setCardioModalOpen] = useState(false);
   const currentUserIdForHistory = useUserStore((s) => s.currentUser?._id);
-  const previousWeekKeyForHistory = getPreviousWeekKey();
+  const todayWeekKey = getCurrentWeekKey();
 
-  const previousWeekFinalizedAt = useWeeklySignatureStore(
-    (s) => s.finalizedWeeks[previousWeekKeyForHistory]
-  );
-  const hasPreviousWeekData = !!previousWeekFinalizedAt;
+  const shiftWeekKey = (key: string, deltaWeeks: number): string => {
+    const [y, m, d] = key.split("-").map(Number);
+    const dt = new Date(y, m - 1, d);
+    dt.setDate(dt.getDate() + deltaWeeks * 7);
+    return getWeekKeyForDate(dt);
+  };
+
+  const finalizedWeeksMap = useWeeklySignatureStore((s) => s.finalizedWeeks);
   const [activeHistoricWeek, setActiveHistoricWeek] = useState<string | null>(null);
+
+  const viewingWeekKey = activeHistoricWeek ?? todayWeekKey;
+  const olderWeekKey = shiftWeekKey(viewingWeekKey, -1);
+  const newerWeekKey = shiftWeekKey(viewingWeekKey, 1);
+  const hasOlderWeekData = !!finalizedWeeksMap[olderWeekKey];
+  const canGoNewer = !!activeHistoricWeek;
+
+  const handleGoOlderWeek = () => {
+    if (!hasOlderWeekData) return;
+    selectionHaptic();
+    setActiveHistoricWeek(olderWeekKey);
+  };
+
+  const handleGoNewerWeek = () => {
+    if (!canGoNewer) return;
+    selectionHaptic();
+    setActiveHistoricWeek(newerWeekKey === todayWeekKey ? null : newerWeekKey);
+  };
   const [activeHistoricData, setActiveHistoricData] = useState<HistoricWeekData | null>(null);
   const [historicLoading, setHistoricLoading] = useState(false);
   const { getWeeklyFeedbackByWeek: fetchHistoricWeek } = useWeeklyFeedbackApi();
@@ -948,10 +980,9 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
       return;
     }
     let cancelled = false;
+    setActiveHistoricData(null);
     setHistoricLoading(true);
-    const [y, m, d] = activeHistoricWeek.split("-").map(Number);
-    const weekStartIso = new Date(y, m - 1, d).toISOString();
-    fetchHistoricWeek(currentUserIdForHistory, weekStartIso)
+    fetchHistoricWeek(currentUserIdForHistory, activeHistoricWeek)
       .then((res) => {
         if (cancelled) return;
         if (!res) {
@@ -969,6 +1000,7 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
         (res.workouts || []).forEach((w, i) => {
           if (w.doneManual || w.doneSmart) {
             workoutMarksMap[`${activeHistoricWeek}::${w.planId || `plan-${i}`}`] = true;
+            workoutMarksMap[`${activeHistoricWeek}::index-${i}`] = true;
           }
         });
         const nutritionMarksMap: Record<string, boolean> = {};
@@ -993,27 +1025,30 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
   }, [activeHistoricWeek, currentUserIdForHistory]);
 
   useEffect(() => {
-    resetSleepIfNewWeek();
     resetIfNewPeriod();
-    resetFeedbackIfNewWeek();
-    resetCardioMinutesIfNewWeek();
-  }, [
-    resetSleepIfNewWeek,
-    resetIfNewPeriod,
-    resetFeedbackIfNewWeek,
-    resetCardioMinutesIfNewWeek,
-  ]);
+  }, [resetIfNewPeriod]);
 
   const mergedHistoricData = activeHistoricData ?? historicData ?? null;
   const mergedHistoricWeekKey = activeHistoricWeek ?? historicWeekKey ?? null;
-  const inHistoric = !!mergedHistoricData;
-  const readOnly = readOnlyFromProps || inHistoric;
-  const effectiveWorkoutMarks = mergedHistoricData?.workoutsDone ?? manualWorkoutIds;
-  const effectiveWorkoutKey = mergedHistoricWeekKey ?? weekKey;
-  const effectiveNutritionMarks = mergedHistoricData?.nutritionMarks ?? manualNutritionMarks;
-  const effectiveDayNotes = mergedHistoricData?.dayNotes ?? dayNotes;
-  const effectiveSleepHours = mergedHistoricData ? mergedHistoricData.sleepHours : sleepHours;
-  const effectiveFeedbackText = mergedHistoricData ? mergedHistoricData.feedbackText : feedbackText;
+  const isViewingHistoric = !!mergedHistoricWeekKey;
+  const inHistoric = isViewingHistoric;
+  const readOnly = readOnlyFromProps || isViewingHistoric;
+  const effectiveWorkoutMarks = isViewingHistoric
+    ? mergedHistoricData?.workoutsDone ?? {}
+    : manualWorkoutIds;
+  const effectiveWorkoutKey = mergedHistoricWeekKey ?? activeWeekKey;
+  const effectiveNutritionMarks = isViewingHistoric
+    ? mergedHistoricData?.nutritionMarks ?? {}
+    : manualNutritionMarks;
+  const effectiveDayNotes = isViewingHistoric
+    ? mergedHistoricData?.dayNotes ?? {}
+    : dayNotes;
+  const effectiveSleepHours = isViewingHistoric
+    ? mergedHistoricData?.sleepHours ?? null
+    : sleepHours;
+  const effectiveFeedbackText = isViewingHistoric
+    ? mergedHistoricData?.feedbackText ?? ""
+    : feedbackText;
 
   const workouts = useMemo<WorkoutEntry[]>(() => {
     const plans = workoutPlan?.workoutPlans ?? [];
@@ -1036,7 +1071,10 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
         !!p._id &&
         required.length > 0 &&
         required.every((mg) => setsByMuscleGroup[mg.muscleGroup]?.has(p._id!));
-      const doneManual = !!effectiveWorkoutMarks[`${effectiveWorkoutKey}::${planId}`];
+      const doneManual =
+        !!effectiveWorkoutMarks[`${effectiveWorkoutKey}::${planId}`] ||
+        (isViewingHistoric &&
+          !!effectiveWorkoutMarks[`${effectiveWorkoutKey}::index-${i}`]);
       return { planId, index: i + 1, doneSmart, doneManual };
     });
   }, [workoutPlan, recordedSets, effectiveWorkoutMarks, effectiveWorkoutKey]);
@@ -1080,10 +1118,13 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
     return workoutPlan?.cardio?.plan as ISimpleCardioType;
   }, [cardioType, workoutPlan?.cardio]);
 
-  const rawCardioMinutes = useCardioMinutesStore((s) => s.minutes);
-  const cardioMinutesDone = mergedHistoricData ? mergedHistoricData.cardioMinutes : rawCardioMinutes;
-  const setCardioMinutes = useCardioMinutesStore((s) => s.setMinutes);
-  const resetCardioMinutesIfNewWeek = useCardioMinutesStore((s) => s.resetIfNewWeek);
+  const minutesByWeek = useCardioMinutesStore((s) => s.minutesByWeek);
+  const setMinutesForWeek = useCardioMinutesStore((s) => s.setMinutesForWeek);
+  const rawCardioMinutes = minutesByWeek[activeWeekKey] ?? null;
+  const cardioMinutesDone = isViewingHistoric
+    ? mergedHistoricData?.cardioMinutes ?? null
+    : rawCardioMinutes;
+  const setCardioMinutes = (value: number) => setMinutesForWeek(activeWeekKey, value);
 
   const stepsWeeklyGoal = useMemo(
     () => buildGoalsByDay(stepsPlan).reduce((sum, g) => sum + (g || 0), 0),
@@ -1117,7 +1158,7 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
   const handleWorkoutToggle = (planId: string) => {
     if (readOnly) return;
     selectionHaptic();
-    toggleWorkoutMark(planId);
+    toggleWorkoutMarkForWeek(planId, activeWeekKey);
   };
 
   const handleNutritionDayToggle = (dayKey: string) => {
@@ -1152,19 +1193,15 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
         {!popupMode && (
           <View style={styles.titleRow}>
             <Pressable
-              onPress={() => {
-                if (!hasPreviousWeekData || inHistoric) return;
-                selectionHaptic();
-                setActiveHistoricWeek(previousWeekKeyForHistory);
-              }}
-              disabled={!hasPreviousWeekData || inHistoric}
+              onPress={handleGoOlderWeek}
+              disabled={!hasOlderWeekData}
               hitSlop={10}
               style={styles.arrowBtn}
               accessibilityLabel="שבוע קודם"
             >
               <Icon
                 name="chevronRightSoft"
-                color={hasPreviousWeekData && !inHistoric ? PRIMARY : "rgba(7,39,35,0.18)"}
+                color={hasOlderWeekData ? PRIMARY : "rgba(7,39,35,0.18)"}
                 width={22}
                 height={22}
               />
@@ -1179,21 +1216,20 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
                 </Text>
               )}
             </View>
-            {inHistoric ? (
-              <Pressable
-                onPress={() => {
-                  selectionHaptic();
-                  setActiveHistoricWeek(null);
-                }}
-                hitSlop={10}
-                style={styles.arrowBtn}
-                accessibilityLabel="שבוע הבא"
-              >
-                <Icon name="chevronLeftSoft" color={PRIMARY} width={22} height={22} />
-              </Pressable>
-            ) : (
-              <View style={styles.arrowBtn} />
-            )}
+            <Pressable
+              onPress={handleGoNewerWeek}
+              disabled={!canGoNewer}
+              hitSlop={10}
+              style={styles.arrowBtn}
+              accessibilityLabel="שבוע הבא"
+            >
+              <Icon
+                name="chevronLeftSoft"
+                color={canGoNewer ? PRIMARY : "rgba(7,39,35,0.18)"}
+                width={22}
+                height={22}
+              />
+            </Pressable>
           </View>
         )}
         <AnimatedShell delay={0}>
@@ -1210,7 +1246,7 @@ const WeeklyProgressScreen: React.FC<WeeklyProgressScreenProps> = ({
               readOnly ? () => {} : (dayKey, dayLabel) => setNoteModal({ dayKey, dayLabel })
             }
             allowAllDays={popupMode && !readOnly}
-            baseWeekKey={mergedHistoricWeekKey ?? undefined}
+            baseWeekKey={mergedHistoricWeekKey ?? targetWeekKey ?? undefined}
           />
         </AnimatedShell>
         <AnimatedShell delay={180}>

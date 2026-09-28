@@ -95,12 +95,8 @@ const styles = StyleSheet.create({
   closeBtn: {
     width: 40,
     height: 40,
-    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: ACCENT_SOFT,
-    borderWidth: 1.5,
-    borderColor: "rgba(11, 42, 34, 0.22)",
   },
   contentWrap: { flex: 1 },
 });

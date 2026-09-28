@@ -19,18 +19,18 @@ const QuestionContainer = ({ question, isLast }: QuestionContainerProps) => {
   const { width } = useWindowDimensions();
 
   return (
-    <View key={question._id} style={[!isLast && styles.borderBottom, spacing.gapMd]}>
+    <View key={question._id} style={spacing.gapMd}>
       <View>
         <View style={[layout.flexRow, layout.itemsStart, spacing.gapSm, { width: width * 0.9 }]}>
           <Text
             fontVariant="semibold"
-            fontSize={16}
+            fontSize={18}
             style={[colors.textPrimary, styles.paddingStart, text.textLeft]}
           >
             {question.question}
           </Text>
           {question.required ? (
-            <Text fontVariant="bold" fontSize={14} style={colors.textDanger}>
+            <Text fontVariant="bold" fontSize={16} style={colors.textDanger}>
               *
             </Text>
           ) : null}
@@ -53,6 +53,8 @@ const QuestionContainer = ({ question, isLast }: QuestionContainerProps) => {
           inValidOptions={invalidOptionsByQuestionId[question._id]}
         />
       </View>
+
+      {!isLast ? <View style={styles.divider} /> : null}
     </View>
   );
 };
@@ -66,10 +68,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   paddingStart: { paddingStart: 24 },
-  borderBottom: {
-    borderBottomWidth: 1,
-    paddingBottom: 20,
-    borderColor: semanticColors.app.formBorder,
+  divider: {
+    height: 0.5,
+    marginTop: 20,
+    marginHorizontal: 24,
+    backgroundColor: semanticColors.app.formBorder,
+    borderRadius: 999,
+    opacity: 0.5,
   },
 });
 

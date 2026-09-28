@@ -37,13 +37,22 @@ const WeighInsGraph = () => {
   return (
     <View style={[spacing.gapLg, layout.flex1]}>
       <Tabs value={selectedTab} onValueChange={(value) => setSelectedTab(value as GraphTab)}>
-        <TabsList>
+        <TabsList backgroundColor="#F1F3F5">
           {tabs.map((tab) => (
             <TabsTrigger key={tab} value={tab} label={tab} />
           ))}
         </TabsList>
       </Tabs>
-      <Card variant="gray" style={{ flex: 1 }}>
+      <Card
+        variant="white"
+        style={{
+          flex: 1,
+          backgroundColor: "#FFFFFF",
+          borderColor: "#86EFAC",
+          borderWidth: 1.5,
+          borderRadius: 18,
+        }}
+      >
         <Card.Header style={[layout.flexRow, layout.itemsCenter, spacing.gapSm]}>
           <Icon name="clock" />
           <Text fontSize={16}>מעקב שקילה</Text>

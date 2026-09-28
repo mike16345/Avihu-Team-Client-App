@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
 import Windows from "./Windows/Windows";
-import PlaceholderWindow from "./Windows/PlaceholderWindow";
+import ProgressPhotosWindow from "./Windows/ProgressPhotosWindow";
 import WeightProgressionWindow from "./Windows/WeightProgressionWindow";
 import MeasurementsWindow from "./Windows/MeasurementsWindow";
 import TopBar from "@/navigators/TopBar";
@@ -10,7 +10,7 @@ import { BottomStackParamList } from "@/types/navigatorTypes";
 import { useEffect, useState } from "react";
 
 const windows = [
-  <PlaceholderWindow key={"placeholder-window"} />,
+  <ProgressPhotosWindow key={"progress-photos-window"} />,
   <WeightProgressionWindow key={"weight-progression-window"} />,
   <MeasurementsWindow key={"measurement-window"} />,
 ];

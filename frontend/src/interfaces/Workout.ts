@@ -55,11 +55,38 @@ export interface IComplexCardioType {
   tips?: string;
 }
 
+export type WorkoutPlanMode = "unified" | "blocks";
+
+export type WorkoutBlockStatus =
+  | "low-intensity"
+  | "moderate-intensity"
+  | "high-intensity"
+  | "peak"
+  | "deload";
+
+export type BlockBackgroundStatus = "normal" | WorkoutBlockStatus;
+
+export interface IBlockBackground {
+  status: BlockBackgroundStatus;
+  url: string;
+}
+
+export interface IWorkoutBlock {
+  id: string;
+  name?: string;
+  status?: WorkoutBlockStatus;
+  workoutPlans: IWorkoutPlan[];
+  tips?: string[];
+}
+
 export interface ICompleteWorkoutPlan {
   userId?: string;
   tips?: string[];
   workoutPlans: IWorkoutPlan[];
   cardio: ICardioPlan;
+  mode?: WorkoutPlanMode;
+  blocks?: IWorkoutBlock[];
+  activeBlockIndex?: number;
 }
 
 export interface ISet {
@@ -98,7 +125,7 @@ export interface IRecordedSet {
   weight: number;
   repsDone: number;
   setNumber: number;
-  rir?: number;
+  rir?: number | null;
 }
 
 export interface IRecordedSetRes extends IRecordedSet {

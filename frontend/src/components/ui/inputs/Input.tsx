@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     textAlign: "right",
     borderRadius: 9,
-    paddingVertical: 8, // ✅ let content define height
+    paddingVertical: 14, // ✅ let content define height
     lineHeight: 20, // ✅ plays nice with fontSize: 16
     textAlignVertical: "center", // ✅ Android vertical centering
     includeFontPadding: false, // ✅ trims extra Android font padding

@@ -6,7 +6,7 @@ import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import { useUserStore } from "@/store/userStore";
 import useStyles from "@/styles/useGlobalStyles";
 import { useCallback, useMemo, useRef } from "react";
-import { Animated, Easing, RefreshControl, ScrollView } from "react-native";
+import { Animated, Easing, RefreshControl, ScrollView, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 const STAGGER_MS = 130;
@@ -53,9 +53,16 @@ const ArticleScreen = () => {
   const articleGroups = useMemo(() => {
     if (!data || data.length === 0)
       return (
-        <Text style={[text.textCenter, layout.widthFull, spacing.pdVertical20]}>
-          אין מאמרים להצגה
-        </Text>
+        <View
+          style={[
+            layout.widthFull,
+            layout.flex1,
+            layout.center,
+            spacing.pdVertical20,
+          ]}
+        >
+          <Text style={text.textCenter}>אין מאמרים להצגה</Text>
+        </View>
       );
 
     return data.map((group, idx) => (
@@ -77,6 +84,7 @@ const ArticleScreen = () => {
         spacing.pdLg,
         spacing.pdStatusBar,
         spacing.pdBottomBar,
+        { flexGrow: 1 },
       ]}
       refreshControl={
         <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />

@@ -10,6 +10,7 @@ export interface UploadDrawerProps {
   loading?: boolean;
   imageCap?: number;
   confirmTitle?: string;
+  hint?: React.ReactNode;
 }
 
 const UploadDrawer: React.FC<UploadDrawerProps> = ({
@@ -18,6 +19,7 @@ const UploadDrawer: React.FC<UploadDrawerProps> = ({
   images,
   loading,
   imageCap,
+  hint,
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -42,6 +44,7 @@ const UploadDrawer: React.FC<UploadDrawerProps> = ({
           imageCap={imageCap}
           handleUpload={onUpload}
           confirmTitle="שמירה"
+          hint={hint}
         />
       </BottomDrawer>
     </>

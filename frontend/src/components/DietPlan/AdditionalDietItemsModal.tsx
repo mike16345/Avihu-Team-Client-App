@@ -6,6 +6,7 @@ import { Text } from "../ui/Text";
 import useFoodGroupQuery from "@/hooks/queries/MenuItems/useFoodGroupQuery";
 import { FoodGroup } from "@/types/foodTypes";
 import { formatServingText } from "@/utils/utils";
+import useDietPlanQuery from "@/hooks/queries/useDietPlanQuery";
 import SecondaryButton from "../ui/buttons/SecondaryButton";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import SpinningIcon from "../ui/loaders/SpinningIcon";
@@ -24,6 +25,8 @@ const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({
 }) => {
   const { colors, layout, common, spacing } = useStyles();
   const { data = [], isLoading } = useFoodGroupQuery(foodGroup);
+  const { data: plan } = useDietPlanQuery();
+  const unitMode = (plan?.unitDisplayMode as 1 | 2 | undefined) || 1;
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -74,7 +77,7 @@ const AdditionalDietItemsModal: FC<AdditionalDietItemsModalProps> = ({
             {data.map((item, i) => {
               return (
                 <Text key={item?._id || i} style={[layout.alignSelfStart]} fontVariant="semibold">
-                  {formatServingText(item.name, item.oneServing, servingSize, 2, [], " | ")}
+                  {formatServingText(item.name, item.oneServing, servingSize, 1, [], " | ", false, unitMode)}
                 </Text>
               );
             })}
