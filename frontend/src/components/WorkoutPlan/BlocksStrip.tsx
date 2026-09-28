@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { Text } from "../ui/Text";
+import Icon from "@/components/Icon/Icon";
 import {
   BlockBackgroundStatus,
   IBlockBackground,
@@ -105,7 +106,12 @@ const BlocksStrip: FC<BlocksStripProps> = ({
                 {renderInner()}
               </ImageBackground>
             ) : (
-              renderInner()
+              <>
+                <View style={styles.watermarkWrap} pointerEvents="none">
+                  <Icon name="dumbbell" width={64} height={64} color="#E2E8F0" />
+                </View>
+                {renderInner()}
+              </>
             )}
           </Pressable>
         );
@@ -177,6 +183,12 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 999,
     backgroundColor: "#FFFFFF",
+  },
+  watermarkWrap: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+    opacity: 0.5,
   },
 });
 
