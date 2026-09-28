@@ -86,9 +86,10 @@ const ExerciseVideo: FC<ExerciseVideoProps> = ({ exercise }) => {
     <View style={[layout.center]}>
       <View>
         <Animated.View
-          style={[styles.setDetails, { opacity: opacityValue, pointerEvents: "none" }]}
+          style={[styles.setDetails, { opacity: opacityValue }]}
+          pointerEvents="box-none"
         >
-          <ExerciseSetDetails sets={sets} exerciseMethod={exerciseMethod} />
+          <ExerciseSetDetails sets={sets} exerciseMethod={exerciseMethod} exerciseName={exercise.exerciseId?.name} />
         </Animated.View>
         <ConditionalRender condition={!isPlaying}>
           <View style={styles.playButton}>
