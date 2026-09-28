@@ -13,10 +13,9 @@ const useTrainerBlockBackgroundsQuery = (trainerId?: string) => {
     ApiResponse<IBlockBackground[]>,
     readonly [string, string | undefined]
   >({
-    queryFn: () => getTrainerBlockBackgrounds(trainerId!),
+    queryFn: () => getTrainerBlockBackgrounds(trainerId ?? ""),
     queryKey: [TRAINER_BLOCK_BACKGROUNDS, trainerId] as const,
     staleTime: ONE_DAY,
-    enabled: !!trainerId,
   });
 };
 
