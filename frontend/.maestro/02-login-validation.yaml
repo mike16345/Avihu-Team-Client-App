@@ -5,6 +5,7 @@ name: Invalid login form remains on the login surface
 - tapOn:
     id: e2e-login-email
 - inputText: not-an-email
+- hideKeyboard
 - tapOn:
     id: e2e-login-submit
 - assertVisible:

@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 import {
   E2E_APP_ID,
@@ -85,5 +87,17 @@ describe("resolveE2EConfig", () => {
         { requireCredentials: true }
       )
     ).toMatchObject({ email: secretEmail, password: secretPassword });
+  });
+});
+
+describe("E2E build command", () => {
+  it("provides tenant identity before EAS evaluates app.config", () => {
+    const packageJson = JSON.parse(
+      readFileSync(resolve(process.cwd(), "package.json"), "utf8")
+    ) as { scripts: Record<string, string> };
+
+    expect(packageJson.scripts["build:android:e2e"]).toMatch(
+      /^APP_TENANT=avihu APP_ENV=preview /
+    );
   });
 });

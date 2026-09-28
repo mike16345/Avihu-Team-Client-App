@@ -1,5 +1,5 @@
 flows: ["0[1-5]-*.yaml"]
-testOutputDir: ../.maestro-artifacts
+testOutputDir: .maestro-artifacts
 executionOrder:
   continueOnFailure: true
   flowsOrder:

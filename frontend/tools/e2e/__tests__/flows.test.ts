@@ -61,7 +61,7 @@ describe("Maestro E2E flow contract", () => {
     const gitignore = readFileSync(resolve(process.cwd(), ".gitignore"), "utf8");
 
     expect(config).toContain('flows: ["0[1-5]-*.yaml"]');
-    expect(config).toContain("testOutputDir: ../.maestro-artifacts");
+    expect(config).toContain("testOutputDir: .maestro-artifacts");
     expect(gitignore).toMatch(/(?:^|\n)\.maestro-artifacts\/(?:\n|$)/);
   });
 });
