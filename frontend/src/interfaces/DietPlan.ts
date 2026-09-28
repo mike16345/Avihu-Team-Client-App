@@ -4,6 +4,7 @@ export interface ICustomItem {
   dietaryType: string[];
   foodGroup: string;
   oneServing: IServingItem;
+  servingOrder?: string[];
 }
 
 export interface ICustomMenuItem {
@@ -61,6 +62,7 @@ export interface IMenuItem {
   dietaryType: string[];
   foodGroup: string;
   oneServing: IServingItem;
+  servingOrder?: string[];
 }
 
 export interface IMenue {

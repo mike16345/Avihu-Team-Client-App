@@ -69,6 +69,7 @@ const AIChatButton: React.FC<{ onPress: () => void }> = ({ onPress }) => {
           />
         </Svg>
         <Animated.Text style={[aiStyles.badge, { opacity: badgeOpacity }]}>AI</Animated.Text>
+        <Animated.Text style={[aiStyles.subLabel, { opacity: badgeOpacity }]}>צ׳אט חכם</Animated.Text>
       </Animated.View>
     </Pressable>
   );
@@ -84,8 +85,16 @@ const aiStyles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     letterSpacing: 1.5,
-    top: "36%",
+    top: "32%",
     marginTop: -2,
+  },
+  subLabel: {
+    position: "absolute",
+    color: AI_GREEN,
+    fontSize: 9,
+    fontWeight: "600",
+    letterSpacing: 0.3,
+    top: "52%",
   },
 });
 

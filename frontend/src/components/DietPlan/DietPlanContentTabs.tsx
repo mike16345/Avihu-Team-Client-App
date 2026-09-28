@@ -6,9 +6,7 @@ import MealsList from "./MealsList";
 import FoodGroupTabs from "./FoodGroupTabs";
 import HighlightsTab from "./HighlightsTab";
 import { TabItem, useTabs } from "@/hooks/useTabs";
-import Supplements from "./Supplements";
 import useDietPlanV1Query from "@/hooks/queries/useDietPlanV1Query";
-import { isHtmlEmpty } from "@/utils/utils";
 
 const tabs: TabItem[] = [
   { label: "דגשים", value: "דגשים", content: <HighlightsTab />, forceMount: true },
@@ -19,7 +17,6 @@ const tabs: TabItem[] = [
     forceMount: true,
   },
   { label: "מידע תזונתי", value: "מידע תזונתי", content: <FoodGroupTabs />, forceMount: true },
-  { label: "תוספים", value: "תוספים", content: <Supplements />, forceMount: true },
 ];
 
 const DietPlanContentTabs = () => {
@@ -27,9 +24,7 @@ const DietPlanContentTabs = () => {
   const { spacing } = useStyles();
   const filteredTabs = useMemo(() => {
     if (!data) return [];
-    const hasSupplements = !isHtmlEmpty(data?.supplements?.join("") || "");
-
-    return hasSupplements ? tabs : tabs.filter((tab) => tab.value !== "תוספים");
+    return tabs;
   }, [data]);
 
   const [selectedTab, setSelectedTab] = useState("הארוחות שלי");

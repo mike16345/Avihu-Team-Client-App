@@ -44,7 +44,7 @@ const FoodGroupTabs = () => {
                 fontVariant="semibold"
                 key={item._id}
               >
-                {formatServingText(item.name, item.oneServing, 1, 1, [], " | ", false, unitMode)}
+                {formatServingText(item.name, item.oneServing, 1, 1, [], " | ", false, unitMode, item.servingOrder)}
               </Text>
             ))}
           </ScrollView>

@@ -90,7 +90,7 @@ const BlocksStrip: FC<BlocksStripProps> = ({
         );
         return (
           <Pressable
-            key={block.id}
+            key={block.id ?? `block-${index}`}
             onPress={() => onSelectBlock(index)}
             style={cardStyle}
           >
@@ -124,29 +124,29 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   card: {
-    minHeight: 320,
+    minHeight: 160,
     borderRadius: 16,
     overflow: "hidden",
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: "#072723",
+    borderColor: "#FFFFFF",
     padding: 12,
     shadowColor: "#0F172A",
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
     elevation: 1,
   },
   cardActive: {
-    borderColor: "#072723",
+    borderColor: "#FFFFFF",
   },
   cardSelected: {
     backgroundColor: "#F8FAFC",
-    borderColor: "#072723",
+    borderColor: "#FFFFFF",
   },
   imageBg: {
     flex: 1,
-    minHeight: 296,
+    minHeight: 136,
     margin: -12,
     padding: 12,
     justifyContent: "flex-start",

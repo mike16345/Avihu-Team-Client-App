@@ -213,7 +213,8 @@ export function formatServingText<K extends keyof IServingItem>(
   ignoreKeys: K[] = [],
   separator = " ",
   reverse: boolean = false,
-  unitDisplayMode?: 1 | 2
+  unitDisplayMode?: 1 | 2,
+  servingOrder?: string[]
 ): string {
   const entries = Object.entries(oneServing).filter(([key, value]) => {
     return (
@@ -221,16 +222,16 @@ export function formatServingText<K extends keyof IServingItem>(
     );
   });
 
-  const gramsEntry = entries.find(([k]) => k === "grams");
-  const nonGrams = entries.filter(([k]) => k !== "grams");
+  const orderedByUser: [string, unknown][] = (servingOrder ?? [])
+    .map((k) => entries.find(([ek]) => ek === k))
+    .filter(Boolean) as [string, unknown][];
+  const baseOrdered = orderedByUser.length > 0 ? orderedByUser : entries;
 
   let ordered: [string, unknown][];
-  if (unitDisplayMode === 2) {
-    ordered = [...nonGrams, ...(gramsEntry ? [gramsEntry] : [])];
-  } else if (unitDisplayMode === 1) {
-    ordered = [...(gramsEntry ? [gramsEntry] : []), ...nonGrams];
+  if (unitDisplayMode === 2 && baseOrdered.length > 1) {
+    ordered = [baseOrdered[1], baseOrdered[0], ...baseOrdered.slice(2)];
   } else {
-    ordered = entries;
+    ordered = baseOrdered;
   }
 
   const units = ordered.slice(0, servingsToShow).map(([unitKey, value]) => {

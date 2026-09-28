@@ -49,13 +49,19 @@ const useInitFormNotifications = () => {
 
       // 3. Daily
       try {
-        const dailyForm = await queryClient.fetchQuery<FormPreset>({
+        const dailyForm = await queryClient.fetchQuery<FormPreset | null>({
           queryKey: [TODAYS_GENERAL_FORM_PRESET_KEY],
-          queryFn: getGeneralFormForToday,
+          queryFn: async () => {
+            try {
+              return await getGeneralFormForToday();
+            } catch (err: any) {
+              if (err?.response?.status === 404 || err?.status === 404) return null;
+              throw err;
+            }
+          },
           staleTime: 1000,
         });
 
-        console.warn("dailyForm", dailyForm);
         if (dailyForm) {
           const occurrenceKey = getOccurrenceKeyForForm(dailyForm);
           if (!occurrenceKey) return;
@@ -64,8 +70,10 @@ const useInitFormNotifications = () => {
             addGeneralFormNotification(dailyForm._id);
           }
         }
-      } catch (error) {
-        console.error("Error fetching daily form:", error);
+      } catch (error: any) {
+        if (error?.response?.status !== 404 && error?.status !== 404) {
+          console.error("Error fetching daily form:", error);
+        }
       }
     };
 

@@ -41,7 +41,8 @@ const FoodItemSelection: FC<FoodItemSelectionProps> = ({
         [],
         " ",
         true,
-        unitMode
+        unitMode,
+        customItem.servingOrder
       )
     );
 
