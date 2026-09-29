@@ -111,8 +111,9 @@ const SearchResultCard: FC<{ article: IArticle; term: string }> = ({ article, te
           borderColor: "#EAECF0",
           padding: 10,
           flexDirection: "row",
+          direction: "rtl",
           alignItems: "center",
-          gap: 12,
+          gap: 10,
           shadowColor: "#0F172A",
           shadowOpacity: 0.04,
           shadowRadius: 3,
@@ -121,7 +122,14 @@ const SearchResultCard: FC<{ article: IArticle; term: string }> = ({ article, te
         },
       ]}
     >
-      <View style={{ flex: 1, gap: 4 }}>
+      <View
+        style={{
+          flex: 1,
+          gap: 4,
+          alignItems: "flex-start",
+          justifyContent: "center",
+        }}
+      >
         <Highlight
           text={article.title}
           term={term}
@@ -131,6 +139,7 @@ const SearchResultCard: FC<{ article: IArticle; term: string }> = ({ article, te
             fontSize: 15,
             color: "#101828",
             lineHeight: 20,
+            textAlign: "right",
           }}
         />
         {article.subtitle ? (
@@ -138,7 +147,7 @@ const SearchResultCard: FC<{ article: IArticle; term: string }> = ({ article, te
             fontSize={12}
             numberOfLines={1}
             ellipsizeMode="tail"
-            style={{ color: "#667085" }}
+            style={{ color: "#667085", textAlign: "right" }}
           >
             {article.subtitle}
           </Text>
