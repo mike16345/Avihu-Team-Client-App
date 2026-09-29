@@ -132,10 +132,6 @@ const ArticleScreen = () => {
         <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
       }
     >
-      <Text fontSize={24} fontVariant="light">
-        מאמרים
-      </Text>
-
       <View
         style={[
           layout.widthFull,
