@@ -13,9 +13,7 @@ const useArticleQuery = (group: string, planType: string) => {
     queryFn: ({ pageParam = { page: 1, limit: LIMIT } }) =>
       getPaginatedPosts({
         ...pageParam,
-        query: planType
-          ? { group, planType: { $in: [planType, "כללי"] } }
-          : { group },
+        query: planType ? { group, planType } : { group },
       }),
     queryKey: [ARTICLE_KEY + group + planType],
     initialPageParam: { page: 1, limit: LIMIT },

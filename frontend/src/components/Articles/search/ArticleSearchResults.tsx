@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react";
+import { FC, useMemo, useState } from "react";
 import { View, Pressable, Image } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { IArticle } from "@/interfaces/IArticle";
@@ -87,76 +87,82 @@ export const ArticleSearchResults: FC<Props> = ({ articles, term }) => {
         </View>
       </View>
 
-      {articles.map((article) => {
-        const uri = resolveImage(article);
-        return (
-          <Pressable
-            key={article._id}
-            onPress={() => navigation.navigate("ViewArticle", { articleId: article._id })}
-            style={({ pressed }) => [
-              {
-                borderRadius: 14,
-                backgroundColor: pressed ? "#F7F9F8" : "#FFFFFF",
-                borderWidth: 1,
-                borderColor: "#EAECF0",
-                padding: 10,
-                flexDirection: "row-reverse",
-                alignItems: "center",
-                gap: 12,
-                shadowColor: "#0F172A",
-                shadowOpacity: 0.04,
-                shadowRadius: 3,
-                shadowOffset: { width: 0, height: 1 },
-                elevation: 1,
-              },
-            ]}
-          >
-            {/* Right side (in RTL row-reverse) — text */}
-            <View style={{ flex: 1, gap: 4 }}>
-              <Highlight
-                text={article.title}
-                term={term}
-                numberOfLines={2}
-                style={{
-                  fontFamily: "assistantSemibold",
-                  fontSize: 15,
-                  color: "#101828",
-                  textAlign: "right",
-                  lineHeight: 20,
-                }}
-              />
-              {article.subtitle ? (
-                <Text
-                  fontSize={12}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={{ color: "#667085", textAlign: "right" }}
-                >
-                  {article.subtitle}
-                </Text>
-              ) : null}
-            </View>
-            {/* Left side — image thumbnail */}
-            <View
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: 10,
-                overflow: "hidden",
-                backgroundColor: "#F2F4F7",
-              }}
-            >
-              <Image
-                source={uri ? { uri } : defaultImage}
-                defaultSource={defaultImage}
-                style={{ width: "100%", height: "100%" }}
-                resizeMode="cover"
-              />
-            </View>
-          </Pressable>
-        );
-      })}
+      {articles.map((article) => (
+        <SearchResultCard key={article._id} article={article} term={term} />
+      ))}
     </View>
+  );
+};
+
+const SearchResultCard: FC<{ article: IArticle; term: string }> = ({ article, term }) => {
+  const navigation = useNavigation<NativeStackNavigationProp<ArticleStackParamsList>>();
+  const initialUri = resolveImage(article);
+  const [failed, setFailed] = useState(false);
+  const showFallback = !initialUri || failed;
+
+  return (
+    <Pressable
+      onPress={() => navigation.navigate("ViewArticle", { articleId: article._id })}
+      style={({ pressed }) => [
+        {
+          borderRadius: 14,
+          backgroundColor: pressed ? "#F7F9F8" : "#FFFFFF",
+          borderWidth: 1,
+          borderColor: "#EAECF0",
+          padding: 10,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 12,
+          shadowColor: "#0F172A",
+          shadowOpacity: 0.04,
+          shadowRadius: 3,
+          shadowOffset: { width: 0, height: 1 },
+          elevation: 1,
+        },
+      ]}
+    >
+      <View style={{ flex: 1, gap: 4 }}>
+        <Highlight
+          text={article.title}
+          term={term}
+          numberOfLines={2}
+          style={{
+            fontFamily: "assistantSemibold",
+            fontSize: 15,
+            color: "#101828",
+            lineHeight: 20,
+          }}
+        />
+        {article.subtitle ? (
+          <Text
+            fontSize={12}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={{ color: "#667085" }}
+          >
+            {article.subtitle}
+          </Text>
+        ) : null}
+      </View>
+      <View
+        style={{
+          width: 72,
+          height: 72,
+          borderRadius: 10,
+          overflow: "hidden",
+          backgroundColor: "#F2F4F7",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Image
+          source={showFallback ? defaultImage : { uri: initialUri }}
+          onError={() => setFailed(true)}
+          style={{ width: "100%", height: "100%" }}
+          resizeMode="cover"
+        />
+      </View>
+    </Pressable>
   );
 };
 

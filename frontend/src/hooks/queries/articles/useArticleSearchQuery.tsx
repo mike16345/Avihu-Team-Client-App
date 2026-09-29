@@ -17,7 +17,7 @@ const useArticleSearchQuery = (search: string, planType: string) => {
         limit: 30,
         query: {
           title: { $regex: term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" },
-          ...(planType ? { planType: { $in: [planType, "כללי"] } } : {}),
+          ...(planType ? { planType } : {}),
         },
       }),
     enabled: term.length > 0,

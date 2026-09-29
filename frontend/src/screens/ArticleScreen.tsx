@@ -148,7 +148,7 @@ const ArticleScreen = () => {
           },
         ]}
       >
-        <Text fontSize={16}>🔍</Text>
+        <Text fontSize={13} style={{ opacity: 0.35 }}>🔍</Text>
         <TextInput
           value={rawSearch}
           onChangeText={setRawSearch}
