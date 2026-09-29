@@ -132,11 +132,7 @@ export const ArticleSearchResults: FC<Props> = ({ articles, term }) => {
   );
 };
 
-export const ArticleSearchEmpty: FC<{ term: string; suggestions?: string[]; onSuggestion?: (s: string) => void }> = ({
-  term,
-  suggestions,
-  onSuggestion,
-}) => {
+export const ArticleSearchEmpty: FC<{ term: string }> = ({ term }) => {
   const { layout, spacing } = useStyles();
   return (
     <View style={[layout.widthFull, layout.center, spacing.gap12, { paddingVertical: 40 }]}>
@@ -145,99 +141,8 @@ export const ArticleSearchEmpty: FC<{ term: string; suggestions?: string[]; onSu
         לא נמצאו מאמרים עבור "{term}"
       </Text>
       <Text fontSize={13} style={{ color: "#667085", textAlign: "center", paddingHorizontal: 20 }}>
-        נסה מילת חיפוש אחרת או בחר אחת מההצעות למטה
+        נסה מילת חיפוש אחרת
       </Text>
-      {suggestions && suggestions.length > 0 && (
-        <View style={[layout.flexRow, spacing.gapXs, { flexWrap: "wrap", justifyContent: "center", marginTop: 8 }]}>
-          {suggestions.map((s) => (
-            <Pressable
-              key={s}
-              onPress={() => onSuggestion?.(s)}
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                borderRadius: 999,
-                backgroundColor: "#F2F4F7",
-                borderWidth: 1,
-                borderColor: "#EAECF0",
-              }}
-            >
-              <Text fontSize={12} fontVariant="semibold" style={{ color: "#344054" }}>
-                {s}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
-    </View>
-  );
-};
-
-export const ArticleSearchSuggestions: FC<{
-  suggestions: string[];
-  onPick: (s: string) => void;
-  recentSearches?: string[];
-  onPickRecent?: (s: string) => void;
-}> = ({ suggestions, onPick, recentSearches, onPickRecent }) => {
-  const { layout, spacing } = useStyles();
-  return (
-    <View style={[layout.widthFull, spacing.gap14]}>
-      {recentSearches && recentSearches.length > 0 && (
-        <View style={spacing.gap12}>
-          <Text fontVariant="semibold" fontSize={13} style={{ color: "#667085" }}>
-            חיפושים אחרונים
-          </Text>
-          <View style={[layout.flexRow, spacing.gapXs, { flexWrap: "wrap" }]}>
-            {recentSearches.map((s) => (
-              <Pressable
-                key={s}
-                onPress={() => onPickRecent?.(s)}
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 999,
-                  backgroundColor: "#F9FAFB",
-                  borderWidth: 1,
-                  borderColor: "#EAECF0",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                <Text fontSize={12} style={{ color: "#667085" }}>🕐</Text>
-                <Text fontSize={12} fontVariant="semibold" style={{ color: "#344054" }}>
-                  {s}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-      )}
-      <View style={spacing.gap12}>
-        <Text fontVariant="semibold" fontSize={13} style={{ color: "#667085" }}>
-          חיפושים פופולריים
-        </Text>
-        <View style={[layout.flexRow, spacing.gapXs, { flexWrap: "wrap" }]}>
-          {suggestions.map((s) => (
-            <Pressable
-              key={s}
-              onPress={() => onPick(s)}
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                borderRadius: 999,
-                backgroundColor: "#ECFDF3",
-                borderWidth: 1,
-                borderColor: "#A6F4C5",
-              }}
-            >
-              <Text fontSize={12} fontVariant="semibold" style={{ color: "#067647" }}>
-                #{s}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      </View>
     </View>
   );
 };

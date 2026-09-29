@@ -3,7 +3,6 @@ import ArticleSkeleton from "@/components/ui/loaders/skeletons/ArticleSkeleton";
 import { Text } from "@/components/ui/Text";
 import useArticleCountQuery from "@/hooks/queries/articles/useArticleCountQuery";
 import useArticleSearchQuery from "@/hooks/queries/articles/useArticleSearchQuery";
-import { useRecentArticleSearches } from "@/hooks/useRecentArticleSearches";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import { useUserStore } from "@/store/userStore";
 import useStyles from "@/styles/useGlobalStyles";
@@ -17,20 +16,16 @@ import {
   ScrollView,
   TextInput,
   View,
-  Keyboard,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import {
   ArticleSearchEmpty,
   ArticleSearchResults,
-  ArticleSearchSuggestions,
 } from "@/components/Articles/search/ArticleSearchResults";
 
 const STAGGER_MS = 130;
 const ITEM_DURATION_MS = 520;
 const DEBOUNCE_MS = 300;
-
-const POPULAR = ["גלידה", "מתכונים", "אנטומיה", "תוספי", "חלבון", "קלוריות"];
 
 const StaggeredItem: React.FC<{ index: number; playKey: number; children: React.ReactNode }> = ({
   index,
@@ -67,7 +62,6 @@ const ArticleScreen = () => {
   const { colors, layout, spacing, text, common } = useStyles();
   const { isRefreshing, refresh } = usePullDownToRefresh();
   const planType = useUserStore((state) => state.currentUser?.planType || "");
-  const { recent, add: rememberSearch } = useRecentArticleSearches();
 
   const [rawSearch, setRawSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -78,13 +72,6 @@ const ArticleScreen = () => {
     return () => clearTimeout(t);
   }, [rawSearch]);
 
-  useEffect(() => {
-    if (debouncedSearch.length >= 2) {
-      const t = setTimeout(() => rememberSearch(debouncedSearch), 1500);
-      return () => clearTimeout(t);
-    }
-  }, [debouncedSearch, rememberSearch]);
-
   const { data, isLoading, refetch } = useArticleCountQuery(planType);
   const { data: searchData, isFetching: isSearching } = useArticleSearchQuery(
     debouncedSearch,
@@ -92,7 +79,6 @@ const ArticleScreen = () => {
   );
 
   const isSearchMode = debouncedSearch.length > 0;
-  const isSearchFocusEmpty = isFocused && rawSearch.trim().length === 0;
 
   const articleGroups = useMemo(() => {
     if (!data || data.length === 0)
@@ -109,12 +95,6 @@ const ArticleScreen = () => {
     ));
   }, [data]);
 
-  const applySuggestion = (term: string) => {
-    setRawSearch(term);
-    setDebouncedSearch(term);
-    Keyboard.dismiss();
-  };
-
   const searchBody = useMemo(() => {
     if (isSearching && !searchData) {
       return (
@@ -128,13 +108,7 @@ const ArticleScreen = () => {
     }
     const results = searchData?.results ?? [];
     if (results.length === 0) {
-      return (
-        <ArticleSearchEmpty
-          term={debouncedSearch}
-          suggestions={POPULAR}
-          onSuggestion={applySuggestion}
-        />
-      );
+      return <ArticleSearchEmpty term={debouncedSearch} />;
     }
     return <ArticleSearchResults articles={results} term={debouncedSearch} />;
   }, [searchData, isSearching, debouncedSearch]);
@@ -218,18 +192,7 @@ const ArticleScreen = () => {
         )}
       </View>
 
-      {isSearchMode
-        ? searchBody
-        : isSearchFocusEmpty
-        ? (
-          <ArticleSearchSuggestions
-            suggestions={POPULAR}
-            onPick={applySuggestion}
-            recentSearches={recent}
-            onPickRecent={applySuggestion}
-          />
-        )
-        : articleGroups}
+      {isSearchMode ? searchBody : articleGroups}
     </ScrollView>
   );
 };
