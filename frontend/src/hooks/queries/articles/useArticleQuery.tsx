@@ -11,7 +11,12 @@ const useArticleQuery = (group: string, planType: string) => {
 
   return useInfiniteQuery({
     queryFn: ({ pageParam = { page: 1, limit: LIMIT } }) =>
-      getPaginatedPosts({ ...pageParam, query: { group, planType } }),
+      getPaginatedPosts({
+        ...pageParam,
+        query: planType
+          ? { group, planType: { $in: [planType, "כללי"] } }
+          : { group },
+      }),
     queryKey: [ARTICLE_KEY + group + planType],
     initialPageParam: { page: 1, limit: LIMIT },
     getNextPageParam: (lastPage: PaginationResult<IArticle>) => {
