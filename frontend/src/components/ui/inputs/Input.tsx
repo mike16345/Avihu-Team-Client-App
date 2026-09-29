@@ -7,10 +7,11 @@ import { Text } from "../Text";
 
 export interface InputProps extends TextInputProps {
   error?: boolean;
+  errorTestID?: string;
   label?: ReactNode;
 }
 
-const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
+const Input: FC<InputProps> = ({ style, error, errorTestID, label, ...props }) => {
   const { colors, common, spacing, layout } = useStyles();
 
   const inputRef = useRef<TextInput>(null);
@@ -18,8 +19,8 @@ const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
   const borderColor = error
     ? colors.borderError
     : inputRef.current?.isFocused()
-    ? colors.borderPrimary
-    : colors.outline;
+      ? colors.borderPrimary
+      : colors.outline;
   const borderwidth = inputRef.current?.isFocused() ? common.borderSm : common.borderXsm;
 
   return (
@@ -62,7 +63,7 @@ const Input: FC<InputProps> = ({ style, error, label, ...props }) => {
           {...props}
         />
         <ConditionalRender condition={error}>
-          <View style={styles.errorIcon}>
+          <View testID={errorTestID} style={styles.errorIcon}>
             <Icon name="info" height={18} width={18} color={colors.textDanger.color} />
           </View>
         </ConditionalRender>

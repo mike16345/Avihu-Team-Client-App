@@ -4,13 +4,22 @@ name: Incorrect credentials show an error
 - runFlow: subflows/reset-to-login.yaml
 - tapOn:
     id: e2e-login-email
-- inputText: ${MAESTRO_REJECTED_EMAIL}
+    waitToSettleTimeoutMs: 500
+- runFlow:
+    file: subflows/fast-input.yaml
+    env:
+      TEXT: ${MAESTRO_REJECTED_EMAIL}
 - tapOn:
     id: e2e-login-password
-- inputText: ${MAESTRO_REJECTED_PASSWORD}
+    waitToSettleTimeoutMs: 500
+- runFlow:
+    file: subflows/fast-input.yaml
+    env:
+      TEXT: ${MAESTRO_REJECTED_PASSWORD}
 - hideKeyboard
 - tapOn:
     id: e2e-login-submit
+    waitToSettleTimeoutMs: 500
 - extendedWaitUntil:
     visible:
       id: e2e-toast-error

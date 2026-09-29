@@ -2,12 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import {
-  E2E_APP_ID,
-  E2E_ARTIFACT_DIR,
-  E2E_FLOW_DIR,
-  resolveE2EConfig,
-} from "../config";
+import { E2E_APP_ID, E2E_ARTIFACT_DIR, E2E_FLOW_DIR, resolveE2EConfig } from "../config";
 
 const baseEnvironment = {
   APP_ENV: "preview",
@@ -96,8 +91,21 @@ describe("E2E build command", () => {
       readFileSync(resolve(process.cwd(), "package.json"), "utf8")
     ) as { scripts: Record<string, string> };
 
-    expect(packageJson.scripts["build:android:e2e"]).toMatch(
-      /^APP_TENANT=avihu APP_ENV=preview /
+    expect(packageJson.scripts["build:android:e2e"]).toMatch(/^APP_TENANT=avihu APP_ENV=preview /);
+  });
+});
+
+describe("local E2E commands", () => {
+  it("loads the client-owned local E2E environment file", () => {
+    const packageJson = JSON.parse(
+      readFileSync(resolve(process.cwd(), "package.json"), "utf8")
+    ) as { scripts: Record<string, string> };
+
+    expect(packageJson.scripts["e2e:preflight"]).toBe(
+      "dotenv -e .env.e2e.local -- tsx tools/e2e/cli.ts --preflight-only"
+    );
+    expect(packageJson.scripts["e2e:android"]).toBe(
+      "dotenv -e .env.e2e.local -- tsx tools/e2e/cli.ts"
     );
   });
 });

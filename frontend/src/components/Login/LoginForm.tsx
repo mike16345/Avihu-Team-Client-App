@@ -79,6 +79,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
     <View style={[spacing.gap20]}>
       <Input
         testID={E2E_TEST_IDS.loginEmail}
+        errorTestID={E2E_TEST_IDS.loginEmailError}
         keyboardType="email-address"
         label="אימייל"
         placeholder="הכנס אימייל"
@@ -100,6 +101,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
 
       <PasswordInput
         testID={E2E_TEST_IDS.loginPassword}
+        errorTestID={E2E_TEST_IDS.loginPasswordError}
         label="סיסמה"
         placeholder="הכנס סיסמה"
         error={formErrors.password}
@@ -114,7 +116,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
         }
       />
 
-      <TouchableOpacity onPress={onForgotPasswordPress}>
+      <TouchableOpacity testID={E2E_TEST_IDS.forgotPasswordOpen} onPress={onForgotPasswordPress}>
         <Text
           fontVariant="semibold"
           fontSize={16}

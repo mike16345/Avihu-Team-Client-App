@@ -9,28 +9,33 @@ name: Core navigation works and logout returns to login
       PASSWORD: ${MAESTRO_E2E_PASSWORD}
 - tapOn:
     id: e2e-tab-workout
+    waitToSettleTimeoutMs: 500
 - extendedWaitUntil:
     visible:
       id: e2e-workout-root
     timeout: 20000
 - tapOn:
     id: e2e-tab-diet
+    waitToSettleTimeoutMs: 500
 - extendedWaitUntil:
     visible:
       id: e2e-diet-root
     timeout: 20000
 - tapOn:
     id: e2e-tab-home
+    waitToSettleTimeoutMs: 500
 - assertVisible:
     id: e2e-home-root
 - tapOn:
     id: e2e-profile-open
+    waitToSettleTimeoutMs: 500
 - extendedWaitUntil:
     visible:
       id: e2e-profile-root
     timeout: 20000
 - tapOn:
     id: e2e-logout
+    waitToSettleTimeoutMs: 500
 - extendedWaitUntil:
     visible:
       id: e2e-login-root

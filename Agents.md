@@ -65,11 +65,19 @@
 
 ## 5. Testing Standards
 
-- No repository-owned `*.test.*` or `*.spec.*` files were found under `frontend/src`.
-- `frontend/package.json` defines no test script, so no automated test runner is currently established as a project standard.
-- An empty `frontend/src/utils/__tests__` directory exists, which is the only visible repository-owned test-location convention.
-- Because no implemented test suite exists yet, agents should not invent a new testing stack as part of routine feature work.
-- If tests are introduced, colocate them with the covered code and follow the existing `__tests__` directory naming convention rather than creating a separate parallel layout.
+- Vitest is the repository unit-test runner. Run the complete suite with `npm run test:unit` from
+  `frontend`, and colocate tests with covered code in `__tests__` directories.
+- Android mobile end-to-end coverage uses Maestro flows under `frontend/.maestro`. Add stable
+  selectors to `frontend/src/constants/e2e.ts`, keep shared setup in `.maestro/subflows`, and extend
+  the repository-owned runner under `frontend/tools/e2e` instead of adding a parallel E2E stack.
+- Run mobile E2E through `npm run e2e:android`; the runner owns preview/test-stage safety checks,
+  credential injection, artifact placement, and secret redaction.
+- Keep committed flows free of credentials and production URLs. Supply dedicated test-account
+  values through environment variables, and keep generated reports and diagnostics under the
+  ignored `frontend/.maestro-artifacts` directory.
+- Unit and contract tests do not replace device execution for Maestro changes. Agents should run
+  fast static verification locally and clearly identify Android emulator execution that remains for
+  the operator when the user asks to run device tests themselves.
 
 ## 6. API & Backend Conventions (if applicable)
 

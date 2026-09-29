@@ -1,0 +1,17 @@
+appId: ${MAESTRO_APP_ID}
+name: Authenticated session survives an app relaunch
+---
+- runFlow: subflows/reset-to-login.yaml
+- runFlow:
+    file: subflows/login.yaml
+    env:
+      EMAIL: ${MAESTRO_E2E_EMAIL}
+      PASSWORD: ${MAESTRO_E2E_PASSWORD}
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: e2e-home-root
+    timeout: 30000
+- assertVisible:
+    id: e2e-profile-open

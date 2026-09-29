@@ -1,7 +1,7 @@
 # Local Android mobile E2E
 
-This suite runs five read-only Maestro flows against the Avihu preview app and the existing `/test`
-API stage. It never selects a database at runtime and it refuses to launch unless the operator
+This suite runs nine Maestro flows against the Avihu preview app and the existing `/test` API
+stage. It never selects a database at runtime and it refuses to launch unless the operator
 explicitly declares `APP_ENV=preview` and a test-stage API URL.
 
 ## One-time setup
@@ -39,27 +39,45 @@ installed before it starts Maestro.
 
 ## Run the suite
 
-Use a dedicated, non-customer test account. Keep the credentials in the shell or a secret manager;
-do not place them in YAML, documentation, screenshots, or committed environment files.
+Use a dedicated, non-customer test account. Copy the committed template to the ignored local E2E
+environment file, then fill in the preview `/test` API URL and test-account credentials. Do not
+place real credentials in YAML, documentation, screenshots, or committed environment files.
 
 ```bash
-export APP_ENV=preview
-export E2E_API_URL="https://your-preview-api.example/test"
-export MAESTRO_E2E_EMAIL="<dedicated-test-account-email>"
-export MAESTRO_E2E_PASSWORD="<dedicated-test-account-password>"
+cp .env.e2e.example .env.e2e.local
+```
 
+The local file must define:
+
+```dotenv
+APP_ENV=preview
+E2E_API_URL=https://your-preview-api.example/test
+MAESTRO_E2E_EMAIL=dedicated-test-account@example.invalid
+MAESTRO_E2E_PASSWORD=replace-with-local-test-password
+```
+
+Both npm commands load `.env.e2e.local` automatically:
+
+```bash
 npm run e2e:preflight
 npm run e2e:android
 ```
 
-The five flows cover fresh launch, client-side login validation, rejected login, successful login,
-and authenticated workout/diet/profile navigation followed by logout. They only read and navigate;
-they do not create, edit, complete, or remove customer data.
+The nine flows cover fresh launch, client-side login validation, rejected login, successful login,
+authenticated workout/diet/profile navigation followed by logout, forgot-password navigation and
+validation, the transition from a successful OTP request to malformed-code validation, and session
+restoration after an app relaunch. The OTP flow sends one email to the dedicated test account but
+does not validate the emailed code or change the password. The remaining flows only authenticate,
+read, and navigate; they do not create, edit, complete, or remove customer data.
 
 The HTML report is written to `.maestro-artifacts/report.html`. Failure diagnostics and screenshots
 are written below `.maestro-artifacts/`; the entire directory is ignored by Git. After Maestro
 exits, the runner automatically replaces the exact test-account email and password in text
 artifacts before it reports success or failure.
+
+The flows cap post-tap UI settling at 500 ms and use Maestro's clipboard-backed `pasteText`
+command for whole-field insertion. Screen transitions still use visible-state assertions, so API
+and navigation waits remain condition-based rather than fixed delays.
 
 ## Common fixes
 
@@ -68,7 +86,8 @@ artifacts before it reports success or failure.
   device, or run `adb kill-server` followed by `adb start-server`.
 - `Expected preview app is not installed`: install the APK with `adb install -r` and verify it with
   `adb shell pm path com.avihuteam.avihuteam`.
-- Environment rejection: confirm `APP_ENV` is exactly `preview` and `E2E_API_URL` ends in `/test`.
+- Environment rejection: confirm `.env.e2e.local` exists, `APP_ENV` is exactly `preview`, and
+  `E2E_API_URL` ends in `/test`.
 - Login failure: verify the dedicated account exists in the current test-stage data and that the
   exported variables are nonblank. The runner redacts their values from console diagnostics and
   generated text artifacts.

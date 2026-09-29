@@ -1,0 +1,4 @@
+appId: ${MAESTRO_APP_ID}
+---
+- evalScript: ${maestro.copiedText = TEXT}
+- pasteText

@@ -12,6 +12,7 @@ import PrimaryButton from "../ui/buttons/PrimaryButton";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { useToast } from "@/hooks/useToast";
 import Animated, { FadeIn } from "react-native-reanimated";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 interface IForgotPassword {
   onConfirmChangePasswordSuccess: () => void;
@@ -115,9 +116,15 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
   }, []);
 
   return (
-    <Animated.View entering={FadeIn.duration(500)} style={[spacing.gapXl]}>
+    <Animated.View
+      testID={E2E_TEST_IDS.forgotPasswordRoot}
+      entering={FadeIn.duration(500)}
+      style={[spacing.gapXl]}
+    >
       <ConditionalRender condition={!showOtpInput}>
         <Input
+          testID={E2E_TEST_IDS.forgotPasswordEmail}
+          errorTestID={E2E_TEST_IDS.forgotPasswordEmailError}
           label="אימייל"
           placeholder="הכנס אימייל"
           keyboardType={"email-address"}
@@ -131,7 +138,12 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
       </ConditionalRender>
 
       <ConditionalRender condition={!showOtpInput}>
-        <PrimaryButton block onPress={handleGetOtp} loading={isLoading}>
+        <PrimaryButton
+          testID={E2E_TEST_IDS.forgotPasswordSubmit}
+          block
+          onPress={handleGetOtp}
+          loading={isLoading}
+        >
           שלח לי קוד אימות
         </PrimaryButton>
       </ConditionalRender>
@@ -140,6 +152,8 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
         <>
           <View style={[spacing.gapXl]}>
             <Input
+              testID={E2E_TEST_IDS.otpInput}
+              errorTestID={E2E_TEST_IDS.otpError}
               label="קוד אימות"
               style={[text.textCenter]}
               placeholder="קוד אימות בעל 6 ספרות"
@@ -158,7 +172,12 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
               </TouchableOpacity>
             </View>
 
-            <PrimaryButton onPress={handleValidateOtp} loading={isLoading} block>
+            <PrimaryButton
+              testID={E2E_TEST_IDS.otpSubmit}
+              onPress={handleValidateOtp}
+              loading={isLoading}
+              block
+            >
               הבא
             </PrimaryButton>
           </View>

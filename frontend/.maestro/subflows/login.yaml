@@ -2,13 +2,22 @@ appId: ${MAESTRO_APP_ID}
 ---
 - tapOn:
     id: e2e-login-email
-- inputText: ${EMAIL}
+    waitToSettleTimeoutMs: 500
+- runFlow:
+    file: fast-input.yaml
+    env:
+      TEXT: ${EMAIL}
 - tapOn:
     id: e2e-login-password
-- inputText: ${PASSWORD}
+    waitToSettleTimeoutMs: 500
+- runFlow:
+    file: fast-input.yaml
+    env:
+      TEXT: ${PASSWORD}
 - hideKeyboard
 - tapOn:
     id: e2e-login-submit
+    waitToSettleTimeoutMs: 500
 - extendedWaitUntil:
     visible:
       id: e2e-home-root

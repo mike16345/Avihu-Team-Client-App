@@ -137,7 +137,7 @@ export default function Login({ onLogin }: ILoginProps) {
                 נזכרתם?
               </Text>
 
-              <TouchableOpacity onPress={handleBackPress}>
+              <TouchableOpacity testID={E2E_TEST_IDS.forgotPasswordBack} onPress={handleBackPress}>
                 <Text
                   fontVariant="semibold"
                   fontSize={16}

@@ -1,11 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
-import {
-  E2E_ARTIFACT_DIR,
-  resolveE2EConfig,
-  type E2EConfig,
-} from "./config";
+import { E2E_ARTIFACT_DIR, resolveE2EConfig, type E2EConfig } from "./config";
 import { redactArtifactSecrets } from "./artifactRedaction";
 import { runProcess, type ProcessRunner } from "./processRunner";
 
@@ -129,9 +125,7 @@ export const runE2EAndroid = async (
     return maestro.exitCode;
   }
 
-  dependencies.writeOutput(
-    `Five Maestro flows passed. Report: ${E2E_ARTIFACT_DIR}/report.html\n`
-  );
+  dependencies.writeOutput(`Maestro flows passed. Report: ${E2E_ARTIFACT_DIR}/report.html\n`);
   return 0;
 };
 
