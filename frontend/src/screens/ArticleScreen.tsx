@@ -1,9 +1,9 @@
 import ArticleGroupDisplay from "@/components/Articles/articleGroup/ArticleGroupDisplay";
-import ArticleCard from "@/components/Articles/ArticleCard";
 import ArticleSkeleton from "@/components/ui/loaders/skeletons/ArticleSkeleton";
 import { Text } from "@/components/ui/Text";
 import useArticleCountQuery from "@/hooks/queries/articles/useArticleCountQuery";
 import useArticleSearchQuery from "@/hooks/queries/articles/useArticleSearchQuery";
+import { useRecentArticleSearches } from "@/hooks/useRecentArticleSearches";
 import usePullDownToRefresh from "@/hooks/usePullDownToRefresh";
 import { useUserStore } from "@/store/userStore";
 import useStyles from "@/styles/useGlobalStyles";
@@ -17,12 +17,20 @@ import {
   ScrollView,
   TextInput,
   View,
+  Keyboard,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import {
+  ArticleSearchEmpty,
+  ArticleSearchResults,
+  ArticleSearchSuggestions,
+} from "@/components/Articles/search/ArticleSearchResults";
 
 const STAGGER_MS = 130;
 const ITEM_DURATION_MS = 520;
 const DEBOUNCE_MS = 300;
+
+const POPULAR = ["גלידה", "מתכונים", "אנטומיה", "תוספי", "חלבון", "קלוריות"];
 
 const StaggeredItem: React.FC<{ index: number; playKey: number; children: React.ReactNode }> = ({
   index,
@@ -59,21 +67,32 @@ const ArticleScreen = () => {
   const { colors, layout, spacing, text, common } = useStyles();
   const { isRefreshing, refresh } = usePullDownToRefresh();
   const planType = useUserStore((state) => state.currentUser?.planType || "");
+  const { recent, add: rememberSearch } = useRecentArticleSearches();
 
   const [rawSearch, setRawSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
+
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(rawSearch.trim()), DEBOUNCE_MS);
     return () => clearTimeout(t);
   }, [rawSearch]);
 
+  useEffect(() => {
+    if (debouncedSearch.length >= 2) {
+      const t = setTimeout(() => rememberSearch(debouncedSearch), 1500);
+      return () => clearTimeout(t);
+    }
+  }, [debouncedSearch, rememberSearch]);
+
   const { data, isLoading, refetch } = useArticleCountQuery(planType);
-  const {
-    data: searchData,
-    isFetching: isSearching,
-  } = useArticleSearchQuery(debouncedSearch, planType);
+  const { data: searchData, isFetching: isSearching } = useArticleSearchQuery(
+    debouncedSearch,
+    planType
+  );
 
   const isSearchMode = debouncedSearch.length > 0;
+  const isSearchFocusEmpty = isFocused && rawSearch.trim().length === 0;
 
   const articleGroups = useMemo(() => {
     if (!data || data.length === 0)
@@ -90,28 +109,35 @@ const ArticleScreen = () => {
     ));
   }, [data]);
 
-  const searchResults = useMemo(() => {
-    const results = searchData?.results ?? [];
-    if (isSearching) {
+  const applySuggestion = (term: string) => {
+    setRawSearch(term);
+    setDebouncedSearch(term);
+    Keyboard.dismiss();
+  };
+
+  const searchBody = useMemo(() => {
+    if (isSearching && !searchData) {
       return (
-        <View style={[layout.widthFull, layout.center, spacing.pdVertical20]}>
-          <ActivityIndicator />
+        <View style={[layout.widthFull, layout.center, { paddingVertical: 40 }]}>
+          <ActivityIndicator size="large" color="#0F5E3B" />
+          <Text fontSize={13} style={{ color: "#667085", marginTop: 12 }}>
+            מחפש "{debouncedSearch}"...
+          </Text>
         </View>
       );
     }
+    const results = searchData?.results ?? [];
     if (results.length === 0) {
       return (
-        <View style={[layout.widthFull, layout.center, spacing.pdVertical20]}>
-          <Text style={text.textCenter}>לא נמצאו מאמרים תואמים</Text>
-        </View>
+        <ArticleSearchEmpty
+          term={debouncedSearch}
+          suggestions={POPULAR}
+          onSuggestion={applySuggestion}
+        />
       );
     }
-    return results.map((article, idx) => (
-      <StaggeredItem key={article._id} index={idx} playKey={results.length}>
-        <ArticleCard article={article} />
-      </StaggeredItem>
-    ));
-  }, [searchData, isSearching]);
+    return <ArticleSearchResults articles={results} term={debouncedSearch} />;
+  }, [searchData, isSearching, debouncedSearch]);
 
   if (isLoading) return <ArticleSkeleton />;
 
@@ -142,9 +168,9 @@ const ArticleScreen = () => {
           common.roundedLg,
           {
             borderWidth: 1,
-            borderColor: colors.outline.borderColor as string,
-            backgroundColor: (colors.backgroundSurface as any)?.backgroundColor ?? "#fff",
-            paddingVertical: 10,
+            borderColor: isFocused ? "#A6F4C5" : "#EAECF0",
+            backgroundColor: "#FFFFFF",
+            paddingVertical: 12,
           },
         ]}
       >
@@ -152,6 +178,8 @@ const ArticleScreen = () => {
         <TextInput
           value={rawSearch}
           onChangeText={setRawSearch}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           placeholder="חיפוש מאמר..."
           placeholderTextColor="#98A2B3"
           returnKeyType="search"
@@ -160,20 +188,48 @@ const ArticleScreen = () => {
             fontFamily: "assistantRegular",
             fontSize: 15,
             textAlign: "right",
-            color: (colors.textPrimary as any)?.color ?? "#101828",
+            color: "#101828",
             padding: 0,
           }}
         />
         {rawSearch.length > 0 && (
-          <Pressable onPress={() => setRawSearch("")} hitSlop={10}>
-            <Text fontSize={18} style={{ color: "#98A2B3" }}>
-              ×
-            </Text>
+          <Pressable
+            onPress={() => {
+              setRawSearch("");
+              setDebouncedSearch("");
+            }}
+            hitSlop={10}
+          >
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: 999,
+                backgroundColor: "#F2F4F7",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text fontSize={12} style={{ color: "#667085" }}>
+                ✕
+              </Text>
+            </View>
           </Pressable>
         )}
       </View>
 
-      {isSearchMode ? searchResults : articleGroups}
+      {isSearchMode
+        ? searchBody
+        : isSearchFocusEmpty
+        ? (
+          <ArticleSearchSuggestions
+            suggestions={POPULAR}
+            onPick={applySuggestion}
+            recentSearches={recent}
+            onPickRecent={applySuggestion}
+          />
+        )
+        : articleGroups}
     </ScrollView>
   );
 };

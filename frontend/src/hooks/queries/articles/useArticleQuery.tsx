@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { ARTICLE_KEY, ONE_DAY } from "@/constants/reactQuery";
+import { ARTICLE_KEY } from "@/constants/reactQuery";
 import { useArticleApi } from "@/hooks/api/useArticleApi";
 import { IArticle } from "@/interfaces/IArticle";
 import { PaginationResult } from "@/interfaces/IPagination";
@@ -17,7 +17,8 @@ const useArticleQuery = (group: string, planType: string) => {
     getNextPageParam: (lastPage: PaginationResult<IArticle>) => {
       return lastPage.hasNextPage ? { page: +lastPage.currentPage + 1, limit: LIMIT } : undefined;
     },
-    staleTime: ONE_DAY,
+    staleTime: 1000 * 60 * 5,
+    refetchOnMount: true,
   });
 };
 
