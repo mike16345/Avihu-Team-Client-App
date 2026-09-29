@@ -1,22 +1,22 @@
 import { FC, useMemo } from "react";
-import { View, Pressable } from "react-native";
+import { View, Pressable, Image } from "react-native";
 import { Text } from "@/components/ui/Text";
 import { IArticle } from "@/interfaces/IArticle";
 import useStyles from "@/styles/useGlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ArticleStackParamsList } from "@/types/navigatorTypes";
-
-const stripHtml = (html?: string) =>
-  (html ?? "")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+import { buildPhotoUrl, extractVideoId, getYouTubeThumbnail } from "@/utils/utils";
+import defaultImage from "@assets/icon.png";
 
 const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-const Highlight: FC<{ text: string; term: string; style?: any }> = ({ text, term, style }) => {
+const Highlight: FC<{ text: string; term: string; style?: any; numberOfLines?: number }> = ({
+  text,
+  term,
+  style,
+  numberOfLines,
+}) => {
   const chunks = useMemo(() => {
     if (!term) return [{ text, hit: false }];
     const re = new RegExp(`(${escapeRegex(term)})`, "gi");
@@ -24,7 +24,7 @@ const Highlight: FC<{ text: string; term: string; style?: any }> = ({ text, term
   }, [text, term]);
 
   return (
-    <Text style={style}>
+    <Text style={style} numberOfLines={numberOfLines} ellipsizeMode="tail">
       {chunks.map((c, i) => (
         <Text
           key={i}
@@ -41,13 +41,13 @@ const Highlight: FC<{ text: string; term: string; style?: any }> = ({ text, term
   );
 };
 
-const excerptAround = (text: string, term: string, size = 90) => {
-  if (!term) return text.slice(0, size * 2);
-  const idx = text.toLowerCase().indexOf(term.toLowerCase());
-  if (idx < 0) return text.slice(0, size * 2);
-  const start = Math.max(0, idx - size);
-  const end = Math.min(text.length, idx + term.length + size);
-  return (start > 0 ? "…" : "") + text.slice(start, end).trim() + (end < text.length ? "…" : "");
+const resolveImage = (article: IArticle): string | undefined => {
+  if (article.imageUrl) return buildPhotoUrl(article.imageUrl);
+  if (article.link) {
+    const videoId = extractVideoId(article.link);
+    if (videoId) return getYouTubeThumbnail(videoId);
+  }
+  return undefined;
 };
 
 interface Props {
@@ -56,7 +56,7 @@ interface Props {
 }
 
 export const ArticleSearchResults: FC<Props> = ({ articles, term }) => {
-  const { colors, spacing, layout, common } = useStyles();
+  const { layout, spacing } = useStyles();
   const navigation = useNavigation<NativeStackNavigationProp<ArticleStackParamsList>>();
 
   return (
@@ -88,42 +88,70 @@ export const ArticleSearchResults: FC<Props> = ({ articles, term }) => {
       </View>
 
       {articles.map((article) => {
-        const plain = stripHtml(article.content);
-        const excerpt = excerptAround(plain, term, 60);
+        const uri = resolveImage(article);
         return (
           <Pressable
             key={article._id}
-            onPress={() =>
-              navigation.navigate("ViewArticle", { articleId: article._id })
-            }
+            onPress={() => navigation.navigate("ViewArticle", { articleId: article._id })}
             style={({ pressed }) => [
               {
                 borderRadius: 14,
                 backgroundColor: pressed ? "#F7F9F8" : "#FFFFFF",
                 borderWidth: 1,
                 borderColor: "#EAECF0",
-                padding: 14,
+                padding: 10,
+                flexDirection: "row-reverse",
+                alignItems: "center",
+                gap: 12,
+                shadowColor: "#0F172A",
+                shadowOpacity: 0.04,
+                shadowRadius: 3,
+                shadowOffset: { width: 0, height: 1 },
+                elevation: 1,
               },
             ]}
           >
-            <View style={[layout.flexRow, layout.justifyBetween, layout.itemsStart, spacing.gapSm]}>
-              <View style={[layout.flex1, spacing.gapXs]}>
-                <Highlight
-                  text={article.title}
-                  term={term}
-                  style={{ fontFamily: "assistantSemibold", fontSize: 16, color: "#101828", textAlign: "right" }}
-                />
-                {article.subtitle && (
-                  <Text fontSize={13} style={{ color: "#667085", textAlign: "right" }}>
-                    {article.subtitle}
-                  </Text>
-                )}
-                <Highlight
-                  text={excerpt}
-                  term={term}
-                  style={{ fontFamily: "assistantRegular", fontSize: 13, color: "#475467", lineHeight: 20, textAlign: "right" }}
-                />
-              </View>
+            {/* Right side (in RTL row-reverse) — text */}
+            <View style={{ flex: 1, gap: 4 }}>
+              <Highlight
+                text={article.title}
+                term={term}
+                numberOfLines={2}
+                style={{
+                  fontFamily: "assistantSemibold",
+                  fontSize: 15,
+                  color: "#101828",
+                  textAlign: "right",
+                  lineHeight: 20,
+                }}
+              />
+              {article.subtitle ? (
+                <Text
+                  fontSize={12}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={{ color: "#667085", textAlign: "right" }}
+                >
+                  {article.subtitle}
+                </Text>
+              ) : null}
+            </View>
+            {/* Left side — image thumbnail */}
+            <View
+              style={{
+                width: 72,
+                height: 72,
+                borderRadius: 10,
+                overflow: "hidden",
+                backgroundColor: "#F2F4F7",
+              }}
+            >
+              <Image
+                source={uri ? { uri } : defaultImage}
+                defaultSource={defaultImage}
+                style={{ width: "100%", height: "100%" }}
+                resizeMode="cover"
+              />
             </View>
           </Pressable>
         );
