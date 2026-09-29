@@ -94,7 +94,7 @@ export const ArticleSearchResults: FC<Props> = ({ articles, term }) => {
           <Pressable
             key={article._id}
             onPress={() =>
-              navigation.navigate("Article", { articleId: article._id, groupId: "" as any })
+              navigation.navigate("ViewArticle", { articleId: article._id })
             }
             style={({ pressed }) => [
               {
