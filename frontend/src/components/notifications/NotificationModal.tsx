@@ -6,6 +6,7 @@ import Notification from "./containers/Notification";
 import { INotification } from "@/store/notificationStore";
 import { ScrollView, View } from "react-native";
 import useStyles from "@/styles/useGlobalStyles";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 interface NotificationModalProps extends CustomModalProps {
   notifications: INotification[];
@@ -32,23 +33,25 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
 
   return (
     <CustomModal onDismiss={onDismiss} {...props}>
-      <CustomModal.Header>התראות</CustomModal.Header>
-      <CustomModal.Content style={{ padding: 0 }}>
-        <ConditionalRender condition={!notifications.length}>
-          <View style={[layout.flex1, layout.center]}>
-            <Text>אין התראות</Text>
-          </View>
-        </ConditionalRender>
+      <View testID={E2E_TEST_IDS.notificationModal} style={[layout.flex1, spacing.gapDefault]}>
+        <CustomModal.Header>התראות</CustomModal.Header>
+        <CustomModal.Content style={{ padding: 0 }}>
+          <ConditionalRender condition={!notifications.length}>
+            <View style={[layout.flex1, layout.center]}>
+              <Text>אין התראות</Text>
+            </View>
+          </ConditionalRender>
 
-        <ConditionalRender condition={!!notifications.length}>
-          <ScrollView
-            style={common.roundedMd}
-            contentContainerStyle={[spacing.gapLg, spacing.pdLg]}
-          >
-            {notificationMap}
-          </ScrollView>
-        </ConditionalRender>
-      </CustomModal.Content>
+          <ConditionalRender condition={!!notifications.length}>
+            <ScrollView
+              style={common.roundedMd}
+              contentContainerStyle={[spacing.gapLg, spacing.pdLg]}
+            >
+              {notificationMap}
+            </ScrollView>
+          </ConditionalRender>
+        </CustomModal.Content>
+      </View>
     </CustomModal>
   );
 };

@@ -1,0 +1,18 @@
+appId: ${MAESTRO_APP_ID}
+name: Articles tab opens its landing page
+---
+- runFlow: subflows/reset-to-login.yaml
+- runFlow:
+    file: subflows/login.yaml
+    env:
+      EMAIL: ${MAESTRO_E2E_EMAIL}
+      PASSWORD: ${MAESTRO_E2E_PASSWORD}
+- tapOn:
+    id: e2e-tab-articles
+    waitToSettleTimeoutMs: 500
+- extendedWaitUntil:
+    visible:
+      id: e2e-articles-root
+    timeout: 20000
+- assertVisible:
+    id: e2e-articles-heading

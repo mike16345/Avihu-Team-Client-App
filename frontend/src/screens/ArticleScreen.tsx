@@ -8,6 +8,7 @@ import useStyles from "@/styles/useGlobalStyles";
 import { useCallback, useMemo, useRef } from "react";
 import { Animated, Easing, RefreshControl, ScrollView } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const STAGGER_MS = 130;
 const ITEM_DURATION_MS = 520;
@@ -69,6 +70,7 @@ const ArticleScreen = () => {
 
   return (
     <ScrollView
+      testID={E2E_TEST_IDS.articlesRoot}
       style={[colors.background, layout.flex1]}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={[
@@ -82,7 +84,7 @@ const ArticleScreen = () => {
         <RefreshControl refreshing={isRefreshing} onRefresh={() => refresh(refetch)} />
       }
     >
-      <Text fontSize={24} fontVariant="light">
+      <Text testID={E2E_TEST_IDS.articlesHeading} fontSize={24} fontVariant="light">
         מאמרים
       </Text>
 

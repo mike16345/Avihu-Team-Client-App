@@ -7,6 +7,7 @@ import { useNotificationStore } from "@/store/notificationStore";
 import { ConditionalRender } from "../ui/ConditionalRender";
 import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const NotificationsWrapper = () => {
   const { getDeliveredNotifications, notifications: allNotifications } = useNotificationStore();
@@ -19,6 +20,7 @@ const NotificationsWrapper = () => {
   return (
     <>
       <TouchableOpacity
+        testID={E2E_TEST_IDS.notificationOpen}
         style={{ position: "relative", paddingVertical: 5 }}
         onPress={() => setOpenNavigationModal(true)}
       >

@@ -41,6 +41,8 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     name: "ChatTab",
     component: HomeScreen,
     options: {
+      tabBarTestID: E2E_TEST_IDS.tabChat,
+      tabBarAccessibilityLabel: "צ׳אט",
       tabBarIcon: ({ color }) => {
         const { setIconLayout } = useIconLayout();
         return (
@@ -119,6 +121,8 @@ const BottomScreenNavigatorTabs: NavigatorTab[] = [
     component: ArticleStack,
     options: {
       tabBarLabel: "",
+      tabBarTestID: E2E_TEST_IDS.tabArticles,
+      tabBarAccessibilityLabel: "מאמרים",
       tabBarIcon: ({ color }) => {
         const { setIconLayout } = useIconLayout();
         return (

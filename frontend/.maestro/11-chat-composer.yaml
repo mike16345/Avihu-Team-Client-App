@@ -1,0 +1,28 @@
+appId: ${MAESTRO_APP_ID}
+name: Chat composer enables without sending a message
+---
+- runFlow: subflows/reset-to-login.yaml
+- runFlow:
+    file: subflows/login.yaml
+    env:
+      EMAIL: ${MAESTRO_E2E_EMAIL}
+      PASSWORD: ${MAESTRO_E2E_PASSWORD}
+- tapOn:
+    id: e2e-tab-chat
+    waitToSettleTimeoutMs: 500
+- extendedWaitUntil:
+    visible:
+      id: e2e-chat-root
+    timeout: 20000
+- assertVisible:
+    id: e2e-chat-input
+- assertVisible:
+    id: e2e-chat-send
+    enabled: false
+- tapOn:
+    id: e2e-chat-input
+    waitToSettleTimeoutMs: 500
+- inputText: maestro-draft
+- assertVisible:
+    id: e2e-chat-send
+    enabled: true

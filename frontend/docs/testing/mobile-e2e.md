@@ -1,6 +1,6 @@
 # Local Android mobile E2E
 
-This suite runs nine Maestro flows against the Avihu preview app and the existing `/test` API
+This suite runs thirteen Maestro flows against the Avihu preview app and the existing `/test` API
 stage. It never selects a database at runtime and it refuses to launch unless the operator
 explicitly declares `APP_ENV=preview` and a test-stage API URL.
 
@@ -63,21 +63,23 @@ npm run e2e:preflight
 npm run e2e:android
 ```
 
-The nine flows cover fresh launch, client-side login validation, rejected login, successful login,
-authenticated workout/diet/profile navigation followed by logout, forgot-password navigation and
-validation, the transition from a successful OTP request to malformed-code validation, and session
-restoration after an app relaunch. The OTP flow sends one email to the dedicated test account but
-does not validate the emailed code or change the password. The remaining flows only authenticate,
-read, and navigate; they do not create, edit, complete, or remove customer data.
+The thirteen flows cover fresh launch, client-side login validation, rejected login, successful
+login, authenticated workout/diet/profile navigation followed by logout, forgot-password
+navigation and validation, the transition from a successful OTP request to malformed-code
+validation, session restoration after an app relaunch, the Home dashboard and notification modal,
+Chat composer enablement without sending, the Articles landing page, and Profile details with back
+navigation. The OTP flow sends one email to the dedicated test account but does not validate the
+emailed code or change the password. The remaining flows only authenticate, read, navigate, and
+prepare an unsent local Chat draft; they do not create, edit, complete, or remove customer data.
 
 The HTML report is written to `.maestro-artifacts/report.html`. Failure diagnostics and screenshots
 are written below `.maestro-artifacts/`; the entire directory is ignored by Git. After Maestro
 exits, the runner automatically replaces the exact test-account email and password in text
 artifacts before it reports success or failure.
 
-The flows cap post-tap UI settling at 500 ms and use Maestro's clipboard-backed `pasteText`
-command for whole-field insertion. Screen transitions still use visible-state assertions, so API
-and navigation waits remain condition-based rather than fixed delays.
+The flows cap post-tap UI settling at 500 ms while retaining Maestro's reliable `inputText`
+command. Screen transitions still use visible-state assertions, so API and navigation waits remain
+condition-based rather than fixed delays.
 
 ## Common fixes
 

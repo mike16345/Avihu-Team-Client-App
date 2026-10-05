@@ -1,17 +1,19 @@
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, TouchableOpacityProps } from "react-native";
 import Icon from "@/components/Icon/Icon";
 import useStyles from "@/styles/useGlobalStyles";
 
 interface SendButtonProps {
   onPress: () => void;
   disabled?: boolean;
+  testID?: TouchableOpacityProps["testID"];
 }
 
-const SendButton: React.FC<SendButtonProps> = ({ onPress, disabled }) => {
+const SendButton: React.FC<SendButtonProps> = ({ onPress, disabled, testID }) => {
   const { colors, common, layout, spacing } = useStyles();
 
   return (
     <TouchableOpacity
+      testID={testID}
       disabled={disabled}
       onPress={onPress}
       style={[

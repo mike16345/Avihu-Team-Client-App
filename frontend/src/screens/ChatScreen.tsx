@@ -15,6 +15,7 @@ import useQuotaPause from "@/hooks/chat/useQuotaPause";
 import useChatController from "@/hooks/chat/useChatController";
 import { KeyboardAvoidingView, KeyboardGestureArea } from "react-native-keyboard-controller";
 import SecondaryButton from "@/components/ui/buttons/SecondaryButton";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const ChatScreen = () => {
   const { colors, layout, spacing, text } = useStyles();
@@ -110,7 +111,7 @@ const ChatScreen = () => {
         behavior="translate-with-padding"
         style={[spacing.pdXl, layout.flex1]}
       >
-        <View style={[layout.flex1, spacing.gapDefault]}>
+        <View testID={E2E_TEST_IDS.chatRoot} style={[layout.flex1, spacing.gapDefault]}>
           <Text
             fontVariant="light"
             fontSize={14}
@@ -140,6 +141,7 @@ const ChatScreen = () => {
 
           <View style={[layout.flexRow, { gap: 24 }]}>
             <ChatInput
+              testID={E2E_TEST_IDS.chatInput}
               style={[
                 colors.backgroundSurface,
                 layout.flex1,
@@ -151,7 +153,11 @@ const ChatScreen = () => {
               editable={!isComposerLocked}
             />
 
-            <SendButton disabled={isSendDisabled} onPress={handleSend} />
+            <SendButton
+              testID={E2E_TEST_IDS.chatSend}
+              disabled={isSendDisabled}
+              onPress={handleSend}
+            />
           </View>
         </View>
       </KeyboardAvoidingView>

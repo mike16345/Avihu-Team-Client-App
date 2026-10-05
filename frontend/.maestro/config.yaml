@@ -1,4 +1,4 @@
-flows: ["0[1-9]-*.yaml"]
+flows: ["[0-9][0-9]-*.yaml"]
 testOutputDir: .maestro-artifacts
 executionOrder:
   continueOnFailure: true
@@ -12,3 +12,7 @@ executionOrder:
     - 07-forgot-password-validation
     - 08-forgot-password-otp-validation
     - 09-session-restoration
+    - 10-home-notifications
+    - 11-chat-composer
+    - 12-articles-navigation
+    - 13-profile-details

@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/useToast";
 import { buildPhotoUrl } from "@/utils/utils";
 import { useNavigation } from "@react-navigation/native";
 import { Text } from "../ui/Text";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const ICON_SIZE = 30;
 const HALF_OF_ICON_SIZE = ICON_SIZE / 2;
@@ -69,6 +70,7 @@ const ProfileHeading = () => {
   return (
     <View style={[layout.center, { position: "relative" }]}>
       <TouchableOpacity
+        testID={E2E_TEST_IDS.profileBack}
         onPress={() => navigation?.navigate("BottomTabs", { screen: "Home" })}
         style={styles.backButton}
       >

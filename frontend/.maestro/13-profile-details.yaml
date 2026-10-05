@@ -1,0 +1,25 @@
+appId: ${MAESTRO_APP_ID}
+name: Profile details display and back returns home
+---
+- runFlow: subflows/reset-to-login.yaml
+- runFlow:
+    file: subflows/login.yaml
+    env:
+      EMAIL: ${MAESTRO_E2E_EMAIL}
+      PASSWORD: ${MAESTRO_E2E_PASSWORD}
+- tapOn:
+    id: e2e-profile-open
+    waitToSettleTimeoutMs: 500
+- extendedWaitUntil:
+    visible:
+      id: e2e-profile-root
+    timeout: 20000
+- assertVisible:
+    id: e2e-profile-details
+- tapOn:
+    id: e2e-profile-back
+    waitToSettleTimeoutMs: 500
+- extendedWaitUntil:
+    visible:
+      id: e2e-home-root
+    timeout: 20000

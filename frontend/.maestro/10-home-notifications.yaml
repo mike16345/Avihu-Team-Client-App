@@ -1,0 +1,21 @@
+appId: ${MAESTRO_APP_ID}
+name: Home dashboard opens and closes notifications
+---
+- runFlow: subflows/reset-to-login.yaml
+- runFlow:
+    file: subflows/login.yaml
+    env:
+      EMAIL: ${MAESTRO_E2E_EMAIL}
+      PASSWORD: ${MAESTRO_E2E_PASSWORD}
+- assertVisible:
+    id: e2e-home-weight-window
+- tapOn:
+    id: e2e-notification-open
+    waitToSettleTimeoutMs: 500
+- assertVisible:
+    id: e2e-notification-modal
+- pressKey: BACK
+- assertNotVisible:
+    id: e2e-notification-modal
+- assertVisible:
+    id: e2e-home-root

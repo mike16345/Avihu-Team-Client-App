@@ -4,6 +4,7 @@ import WeightCardsContainer from "@/components/WeightGraph/WeightCardsContainer"
 import useWeighInsQuery from "@/hooks/queries/WeighIns/useWeighInsQuery";
 import { RefreshControl } from "react-native";
 import CustomScrollView from "@/components/ui/scrollview/CustomScrollView";
+import { E2E_TEST_IDS } from "@/constants/e2e";
 
 const WeightProgressionWindow = () => {
   const { spacing } = useStyles();
@@ -11,6 +12,7 @@ const WeightProgressionWindow = () => {
 
   return (
     <CustomScrollView
+      testID={E2E_TEST_IDS.homeWeightWindow}
       bottomOffset={100}
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={[
