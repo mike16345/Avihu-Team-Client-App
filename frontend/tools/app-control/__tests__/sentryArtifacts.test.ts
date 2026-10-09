@@ -71,3 +71,31 @@ it("sequences preflight, publication, upload, and returns upload failure", async
   expect(await runner(spec)).toBe(1);
   expect(commands).toEqual(["preflight", "publish"]);
 });
+
+it("uploads with selected destination despite a conflicting build-plugin dotenv file", async () => {
+  const { uploadPublishedArtifacts } = await import("../sentryArtifacts");
+  const root = mkdtempSync(join(tmpdir(), "sentry-conflicting-env-"));
+  roots.push(root);
+  const directory = join(root, "artifacts");
+  mkdirSync(directory);
+  writeFileSync(join(directory, "app.hbc"), "bundle");
+  writeFileSync(join(directory, "app.hbc.map"), '{"debug_id":"fixture-id"}');
+  writeFileSync(
+    join(root, ".env.sentry-build-plugin"),
+    "SENTRY_ORG=wrong-org\nSENTRY_PROJECT=wrong-project\n"
+  );
+  recordPublishedArtifacts(selection, directory);
+  const commands: any[] = [];
+  const result = await uploadPublishedArtifacts(selection, directory, async (spec: any) => {
+    commands.push(spec);
+    return 0;
+  });
+  expect(result).toBe(0);
+  expect(commands).toHaveLength(1);
+  expect(commands[0].args).not.toContain("sentry-expo-upload-sourcemaps");
+  expect(commands[0].args).toEqual(
+    expect.arrayContaining(["sourcemaps", "upload", "--debug-id-reference"])
+  );
+  expect(commands[0].env.SENTRY_ORG).toBe("avihuteam");
+  expect(commands[0].env.SENTRY_PROJECT).toBe("avihu-mobile");
+});

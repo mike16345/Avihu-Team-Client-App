@@ -23,6 +23,7 @@ export const initializeErrorReporting = (): void => {
       dsn: tenant.monitoring.sentry.dsn,
       environment: tenant.environment,
       sendDefaultPii: false,
+      integrations: (defaults) => defaults.filter((integration) => integration.name !== "Dedupe"),
       normalizeDepth: 10,
       maxValueLength: 12000,
       tracesSampleRate: 0,

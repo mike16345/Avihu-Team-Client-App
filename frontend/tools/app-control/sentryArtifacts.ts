@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 import { getTenant } from "../../config/tenants/registry";
 import { assertTenantEasActionAllowed, parseTenantEnvironment } from "../../config/tenants/schema";
@@ -33,11 +33,8 @@ export const createArtifactDirectory = (selection: Selection): string =>
 const validateDirectory = (directory: string): string => {
   const path = resolve(directory);
   const root = resolve(".sentry-artifacts");
-  // The installed SDK uploader interpolates paths into a shell command.
-  if (!path.startsWith(root + "/") || !/^[a-zA-Z0-9_./-]+$/.test(path))
-    throw new Error(
-      "Use an invocation directory under .sentry-artifacts in a workspace path without spaces or shell characters"
-    );
+  if (!path.startsWith(root + sep))
+    throw new Error("Use an invocation directory under .sentry-artifacts");
   return path;
 };
 const collectFiles = (directory: string): string[] =>
@@ -128,6 +125,40 @@ export const createSentryUploadRetryCommand = (
   if (!step) throw new Error("Selected tenant has no Sentry destination");
   return step;
 };
+export const uploadPublishedArtifacts = async (
+  selection: Selection,
+  directory: string,
+  runner: (spec: CommandSpec) => Promise<number> = runCommand
+): Promise<number> => {
+  validatePublishedArtifacts(selection, directory);
+  const config = destination(selection)!;
+  const bundles = collectFiles(directory).filter((path) => /\.(js|hbc)$/.test(path));
+  for (const bundle of bundles) {
+    const code = await runner({
+      command: "npx",
+      args: [
+        "--no-install",
+        "sentry-cli",
+        "sourcemaps",
+        "upload",
+        ...(bundle.endsWith(".hbc") ? ["--debug-id-reference"] : []),
+        bundle,
+        bundle + ".map",
+      ],
+      env: {
+        APP_TENANT: selection.tenantId,
+        APP_ENV: selection.environment,
+        SENTRY_ORG: config.organization,
+        SENTRY_PROJECT: config.project,
+        SENTRY_URL: "https://sentry.io/",
+        SENTRY_LOAD_DOTENV: "0",
+      },
+      label: "Upload matching Sentry bundle and source map",
+    });
+    if (code !== 0) return code;
+  }
+  return 0;
+};
 const main = async (): Promise<number> => {
   const tenantId = process.env.APP_TENANT;
   if (!tenantId) throw new Error("APP_TENANT is required");
@@ -160,19 +191,7 @@ const main = async (): Promise<number> => {
   }
   if (mode !== "upload") throw new Error("Unknown artifact action");
   validatePublishedArtifacts(selection, directory);
-  const code = await runCommand({
-    command: "npx",
-    args: ["--no-install", "sentry-expo-upload-sourcemaps", directory],
-    env: {
-      APP_TENANT: tenantId,
-      APP_ENV: selection.environment,
-      SENTRY_ORG: config.organization,
-      SENTRY_PROJECT: config.project,
-      SENTRY_URL: "https://sentry.io/",
-      EXPO_NO_DOTENV: "1",
-    },
-    label: "Upload matching Sentry bundles and source maps",
-  });
+  const code = await uploadPublishedArtifacts(selection, directory);
   if (code !== 0)
     console.error(
       renderStatusLine(

@@ -67,9 +67,8 @@ Retry **only** that upload, without another publication:
 npm run app -- sentry-upload --tenant avihu --environment preview --artifacts .sentry-artifacts/avihu/preview/<invocation-id> --yes
 ```
 
-Retry rejects modified artifacts and mismatched selections. The installed SDK uploader
-interpolates paths into a shell command, so this workflow requires a workspace path
-without spaces or shell characters. Dry-run prints the steps without publishing.
+Retry rejects modified artifacts and mismatched selections. Upload uses the installed Sentry CLI directly, with the validated tenant destination;
+build-plugin dotenv files cannot override it. Dry-run prints the steps without publishing.
 
 To verify without publishing, build a new development binary:
 

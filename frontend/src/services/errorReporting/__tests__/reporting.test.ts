@@ -100,3 +100,41 @@ describe("reporting boundary", () => {
     expect(reportError(new Error("x"), { operation: "storage.read" })).toBeUndefined();
   });
 });
+
+it("redacts serialized credentials, Basic authorization and cookie text", () => {
+  const value =
+    '{"password":"JSON_PASSWORD_FIXTURE","refresh_token":"JSON_TOKEN_FIXTURE"} Authorization: Basic dXNlcjpTRUNSRVQ= Cookie: session=COOKIE_FIXTURE; preference=dark';
+  const clean = JSON.stringify(sanitizeSentryEvent({ exception: { values: [{ value }] } }));
+  const breadcrumb = JSON.stringify(sanitizeSentryBreadcrumb({ message: value }));
+  for (const serialized of [clean, breadcrumb]) {
+    for (const marker of [
+      "JSON_PASSWORD_FIXTURE",
+      "JSON_TOKEN_FIXTURE",
+      "dXNlcjpTRUNSRVQ=",
+      "COOKIE_FIXTURE",
+    ])
+      expect(serialized).not.toContain(marker);
+  }
+});
+it("preserves SDK envelope and typed arrays when diagnostics are large", () => {
+  const frames = Array.from({ length: 150 }, (_, i) => ({ filename: "app.ts", lineno: i }));
+  const event = {
+    exception: { values: [{ type: "Error", value: "failed", stacktrace: { frames } }] },
+    contexts: { diagnostics: { answers: Array.from({ length: 100 }, () => "א".repeat(12000)) } },
+    tags: { tenant: "avihu", operation: "form.submit" },
+    event_id: "test-id",
+    release: "2.4.1",
+    dist: "1",
+    debug_meta: {
+      images: [{ type: "sourcemap" as const, debug_id: "debug-id", code_file: "app.hbc" }],
+    },
+  };
+  const clean = sanitizeSentryEvent(event);
+  expect(clean.event_id).toBe("test-id");
+  expect(clean.release).toBe("2.4.1");
+  expect(clean.tags).toEqual(event.tags);
+  expect(clean.debug_meta).toEqual(event.debug_meta);
+  expect(clean.exception.values[0].stacktrace.frames).toEqual(frames);
+  expect(Buffer.byteLength(JSON.stringify(clean.contexts.diagnostics))).toBeLessThanOrEqual(65536);
+  expect(JSON.stringify(clean.contexts.diagnostics)).toContain("truncated");
+});

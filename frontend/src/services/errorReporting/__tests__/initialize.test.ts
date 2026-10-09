@@ -57,3 +57,31 @@ it("does not initialize when the tenant has no destination", async () => {
   initializeErrorReporting();
   expect(sdk.init).not.toHaveBeenCalled();
 });
+
+it("keeps separate attempts through the installed SDK integration pipeline", async () => {
+  const { dedupeIntegration } = await import("@sentry/core");
+  const { initializeErrorReporting } = await import("../initialize");
+  initializeErrorReporting();
+  const options = sdk.init.mock.calls[0][0];
+  const dedupe = dedupeIntegration();
+  const integrations = options.integrations ? options.integrations([dedupe]) : [dedupe];
+  const processEvent = (id: string) =>
+    integrations.reduce(
+      (event: any, integration: any) =>
+        event && integration.processEvent ? integration.processEvent(event, {}, {}) : event,
+      {
+        event_id: id,
+        exception: {
+          values: [
+            {
+              type: "Error",
+              value: "retry failed",
+              stacktrace: { frames: [{ filename: "app.ts", lineno: 1 }] },
+            },
+          ],
+        },
+      }
+    );
+  expect(processEvent("attempt1")).not.toBeNull();
+  expect(processEvent("attempt2")).not.toBeNull();
+});
