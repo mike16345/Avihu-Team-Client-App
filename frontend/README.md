@@ -70,3 +70,21 @@ npm run app -- sentry-upload --tenant avihu --environment preview --artifacts .s
 Retry rejects modified artifacts and mismatched selections. The installed SDK uploader
 interpolates paths into a shell command, so this workflow requires a workspace path
 without spaces or shell characters. Dry-run prints the steps without publishing.
+
+To verify without publishing, build a new development binary:
+
+```sh
+npm run app -- run ios --tenant avihu --environment development --yes
+```
+
+Open the existing developer tools panel and tap **Send test error**. This sends a real
+synthetic Error through the shared reporter and flushes for up to five seconds. A flush
+success is not proof of ingestion: confirm **Avihu Sentry verification error** in Sentry,
+including operation `developerTools.verifyReporting`, tenant/environment/update tags,
+Hebrew answer context, no fake credential markers, and readable application frames.
+Developer tools retain their existing development-only gate. Validate automatic capture
+with a temporary uncaught throw in a disposable verification build, then remove it.
+
+Production readiness also requires an authorized new 2.4.1 binary, matching uploaded
+JS/native artifacts and a release-frame check. OTA upload validation requires an authorized
+publication. These are separate from passing unit tests.

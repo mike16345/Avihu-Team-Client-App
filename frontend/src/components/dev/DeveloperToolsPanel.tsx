@@ -74,6 +74,7 @@ const DeveloperToolsPanel = () => {
     runningAction,
     requestNotificationPermission,
     sendTestNotification,
+    sendTestError,
     openNotificationSettings,
     clearServerCache,
     reloadApp,
@@ -233,6 +234,13 @@ const DeveloperToolsPanel = () => {
               loading={isActionRunning(runningAction, "cache")}
               onPress={confirmCacheClear}
               title="Clear server cache"
+            />
+            <DeveloperToolActionRow
+              detail="Send a synthetic error and verify it in Sentry"
+              disabled={actionsDisabled}
+              loading={isActionRunning(runningAction, "error-reporting")}
+              onPress={() => void runAction(sendTestError)}
+              title="Send test error"
             />
             <DeveloperToolActionRow
               detail="Restart the JavaScript application"

@@ -1,7 +1,13 @@
 import { reportError } from "@/services/errorReporting/reportError";
 export type DeveloperNotificationPermission = "granted" | "denied" | "undetermined";
 
-export type DeveloperActionName = "permission" | "notification" | "settings" | "cache" | "reload";
+export type DeveloperActionName =
+  | "permission"
+  | "notification"
+  | "settings"
+  | "cache"
+  | "reload"
+  | "error-reporting";
 
 export interface DeveloperActionResult {
   ok: boolean;
@@ -20,10 +26,12 @@ export interface DeveloperActionDependencies {
   clearMemoryQueryCache(): void;
   clearPersistedQueryCache(): Promise<void>;
   reloadApp(): Promise<void>;
+  flushReports?(): Promise<boolean>;
   reportFailure(action: DeveloperActionName): void;
 }
 
 export interface DeveloperActions {
+  sendTestError(): Promise<DeveloperActionResult>;
   refreshNotificationPermission(): Promise<DeveloperPermissionResult>;
   requestNotificationPermission(): Promise<DeveloperPermissionResult>;
   sendTestNotification(title: string): Promise<DeveloperActionResult>;
@@ -43,6 +51,33 @@ export const createDeveloperActions = (
   };
 
   return {
+    sendTestError: async () => {
+      const eventId = reportError(new Error("Avihu Sentry verification error"), {
+        operation: "developerTools.verifyReporting",
+        tags: { verification: "synthetic" },
+        diagnostics: {
+          answers: { example: "תשובה לדוגמה", password: "FAKE_CREDENTIAL_MARKER" },
+          authorization: "Bearer FAKE_CREDENTIAL_MARKER",
+          uploadUrl: "https://example.com/photo?X-Amz-Signature=FAKE_CREDENTIAL_MARKER",
+        },
+      });
+      if (!eventId) return { ok: false, message: "Error reporting is unavailable for this build." };
+      try {
+        const flushed = await dependencies.flushReports?.();
+        if (!flushed)
+          return {
+            ok: false,
+            message: "Error queued, but sending did not finish. Check connectivity and Sentry.",
+          };
+        return {
+          ok: true,
+          message: "Verification error queued. Check Sentry to confirm ingestion.",
+        };
+      } catch (error) {
+        reportError(error, { operation: "developerTools.flushReports" });
+        return { ok: false, message: "Sending did not finish. Check connectivity and Sentry." };
+      }
+    },
     refreshNotificationPermission: async () => {
       try {
         const permission = await dependencies.getNotificationPermission();

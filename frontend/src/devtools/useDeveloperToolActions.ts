@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
@@ -31,6 +32,7 @@ const normalizePermission = (
 };
 
 export interface DeveloperToolActionState {
+  sendTestError(): Promise<DeveloperActionResult>;
   permission: DeveloperNotificationPermission;
   runningAction: DeveloperActionName | null;
   refreshNotificationPermission(): Promise<DeveloperPermissionResult>;
@@ -72,6 +74,7 @@ export const useDeveloperToolActions = (open: boolean): DeveloperToolActionState
           await persister.removeClient();
         },
         reloadApp: () => Updates.reloadAsync(),
+        flushReports: async () => (await Sentry.getClient()?.flush(5000)) ?? false,
         reportFailure: (action) => {
           console.error(`[developer-tools] ${action} failed`);
         },
@@ -144,6 +147,11 @@ export const useDeveloperToolActions = (open: boolean): DeveloperToolActionState
     [actions, execute]
   );
 
+  const sendTestError = useCallback(
+    () => execute("error-reporting", actions.sendTestError, ACTION_BUSY_RESULT),
+    [actions, execute]
+  );
+
   const reloadApp = useCallback(
     () => execute("reload", actions.reloadApp, ACTION_BUSY_RESULT),
     [actions, execute]
@@ -163,6 +171,7 @@ export const useDeveloperToolActions = (open: boolean): DeveloperToolActionState
   }, [open, refreshNotificationPermission]);
 
   return {
+    sendTestError,
     permission,
     runningAction,
     refreshNotificationPermission,

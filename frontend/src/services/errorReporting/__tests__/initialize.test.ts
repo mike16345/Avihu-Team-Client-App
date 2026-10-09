@@ -33,11 +33,15 @@ beforeEach(() => {
   });
 });
 it("initializes once with release context and event sanitizers", async () => {
+  constants.expoConfig.extra.API_TOKEN = "STARTUP_KEY_FIXTURE";
   const { initializeErrorReporting } = await import("../initialize");
   initializeErrorReporting();
   initializeErrorReporting();
   expect(sdk.init).toHaveBeenCalledTimes(1);
   const options = sdk.init.mock.calls[0][0];
+  expect(
+    options.beforeSend({ message: "request failed STARTUP_KEY_FIXTURE" }).message
+  ).not.toContain("STARTUP_KEY_FIXTURE");
   expect(options.environment).toBe("preview");
   expect(options.dsn).toContain("ingest.de.sentry.io");
   expect(options.tracesSampleRate).toBe(0);

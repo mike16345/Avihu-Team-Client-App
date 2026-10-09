@@ -3,8 +3,9 @@ import Constants from "expo-constants";
 import * as Updates from "expo-updates";
 import { Platform } from "react-native";
 import { getRuntimeTenant } from "@/config/runtimeTenant";
+import { getApiKey } from "@/services/apiKey";
 import { setErrorReporter } from "./reportError";
-import { sanitizeSentryBreadcrumb, sanitizeSentryEvent } from "./sanitize";
+import { sanitizeSentryBreadcrumb, sanitizeSentryEvent, setReportingSecrets } from "./sanitize";
 
 let initialized = false;
 
@@ -13,6 +14,11 @@ export const initializeErrorReporting = (): void => {
   try {
     const tenant = getRuntimeTenant(Constants);
     if (!tenant.monitoring) return;
+    try {
+      setReportingSecrets([getApiKey()]);
+    } catch {
+      /* Missing config is reported by the API consumer. */
+    }
     Sentry.init({
       dsn: tenant.monitoring.sentry.dsn,
       environment: tenant.environment,
