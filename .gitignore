@@ -63,3 +63,4 @@ docs/superpowers/
 
 # Invocation-owned Sentry update artifacts
 frontend/.sentry-artifacts/
+.maestro-artifacts/
