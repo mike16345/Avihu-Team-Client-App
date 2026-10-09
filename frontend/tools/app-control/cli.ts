@@ -13,6 +13,14 @@ const selectionFromConfirmedArguments = (arguments_: ParsedAppArguments): AppSel
   }
 
   switch (arguments_.action) {
+    case "sentry-upload":
+      if (!arguments_.artifactDirectory) throw new Error("--artifacts is required");
+      return {
+        action: "sentry-upload",
+        tenantId: arguments_.tenantId,
+        environment: arguments_.environment,
+        artifactDirectory: arguments_.artifactDirectory,
+      };
     case "start":
       return {
         action: "start",

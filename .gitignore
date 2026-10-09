@@ -60,3 +60,6 @@ credentials.json
 docs/superpowers/
 .superpowers/
 .worktrees/
+
+# Invocation-owned Sentry update artifacts
+frontend/.sentry-artifacts/

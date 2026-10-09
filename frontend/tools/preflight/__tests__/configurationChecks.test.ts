@@ -187,6 +187,7 @@ describe("tenant and environment checks", () => {
 
   it("rejects missing production EAS values even when local Expo values exist", async () => {
     const context = await createContext({
+      SENTRY_AUTH_TOKEN: "local-upload-fixture",
       EXPO_PUBLIC_API_AUTH_TOKEN: "local-client-key",
       EXPO_PUBLIC_SERVER: "https://local.example.com",
     });
@@ -198,7 +199,7 @@ describe("tenant and environment checks", () => {
         specifications.push({ args: spec.args, env: spec.env });
         return {
           exitCode: 1,
-          stdout: 'REMOTE_ENV_MISSING:["API_KEY","API_URL"]',
+          stdout: 'REMOTE_ENV_MISSING:["API_KEY","API_URL","SENTRY_AUTH_TOKEN"]',
           stderr: "",
         };
       },
@@ -207,10 +208,12 @@ describe("tenant and environment checks", () => {
     expect(result).toMatchObject({
       status: "fail",
       check: "eas.environment",
-      details: ["Missing: API_KEY", "Missing: API_URL"],
+      details: ["Missing: API_KEY", "Missing: API_URL", "Missing: SENTRY_AUTH_TOKEN"],
     });
     expect(specifications[0].args).toContain("env:exec");
     expect(specifications[0].args).toContain("production");
+    expect(specifications[0].env.SENTRY_AUTH_TOKEN).toBe("");
+    expect(JSON.stringify(result)).not.toContain("local-upload-fixture");
     expect(specifications[0].env.API_KEY).toBe("");
     expect(specifications[0].env.API_URL).toBe("");
   });

@@ -13,6 +13,9 @@ const baseSelectionSchema = z.object({
 });
 
 const appSelectionSchema = z.discriminatedUnion("action", [
+  baseSelectionSchema
+    .extend({ action: z.literal("sentry-upload"), artifactDirectory: z.string().min(1) })
+    .strict(),
   baseSelectionSchema.extend({ action: z.literal("start") }).strict(),
   baseSelectionSchema
     .extend({

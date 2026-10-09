@@ -145,6 +145,7 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
     args: argv,
     allowPositionals: true,
     options: {
+      artifacts: { type: "string" },
       tenant: { type: "string" },
       environment: { type: "string" },
       profile: { type: "string" },
@@ -170,6 +171,7 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
       throw new Error('The "previous" action always requires confirmation; remove --yes');
     }
     if (
+      values.artifacts ||
       values.tenant ||
       values.environment ||
       values.profile ||
@@ -243,7 +245,11 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
     throw new Error("--message is only supported for update actions");
   }
 
-  if (action === "update" && environment === "development") {
+  if (values.artifacts && action !== "sentry-upload")
+    throw new Error("--artifacts is only supported for sentry-upload");
+  if (action === "sentry-upload" && !values.artifacts)
+    throw new Error("--artifacts is required for sentry-upload");
+  if ((action === "update" || action === "sentry-upload") && environment === "development") {
     throw new Error("Updates require the preview or production environment");
   }
 
@@ -260,6 +266,7 @@ export const parseAppArguments = (argv: string[]): ParsedAppArguments => {
     profile,
     preflightMode,
     assetOperation,
+    artifactDirectory: values.artifacts,
     binaryPath: values.binary,
     device: values.device,
     updateMessage: values.message?.trim(),

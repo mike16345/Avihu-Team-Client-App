@@ -43,6 +43,8 @@ const formatAction = (selection: AppSelection): string => {
       return `build, install & launch (${selection.environment === "development" ? "Debug" : "Release"})`;
     case "start":
       return "start development server";
+    case "sentry-upload":
+      return "retry Sentry artifact upload";
     case "update":
       return "publish update";
   }
@@ -92,6 +94,8 @@ const formatEquivalentCommand = (selection: AppSelection): string => {
     parts.push("--message", JSON.stringify(selection.updateMessage));
   }
 
+  if (selection.action === "sentry-upload")
+    parts.push("--artifacts", JSON.stringify(selection.artifactDirectory));
   parts.push("--yes");
   return parts.join(" ");
 };
@@ -380,6 +384,10 @@ export const promptForSelection = async (
       }
       const environment = environmentResult;
 
+      if (action === "sentry-upload") {
+        if (!parsed.artifactDirectory) throw new Error("--artifacts is required for sentry-upload");
+        return { action, tenantId, environment, artifactDirectory: parsed.artifactDirectory };
+      }
       if (action === "start") {
         return { action, tenantId, environment };
       }

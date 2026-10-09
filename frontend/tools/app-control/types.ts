@@ -9,6 +9,7 @@ export const APP_ACTIONS = [
   "build",
   "submit",
   "update",
+  "sentry-upload",
 ] as const;
 export const APP_PLATFORMS = ["android", "ios"] as const;
 export const PREFLIGHT_MODES = ["fast", "release"] as const;
@@ -21,6 +22,7 @@ export type AssetOperation = (typeof ASSET_OPERATIONS)[number];
 export type ReleaseProfile = TenantEnvironment;
 
 export interface CommandStep {
+  cwd?: string;
   command: string;
   args: string[];
   env: Record<string, string>;
@@ -29,6 +31,7 @@ export interface CommandStep {
 
 export interface CommandSpec extends CommandStep {
   prerequisite?: CommandStep;
+  successor?: CommandStep;
 }
 
 export interface ParsedAppArguments {
@@ -40,6 +43,7 @@ export interface ParsedAppArguments {
   profile?: ReleaseProfile;
   preflightMode?: PreflightMode;
   assetOperation?: AssetOperation;
+  artifactDirectory?: string;
   binaryPath?: string;
   device?: string;
   updateMessage?: string;
@@ -53,6 +57,7 @@ interface BaseSelection {
 }
 
 export type AppSelection =
+  | (BaseSelection & { action: "sentry-upload"; artifactDirectory: string })
   | (BaseSelection & { action: "start" })
   | (BaseSelection & { action: "run"; platform: AppPlatform; device?: string })
   | (BaseSelection & {

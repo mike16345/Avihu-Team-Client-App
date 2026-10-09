@@ -310,7 +310,7 @@ describe("resolveAction", () => {
       })
     ).toMatchObject({
       command: "npx",
-      args: expect.arrayContaining(["eas-cli@22.4.0", "update"]),
+      args: expect.arrayContaining(["tsx", "tools/app-control/sentryArtifacts.ts", "publish"]),
       env: { APP_TENANT: "avihu", APP_ENV: "production" },
       prerequisite: {
         command: "npm",

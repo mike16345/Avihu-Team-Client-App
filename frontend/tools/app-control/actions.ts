@@ -1,3 +1,8 @@
+import {
+  createArtifactDirectory,
+  createSentryArtifactUploadStep,
+  createSentryUploadRetryCommand,
+} from "./sentryArtifacts";
 import { existsSync } from "node:fs";
 import { delimiter, join } from "node:path";
 import { getTenant } from "../../config/tenants/registry";
@@ -129,6 +134,8 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
   const labelPrefix = `${tenant.displayName} (${selection.environment})`;
 
   switch (selection.action) {
+    case "sentry-upload":
+      return createSentryUploadRetryCommand(selection, selection.artifactDirectory);
     case "start":
       return createCommandSpec(
         selection,
@@ -261,12 +268,14 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
       };
     }
     case "update": {
+      const directory = tenant.monitoring ? createArtifactDirectory(selection) : undefined;
       const update = createCommandSpec(
         selection,
         "npx",
         [
-          ...EAS_CLI_ARGS,
-          "update",
+          ...(directory
+            ? ["tsx", "tools/app-control/sentryArtifacts.ts", "publish", directory]
+            : [...EAS_CLI_ARGS, "update"]),
           "--branch",
           selection.environment,
           "--environment",
@@ -278,6 +287,7 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
       );
       return {
         ...update,
+        successor: directory ? createSentryArtifactUploadStep(selection, directory) : undefined,
         prerequisite: createCommandStep(
           selection,
           "npm",

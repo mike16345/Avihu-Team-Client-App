@@ -35,7 +35,12 @@ export const environmentCheck: CheckDefinition<ConfigurationPreflightContext> = 
 export const easEnvironmentCheck: CheckDefinition<ProcessPreflightContext> = {
   check: "eas.environment",
   run: async (context) => {
-    const requiredNames = context.tenantConfig.requiredEnvironmentVariables[context.environment];
+    const requiredNames = [
+      ...context.tenantConfig.requiredEnvironmentVariables[context.environment],
+      ...(context.tenantConfig.monitoring && context.environment !== "development"
+        ? ["SENTRY_AUTH_TOKEN"]
+        : []),
+    ];
     const probe = [
       `const names=${JSON.stringify(requiredNames)};`,
       "const missing=names.filter((name)=>!process.env[name]?.trim());",

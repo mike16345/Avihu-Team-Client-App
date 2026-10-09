@@ -20,6 +20,7 @@ const runStep = (
     writeOutput(renderStatusLine("info", step.label));
     const child = spawnProcess(step.command, step.args, {
       stdio: "inherit",
+      cwd: step.cwd,
       env: { ...process.env, ...step.env },
     });
     const forwardSignal = (signal: NodeJS.Signals) => {
@@ -62,7 +63,9 @@ export const createCommandRunner =
       }
     }
 
-    return runStep(spec, dependencies);
+    const code = await runStep(spec, dependencies);
+    if (code !== 0 || !spec.successor) return code;
+    return runStep(spec.successor, dependencies);
   };
 
 export const runCommand = (spec: CommandSpec): Promise<number> => createCommandRunner()(spec);

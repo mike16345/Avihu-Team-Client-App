@@ -69,7 +69,7 @@ describe("injectable preflight CLI", () => {
     expect(humanExit).toBe(jsonExit);
     expect(report.exitCode).toBe(jsonExit);
     expect(human).toContain(
-      `└  ${report.counts.pass} passed · ${report.counts.warn} warning · ${report.counts.fail} failed`
+      `└  ${report.counts.pass} passed · ${report.counts.warn} warning${report.counts.fail ? ` · ${report.counts.fail} failed` : ""}`
     );
   });
 });

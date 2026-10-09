@@ -11,8 +11,11 @@ const formatCommand = (step: CommandStep): string => [step.command, ...step.args
 const formatEnvironment = (step: CommandStep): string =>
   `APP_TENANT=${step.env.APP_TENANT} APP_ENV=${step.env.APP_ENV}`;
 
-const getSteps = (spec: CommandSpec): CommandStep[] =>
-  spec.prerequisite ? [spec.prerequisite, spec] : [spec];
+const getSteps = (spec: CommandSpec): CommandStep[] => [
+  ...(spec.prerequisite ? [spec.prerequisite] : []),
+  spec,
+  ...(spec.successor ? [spec.successor] : []),
+];
 
 export const formatDryRun = (spec: CommandSpec, decorated = supportsDecoratedOutput()): string => {
   const steps = getSteps(spec);
