@@ -74,7 +74,15 @@ describe("resolveAction", () => {
       })
     ).toMatchObject({
       command: "npx",
-      args: ["expo", "start", "-c", "--dev-client", "--scheme", "exp+avihu-team"],
+      args: [
+        "tsx",
+        "tools/app-control/expoCli.ts",
+        "start",
+        "-c",
+        "--dev-client",
+        "--scheme",
+        "exp+avihu-team",
+      ],
       env: {
         APP_TENANT: "avihu",
         APP_ENV: "development",
@@ -145,7 +153,15 @@ describe("resolveAction", () => {
       })
     ).toMatchObject({
       command: "npx",
-      args: ["expo", "run:ios", "--configuration", "Debug", "--device", "iPhone 16 Pro"],
+      args: [
+        "tsx",
+        "tools/app-control/expoCli.ts",
+        "run:ios",
+        "--configuration",
+        "Debug",
+        "--device",
+        "iPhone 16 Pro",
+      ],
     });
   });
 

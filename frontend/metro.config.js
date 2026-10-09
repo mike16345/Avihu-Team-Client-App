@@ -23,7 +23,13 @@ if (!fs.existsSync(tenantAssetsDirectory)) {
 
 const config = getDefaultConfig(__dirname);
 
-const { assetExts, sourceExts } = config.resolver;
+const { assetExts, sourceExts, blockList } = config.resolver;
+const existingBlockList = Array.isArray(blockList) ? blockList : [blockList].filter(Boolean);
+
+// Expo SDK 53 watches all .env* files but only transforms standard dotenv names.
+// Keep test-runner files and examples out of its JavaScript dependency graph.
+const toolingEnvironmentFiles =
+  /[/\\]\.env(?!(?:\.(?:local|(?:development|production)(?:\.local)?))?$)[^/\\]*$/;
 
 config.transformer = {
   ...config.transformer,
@@ -34,6 +40,7 @@ config.resolver = {
   ...config.resolver,
   assetExts: assetExts.filter((ext) => ext !== "svg"),
   sourceExts: [...sourceExts, "svg"],
+  blockList: [...existingBlockList, toolingEnvironmentFiles],
   extraNodeModules: {
     ...config.resolver.extraNodeModules,
     "tenant-assets": tenantAssetsDirectory,

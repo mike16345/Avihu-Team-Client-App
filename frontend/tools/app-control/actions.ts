@@ -8,6 +8,8 @@ import { getBuildPackageScript } from "./buildScripts";
 
 export { EAS_CLI_ARGS } from "../eas/constants";
 
+const EXPO_COMPATIBILITY_ARGS = ["tsx", "tools/app-control/expoCli.ts"];
+
 export const assertTenantActionAllowed = (
   tenant: ReturnType<typeof getTenant>,
   selection: AppSelection
@@ -133,7 +135,7 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
       return createCommandSpec(
         selection,
         "npx",
-        ["expo", "start", "-c", "--dev-client", "--scheme", `exp+${tenant.slug}`],
+        [...EXPO_COMPATIBILITY_ARGS, "start", "-c", "--dev-client", "--scheme", `exp+${tenant.slug}`],
         `Start ${labelPrefix}`
       );
     case "run": {
@@ -148,7 +150,7 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         selection,
         "npx",
         [
-          "expo",
+          ...(selection.platform === "ios" ? EXPO_COMPATIBILITY_ARGS : ["expo"]),
           `run:${selection.platform}`,
           ...buildArguments,
           ...deviceArguments,
@@ -167,7 +169,7 @@ export const resolveAction = (selection: AppSelection): CommandSpec => {
         selection,
         "npx",
         [
-          "expo",
+          ...(selection.platform === "ios" ? EXPO_COMPATIBILITY_ARGS : ["expo"]),
           `run:${selection.platform}`,
           "--binary",
           selection.binaryPath,
