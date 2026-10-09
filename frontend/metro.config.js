@@ -1,5 +1,5 @@
 const fs = require("node:fs");
-const { getDefaultConfig } = require("expo/metro-config");
+const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const { resolveTenantAssetsDirectory } = require("./tools/metro/tenantAssets.cjs");
 
 const tenantId = process.env.APP_TENANT;
@@ -21,7 +21,7 @@ if (!fs.existsSync(tenantAssetsDirectory)) {
   );
 }
 
-const config = getDefaultConfig(__dirname);
+const config = getSentryExpoConfig(__dirname);
 
 const { assetExts, sourceExts } = config.resolver;
 

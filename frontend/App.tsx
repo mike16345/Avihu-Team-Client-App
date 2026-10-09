@@ -1,5 +1,7 @@
 import "react-native-reanimated";
 import "react-native-gesture-handler";
+import * as Sentry from "@sentry/react-native";
+import { initializeErrorReporting } from "@/services/errorReporting/initialize";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -26,7 +28,9 @@ import { DeveloperToolsProvider } from "@/devtools/DeveloperToolsProvider";
 import { getRuntimeTenant } from "@/config/runtimeTenant";
 import Constants from "expo-constants";
 
-export default function App() {
+initializeErrorReporting();
+
+function App() {
   const runtimeTenant = getRuntimeTenant(Constants);
   const ready = useOneTimeRTLFix(runtimeTenant.id, runtimeTenant.localization);
   const colorScheme = Appearance.getColorScheme();
@@ -70,3 +74,5 @@ export default function App() {
     </KeyboardProvider>
   );
 }
+
+export default Sentry.wrap(App);

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { tenantFeatureDefaultsSchema } from "../../config/tenants/features";
 import {
   tenantLocalizationSchema,
+  tenantMonitoringSchema,
   tenantNativeCapabilitiesSchema,
 } from "../../config/tenants/schema";
 import { tenantThemeSchema } from "../../config/tenants/theme";
@@ -21,6 +22,7 @@ const runtimeTenantSchema = z
     localization: tenantLocalizationSchema,
     featureDefaults: tenantFeatureDefaultsSchema,
     nativeCapabilities: tenantNativeCapabilitiesSchema,
+    monitoring: tenantMonitoringSchema.optional(),
     showEnvironmentBadge: z.boolean(),
   })
   .strict();
