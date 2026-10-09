@@ -6,6 +6,7 @@ const useAddFormResponse = () => {
   const { submitFormResponse } = useFormResponseApi();
 
   return useMutation({
+    meta: { errorReporting: { owner: "feature", operation: "form.submit" } },
     mutationFn: async (payload: FormResponsePayload) => submitFormResponse(payload),
   });
 };

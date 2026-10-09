@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useState } from "react";
 import { useUserApi } from "./useUserApi";
 import { useToast } from "../useToast";
@@ -32,6 +33,7 @@ export const useWeighInPhotosApi = () => {
       await addImageUrl(userId, urlToStore);
       await updateUserField(userId, "imagesUploaded", true);
     } catch (error) {
+      reportError(error, { operation: "weighIn.uploadPhoto", diagnostics: { imageName, userId } });
       triggerErrorToast({ message: "אירעה שגיאה בהעלאת הקבצים!" });
     } finally {
       setUploading(false);

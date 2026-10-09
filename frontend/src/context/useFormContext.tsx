@@ -1,3 +1,5 @@
+import { reportError } from "@/services/errorReporting/reportError";
+import { createFormErrorContext } from "@/utils/formErrorContext";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { FormPreset, FormQuestion } from "@/interfaces/FormPreset";
@@ -273,8 +275,13 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
 
           const extension = getFileExtension(uri);
           const imageName = `${form._id}/${question._id}/${userId}-${index}.${extension}`;
-          const { urlToStore } = await handleUploadImageToS3(uri, userId!, imageName);
-          uploaded.push(urlToStore);
+          try {
+            const { urlToStore } = await handleUploadImageToS3(uri, userId!, imageName);
+            uploaded.push(urlToStore);
+          } catch (error) {
+            if (error instanceof Error) Object.assign(error, { questionId: question._id, fileIndex: index });
+            throw error;
+          }
         }
 
         nextAnswers[question._id] = uploaded;
@@ -325,6 +332,13 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
     setIsPending(true);
 
     let finalAnswers = answers;
+    let stage: "upload" | "submit" | "complete" = "upload";
+    let submitted = false;
+    let attemptedPayload: unknown;
+    const reportSubmissionError = (error: unknown) => reportError(error, createFormErrorContext({
+      formId: form._id, formType: form.type, stage, answers: finalAnswers,
+      sections, payload: attemptedPayload, error, submitted,
+    }));
 
     try {
       try {
@@ -332,11 +346,12 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
         setAnswers(finalAnswers);
         updateFormProgress(form._id, { answers: finalAnswers });
       } catch (error) {
-        console.error("Error uploading form files:", error);
+        reportSubmissionError(error);
         triggerErrorToast({ message: "אירעה שגיאה בהעלאת הקבצים. נסה שוב." });
         return;
       }
 
+      stage = "submit";
       const payload = {
         formId: form._id,
         userId,
@@ -353,7 +368,10 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
         })),
       };
 
+      attemptedPayload = payload;
       await mutateAsync(payload);
+      submitted = true;
+      stage = "complete";
 
       let navigationPath: "BottomTabs" | "agreements" = "BottomTabs";
 
@@ -380,7 +398,7 @@ export const FormProvider: React.FC<FormProviderProps> = ({ form, onComplete, ch
       onComplete?.();
       navigation.replace(navigationPath);
     } catch (error) {
-      console.error("Error submitting form:", error);
+      reportSubmissionError(error);
       triggerErrorToast({ message: "אירעה שגיאה בשליחת הטופס. נסה שוב." });
     } finally {
       setIsPending(false);
