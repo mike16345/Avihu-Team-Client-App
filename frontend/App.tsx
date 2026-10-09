@@ -1,6 +1,7 @@
 import "react-native-reanimated";
 import "react-native-gesture-handler";
 import * as Sentry from "@sentry/react-native";
+import { subscribeReportingUser } from "@/services/errorReporting/sessionContext";
 import { initializeErrorReporting } from "@/services/errorReporting/initialize";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
@@ -37,6 +38,7 @@ function App() {
   const [loaded] = useCustomFonts();
   const { registerBackgroundTask, runTaskOnAppOpen } = useBackgroundTasks();
   useWorkoutSessionExpiryWatcher();
+  useEffect(subscribeReportingUser, []);
 
   useEffect(() => {
     registerBackgroundTask();
