@@ -32,11 +32,13 @@ export const avihuTenant = {
     projectId: "bbbbb60d-eb47-48fb-a278-517aba8dcea2",
     updateUrl: "https://u.expo.dev/bbbbb60d-eb47-48fb-a278-517aba8dcea2",
   },
-  monitoring: { sentry: {
-    organization: "avihuteam",
-    project: "avihu-mobile",
-    dsn: "https://579aed4f04c3fdbfe996d4d96d963f8f@o4511099727249408.ingest.de.sentry.io/4512226933538896",
-  } },
+  monitoring: {
+    sentry: {
+      organization: "avihuteam",
+      project: "avihu-mobile",
+      dsn: "https://579aed4f04c3fdbfe996d4d96d963f8f@o4511099727249408.ingest.de.sentry.io/4512226933538896",
+    },
+  },
   runtimeVersion: { policy: "appVersion" },
   orientation: "portrait",
   platforms: ["ios", "android"],

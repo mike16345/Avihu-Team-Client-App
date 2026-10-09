@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { loginWithPassword } from "@/API/authApi";
 import { NO_ACCESS } from "@/constants/Constants";
 import { useToast } from "@/hooks/useToast";
@@ -67,6 +68,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordPress, onLoginSuc
         onLoginSuccess(response.user as IUser);
       })
       .catch((e) => {
+        if (![400, 401].includes(e?.response?.status)) {
+          reportError(e, { operation: "LoginForm.handleSubmit" });
+        }
+
         const errMessage = e?.response?.data?.message || "";
 
         triggerErrorToast({ message: errMessage || "מייל או סיסמה שגויים" });

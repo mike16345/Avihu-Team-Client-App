@@ -61,6 +61,7 @@
 - Ephemeral UI state remains local in components through `useState`, `useEffect`, or feature hooks instead of being promoted into a global store by default.
 - Bootstrap flow is centralized in `RootNavigator`: read the persisted session token, validate it through the API layer, hydrate the user store, then choose the first navigator route.
 - Cross-cutting side effects such as logout, background tasks, toasts, notifications, font loading, and RTL setup are encapsulated in dedicated hooks instead of being duplicated across screens.
+- Report unexpected runtime failures through the shared error-reporting service at the handling boundary. Preserve the original exception/cause through rethrows, attach operation-specific context, and keep one reporting owner per failure. React Query reports final failures centrally unless a feature explicitly owns capture; credential sanitization applies before telemetry leaves the app. Expected validation, cancellation, and documented fallback conditions should not become issues.
 - Derived display state should stay close to the consuming screen/component, but repeated transformations should move into feature-local helpers or hooks. Do not copy the same filtering, label, color, or status logic across multiple screens.
 
 ## 5. Testing Standards

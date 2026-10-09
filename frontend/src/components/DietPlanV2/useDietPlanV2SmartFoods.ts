@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
@@ -21,7 +22,13 @@ const useDietPlanV2SmartFoods = (plan: IDietPlanV2) => {
         const parsed: unknown = stored ? JSON.parse(stored) : [];
         setEntries(reconcileSmartFoodEntries(parsed));
       })
-      .catch(() => {
+      .catch((caughtError) => {
+        if (!(caughtError instanceof SyntaxError)) {
+          reportError(caughtError, {
+            operation: "useDietPlanV2SmartFoods.useDietPlanV2SmartFoods",
+          });
+        }
+
         if (active) setEntries([]);
       })
       .finally(() => {
@@ -39,7 +46,12 @@ const useDietPlanV2SmartFoods = (plan: IDietPlanV2) => {
 
       setEntries((current) => {
         const next = update(current);
-        void AsyncStorage.setItem(storageKey, JSON.stringify(next)).catch(() => undefined);
+        void AsyncStorage.setItem(storageKey, JSON.stringify(next)).catch((caughtError) => {
+          if (!(caughtError instanceof SyntaxError)) {
+            reportError(caughtError, { operation: "useDietPlanV2SmartFoods.updateEntries" });
+          }
+          return undefined;
+        });
         return next;
       });
     },

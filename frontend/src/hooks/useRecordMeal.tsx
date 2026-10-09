@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { IMeal } from "@/interfaces/DietPlan";
@@ -98,7 +99,7 @@ export function useRecordMeal() {
     try {
       // TODO: Sync meal to API
     } catch (err) {
-      console.warn("Failed to sync session start", err);
+      reportError(err, { operation: "useRecordMeal.startNewSession" });
     }
 
     return newSession;
@@ -123,7 +124,7 @@ export function useRecordMeal() {
     try {
       // TODO: Expire meal in API
     } catch (err) {
-      console.warn("Failed to sync expire", err);
+      reportError(err, { operation: "useRecordMeal.expireSession" });
     }
 
     await startNewSession();
@@ -172,7 +173,7 @@ export function useRecordMeal() {
     try {
       // TODO: Post meal to API
     } catch (err) {
-      console.warn("Failed to sync meal", err);
+      reportError(err, { operation: "useRecordMeal.recordMeal" });
     }
   };
 
@@ -194,7 +195,7 @@ export function useRecordMeal() {
     try {
       // TODO: delete meal from API
     } catch (err) {
-      console.warn("Failed to sync meal deletion", err);
+      reportError(err, { operation: "useRecordMeal.cancelMeal" });
     }
   };
 

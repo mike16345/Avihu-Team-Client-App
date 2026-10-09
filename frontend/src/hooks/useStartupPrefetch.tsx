@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useArticleApi } from "@/hooks/api/useArticleApi";
 import { useDietPlanApi } from "@/hooks/api/useDietPlanApi";
 import { useWorkoutPlanApi } from "@/hooks/api/useWorkoutPlanApi";
@@ -70,7 +71,7 @@ const useStartupPrefetch = () => {
       try {
         await queryClient.prefetchQuery(getArticleCountQueryOptions(planType, getPostCountByGroup));
       } catch (error) {
-        console.error("Error prefetching article groups:", error);
+        reportError(error, { operation: "useStartupPrefetch.prefetchArticleGroups" });
       }
     };
 

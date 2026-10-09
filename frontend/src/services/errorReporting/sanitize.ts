@@ -2,11 +2,14 @@ const MAX_BYTES = 65536;
 const MAX_DEPTH = 8;
 const MAX_ENTRIES = 100;
 const TRUNCATED = "[truncated]";
-const secretKey = /^(password|passwd|authorization|proxyauthorization|cookie|setcookie|apikey|apitoken|token|accesstoken|refreshtoken|idtoken|secret|clientsecret|sentryauthtoken)$/i;
+const secretKey =
+  /^(password|passwd|authorization|proxyauthorization|cookie|setcookie|apikey|xapikey|apitoken|token|accesstoken|refreshtoken|idtoken|secret|clientsecret|sentryauthtoken)$/i;
 let knownSecrets: string[] = [];
 
 export const setReportingSecrets = (values: readonly (string | null | undefined)[]): void => {
-  knownSecrets = values.filter((value): value is string => typeof value === "string" && value.length >= 6);
+  knownSecrets = values.filter(
+    (value): value is string => typeof value === "string" && value.length >= 6
+  );
 };
 
 const utf8Bytes = (text: string): number => {
@@ -20,9 +23,15 @@ const utf8Bytes = (text: string): number => {
 
 export const sanitizeText = (text: string): string => {
   let clean = text
-    .replace(/([?&](?:X-Amz-(?:Signature|Credential|Security-Token)|access_token|refresh_token|token|api_key|signature)=)[^&\s"']*/gi, "$1[redacted]")
+    .replace(
+      /([?&](?:X-Amz-(?:Signature|Credential|Security-Token)|access_token|refresh_token|token|api_key|signature)=)[^&\s"']*/gi,
+      "$1[redacted]"
+    )
     .replace(/\bBearer\s+[A-Za-z0-9._~+\/-]+/gi, "Bearer [redacted]")
-    .replace(/\b(password|authorization|api[_-]?key|access[_-]?token|refresh[_-]?token)\s*[:=]\s*[^\s,;"']+/gi, "$1=[redacted]");
+    .replace(
+      /\b(password|authorization|api[_-]?key|access[_-]?token|refresh[_-]?token)\s*[:=]\s*[^\s,;"']+/gi,
+      "$1=[redacted]"
+    );
   for (const secret of knownSecrets) clean = clean.split(secret).join("[redacted]");
   return clean;
 };
@@ -57,7 +66,8 @@ export const sanitizeDiagnostics = (value: unknown): unknown => {
       if (input instanceof Date) return input.toISOString();
       const result: Record<string, unknown> = {};
       let keys = Object.keys(input);
-      if (input instanceof Error) keys = [...new Set(["name", "message", "stack", "cause", ...keys])];
+      if (input instanceof Error)
+        keys = [...new Set(["name", "message", "stack", "cause", ...keys])];
       const array: unknown[] = [];
       for (const key of keys.slice(0, MAX_ENTRIES)) {
         if (remaining <= 0) break;
@@ -65,11 +75,15 @@ export const sanitizeDiagnostics = (value: unknown): unknown => {
         let next: unknown;
         if (secretKey.test(key.replace(/[-_\s]/g, ""))) next = "[redacted]";
         else {
-          try { next = visit(Reflect.get(input, key), depth + 1); }
-          catch { next = "[Unreadable]"; }
+          try {
+            next = visit(Reflect.get(input, key), depth + 1);
+          } catch {
+            next = "[Unreadable]";
+          }
         }
         if (Array.isArray(input)) array.push(next);
-        else Object.defineProperty(result, key, { value: next, enumerable: true, configurable: true });
+        else
+          Object.defineProperty(result, key, { value: next, enumerable: true, configurable: true });
       }
       if (keys.length > MAX_ENTRIES || remaining <= 0) {
         if (Array.isArray(input)) array.push(TRUNCATED);
@@ -92,4 +106,5 @@ export const sanitizeDiagnostics = (value: unknown): unknown => {
 };
 
 export const sanitizeSentryEvent = <T>(event: T): T => sanitizeDiagnostics(event) as T;
-export const sanitizeSentryBreadcrumb = <T>(breadcrumb: T): T => sanitizeDiagnostics(breadcrumb) as T;
+export const sanitizeSentryBreadcrumb = <T>(breadcrumb: T): T =>
+  sanitizeDiagnostics(breadcrumb) as T;

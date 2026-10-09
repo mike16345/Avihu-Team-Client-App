@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { formatSteps, getLocalDateKey } from "@/utils/stepsUtils";
@@ -62,7 +63,9 @@ const MILESTONES: StepsMilestone[] = [
 const loadNotifications = () => {
   try {
     return require("expo-notifications");
-  } catch {
+  } catch (caughtError) {
+    reportError(caughtError, { operation: "useStepsNotifications.loadNotifications" });
+
     return null;
   }
 };
@@ -94,11 +97,7 @@ export interface UseStepsNotificationsResult {
   isAvailable: boolean;
   requestPermission: () => Promise<boolean>;
   cancelLegacyDaily: () => Promise<void>;
-  notifyMilestone: (
-    todaySteps: number,
-    dailyGoal: number,
-    userId: string
-  ) => Promise<void>;
+  notifyMilestone: (todaySteps: number, dailyGoal: number, userId: string) => Promise<void>;
 }
 
 const getMilestoneStorageKey = (userId: string) => `${MILESTONE_STORAGE_KEY}:${userId}`;
@@ -122,57 +121,57 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
     });
   }, []);
 
-  const readMilestoneState = useCallback(
-    async (userId: string): Promise<StoredMilestoneState> => {
-      const todayKey = getLocalDateKey();
-      const storageKey = getMilestoneStorageKey(userId);
-      const cached = milestoneStateRef.current;
+  const readMilestoneState = useCallback(async (userId: string): Promise<StoredMilestoneState> => {
+    const todayKey = getLocalDateKey();
+    const storageKey = getMilestoneStorageKey(userId);
+    const cached = milestoneStateRef.current;
 
-      if (cached?.storageKey === storageKey && cached.dateKey === todayKey) {
-        return cached;
-      }
+    if (cached?.storageKey === storageKey && cached.dateKey === todayKey) {
+      return cached;
+    }
 
-      try {
-        const raw = await AsyncStorage.getItem(storageKey);
+    try {
+      const raw = await AsyncStorage.getItem(storageKey);
 
-        if (raw) {
-          const parsed = JSON.parse(raw) as Omit<StoredMilestoneState, "storageKey">;
+      if (raw) {
+        const parsed = JSON.parse(raw) as Omit<StoredMilestoneState, "storageKey">;
 
-          if (parsed?.dateKey === todayKey) {
-            const nextState = { ...parsed, storageKey };
-            milestoneStateRef.current = nextState;
-            return nextState;
-          }
+        if (parsed?.dateKey === todayKey) {
+          const nextState = { ...parsed, storageKey };
+          milestoneStateRef.current = nextState;
+          return nextState;
         }
-      } catch {
-        // ignore malformed local state
+      }
+    } catch (caughtError) {
+      if (!(caughtError instanceof SyntaxError)) {
+        reportError(caughtError, { operation: "useStepsNotifications.readMilestoneState" });
       }
 
-      const nextState = { storageKey, dateKey: todayKey, lastSentLevel: 0 };
-      milestoneStateRef.current = nextState;
-      return nextState;
-    },
-    []
-  );
+      // ignore malformed local state
+    }
 
-  const writeMilestoneState = useCallback(
-    async (state: StoredMilestoneState): Promise<void> => {
-      milestoneStateRef.current = state;
+    const nextState = { storageKey, dateKey: todayKey, lastSentLevel: 0 };
+    milestoneStateRef.current = nextState;
+    return nextState;
+  }, []);
 
-      try {
-        await AsyncStorage.setItem(
-          state.storageKey,
-          JSON.stringify({
-            dateKey: state.dateKey,
-            lastSentLevel: state.lastSentLevel,
-          })
-        );
-      } catch {
-        // persistence failure is non-fatal
-      }
-    },
-    []
-  );
+  const writeMilestoneState = useCallback(async (state: StoredMilestoneState): Promise<void> => {
+    milestoneStateRef.current = state;
+
+    try {
+      await AsyncStorage.setItem(
+        state.storageKey,
+        JSON.stringify({
+          dateKey: state.dateKey,
+          lastSentLevel: state.lastSentLevel,
+        })
+      );
+    } catch (caughtError) {
+      reportError(caughtError, { operation: "useStepsNotifications.writeMilestoneState" });
+
+      // persistence failure is non-fatal
+    }
+  }, []);
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
     const Notifications = notifModuleRef.current;
@@ -187,7 +186,9 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
       });
 
       return requested?.status === "granted";
-    } catch {
+    } catch (caughtError) {
+      reportError(caughtError, { operation: "useStepsNotifications.requestPermission" });
+
       return false;
     }
   }, []);
@@ -198,7 +199,9 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
 
     try {
       await Notifications.cancelScheduledNotificationAsync(LEGACY_STEPS_NOTIFICATION_IDENTIFIER);
-    } catch {
+    } catch (caughtError) {
+      reportError(caughtError, { operation: "useStepsNotifications.cancelLegacyDaily" });
+
       // identifier may not exist; ignore
     }
   }, []);
@@ -239,7 +242,9 @@ const useStepsNotifications = (): UseStepsNotificationsResult => {
           dateKey: state.dateKey,
           lastSentLevel: milestone.level,
         });
-      } catch {
+      } catch (caughtError) {
+        reportError(caughtError, { operation: "useStepsNotifications.notifyMilestone" });
+
         // notification failure is non-fatal
       }
     },

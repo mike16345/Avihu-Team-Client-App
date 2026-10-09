@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { semanticColors } from "@/themes/semanticColors";
 import { useMemo, useState } from "react";
 import { Linking, Pressable, StyleSheet, View } from "react-native";
@@ -72,7 +73,7 @@ const DietPlanV2SmartMenu = ({
     onRecord(entry);
     setProduct(null);
     void reportConsumption(entry.catalogItemId).catch((error) => {
-      console.warn("Failed to report Food Catalog consumption", error);
+      reportError(error, { operation: "DietPlanV2SmartMenu.record" });
     });
   };
 
@@ -254,7 +255,7 @@ const DietPlanV2SmartMenu = ({
         onPress={() => {
           selectionHaptic();
           void Linking.openURL(OPEN_FOOD_FACTS_URL).catch((error) => {
-            console.warn("Failed to open Open Food Facts website", error);
+            reportError(error, { operation: "DietPlanV2SmartMenu.DietPlanV2SmartMenu" });
           });
         }}
         style={({ pressed }) => [styles.attribution, pressed && styles.attributionPressed]}

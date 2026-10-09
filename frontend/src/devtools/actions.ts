@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 export type DeveloperNotificationPermission = "granted" | "denied" | "undetermined";
 
 export type DeveloperActionName = "permission" | "notification" | "settings" | "cache" | "reload";
@@ -50,7 +51,9 @@ export const createDeveloperActions = (
           message: "Notification permission refreshed.",
           permission,
         };
-      } catch {
+      } catch (caughtError) {
+        reportError(caughtError, { operation: "actions.refreshNotificationPermission" });
+
         return {
           ...reportFailure("permission", "Notification permission could not be checked."),
           permission: "undetermined",
@@ -68,7 +71,9 @@ export const createDeveloperActions = (
             : "Notification permission was not granted.",
           permission,
         };
-      } catch {
+      } catch (caughtError) {
+        reportError(caughtError, { operation: "actions.requestNotificationPermission" });
+
         return {
           ...reportFailure("permission", "Notification permission could not be requested."),
           permission: "undetermined",
@@ -91,7 +96,9 @@ export const createDeveloperActions = (
         }
 
         return { ok: true, message: "Test notification scheduled." };
-      } catch {
+      } catch (caughtError) {
+        reportError(caughtError, { operation: "actions.sendTestNotification" });
+
         return reportFailure("notification", "Test notification could not be scheduled.");
       }
     },
@@ -99,7 +106,9 @@ export const createDeveloperActions = (
       try {
         await dependencies.openNotificationSettings();
         return { ok: true, message: "Notification settings opened." };
-      } catch {
+      } catch (caughtError) {
+        reportError(caughtError, { operation: "actions.openNotificationSettings" });
+
         return reportFailure("settings", "Notification settings could not be opened.");
       }
     },
@@ -108,7 +117,9 @@ export const createDeveloperActions = (
         dependencies.clearMemoryQueryCache();
         await dependencies.clearPersistedQueryCache();
         return { ok: true, message: "Server cache cleared." };
-      } catch {
+      } catch (caughtError) {
+        reportError(caughtError, { operation: "actions.clearServerCache" });
+
         return reportFailure("cache", "Server cache could not be cleared.");
       }
     },
@@ -116,7 +127,9 @@ export const createDeveloperActions = (
       try {
         await dependencies.reloadApp();
         return { ok: true, message: "App reload requested." };
-      } catch {
+      } catch (caughtError) {
+        reportError(caughtError, { operation: "actions.reloadApp" });
+
         return reportFailure("reload", "The app could not be reloaded.");
       }
     },

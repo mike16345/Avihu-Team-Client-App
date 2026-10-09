@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Constants from "expo-constants";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
@@ -37,8 +38,8 @@ export const DeveloperToolsProvider = ({ children }: { children: ReactNode }) =>
         if (cancelled) return;
         setState((current) => setDeveloperToolsBadgeVisible(current, badgeVisible));
       })
-      .catch(() => {
-        console.error("[developer-tools] badge preference load failed");
+      .catch((caughtError) => {
+        reportError(caughtError, { operation: "DeveloperToolsProvider.DeveloperToolsProvider" });
       });
 
     return () => {
@@ -59,8 +60,8 @@ export const DeveloperToolsProvider = ({ children }: { children: ReactNode }) =>
       if (!available) return;
 
       setState((current) => setDeveloperToolsBadgeVisible(current, visible));
-      preferenceRepository.save(tenant.id, visible).catch(() => {
-        console.error("[developer-tools] badge preference save failed");
+      preferenceRepository.save(tenant.id, visible).catch((caughtError) => {
+        reportError(caughtError, { operation: "DeveloperToolsProvider.setBadgeVisible" });
       });
     },
     [available, preferenceRepository, tenant.id]

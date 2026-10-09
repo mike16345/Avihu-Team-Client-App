@@ -314,7 +314,7 @@ describe("createExpoConfig", () => {
     ).toEqual(["./plugins/withAndroidBackCompatibility"]);
   });
 
-  it("composes binary plugins only from native capabilities", () => {
+  it("composes native capability plugins independently of monitoring", () => {
     const plugins = createTenantPlugins({
       ...avihuTenant,
       nativeCapabilities: {
@@ -339,6 +339,10 @@ describe("createExpoConfig", () => {
       ["expo-build-properties", { android: avihuTenant.androidBuildProperties }],
       "./plugins/withFmtXcode26Fix",
       "./plugins/withAndroidBackCompatibility",
+      [
+        "@sentry/react-native/expo",
+        { organization: "avihuteam", project: "avihu-mobile", url: "https://sentry.io/" },
+      ],
     ]);
   });
 

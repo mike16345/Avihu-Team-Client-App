@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { isNotFoundError } from "@/API/api";
 import { useAgreementApi } from "@/hooks/api/useAgreementApi";
 
@@ -13,8 +14,8 @@ export const useGetCurrentAgreement = () => {
       if (isNotFoundError(error)) {
         return null;
       }
+      reportError(error, { operation: "useGetCurrentAgreement.resolveAgreement" });
 
-      console.error("Error fetching current agreement:", error);
       return null;
     }
   };

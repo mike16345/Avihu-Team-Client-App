@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { semanticColors } from "@/themes/semanticColors";
 import React, { useMemo } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
@@ -29,7 +30,7 @@ const PDFViewer: React.FC<Props> = ({ uri, onScrollToEnd }) => {
           onScrollToEnd();
         }}
         onError={(error) => {
-          console.error("PDF load error", error);
+          reportError(error, { operation: "pdf.load", diagnostics: { uri } });
         }}
         renderActivityIndicator={() => <SpinningIcon mode="light" />}
       />

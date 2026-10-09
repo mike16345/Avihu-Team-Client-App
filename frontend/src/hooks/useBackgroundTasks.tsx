@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import React from "react";
 import * as TaskManager from "expo-task-manager";
 import * as BackgroundTask from "expo-background-task";
@@ -13,7 +14,8 @@ const useBackgroundTasks = () => {
 
       return BackgroundTask.BackgroundTaskResult.Success;
     } catch (error) {
-      console.error("[BackgroundTask] Failed:", error);
+      reportError(error, { operation: "useBackgroundTasks.useBackgroundTasks" });
+
       return BackgroundTask.BackgroundTaskResult.Failed;
     }
   });
@@ -28,7 +30,7 @@ const useBackgroundTasks = () => {
         });
       }
     } catch (error) {
-      console.error("[BackgroundTask] Registration failed:", error);
+      reportError(error, { operation: "useBackgroundTasks.registerBackgroundTask" });
     }
   }, []);
 
@@ -37,7 +39,7 @@ const useBackgroundTasks = () => {
     try {
       useNotificationStore.getState().updateNotificationsPastTriggerTime();
     } catch (error) {
-      console.error("[BackgroundTask] App open task failed:", error);
+      reportError(error, { operation: "useBackgroundTasks.runTaskOnAppOpen" });
     }
   }, []);
 

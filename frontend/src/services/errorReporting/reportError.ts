@@ -12,9 +12,12 @@ export const setErrorReporter = (adapter: ErrorReporter | null): void => {
 export const reportError = (error: unknown, context: ErrorReportContext): string | undefined => {
   try {
     if (!reporter) return undefined;
-    const exception = error instanceof Error ? error : new Error(
-      typeof error === "string" ? sanitizeText(error) : "Unexpected non-Error exception"
-    );
+    const exception =
+      error instanceof Error
+        ? error
+        : new Error(
+            typeof error === "string" ? sanitizeText(error) : "Unexpected non-Error exception"
+          );
     if (reportedErrors.has(exception)) return undefined;
     const clean = sanitizeDiagnostics({
       ...context,

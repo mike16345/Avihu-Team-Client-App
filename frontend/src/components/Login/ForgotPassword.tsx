@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { View, BackHandler, TouchableOpacity } from "react-native";
 import { FC, useEffect, useState } from "react";
 import { useOTPApi } from "@/hooks/api/useOTPApi";
@@ -53,6 +54,10 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
 
       onConfirmChangePasswordSuccess();
     } catch (error: any) {
+      if (![400, 401].includes(error?.response?.status)) {
+        reportError(error, { operation: "ForgotPassword.handleConfirmPasswordChange" });
+      }
+
       triggerErrorToast({ message: error?.response?.data?.message });
       setFormErrors({ ...formErrors, ["password"]: true });
     } finally {
@@ -74,6 +79,10 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
       await getOTP(formattedEmail);
       setShowOtpInput(true);
     } catch (error: any) {
+      if (![400, 401].includes(error?.response?.status)) {
+        reportError(error, { operation: "ForgotPassword.handleGetOtp" });
+      }
+
       triggerErrorToast({ message: error?.response?.data?.message });
     } finally {
       setIsLoading(false);
@@ -92,6 +101,10 @@ const ForgotPassword: FC<IForgotPassword> = ({ onConfirmChangePasswordSuccess, o
       setSessionId(sessionId);
       setIsOtpConfirmed(true);
     } catch (error: any) {
+      if (![400, 401].includes(error?.response?.status)) {
+        reportError(error, { operation: "ForgotPassword.handleValidateOtp" });
+      }
+
       setFormErrors({ ...formErrors, ["otp"]: true });
     } finally {
       setIsLoading(false);

@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import PrimaryButton from "../ui/buttons/PrimaryButton";
 import { Text } from "../ui/Text";
 import useStyles from "@/styles/useGlobalStyles";
@@ -16,6 +17,8 @@ const ProgressImageUpload = () => {
 
       triggerSuccessToast({ title: "הועלה בהצלחה", message: "המאמן קיבל את התמונות" });
     } catch (error) {
+      reportError(error, { operation: "ProgressImageUpload.onImageUpload" });
+
       triggerErrorToast({ message: "אירעה שגיאה בהעלאת התמונות" });
     }
   };

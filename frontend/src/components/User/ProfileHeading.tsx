@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { Image, LayoutChangeEvent, StyleSheet, TouchableOpacity, View } from "react-native";
 import { useMemo, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
@@ -60,6 +61,8 @@ const ProfileHeading = () => {
 
       await updateProfilePhoto(profileImage);
     } catch (error: any) {
+      reportError(error, { operation: "ProfileHeading.onUpload" });
+
       triggerErrorToast({ message: error.response.body.message });
     } finally {
       setLoading(false);

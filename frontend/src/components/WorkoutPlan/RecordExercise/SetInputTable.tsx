@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, Pressable, TextInput } from "react-native";
 import Animated, { FadeInDown, FadeOutUp, LinearTransition } from "react-native-reanimated";
@@ -206,7 +207,8 @@ const SetInputTable: FC<SetInputTableProps> = ({
           return next;
         });
       } catch (e: any) {
-        console.log("Error saving/updating set at index:", index, "Row data:", row, "Error:", e);
+        reportError(e, { operation: "SetInputTable.handleTapCheck" });
+
         setRows((prev) => {
           const next = [...prev];
           next[index] = { ...next[index], saving: false };

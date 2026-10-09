@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -86,7 +87,8 @@ const loadNativeIOS = () => {
 
     return AppleHealthKit;
   } catch (err) {
-    console.error("[steps] require(react-native-health) failed:", err);
+    reportError(err, { operation: "useStepsData.loadNativeIOS" });
+
     return null;
   }
 };
@@ -321,7 +323,7 @@ const readAndroid = async (native: NativeAndroidModule, today: Date): Promise<St
       }
     }
   } catch (err) {
-    console.error("[steps] Android Health Connect aggregateGroupByPeriod failed:", err);
+    reportError(err, { operation: "useStepsData.readAndroid" });
   }
 
   const records = await native.readRecords("Steps", {
@@ -374,7 +376,9 @@ const requestIOSPermission = async (native: any): Promise<boolean> => {
 const markHealthConnected = async () => {
   try {
     await AsyncStorage.setItem(STEPS_HEALTH_CONNECTED_KEY, "true");
-  } catch {
+  } catch (caughtError) {
+    reportError(caughtError, { operation: "useStepsData.markHealthConnected" });
+
     // persistence failure should not block HealthKit reads
   }
 };
@@ -382,7 +386,9 @@ const markHealthConnected = async () => {
 const hasConnectedHealthBefore = async () => {
   try {
     return (await AsyncStorage.getItem(STEPS_HEALTH_CONNECTED_KEY)) === "true";
-  } catch {
+  } catch (caughtError) {
+    reportError(caughtError, { operation: "useStepsData.hasConnectedHealthBefore" });
+
     return false;
   }
 };
@@ -429,7 +435,8 @@ const requestAndroidPermission = async (
       hasBackgroundAccess: hasAndroidBackgroundPermission(grantedPermissions),
     };
   } catch (err) {
-    console.error("[steps] Android Health Connect requestPermission failed:", err);
+    reportError(err, { operation: "useStepsData.requestAndroidPermission" });
+
     return {
       hasStepsRead: false,
       hasBackgroundAccess: false,
@@ -457,7 +464,8 @@ const initializeAndroidExistingConnection = async (
       hasBackgroundAccess: hasAndroidBackgroundPermission(grantedPermissions),
     };
   } catch (err) {
-    console.error("[steps] Android Health Connect initialize/getGrantedPermissions failed:", err);
+    reportError(err, { operation: "useStepsData.initializeAndroidExistingConnection" });
+
     return {
       hasStepsRead: false,
       hasBackgroundAccess: false,
@@ -526,7 +534,7 @@ const useStepsData = (): UseStepsDataResult => {
       setSyncedAt(new Date());
       setStatus("granted");
     } catch (err) {
-      console.error("[steps] refresh failed:", err);
+      reportError(err, { operation: "useStepsData.refresh" });
 
       if (Platform.OS === "android") {
         const permissionState = await initializeAndroidExistingConnection(
@@ -570,7 +578,8 @@ const useStepsData = (): UseStepsDataResult => {
       await refresh();
       return true;
     } catch (err) {
-      console.error("[steps] requestPermission threw:", err);
+      reportError(err, { operation: "useStepsData.requestPermission" });
+
       resetDisconnectedState("denied");
       return false;
     }
@@ -600,7 +609,8 @@ const useStepsData = (): UseStepsDataResult => {
       setHasBackgroundAccess(granted);
       return granted;
     } catch (err) {
-      console.error("[steps] ensureBackgroundAccess failed:", err);
+      reportError(err, { operation: "useStepsData.ensureBackgroundAccess" });
+
       return false;
     }
   }, [native]);

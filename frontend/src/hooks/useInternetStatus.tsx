@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useEffect, useState } from "react";
 import NetInfo, { NetInfoState } from "@react-native-community/netinfo";
 
@@ -27,7 +28,8 @@ const useInternetStatus = (): InternetStatus => {
 
   useEffect(() => {
     refresh().catch((error) => {
-      console.error("Error fetching internet status:", error);
+      reportError(error, { operation: "useInternetStatus.useInternetStatus" });
+
       setIsLoading(false);
     });
 

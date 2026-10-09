@@ -17,6 +17,8 @@ export const initializeErrorReporting = (): void => {
       dsn: tenant.monitoring.sentry.dsn,
       environment: tenant.environment,
       sendDefaultPii: false,
+      normalizeDepth: 10,
+      maxValueLength: 12000,
       tracesSampleRate: 0,
       profilesSampleRate: 0,
       enableAutoPerformanceTracing: false,
@@ -27,7 +29,10 @@ export const initializeErrorReporting = (): void => {
     });
     Sentry.setTag("tenant", tenant.id);
     Sentry.setTag("platform", Platform.OS);
-    Sentry.setTag("app-version", Constants.nativeAppVersion ?? Constants.expoConfig?.version ?? "unknown");
+    Sentry.setTag(
+      "app-version",
+      Constants.nativeAppVersion ?? Constants.expoConfig?.version ?? "unknown"
+    );
     Sentry.setTag("build-version", Constants.nativeBuildVersion ?? "unknown");
     Sentry.setTag("expo-update-id", Updates.updateId ?? "embedded");
     Sentry.setTag("expo-runtime-version", Updates.runtimeVersion ?? "unknown");

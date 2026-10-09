@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { semanticColors } from "@/themes/semanticColors";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -93,6 +94,8 @@ const AgreementSignatureScreen = () => {
       setCurrentAgreement(null);
       navigation.replace("AgreementSigned");
     } catch (error: any) {
+      reportError(error, { operation: "AgreementSignatureScreen.handleAgreeAndContinue" });
+
       if (error.message.includes("Network Error")) {
         triggerErrorToast({ message: "אין חיבור לאינטרנט" });
       } else {

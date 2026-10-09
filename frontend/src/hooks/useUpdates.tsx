@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { semanticColors } from "@/themes/semanticColors";
 import { useEffect, useRef, useState } from "react";
 import { Modal, StyleSheet, View } from "react-native";
@@ -53,7 +54,8 @@ const Update = () => {
         queryClient.clear();
         await Updates.reloadAsync();
       } catch (error) {
-        console.error("Error syncing update in background:", error);
+        reportError(error, { operation: "useUpdates.syncUpdateInBackground" });
+
         if (!cancelled) {
           setIsInstallingUpdate(false);
         }

@@ -46,7 +46,6 @@ export const useUserApi = () => {
 
       await updateUserField(userId, "profileImage", urlToStore);
     } catch (error) {
-      console.error("error here", error);
       throw error;
     }
   };

@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { IDietPlanV2 } from "@/interfaces/IDietPlanV2";
@@ -17,7 +18,11 @@ const readCompletion = async (storageKey: string): Promise<unknown> => {
   try {
     const stored = await AsyncStorage.getItem(storageKey);
     return stored ? JSON.parse(stored) : {};
-  } catch {
+  } catch (caughtError) {
+    if (!(caughtError instanceof SyntaxError)) {
+      reportError(caughtError, { operation: "useDietPlanV2Consumption.readCompletion" });
+    }
+
     return {};
   }
 };
@@ -52,7 +57,12 @@ const useDietPlanV2Consumption = (plan: IDietPlanV2) => {
 
       setCompletion((current) => {
         const next = update(current);
-        void AsyncStorage.setItem(storageKey, JSON.stringify(next)).catch(() => undefined);
+        void AsyncStorage.setItem(storageKey, JSON.stringify(next)).catch((caughtError) => {
+          if (!(caughtError instanceof SyntaxError)) {
+            reportError(caughtError, { operation: "useDietPlanV2Consumption.updateCompletion" });
+          }
+          return undefined;
+        });
         return next;
       });
     },

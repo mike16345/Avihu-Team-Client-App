@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { semanticColors } from "@/themes/semanticColors";
 import { useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -118,13 +119,25 @@ const SmartFoodHistoryModal = ({
             try {
               const stored = storedByKey.get(getDietPlanV2SmartFoodsStorageKey(plan, dayKey));
               parsedSmartFoods = stored ? JSON.parse(stored) : [];
-            } catch {
+            } catch (caughtError) {
+              if (!(caughtError instanceof SyntaxError)) {
+                reportError(caughtError, {
+                  operation: "SmartFoodHistoryModal.SmartFoodHistoryModal",
+                });
+              }
+
               parsedSmartFoods = [];
             }
             try {
               const stored = storedByKey.get(getDietPlanV2ConsumptionStorageKey(plan, dayKey));
               parsedCompletion = stored ? JSON.parse(stored) : {};
-            } catch {
+            } catch (caughtError) {
+              if (!(caughtError instanceof SyntaxError)) {
+                reportError(caughtError, {
+                  operation: "SmartFoodHistoryModal.SmartFoodHistoryModal",
+                });
+              }
+
               parsedCompletion = {};
             }
             return {
@@ -138,7 +151,11 @@ const SmartFoodHistoryModal = ({
           })
         );
       })
-      .catch(() => {
+      .catch((caughtError) => {
+        if (!(caughtError instanceof SyntaxError)) {
+          reportError(caughtError, { operation: "SmartFoodHistoryModal.SmartFoodHistoryModal" });
+        }
+
         if (active) setDays(dayKeys.map((dayKey) => ({ dayKey, entries: [] })));
       })
       .finally(() => {

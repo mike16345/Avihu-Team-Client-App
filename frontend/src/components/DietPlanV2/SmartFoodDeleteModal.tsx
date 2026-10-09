@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { semanticColors } from "@/themes/semanticColors";
 import { Pressable, StyleSheet, View } from "react-native";
 import Icon from "@/components/Icon/Icon";
@@ -46,7 +47,12 @@ const SmartFoodDeleteModal = ({ entry, onDismiss, onConfirm }: SmartFoodDeleteMo
             style={[styles.action, styles.deleteButton]}
             onPress={() => {
               if (!entry) return;
-              void errorNotificationHaptic().catch(() => undefined);
+              void errorNotificationHaptic().catch((caughtError) => {
+                reportError(caughtError, {
+                  operation: "SmartFoodDeleteModal.SmartFoodDeleteModal",
+                });
+                return undefined;
+              });
               onConfirm(entry);
             }}
           >

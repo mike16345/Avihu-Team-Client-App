@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { View } from "react-native";
 import { useMemo, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
@@ -56,7 +57,6 @@ const MeasurementHistoryContent = () => {
 
       await save({ date: selectedDate, measurement: value, muscle: muscleInEnglish });
     } catch (error) {
-      console.error(error);
       throw error;
     }
   };
@@ -67,7 +67,7 @@ const MeasurementHistoryContent = () => {
 
       await remove({ date: selectedDate, muscle: muscleInEnglish });
     } catch (error) {
-      console.error(error);
+      reportError(error, { operation: "MeasurementHistoryContent.handleDelete" });
     }
   };
 

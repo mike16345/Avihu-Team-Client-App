@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 // hooks/useNotification.ts
 import { NotificationBodies, NotificationIdentifiers } from "@/constants/notifications";
 import { getRuntimeTenantDisplayName } from "@/config/runtimeTenant";
@@ -128,8 +129,8 @@ export const useNotification = () => {
         }),
       });
       return identifier;
-    } catch {
-      console.error("[notifications] scheduling failed");
+    } catch (caughtError) {
+      reportError(caughtError, { operation: "useNotification.showNotification" });
     }
   };
 
@@ -169,7 +170,7 @@ export const useNotification = () => {
         await scheduleDailyWeightInReminder();
       }
     } catch (error) {
-      console.log(error);
+      reportError(error, { operation: "useNotification.initializeNotifications" });
     }
   };
 
@@ -177,7 +178,7 @@ export const useNotification = () => {
     try {
       await Notifications.cancelScheduledNotificationAsync(identifier);
     } catch (error) {
-      console.log(error);
+      reportError(error, { operation: "useNotification.cancelNotification" });
     }
   };
 
@@ -191,7 +192,7 @@ export const useNotification = () => {
         }
       });
     } catch (error) {
-      console.error(error);
+      reportError(error, { operation: "useNotification.notificationReceivedListener" });
     }
   };
 
@@ -201,7 +202,7 @@ export const useNotification = () => {
         handler(response.notification.request.content.data || {});
       });
     } catch (error) {
-      console.error(error);
+      reportError(error, { operation: "useNotification.notificationResponseListener" });
     }
   };
 

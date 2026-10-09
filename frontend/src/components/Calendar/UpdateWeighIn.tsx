@@ -46,7 +46,6 @@ const UpdateWeighIn: FC<EditWeighInProps> = ({ date, weighInToEdit }) => {
     try {
       await deleteWeighIn(weighInToEdit?._id || "");
     } catch (e) {
-      console.error(e);
       throw e;
     }
   };

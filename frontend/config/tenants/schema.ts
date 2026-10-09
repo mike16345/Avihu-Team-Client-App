@@ -110,16 +110,28 @@ const requiredEnvironmentVariablesSchema = z
   })
   .strict();
 
-export const tenantMonitoringSchema = z.object({
-  sentry: z.object({
-    organization: z.string().trim().min(1),
-    project: z.string().trim().min(1),
-    dsn: z.string().url().refine((value) => {
-      const url = new URL(value);
-      return url.protocol === "https:" && !!url.username && /^\/\d+$/.test(url.pathname) && !url.password;
-    }, "Expected an HTTPS Sentry DSN"),
-  }).strict(),
-}).strict();
+export const tenantMonitoringSchema = z
+  .object({
+    sentry: z
+      .object({
+        organization: z.string().trim().min(1),
+        project: z.string().trim().min(1),
+        dsn: z
+          .string()
+          .url()
+          .refine((value) => {
+            const url = new URL(value);
+            return (
+              url.protocol === "https:" &&
+              !!url.username &&
+              /^\/\d+$/.test(url.pathname) &&
+              !url.password
+            );
+          }, "Expected an HTTPS Sentry DSN"),
+      })
+      .strict(),
+  })
+  .strict();
 
 export const tenantConfigSchema = z
   .object({

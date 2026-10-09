@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Linking,
@@ -198,7 +199,10 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
     }
 
     if (steps.status === "denied" && Platform.OS === "ios") {
-      Linking.openSettings().catch((err) => console.error("[steps] failed to open settings:", err));
+      Linking.openSettings().catch((err) => {
+        reportError(err, { operation: "StepsCardioContainer.handleConnectPress" });
+        return undefined;
+      });
       return;
     }
 
@@ -208,7 +212,7 @@ const StepsCardioContainer: React.FC<StepsCardioContainerProps> = ({ plan }) => 
         await notifications.requestPermission();
       }
     } catch (err) {
-      console.error("[steps] handleConnectPress threw:", err);
+      reportError(err, { operation: "StepsCardioContainer.handleConnectPress" });
     }
   };
 

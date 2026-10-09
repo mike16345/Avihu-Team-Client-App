@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useUserStore } from "@/store/userStore";
 import { useFormStore } from "@/store/formStore";
 import { useEffect, useRef } from "react";
@@ -44,7 +45,7 @@ const useInitFormNotifications = () => {
           addMonthlyFormNotification(status.presetId);
         }
       } catch (error) {
-        console.error("Error fetching monthly form notifications:", error);
+        reportError(error, { operation: "useInitFormNotifications.performChecks" });
       }
 
       // 3. Daily
@@ -65,7 +66,7 @@ const useInitFormNotifications = () => {
           }
         }
       } catch (error) {
-        console.error("Error fetching daily form:", error);
+        reportError(error, { operation: "useInitFormNotifications.performChecks" });
       }
     };
 

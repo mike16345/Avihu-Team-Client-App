@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { IToast } from "@/interfaces/toast";
 import React, { ReactNode, useEffect, useState } from "react";
 import { StyleProp, TouchableOpacity, View, ViewStyle } from "react-native";
@@ -74,7 +75,8 @@ const AsyncToastWrapper: React.FC<AsyncToastWrapperProps> = ({
         duration: toastDuration,
       });
     } catch (error: any) {
-      console.error(error);
+      reportError(error, { operation: "AsyncToastWrapper.handlePress" });
+
       triggerErrorToast({
         message: messages?.error?.message || error.message,
         title: messages?.error?.title,

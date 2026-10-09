@@ -90,11 +90,14 @@ export const createTenantPlugins = (tenant: TenantConfig): NonNullable<ExpoConfi
     plugins.push("./native-modules/live-steps-activity/plugin/withLiveStepsActivity");
   }
   if (tenant.monitoring) {
-    plugins.push(["@sentry/react-native/expo", {
-      organization: tenant.monitoring.sentry.organization,
-      project: tenant.monitoring.sentry.project,
-      url: "https://sentry.io/",
-    }]);
+    plugins.push([
+      "@sentry/react-native/expo",
+      {
+        organization: tenant.monitoring.sentry.organization,
+        project: tenant.monitoring.sentry.project,
+        url: "https://sentry.io/",
+      },
+    ]);
   }
   return plugins;
 };

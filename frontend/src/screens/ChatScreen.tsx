@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { Clipboard, Keyboard, Platform, View } from "react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
@@ -49,7 +50,9 @@ const ChatScreen = () => {
             await webClipboard.writeText(message.text);
           }
         }
-      } catch {
+      } catch (caughtError) {
+        reportError(caughtError, { operation: "ChatScreen.handleCopyMessage" });
+
         triggerErrorToast({ message: "העתקה נכשלה" });
       }
     },

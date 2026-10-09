@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { Keyboard, StyleSheet, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import Icon from "@/components/Icon/Icon";
@@ -16,7 +17,12 @@ export type FieldConfig = {
   placeholder?: string;
   prefix?: string;
   keyboardType?:
-    "default" | "number-pad" | "numeric" | "email-address" | "phone-pad" | "decimal-pad";
+    | "default"
+    | "number-pad"
+    | "numeric"
+    | "email-address"
+    | "phone-pad"
+    | "decimal-pad";
   existingValue?: string;
   schemaKey?: string;
   parse?: (raw: string | undefined) => unknown;
@@ -155,6 +161,8 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
       await onSave(payload);
       handleDismissModal();
     } catch (error: any) {
+      reportError(error, { operation: "UpdateDataModal.handleSave" });
+
       triggerErrorToast({ message: error?.response?.message });
     } finally {
       setIsLoading(false);
@@ -168,6 +176,8 @@ const UpdateDataModal: React.FC<UpdateDataModalProps> = ({
 
       handleDismissModal();
     } catch (error: any) {
+      reportError(error, { operation: "UpdateDataModal.handleDelete" });
+
       triggerErrorToast({ message: error?.response?.message, isModalToast: true });
     } finally {
       setIsDeleting(false);

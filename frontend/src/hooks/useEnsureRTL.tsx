@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useEffect, useState } from "react";
 import { I18nManager } from "react-native";
 import * as Updates from "expo-updates";
@@ -33,7 +34,7 @@ export const useOneTimeRTLFix = (tenantId: string, localization: TenantLocalizat
 
         setReady(true); // Only set ready if no reload needed
       } catch (err) {
-        console.warn("RTL fix failed:", err);
+        reportError(err, { operation: "useEnsureRTL.applyRTLFix" });
       } finally {
         setReady(true); // Avoid blocking UI forever
       }

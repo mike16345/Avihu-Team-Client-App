@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import moment from "moment-timezone";
 import type {
   DateAndValue,
@@ -180,7 +181,8 @@ class DateUtils {
           throw new Error("Invalid range. Use  'days','months', or 'years'.");
       }
     } catch (err) {
-      console.error(err);
+      reportError(err, { operation: "dateUtils" });
+
       return [];
     }
   }

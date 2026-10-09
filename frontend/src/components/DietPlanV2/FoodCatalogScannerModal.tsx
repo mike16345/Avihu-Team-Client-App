@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { semanticColors } from "@/themes/semanticColors";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Linking, Modal, Pressable, StyleSheet, View } from "react-native";
@@ -86,7 +87,10 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
     clearHoldCandidate();
     setStatus("scanning");
     setErrorMessage("");
-    void cameraRef.current?.resumePreview().catch(() => undefined);
+    void cameraRef.current?.resumePreview().catch((caughtError) => {
+      reportError(caughtError, { operation: "FoodCatalogScannerModal.resetScanner" });
+      return undefined;
+    });
   }, [clearHoldCandidate]);
 
   useEffect(() => {
@@ -149,13 +153,19 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
       clearHoldCandidate();
       setStatus("looking-up");
       selectionHaptic();
-      await cameraRef.current?.pausePreview().catch(() => undefined);
+      await cameraRef.current?.pausePreview().catch((caughtError) => {
+        reportError(caughtError, { operation: "FoodCatalogScannerModal.confirmBarcode" });
+        return undefined;
+      });
 
       try {
         const result = await lookupBarcode(barcode);
         if (attempt !== scanAttempt.current) return;
         setStatus("found");
-        void successNotificationHaptic().catch(() => undefined);
+        void successNotificationHaptic().catch((caughtError) => {
+          reportError(caughtError, { operation: "FoodCatalogScannerModal.confirmBarcode" });
+          return undefined;
+        });
         await wait(
           Math.max(MINIMUM_FOUND_FEEDBACK_MS, getRemainingScanFeedbackMs(startedAt, Date.now()))
         );
@@ -163,9 +173,14 @@ const FoodCatalogScannerModal = ({ visible, onClose, onProduct }: FoodCatalogSca
         onProduct(result.product);
       } catch (error) {
         if (attempt !== scanAttempt.current) return;
+        reportError(error, { operation: "FoodCatalogScannerModal.confirmBarcode" });
+
         setErrorMessage(getLookupErrorMessage(error));
         setStatus("error");
-        void errorNotificationHaptic().catch(() => undefined);
+        void errorNotificationHaptic().catch((caughtError) => {
+          reportError(caughtError, { operation: "FoodCatalogScannerModal.confirmBarcode" });
+          return undefined;
+        });
       }
     },
     [clearHoldCandidate, lookupBarcode, onProduct]

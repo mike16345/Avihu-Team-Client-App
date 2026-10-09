@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useChatStorage from "@/hooks/sessions/useChatStorage";
 import useChatApi from "@/hooks/api/useChatApi";
@@ -109,6 +110,10 @@ const useChatController = (currentUserId?: string, activeSessionId?: string) => 
           });
         }
       } catch (error: any) {
+        if (!error?.ragError) {
+          reportError(error, { operation: "useChatController.executeQuery" });
+        }
+
         const status = error?.response?.status;
         const message = error?.response?.data?.message || "אירעה שגיאה בשליחת ההודעה";
         const ragError = error?.ragError as

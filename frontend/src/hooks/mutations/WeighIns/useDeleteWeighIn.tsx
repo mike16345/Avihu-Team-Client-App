@@ -20,7 +20,7 @@ const useDeleteWeighIn = () => {
 
       return result;
     } catch (error: any) {
-      return Promise.reject(error?.message);
+      throw error;
     }
   };
 

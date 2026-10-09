@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { logoutRefreshSession } from "@/API/authApi";
 import { getRefreshToken } from "@/services/authSession";
 import { clearLocalAuthState } from "@/services/authLogout";
@@ -11,7 +12,7 @@ const useLogout = () => {
       try {
         await logoutRefreshSession(refreshToken);
       } catch (error) {
-        console.error("Failed to logout auth session", error);
+        reportError(error, { operation: "useLogout.handleLogout" });
       }
     }
   };

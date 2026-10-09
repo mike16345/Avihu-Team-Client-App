@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useQuery } from "@tanstack/react-query";
 import { useSessionsApi } from "../api/useSessionsApi";
 import { ONE_HOUR, WORKOUT_SESSION_KEY } from "@/constants/reactQuery";
@@ -11,7 +12,10 @@ const useWorkoutSessionQuery = () => {
 
   const loadWorkoutSession = async () => {
     if (!workoutSession?._id) return null;
-    const currentWorkoutSession = await getSession(workoutSession._id).catch(() => null);
+    const currentWorkoutSession = await getSession(workoutSession._id).catch((caughtError) => {
+      reportError(caughtError, { operation: "useWorkoutSessionQuery.currentWorkoutSession" });
+      return null;
+    });
 
     if (!currentWorkoutSession) {
       clearWorkoutSession();

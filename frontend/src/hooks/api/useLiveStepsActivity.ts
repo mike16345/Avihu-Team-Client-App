@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NativeModules } from "react-native";
 import { stepsToDistanceKm } from "@/utils/stepsUtils";
@@ -37,7 +38,10 @@ const useLiveStepsActivity = (): UseLiveStepsActivityResult => {
     RNLiveSteps!
       .areActivitiesEnabled()
       .then(setIsEnabled)
-      .catch(() => setIsEnabled(false));
+      .catch((caughtError) => {
+        reportError(caughtError, { operation: "useLiveStepsActivity.useLiveStepsActivity" });
+        return setIsEnabled(false);
+      });
   }, [isAvailable]);
 
   const start = useCallback(
@@ -49,7 +53,9 @@ const useLiveStepsActivity = (): UseLiveStepsActivityResult => {
         activityIdRef.current = id;
         setActivityId(id);
         return id;
-      } catch {
+      } catch (caughtError) {
+        reportError(caughtError, { operation: "useLiveStepsActivity.start" });
+
         return null;
       }
     },
@@ -62,7 +68,9 @@ const useLiveStepsActivity = (): UseLiveStepsActivityResult => {
       try {
         const distanceKm = stepsToDistanceKm(todaySteps, 2);
         await RNLiveSteps!.update(activityIdRef.current, todaySteps, dailyGoal, distanceKm);
-      } catch {
+      } catch (caughtError) {
+        reportError(caughtError, { operation: "useLiveStepsActivity.update" });
+
         // update failure is non-fatal
       }
     },
@@ -78,7 +86,9 @@ const useLiveStepsActivity = (): UseLiveStepsActivityResult => {
       } else {
         await RNLiveSteps!.stopAll();
       }
-    } catch {
+    } catch (caughtError) {
+      reportError(caughtError, { operation: "useLiveStepsActivity.stop" });
+
       // ignore
     } finally {
       activityIdRef.current = null;

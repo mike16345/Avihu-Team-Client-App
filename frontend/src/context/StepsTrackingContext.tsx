@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { AppState, AppStateStatus, Platform } from "react-native";
 import { IStepsCardioType } from "@/interfaces/Workout";
@@ -100,7 +101,7 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
         lastServerSyncAtRef.current = now;
         lastServerSyncPayloadRef.current = payloadKey;
       } catch (err) {
-        console.error("[steps] failed to sync steps progress:", err);
+        reportError(err, { operation: "StepsTrackingContext.syncCurrentSteps" });
       }
     },
     [
@@ -137,9 +138,10 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
     if (requestedBackgroundAccessRef.current) return;
 
     requestedBackgroundAccessRef.current = true;
-    steps
-      .ensureBackgroundAccess()
-      .catch((err) => console.error("[steps] failed to request background access:", err));
+    steps.ensureBackgroundAccess().catch((err) => {
+      reportError(err, { operation: "StepsTrackingContext.StepsTrackingProvider" });
+      return undefined;
+    });
   }, [
     canUseNativeSteps,
     isStepsTrackingEnabled,
@@ -204,7 +206,10 @@ export const StepsTrackingProvider: React.FC<React.PropsWithChildren> = ({ child
       }
     };
 
-    syncLiveSteps().catch((err) => console.error("[steps] failed to sync live steps:", err));
+    syncLiveSteps().catch((err) => {
+      reportError(err, { operation: "StepsTrackingContext.StepsTrackingProvider" });
+      return undefined;
+    });
   }, [
     canUseNativeSteps,
     dailyGoal,

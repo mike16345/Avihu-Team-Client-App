@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { semanticColors } from "@/themes/semanticColors";
 import { useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
@@ -25,7 +26,7 @@ const QuestionnaireExitButton = () => {
       await handleLogout();
       setIsModalOpen(false);
     } catch (e) {
-      console.error("Error during logout:", e);
+      reportError(e, { operation: "QuestionnaireExitButton.onConfirmExit" });
     } finally {
       setIsLoggingOut(false);
     }

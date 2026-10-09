@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { isNotFoundError } from "@/API/api";
 import AgreementPdfViewerScreen from "@/screens/Agreement/AgreementPdfViewerScreen";
 import AgreementQuestionsScreen from "@/screens/Agreement/AgreementQuestionsScreen";
@@ -73,8 +74,7 @@ const AgreementStack = () => {
         navigation.replace("BottomTabs");
         return;
       }
-
-      console.error("Error loading agreement:", error);
+      reportError(error, { operation: "AgreementStack.loadAgreement" });
     } finally {
       setIsLoading(false);
     }

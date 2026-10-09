@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import useStyles from "@/styles/useGlobalStyles";
 import { Dimensions, View } from "react-native";
 import RecordExerciseHeader from "./RecordExerciseHeader";
@@ -19,10 +20,8 @@ import { useWorkoutSessionStore } from "@/store/workoutSessionStore";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { DEFAULT_PAGE_TOP_PADDING } from "@/constants/Constants";
 
-interface RecordExerciseProps extends StackNavigatorProps<
-  WorkoutPlanStackParamList,
-  "RecordExercise"
-> {}
+interface RecordExerciseProps
+  extends StackNavigatorProps<WorkoutPlanStackParamList, "RecordExercise"> {}
 
 function hasRecordedSets(data: IMuscleGroupRecordedSets[], exercise: string) {
   for (const muscleGroup of data) {
@@ -105,6 +104,8 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
         });
         return true;
       } catch (e) {
+        reportError(e, { operation: "RecordExercise.handleRecordSets" });
+
         triggerErrorToast({ message: e instanceof Error ? e.message : "שגיאה" });
         return false;
       }
@@ -124,6 +125,8 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
         });
         return nextSet;
       } catch (e) {
+        reportError(e, { operation: "RecordExercise.handleRecordSetsWheel" });
+
         triggerErrorToast({ message: e instanceof Error ? e.message : "שגיאה" });
         return undefined;
       }
@@ -146,6 +149,8 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
         });
         return { setId };
       } catch (e) {
+        reportError(e, { operation: "RecordExercise.handleUpdateSet" });
+
         triggerErrorToast({ message: e instanceof Error ? e.message : "שגיאה" });
         return undefined;
       }
@@ -169,6 +174,8 @@ const RecordExercise: FC<RecordExerciseProps> = ({ route }) => {
         });
         return true;
       } catch (e) {
+        reportError(e, { operation: "RecordExercise.handleDeleteSet" });
+
         triggerErrorToast({ message: e instanceof Error ? e.message : "שגיאה" });
         return false;
       }

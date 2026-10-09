@@ -6,7 +6,11 @@ import { setReportingSecrets } from "./sanitize";
 
 const syncSecrets = (): void => {
   let apiKey: string | undefined;
-  try { apiKey = getApiKey(); } catch { /* Missing config is handled by the API consumer. */ }
+  try {
+    apiKey = getApiKey();
+  } catch {
+    /* Missing config is handled by the API consumer. */
+  }
   setReportingSecrets([apiKey, getAccessToken(), getRefreshToken()]);
 };
 
@@ -14,7 +18,9 @@ export const syncReportingUser = (userId: string | null): void => {
   try {
     Sentry.setUser(userId ? { id: userId } : null);
     syncSecrets();
-  } catch { /* Monitoring must not interfere with session updates. */ }
+  } catch {
+    /* Monitoring must not interfere with session updates. */
+  }
 };
 
 export const subscribeReportingUser = (): (() => void) => {
@@ -25,5 +31,8 @@ export const subscribeReportingUser = (): (() => void) => {
     }
   });
   const unsubscribeAuth = subscribeAuthSession(syncSecrets);
-  return () => { unsubscribeUser(); unsubscribeAuth(); };
+  return () => {
+    unsubscribeUser();
+    unsubscribeAuth();
+  };
 };

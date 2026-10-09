@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { isNotFoundError } from "@/API/api";
 import { getCurrentAuthUser, refreshAccessToken } from "@/API/authApi";
 import { NO_ACCESS, SESSION_EXPIRED } from "@/constants/Constants";
@@ -111,14 +112,17 @@ const RootNavigator = () => {
           setCurrentUser(nextUser as IUser);
         }
       } catch (e) {
-        console.error(e);
+        reportError(e, { operation: "RootNavigator.bootstrap" });
       } finally {
         setLoading(false);
       }
     };
 
     bootstrap();
-    requestPermissions().catch((err) => console.log(err));
+    requestPermissions().catch((err) => {
+      reportError(err, { operation: "RootNavigator.RootNavigator" });
+      return undefined;
+    });
   }, []);
 
   useEffect(() => {
@@ -152,6 +156,7 @@ const RootNavigator = () => {
           if (isNotFoundError(error)) {
             return null;
           }
+          reportError(error, { operation: "RootNavigator.resolveOnboardingForm" });
 
           return null;
         }

@@ -21,7 +21,7 @@ const useUpdateWeighIn = () => {
       return result;
     } catch (error: any) {
       triggerErrorToast({ message: error?.message });
-      return Promise.reject(error?.message);
+      throw error;
     }
   };
 

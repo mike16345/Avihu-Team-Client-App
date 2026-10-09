@@ -1,3 +1,4 @@
+import { reportError } from "@/services/errorReporting/reportError";
 import { Keyboard } from "react-native";
 import { useState } from "react";
 import useStyles from "@/styles/useGlobalStyles";
@@ -82,6 +83,8 @@ const RegisterForm = () => {
         message: "ניצור איתך קשר בהקדם האפשרי",
       });
     } catch (error) {
+      reportError(error, { operation: "RegisterForm.handleSubmit" });
+
       triggerErrorToast({ message: "שגיאה בשמירת הפרטים" });
     } finally {
       setLoading(false);

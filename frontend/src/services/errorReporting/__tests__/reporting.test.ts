@@ -4,10 +4,15 @@ import { reportError, setErrorReporter } from "../reportError";
 
 describe("diagnostic sanitization", () => {
   it("retains Hebrew answers while removing nested credentials and signed queries", () => {
-    const clean = sanitizeDiagnostics({ answer: "כאב בברך", password: "PRIVATE", nested: {
-      Authorization: "Bearer PRIVATE", refreshToken: "PRIVATE",
-      url: "https://s3.example/photo?X-Amz-Signature=PRIVATE&format=jpg",
-    }});
+    const clean = sanitizeDiagnostics({
+      answer: "כאב בברך",
+      password: "PRIVATE",
+      nested: {
+        Authorization: "Bearer PRIVATE",
+        refreshToken: "PRIVATE",
+        url: "https://s3.example/photo?X-Amz-Signature=PRIVATE&format=jpg",
+      },
+    });
     expect(JSON.stringify(clean)).toContain("כאב בברך");
     expect(JSON.stringify(clean)).not.toContain("PRIVATE");
     expect(JSON.stringify(clean)).toContain("format=jpg");
@@ -18,7 +23,12 @@ describe("diagnostic sanitization", () => {
     Object.assign(error, { cause: original });
     const value: Record<string, unknown> = { error };
     value.circular = value;
-    Object.defineProperty(value, "bad", { enumerable: true, get() { throw new Error("getter"); } });
+    Object.defineProperty(value, "bad", {
+      enumerable: true,
+      get() {
+        throw new Error("getter");
+      },
+    });
     const serialized = JSON.stringify(sanitizeDiagnostics(value));
     expect(serialized).toContain("read failed");
     expect(serialized).toContain("Circular");
@@ -35,8 +45,22 @@ describe("diagnostic sanitization", () => {
     expect(JSON.stringify(sanitizeDiagnostics(large.rows))).not.toContain("149");
   });
   it("sanitizes SDK events and breadcrumbs including exception strings", () => {
-    const event = sanitizeSentryEvent({ exception: { values: [{ type: "Error", value: "request https://s3.example/a?X-Amz-Credential=PRIVATE failed Authorization: Bearer PRIVATE" }] }, request: { headers: { Authorization: "PRIVATE" } } });
-    const breadcrumb = sanitizeSentryBreadcrumb({ message: "request https://s3.example/a?X-Amz-Signature=PRIVATE", data: { cookie: "PRIVATE" } });
+    const event = sanitizeSentryEvent({
+      exception: {
+        values: [
+          {
+            type: "Error",
+            value:
+              "request https://s3.example/a?X-Amz-Credential=PRIVATE failed Authorization: Bearer PRIVATE",
+          },
+        ],
+      },
+      request: { headers: { Authorization: "PRIVATE" } },
+    });
+    const breadcrumb = sanitizeSentryBreadcrumb({
+      message: "request https://s3.example/a?X-Amz-Signature=PRIVATE",
+      data: { cookie: "PRIVATE" },
+    });
     expect(JSON.stringify(event)).not.toContain("PRIVATE");
     expect(JSON.stringify(breadcrumb)).not.toContain("PRIVATE");
   });
@@ -46,7 +70,10 @@ describe("reporting boundary", () => {
   beforeEach(() => setErrorReporter(null));
   it("preserves original errors and captures each instance once", () => {
     const captured: Error[] = [];
-    setErrorReporter((error) => { captured.push(error); return "event"; });
+    setErrorReporter((error) => {
+      captured.push(error);
+      return "event";
+    });
     const error = new Error("failure");
     expect(reportError(error, { operation: "chat.send" })).toBe("event");
     expect(reportError(error, { operation: "chat.screen" })).toBeUndefined();
@@ -56,7 +83,10 @@ describe("reporting boundary", () => {
   });
   it("normalizes non-error throws with diagnostic context", () => {
     const captured: { error: Error; context: unknown }[] = [];
-    setErrorReporter((error, context) => { captured.push({ error, context }); return "id"; });
+    setErrorReporter((error, context) => {
+      captured.push({ error, context });
+      return "id";
+    });
     reportError({ reason: "bad response", token: "PRIVATE" }, { operation: "api.read" });
     expect(captured[0].error).toBeInstanceOf(Error);
     expect(JSON.stringify(captured[0].context)).toContain("bad response");
@@ -64,7 +94,9 @@ describe("reporting boundary", () => {
   });
   it("never throws or blocks the original flow when reporting fails", () => {
     expect(reportError(new Error("x"), { operation: "storage.read" })).toBeUndefined();
-    setErrorReporter(() => { throw new Error("reporter offline"); });
+    setErrorReporter(() => {
+      throw new Error("reporter offline");
+    });
     expect(reportError(new Error("x"), { operation: "storage.read" })).toBeUndefined();
   });
 });
